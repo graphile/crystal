@@ -50,180 +50,33 @@ inherit directly from `ExecutableStep`.
 
 :::
 
-## Conventions
+## Step function
 
-Your step may implement any additional methods that it needs; however certain methods
-have special meaning. For example, if your step represents an object then it should
-implement the `.get(key)` method; and if the step represents an array/list then it
-should implement the `.at(index)` method.
+By convention, we always define a function that constructs an instance of our
+class so we don't see the `new` calls or redundant `Step` text in our plan
+resolver functions.
 
-These conventions are still evolving, and more may be added as common usage patterns are
-detected. Functions that have special meanings/expectations can be found below:
-
-### at
-
-Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
-integer, which represents the index within the list-like value which should be accessed.
-
-Usage:
+This function is typically named after the corresponding
+step class, but with the first letter in lower case and the `Step` suffix
+omitted, for example `AddStep` would become `add`:
 
 ```ts
-import { access } from "grafast";
-
-class MyListStep extends ExecutableStep {
-  // ...
-
-  at(index) {
-    // Your step may implement a more optimized solution here.
-    return access(this, index);
-  }
+function add($a, $b) {
+  return new AddStep($a, $b);
 }
 ```
 
-:::caution
-
-If your step implements `.at()`, make sure it meets the expectations:
-ie it correctly accepts a single argument an integer.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
-
-:::
-
-### get
-
-Implement `.get()` if your step represents an object. It should accept a single argument, a
-string, which represents an attribute to access an object-like value.
-
-```ts
-import { access } from "grafast";
-
-class MyObjectStep extends ExecutableStep {
-  // ...
-
-  get(key) {
-    // Your step may implement a more optimized solution here.
-    return access(this, key);
-  }
-}
-```
-
-:::caution
-
-If your step implements `.get()`, make sure it meets the expectations:
-ie it correctly accepts a single argument of a string.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
-
-:::
-
-## Built in methods
-
-Your custom step class will have access to all the built-in methods that come
-as part of `ExecutableStep`.
-
-### addDependency
-
-When your step requires another step's value in order to execute (which is the
-case for the majority of steps!) it must add a dependency via the
-`this.addDependency($otherStep)` method. This method will return a number,
-which is the index in the `execute` values tuple that represents this step.
-
-It's common to do this in the constructor, but it can be done at other stages
-too, for example during the optimize phase a step's descendent might ask it to
-do additional work, and that work might depend on another step.
-
-In the [getting started][] guide we saw the constructor for the `AddStep` step
-class added two dependencies:
-
-```ts
-class AddStep extends ExecutableStep {
-  constructor($a, $b) {
-    super();
-    this.addDependency($a); // Returns 0
-    this.addDependency($b); // Returns 1
-  }
-```
-
-:::warning Steps are ethemeral, never store a reference to a step.
-
-You must never store a reference to another step directly (or indirectly) in
-your step class. Steps come and go at quite a rate during planning - being
-removed due to deduplicate, optimize, or tree shaking lifecycle events.
-Referring to a step that no longer exists is likely to make your program have
-very unexpected behaviors and/or crash.
-
-In the exceedingly unlikely event that you need to reference another step but it
-is not a dependency, use its `id` ─ you can then look up the step associated
-with that `id` at a later time; if it exists it may be different to the step you
-remember, but it should serve the same purpose. However, it may have been
-deleted due to tree shaking - if this causes a problem, then maybe that step
-should have been a dependency after all?
-
-:::
-
-### addUnaryDependency
-
-Sometimes you'll want to ensure that one or more of the steps your step class
-depends on will have exactly one value at runtime; to do so, you can use
-`this.addUnaryDependency($step)` rather than `this.addDependency($step)`. This
-asserts that the given dependency is a **unary step** (a regular step which the
-system has determined will always represent exactly one value) and is primarily
-useful when a parameter to a remote service request needs to be the same for
-all entries in the batch; typically this will be the case for ordering,
-pagination and access control.
-
-:::warning Use with caution.
-
-`this.addUnaryDependency($step)` will raise an error during planning if the
-given `$step` is not unary, so you should be very careful using it. If in
-doubt, use `this.addDependency($step)` instead.
-
-The system steps which represent request–level data (e.g. context, variable and
-argument values) are always unary steps, and &ZeroWidthSpace;<grafast /> will
-automatically determine which other steps are also unary steps.
-
-It's generally intended for `addUnaryDependency` to be used for arguments and
-their derivatives; it can also be used with `context`-derived values, but there
-is complexity when it comes to mutations since `context` is mutable (whereas
-input values are not).
-
-:::
-
-### getDep
-
-Pass in the number of the dependency (`0` for the first dependency, `1` for the
-second, and so on) and Grafast will return the corresponding step. This should
-only be used before or during the `optimize` phase.
-
-For example in the `AddStep` example above we might have:
-
-```ts
-const $a = this.getDep(0);
-const $b = this.getDep(1);
-```
-
-### getDepDeep
-
-_EXPERIMENTAL_
-
-Like `getDep`, but skips over `__ItemStep` and similar builtin intermediary
-steps to try and get to the original source. Typically useful if you have a
-step representing an entry from a collection (e.g. a database "row") and you
-want to get the step representing the entire collection (e.g. a database
-`SELECT` statement).
-
-### toString
-
-Pretty formatting for the step.
-
-```ts
-console.log("$a = " + $a.toString());
-```
-
-### toStringMeta
-
-You may override this to add additional data to the `toString` method (the data
-that would occur between the triangular brackets).
+There's multiple reasons for this, a simple one is to make the plan code
+easier to read: we won't see the `new` calls in our plan resolver functions,
+nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
+More importantly, though, is that the small layer of indirection allows us to
+do some minor manipulations before handing off to the class constructor, and
+makes the APIs more future-proof since we can have the function return
+something different in future without having to refactor our plans in the
+schema. And remember that this cost is only incurred at planning time (which is
+generally cached and can be re-used for similar future requests), and each
+field is only planned once, so the overhead of an additional function call is
+negligible.
 
 ## Lifecycle methods
 
@@ -515,6 +368,185 @@ should use the `optimize` method to do so.
 
 :::
 
+## Custom Methods
+
+conventions blurb, list of likely future keywords (import, export, defer, filter, order, merge)
+
+### Conventions
+
+Your step may implement any additional methods that it needs; however certain methods
+have special meaning. For example, if your step represents an object then it should
+implement the `.get(key)` method; and if the step represents an array/list then it
+should implement the `.at(index)` method.
+
+These conventions are still evolving, and more may be added as common usage patterns are
+detected. Functions that have special meanings/expectations can be found below:
+
+### at
+
+Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
+integer, which represents the index within the list-like value which should be accessed.
+
+Usage:
+
+```ts
+import { access } from "grafast";
+
+class MyListStep extends ExecutableStep {
+  // ...
+
+  at(index) {
+    // Your step may implement a more optimized solution here.
+    return access(this, index);
+  }
+}
+```
+
+:::caution
+
+If your step implements `.at()`, make sure it meets the expectations:
+ie it correctly accepts a single argument an integer.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
+### get
+
+Implement `.get()` if your step represents an object. It should accept a single argument, a
+string, which represents an attribute to access an object-like value.
+
+```ts
+import { access } from "grafast";
+
+class MyObjectStep extends ExecutableStep {
+  // ...
+
+  get(key) {
+    // Your step may implement a more optimized solution here.
+    return access(this, key);
+  }
+}
+```
+
+:::caution
+
+If your step implements `.get()`, make sure it meets the expectations:
+ie it correctly accepts a single argument of a string.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
+## Built in methods
+
+Your custom step class will have access to all the built-in methods that come
+as part of `ExecutableStep`.
+
+### addDependency
+
+When your step requires another step's value in order to execute (which is the
+case for the majority of steps!) it must add a dependency via the
+`this.addDependency($otherStep)` method. This method will return a number,
+which is the index in the `execute` values tuple that represents this step.
+
+It's common to do this in the constructor, but it can be done at other stages
+too, for example during the optimize phase a step's descendent might ask it to
+do additional work, and that work might depend on another step.
+
+In the [getting started][] guide we saw the constructor for the `AddStep` step
+class added two dependencies:
+
+```ts
+class AddStep extends ExecutableStep {
+  constructor($a, $b) {
+    super();
+    this.addDependency($a); // Returns 0
+    this.addDependency($b); // Returns 1
+  }
+```
+
+:::warning Steps are ethemeral, never store a reference to a step.
+
+You must never store a reference to another step directly (or indirectly) in
+your step class. Steps come and go at quite a rate during planning - being
+removed due to deduplicate, optimize, or tree shaking lifecycle events.
+Referring to a step that no longer exists is likely to make your program have
+very unexpected behaviors and/or crash.
+
+In the exceedingly unlikely event that you need to reference another step but it
+is not a dependency, use its `id` ─ you can then look up the step associated
+with that `id` at a later time; if it exists it may be different to the step you
+remember, but it should serve the same purpose. However, it may have been
+deleted due to tree shaking - if this causes a problem, then maybe that step
+should have been a dependency after all?
+
+:::
+
+### addUnaryDependency
+
+Sometimes you'll want to ensure that one or more of the steps your step class
+depends on will have exactly one value at runtime; to do so, you can use
+`this.addUnaryDependency($step)` rather than `this.addDependency($step)`. This
+asserts that the given dependency is a **unary step** (a regular step which the
+system has determined will always represent exactly one value) and is primarily
+useful when a parameter to a remote service request needs to be the same for
+all entries in the batch; typically this will be the case for ordering,
+pagination and access control.
+
+:::warning Use with caution.
+
+`this.addUnaryDependency($step)` will raise an error during planning if the
+given `$step` is not unary, so you should be very careful using it. If in
+doubt, use `this.addDependency($step)` instead.
+
+The system steps which represent request–level data (e.g. context, variable and
+argument values) are always unary steps, and &ZeroWidthSpace;<grafast /> will
+automatically determine which other steps are also unary steps.
+
+It's generally intended for `addUnaryDependency` to be used for arguments and
+their derivatives; it can also be used with `context`-derived values, but there
+is complexity when it comes to mutations since `context` is mutable (whereas
+input values are not).
+
+:::
+
+### getDep
+
+Pass in the number of the dependency (`0` for the first dependency, `1` for the
+second, and so on) and Grafast will return the corresponding step. This should
+only be used before or during the `optimize` phase.
+
+For example in the `AddStep` example above we might have:
+
+```ts
+const $a = this.getDep(0);
+const $b = this.getDep(1);
+```
+
+### getDepDeep
+
+_EXPERIMENTAL_
+
+Like `getDep`, but skips over `__ItemStep` and similar builtin intermediary
+steps to try and get to the original source. Typically useful if you have a
+step representing an entry from a collection (e.g. a database "row") and you
+want to get the step representing the entire collection (e.g. a database
+`SELECT` statement).
+
+### toString
+
+Pretty formatting for the step.
+
+```ts
+console.log("$a = " + $a.toString());
+```
+
+### toStringMeta
+
+You may override this to add additional data to the `toString` method (the data
+that would occur between the triangular brackets).
+
 ## Other properties
 
 ### id
@@ -602,34 +634,6 @@ The `loadMany` and `loadOne` standard steps make use of this key to optimize
 value caching, you may want to look at them for more inspiration.
 
 :::
-
-## Step function
-
-By convention, we always define a function that constructs an instance of our
-class so we don't see the `new` calls or redundant `Step` text in our plan
-resolver functions.
-
-This function is typically named after the corresponding
-step class, but with the first letter in lower case and the `Step` suffix
-omitted, for example `AddStep` would become `add`:
-
-```ts
-function add($a, $b) {
-  return new AddStep($a, $b);
-}
-```
-
-There's multiple reasons for this, a simple one is to make the plan code
-easier to read: we won't see the `new` calls in our plan resolver functions,
-nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
-More importantly, though, is that the small layer of indirection allows us to
-do some minor manipulations before handing off to the class constructor, and
-makes the APIs more future-proof since we can have the function return
-something different in future without having to refactor our plans in the
-schema. And remember that this cost is only incurred at planning time (which is
-generally cached and can be re-used for similar future requests), and each
-field is only planned once, so the overhead of an additional function call is
-negligible.
 
 [plan resolvers]: ./plan-resolvers
 [getting started]: ./getting-started
