@@ -368,11 +368,7 @@ should use the `optimize` method to do so.
 
 :::
 
-## Custom Methods
-
-conventions blurb, list of likely future keywords (import, export, defer, filter, order, merge)
-
-### Conventions
+## Custom methods and conventions
 
 Your step may implement any additional methods that it needs; however certain methods
 have special meaning. For example, if your step represents an object then it should
@@ -380,7 +376,11 @@ implement the `.get(key)` method; and if the step represents an array/list then 
 should implement the `.at(index)` method.
 
 These conventions are still evolving, and more may be added as common usage patterns are
-detected. Functions that have special meanings/expectations can be found below:
+detected. Some likely candidates for future reserved methods include: import, export,
+defer, filter, order and merge. To avoid conflicts with built in and future methods,
+consider using a prefix when naming custom methods.
+
+Functions that have special meanings/expectations can be found below:
 
 ### at
 
