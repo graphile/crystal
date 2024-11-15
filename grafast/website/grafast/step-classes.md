@@ -316,7 +316,7 @@ equivalent of `SELECT *` - it can be more selective). However, since
 can simply replace itself during `optimize` with its parent step (typically an
 `__ItemStep`).
 
-The builtin `each` step uses `optimize` to replace itself with the underlying
+The built-in `each` step uses `optimize` to replace itself with the underlying
 list where possible.
 
 #### Optimize: simplification
@@ -528,7 +528,7 @@ const $b = this.getDep(1);
 
 _EXPERIMENTAL_
 
-Like `getDep`, but skips over `__ItemStep` and similar builtin intermediary
+Like `getDep`, but skips over `__ItemStep` and similar built-in intermediary
 steps to try and get to the original source. Typically useful if you have a
 step representing an entry from a collection (e.g. a database "row") and you
 want to get the step representing the entire collection (e.g. a database
