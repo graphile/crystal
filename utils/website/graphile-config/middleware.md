@@ -206,6 +206,32 @@ type SomeActionResult = number;
 
 export type PromiseOrDirect<T> = Promise<T> | T;
 
+/***** index.ts *****/
+
+import type { MiddlewareHandlers } from "graphile-config";
+
+// Extend Plugin with support for registering handlers for the middleware activities:
+declare global {
+  namespace GraphileConfig {
+    interface Plugin {
+      libraryName?: {
+        middleware?: MiddlewareHandlers<MyMiddleware>;
+
+        // Prior to graphile-config@0.0.1-beta.12, a more verbose alternative was required:
+        /*
+        middleware?: {
+          [key in keyof MyMiddleware]?: CallbackOrDescriptor<
+            MyMiddleware[key] extends (...args: infer UArgs) => infer UResult
+              ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
+              : never
+          >;
+        };
+        */
+      };
+    }
+  }
+}
+
 /***** getMiddleware.ts *****/
 
 import { Middleware, orderedApply, resolvePresets } from "graphile-config";
