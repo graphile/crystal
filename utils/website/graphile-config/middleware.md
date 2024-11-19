@@ -185,7 +185,6 @@ library):
 
 ```ts
 import { Middleware, orderedApply, resolvePresets } from "graphile-config";
-type PromiseOrDirect<T> = Promise<T> | T;
 
 // Get the user's Graphile Config from somewhere, e.g.
 import config from "./graphile.config.js";
@@ -194,6 +193,7 @@ import config from "./graphile.config.js";
 const resolvedPreset = resolvePresets([config]);
 
 /***** interfaces.ts *****/
+export type PromiseOrDirect<T> = Promise<T> | T;
 
 // Define the middlewares that you support, their event type and their return type
 interface MyMiddleware {
