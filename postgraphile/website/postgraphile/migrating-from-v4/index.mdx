@@ -247,7 +247,8 @@ as possible when you use `makeV4Preset()`, but some breaking changes persist
 issues to you they can all be solved by writing a plugin to shape the GraphQL
 API how you need, but we suggest that if possible you accept these new changes.
 
-- The long deprecated "legacy relations" are no longer generated.
+- The long deprecated "legacy relations" are no longer generated (so the
+  `legacyRelations` configuration parameter has been deleted)
 - Node IDs for bigint columns have changed (specifically numbers under
   `MAX_SAFE_INT` now have quote marks inside the encoding too)
 - In alignment with the
