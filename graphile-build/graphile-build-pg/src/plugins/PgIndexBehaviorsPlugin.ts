@@ -117,34 +117,25 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRelation: {
-        inferred: [
-          {
-            provides: ["inferred"],
-            callback(behavior) {
-              return [`select`, behavior];
-            },
-          },
-          {
-            after: ["inferred"],
-            provides: ["postInferred"],
-            callback(behavior, relation) {
-              const newBehavior = [behavior];
-              if (relation.extensions?.isIndexed === false) {
-                newBehavior.push(
-                  "-select", // <<<<<
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, relation) {
+            const newBehavior = [behavior];
+            if (relation.extensions?.isIndexed === false) {
+              newBehavior.push(
+                "-select",
+                "-list",
+                "-connection",
+                "-single",
 
-                  "-list",
-                  "-connection",
-                  "-single",
-
-                  // HACK: this impacts a community plugin and isn't part of core.
-                  "-manyToMany",
-                );
-              }
-              return newBehavior;
-            },
+                // HACK: this impacts a community plugin and isn't part of core.
+                "-manyToMany",
+              );
+            }
+            return newBehavior;
           },
-        ],
+        },
       },
     },
   },
