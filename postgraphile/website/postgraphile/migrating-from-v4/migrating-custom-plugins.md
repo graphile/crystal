@@ -22,6 +22,8 @@ Here's the rough process:
 1. Upgrade to V5 dependencies
 1. Turn on strict typing
 1. Fix the TypeScript errors
+1. Ensure your tests still pass
+1. Make your plugin exportable (optional)
 
 Here's some expansion on the topics above
 
@@ -172,6 +174,11 @@ with
 details](https://github.com/graphile/crystal/edit/main/postgraphile/website/postgraphile/migrating-from-v4/migrating-custom-plugins.md) -
 thanks for contributing to making everyone's migration to V5 easier!
 
+### Make your plugin exportable (optional)
+
+TODO: document this! For now, see: [Exporting your schema](../exporting-schema)
+and https://star.graphile.org/graphile-export/
+
 ## TypeScript
 
 It is **very strongly recommended** that you write plugins in TypeScript. There
@@ -201,6 +208,7 @@ you'll work with are `GraphileConfig` and `GraphileBuild`.
 Many of the types need to be converted, here's a few:
 
 - `import("graphile-build").Build` -> `GraphileBuild.Build`
+- `import("graphile-build").Inflection` -> `GraphileBuild.Inflection`
 - `import("graphile-build").Plugin` -> `GraphileConfig.Plugin` (the `inflection`, `gather` and `schema` scopes therein)
 - `import("postgraphile").PostGraphilePlugin` -> `GraphileConfig.Plugin` (the `grafast` and `grafserv` scopes therein)
 - `import("postgraphile").PostGraphileOptions` -> `GraphileConfig.Preset` (split across the various scopes therein)
