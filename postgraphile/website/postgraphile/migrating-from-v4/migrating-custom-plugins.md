@@ -20,6 +20,7 @@ Here's the rough process:
 1. Convert your tests to TypeScript (or use `// @ts-check`) and fix errors
 1. Ensure your tests still pass
 1. Upgrade to V5 dependencies
+1. Perform basic code transforms
 1. Turn on strict typing
 1. Fix the TypeScript errors
 1. Ensure your tests still pass
@@ -149,6 +150,91 @@ now be just:
 You should do this for `graphql` as well: `import { ... } from "postgraphile/graphql"`.
 
 :::
+
+### Perform basic code transforms
+
+TODO: write some codemods to help with this.
+
+See [Plugins](#plugins) below for full details, but essentially a V4 plugin like:
+
+```ts title="v4.ts"
+import { Plugin } from "graphile-build";
+
+export const MyPlugin: Plugin = (builder) => {
+  builder.hook("inflection", (inflection, build) => {
+    return build.extend(inflection, {
+      myInflector(stuff) {
+        return stuff + "Stuff";
+      },
+    });
+  });
+
+  builder.hook("build", (build) => {
+    return build.extend(
+      build,
+      { myStuff: () => ["my", "stuff"] },
+      "Adding myStuff to build",
+    );
+  });
+
+  builder.hook("init", (_, build) => {
+    doSomethingWith(build.myStuff());
+    return _;
+  });
+
+  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    return build.extend(
+      fields,
+      { myField: { type: build.graphql.GraphQLString } },
+      "Adding fields from MyPlugin",
+    );
+  });
+};
+```
+
+in V5 would become a declarative structured object rather than a function
+containing a lot of function calls:
+
+```ts title="v5.ts"
+import type {} from "postgraphile";
+
+export const MyPlugin: GraphileConfig.Plugin = {
+  name: "MyPlugin",
+
+  inflection: {
+    add: {
+      myInflector(stuff) {
+        return stuff + "Stuff";
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          { myStuff: () => ["my", "stuff"] },
+          "Adding myStuff to build",
+        );
+      },
+
+      init(_, build) {
+        doSomethingWith(build.myStuff());
+        return _;
+      },
+
+      GraphQLObjectType_fields(fields, build, context) {
+        return build.extend(
+          fields,
+          { myField: { type: build.graphql.GraphQLString } },
+          "Adding fields from MyPlugin",
+        );
+      },
+    },
+  },
+};
+```
 
 ### Turn on strict typing
 
