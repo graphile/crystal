@@ -16,17 +16,15 @@ Here's the rough process:
 
 1. Ensure you have tests and that they pass
 1. Move all `require()` calls to the top (not inside of functions)
-1. Convert the plugin to TypeScript
+1. [Convert the plugin to TypeScript](#convert-the-plugin-to-typescript)
 1. Convert your tests to TypeScript (or use `// @ts-check`) and fix errors
 1. Ensure your tests still pass
-1. Upgrade to V5 dependencies
-1. Perform basic code transforms
-1. Turn on strict typing
-1. Fix the TypeScript errors
+1. [Upgrade to V5 dependencies](#upgrade-to-v5-dependencies)
+1. [Perform basic code transforms](#perform-basic-code-transforms)
+1. [Turn on strict typing](#turn-on-strict-typing)
+1. [Fix the TypeScript errors](#fix-the-typescript-errors)
 1. Ensure your tests still pass
-1. Make your plugin exportable (optional)
-
-Here's some expansion on the topics above
+1. [Make your plugin exportable](#make-your-plugin-exportable) (optional)
 
 ### Convert the plugin to TypeScript
 
@@ -260,7 +258,11 @@ with
 details](https://github.com/graphile/crystal/edit/main/postgraphile/website/postgraphile/migrating-from-v4/migrating-custom-plugins.md) -
 thanks for contributing to making everyone's migration to V5 easier!
 
-### Make your plugin exportable (optional)
+### Make your plugin exportable
+
+This is optional, you only need it if you want people to be able to use
+Graphile Export to export a schema using this plugin as executable code, for
+example to use in serverless situations where bootup time is at a premium.
 
 TODO: document this! For now, see: [Exporting your schema](../exporting-schema)
 and https://star.graphile.org/graphile-export/
