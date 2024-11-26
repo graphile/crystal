@@ -215,7 +215,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 TFieldStep,
                 TArgs
               > => {
-                const { fieldName } = fieldScope;
+                const fieldName = build.assertValidName(
+                  fieldScope.fieldName,
+                  `Object type $1 attempted to define a field with invalid name $0.`,
+                  [Self.name],
+                );
                 build.extend(
                   fieldScope,
                   scope,

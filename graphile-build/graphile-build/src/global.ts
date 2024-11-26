@@ -521,6 +521,19 @@ declare global {
         type: T,
       ): T | GraphQLNonNull<T>;
 
+      /**
+       * @param name - the GraphQL name, also $0 in the message
+       * @param message - e.g. `Object type $1 attempted to define a field with invalid name $0.`
+       * @param args - the arguments to populate in message, from $1 onwards
+       * @param allowDoubleUnderscorePrefix - if true, allow `__` prefix (reserved for introspection)
+       */
+      assertValidName(
+        name: string,
+        message: string,
+        args?: string[],
+        allowDoubleUnderscorePrefix?: boolean,
+      ): string;
+
       _pluginMeta: {
         [pluginName: string]: Record<string, any> | undefined;
       };
