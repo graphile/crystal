@@ -146,10 +146,20 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           ? null
           : {
               // Don't rename 'id' to 'rowId'
-              _attributeName(previous, options, { codec, attributeName }) {
+              _attributeName(previous, options, details) {
+                const { codec, attributeName } = details;
                 const attribute = codec.attributes[attributeName];
-                const name = attribute.extensions?.tags?.name || attributeName;
-                return this.coerceToGraphQLName(name);
+                const baseName =
+                  attribute.extensions?.tags?.name || attributeName;
+                const name = previous!(details);
+                if (
+                  baseName === "id" &&
+                  name === "row_id" &&
+                  !codec.isAnonymous
+                ) {
+                  return "id";
+                }
+                return name;
               },
             }),
       },
