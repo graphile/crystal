@@ -2,11 +2,7 @@ import type { Readable } from "node:stream";
 
 import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
-import type {
-  AsyncExecutionResult,
-  ExecutionArgs,
-  ExecutionResult,
-} from "grafast/graphql";
+import type { ExecutionArgs } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";

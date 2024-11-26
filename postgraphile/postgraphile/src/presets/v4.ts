@@ -227,7 +227,8 @@ export type GraphQLErrorExtended = GraphQLError & {
 };
 
 /**
- * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
+ * Extracts the requested fields from a pg error object, handling 'code' to
+ * 'errcode' mapping.
  */
 function pickPgError(
   err: Record<string, unknown>,
@@ -466,10 +467,8 @@ export const makeV4Preset = (
         ...DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES,
         "application/x-www-form-urlencoded",
       ],
-      ...(options.bodySizeLimit != null
-        ? {
-            maxRequestLength: bsl2mrl(options.bodySizeLimit),
-          }
+      ...(bodySizeLimit != null
+        ? { maxRequestLength: bsl2mrl(bodySizeLimit) }
         : null),
     },
   };
