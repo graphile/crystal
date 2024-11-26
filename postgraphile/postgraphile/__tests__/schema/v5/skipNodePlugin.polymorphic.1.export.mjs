@@ -6009,8 +6009,8 @@ enum LogEntryOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   PERSON_ID_ASC
   PERSON_ID_DESC
   ORGANIZATION_ID_ASC
@@ -6936,8 +6936,8 @@ input GcpApplicationThirdPartyVulnerabilityCondition {
 """Methods to use when ordering \`Application\`."""
 enum ApplicationOrderBy {
   NATURAL
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   LAST_DEPLOYED_ASC
@@ -6971,8 +6971,8 @@ type GcpApplicationThirdPartyVulnerabilityEdge {
 """Methods to use when ordering \`Vulnerability\`."""
 enum VulnerabilityOrderBy {
   NATURAL
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   CVSS_SCORE_ASC
@@ -7026,8 +7026,8 @@ enum AwsApplicationOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   LAST_DEPLOYED_ASC
@@ -7095,8 +7095,8 @@ enum GcpApplicationOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   LAST_DEPLOYED_ASC
@@ -7175,8 +7175,8 @@ enum SingleTableItemOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -7490,8 +7490,8 @@ enum RelationalItemOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -7640,8 +7640,8 @@ enum SingleTableItemRelationOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   CHILD_ID_ASC
@@ -8675,8 +8675,8 @@ enum RelationalItemRelationOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   CHILD_ID_ASC
@@ -10367,8 +10367,8 @@ type ZeroImplementationEdge {
 """Methods to use when ordering \`ZeroImplementation\`."""
 enum ZeroImplementationOrderBy {
   NATURAL
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
 }
@@ -10513,8 +10513,8 @@ enum PriorityOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
 }
@@ -10566,8 +10566,8 @@ enum RelationalChecklistOrderBy {
   PRIMARY_KEY_DESC
   TITLE_ASC
   TITLE_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -10662,8 +10662,8 @@ enum RelationalTopicOrderBy {
   PRIMARY_KEY_DESC
   TITLE_ASC
   TITLE_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -10760,8 +10760,8 @@ enum RelationalChecklistItemOrderBy {
   DESCRIPTION_DESC
   NOTE_ASC
   NOTE_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -10861,8 +10861,8 @@ enum RelationalDividerOrderBy {
   TITLE_DESC
   COLOR_ASC
   COLOR_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -10962,8 +10962,8 @@ enum RelationalPostOrderBy {
   DESCRIPTION_DESC
   NOTE_ASC
   NOTE_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   PARENT_ID_ASC
@@ -11062,8 +11062,8 @@ enum FirstPartyVulnerabilityOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   CVSS_SCORE_ASC
@@ -11123,8 +11123,8 @@ enum ThirdPartyVulnerabilityOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   NAME_ASC
   NAME_DESC
   CVSS_SCORE_ASC
@@ -14955,7 +14955,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -14972,7 +14972,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17038,7 +17038,7 @@ export const plans = {
     NATURAL: {
       applyPlan() {}
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17055,7 +17055,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17225,7 +17225,7 @@ export const plans = {
     NATURAL: {
       applyPlan() {}
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17242,7 +17242,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17462,7 +17462,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17479,7 +17479,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17868,7 +17868,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -17885,7 +17885,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -18283,7 +18283,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -18300,7 +18300,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -19008,7 +19008,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -19025,7 +19025,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -19708,7 +19708,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -19725,7 +19725,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -22123,7 +22123,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -22140,7 +22140,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -25807,7 +25807,7 @@ export const plans = {
     NATURAL: {
       applyPlan() {}
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -25824,7 +25824,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -26341,7 +26341,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -26358,7 +26358,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -26553,7 +26553,7 @@ export const plans = {
         }
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -26570,7 +26570,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -27244,7 +27244,7 @@ export const plans = {
         }
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -27261,7 +27261,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -27969,7 +27969,7 @@ export const plans = {
         }
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -27986,7 +27986,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -28717,7 +28717,7 @@ export const plans = {
         }
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -28734,7 +28734,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -29499,7 +29499,7 @@ export const plans = {
         }
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -29516,7 +29516,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -30202,7 +30202,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -30219,7 +30219,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -30494,7 +30494,7 @@ export const plans = {
         step.setOrderIsUnique();
       }
     },
-    ID_ASC: {
+    ROW_ID_ASC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
@@ -30511,7 +30511,7 @@ export const plans = {
         }
       }
     },
-    ID_DESC: {
+    ROW_ID_DESC: {
       applyPlan(plan) {
         if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
           throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
