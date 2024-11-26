@@ -1,6 +1,7 @@
 import "graphile-config";
 
-import type { GraphQLError } from "grafast/graphql";
+import type { GraphQLError, GraphQLFormattedError } from "grafast/graphql";
+import { formatError as defaultFormatError } from "grafast/graphql";
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
 import type { IncomingMessage, ServerResponse } from "http";
 
@@ -71,10 +72,17 @@ export interface V4Options<
   graphiqlRoute?: string;
   eventStreamRoute?: string;
   graphiql?: boolean;
+  /**
+   * preset.grafserv.maxRequestLength: the length, in bytes, for the largest
+   * request body that grafserv will accept. String values no longer supported.
+   */
+  bodySizeLimit?: number;
   /** Always ignored, ruru is always enhanced. */
   enhanceGraphiql?: boolean;
   allowExplain?: boolean;
   handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
+  extendedErrors?: string[];
+  showErrorStack?: boolean | "json";
 
   /**
    * As of PostGraphile v5, query batching is no longer supported. Query batching
@@ -197,6 +205,142 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
   };
 };
 
+/** bodySizeLimit to maxRequestLength */
+function bsl2mrl(bsl: number | string) {
+  if (typeof bsl !== "number") {
+    throw new Error(
+      `bodySizeLimit must now be a number of bytes, string formats are no longer supported`,
+    );
+  } else {
+    return bsl;
+  }
+}
+
+export type GraphQLErrorExtended = GraphQLError & {
+  extensions: {
+    exception: {
+      hint?: string;
+      detail?: string;
+      code: string;
+    };
+  };
+};
+
+/**
+ * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
+ */
+function pickPgError(
+  err: Record<string, unknown>,
+  inFields: string | Array<string>,
+): Record<string, string | null | undefined> {
+  const result: Record<string, string | null | undefined> = Object.create(null);
+  let fields;
+  if (Array.isArray(inFields)) {
+    fields = inFields;
+  } else if (typeof inFields === "string") {
+    fields = inFields.split(",");
+  } else {
+    throw new Error(
+      "Invalid argument to extendedErrors - expected array of strings",
+    );
+  }
+
+  if (err && typeof err === "object") {
+    fields.forEach((field: string) => {
+      // pg places 'errcode' on the 'code' property
+      if (typeof field !== "string") {
+        throw new Error(
+          "Invalid argument to extendedErrors - expected array of strings",
+        );
+      }
+      const errField = field === "errcode" ? "code" : field;
+      result[field] =
+        err[errField] != null
+          ? String(err[errField])
+          : (err[errField] as null | undefined);
+    });
+  }
+  return result;
+}
+
+/**
+ * Given a GraphQLError, format it according to the rules described by the
+ * Response Format, Errors section of the GraphQL Specification, plus it can
+ * extract additional error codes from the postgres error, such as 'hint',
+ * 'detail', 'errcode', 'where', etc. - see `extendedErrors` option.
+ */
+function extendedFormatError(
+  error: GraphQLError,
+  fields: Array<string>,
+): GraphQLFormattedError {
+  if (!error) {
+    throw new Error("Received null or undefined error.");
+  }
+  const originalError = error.originalError as
+    | Record<string, unknown>
+    | undefined;
+  const exceptionDetails =
+    originalError && fields ? pickPgError(originalError, fields) : undefined;
+  return {
+    message: error.message,
+    locations: error.locations,
+    path: error.path,
+    ...(exceptionDetails
+      ? {
+          // Reference: https://facebook.github.io/graphql/draft/#sec-Errors
+          extensions: {
+            ...(originalError?.extensions as
+              | Record<string, any>
+              | null
+              | undefined),
+            exception: exceptionDetails,
+          },
+        }
+      : null),
+  };
+}
+
+function makeMaskErrorConfig<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse,
+>(
+  options: V4Options<Request, Response>,
+): GraphileConfig.GrafservOptions | null {
+  const { extendedErrors, showErrorStack, handleErrors } = options;
+  if (handleErrors) {
+    if (extendedErrors || showErrorStack) {
+      throw new Error(
+        `handleErrors cannot be combined with extendedErrors / showErrorStack`,
+      );
+    }
+    return {
+      maskError(error) {
+        return handleErrors!([error])[0];
+      },
+    };
+  } else if (extendedErrors || showErrorStack) {
+    return {
+      maskError(error) {
+        const formattedError =
+          extendedErrors && extendedErrors.length
+            ? extendedFormatError(error, extendedErrors)
+            : defaultFormatError(error);
+        // If the user wants to see the error’s stack, let’s add it to the
+        // formatted error.
+        if (showErrorStack)
+          (formattedError as Record<string, any>)["stack"] =
+            error.stack != null && showErrorStack === "json"
+              ? error.stack.split("\n")
+              : error.stack;
+
+        return formattedError;
+      },
+    };
+  } else {
+    return null;
+  }
+}
+
 export const makeV4Preset = (
   options: V4Options = {},
 ): GraphileConfig.Preset => {
@@ -214,6 +358,7 @@ export const makeV4Preset = (
   const graphqlPath = options.graphqlRoute ?? "/graphql";
   const graphiqlPath = options.graphiqlRoute ?? "/graphiql";
   const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
+  const bodySizeLimit = options.bodySizeLimit;
   return {
     extends: [PostGraphileAmberPreset],
     plugins: [
@@ -310,23 +455,22 @@ export const makeV4Preset = (
         : null),
     },
     grafserv: {
+      ...makeMaskErrorConfig(options),
       graphqlPath,
       graphiqlPath,
       eventStreamPath,
       graphiql: options.graphiql ?? false,
-      ...(options.handleErrors
-        ? {
-            maskError(error) {
-              return options.handleErrors!([error])[0];
-            },
-          }
-        : null),
       watch: options.watchPg,
       websockets: options.subscriptions,
       allowedRequestContentTypes: [
         ...DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES,
         "application/x-www-form-urlencoded",
       ],
+      ...(options.bodySizeLimit != null
+        ? {
+            maxRequestLength: bsl2mrl(options.bodySizeLimit),
+          }
+        : null),
     },
   };
 };

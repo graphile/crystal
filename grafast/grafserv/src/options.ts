@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 
-import { isAsyncIterable, isSafeError } from "grafast";
+import { isAsyncIterable, isDev, isSafeError } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
+
+import type { MaskErrorFn } from "./interfaces";
 
 const { GraphQLError } = graphql;
 // Only the non-ambiguous characters
@@ -64,22 +66,22 @@ export function defaultMaskError(
   }
 }
 
-export function makeMaskError(
-  callback: (error: graphql.GraphQLError) => graphql.GraphQLError,
-): (error: graphql.GraphQLError) => graphql.GraphQLError {
-  let warnedAboutMaskErrorCallback = false;
-  return (error) => {
-    const path = error.path;
-    const replacement = callback(error);
-    if (!warnedAboutMaskErrorCallback && replacement.path !== path) {
-      warnedAboutMaskErrorCallback = true;
-      console.warn(
-        `[WARNING] Your maskError callback is changing the error path; please reuse the path of the original error to ensure compliance with the GraphQL specification. We will not issue this warning again until the server is restarted or another maskError function is provided.`,
-      );
+export const makeMaskError: (callback: MaskErrorFn) => MaskErrorFn = isDev
+  ? (callback) => {
+      let warnedAboutMaskErrorCallback = false;
+      return (error) => {
+        const path = error.path;
+        const replacement = callback(error);
+        if (!warnedAboutMaskErrorCallback && replacement.path !== path) {
+          warnedAboutMaskErrorCallback = true;
+          console.warn(
+            `[WARNING] Your maskError callback is changing the error path; please reuse the path of the original error to ensure compliance with the GraphQL specification. We will not issue this warning again until the server is restarted or another maskError function is provided.`,
+          );
+        }
+        return replacement;
+      };
     }
-    return replacement;
-  };
-}
+  : (callback) => callback;
 
 export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   const {
