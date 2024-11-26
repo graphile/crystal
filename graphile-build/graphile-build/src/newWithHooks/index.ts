@@ -12,6 +12,7 @@ import type {
   GraphQLInputFieldConfigMap,
   GraphQLNamedType,
   GraphQLOutputType,
+  GraphQLScalarLiteralParser,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
 } from "grafast/graphql";
@@ -134,7 +135,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
+          const rawObjectSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
             any,
             any
           >;
@@ -146,24 +147,34 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const baseSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            interfaces: baseInterfaces,
+            fields: baseFields,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLObjectType",
-            rawSpec,
+            rawObjectSpec,
             build,
             objectContext,
+            `|${rawObjectSpec.name}`,
+          );
 
-            `|${rawSpec.name}`,
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define an object type with invalid name $0.`,
           );
 
           const finalSpec = {
-            ...baseSpec,
+            name: typeName,
+            ...restOfConfig,
             interfaces: (): GraphQLInterfaceType[] => {
               const interfacesContext: GraphileBuild.ContextObjectInterfaces = {
                 ...objectContext,
                 Self,
               };
 
-              let rawInterfaces = rawSpec.interfaces || [];
+              let rawInterfaces = baseInterfaces || [];
               if (typeof rawInterfaces === "function") {
                 rawInterfaces = rawInterfaces(interfacesContext);
               }
@@ -215,6 +226,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 TFieldStep,
                 TArgs
               > => {
+                if (!isString(fieldScope.fieldName)) {
+                  throw new Error(
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
+                  );
+                }
                 const fieldName = build.assertValidName(
                   fieldScope.fieldName,
                   `Object type $1 attempted to define a field with invalid name $0.`,
@@ -225,11 +241,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   scope,
                   "Adding the object type scope to the field's scope",
                 );
-                if (!isString(fieldName)) {
-                  throw new Error(
-                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
-                  );
-                }
                 if (!fieldScope) {
                   throw new Error(
                     "All calls to `fieldWithHooks` must specify a `fieldScope` " +
@@ -313,21 +324,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               };
 
               const rawFields =
-                typeof rawSpec.fields === "function"
-                  ? rawSpec.fields(fieldsContext)
-                  : rawSpec.fields || {};
+                typeof baseFields === "function"
+                  ? baseFields(fieldsContext)
+                  : baseFields || {};
               const fieldsSpec = builder.applyHooks(
                 "GraphQLObjectType_fields",
                 build.extend(
                   Object.create(null),
                   rawFields,
-                  `Default field included in newWithHooks call for '${
-                    rawSpec.name
-                  }'. ${inScope.__origin || ""}`,
+                  `Default field included in newWithHooks call for '${typeName}'. ${
+                    inScope.__origin || ""
+                  }`,
                 ),
                 build,
                 fieldsContext,
-                `|${rawSpec.name}`,
+                `|${typeName}`,
               );
 
               // Finally, check through all the fields that they've all been
@@ -358,10 +369,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLInterfaceType: {
-          const rawSpec = inSpec as GraphileBuild.GrafastInterfaceTypeConfig<
-            any,
-            any
-          >;
+          const rawInterfaceSpec =
+            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any, any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInterface;
 
@@ -369,16 +378,27 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             type: "GraphQLInterfaceType",
             scope,
           };
-          const baseSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            fields: baseFields,
+            interfaces: baseInterfaces,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLInterfaceType",
-            rawSpec,
+            rawInterfaceSpec,
             build,
             interfaceContext,
-            `|${rawSpec.name}`,
+            `|${rawInterfaceSpec.name}`,
+          );
+
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define an interface type with invalid name $0.`,
           );
 
           const finalSpec = {
-            ...baseSpec,
+            name: typeName,
+            ...restOfConfig,
             fields: () => {
               const processedFields: GraphQLFieldConfig<any, any>[] = [];
               const fieldsContext: GraphileBuild.ContextInterfaceFields = {
@@ -472,21 +492,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 },
               };
               const rawFields =
-                (typeof rawSpec.fields === "function"
-                  ? rawSpec.fields(fieldsContext)
-                  : rawSpec.fields) || {};
+                (typeof baseFields === "function"
+                  ? baseFields(fieldsContext)
+                  : baseFields) || {};
               const fieldsSpec = builder.applyHooks(
                 "GraphQLInterfaceType_fields",
                 build.extend(
                   Object.create(null),
                   rawFields,
-                  `Default field included in newWithHooks call for '${
-                    rawSpec.name
-                  }'. ${inScope.__origin || ""}`,
+                  `Default field included in newWithHooks call for '${typeName}'. ${
+                    inScope.__origin || ""
+                  }`,
                 ),
                 build,
                 fieldsContext,
-                `|${rawSpec.name}`,
+                `|${typeName}`,
               );
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
@@ -515,15 +535,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   Self,
                 };
               const rawInterfaces =
-                (typeof rawSpec.interfaces === "function"
-                  ? rawSpec.interfaces(interfacesContext)
-                  : rawSpec.interfaces) || [];
+                (typeof baseInterfaces === "function"
+                  ? baseInterfaces(interfacesContext)
+                  : baseInterfaces) || [];
               const interfacesSpec = builder.applyHooks(
                 "GraphQLInterfaceType_interfaces",
                 rawInterfaces,
                 build,
                 interfacesContext,
-                `|${rawSpec.name}`,
+                `|${typeName}`,
               );
               return interfacesSpec;
             },
@@ -535,7 +555,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
+          const rawUnionSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
             any,
             any
           >;
@@ -547,16 +567,26 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const baseSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            types: baseTypes,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLUnionType",
-            rawSpec,
+            rawUnionSpec,
             build,
             commonContext,
-            `|${rawSpec.name}`,
+            `|${rawUnionSpec.name}`,
+          );
+
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define an interface type with invalid name $0.`,
           );
 
           const finalSpec = {
-            ...baseSpec,
+            name: typeName,
+            ...restOfConfig,
             types: (): GraphQLObjectType[] => {
               const typesContext: GraphileBuild.ContextUnionTypes = {
                 ...commonContext,
@@ -564,9 +594,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               };
 
               const rawTypes =
-                (typeof baseSpec.types === "function"
-                  ? baseSpec.types(typesContext)
-                  : baseSpec.types) || [];
+                (typeof baseTypes === "function"
+                  ? baseTypes(typesContext)
+                  : baseTypes) || [];
               return builder.applyHooks(
                 "GraphQLUnionType_types",
                 rawTypes,
@@ -581,7 +611,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLInputObjectType: {
-          const rawSpec = inSpec as GraphileBuild.GrafastInputObjectTypeConfig;
+          const rawInputObjectSpec =
+            inSpec as GraphileBuild.GrafastInputObjectTypeConfig;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInputObject;
 
@@ -590,31 +621,45 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const baseSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            fields: baseFields,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLInputObjectType",
-            rawSpec,
+            rawInputObjectSpec,
             build,
             inputObjectContext,
-            `|${rawSpec.name}`,
+            `|${rawInputObjectSpec.name}`,
+          );
+
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define an input object type with invalid name $0.`,
           );
 
           const finalSpec = {
-            ...baseSpec,
+            name: typeName,
+            ...restOfConfig,
             fields: () => {
               const processedFields: GraphQLInputFieldConfig[] = [];
               const fieldWithHooks: GraphileBuild.InputFieldWithHooksFunction =
                 (fieldScope, spec) => {
-                  const { fieldName } = fieldScope;
-                  if (!isString(fieldName)) {
+                  if (!isString(fieldScope.fieldName)) {
                     throw new Error(
-                      "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
+                      "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
                     );
                   }
+                  const fieldName = build.assertValidName(
+                    fieldScope.fieldName,
+                    `Input object type $1 attempted to define a field with invalid name $0.`,
+                    [Self.name],
+                  );
                   const finalFieldScope: GraphileBuild.ScopeInputObjectFieldsField =
                     build.extend(
                       fieldScope,
                       scope,
-                      `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`,
+                      `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${typeName}'`,
                     );
                   const fieldContext: GraphileBuild.ContextInputObjectFieldsField =
                     {
@@ -643,15 +688,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               };
 
               const rawFields =
-                (typeof rawSpec.fields === "function"
-                  ? rawSpec.fields(fieldsContext)
-                  : rawSpec.fields) || {};
+                (typeof baseFields === "function"
+                  ? baseFields(fieldsContext)
+                  : baseFields) || {};
               const fieldsList: typeof rawFields = build.extend(
                 Object.create(null),
                 rawFields,
-                `Default field included in newWithHooks call for '${
-                  rawSpec.name
-                }'. ${inScope.__origin || ""}`,
+                `Default field included in newWithHooks call for '${typeName}'. ${
+                  inScope.__origin || ""
+                }`,
               );
               const fieldsSpec: GraphQLInputFieldConfigMap = builder.applyHooks(
                 "GraphQLInputObjectType_fields",
@@ -691,7 +736,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLScalarType: {
-          const rawSpec = inSpec as GraphQLScalarTypeConfig<any, any>;
+          const rawScalarSpec = inSpec as GraphQLScalarTypeConfig<any, any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeScalar;
 
@@ -700,35 +745,53 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const finalSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            parseValue: baseParseValue,
+            parseLiteral: baseParseLiteral,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLScalarType",
-            rawSpec,
+            rawScalarSpec,
             build,
             scalarContext,
-            `|${rawSpec.name}`,
+            `|${rawScalarSpec.name}`,
           );
 
-          // parseLiteral in GraphQL defaults to a dynamic function; that's not
-          // exportable... So we must handle this ourselves.
-          if (!finalSpec.parseValue) {
-            finalSpec.parseValue = identity;
-          }
-          if (!finalSpec.parseLiteral) {
-            const parseValue = finalSpec.parseValue!;
-            finalSpec.parseLiteral = EXPORTABLE(
-              (parseValue, valueFromASTUntyped) => (node, variables) => {
-                return parseValue(valueFromASTUntyped(node, variables));
-              },
-              [parseValue, valueFromASTUntyped],
-            );
-          }
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define a scalar type with invalid name $0.`,
+          );
+
+          const finalSpec = {
+            name: typeName,
+            ...restOfConfig,
+            parseValue: (() => {
+              return baseParseValue ?? identity;
+            })(),
+            // parseLiteral in GraphQL defaults to a dynamic function; that's not
+            // exportable... So we must handle this ourselves.
+            parseLiteral: (() => {
+              if (baseParseLiteral) {
+                return baseParseLiteral;
+              }
+              const parseValue = baseParseValue ?? identity;
+              return EXPORTABLE(
+                (parseValue, valueFromASTUntyped) =>
+                  ((node, variables) => {
+                    return parseValue(valueFromASTUntyped(node, variables));
+                  }) as GraphQLScalarLiteralParser<any>,
+                [parseValue, valueFromASTUntyped],
+              );
+            })(),
+          };
 
           const Self = new GraphQLScalarType(finalSpec);
           return Self;
         }
 
         case GraphQLEnumType: {
-          const rawSpec = inSpec as GraphQLEnumTypeConfig;
+          const rawEnumConfig = inSpec as GraphQLEnumTypeConfig;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeEnum;
 
@@ -737,53 +800,71 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const finalSpec = builder.applyHooks(
+          const {
+            name: baseName,
+            values: baseValues,
+            ...restOfConfig
+          } = builder.applyHooks(
             "GraphQLEnumType",
-            rawSpec,
+            rawEnumConfig,
             build,
             enumContext,
-            `|${rawSpec.name}`,
+            `|${rawEnumConfig.name}`,
+          );
+
+          const typeName = build.assertValidName(
+            baseName,
+            `Attempted to define a scalar type with invalid name $0.`,
           );
 
           const valuesContext: GraphileBuild.ContextEnumValues = {
             ...enumContext,
-            Self: { name: finalSpec.name },
+            Self: { name: typeName },
           };
 
-          finalSpec.values = builder.applyHooks(
-            "GraphQLEnumType_values",
-            finalSpec.values,
-            build,
-            valuesContext,
-            `|${finalSpec.name}`,
-          );
-
-          const values = finalSpec.values;
-          finalSpec.values = Object.entries(values).reduce(
-            (memo, [valueName, value]) => {
-              const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
-                build.extend(
-                  { valueName },
-                  scope,
-                  `Extending scope for value '${valueName}' within context for GraphQLEnumType '${rawSpec.name}'`,
-                );
-              const valueContext: GraphileBuild.ContextEnumValuesValue = {
-                ...valuesContext,
-                scope: finalValueScope,
-              };
-              const newValue = builder.applyHooks(
-                "GraphQLEnumType_values_value",
-                value,
+          const finalSpec = {
+            name: typeName,
+            ...restOfConfig,
+            values: (() => {
+              const values = builder.applyHooks(
+                "GraphQLEnumType_values",
+                baseValues,
                 build,
-                valueContext,
-                `|${finalSpec.name}|${valueName}`,
+                valuesContext,
+                `|${typeName}`,
               );
+              return Object.entries(values).reduce(
+                (memo, [rawValueName, value]) => {
+                  const valueName = build.assertValidName(
+                    rawValueName,
+                    `Enum type $1 attempted to define a value with invalid name $0.`,
+                    [Self.name],
+                  );
+                  const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
+                    build.extend(
+                      { valueName },
+                      scope,
+                      `Extending scope for value '${valueName}' within context for GraphQLEnumType '${typeName}'`,
+                    );
+                  const valueContext: GraphileBuild.ContextEnumValuesValue = {
+                    ...valuesContext,
+                    scope: finalValueScope,
+                  };
+                  const newValue = builder.applyHooks(
+                    "GraphQLEnumType_values_value",
+                    value,
+                    build,
+                    valueContext,
+                    `|${typeName}|${valueName}`,
+                  );
 
-              memo[valueName] = newValue;
-              return memo;
-            },
-            Object.create(null),
-          );
+                  memo[valueName] = newValue;
+                  return memo;
+                },
+                Object.create(null),
+              );
+            })(),
+          };
 
           const Self = new GraphQLEnumType(finalSpec);
           return Self;
