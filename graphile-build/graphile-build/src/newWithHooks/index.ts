@@ -183,7 +183,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 rawInterfaces,
                 build,
                 interfacesContext,
-                `|${Self.name}`,
+                `|${typeName}`,
               );
             },
             fields: () => {
@@ -234,7 +234,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 const fieldName = build.assertValidName(
                   fieldScope.fieldName,
                   `Object type $1 attempted to define a field with invalid name $0.`,
-                  [Self.name],
+                  [typeName],
                 );
                 build.extend(
                   fieldScope,
@@ -267,7 +267,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   resolvedFieldSpec,
                   build,
                   fieldContext,
-                  `|${Self.name}.fields.${fieldName}`,
+                  `|${typeName}.fields.${fieldName}`,
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
@@ -282,7 +282,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     resolvedFieldSpec.args,
                     build,
                     argsContext,
-                    `|${Self.name}.fields.${fieldName}.args`,
+                    `|${typeName}.fields.${fieldName}.args`,
                   ),
                 };
 
@@ -291,9 +291,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 )) {
                   if (!argName) {
                     throw new Error(
-                      `Attempted to add empty/falsy argName to GraphQLObjectType ${
-                        Self.name
-                      }'s '${fieldName}' field; ${inspect(argSpec)}`,
+                      `Attempted to add empty/falsy argName to GraphQLObjectType ${typeName}'s '${fieldName}' field; ${inspect(
+                        argSpec,
+                      )}`,
                     );
                   }
                   const argContext = {
@@ -309,7 +309,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     argSpec,
                     build,
                     argContext,
-                    `|${Self.name}.fields.${fieldName}.args.${argName}`,
+                    `|${typeName}.fields.${fieldName}.args.${argName}`,
                   );
                 }
 
@@ -346,9 +346,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (!fieldName) {
                   throw new Error(
-                    `Attempted to add empty/falsy fieldName to GraphQLObjectType ${
-                      Self.name
-                    }; ${inspect(fieldSpec)}`,
+                    `Attempted to add empty/falsy fieldName to GraphQLObjectType ${typeName}; ${inspect(
+                      fieldSpec,
+                    )}`,
                   );
                 }
                 if (processedFields.indexOf(fieldSpec) < 0) {
@@ -442,7 +442,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     newSpec,
                     build,
                     fieldContext,
-                    `|${Self.name}.fields.${fieldName}`,
+                    `|${typeName}.fields.${fieldName}`,
                   );
                   newSpec.args = newSpec.args || {};
                   const argsContext = {
@@ -455,7 +455,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       newSpec.args ?? Object.create(null),
                       build,
                       argsContext,
-                      `|${Self.name}.fields.${fieldName}.args`,
+                      `|${typeName}.fields.${fieldName}.args`,
                     ),
                   };
                   const finalFieldSpec = newSpec;
@@ -465,9 +465,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   )) {
                     if (!argName) {
                       throw new Error(
-                        `Attempted to add empty/falsy argName to GraphQLInterfaceType ${
-                          Self.name
-                        }'s '${fieldName}' field; ${inspect(argSpec)}`,
+                        `Attempted to add empty/falsy argName to GraphQLInterfaceType ${typeName}'s '${fieldName}' field; ${inspect(
+                          argSpec,
+                        )}`,
                       );
                     }
                     const argContext = {
@@ -483,7 +483,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       argSpec,
                       build,
                       argContext,
-                      `|${Self.name}.fields.${fieldName}.args.${argName}`,
+                      `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
                   }
 
@@ -512,9 +512,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (!fieldName) {
                   throw new Error(
-                    `Attempted to add empty/falsy fieldName to GraphQLInterfaceType ${
-                      Self.name
-                    }; ${inspect(fieldSpec)}`,
+                    `Attempted to add empty/falsy fieldName to GraphQLInterfaceType ${typeName}; ${inspect(
+                      fieldSpec,
+                    )}`,
                   );
                 }
                 if (processedFields.indexOf(fieldSpec) < 0) {
@@ -602,7 +602,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 rawTypes,
                 build,
                 typesContext,
-                `|${Self.name}`,
+                `|${typeName}`,
               );
             },
           };
@@ -653,7 +653,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   const fieldName = build.assertValidName(
                     fieldScope.fieldName,
                     `Input object type $1 attempted to define a field with invalid name $0.`,
-                    [Self.name],
+                    [typeName],
                   );
                   const finalFieldScope: GraphileBuild.ScopeInputObjectFieldsField =
                     build.extend(
@@ -674,7 +674,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     newSpec,
                     build,
                     fieldContext,
-                    `|${Self.name}.fields.${fieldName}`,
+                    `|${typeName}.fields.${fieldName}`,
                   );
 
                   const finalSpec = newSpec;
@@ -703,16 +703,16 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 fieldsList,
                 build,
                 fieldsContext,
-                `|${Self.name}`,
+                `|${typeName}`,
               );
 
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (!fieldName) {
                   throw new Error(
-                    `Attempted to add empty/falsy fieldName to GraphQLInputObjectType ${
-                      Self.name
-                    }; ${inspect(fieldSpec)}`,
+                    `Attempted to add empty/falsy fieldName to GraphQLInputObjectType ${typeName}; ${inspect(
+                      fieldSpec,
+                    )}`,
                   );
                 }
                 if (processedFields.indexOf(fieldSpec) < 0) {
@@ -725,7 +725,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }
                 fieldsSpec[fieldName] = inputObjectFieldSpec(
                   fieldsSpec[fieldName],
-                  `${Self.name}.${fieldName}`,
+                  `${typeName}.${fieldName}`,
                 );
               }
               return fieldsSpec;
@@ -838,7 +838,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   const valueName = build.assertValidName(
                     rawValueName,
                     `Enum type $1 attempted to define a value with invalid name $0.`,
-                    [Self.name],
+                    [typeName],
                   );
                   const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
                     build.extend(
