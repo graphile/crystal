@@ -27,10 +27,17 @@ export interface V4GraphileBuildOptions {
   orderByNullsLast?: boolean;
 }
 
+export interface V4ErrorOutputOptions {
+  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
+  extendedErrors?: string[];
+  showErrorStack?: boolean | "json";
+}
+
 export interface V4Options<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse,
-> extends GraphileBuild.SchemaOptions {
+> extends GraphileBuild.SchemaOptions,
+    V4ErrorOutputOptions {
   /**
    * - 'only': connections will be avoided, preferring lists
    * - 'omit': lists will be avoided, preferring connections
@@ -80,9 +87,6 @@ export interface V4Options<
   /** Always ignored, ruru is always enhanced. */
   enhanceGraphiql?: boolean;
   allowExplain?: boolean;
-  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
-  extendedErrors?: string[];
-  showErrorStack?: boolean | "json";
 
   /**
    * As of PostGraphile v5, query batching is no longer supported. Query batching
@@ -301,11 +305,7 @@ function extendedFormatError(
   };
 }
 
-export function makeV4ErrorHandlingPreset(options: {
-  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
-  extendedErrors?: string[];
-  showErrorStack?: boolean | "json";
-}): {
+export function makeV4ErrorOutputPreset(options: V4ErrorOutputOptions): {
   grafserv: {
     maskError?: GraphileConfig.GrafservOptions["maskError"];
   };
@@ -368,7 +368,7 @@ export const makeV4Preset = (
   const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
   const bodySizeLimit = options.bodySizeLimit;
   return {
-    extends: [PostGraphileAmberPreset, makeV4ErrorHandlingPreset(options)],
+    extends: [PostGraphileAmberPreset, makeV4ErrorOutputPreset(options)],
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
