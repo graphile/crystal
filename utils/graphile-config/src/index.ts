@@ -17,7 +17,7 @@ export type {
   CallbackOrDescriptor,
   FunctionalityObject,
 } from "./interfaces.js";
-export type { MiddlewareNext } from "./middleware.js";
+export type { MiddlewareHandlers, MiddlewareNext } from "./middleware.js";
 export { Middleware } from "./middleware.js";
 export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
 

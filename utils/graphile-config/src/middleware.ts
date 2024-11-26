@@ -175,3 +175,13 @@ function makeNext<TRawResult, TAwaitedResult = Awaited<TRawResult>>(
   };
   return next;
 }
+
+export type MiddlewareHandlers<
+  TActivities extends FunctionalityObject<TActivities>,
+> = {
+  [key in keyof TActivities]?: CallbackOrDescriptor<
+    TActivities[key] extends (...args: infer UArgs) => infer UResult
+      ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
+      : never
+  >;
+};

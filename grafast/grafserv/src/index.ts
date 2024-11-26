@@ -1,6 +1,6 @@
 import type { PromiseOrDirect } from "grafast";
 import type { ExecutionArgs, GraphQLError } from "grafast/graphql";
-import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
+import type { CallbackOrDescriptor, MiddlewareHandlers } from "graphile-config";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type {
@@ -86,18 +86,7 @@ declare global {
               : never
           >;
         };
-        middleware?: {
-          [key in keyof GrafservMiddleware]?: CallbackOrDescriptor<
-            GrafservMiddleware[key] extends (
-              ...args: infer UArgs
-            ) => infer UResult
-              ? (
-                  next: MiddlewareNext<Awaited<UResult>>,
-                  ...args: UArgs
-                ) => UResult
-              : never
-          >;
-        };
+        middleware?: MiddlewareHandlers<GrafservMiddleware>;
       };
     }
     interface GrafservOptions {
