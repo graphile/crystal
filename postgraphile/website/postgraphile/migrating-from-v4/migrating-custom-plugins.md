@@ -10,6 +10,263 @@ If you've written some PostGraphile V4 plugins by hand (not using one of the
 `make...Plugin` helpers) then this migration guide is for you. We'll step you
 through some of the key changes.
 
+## Overview
+
+Here's the rough process:
+
+1. Ensure you have tests and that they pass
+1. Move all `require()` calls to the top (not inside of functions)
+1. [Convert the plugin to TypeScript](#convert-the-plugin-to-typescript)
+1. Convert your tests to TypeScript (or use `// @ts-check`) and fix errors
+1. Ensure your tests still pass
+1. [Upgrade to V5 dependencies](#upgrade-to-v5-dependencies)
+1. [Perform basic code transforms](#perform-basic-code-transforms)
+1. [Turn on strict typing](#turn-on-strict-typing)
+1. [Fix the TypeScript errors](#fix-the-typescript-errors)
+1. Ensure your tests still pass
+1. [Make your plugin exportable](#make-your-plugin-exportable) (optional)
+
+### Convert the plugin to TypeScript
+
+(You can read why converting to TypeScript is so important in [the TypeScript section below](#typescript).)
+
+We recommend that you extend from the `@tsconfig/node18` preset; you can disable `noImplicitAny` to massively reduce the number of TypeScript errors you need to deal with:
+
+```json title="tsconfig.json"
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    // You may want to enable this flag in V4 since V4 types were extremely
+    // loose (since it was originally written in Flow, not TypeScript):
+    //
+    // "noImplicitAny": false,
+
+    // If your tests are written in JS you'll need this for subpath importing
+    // to work:
+    "allowJs": true,
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "declarationDir": "dist",
+    "declaration": true,
+    "sourceMap": true
+  },
+  "exclude": ["node_modules"]
+}
+```
+
+:::tip It's okay to make this TypeScript config loose for V4
+
+The main thing is to make it so we're using TypeScript syntax, that TypeScript
+compiles, and that our tests run the compiled code. Once we've ported to V5
+we'll make the types a lot stricter.
+
+:::
+
+Don't forget to update your package.json to point to the new locations and add
+a `prepack` script to compile your TypeScript:
+
+```json title="package.json"
+{
+  // ...
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    // ...
+    "watch": "tsc --watch",
+    "prepack": "tsc"
+  },
+  "devDependencies": {
+    // ...
+    "@tsconfig/node18": "^18.2.4",
+    "typescript": "^5.7.2"
+  }
+}
+```
+
+### Upgrade to V5 dependencies
+
+At time of writing, V5 is still in beta, so you should use the `@beta` tag to
+install devDependencies. Go through each PostGraphile V4 related package
+referenced in package.json and install the `@beta` version of it, for example:
+
+```json title="package.json before"
+{
+  "devDependencies": {
+    "graphile-build": "^4.12.0-alpha.0",
+    "graphile-build-pg": "^4.12.0-alpha.0",
+    "postgraphile": "^4.12.0-alpha.0",
+    "postgraphile-plugin-connection-filter": "^2.2.0"
+  }
+}
+```
+
+```bash
+yarn add --dev \
+  graphile-build@beta \
+  graphile-build-pg@beta \
+  postgraphile@beta \
+  postgraphile-plugin-connection-filter@beta
+```
+
+```json title="package.json after"
+{
+  "devDependencies": {
+    "graphile-build": "^5.0.0-beta.27",
+    "graphile-build-pg": "^5.0.0-beta.31",
+    "postgraphile": "^5.0.0-beta.32",
+    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+  }
+}
+```
+
+:::info `postgraphile-core` is no more
+
+Huh... that rhymed. But yeah, just use `postgraphile` instead.
+
+:::
+
+:::tip Use subpaths instead of explicit modules where possible
+
+It's really annoying when you end up with version conflicts, so in V5 we've
+made it easy for you to consistently install one version of the package and
+depend on parts within that; instead of `import { ... } from "graphile-build"`
+you would now do `import { ... } from "postgraphile/graphile-build"` - that way
+you don't need to list `graphile-build` as a dependency. Your package.json can
+now be just:
+
+```json title="package.json using subpaths for graphile-build*"
+{
+  "devDependencies": {
+    "postgraphile": "^5.0.0-beta.32",
+    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+  }
+}
+```
+
+You should do this for `graphql` as well: `import { ... } from "postgraphile/graphql"`.
+
+:::
+
+### Perform basic code transforms
+
+TODO: write some codemods to help with this.
+
+See [Plugins](#plugins) below for full details, but essentially a V4 plugin like:
+
+```ts title="v4.ts"
+import { Plugin } from "graphile-build";
+
+export const MyPlugin: Plugin = (builder) => {
+  builder.hook("inflection", (inflection, build) => {
+    return build.extend(inflection, {
+      myInflector(stuff) {
+        return stuff + "Stuff";
+      },
+    });
+  });
+
+  builder.hook("build", (build) => {
+    return build.extend(
+      build,
+      { myStuff: () => ["my", "stuff"] },
+      "Adding myStuff to build",
+    );
+  });
+
+  builder.hook("init", (_, build) => {
+    doSomethingWith(build.myStuff());
+    return _;
+  });
+
+  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    return build.extend(
+      fields,
+      { myField: { type: build.graphql.GraphQLString } },
+      "Adding fields from MyPlugin",
+    );
+  });
+};
+```
+
+in V5 would become a declarative structured object rather than a function
+containing a lot of function calls:
+
+```ts title="v5.ts"
+import type {} from "postgraphile";
+
+export const MyPlugin: GraphileConfig.Plugin = {
+  name: "MyPlugin",
+
+  inflection: {
+    add: {
+      myInflector(stuff) {
+        return stuff + "Stuff";
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          { myStuff: () => ["my", "stuff"] },
+          "Adding myStuff to build",
+        );
+      },
+
+      init(_, build) {
+        doSomethingWith(build.myStuff());
+        return _;
+      },
+
+      GraphQLObjectType_fields(fields, build, context) {
+        return build.extend(
+          fields,
+          { myField: { type: build.graphql.GraphQLString } },
+          "Adding fields from MyPlugin",
+        );
+      },
+    },
+  },
+};
+```
+
+### Turn on strict typing
+
+Importantly you need at least the following:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    // ...
+    "strict": true,
+    "noImplicitAny": true
+  }
+}
+```
+
+### Fix the TypeScript errors
+
+Run `yarn tsc --watch` or similar in a terminal, and start working through the
+errors top to bottom. For each error, find the relevant part of this guide
+and follow the advice. If it's not clear, [ask on
+Discord](https://discord.gg/graphile) and then [submit an update to this page
+with
+details](https://github.com/graphile/crystal/edit/main/postgraphile/website/postgraphile/migrating-from-v4/migrating-custom-plugins.md) -
+thanks for contributing to making everyone's migration to V5 easier!
+
+### Make your plugin exportable
+
+This is optional, you only need it if you want people to be able to use
+Graphile Export to export a schema using this plugin as executable code, for
+example to use in serverless situations where bootup time is at a premium.
+
+TODO: document this! For now, see: [Exporting your schema](../exporting-schema)
+and https://star.graphile.org/graphile-export/
+
 ## TypeScript
 
 It is **very strongly recommended** that you write plugins in TypeScript. There
@@ -39,9 +296,17 @@ you'll work with are `GraphileConfig` and `GraphileBuild`.
 Many of the types need to be converted, here's a few:
 
 - `import("graphile-build").Build` -> `GraphileBuild.Build`
+- `import("graphile-build").Inflection` -> `GraphileBuild.Inflection`
 - `import("graphile-build").Plugin` -> `GraphileConfig.Plugin` (the `inflection`, `gather` and `schema` scopes therein)
 - `import("postgraphile").PostGraphilePlugin` -> `GraphileConfig.Plugin` (the `grafast` and `grafserv` scopes therein)
 - `import("postgraphile").PostGraphileOptions` -> `GraphileConfig.Preset` (split across the various scopes therein)
+
+## General migration changes
+
+Your test suite likely uses standard APIs, so will need to follow the regular
+[V4 migration guide](../migrating-from-v4).
+
+- [`createPostGraphileSchema`](https://postgraphile.org/postgraphile/next/migrating-from-v4/#schema-only-mode)
 
 ## No look-ahead
 
