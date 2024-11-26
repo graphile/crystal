@@ -246,7 +246,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ["json5", "jsonc"],
+        additionalLanguages: ["json5"],
       },
       algolia: {
         // The application ID provided by Algolia

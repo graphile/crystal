@@ -32,7 +32,7 @@ Here's the rough process:
 
 We recommend that you extend from the `@tsconfig/node18` preset; you can disable `noImplicitAny` to massively reduce the number of TypeScript errors you need to deal with:
 
-```jsonc title="tsconfig.json"
+```json title="tsconfig.json"
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
@@ -66,7 +66,7 @@ we'll make the types a lot stricter.
 Don't forget to update your package.json to point to the new locations and add
 a `prepack` script to compile your TypeScript:
 
-```jsonc title="package.json"
+```json title="package.json"
 {
   // ...
   "main": "dist/index.js",
@@ -238,7 +238,7 @@ export const MyPlugin: GraphileConfig.Plugin = {
 
 Importantly you need at least the following:
 
-```jsonc title="tsconfig.json"
+```json title="tsconfig.json"
 {
   "compilerOptions": {
     // ...
