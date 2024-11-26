@@ -512,6 +512,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
+        "resource:select": {
+          description: "can we select records via this relationship/ref?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
         "singularRelation:resource:single": {
           description:
             "can we get a single one of these (resource) from a type?",
@@ -544,13 +548,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         inferred(behavior, entity): GraphileBuild.BehaviorString[] {
           if (entity.isUnique) {
             return [
+              "resource:select",
               behavior,
               "single",
               "-singularRelation:resource:list",
               "-singularRelation:resource:connection",
             ];
           } else {
-            return [behavior];
+            return ["resource:select", behavior];
           }
         },
       },
@@ -559,6 +564,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           const ref = codec.refs?.[refName];
           if (ref?.definition.singular) {
             return [
+              "resource:select",
               behavior,
               "single",
               "-singularRelation:resource:list",
@@ -566,6 +572,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             ];
           } else {
             return [
+              "resource:select",
               behavior,
               "-single",
               "manyRelation:resource:connection",
@@ -578,13 +585,14 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         inferred(behavior, entity) {
           if (entity.singular) {
             return [
+              "resource:select",
               behavior,
               "single",
               "-singularRelation:resource:list",
               "-singularRelation:resource:connection",
             ];
           } else {
-            return behavior;
+            return ["resource:select", behavior];
           }
         },
       },

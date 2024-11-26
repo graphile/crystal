@@ -124,6 +124,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             const newBehavior = [behavior];
             if (relation.extensions?.isIndexed === false) {
               newBehavior.push(
+                "-select",
                 "-list",
                 "-connection",
                 "-single",
