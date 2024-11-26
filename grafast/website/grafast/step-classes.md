@@ -432,7 +432,7 @@ class MyObjectStep extends ExecutableStep {
 :::caution
 
 If your step implements `.get()`, make sure it meets the expectations:
-ie it correctly accepts a single argument of a string.
+i.e. it correctly accepts a single argument of a string.
 &ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 
