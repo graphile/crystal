@@ -5,7 +5,7 @@ sidebar_position: 1
 # Codecs
 
 A `PgCodec` ("codec") represents a type (data type) in the database. There are
-loads of built in codecs for dealing with the builtin types in Postgres made
+loads of built in codecs for dealing with the built-in types in Postgres made
 available via the [`TYPES` export](#TYPES), but you can also create your own
 codecs for other types using the various helpers.
 
@@ -25,7 +25,7 @@ import { TYPES } from "@dataplan/pg";
 const intCodec = TYPES.int;
 ```
 
-The `TYPES` object comprises a number of builtin codecs for common types in your
+The `TYPES` object comprises a number of built-in codecs for common types in your
 database; the following keys on `TYPES` represent the similarly named database
 types (e.g. `TYPES.boolean` represents the `bool` type):
 
