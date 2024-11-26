@@ -334,11 +334,12 @@ export function makeV4ErrorOutputPreset(options: V4ErrorOutputOptions): {
               : defaultFormatError(error);
           // If the user wants to see the error’s stack, let’s add it to the
           // formatted error.
-          if (showErrorStack)
+          if (showErrorStack) {
             (formattedError as Record<string, any>)["stack"] =
               error.stack != null && showErrorStack === "json"
                 ? error.stack.split("\n")
                 : error.stack;
+          }
 
           return formattedError;
         },
