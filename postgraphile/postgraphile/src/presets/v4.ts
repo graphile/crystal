@@ -301,12 +301,15 @@ function extendedFormatError(
   };
 }
 
-function makeMaskErrorConfig<
-  Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse,
->(
-  options: V4Options<Request, Response>,
-): GraphileConfig.GrafservOptions | null {
+export function makeV4ErrorHandlingPreset(options: {
+  handleErrors?: (error: readonly GraphQLError[]) => readonly GraphQLError[];
+  extendedErrors?: string[];
+  showErrorStack?: boolean | "json";
+}): {
+  grafserv: {
+    maskError?: GraphileConfig.GrafservOptions["maskError"];
+  };
+} {
   const { extendedErrors, showErrorStack, handleErrors } = options;
   if (handleErrors) {
     if (extendedErrors || showErrorStack) {
@@ -315,30 +318,34 @@ function makeMaskErrorConfig<
       );
     }
     return {
-      maskError(error) {
-        return handleErrors!([error])[0];
+      grafserv: {
+        maskError(error) {
+          return handleErrors!([error])[0];
+        },
       },
     };
   } else if (extendedErrors || showErrorStack) {
     return {
-      maskError(error) {
-        const formattedError =
-          extendedErrors && extendedErrors.length
-            ? extendedFormatError(error, extendedErrors)
-            : defaultFormatError(error);
-        // If the user wants to see the error’s stack, let’s add it to the
-        // formatted error.
-        if (showErrorStack)
-          (formattedError as Record<string, any>)["stack"] =
-            error.stack != null && showErrorStack === "json"
-              ? error.stack.split("\n")
-              : error.stack;
+      grafserv: {
+        maskError(error) {
+          const formattedError =
+            extendedErrors && extendedErrors.length
+              ? extendedFormatError(error, extendedErrors)
+              : defaultFormatError(error);
+          // If the user wants to see the error’s stack, let’s add it to the
+          // formatted error.
+          if (showErrorStack)
+            (formattedError as Record<string, any>)["stack"] =
+              error.stack != null && showErrorStack === "json"
+                ? error.stack.split("\n")
+                : error.stack;
 
-        return formattedError;
+          return formattedError;
+        },
       },
     };
   } else {
-    return null;
+    return { grafserv: {} };
   }
 }
 
@@ -361,7 +368,7 @@ export const makeV4Preset = (
   const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
   const bodySizeLimit = options.bodySizeLimit;
   return {
-    extends: [PostGraphileAmberPreset],
+    extends: [PostGraphileAmberPreset, makeV4ErrorHandlingPreset(options)],
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
@@ -456,7 +463,6 @@ export const makeV4Preset = (
         : null),
     },
     grafserv: {
-      ...makeMaskErrorConfig(options),
       graphqlPath,
       graphiqlPath,
       eventStreamPath,
