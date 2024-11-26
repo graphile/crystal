@@ -145,7 +145,8 @@ declare global {
       isTableLike?: boolean;
       tags: Partial<GraphileBuild.PgCodecTags>;
       pg?: {
-        serviceName: string;
+        /** The service from which this type originates; if it represents a built in type then it should be null */
+        serviceName: string | null;
         schemaName: string;
         name: string;
         /**
