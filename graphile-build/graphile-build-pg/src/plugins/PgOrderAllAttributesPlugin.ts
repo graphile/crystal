@@ -92,7 +92,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
         return extend(
           values,
           Object.entries(attributes).reduce(
-            (memo, [attributeName, attribute]) => {
+            (memo, [attributeName, _attribute]) => {
               const fieldBehaviorScope = `attribute:orderBy`;
               if (
                 !build.behavior.pgCodecAttributeMatches(
