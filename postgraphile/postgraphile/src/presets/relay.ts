@@ -35,9 +35,9 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
       nodeIdFieldName() {
         return "id";
       },
-      attribute(previous, options, details) {
+      _attributeName(previous, options, details) {
         const name = previous!(details);
-        if (name === "id") return "rowId";
+        if (name === "id") return "row_id";
         return name;
       },
     },

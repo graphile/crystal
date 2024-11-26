@@ -146,11 +146,10 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
           ? null
           : {
               // Don't rename 'id' to 'rowId'
-              attribute(previous, options, details) {
-                const attributeFieldName = this.camelCase(
-                  this._attributeName(details),
-                );
-                return attributeFieldName;
+              _attributeName(previous, options, { codec, attributeName }) {
+                const attribute = codec.attributes[attributeName];
+                const name = attribute.extensions?.tags?.name || attributeName;
+                return this.coerceToGraphQLName(name);
               },
             }),
       },
