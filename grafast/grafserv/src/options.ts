@@ -66,22 +66,24 @@ export function defaultMaskError(
   }
 }
 
-export const makeMaskError: (callback: MaskErrorFn) => MaskErrorFn = isDev
-  ? (callback) => {
-      let warnedAboutMaskErrorCallback = false;
-      return (error) => {
-        const path = error.path;
-        const replacement = callback(error);
-        if (!warnedAboutMaskErrorCallback && replacement.path !== path) {
-          warnedAboutMaskErrorCallback = true;
-          console.warn(
-            `[WARNING] Your maskError callback is changing the error path; please reuse the path of the original error to ensure compliance with the GraphQL specification. We will not issue this warning again until the server is restarted or another maskError function is provided.`,
-          );
-        }
-        return replacement;
-      };
+function devMakeMaskError(callback: MaskErrorFn): MaskErrorFn {
+  let warnedAboutMaskErrorCallback = false;
+  return (error) => {
+    const path = error.path;
+    const replacement = callback(error);
+    if (!warnedAboutMaskErrorCallback && replacement.path !== path) {
+      warnedAboutMaskErrorCallback = true;
+      console.warn(
+        `[WARNING] Your maskError callback is changing the error path; please reuse the path of the original error to ensure compliance with the GraphQL specification. We will not issue this warning again until the server is restarted or another maskError function is provided.`,
+      );
     }
-  : (callback) => callback;
+    return replacement;
+  };
+}
+
+export const makeMaskError: (callback: MaskErrorFn) => MaskErrorFn = isDev
+  ? devMakeMaskError
+  : (callback: MaskErrorFn) => callback;
 
 export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   const {
