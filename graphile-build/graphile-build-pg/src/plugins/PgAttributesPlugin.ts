@@ -282,9 +282,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
       _joinAttributeNames(options, codec, names) {
         return names
-          .map((attributeName) => {
-            return this._attributeName({ attributeName, codec });
-          })
+          .map((attributeName) => this._attributeName({ attributeName, codec }))
           .join("-and-");
       },
 
