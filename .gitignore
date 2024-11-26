@@ -1,3 +1,4 @@
+.git
 node_modules
 coverage
 dist
@@ -18,7 +19,7 @@ _LOCAL
 grafast/dataplan-pg/__tests__/**/*.mermaid.png
 
 # yarn2 stuff
-.yarn/*
+.yarn
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
