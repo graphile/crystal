@@ -3,9 +3,9 @@ import type { Readable } from "node:stream";
 import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
 import type {
-  AsyncExecutionResult,
   ExecutionArgs,
-  ExecutionResult,
+  FormattedExecutionPatchResult,
+  FormattedExecutionResult,
 } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
@@ -39,7 +39,7 @@ export const sleep = (ms: number) => {
 
 // TODO: remove this ANSI-removal hack!
 export function handleErrors(
-  payload: ExecutionResult | AsyncExecutionResult,
+  payload: FormattedExecutionResult | FormattedExecutionPatchResult,
 ): void {
   if (payload.errors !== undefined) {
     (payload.errors as any[]) = payload.errors.map((e) => {
@@ -273,6 +273,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         : onSubscribeWithEvent(event);
     },
     // TODO: validate that this actually does mask every error
+    // @ts-expect-error See: https://github.com/enisdenjo/graphql-ws/pull/599
     onError(_ctx, _message, errors) {
       return errors.map(instance.dynamicOptions.maskError);
     },

@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 
-import { isAsyncIterable, isSafeError } from "grafast";
+import { isAsyncIterable, isDev, isSafeError } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
+
+import type { MaskErrorFn } from "./interfaces";
 
 const { GraphQLError } = graphql;
 // Only the non-ambiguous characters
@@ -64,9 +66,7 @@ export function defaultMaskError(
   }
 }
 
-export function makeMaskError(
-  callback: (error: graphql.GraphQLError) => graphql.GraphQLError,
-): (error: graphql.GraphQLError) => graphql.GraphQLError {
+function devMakeMaskError(callback: MaskErrorFn): MaskErrorFn {
   let warnedAboutMaskErrorCallback = false;
   return (error) => {
     const path = error.path;
@@ -80,6 +80,10 @@ export function makeMaskError(
     return replacement;
   };
 }
+
+export const makeMaskError: (callback: MaskErrorFn) => MaskErrorFn = isDev
+  ? devMakeMaskError
+  : (callback: MaskErrorFn) => callback;
 
 export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
   const {

@@ -6,6 +6,7 @@ import type { RuruHTMLParts } from "ruru/server";
 import type {
   GrafservPluginContext,
   InitEvent,
+  MaskErrorFn,
   NormalizedRequestDigest,
   OnSubscribeEvent,
   ProcessGraphQLRequestBodyEvent,
@@ -147,7 +148,7 @@ declare global {
        * pass your own error masking function here. You can also import
        * `defaultMaskError` from `grafserv`.
        */
-      maskError?: (error: GraphQLError) => GraphQLError;
+      maskError?: MaskErrorFn;
 
       /**
        * By default `application/json` and `application/graphql` are supported

@@ -239,6 +239,19 @@ const preset = {
 
 :::
 
+### V4 options not (yet) supported
+
+TODO: this isn't fully documented, please send PRs with any other options you
+notice aren't supported!
+
+- legacyRelations - this has explicitly been removed from V5, see the [Breaking
+  GraphQL schema changes](#breaking-graphql-schema-changes) section below.
+- disableQueryLog - V5 will integrate `@graphile/logger` but this work hasn't
+  started yet
+- operationMessages - this originates from the
+  [@graphile/operation-hooks](https://github.com/graphile/operation-hooks) plugin
+  which has not yet been ported to V5
+
 ## Breaking GraphQL schema changes
 
 We've done our best to maintain as much compatibility with a V4 GraphQL schema

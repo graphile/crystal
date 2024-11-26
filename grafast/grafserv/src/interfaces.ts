@@ -3,7 +3,9 @@ import "graphile-config";
 import type { execute, PromiseOrDirect, SafeError, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
-  ExecutionResult,
+  FormattedExecutionResult,
+  GraphQLError,
+  GraphQLFormattedError,
   GraphQLSchema,
   ValidationRule,
 } from "grafast/graphql";
@@ -163,7 +165,7 @@ export interface TextHandlerResult extends IHandlerResult {
 export interface GraphQLHandlerResult extends IHandlerResult {
   type: "graphql";
   contentType: string;
-  payload: ExecutionResult;
+  payload: FormattedExecutionResult;
   outputDataAsString?: boolean;
 }
 /** @see {@link https://github.com/glasser/graphql-over-http/blob/dac9638459bb17dd3ade889334fc2fadee9d11e5/rfcs/IncrementalDelivery.md} */
@@ -230,7 +232,7 @@ export interface JSONResult {
   type: "json";
   statusCode: number;
   headers: Record<string, string>;
-  // TYPES: should this be `ExecutionResult | AsyncExecutionResult` instead?
+  // TYPES: should this be `FormattedExecutionResult | FormattedExecutionPatchResult` instead?
   json: JSONValue;
 }
 
@@ -277,3 +279,7 @@ export interface ExecutionConfig {
   subscribe: typeof subscribe;
   contextValue: Record<string, any>;
 }
+
+export type MaskErrorFn = (
+  error: GraphQLError,
+) => GraphQLError | GraphQLFormattedError;
