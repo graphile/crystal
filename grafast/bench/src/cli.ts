@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 
 import { glob } from "glob";
 import { isSchema } from "grafast/graphql";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 
@@ -49,7 +49,7 @@ async function configFromArgs(args: ArgsFromOptions<typeof options>) {
     preset.bench.operations = operations;
   }
 
-  const config = resolvePresets([preset]);
+  const config = resolvePreset(preset);
   return config;
 }
 

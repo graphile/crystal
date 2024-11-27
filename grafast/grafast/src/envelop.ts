@@ -1,4 +1,5 @@
 import type { Plugin as EnvelopPlugin } from "@envelop/core";
+import { resolvePreset } from "graphile-config";
 import type { IncomingMessage } from "http";
 
 import { execute as grafastExecute } from "./execute.js";
@@ -52,9 +53,12 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
       )?.headers["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
       opts.setExecuteFn((args) =>
-        grafastExecute(args, {
-          grafast: { explain },
-        }),
+        grafastExecute(
+          args,
+          resolvePreset({
+            grafast: { explain },
+          }),
+        ),
       );
     },
     async onSubscribe(opts) {
@@ -64,9 +68,12 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
         ctx?.connectionParams)?.["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
       opts.setSubscribeFn(async (args) =>
-        grafastSubscribe(args, {
-          grafast: { explain },
-        }),
+        grafastSubscribe(
+          args,
+          resolvePreset({
+            grafast: { explain },
+          }),
+        ),
       );
     },
   };

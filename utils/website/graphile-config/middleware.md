@@ -234,7 +234,7 @@ declare global {
 
 /***** getMiddleware.ts *****/
 
-import { Middleware, orderedApply, resolvePresets } from "graphile-config";
+import { Middleware, orderedApply, resolvePreset } from "graphile-config";
 
 export function getMiddleware(resolvedPreset: GraphileConfig.ResolvedPreset) {
   // Create your middleware instance. The generic describes the events supported
@@ -256,7 +256,7 @@ export function getMiddleware(resolvedPreset: GraphileConfig.ResolvedPreset) {
 import config from "./graphile.config.js";
 
 // Resolve the above config, recursively applying all the presets it extends from
-const resolvedPreset = resolvePresets([config]);
+const resolvedPreset = resolvePreset(config);
 
 // Get the middleware for this preset
 const middleware = getMiddleware(resolvedPreset);

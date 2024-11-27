@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -13,6 +14,9 @@ import {
   trap,
   TRAP_ERROR,
 } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 const makeSchema = () => {
   return makeGrafastSchema({
@@ -97,8 +101,8 @@ it("schema works as expected", async () => {
     source,
     variableValues,
     contextValue: {},
-    resolvedPreset: {},
-    requestContext: {},
+    resolvedPreset,
+    requestContext,
   })) as ExecutionResult;
   expect(result.errors).to.exist;
   expect(result.errors).to.have.length(1);
@@ -120,8 +124,8 @@ it("enables trapping an error to null", async () => {
     source,
     variableValues,
     contextValue: {},
-    resolvedPreset: {},
-    requestContext: {},
+    resolvedPreset,
+    requestContext,
   })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: 2, error: null });
@@ -140,8 +144,8 @@ it("enables trapping an error to emptyList", async () => {
     source,
     variableValues,
     contextValue: {},
-    resolvedPreset: {},
-    requestContext: {},
+    resolvedPreset,
+    requestContext,
   })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: [2], error: [] });
@@ -164,8 +168,8 @@ it("enables trapping an error to error", async () => {
     source,
     variableValues,
     contextValue: {},
-    resolvedPreset: {},
-    requestContext: {},
+    resolvedPreset,
+    requestContext,
   })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({

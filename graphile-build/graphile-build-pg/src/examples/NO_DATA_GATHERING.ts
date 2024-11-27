@@ -31,7 +31,7 @@ import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
 } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { Pool } from "pg";
 import sql from "pg-sql2";
@@ -87,12 +87,10 @@ async function main() {
       },
     },
   };
-  const config = resolvePresets([
-    {
-      extends: [graphileBuildPreset, graphileBuildPgPreset],
-      plugins: [QueryQueryPlugin, UseRelationNamesPlugin],
-    },
-  ]);
+  const config = resolvePreset({
+    extends: [graphileBuildPreset, graphileBuildPgPreset],
+    plugins: [QueryQueryPlugin, UseRelationNamesPlugin],
+  });
 
   const pgRegistry = EXPORTABLE(
     (

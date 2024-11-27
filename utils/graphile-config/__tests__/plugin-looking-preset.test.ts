@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { it } from "mocha";
 
-import { resolvePresets } from "../dist/index.js";
+import { resolvePreset } from "../dist/index.js";
 
 const SomePlugin: GraphileConfig.Plugin = {
   name: "SomePlugin",
@@ -35,11 +35,9 @@ const PresetWithAfter: GraphileConfig.Preset = {
 it("is fine with reasonable looking preset", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        extends: [SomePreset],
-      },
-    ]);
+    resolvePreset({
+      extends: [SomePreset],
+    });
   } catch (e) {
     error = e;
   }
@@ -49,11 +47,9 @@ it("is fine with reasonable looking preset", () => {
 it("throws an error if a preset looks like a plugin (has name)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        extends: [PresetWithName],
-      },
-    ]);
+    resolvePreset({
+      extends: [PresetWithName],
+    });
   } catch (e) {
     error = e;
   }
@@ -64,11 +60,9 @@ it("throws an error if a preset looks like a plugin (has name)", () => {
 it("throws an error if a preset looks like a plugin (has provides)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        extends: [PresetWithProvides],
-      },
-    ]);
+    resolvePreset({
+      extends: [PresetWithProvides],
+    });
   } catch (e) {
     error = e;
   }
@@ -79,11 +73,9 @@ it("throws an error if a preset looks like a plugin (has provides)", () => {
 it("throws an error if a preset looks like a plugin (has before)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        extends: [PresetWithBefore],
-      },
-    ]);
+    resolvePreset({
+      extends: [PresetWithBefore],
+    });
   } catch (e) {
     error = e;
   }
@@ -94,11 +86,9 @@ it("throws an error if a preset looks like a plugin (has before)", () => {
 it("throws an error if a preset looks like a plugin (has after)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        extends: [PresetWithAfter],
-      },
-    ]);
+    resolvePreset({
+      extends: [PresetWithAfter],
+    });
   } catch (e) {
     error = e;
   }

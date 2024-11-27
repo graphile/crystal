@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -8,6 +9,9 @@ import type {
   LoadOneCallback,
 } from "../dist/index.js";
 import { context, grafast, loadOne, makeGrafastSchema } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 interface Thing {
   id: number;
@@ -272,14 +276,12 @@ it("batches across parallel trees with identical selection sets", async () => {
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -316,14 +318,12 @@ it("batches across parallel trees with non-identical selection sets", async () =
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -351,14 +351,12 @@ it("supports pure ioEquivalence (obj)", async () => {
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -381,14 +379,12 @@ it("supports pure ioEquivalence (list)", async () => {
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -420,14 +416,12 @@ it("supports mixed ioEquivalence", async () => {
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -470,14 +464,12 @@ it("supports no ioEquivalence", async () => {
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -519,17 +511,15 @@ it("uses stable identifiers to avoid the need for double-fetches (tuple)", async
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      contextValue: {
-        orgId: 27,
-      },
+  const result = (await grafast({
+    schema,
+    source,
+    contextValue: {
+      orgId: 27,
     },
-    {},
-    {},
-  )) as ExecutionResult;
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {
@@ -568,17 +558,15 @@ it("uses stable identifiers to avoid the need for double-fetches (obj)", async (
   const schema = makeSchema(false);
 
   CALLS = [];
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      contextValue: {
-        orgId: 27,
-      },
+  const result = (await grafast({
+    schema,
+    source,
+    contextValue: {
+      orgId: 27,
     },
-    {},
-    {},
-  )) as ExecutionResult;
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: {
       t1: {

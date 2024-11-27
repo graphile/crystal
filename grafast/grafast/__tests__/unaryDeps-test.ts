@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
@@ -12,6 +13,9 @@ import {
   grafast,
   makeGrafastSchema,
 } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 declare global {
   namespace Grafast {
@@ -252,18 +256,16 @@ it("works", () =>
       }
     `;
     const variableValues = {};
-    const result = (await grafast(
-      {
-        schema,
-        source,
-        variableValues,
-        contextValue: {
-          db,
-        },
+    const result = (await grafast({
+      schema,
+      source,
+      variableValues,
+      contextValue: {
+        db,
       },
-      {},
-      {},
-    )) as ExecutionResult;
+      resolvedPreset,
+      requestContext,
+    })) as ExecutionResult;
     expect(result.errors).to.be.undefined;
     expect(result.data).to.deep.equal({
       allPeople: [

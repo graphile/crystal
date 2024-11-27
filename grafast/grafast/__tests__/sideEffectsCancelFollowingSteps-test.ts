@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import assert from "assert";
+import { resolvePreset } from "graphile-config";
 import { it } from "mocha";
 
 import {
@@ -8,6 +9,8 @@ import {
   makeGrafastSchema,
   sideEffect,
 } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
 
 declare global {
   namespace Grafast {
@@ -61,7 +64,7 @@ it("cancels future steps on error", async () => {
     schema,
     source,
     requestContext: {},
-    resolvedPreset: {},
+    resolvedPreset,
     contextValue,
   });
   if (!("data" in result)) {

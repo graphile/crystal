@@ -1,15 +1,13 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type { ExecutionDetails } from "../dist/index.js";
 import {
   arrayOfLength,
-  constant,
   ExecutableStep,
   grafast,
-  lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
 

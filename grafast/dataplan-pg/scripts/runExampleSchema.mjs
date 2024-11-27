@@ -6,7 +6,7 @@ import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { readFile } from "fs/promises";
 import { sync as globSync } from "glob";
 import { grafast } from "grafast";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 
@@ -33,7 +33,7 @@ const preset = {
     },
   },
 };
-const resolvedPreset = resolvePresets([preset]);
+const resolvedPreset = resolvePreset(preset);
 
 async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");

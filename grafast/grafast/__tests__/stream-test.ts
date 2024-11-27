@@ -1,13 +1,10 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {
-  ExecutionDetails,
-  ExecutionExtra,
-  PromiseOrDirect,
-} from "../dist/index.js";
+import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   constant,
   ExecutableStep,
@@ -16,6 +13,9 @@ import {
   makeGrafastSchema,
 } from "../dist/index.js";
 import type { StreamDetails } from "../dist/interfaces.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 class SyncListCallbackStep<
   TIn,
@@ -102,14 +102,12 @@ it("streams with streamable step", async () => {
     }
   `;
   const schema = makeSchema(true);
-  const stream = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as AsyncGenerator<AsyncExecutionResult>;
+  const stream = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as AsyncGenerator<AsyncExecutionResult>;
   let payloads: AsyncExecutionResult[] = [];
   for await (const payload of stream) {
     payloads.push(payload);
@@ -151,14 +149,12 @@ it("streams with non-streamable step", async () => {
     }
   `;
   const schema = makeSchema(false);
-  const stream = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {},
-    {},
-  )) as AsyncGenerator<AsyncExecutionResult>;
+  const stream = (await grafast({
+    schema,
+    source,
+    resolvedPreset,
+    requestContext,
+  })) as AsyncGenerator<AsyncExecutionResult>;
   let payloads: AsyncExecutionResult[] = [];
   for await (const payload of stream) {
     payloads.push(payload);
