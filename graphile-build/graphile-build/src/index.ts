@@ -77,6 +77,7 @@ import type { PluginHook } from "graphile-config";
 
 import type { GatherPluginContext } from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
+import { GraphileBuildLibPreset } from "./preset.js";
 import { EXPORTABLE } from "./utils.js";
 
 // export globals for TypeDoc
@@ -470,12 +471,15 @@ async function writeFileIfDiffers(
  * Builds a GraphQL schema according to the given preset and input data.
  */
 export const buildSchema = (
-  preset: GraphileConfig.Preset,
+  rawPreset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
   shared: {
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
+  const preset = {
+    extends: [GraphileBuildLibPreset, rawPreset],
+  };
   const builder = getBuilder(preset, shared.inflection);
   const schema = builder.buildSchema(input);
   const {
