@@ -37,9 +37,9 @@ try {
   };
 }
 
-export function isResolvedPreset(
-  preset: GraphileConfig.Preset,
-): preset is GraphileConfig.ResolvedPreset {
+export function isResolvedPreset<TLib extends Record<string, unknown>>(
+  preset: GraphileConfig.Preset<TLib, any>,
+): preset is GraphileConfig.ResolvedPreset<TLib> {
   return (
     (preset.plugins &&
       preset.extends?.length === 0 &&
@@ -52,21 +52,48 @@ export function isResolvedPreset(
   );
 }
 
+/** @deprecated Use `resolvePreset({ extends: presets })` instead */
+export function resolvePresets(
+  presets: ReadonlyArray<GraphileConfig.Preset<any, any>>,
+) {
+  if (presets.length === 1) {
+    return resolvePreset(presets[0]);
+  }
+  return resolvePreset({ extends: presets });
+}
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
+export type Simplify<T> = {} & { [P in keyof T]: T[P] };
+
 /**
- * Given a list of presets, resolves the presets and returns the resulting
+ * Given a preset, recursively walks the `extends` and returns the resulting
  * ResolvedPreset (which does not have any `extends`).
  */
-export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
-  if (presets.length === 1) {
-    // Maybe it's already resolved?
-    const preset = presets[0];
-    if (preset && isResolvedPreset(preset)) {
-      return preset;
-    }
+export function resolvePreset<
+  TLib extends Record<string, unknown>,
+  TExtends extends ReadonlyArray<GraphileConfig.Preset<any, any>>,
+>(
+  preset: GraphileConfig.Preset<TLib, TExtends>,
+): GraphileConfig.ResolvedPreset<
+  Simplify<
+    TLib & TExtends extends readonly GraphileConfig.Preset<infer U, any>[]
+      ? UnionToIntersection<any extends U ? {} : U>
+      : {}
+  >
+> {
+  if (typeof preset !== "object" || preset === null) {
+    throw new Error(`Expected a preset, received ${inspect(preset)}`);
   }
-
+  // Maybe it's already resolved?
+  if (isResolvedPreset(preset)) {
+    return preset as any;
+  }
   const seenPluginNames = new Set<string>();
-  const resolvedPreset = resolvePresetsInternal(presets, seenPluginNames, 0);
+  const resolvedPreset = resolvePresetsInternal([preset], seenPluginNames, 0);
 
   const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
     (n) => !seenPluginNames.has(n),
@@ -85,10 +112,15 @@ export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
 }
 
 function resolvePresetsInternal(
-  presets: ReadonlyArray<GraphileConfig.Preset>,
+  presets: ReadonlyArray<
+    GraphileConfig.Preset<
+      Record<string, any>,
+      readonly GraphileConfig.Preset<any, any>[]
+    >
+  >,
   seenPluginNames: Set<string>,
   depth: number,
-): GraphileConfig.ResolvedPreset {
+): GraphileConfig.ResolvedPreset<any> {
   const finalPreset = blankResolvedPreset();
   for (const preset of presets) {
     if (isResolvedPreset(preset) && preset.disablePlugins) {
