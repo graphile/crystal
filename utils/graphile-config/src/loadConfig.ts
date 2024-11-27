@@ -61,10 +61,7 @@ function fixESMShenanigans(requiredModule: any): any {
 
 export async function loadConfig(
   configPath?: string | null,
-): Promise<GraphileConfig.Preset<
-  Record<string, unknown>,
-  readonly GraphileConfig.Preset<any, any>[]
-> | null> {
+): Promise<GraphileConfig.Preset | null> {
   if (configPath != null) {
     // Explicitly load the file the user has indicated
 
