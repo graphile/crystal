@@ -205,15 +205,25 @@ const gatherBase = (
       }
       const state = EMPTY_OBJECT;
       const context: GatherPluginContext<any, any> = {
-        helpers: helpers as GraphileConfig.GatherHelpers,
-        options,
-        state,
-        cache,
-        process: hooks.process.bind(hooks),
-        inflection,
-        resolvedPreset,
+        // Global libraries/helpers
+        lib: resolvedPreset.lib,
+
+        // DEPRECATED: use `lib` instead:
         grafast,
         EXPORTABLE,
+
+        // Established by the config
+        resolvedPreset,
+        options,
+
+        // Established by the start of the gather phase
+        inflection,
+        process: hooks.process.bind(hooks),
+
+        // Specific to this call
+        helpers: helpers as GraphileConfig.GatherHelpers,
+        state,
+        cache,
       };
       pluginContext.set(plugin, context);
       helpers[specNamespace] = Object.create(null);

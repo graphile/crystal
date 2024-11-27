@@ -9,11 +9,10 @@ import type {
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
+import { gatherConfig } from "graphile-build";
 import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
+import type sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import type { PgCodecMetaLookup } from "../inputUtils.js";
@@ -168,6 +167,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
     namespace: "pgBasics",
     helpers: {
       identifier(info, ...parts) {
+        const {
+          sql,
+          graphileBuild: { EXPORTABLE },
+        } = info.lib;
         switch (info.options.pgIdentifiers) {
           case "unqualified": {
             // strip the schema
@@ -380,6 +383,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       build(build) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
+          lib: { dataplanPg, sql },
         } = build;
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 

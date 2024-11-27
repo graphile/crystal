@@ -3,6 +3,7 @@ import * as assert from "assert";
 import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
+export { version } from "./version.js";
 
 /** Use this to enable coercing objects to SQL to make composing SQL fragments more ergonomic */
 export const $$toSQL = Symbol("toSQL");

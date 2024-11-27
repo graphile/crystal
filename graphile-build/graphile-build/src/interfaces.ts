@@ -10,6 +10,9 @@ export interface GatherPluginContext<
   TState extends { [key: string]: any },
   TCache extends { [key: string]: any },
 > {
+  /** Libraries and modules to save importing */
+  lib: GraphileConfig.Lib;
+
   /**
    * The (completed) inflection object, to help you name things your data
    * gathering produces.
