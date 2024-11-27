@@ -146,7 +146,10 @@ function resolvePresetsInternal(
   return finalPreset;
 }
 
-function isGraphileConfigPreset(foo: unknown): foo is GraphileConfig.Preset {
+function isGraphileConfigPreset<
+  TLib extends Record<string, unknown> = any,
+  TExtends extends ReadonlyArray<GraphileConfig.Preset<any, any>> = any,
+>(foo: unknown): foo is GraphileConfig.Preset<TLib, TExtends> {
   if (typeof foo !== "object" || foo === null) return false;
 
   // Check regular prototype
@@ -223,11 +226,20 @@ function isForbiddenPluginKey(key: string): boolean {
  *
  * @internal
  */
-function resolvePresetInternal(
-  preset: GraphileConfig.Preset,
+function resolvePresetInternal<
+  TLib extends Record<string, unknown>,
+  TExtends extends ReadonlyArray<GraphileConfig.Preset<any, any>>,
+>(
+  preset: GraphileConfig.Preset<TLib, TExtends>,
   seenPluginNames: Set<string>,
   depth: number,
-): GraphileConfig.ResolvedPreset {
+): GraphileConfig.ResolvedPreset<
+  Simplify<
+    TLib & TExtends extends readonly GraphileConfig.Preset<infer U, any>[]
+      ? UnionToIntersection<any extends U ? {} : U>
+      : {}
+  >
+> {
   if (!isGraphileConfigPreset(preset)) {
     throw new Error(
       `Expected a GraphileConfig preset (a plain JS object), but found '${inspect(
@@ -276,7 +288,7 @@ function resolvePresetInternal(
   );
 
   try {
-    mergePreset(basePreset, rest, seenPluginNames, depth);
+    mergePreset(basePreset, { lib: {}, ...rest }, seenPluginNames, depth);
     return basePreset;
   } catch (e) {
     throw new Error(
@@ -297,8 +309,8 @@ function resolvePresetInternal(
  * @internal
  */
 function mergePreset(
-  targetPreset: GraphileConfig.ResolvedPreset,
-  sourcePreset: GraphileConfig.ResolvedPreset,
+  targetPreset: GraphileConfig.ResolvedPreset<any>,
+  sourcePreset: GraphileConfig.ResolvedPreset<any>,
   seenPluginNames: Set<string>,
   _depth: number,
 ): void {
@@ -353,32 +365,36 @@ function mergePreset(
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
   for (const scope of scopes) {
     const targetScope =
-      targetPreset[scope as keyof GraphileConfig.ResolvedPreset];
-    const sourceScope = sourcePreset[scope as keyof GraphileConfig.Preset];
+      targetPreset[scope as keyof GraphileConfig.ResolvedPreset<any>];
+    const sourceScope =
+      sourcePreset[scope as keyof GraphileConfig.Preset<any, any>];
     if (targetScope && sourceScope) {
       if (Array.isArray(targetScope) !== Array.isArray(sourceScope)) {
         throw new Error(
           `${scope} contains an array entry in one preset and a non-array entry in another, this doesn't make sense`,
         );
       } else if (Array.isArray(sourceScope)) {
-        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+        targetPreset[scope as keyof GraphileConfig.ResolvedPreset<any>] =
           sourceScope as any;
       } else {
-        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+        targetPreset[scope as keyof GraphileConfig.ResolvedPreset<any>] =
           Object.assign(Object.create(null), targetScope, sourceScope);
       }
     } else {
-      targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
+      targetPreset[scope as keyof GraphileConfig.ResolvedPreset<any>] =
         (targetScope || sourceScope) as any;
     }
   }
 }
 
-function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
+function blankResolvedPreset(): GraphileConfig.ResolvedPreset<
+  Record<string, unknown>
+> {
   return {
     extends: [],
     plugins: [],
     disablePlugins: [],
+    lib: Object.create(null),
   };
 }
 
