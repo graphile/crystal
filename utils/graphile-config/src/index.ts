@@ -38,6 +38,7 @@ export function sortedPlugins(
 declare global {
   namespace GraphileConfig {
     interface Lib {
+      versions: Record<string, string | undefined>;
       // Extend this through declaration merging
     }
 

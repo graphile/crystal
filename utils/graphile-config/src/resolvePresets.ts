@@ -330,19 +330,34 @@ function mergePreset(
     for (const key of Object.keys(sourcePreset.lib) as Array<
       keyof GraphileConfig.Lib
     >) {
-      const value = sourcePreset.lib[key];
+      const sourceValue = sourcePreset.lib[key];
       if (!(key in targetPreset.lib)) {
-        targetPreset.lib[key] = value;
-      } else if (targetPreset.lib[key] === value) {
+        (targetPreset.lib as Record<string, any>)[key] = sourceValue;
+      } else if (key === "versions") {
+        if (sourceValue) {
+          for (const versionKey of Object.keys(sourceValue)) {
+            const { versions: targetVersions } = targetPreset.lib;
+            const sourceVersion = sourceValue[versionKey];
+            if (targetVersions[versionKey] === sourceVersion) {
+              // noop
+            } else if (targetVersions[versionKey]) {
+              throw new Error(
+                `Preset attempted to register version '${sourceVersion}' of '${versionKey}', but version '${targetVersions[versionKey]}' is already registered`,
+              );
+            } else {
+              targetVersions[versionKey] = sourceVersion;
+            }
+          }
+        }
+      } else if (targetPreset.lib[key] === sourceValue) {
         // noop
       } else {
         throw new Error(
           `Two different presets defined lib '${key}' but they had different values:\n\n    ${inspect(
             targetPreset.lib[key],
-          ).replace(/\n/g, "\n    ")}\n\nvs\n\n    ${inspect(value).replace(
-            /\n/g,
-            "\n    ",
-          )}`,
+          ).replace(/\n/g, "\n    ")}\n\nvs\n\n    ${inspect(
+            sourceValue,
+          ).replace(/\n/g, "\n    ")}`,
         );
       }
     }
