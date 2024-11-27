@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { it } from "mocha";
 
-import { resolvePresets } from "../dist/index.js";
+import { resolvePreset } from "../dist/index.js";
 
 const SomePreset: GraphileConfig.Preset = {};
 
@@ -28,11 +28,9 @@ const PluginWithExtends: GraphileConfig.Plugin = {
 it("is fine with reasonable looking plugin", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        plugins: [SomePlugin],
-      },
-    ]);
+    resolvePreset({
+      plugins: [SomePlugin],
+    });
   } catch (e) {
     error = e;
   }
@@ -42,11 +40,9 @@ it("is fine with reasonable looking plugin", () => {
 it("throws an error if a plugin looks like a preset (has plugins)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        plugins: [PluginWithPlugins],
-      },
-    ]);
+    resolvePreset({
+      plugins: [PluginWithPlugins],
+    });
   } catch (e) {
     error = e;
   }
@@ -57,11 +53,9 @@ it("throws an error if a plugin looks like a preset (has plugins)", () => {
 it("throws an error if a plugin looks like a preset (has disablePlugins)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        plugins: [PluginWithDisablePlugins],
-      },
-    ]);
+    resolvePreset({
+      plugins: [PluginWithDisablePlugins],
+    });
   } catch (e) {
     error = e;
   }
@@ -72,11 +66,9 @@ it("throws an error if a plugin looks like a preset (has disablePlugins)", () =>
 it("throws an error if a plugin looks like a preset (has extends)", () => {
   let error: Error | undefined;
   try {
-    resolvePresets([
-      {
-        plugins: [PluginWithExtends],
-      },
-    ]);
+    resolvePreset({
+      plugins: [PluginWithExtends],
+    });
   } catch (e) {
     error = e;
   }

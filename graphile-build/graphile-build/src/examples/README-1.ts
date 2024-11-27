@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import chalk from "chalk";
 import { lambda } from "grafast";
 import { graphql, printSchema } from "grafast/graphql";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { exportSchema } from "graphile-export";
 
 import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
@@ -92,16 +92,14 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
 
 (async function () {
   // Create our GraphQL schema by applying all the plugins
-  const config = resolvePresets([
-    {
-      extends: [defaultPreset],
-      plugins: [MyRandomFieldPlugin],
-      schema: {
-        myDefaultMin: 1,
-        myDefaultMax: 6,
-      },
+  const config = resolvePreset({
+    extends: [defaultPreset],
+    plugins: [MyRandomFieldPlugin],
+    schema: {
+      myDefaultMin: 1,
+      myDefaultMax: 6,
     },
-  ]);
+  });
 
   // This'd normally be the "gather" phase, but we don't need one
   const input: GraphileBuild.BuildInput = Object.create(null);

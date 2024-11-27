@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
@@ -95,7 +95,7 @@ async function configFromArgs(args: ArgsFromOptions<typeof options>) {
     preset.ruru.enableProxy = enableProxy;
   }
 
-  const config = resolvePresets([preset]);
+  const config = resolvePreset(preset);
   return config;
 }
 

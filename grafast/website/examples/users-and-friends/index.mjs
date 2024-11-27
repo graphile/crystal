@@ -16,7 +16,7 @@ import {
   TRAP_INHIBITED,
 } from "grafast";
 import { planToMermaid } from "grafast/mermaid";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import {
   buildSchema,
   execute as graphqlExecute,
@@ -221,7 +221,7 @@ async function runGraphQL() {
 }
 
 const baseContext = { currentUserId: 1 };
-const resolvedPreset = resolvePresets([{}]);
+const resolvedPreset = resolvePreset({});
 async function runGrafastWithGraphQLSchema() {
   const result = await grafastExecute({
     schema: schemaDL,

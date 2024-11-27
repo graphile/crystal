@@ -1,6 +1,6 @@
 import type { PgRegistry } from "@dataplan/pg";
 import chalk from "chalk";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type {} from "postgraphile";
 
@@ -31,7 +31,7 @@ export async function main(options: {
     process.exit(1);
   }
   const { buildInflection, gather, getBuilder } = await importGraphileBuild();
-  const resolvedPreset = resolvePresets([userPreset]);
+  const resolvedPreset = resolvePreset(userPreset);
   const inflection = buildInflection(resolvedPreset);
   const shared = { inflection };
   const input = await gather(resolvedPreset, shared);

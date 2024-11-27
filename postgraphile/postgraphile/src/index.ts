@@ -7,7 +7,7 @@ import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 
 export { makeSchema, watchSchema };
 
@@ -25,7 +25,7 @@ function noop() {}
 export function postgraphile(
   preset: GraphileConfig.Preset,
 ): PostGraphileInstance {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   let schemaResult:
     | PromiseLike<SchemaResult>
     | Deferred<SchemaResult>

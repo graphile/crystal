@@ -8,7 +8,7 @@ import {
   lexicographicSortSchema,
   printSchema,
 } from "grafast/graphql";
-import { AsyncHooks, orderedApply, resolvePresets } from "graphile-config";
+import { AsyncHooks, orderedApply, resolvePreset } from "graphile-config";
 
 export { isValidBehaviorString } from "./behavior.js";
 import extend from "./extend.js";
@@ -94,7 +94,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const buildInflection = (
   preset: GraphileConfig.Preset,
 ): GraphileBuild.Inflection => {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   const { plugins, inflection: _options = {} } = resolvedPreset;
 
   const inflectors: Partial<GraphileBuild.Inflection> = makeInitialInflection();
@@ -168,7 +168,7 @@ const gatherBase = (
     inflection: GraphileBuild.Inflection;
   } = { inflection: buildInflection(preset) },
 ) => {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   const options = resolvedPreset.gather || {};
   const plugins = resolvedPreset.plugins;
   const globalState: { [key: string]: any } = Object.create(null);
@@ -422,7 +422,7 @@ export const getBuilder = (
   preset: GraphileConfig.Preset,
   inflection: GraphileBuild.Inflection = buildInflection(preset),
 ): SchemaBuilder => {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   if (!resolvedPreset.plugins || resolvedPreset.plugins.length === 0) {
     throw new Error(
       `You're attempting to build a GraphQL schema, but no plugins are specified in your preset. Please check the 'extends' key in your preset - you may have forgotten to add the relevant presets, or the presets may not have been imported correctly.`,
@@ -542,7 +542,7 @@ export async function makeSchema(
   preset: GraphileConfig.Preset,
   // ENHANCE: AbortSignal
 ): Promise<SchemaResult> {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   // An error caused here cannot be solved by retrying, so don't catch it.
   const inflection = buildInflection(resolvedPreset);
   const shared = { inflection };
@@ -648,7 +648,7 @@ export async function watchSchema(
   preset: GraphileConfig.Preset,
   callback: (fatalError: Error | null, params?: SchemaResult) => void,
 ): Promise<() => void> {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   const shared = { inflection: buildInflection(resolvedPreset) };
 
   const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;

@@ -6,7 +6,7 @@
  */
 
 import { buildInflection, buildSchema, gather } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import * as jsonwebtoken from "jsonwebtoken";
 
@@ -22,7 +22,7 @@ async function main() {
   // Resolve the preset(s)
 
   /** Our final resolved preset; containing all plugins and configs */
-  const config = resolvePresets([preset]);
+  const config = resolvePreset(preset);
 
   // ---------------------------------------------------------------------------
   // Perform the "inflection" phase

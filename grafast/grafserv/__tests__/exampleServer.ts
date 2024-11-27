@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { constant, error, makeGrafastSchema } from "grafast";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 
 import { grafserv } from "../src/servers/node/index.js";
 
@@ -15,7 +15,7 @@ export async function makeExampleServer(
     },
   },
 ) {
-  const resolvedPreset = resolvePresets([preset]);
+  const resolvedPreset = resolvePreset(preset);
   const schema = makeGrafastSchema({
     typeDefs: /* GraphQL */ `
       type Query {

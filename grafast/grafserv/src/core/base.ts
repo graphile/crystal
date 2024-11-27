@@ -11,7 +11,7 @@ import {
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { Middleware } from "graphile-config";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 
 import { getGrafservMiddleware } from "../hooks.js";
 import type {
@@ -74,7 +74,7 @@ export class GrafservBase {
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
-    this.resolvedPreset = config.preset ? resolvePresets([config.preset]) : {};
+    this.resolvedPreset = config.preset ? resolvePreset(config.preset) : {};
     this.dynamicOptions = {
       validationRules: [...graphql.specifiedRules],
       getExecutionConfig: defaultMakeGetExecutionConfig(),
@@ -218,7 +218,7 @@ export class GrafservBase {
       );
     }
     this._settingPreset = true;
-    const resolvedPreset = resolvePresets([newPreset]);
+    const resolvedPreset = resolvePreset(newPreset);
     const middleware = getGrafservMiddleware(this.resolvedPreset);
     const grafastMiddleware = getGrafastMiddleware(this.resolvedPreset);
     // Note: this gets directly mutated

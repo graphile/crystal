@@ -4,7 +4,7 @@ import { inspect } from "node:util";
 
 import type { PgAdaptor } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 
@@ -225,7 +225,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     preset.grafserv!.watch = watch;
   }
 
-  const config = resolvePresets([preset]);
+  const config = resolvePreset(preset);
   if (!Array.isArray(config.pgServices) || config.pgServices.length === 0) {
     // ENHANCE: respect envvars here?
     console.error(

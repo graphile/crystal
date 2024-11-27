@@ -686,11 +686,11 @@ which were previously the second argument), second comes the result of gather
 and finally comes the shared object which contains inflection.
 
 ```js
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { buildInflection, gather, buildSchema } from "graphile-build";
 import preset from "./graphile.config.js";
 
-const resolvedPreset = resolvePresets([preset]);
+const resolvedPreset = resolvePreset(preset);
 const shared = { inflection: buildInflection(resolvedPreset) };
 const input = await gather(resolvedPreset, shared);
 const schema = buildSchema(resolvedPreset, input, shared);

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { getTerminalWidth } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
@@ -48,7 +48,7 @@ export async function run(args: Opts) {
     console.error("Failed to load config, please check the file exists");
     process.exit(1);
   }
-  const resolvedPreset = resolvePresets([userPreset]);
+  const resolvedPreset = resolvePreset(userPreset);
   console.log(printPlugins(opts, resolvedPreset.plugins));
   for (const key of Object.keys(
     resolvedPreset,

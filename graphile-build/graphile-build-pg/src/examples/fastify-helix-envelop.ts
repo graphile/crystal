@@ -17,7 +17,7 @@ import chalk from "chalk";
 import fastify from "fastify";
 import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import { buildInflection, buildSchema, gather } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import {
   getGraphQLParameters,
   processRequest,
@@ -36,7 +36,7 @@ async function main() {
   // Resolve the preset(s)
 
   /** Our final resolved preset; containing all plugins and configs */
-  const config = resolvePresets([preset]);
+  const config = resolvePreset(preset);
 
   // ---------------------------------------------------------------------------
   // Perform the "inflection" phase

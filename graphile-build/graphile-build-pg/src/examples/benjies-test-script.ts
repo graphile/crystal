@@ -29,7 +29,7 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import {
   getGraphQLParameters,
@@ -52,27 +52,25 @@ pool.on("error", (e) => {
 
 (async function () {
   // Create our GraphQL schema by applying all the plugins
-  const config = resolvePresets([
-    {
-      extends: [graphileBuildPreset, graphileBuildPgPreset],
-      plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
-      pgServices: [
-        makePgService({
-          name: "main",
-          schemas: ["a", "b", "c"],
-          pgSettingsKey: "pgSettings",
-          withPgClientKey: "withPgClient",
-          pool,
-        }),
-      ],
-      gather: {
-        pgJwtTypes: "b.jwt_token",
-      },
-      schema: {
-        pgJwtSecret: "secret",
-      },
+  const config = resolvePreset({
+    extends: [graphileBuildPreset, graphileBuildPgPreset],
+    plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
+    pgServices: [
+      makePgService({
+        name: "main",
+        schemas: ["a", "b", "c"],
+        pgSettingsKey: "pgSettings",
+        withPgClientKey: "withPgClient",
+        pool,
+      }),
+    ],
+    gather: {
+      pgJwtTypes: "b.jwt_token",
     },
-  ]);
+    schema: {
+      pgJwtSecret: "secret",
+    },
+  });
 
   // Perform the "inflection" phase
   const shared = { inflection: buildInflection(config) };

@@ -9,7 +9,7 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { resolvePresets } from "graphile-config";
+import { resolvePreset } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import { Pool } from "pg";
 import webpack from "webpack";
@@ -34,26 +34,24 @@ pool.on("error", (e) => {
 
 async function main() {
   // The Graphile configuration
-  const config = resolvePresets([
-    {
-      extends: [graphileBuildPreset, graphileBuildPgPreset],
-      plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
-      pgServices: [
-        // Configuration of our main (and only) Postgres database
-        makePgService({
-          name: "main",
-          schemas: ["public"],
-          pgSettingsKey: "pgSettings",
-          withPgClientKey: "withPgClient",
-          pool,
-        }),
-      ],
-      gather: {},
-      schema: {
-        defaultBehavior: "+list -connection",
-      },
+  const config = resolvePreset({
+    extends: [graphileBuildPreset, graphileBuildPgPreset],
+    plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
+    pgServices: [
+      // Configuration of our main (and only) Postgres database
+      makePgService({
+        name: "main",
+        schemas: ["public"],
+        pgSettingsKey: "pgSettings",
+        withPgClientKey: "withPgClient",
+        pool,
+      }),
+    ],
+    gather: {},
+    schema: {
+      defaultBehavior: "+list -connection",
     },
-  ]);
+  });
 
   // Inflection phase
   const shared = { inflection: buildInflection(config) };
