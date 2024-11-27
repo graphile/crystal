@@ -233,7 +233,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }
                 const fieldName = build.assertValidName(
                   fieldScope.fieldName,
-                  `Object type $1 attempted to define a field with invalid name $0.`,
+                  `Object type '$1' attempted to define a field with invalid name $0.`,
                   [typeName],
                 );
                 build.extend(
@@ -286,16 +286,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ),
                 };
 
-                for (const [argName, argSpec] of Object.entries(
+                for (const [rawArgName, argSpec] of Object.entries(
                   finalFieldSpec.args,
                 )) {
-                  if (!argName) {
-                    throw new Error(
-                      `Attempted to add empty/falsy argName to GraphQLObjectType ${typeName}'s '${fieldName}' field; ${inspect(
-                        argSpec,
-                      )}`,
-                    );
-                  }
+                  const argName = build.assertValidName(
+                    rawArgName,
+                    `Object type '$1' attempted to define an argument for field '$2' with invalid name $0.`,
+                    [typeName, fieldName],
+                  );
                   const argContext = {
                     ...argsContext,
                     scope: {
@@ -405,17 +403,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ...interfaceContext,
                 Self,
                 fieldWithHooks: (fieldScope, fieldSpec) => {
-                  const { fieldName } = fieldScope;
+                  if (!isString(fieldScope.fieldName)) {
+                    throw new Error(
+                      "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
+                    );
+                  }
+                  const fieldName = build.assertValidName(
+                    fieldScope.fieldName,
+                    `Interface type '$1' attempted to define a field with invalid name $0.`,
+                    [typeName],
+                  );
                   build.extend(
                     fieldScope,
                     scope,
                     "Adding interface scope to interface's field scope",
                   );
-                  if (!isString(fieldName)) {
-                    throw new Error(
-                      "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
-                    );
-                  }
                   if (!fieldScope) {
                     throw new Error(
                       "All calls to `fieldWithHooks` must specify a `fieldScope` " +
@@ -460,16 +462,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   };
                   const finalFieldSpec = newSpec;
 
-                  for (const [argName, argSpec] of Object.entries(
+                  for (const [rawArgName, argSpec] of Object.entries(
                     finalFieldSpec.args!,
                   )) {
-                    if (!argName) {
-                      throw new Error(
-                        `Attempted to add empty/falsy argName to GraphQLInterfaceType ${typeName}'s '${fieldName}' field; ${inspect(
-                          argSpec,
-                        )}`,
-                      );
-                    }
+                    const argName = build.assertValidName(
+                      rawArgName,
+                      `Interface type '$1' attempted to define an argument for field '$2' with invalid name $0.`,
+                      [typeName, fieldName],
+                    );
                     const argContext = {
                       ...argsContext,
                       scope: {
@@ -581,7 +581,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const typeName = build.assertValidName(
             baseName,
-            `Attempted to define an interface type with invalid name $0.`,
+            `Attempted to define an union type with invalid name $0.`,
           );
 
           const finalSpec = {
@@ -652,7 +652,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   }
                   const fieldName = build.assertValidName(
                     fieldScope.fieldName,
-                    `Input object type $1 attempted to define a field with invalid name $0.`,
+                    `Input object type '$1' attempted to define a field with invalid name $0.`,
                     [typeName],
                   );
                   const finalFieldScope: GraphileBuild.ScopeInputObjectFieldsField =
@@ -814,7 +814,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const typeName = build.assertValidName(
             baseName,
-            `Attempted to define a scalar type with invalid name $0.`,
+            `Attempted to define an enum type with invalid name $0.`,
           );
 
           const valuesContext: GraphileBuild.ContextEnumValues = {
@@ -837,7 +837,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 (memo, [rawValueName, value]) => {
                   const valueName = build.assertValidName(
                     rawValueName,
-                    `Enum type $1 attempted to define a value with invalid name $0.`,
+                    `Enum type '$1' attempted to define a value with invalid name $0.`,
                     [typeName],
                   );
                   const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
