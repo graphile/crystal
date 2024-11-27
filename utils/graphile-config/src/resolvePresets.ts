@@ -49,23 +49,31 @@ export function isResolvedPreset(
   );
 }
 
-/**
- * Given a list of presets, resolves the presets and returns the resulting
- * ResolvedPreset (which does not have any `extends`).
- */
+/** @deprecated Use `resolvePreset({ extends: presets })` instead */
 export function resolvePresets(
   presets: ReadonlyArray<GraphileConfig.Preset>,
 ): GraphileConfig.ResolvedPreset {
   if (presets.length === 1) {
-    // Maybe it's already resolved?
-    const preset = presets[0];
-    if (preset && isResolvedPreset(preset)) {
-      return preset;
-    }
+    return resolvePreset(presets[0]);
+  } else {
+    return resolvePreset({ extends: presets });
+  }
+}
+
+/**
+ * Given a presets, recursively resolve all the extends and returns the
+ * resulting ResolvedPreset (which does not have any `extends`).
+ */
+export function resolvePreset(
+  preset: GraphileConfig.Preset,
+): GraphileConfig.ResolvedPreset {
+  // Maybe it's already resolved?
+  if (preset && isResolvedPreset(preset)) {
+    return preset;
   }
 
   const seenPluginNames = new Set<string>();
-  const resolvedPreset = resolvePresetsInternal(presets, seenPluginNames, 0);
+  const resolvedPreset = resolvePresetsInternal([preset], seenPluginNames, 0);
 
   const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
     (n) => !seenPluginNames.has(n),

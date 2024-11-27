@@ -19,7 +19,11 @@ export type {
 } from "./interfaces.js";
 export type { MiddlewareHandlers, MiddlewareNext } from "./middleware.js";
 export { Middleware } from "./middleware.js";
-export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
+export {
+  isResolvedPreset,
+  resolvePreset,
+  resolvePresets,
+} from "./resolvePresets.js";
 
 export function sortedPlugins(
   plugins: GraphileConfig.Plugin[] | undefined,
