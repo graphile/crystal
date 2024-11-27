@@ -61,7 +61,7 @@ export function resolvePresets(
 }
 
 /**
- * Given a presets, recursively resolve all the extends and returns the
+ * Given a preset, recursively resolves all the `extends` and returns the
  * resulting ResolvedPreset (which does not have any `extends`).
  */
 export function resolvePreset(
