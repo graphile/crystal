@@ -44,6 +44,8 @@ export function isResolvedPreset(
     (preset.extends == null &&
       preset.plugins &&
       preset.disablePlugins &&
+      typeof preset.lib === "object" &&
+      preset.lib !== null &&
       !preset.plugins.some((p) => preset.disablePlugins!.includes(p.name))) ||
     false
   );
@@ -324,6 +326,28 @@ function mergePreset(
     (p) => !disablePlugins.includes(p.name),
   );
 
+  if (sourcePreset.lib) {
+    for (const key of Object.keys(sourcePreset.lib) as Array<
+      keyof GraphileConfig.Lib
+    >) {
+      const value = sourcePreset.lib[key];
+      if (!(key in targetPreset.lib)) {
+        targetPreset.lib[key] = value;
+      } else if (targetPreset.lib[key] === value) {
+        // noop
+      } else {
+        throw new Error(
+          `Two different presets defined lib '${key}' but they had different values:\n\n    ${inspect(
+            targetPreset.lib[key],
+          ).replace(/\n/g, "\n    ")}\n\nvs\n\n    ${inspect(value).replace(
+            /\n/g,
+            "\n    ",
+          )}`,
+        );
+      }
+    }
+  }
+
   const targetScopes = Object.keys(targetPreset).filter(isScopeKeyForPreset);
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
@@ -357,6 +381,7 @@ function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
   return {
     plugins: [],
     disablePlugins: [],
+    lib: Object.create(null),
   };
 }
 
@@ -365,5 +390,10 @@ function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
  * Preset type (before declaration merging).
  */
 function isScopeKeyForPreset(key: string) {
-  return key !== "extends" && key !== "plugins" && key !== "disablePlugins";
+  return (
+    key !== "extends" &&
+    key !== "plugins" &&
+    key !== "disablePlugins" &&
+    key !== "lib"
+  );
 }
