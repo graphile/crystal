@@ -271,7 +271,7 @@ const gatherBase = (
         const context = pluginContext.get(plugin)!;
         const val =
           typeof spec.initialState === "function"
-            ? await spec.initialState(context.cache)
+            ? await spec.initialState(context.cache, context)
             : Object.create(null);
         context.state = gatherState[specNamespace] = val;
       }
@@ -819,7 +819,10 @@ declare global {
        * The initial value to use for this plugin when a new gather run
        * executes.
        */
-      initialState?: (cache: TCache) => PromiseOrDirect<TState>;
+      initialState?: (
+        cache: TCache,
+        context: GatherPluginContext<TState, TCache>,
+      ) => PromiseOrDirect<TState>;
 
       /**
        * The plugin must register helpers to allow other plugins to access its

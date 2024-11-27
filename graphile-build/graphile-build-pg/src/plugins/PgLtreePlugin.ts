@@ -1,7 +1,5 @@
 import type { PgCodec } from "@dataplan/pg";
-import { listOfCodec } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-build";
-import sql from "pg-sql2";
+import { gatherConfig } from "graphile-build";
 
 import { version } from "../version.js";
 
@@ -9,6 +7,7 @@ interface State {
   ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;
   ltreeArrayCodec: PgCodec;
 }
+interface Cache {}
 
 declare global {
   namespace GraphileConfig {
@@ -22,8 +21,13 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
   name: "PgLtreePlugin",
   version,
 
-  gather: {
-    initialState(): State {
+  gather: gatherConfig({
+    initialState(cache: Cache, { lib }): State {
+      const {
+        dataplanPg: { listOfCodec },
+        graphileBuild: { EXPORTABLE },
+        sql,
+      } = lib;
       const ltreeCodec: PgCodec<string, any, any, any, undefined, any, any> =
         EXPORTABLE(
           (sql) => ({
@@ -68,7 +72,7 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  },
+  }),
   schema: {
     hooks: {
       init(_, build) {
