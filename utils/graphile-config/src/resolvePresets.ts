@@ -41,13 +41,10 @@ export function isResolvedPreset(
   preset: GraphileConfig.Preset,
 ): preset is GraphileConfig.ResolvedPreset {
   return (
-    (preset.plugins &&
-      preset.extends?.length === 0 &&
-      (!preset.disablePlugins ||
-        !preset.plugins ||
-        !preset.plugins.some((p) =>
-          preset.disablePlugins!.includes(p.name),
-        ))) ||
+    (preset.extends == null &&
+      preset.plugins &&
+      preset.disablePlugins &&
+      !preset.plugins.some((p) => preset.disablePlugins!.includes(p.name))) ||
     false
   );
 }
@@ -56,7 +53,9 @@ export function isResolvedPreset(
  * Given a list of presets, resolves the presets and returns the resulting
  * ResolvedPreset (which does not have any `extends`).
  */
-export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
+export function resolvePresets(
+  presets: ReadonlyArray<GraphileConfig.Preset>,
+): GraphileConfig.ResolvedPreset {
   if (presets.length === 1) {
     // Maybe it's already resolved?
     const preset = presets[0];
@@ -266,7 +265,7 @@ function resolvePresetInternal(
  */
 function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
-  sourcePreset: GraphileConfig.ResolvedPreset,
+  sourcePreset: Omit<GraphileConfig.Preset, "extends">,
   seenPluginNames: Set<string>,
   _depth: number,
 ): void {
@@ -278,7 +277,7 @@ function mergePreset(
       sourcePluginNames.push(plugin.name);
     }
   }
-  if (targetPreset.extends != null && targetPreset.extends.length !== 0) {
+  if (targetPreset.extends != null) {
     throw new Error("First argument to mergePreset must be a resolved preset");
   }
 
@@ -316,35 +315,38 @@ function mergePreset(
   targetPreset.plugins = [...plugins].filter(
     (p) => !disablePlugins.includes(p.name),
   );
+
   const targetScopes = Object.keys(targetPreset).filter(isScopeKeyForPreset);
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
   for (const scope of scopes) {
     const targetScope =
       targetPreset[scope as keyof GraphileConfig.ResolvedPreset];
-    const sourceScope = sourcePreset[scope as keyof GraphileConfig.Preset];
+    const sourceScope =
+      sourcePreset[scope as keyof Omit<GraphileConfig.Preset, "extends">];
     if (targetScope && sourceScope) {
       if (Array.isArray(targetScope) !== Array.isArray(sourceScope)) {
         throw new Error(
           `${scope} contains an array entry in one preset and a non-array entry in another, this doesn't make sense`,
         );
       } else if (Array.isArray(sourceScope)) {
-        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
-          sourceScope as any;
+        (targetPreset as any)[scope] = sourceScope as any;
       } else {
-        targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
-          Object.assign(Object.create(null), targetScope, sourceScope);
+        (targetPreset as any)[scope] = Object.assign(
+          Object.create(null),
+          targetScope,
+          sourceScope,
+        );
       }
     } else {
-      targetPreset[scope as keyof GraphileConfig.ResolvedPreset] =
-        (targetScope || sourceScope) as any;
+      (targetPreset as any)[scope as keyof GraphileConfig.ResolvedPreset] =
+        targetScope || sourceScope;
     }
   }
 }
 
 function blankResolvedPreset(): GraphileConfig.ResolvedPreset {
   return {
-    extends: [],
     plugins: [],
     disablePlugins: [],
   };

@@ -83,11 +83,17 @@ declare global {
       // isScopeKeyForPreset check.
     }
 
+    /**
+     * The result of `resolvePreset(preset)` on a preset - compatible with
+     * `Preset` but guaranteed to not extend from other presets (and a few
+     * other assertions).
+     */
     interface ResolvedPreset extends Preset {
-      // As Preset, except extends is an empty array and plugins is definitely set.
-      extends?: ReadonlyArray<never>;
-      plugins?: Plugin[];
-      disablePlugins?: ReadonlyArray<keyof GraphileConfig.Plugins>;
+      // As Preset, except `extends` is omitted, plugins and disable plugins
+      // are required.
+      extends?: never;
+      plugins: Plugin[];
+      disablePlugins: ReadonlyArray<keyof GraphileConfig.Plugins>;
     }
   }
 }
