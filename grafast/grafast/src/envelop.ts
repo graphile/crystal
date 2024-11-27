@@ -1,10 +1,10 @@
 import type { Plugin as EnvelopPlugin } from "@envelop/core";
+import { resolvePreset } from "graphile-config";
 import type { IncomingMessage } from "http";
 
 import { execute as grafastExecute } from "./execute.js";
 import { stripAnsi } from "./stripAnsi.js";
 import { subscribe as grafastSubscribe } from "./subscribe.js";
-import { resolvePreset } from "graphile-config";
 
 export interface UseGrafastOptions {
   /**
