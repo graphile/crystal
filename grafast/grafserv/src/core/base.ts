@@ -74,7 +74,7 @@ export class GrafservBase {
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
-    this.resolvedPreset = config.preset ? resolvePreset(config.preset) : {};
+    this.resolvedPreset = resolvePreset(config.preset ? config.preset : {});
     this.dynamicOptions = {
       validationRules: [...graphql.specifiedRules],
       getExecutionConfig: defaultMakeGetExecutionConfig(),
