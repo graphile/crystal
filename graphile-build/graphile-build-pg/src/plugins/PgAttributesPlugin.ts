@@ -273,25 +273,21 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
     add: {
       _attributeName(options, { attributeName, codec }) {
         const attribute = codec.attributes[attributeName];
-        return this.coerceToGraphQLName(
-          attribute.extensions?.tags?.name || attributeName,
-        );
+        const name = attribute.extensions?.tags?.name || attributeName;
+        // Avoid conflict with 'id' field used for Relay.
+        const nonconflictName =
+          name === "id" && !codec.isAnonymous ? "row_id" : name;
+        return this.coerceToGraphQLName(nonconflictName);
       },
 
       _joinAttributeNames(options, codec, names) {
         return names
-          .map((attributeName) => {
-            return this.attribute({ attributeName, codec });
-          })
+          .map((attributeName) => this._attributeName({ attributeName, codec }))
           .join("-and-");
       },
 
       attribute(options, details) {
-        const attributeFieldName = this.camelCase(this._attributeName(details));
-        // Avoid conflict with 'id' field used for Relay.
-        return attributeFieldName === "id" && !details.codec.isAnonymous
-          ? "rowId"
-          : attributeFieldName;
+        return this.camelCase(this._attributeName(details));
       },
     },
   },

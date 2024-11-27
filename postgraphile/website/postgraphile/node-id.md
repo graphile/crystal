@@ -33,15 +33,10 @@ const IdToNodeIdPlugin: GraphileConfig.Plugin = {
       nodeIdFieldName() {
         return "nodeId";
       },
-      attribute(previous, options, details) {
-        if (!previous) {
-          throw new Error("There was no 'attribute' inflector to replace?!");
-        }
-        const name = previous(details);
-        if (name === "rowId") {
-          return "id";
-        }
-        return name;
+      _attributeName(previous, options, details) {
+        const attribute = codec.attributes[attributeName];
+        const name = attribute.extensions?.tags?.name || attributeName;
+        return this.coerceToGraphQLName(name);
       },
     },
   },

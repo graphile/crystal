@@ -77,11 +77,23 @@ declare global {
           isReferencee: boolean;
         },
       ): string;
+      _singleRelationRaw(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
       singleRelation(
         this: Inflection,
         details: PgRelationsPluginRelationDetails,
       ): string;
+      _singleRelationBackwardsRaw(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
       singleRelationBackwards(
+        this: Inflection,
+        details: PgRelationsPluginRelationDetails,
+      ): string;
+      _manyRelationRaw(
         this: Inflection,
         details: PgRelationsPluginRelationDetails,
       ): string;
@@ -192,7 +204,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      singleRelation(options, details) {
+      _singleRelationRaw(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         //const codec = relation.remoteResource.codec;
@@ -202,14 +214,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(relation.remoteResource.codec);
         const localAttributes = relation.localAttributes as string[];
-        return this.camelCase(
-          `${remoteType}-by-${this._joinAttributeNames(
-            codec,
-            localAttributes,
-          )}`,
-        );
+        return `${remoteType}-by-${this._joinAttributeNames(
+          codec,
+          localAttributes,
+        )}`;
       },
-      singleRelationBackwards(options, details) {
+      singleRelation(options, details) {
+        return this.camelCase(this._singleRelationRaw(details));
+      },
+      _singleRelationBackwardsRaw(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         if (
@@ -223,14 +236,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         // E.g. posts(author_id) references users(id)
         const remoteType = this.tableType(relation.remoteResource.codec);
         const remoteAttributes = relation.remoteAttributes as string[];
-        return this.camelCase(
-          `${remoteType}-by-${this._joinAttributeNames(
-            relation.remoteResource.codec,
-            remoteAttributes,
-          )}`,
-        );
+        return `${remoteType}-by-${this._joinAttributeNames(
+          relation.remoteResource.codec,
+          remoteAttributes,
+        )}`;
       },
-      _manyRelation(options, details) {
+      singleRelationBackwards(options, details) {
+        return this.camelCase(this._singleRelationBackwardsRaw(details));
+      },
+      _manyRelationRaw(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         const baseOverride = relation.extensions?.tags.foreignFieldName;
@@ -240,12 +254,13 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(relation.remoteResource.codec);
         const remoteAttributes = relation.remoteAttributes as string[];
-        return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${this._joinAttributeNames(
-            relation.remoteResource.codec,
-            remoteAttributes,
-          )}`,
-        );
+        return `${this.pluralize(remoteType)}-by-${this._joinAttributeNames(
+          relation.remoteResource.codec,
+          remoteAttributes,
+        )}`;
+      },
+      _manyRelation(options, details) {
+        return this.camelCase(this._manyRelationRaw(details));
       },
       manyRelationConnection(options, details) {
         const { registry, codec, relationName } = details;

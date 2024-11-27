@@ -76,13 +76,13 @@ type ApplicationEdge {
 
 """Methods to use when ordering `Application`."""
 enum ApplicationOrderBy {
-  ID_ASC
-  ID_DESC
   LAST_DEPLOYED_ASC
   LAST_DEPLOYED_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 enum ApplicationType {
@@ -358,8 +358,6 @@ input AwsApplicationInput {
 enum AwsApplicationOrderBy {
   AWS_ID_ASC
   AWS_ID_DESC
-  ID_ASC
-  ID_DESC
   LAST_DEPLOYED_ASC
   LAST_DEPLOYED_DESC
   NAME_ASC
@@ -371,6 +369,8 @@ enum AwsApplicationOrderBy {
   PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -1918,13 +1918,13 @@ input FirstPartyVulnerabilityInput {
 enum FirstPartyVulnerabilityOrderBy {
   CVSS_SCORE_ASC
   CVSS_SCORE_DESC
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TEAM_NAME_ASC
   TEAM_NAME_DESC
 }
@@ -2207,8 +2207,6 @@ input GcpApplicationInput {
 enum GcpApplicationOrderBy {
   GCP_ID_ASC
   GCP_ID_DESC
-  ID_ASC
-  ID_DESC
   LAST_DEPLOYED_ASC
   LAST_DEPLOYED_DESC
   NAME_ASC
@@ -2220,6 +2218,8 @@ enum GcpApplicationOrderBy {
   PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -2398,8 +2398,6 @@ input LogEntryInput {
 
 """Methods to use when ordering `LogEntry`."""
 enum LogEntryOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   ORGANIZATION_ID_ASC
   ORGANIZATION_ID_DESC
@@ -2407,6 +2405,8 @@ enum LogEntryOrderBy {
   PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TEXT_ASC
   TEXT_DESC
 }
@@ -3427,11 +3427,11 @@ input PriorityInput {
 
 """Methods to use when ordering `Priority`."""
 enum PriorityOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
 }
@@ -4839,8 +4839,6 @@ enum RelationalChecklistItemOrderBy {
   CREATED_AT_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -4854,6 +4852,8 @@ enum RelationalChecklistItemOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   UPDATED_AT_ASC
@@ -4868,8 +4868,6 @@ enum RelationalChecklistOrderBy {
   AUTHOR_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -4881,6 +4879,8 @@ enum RelationalChecklistOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
   TYPE_ASC
@@ -5150,8 +5150,6 @@ enum RelationalDividerOrderBy {
   COLOR_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -5163,6 +5161,8 @@ enum RelationalDividerOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
   TYPE_ASC
@@ -5380,8 +5380,6 @@ enum RelationalItemOrderBy {
   AUTHOR_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -5393,6 +5391,8 @@ enum RelationalItemOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   UPDATED_AT_ASC
@@ -5549,13 +5549,13 @@ input RelationalItemRelationInput {
 enum RelationalItemRelationOrderBy {
   CHILD_ID_ASC
   CHILD_ID_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PARENT_ID_ASC
   PARENT_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -5830,8 +5830,6 @@ enum RelationalPostOrderBy {
   CREATED_AT_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -5845,6 +5843,8 @@ enum RelationalPostOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
   TYPE_ASC
@@ -6137,8 +6137,6 @@ enum RelationalTopicOrderBy {
   AUTHOR_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -6150,6 +6148,8 @@ enum RelationalTopicOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TITLE_ASC
   TITLE_DESC
   TYPE_ASC
@@ -6923,8 +6923,6 @@ enum SingleTableItemOrderBy {
   AUTHOR_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  ID_ASC
-  ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
   IS_EXPLICITLY_ARCHIVED_DESC
   NATURAL
@@ -6936,6 +6934,8 @@ enum SingleTableItemOrderBy {
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
   ROOT_TOPIC_ID_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TYPE_ASC
   TYPE_DESC
   UPDATED_AT_ASC
@@ -7092,13 +7092,13 @@ input SingleTableItemRelationInput {
 enum SingleTableItemRelationOrderBy {
   CHILD_ID_ASC
   CHILD_ID_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PARENT_ID_ASC
   PARENT_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -7643,13 +7643,13 @@ input ThirdPartyVulnerabilityInput {
 enum ThirdPartyVulnerabilityOrderBy {
   CVSS_SCORE_ASC
   CVSS_SCORE_DESC
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   VENDOR_NAME_ASC
   VENDOR_NAME_DESC
 }
@@ -8480,11 +8480,11 @@ type VulnerabilityEdge {
 enum VulnerabilityOrderBy {
   CVSS_SCORE_ASC
   CVSS_SCORE_DESC
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 enum VulnerabilityType {
@@ -8539,9 +8539,9 @@ type ZeroImplementationEdge {
 
 """Methods to use when ordering `ZeroImplementation`."""
 enum ZeroImplementationOrderBy {
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
+  ROW_ID_ASC
+  ROW_ID_DESC
 }

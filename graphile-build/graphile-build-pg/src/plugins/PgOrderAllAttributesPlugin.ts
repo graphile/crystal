@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgCodecAttribute, PgCodecWithAttributes } from "@dataplan/pg";
+import type { PgCodecWithAttributes } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
@@ -22,7 +22,6 @@ declare global {
         details: {
           codec: PgCodecWithAttributes;
           attributeName: string;
-          attribute: PgCodecAttribute;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -93,7 +92,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
         return extend(
           values,
           Object.entries(attributes).reduce(
-            (memo, [attributeName, attribute]) => {
+            (memo, [attributeName, _attribute]) => {
               const fieldBehaviorScope = `attribute:orderBy`;
               if (
                 !build.behavior.pgCodecAttributeMatches(
@@ -108,13 +107,11 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               );
 
               const ascFieldName = inflection.orderByAttributeEnum({
-                attribute,
                 codec: pgCodec,
                 attributeName,
                 variant: "asc",
               });
               const descFieldName = inflection.orderByAttributeEnum({
-                attribute,
                 codec: pgCodec,
                 attributeName,
                 variant: "desc",

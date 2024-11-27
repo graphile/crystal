@@ -936,8 +936,6 @@ enum BTypeOrderBy {
   DOMAIN_DESC
   ENUM_ASC
   ENUM_DESC
-  ID_ASC
-  ID_DESC
   INET_ASC
   INET_DESC
   INTERVAL_ASC
@@ -977,6 +975,8 @@ enum BTypeOrderBy {
   REGPROC_DESC
   REGTYPE_ASC
   REGTYPE_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   SMALLINT_ASC
   SMALLINT_DESC
   TIMESTAMPTZ_ASC
@@ -1733,11 +1733,11 @@ type CIssue756MutationPayload {
 
 """Methods to use when ordering `CIssue756`."""
 enum CIssue756OrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   TS_ASC
   TS_DESC
 }
@@ -1979,8 +1979,6 @@ input CLeftArmInput {
 
 """Methods to use when ordering `CLeftArm`."""
 enum CLeftArmOrderBy {
-  ID_ASC
-  ID_DESC
   LENGTH_IN_METRES_ASC
   LENGTH_IN_METRES_DESC
   MOOD_ASC
@@ -1990,6 +1988,8 @@ enum CLeftArmOrderBy {
   PERSON_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -2498,13 +2498,13 @@ input CMyTableInput {
 
 """Methods to use when ordering `CMyTable`."""
 enum CMyTableOrderBy {
-  ID_ASC
-  ID_DESC
   JSON_DATA_ASC
   JSON_DATA_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -2604,8 +2604,6 @@ input CNullTestRecordInput {
 
 """Methods to use when ordering `CNullTestRecord`."""
 enum CNullTestRecordOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   NON_NULL_TEXT_ASC
   NON_NULL_TEXT_DESC
@@ -2615,6 +2613,8 @@ enum CNullTestRecordOrderBy {
   NULLABLE_TEXT_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -2927,8 +2927,6 @@ enum CPersonOrderBy {
   CREATED_AT_DESC
   EMAIL_ASC
   EMAIL_DESC
-  ID_ASC
-  ID_DESC
   LAST_LOGIN_FROM_IP_ASC
   LAST_LOGIN_FROM_IP_DESC
   LAST_LOGIN_FROM_SUBNET_ASC
@@ -2938,6 +2936,8 @@ enum CPersonOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
   USER_MAC_ASC
   USER_MAC_DESC
 }
@@ -4089,13 +4089,13 @@ input DefaultValueInput {
 
 """Methods to use when ordering `DefaultValue`."""
 enum DefaultValueOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   NULL_VALUE_ASC
   NULL_VALUE_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -4918,11 +4918,11 @@ input InputInput {
 
 """Methods to use when ordering `Input`."""
 enum InputOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -6048,9 +6048,9 @@ input NoPrimaryKeyInput {
 
 """Methods to use when ordering `NoPrimaryKey`."""
 enum NoPrimaryKeyOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
+  ROW_ID_ASC
+  ROW_ID_DESC
   STR_ASC
   STR_DESC
 }
@@ -6172,11 +6172,11 @@ input PatchInput {
 
 """Methods to use when ordering `Patch`."""
 enum PatchOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -6377,11 +6377,11 @@ enum PostOrderBy {
   BODY_DESC
   HEADLINE_ASC
   HEADLINE_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """Represents an update to a `Post`. Fields that are set will be updated."""
@@ -7658,11 +7658,11 @@ input ReservedInputRecordInput {
 
 """Methods to use when ordering `ReservedInputRecord`."""
 enum ReservedInputRecordOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -7674,11 +7674,11 @@ input ReservedInputRecordPatch {
 
 """Methods to use when ordering `Reserved`."""
 enum ReservedOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -7739,11 +7739,11 @@ input ReservedPatchRecordInput {
 
 """Methods to use when ordering `ReservedPatchRecord`."""
 enum ReservedPatchRecordOrderBy {
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -7843,11 +7843,11 @@ enum SimilarTable1OrderBy {
   COL2_DESC
   COL3_ASC
   COL3_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -7927,11 +7927,11 @@ enum SimilarTable2OrderBy {
   COL4_DESC
   COL5_ASC
   COL5_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -8963,11 +8963,11 @@ enum ViewTableOrderBy {
   COL1_DESC
   COL2_ASC
   COL2_DESC
-  ID_ASC
-  ID_DESC
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """

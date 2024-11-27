@@ -498,6 +498,29 @@ style for these configuration options (e.g. change \`interfaces: \
       }
     },
 
+    assertValidName(
+      name,
+      message,
+      args = [],
+      allowDoubleUnderscorePrefix = false,
+    ) {
+      try {
+        graphql.assertName(name);
+        if (!allowDoubleUnderscorePrefix && name.startsWith("__")) {
+          throw new Error(
+            `Names beginning with two underscores are reserved for introspection.`,
+          );
+        }
+      } catch (e) {
+        const placeholders = [name, ...args];
+        const msg = message.replace(/\$([0-9]+)/g, (_, n) =>
+          n == "0" ? JSON.stringify(name) : placeholders[n] ?? _,
+        );
+        throw new TypeError(msg + " " + e.message);
+      }
+      return name;
+    },
+
     _pluginMeta: Object.create(null),
   };
   return build;
