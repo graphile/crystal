@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -13,6 +14,9 @@ import {
   makeGrafastSchema,
 } from "../dist/index.js";
 import type { StreamDetails } from "../dist/interfaces.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -158,14 +162,12 @@ function throwOnUnhandledRejections(callback: () => Promise<void>) {
           streams--;
         }
       });
-      const stream = await grafast(
-        {
-          schema,
-          source,
-        },
-        {},
-        {},
-      );
+      const stream = await grafast({
+        schema,
+        source,
+        resolvedPreset,
+        requestContext,
+      });
 
       let payloads: AsyncExecutionResult[] = [];
       const wasAStream = isAsyncIterable(stream);

@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -52,19 +53,17 @@ it("planning timeout works", async () => {
       }
     }
   `;
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset: resolvePreset({
       grafast: {
         timeouts: {
           planning: Number.MIN_VALUE,
         },
       },
-    },
-  )) as ExecutionResult;
+    }),
+  })) as ExecutionResult;
   expect(JSON.stringify(result.data, null, 2)).to.equal(undefined);
   expect(JSON.stringify(result.errors, null, 2)).to.equal(
     `\
@@ -84,19 +83,17 @@ it("execution timeout works", async () => {
       }
     }
   `;
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset: resolvePreset({
       grafast: {
         timeouts: {
           execution: Number.MIN_VALUE,
         },
       },
-    },
-  )) as ExecutionResult;
+    }),
+  })) as ExecutionResult;
   expect(JSON.stringify(result.data, null, 2)).to.equal(`\
 {
   "delayed": null
@@ -134,20 +131,18 @@ it("execution timeout works 2", async () => {
       }
     }
   `;
-  const result = (await grafast(
-    {
-      schema,
-      source,
-    },
-    {
+  const result = (await grafast({
+    schema,
+    source,
+    resolvedPreset: resolvePreset({
       grafast: {
         timeouts: {
           execution: 1,
         },
         explain: true,
       },
-    },
-  )) as ExecutionResult;
+    }),
+  })) as ExecutionResult;
   expect(JSON.stringify(result.data, null, 2)).to.equal(`\
 {
   "delayed": {

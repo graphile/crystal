@@ -1,16 +1,13 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import { resolvePreset } from "graphile-config";
+import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { PromiseOrDirect } from "../dist/index.js";
-import {
-  constant,
-  ExecutableStep,
-  grafast,
-  lambda,
-  makeGrafastSchema,
-} from "../dist/index.js";
+import { grafast, makeGrafastSchema } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 const makeSchema = (useStreamableStep = false) => {
   return makeGrafastSchema({
@@ -81,15 +78,13 @@ it("executes with matching types", async () => {
     nnlos3: [null, null, null],
     nnlonns1: ["1", "2", "3"],
   };
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result.data).to.deep.equal(variableValues);
 });
 
@@ -120,15 +115,13 @@ it("executes with stricter inner type", async () => {
     nnlos1: ["1", "2", "3"],
     nnlonns1: ["1", "2", "3"],
   };
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result.data).to.deep.equal(variableValues);
 });
 
@@ -165,15 +158,13 @@ it("executes with stricter outer type", async () => {
     nnlos3: [null, null, null],
     nnlonns1: ["1", "2", "3"],
   };
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result.data).to.deep.equal(variableValues);
 });
 
@@ -198,14 +189,12 @@ it("executes with stricter inner and outer type", async () => {
     nnlos1: ["1", "2", "3"],
     nnlonns1: ["1", "2", "3"],
   };
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
   expect(result.data).to.deep.equal(variableValues);
 });

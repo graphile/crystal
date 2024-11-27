@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import {
   graphql,
@@ -88,7 +89,7 @@ it("Resolves the same in Grafast as GraphQL.js", async () => {
     source,
     variableValues,
     contextValue: {},
-    resolvedPreset: {},
+    resolvedPreset: resolvePreset({}),
     requestContext: {},
   };
 

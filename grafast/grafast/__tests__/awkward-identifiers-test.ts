@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import { ExecutionResult, parse } from "graphql";
 import { it } from "mocha";
 
@@ -89,13 +90,11 @@ it("ok", () => {
   }
 }`;
   expect(JSON.stringify(result.data, null, 2)).to.equal(expected);
-  const result2 = execute(
-    {
-      schema,
-      document: parse(source),
-    },
-    {},
-    true,
-  ) as any;
+  const result2 = execute({
+    schema,
+    document: parse(source),
+    resolvedPreset: resolvePreset({}),
+    outputDataAsString: true,
+  }) as any;
   expect(JSON.stringify(JSON.parse(result2.data), null, 2)).to.equal(expected);
 });

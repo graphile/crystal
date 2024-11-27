@@ -1,5 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -13,6 +14,9 @@ import {
   makeGrafastSchema,
   sideEffect,
 } from "../dist/index.js";
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 declare global {
   namespace Grafast {
@@ -146,7 +150,7 @@ it(
       requestContext: {
         mol: 42,
       },
-      resolvedPreset: {},
+      resolvedPreset,
     })) as AsyncGenerator<AsyncExecutionResult>;
     let payloads: AsyncExecutionResult[] = [];
     for await (const payload of stream) {
@@ -185,8 +189,8 @@ it(
       variableValues: {
         arr: ["A", "b"],
       },
-      requestContext: {},
-      resolvedPreset: {},
+      requestContext,
+      resolvedPreset,
     })) as ExecutionResult;
     expect(result.errors).to.be.undefined;
     expect(result.data).to.deep.equal({
