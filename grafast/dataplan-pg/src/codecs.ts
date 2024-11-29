@@ -456,11 +456,17 @@ function listCastViaUnnest(
   name: string,
   frag: SQL,
   castFromPg: (identifier: SQL) => SQL,
+  guaranteedNonNull: boolean | undefined,
 ) {
   const identifier = sql.identifier(Symbol(name));
-  return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
+  const arraySql = sql`array(${sql.indent(
     sql`select ${castFromPg(identifier)}\nfrom unnest(${frag}) ${identifier}`,
-  )}) end)::text`;
+  )})::text`;
+  if (guaranteedNonNull) {
+    return arraySql;
+  } else {
+    return sql`(case when (${frag}) is not distinct from null then null::text else ${arraySql} end)`;
+  }
 }
 
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
