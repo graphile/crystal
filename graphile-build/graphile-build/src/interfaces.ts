@@ -2,6 +2,11 @@ import type { AsyncHooks } from "graphile-config";
 
 import type { EXPORTABLE } from "./utils.js";
 
+/**
+ * The base details in the 'info' object passed as the first argument to all gather
+ * hooks and helpers; this one excludes `cache` and `state` so that it can be passed
+ * into the `initialCache(info)` and `initialState(context, info)` hooks.
+ */
 export interface GatherPluginContextBase {
   /** Libraries and modules to save importing */
   lib: GraphileConfig.Lib;
@@ -50,7 +55,7 @@ export interface GatherPluginContextBase {
 
 /**
  * The details in the 'info' object passed as the first argument to all gather
- * hooks and helpers.
+ * hooks and helpers except `initialCache()` and `initialState()`
  */
 export interface GatherPluginContext<
   TState extends { [key: string]: any },
