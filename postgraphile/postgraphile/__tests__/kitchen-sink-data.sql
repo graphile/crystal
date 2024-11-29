@@ -22,6 +22,7 @@ delete from c.left_arm cascade;
 delete from c.edge_case cascade;
 delete from c.compound_key cascade;
 delete from b.types cascade;
+delete from b.lists cascade;
 delete from a.view_table cascade;
 delete from a.unique_foreign_key cascade;
 delete from a.similar_table_2 cascade;
@@ -245,6 +246,66 @@ insert into b.types values (
   array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
   'Top.Child1.Child2'::ltree,
   '{Top.Child1.Child2,Top.Child3.Child4}'::ltree[]
+);
+
+-- Arrays
+insert into b.lists values (
+  1,
+  ARRAY[1,2,3],
+  ARRAY[1,2,3],
+  ARRAY['green', 'red']::b.color[],
+  ARRAY['green', 'red']::b.color[],
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+),
+
+-- Nulls
+(
+  2,
+  null,
+  ARRAY[1,2,3],
+  null,
+  ARRAY['green', 'red']::b.color[],
+  null,
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  null,
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  null,
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  null,
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+),
+
+-- Empty arrays
+(
+  3,
+  ARRAY[]::int[],
+  ARRAY[]::int[],
+  ARRAY[]::b.color[],
+  ARRAY[]::b.color[],
+  ARRAY[]::date[],
+  ARRAY[]::date[],
+  ARRAY[]::timestamptz[],
+  ARRAY[]::timestamptz[],
+  ARRAY[]::c.compound_type[],
+  ARRAY[]::c.compound_type[],
+  ARRAY[]::bytea[],
+  ARRAY[]::bytea[]
 );
 
 insert into c.edge_case values
