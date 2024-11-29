@@ -64,6 +64,7 @@ export class PgClassExpressionStep<
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
+    private guaranteedNotNull: boolean | undefined,
   ) {
     super();
     this.needsPolymorphicUnwrap =
@@ -195,7 +196,11 @@ export class PgClassExpressionStep<
         )}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
-    const sqlExpr = pgClassExpression(this.getParentStep(), attribute.codec);
+    const sqlExpr = pgClassExpression(
+      this.getParentStep(),
+      attribute.codec,
+      attribute.notNull,
+    );
     return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
       attributeName as string,
     )}` as any;
@@ -220,7 +225,7 @@ export class PgClassExpressionStep<
   public optimize(): this {
     this.attrIndex = this.getParentStep().selectAndReturnIndex(
       this.pgCodec.castFromPg
-        ? this.pgCodec.castFromPg(this.expression)
+        ? this.pgCodec.castFromPg(this.expression, this.guaranteedNotNull)
         : sql`${sql.parens(this.expression)}::text`,
     );
     return this;
@@ -274,12 +279,19 @@ function pgClassExpression<
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,
+  guaranteedNotNull: boolean | undefined,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>
 ) => PgClassExpressionStep<TExpressionCodec, TResource> {
   return (strings, ...dependencies) => {
-    return new PgClassExpressionStep(table, codec, strings, dependencies);
+    return new PgClassExpressionStep(
+      table,
+      codec,
+      strings,
+      dependencies,
+      codec.notNull || guaranteedNotNull,
+    );
   };
 }
 

@@ -2178,7 +2178,7 @@ export function makeExampleSchema(
             $connection
               .cloneSubplanWithoutPagination("aggregate")
               .single()
-              .select(sql`count(*)`, TYPES.bigint),
+              .select(sql`count(*)`, TYPES.bigint, false),
           [TYPES, sql],
         ),
       },
@@ -2474,10 +2474,12 @@ export function makeExampleSchema(
               const $expr1 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
+                false,
               )`${$archivedAt} is not null`;
               const $expr2 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
+                false,
               )`${$expr1} is true`;
               return $expr2;
             },

@@ -302,8 +302,9 @@ export class PgUnionAllSingleStep
   expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
+    guaranteedNotNull: boolean | undefined,
   ): PgClassExpressionStep<TExpressionCodec, any> {
-    return pgClassExpression<TExpressionCodec, any>(this, codec)`${expression}`;
+    return this.select(expression, codec, guaranteedNotNull);
   }
 
   /**
@@ -319,8 +320,13 @@ export class PgUnionAllSingleStep
   public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
+    guaranteedNotNull: boolean | undefined,
   ): PgClassExpressionStep<TExpressionCodec, any> {
-    const sqlExpr = pgClassExpression<TExpressionCodec, any>(this, codec);
+    const sqlExpr = pgClassExpression<TExpressionCodec, any>(
+      this,
+      codec,
+      codec.notNull || guaranteedNotNull,
+    );
     return sqlExpr`${fragment}`;
   }
 
@@ -1737,7 +1743,7 @@ from (${innerQuery}) as ${tableAlias}\
               ? this.spec.attributes![select.attribute].codec
               : select.codec;
           return sql`${
-            codec.castFromPg?.(sqlSrc) ?? sql`${sqlSrc}::text`
+            codec.castFromPg?.(sqlSrc, false) ?? sql`${sqlSrc}::text`
           } as ${sql.identifier(String(i))}`;
         } else {
           // PERF: eradicate this (aggregate mode) without breaking arrayMode

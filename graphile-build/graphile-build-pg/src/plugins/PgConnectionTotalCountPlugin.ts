@@ -112,7 +112,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                         $connection
                           .cloneSubplanWithoutPagination("aggregate")
                           .singleAsRecord()
-                          .select(sql`count(*)`, TYPES.bigint) as any,
+                          .select(sql`count(*)`, TYPES.bigint, false) as any,
                     [TYPES, sql],
                   ),
                 };
