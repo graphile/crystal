@@ -43,7 +43,6 @@ export interface GatherPluginContextBase {
   grafast: typeof import("grafast");
 
   /**
-   *
    * @deprecated Use `lib.graphileBuild.EXPORTABLE` instead.
    */
   EXPORTABLE: typeof EXPORTABLE;
