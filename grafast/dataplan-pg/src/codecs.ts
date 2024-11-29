@@ -452,6 +452,17 @@ export function recordCodec<
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
 
+function listCastViaUnnest(
+  name: string,
+  frag: SQL,
+  castFromPg: (identifier: SQL) => SQL,
+) {
+  const identifier = sql.identifier(Symbol(name));
+  return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
+    sql`select ${castFromPg(identifier)}\nfrom unnest(${frag}) ${identifier}`,
+  )}) end)::text`;
+}
+
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
   name: string,
   attributes: TAttributes,
@@ -474,12 +485,7 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
     return {
       castFromPg,
       listCastFromPg(frag) {
-        const identifier = sql.identifier(Symbol(name));
-        return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
-          sql`select ${castFromPg(
-            identifier,
-          )}\nfrom unnest(${frag}) ${identifier}`,
-        )}) end)::text`;
+        return listCastViaUnnest(name, frag, castFromPg);
       },
       fromPg: makeSQLValueToRecord(attributes, true),
       toPg: makeRecordToSQLRawValue(attributes),
@@ -682,13 +688,9 @@ export function listOfCodec<
       ? {
           castFromPg: innerCodec.listCastFromPg,
           listCastFromPg(frag) {
-            const identifier = sql.identifier(Symbol(`${name}_item`));
-            return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
-              sql`select ${innerCodec.listCastFromPg!.call(
-                this,
-                identifier,
-              )}\nfrom unnest(${frag}) ${identifier}`,
-            )}) end)::text`;
+            return listCastViaUnnest(`${name}_item`, frag, (identifier) =>
+              innerCodec.listCastFromPg!.call(this, identifier),
+            );
           },
         }
       : null),
@@ -831,12 +833,7 @@ export function rangeOfCodec<
       ? {
           castFromPg,
           listCastFromPg(frag) {
-            const identifier = sql.identifier(Symbol(name));
-            return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
-              sql`select ${castFromPg(
-                identifier,
-              )}\nfrom unnest(${frag}) ${identifier}`,
-            )}) end)::text`;
+            return listCastViaUnnest(name, frag, castFromPg);
           },
         }
       : null),
@@ -949,13 +946,7 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   return {
     castFromPg,
     listCastFromPg(frag) {
-      const identifier = sql.identifier(Symbol("entry"));
-      return sql`(case when (${frag}) is not distinct from null then null else array(${sql.indent(
-        sql`select ${castFromPg.call(
-          this,
-          identifier,
-        )}\nfrom unnest(${frag}) ${identifier}`,
-      )}) end)::text`;
+      return listCastViaUnnest("entry", frag, castFromPg);
     },
   };
 };
