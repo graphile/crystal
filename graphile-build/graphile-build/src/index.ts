@@ -75,8 +75,12 @@ import type {
 } from "grafast/graphql";
 import type { PluginHook } from "graphile-config";
 
-import type { GatherPluginContext } from "./interfaces.js";
+import type {
+  GatherPluginContext,
+  GatherPluginContextBase,
+} from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
+import { GraphileBuildLibPreset } from "./preset.js";
 import { EXPORTABLE } from "./utils.js";
 
 // export globals for TypeDoc
@@ -176,6 +180,21 @@ const gatherBase = (
   const helpers: { [key: string]: any } = Object.create(null); // GatherHelpers
 
   const hooks = new AsyncHooks<GraphileConfig.GatherHooks>();
+  const contextBase: GatherPluginContextBase = Object.freeze({
+    // Global libraries/helpers
+    lib: resolvedPreset.lib,
+
+    // DEPRECATED: use `lib` instead:
+    grafast,
+    EXPORTABLE,
+
+    // Established by the start of the gather phase
+    resolvedPreset,
+    options,
+    inflection,
+    process: hooks.process.bind(hooks),
+    helpers: helpers as GraphileConfig.GatherHelpers,
+  });
 
   const pluginContext = new Map<
     GraphileConfig.Plugin,
@@ -196,25 +215,18 @@ const gatherBase = (
         );
       }
       const cache = (globalState[specNamespace] =
-        spec.initialCache?.() ?? Object.create(null));
+        spec.initialCache?.(contextBase) ?? Object.create(null));
       if (typeof cache.then === "function") {
         // ENHANCE: can we just make `initialCache` allow promises?
         throw new Error(
           `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
         );
       }
-      const state = EMPTY_OBJECT;
-      const context: GatherPluginContext<any, any> = {
-        helpers: helpers as GraphileConfig.GatherHelpers,
-        options,
-        state,
+      const context: GatherPluginContext<any, any> = Object.seal({
+        ...contextBase,
         cache,
-        process: hooks.process.bind(hooks),
-        inflection,
-        resolvedPreset,
-        grafast,
-        EXPORTABLE,
-      };
+        state: EMPTY_OBJECT /* This will be overwritten before it's used */,
+      });
       pluginContext.set(plugin, context);
       helpers[specNamespace] = Object.create(null);
       if (spec.helpers != null) {
@@ -261,7 +273,7 @@ const gatherBase = (
         const context = pluginContext.get(plugin)!;
         const val =
           typeof spec.initialState === "function"
-            ? await spec.initialState(context.cache)
+            ? await spec.initialState(context.cache, context)
             : Object.create(null);
         context.state = gatherState[specNamespace] = val;
       }
@@ -460,12 +472,15 @@ async function writeFileIfDiffers(
  * Builds a GraphQL schema according to the given preset and input data.
  */
 export const buildSchema = (
-  preset: GraphileConfig.Preset,
+  rawPreset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
   shared: {
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
+  const preset = {
+    extends: [GraphileBuildLibPreset, rawPreset],
+  };
   const builder = getBuilder(preset, shared.inflection);
   const schema = builder.buildSchema(input);
   const {
@@ -803,13 +818,16 @@ declare global {
        * is an optimisation for watch mode), this returns the value to initialise
        * this cache to.
        */
-      initialCache?: () => TCache;
+      initialCache?: (context: GatherPluginContextBase) => TCache;
 
       /**
        * The initial value to use for this plugin when a new gather run
        * executes.
        */
-      initialState?: (cache: TCache) => PromiseOrDirect<TState>;
+      initialState?: (
+        cache: TCache,
+        context: GatherPluginContextBase,
+      ) => PromiseOrDirect<TState>;
 
       /**
        * The plugin must register helpers to allow other plugins to access its

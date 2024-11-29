@@ -1,9 +1,9 @@
 import "./global.js";
 
 import chalk from "chalk";
-import * as grafast from "grafast";
-import type { GraphQLNamedType } from "grafast/graphql";
+import type { GraphQLNamedType, GraphQLType } from "grafast/graphql";
 import {
+  assertName,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
@@ -11,6 +11,7 @@ import {
   GraphQLInputObjectType,
   GraphQLInt,
   GraphQLInterfaceType,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLString,
@@ -18,18 +19,11 @@ import {
   isInputType,
   isOutputType,
 } from "grafast/graphql";
-import * as graphql from "grafast/graphql";
 import * as semver from "semver";
 
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
-import {
-  EXPORTABLE,
-  EXPORTABLE_OBJECT_CLONE,
-  exportNameHint,
-  stringTypeSpec,
-  wrapDescription,
-} from "./utils.js";
+import { stringTypeSpec, wrapDescription } from "./utils.js";
 import { version } from "./version.js";
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -55,6 +49,8 @@ export default function makeNewBuild(
   input: GraphileBuild.BuildInput,
   inflection: GraphileBuild.Inflection,
 ): GraphileBuild.BuildBase {
+  const lib = builder.resolvedPreset.lib ?? {};
+
   const building = new Set<string>();
   const allTypes = {
     Int: GraphQLInt,
@@ -127,10 +123,19 @@ export default function makeNewBuild(
   }
 
   const build: GraphileBuild.BuildBase = {
+    lib,
+
+    // Legacy support for things from lib
+    EXPORTABLE: lib.graphileBuild.EXPORTABLE,
+    exportNameHint: lib.graphileBuild.exportNameHint,
+    EXPORTABLE_OBJECT_CLONE: lib.graphileBuild.EXPORTABLE_OBJECT_CLONE,
+    grafast: lib.grafast,
+    graphql: lib.graphql,
+
     options: builder.options,
     versions: {
-      grafast: grafast.version,
-      graphql: graphql.version,
+      grafast: lib.grafast.version,
+      graphql: lib.graphql.version,
       "graphile-build": version,
     },
     input,
@@ -144,12 +149,6 @@ export default function makeNewBuild(
       if (!packageVersion) return false;
       return semver.satisfies(packageVersion, range, options);
     },
-
-    EXPORTABLE,
-    exportNameHint,
-    EXPORTABLE_OBJECT_CLONE,
-    grafast,
-    graphql,
 
     extend(base, extra, hint, behaviorOnConflict = "throw") {
       try {
@@ -487,14 +486,14 @@ style for these configuration options (e.g. change \`interfaces: \
       }
       return type;
     },
-    nullableIf<T extends graphql.GraphQLType>(
+    nullableIf<T extends GraphQLType>(
       condition: boolean,
       type: T,
-    ): T | graphql.GraphQLNonNull<T> {
+    ): T | GraphQLNonNull<T> {
       if (condition) {
         return type;
       } else {
-        return new graphql.GraphQLNonNull(type);
+        return new GraphQLNonNull(type);
       }
     },
 
@@ -505,7 +504,7 @@ style for these configuration options (e.g. change \`interfaces: \
       allowDoubleUnderscorePrefix = false,
     ) {
       try {
-        graphql.assertName(name);
+        assertName(name);
         if (!allowDoubleUnderscorePrefix && name.startsWith("__")) {
           throw new Error(
             `Names beginning with two underscores are reserved for introspection.`,

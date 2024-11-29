@@ -1,8 +1,9 @@
 import "graphile-config";
 
+import * as dataplanPg from "@dataplan/pg";
 import { PgContextPlugin } from "@dataplan/pg";
+import sql, { version as pgSql2Version } from "pg-sql2";
 
-import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 import { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 import { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
@@ -32,6 +33,7 @@ import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.j
 import { PgPolymorphismOnlyArgumentPlugin } from "./plugins/PgPolymorphismOnlyArgumentPlugin.js";
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
+import { PgRBACPlugin } from "./plugins/PgRBACPlugin.js";
 import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
 import { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.js";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.js";
@@ -40,9 +42,34 @@ import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.js";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
+import { version } from "./version.js";
+
+declare global {
+  namespace GraphileConfig {
+    interface Lib {
+      /** The `@dataplan/pg` module */
+      dataplanPg: typeof dataplanPg;
+      /** The `pg-sql2` module's `sql` export */
+      sql: typeof sql;
+    }
+  }
+}
+
+export const GraphileBuildPgLibPreset: GraphileConfig.Preset = {
+  lib: {
+    versions: {
+      "graphile-build-pg": version,
+      "@dataplan/pg": dataplanPg.version,
+      "pg-sql2": pgSql2Version,
+    },
+    dataplanPg,
+    sql,
+  },
+};
 
 // TODO: version this.
 export const defaultPreset: GraphileConfig.Preset = {
+  extends: [GraphileBuildPgLibPreset],
   plugins: [
     PgBasicsPlugin,
     PgLtreePlugin,

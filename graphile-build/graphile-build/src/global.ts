@@ -294,6 +294,12 @@ declare global {
      */
     interface BuildBase {
       /**
+       * Various libraries and utilities to save from having to import them in
+       * plugins (and thereby avoid having module conflict errors).
+       */
+      lib: GraphileConfig.Lib;
+
+      /**
        * The options that graphile-build was called with.
        */
       options: SchemaOptions;

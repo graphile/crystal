@@ -37,6 +37,11 @@ export function sortedPlugins(
 
 declare global {
   namespace GraphileConfig {
+    interface Lib {
+      versions: Record<string, string | undefined>;
+      // Extend this through declaration merging
+    }
+
     /**
      * Expand this through declaration merging to get TypeScript
      * auto-completion of plugin names in the relevant places.
@@ -77,6 +82,7 @@ declare global {
       extends?: ReadonlyArray<Preset>;
       plugins?: Plugin[];
       disablePlugins?: ReadonlyArray<keyof GraphileConfig.Plugins>;
+      lib?: Partial<GraphileConfig.Lib>;
 
       // These are to explicitly forbid options used in PostGraphile V4 for
       // legacy reasons.
@@ -93,11 +99,12 @@ declare global {
      * other assertions).
      */
     interface ResolvedPreset extends Preset {
-      // As Preset, except `extends` is omitted, plugins and disable plugins
-      // are required.
+      // As Preset, except `extends` is omitted; `plugins`, `disablePlugins`,
+      // and `lib` are required.
       extends?: never;
       plugins: Plugin[];
       disablePlugins: ReadonlyArray<keyof GraphileConfig.Plugins>;
+      lib: GraphileConfig.Lib;
     }
   }
 }
