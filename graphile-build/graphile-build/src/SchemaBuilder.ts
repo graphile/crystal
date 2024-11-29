@@ -45,7 +45,7 @@ class SchemaBuilder<
   newWithHooks: NewWithHooksFunction;
 
   constructor(
-    public resolvedPreset: GraphileConfig.ResolvedPreset,
+    public readonly resolvedPreset: GraphileConfig.ResolvedPreset,
     private inflection: GraphileBuild.Inflection,
   ) {
     super();
