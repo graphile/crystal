@@ -75,7 +75,10 @@ import type {
 } from "grafast/graphql";
 import type { PluginHook } from "graphile-config";
 
-import type { GatherPluginContext } from "./interfaces.js";
+import type {
+  GatherPluginContext,
+  GatherPluginContextBase,
+} from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
 import { GraphileBuildLibPreset } from "./preset.js";
 import { EXPORTABLE } from "./utils.js";
@@ -196,16 +199,7 @@ const gatherBase = (
           `Namespace '${specNamespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique. Latest plugin was '${plugin.name}'.`,
         );
       }
-      const cache = (globalState[specNamespace] =
-        spec.initialCache?.() ?? Object.create(null));
-      if (typeof cache.then === "function") {
-        // ENHANCE: can we just make `initialCache` allow promises?
-        throw new Error(
-          `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
-        );
-      }
-      const state = EMPTY_OBJECT;
-      const context: GatherPluginContext<any, any> = {
+      const contextBase: GatherPluginContextBase = {
         // Global libraries/helpers
         lib: resolvedPreset.lib,
 
@@ -223,9 +217,22 @@ const gatherBase = (
 
         // Specific to this call
         helpers: helpers as GraphileConfig.GatherHelpers,
-        state,
-        cache,
       };
+      const cache = (globalState[specNamespace] =
+        spec.initialCache?.(contextBase) ?? Object.create(null));
+      if (typeof cache.then === "function") {
+        // ENHANCE: can we just make `initialCache` allow promises?
+        throw new Error(
+          `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
+        );
+      }
+      const context: GatherPluginContext<any, any> = Object.assign(
+        contextBase,
+        {
+          cache,
+          state: EMPTY_OBJECT,
+        },
+      );
       pluginContext.set(plugin, context);
       helpers[specNamespace] = Object.create(null);
       if (spec.helpers != null) {
@@ -817,7 +824,7 @@ declare global {
        * is an optimisation for watch mode), this returns the value to initialise
        * this cache to.
        */
-      initialCache?: () => TCache;
+      initialCache?: (context: GatherPluginContextBase) => TCache;
 
       /**
        * The initial value to use for this plugin when a new gather run
@@ -825,7 +832,7 @@ declare global {
        */
       initialState?: (
         cache: TCache,
-        context: GatherPluginContext<TState, TCache>,
+        context: GatherPluginContextBase,
       ) => PromiseOrDirect<TState>;
 
       /**

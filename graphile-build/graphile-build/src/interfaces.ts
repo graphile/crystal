@@ -2,14 +2,7 @@ import type { AsyncHooks } from "graphile-config";
 
 import type { EXPORTABLE } from "./utils.js";
 
-/**
- * The details in the 'info' object passed as the first argument to all gather
- * hooks and helpers.
- */
-export interface GatherPluginContext<
-  TState extends { [key: string]: any },
-  TCache extends { [key: string]: any },
-> {
+export interface GatherPluginContextBase {
   /** Libraries and modules to save importing */
   lib: GraphileConfig.Lib;
 
@@ -35,20 +28,6 @@ export interface GatherPluginContext<
   helpers: GraphileConfig.GatherHelpers;
 
   /**
-   * The state for this plugin specifically. State exists only for a single
-   * 'gather' phase and is then discarded.
-   */
-  state: TState;
-
-  /**
-   * The cache for this plugin specifically. The cache persists between
-   * multiple 'gather' phases and can be a useful place to cache expensive
-   * computation so later builds are faster. NOTE: cache is _not_ persisted, it
-   * only exists whilst the code is in memory.
-   */
-  cache: TCache;
-
-  /**
    * Triggers the given hook with the given event (used to broadcast to other
    * gather plugins so they can make their own changes/additions).
    */
@@ -68,4 +47,27 @@ export interface GatherPluginContext<
    * @deprecated Use `lib.graphileBuild.EXPORTABLE` instead.
    */
   EXPORTABLE: typeof EXPORTABLE;
+}
+
+/**
+ * The details in the 'info' object passed as the first argument to all gather
+ * hooks and helpers.
+ */
+export interface GatherPluginContext<
+  TState extends { [key: string]: any },
+  TCache extends { [key: string]: any },
+> {
+  /**
+   * The state for this plugin specifically. State exists only for a single
+   * 'gather' phase and is then discarded.
+   */
+  state: TState;
+
+  /**
+   * The cache for this plugin specifically. The cache persists between
+   * multiple 'gather' phases and can be a useful place to cache expensive
+   * computation so later builds are faster. NOTE: cache is _not_ persisted, it
+   * only exists whilst the code is in memory.
+   */
+  cache: TCache;
 }
