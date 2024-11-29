@@ -316,23 +316,15 @@ const ACL_USAGE = "U";
 const ACL_NO_RIGHTS = "";
 
 /** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
-const ACL_ALL_RIGHTS_RELATION =
-  ACL_INSERT +
-  ACL_SELECT +
-  ACL_UPDATE +
-  ACL_DELETE +
-  ACL_TRUNCATE +
-  ACL_REFERENCES +
-  ACL_TRIGGER +
-  ACL_MAINTAIN;
-const ACL_ALL_RIGHTS_SEQUENCE = ACL_USAGE + ACL_SELECT + ACL_UPDATE;
-const ACL_ALL_RIGHTS_DATABASE = ACL_CREATE + ACL_CREATE_TEMP + ACL_CONNECT;
+const ACL_ALL_RIGHTS_RELATION = `${ACL_INSERT}${ACL_SELECT}${ACL_UPDATE}${ACL_DELETE}${ACL_TRUNCATE}${ACL_REFERENCES}${ACL_TRIGGER}${ACL_MAINTAIN}`;
+const ACL_ALL_RIGHTS_SEQUENCE = `${ACL_USAGE}${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_DATABASE = `${ACL_CREATE}${ACL_CREATE_TEMP}${ACL_CONNECT}`;
 const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
 const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
 const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
 const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
-const ACL_ALL_RIGHTS_LARGEOBJECT = ACL_SELECT + ACL_UPDATE;
-const ACL_ALL_RIGHTS_SCHEMA = ACL_USAGE + ACL_CREATE;
+const ACL_ALL_RIGHTS_LARGEOBJECT = `${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_SCHEMA = `${ACL_USAGE}${ACL_CREATE}`;
 const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
 const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
 
@@ -375,7 +367,7 @@ export function parseAcls(
           ownerDefault = ACL_ALL_RIGHTS_SEQUENCE;
           break;
         case OBJECT_DATABASE:
-          worldDefault = ACL_CREATE_TEMP + ACL_CONNECT;
+          worldDefault = `${ACL_CREATE_TEMP}${ACL_CONNECT}`;
           ownerDefault = ACL_ALL_RIGHTS_DATABASE;
           break;
         case OBJECT_FUNCTION:
@@ -609,6 +601,7 @@ export function resolvePermissions(
 
   return permissions;
 }
+
 export function entityPermissions(
   introspection: Introspection,
   entity: Extract<PgEntity, { getACL(): readonly AclObject[] }>,
