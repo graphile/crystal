@@ -2563,7 +2563,20 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   executor,
   isAnonymous: true
 });
-const typesIdentifier = sql.identifier("b", "types");
+const listsIdentifier = sql.identifier("b", "lists");
+const int4ArrayCodec = listOfCodec(TYPES.int, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_int4"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "int4Array"
+});
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
     pg: {
@@ -2577,6 +2590,232 @@ const colorArrayCodec = listOfCodec(colorCodec, {
   description: undefined,
   name: "colorArray"
 });
+const dateArrayCodec = listOfCodec(TYPES.date, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_date"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "dateArray"
+});
+const timestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_timestamptz"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "timestamptzArray"
+});
+const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "_compound_type"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "compoundTypeArray"
+});
+const byteaArrayCodec = listOfCodec(TYPES.bytea, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_bytea"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "byteaArray"
+});
+const listsCodec = recordCodec({
+  name: "lists",
+  identifier: listsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    int_array: {
+      description: undefined,
+      codec: int4ArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    int_array_nn: {
+      description: undefined,
+      codec: int4ArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    enum_array: {
+      description: undefined,
+      codec: colorArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    enum_array_nn: {
+      description: undefined,
+      codec: colorArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    date_array: {
+      description: undefined,
+      codec: dateArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    date_array_nn: {
+      description: undefined,
+      codec: dateArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    timestamptz_array: {
+      description: undefined,
+      codec: timestamptzArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    timestamptz_array_nn: {
+      description: undefined,
+      codec: timestamptzArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    compound_type_array: {
+      description: undefined,
+      codec: compoundTypeArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    compound_type_array_nn: {
+      description: undefined,
+      codec: compoundTypeArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    bytea_array: {
+      description: undefined,
+      codec: byteaArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    bytea_array_nn: {
+      description: undefined,
+      codec: byteaArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "lists"
+    },
+    tags: Object.create(null)
+  },
+  executor: executor
+});
+const typesIdentifier = sql.identifier("b", "types");
 const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
   description: undefined,
   extensions: {
@@ -2714,19 +2953,6 @@ const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sq
     tags: Object.create(null)
   },
   notNull: false
-});
-const byteaArrayCodec = listOfCodec(TYPES.bytea, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_bytea"
-    },
-    tags: Object.create(null)
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "byteaArray"
 });
 const spec_types_attributes_ltree_codec_ltree = {
   name: "ltree",
@@ -3349,19 +3575,6 @@ const spec_types = {
   executor: executor
 };
 const typesCodec = recordCodec(spec_types);
-const int4ArrayCodec = listOfCodec(TYPES.int, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int4"
-    },
-    tags: Object.create(null)
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "int4Array"
-});
 const floatrangeCodec = rangeOfCodec(TYPES.float, "floatrange", sql.identifier("c", "floatrange"), {
   description: undefined,
   extensions: {
@@ -3971,13 +4184,20 @@ const registry = makeRegistry({
     MutationOutComplexRecord: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
     MutationOutComplexSetofRecord: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
     PersonComputedComplexRecord: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
-    types: typesCodec,
+    lists: listsCodec,
+    int4Array: int4ArrayCodec,
     colorArray: colorArrayCodec,
+    dateArray: dateArrayCodec,
+    date: TYPES.date,
+    timestamptzArray: timestamptzArrayCodec,
+    compoundTypeArray: compoundTypeArrayCodec,
+    byteaArray: byteaArrayCodec,
+    bytea: TYPES.bytea,
+    types: typesCodec,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,
     numrange: numrangeCodec,
     daterange: daterangeCodec,
-    date: TYPES.date,
     anIntRange: anIntRangeCodec,
     time: TYPES.time,
     timetz: TYPES.timetz,
@@ -3994,24 +4214,9 @@ const registry = makeRegistry({
     regdictionary: TYPES.regdictionary,
     textArrayDomain: textArrayDomainCodec,
     int8ArrayDomain: int8ArrayDomainCodec,
-    bytea: TYPES.bytea,
-    byteaArray: byteaArrayCodec,
     ltree: spec_types_attributes_ltree_codec_ltree,
     "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
-    compoundTypeArray: listOfCodec(compoundTypeCodec, {
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "_compound_type"
-        },
-        tags: Object.create(null)
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "compoundTypeArray"
-    }),
     jwtTokenArray: listOfCodec(jwtTokenCodec, {
       extensions: {
         pg: {
@@ -4038,7 +4243,6 @@ const registry = makeRegistry({
       description: undefined,
       name: "typesArray"
     }),
-    int4Array: int4ArrayCodec,
     floatrange: floatrangeCodec,
     postArray: postArrayCodec,
     int8Array: int8ArrayCodec,
@@ -8586,6 +8790,39 @@ const registry = makeRegistry({
       },
       description: undefined
     }),
+    lists: {
+      executor: executor,
+      name: "lists",
+      identifier: "main.b.lists",
+      from: listsIdentifier,
+      codec: listsCodec,
+      uniques: [{
+        isPrimary: true,
+        attributes: ["id"],
+        description: undefined,
+        extensions: {
+          tags: Object.create(null)
+        }
+      }],
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "lists"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      }
+    },
     types: registryConfig_pgResources_types_types,
     type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
       name: "type_function_connection",
