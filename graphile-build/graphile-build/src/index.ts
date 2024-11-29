@@ -180,6 +180,21 @@ const gatherBase = (
   const helpers: { [key: string]: any } = Object.create(null); // GatherHelpers
 
   const hooks = new AsyncHooks<GraphileConfig.GatherHooks>();
+  const contextBase: GatherPluginContextBase = Object.freeze({
+    // Global libraries/helpers
+    lib: resolvedPreset.lib,
+
+    // DEPRECATED: use `lib` instead:
+    grafast,
+    EXPORTABLE,
+
+    // Established by the start of the gather phase
+    resolvedPreset,
+    options,
+    inflection,
+    process: hooks.process.bind(hooks),
+    helpers: helpers as GraphileConfig.GatherHelpers,
+  });
 
   const pluginContext = new Map<
     GraphileConfig.Plugin,
@@ -199,25 +214,6 @@ const gatherBase = (
           `Namespace '${specNamespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique. Latest plugin was '${plugin.name}'.`,
         );
       }
-      const contextBase: GatherPluginContextBase = {
-        // Global libraries/helpers
-        lib: resolvedPreset.lib,
-
-        // DEPRECATED: use `lib` instead:
-        grafast,
-        EXPORTABLE,
-
-        // Established by the config
-        resolvedPreset,
-        options,
-
-        // Established by the start of the gather phase
-        inflection,
-        process: hooks.process.bind(hooks),
-
-        // Specific to this call
-        helpers: helpers as GraphileConfig.GatherHelpers,
-      };
       const cache = (globalState[specNamespace] =
         spec.initialCache?.(contextBase) ?? Object.create(null));
       if (typeof cache.then === "function") {
@@ -226,13 +222,11 @@ const gatherBase = (
           `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
         );
       }
-      const context: GatherPluginContext<any, any> = Object.assign(
-        contextBase,
-        {
-          cache,
-          state: EMPTY_OBJECT,
-        },
-      );
+      const context: GatherPluginContext<any, any> = {
+        ...contextBase,
+        cache,
+        state: EMPTY_OBJECT,
+      };
       pluginContext.set(plugin, context);
       helpers[specNamespace] = Object.create(null);
       if (spec.helpers != null) {
