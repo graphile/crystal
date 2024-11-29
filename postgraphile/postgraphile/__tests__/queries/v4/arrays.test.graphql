@@ -1,0 +1,35 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  allListsList {
+    id
+    intArray
+    intArrayNn
+    enumArray
+    enumArrayNn
+    dateArray
+    dateArrayNn
+    timestamptzArray
+    timestamptzArrayNn
+    compoundTypeArray {
+      ...compoundType
+    }
+    compoundTypeArrayNn {
+      ...compoundType
+    }
+    byteaArray
+    byteaArrayNn
+  }
+}
+
+fragment compoundType on CompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
+}
