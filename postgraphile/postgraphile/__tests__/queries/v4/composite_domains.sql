@@ -2,22 +2,22 @@ select
   __posts__."id"::text as "0",
   __posts__."user_id"::text as "1",
   __frmcdc_user_update_content__."img_url" as "2",
-  (
-    select array_agg((
-      select array_agg(case when (__base_user_update_content_line_node__) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node__)."line_node_type"))::text, ((__base_user_update_content_line_node__)."line_node_text"))::text end)
+  array(
+    select array(
+      select case when (__base_user_update_content_line_node__) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node__)."line_node_type"))::text, ((__base_user_update_content_line_node__)."line_node_text"))::text end
       from unnest(__user_update_content_line_node_array_item__) __base_user_update_content_line_node__
-    )::text)
+    )::text
     from unnest(__frmcdc_user_update_content__."lines") __user_update_content_line_node_array_item__
   )::text as "3",
   (not (__frmcdc_user_update_content__ is null))::text as "4",
   (select json_agg(s) from (
     select
       __frmcdc_user_update_content_2."img_url" as "0",
-      (
-        select array_agg((
-          select array_agg(case when (__base_user_update_content_line_node_2) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node_2)."line_node_type"))::text, ((__base_user_update_content_line_node_2)."line_node_text"))::text end)
+      array(
+        select array(
+          select case when (__base_user_update_content_line_node_2) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node_2)."line_node_type"))::text, ((__base_user_update_content_line_node_2)."line_node_text"))::text end
           from unnest(__user_update_content_line_node_array_item_2) __base_user_update_content_line_node_2
-        )::text)
+        )::text
         from unnest(__frmcdc_user_update_content_2."lines") __user_update_content_line_node_array_item_2
       )::text as "1",
       (not (__frmcdc_user_update_content_2 is null))::text as "2"

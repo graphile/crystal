@@ -27,8 +27,8 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "20",
   to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "21",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "22",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry__
   )::text as "23",
   __types__."money"::numeric::text as "24",
@@ -523,8 +523,8 @@ insert into "a"."default_value" as __default_value__ ("id", "null_value") values
 insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text", $2::"a"."comptype"[]) returning
   __post__."id"::text as "0",
   __post__."headline" as "1",
-  (
-    select array_agg(case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end)
+  array(
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
   )::text as "2";
 
@@ -541,8 +541,8 @@ lateral (
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."headline" as "0",
-  (
-    select array_agg(case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end)
+  array(
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
   )::text as "1",
   __post__."id"::text as "2",

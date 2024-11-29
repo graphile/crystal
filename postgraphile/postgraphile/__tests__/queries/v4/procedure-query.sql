@@ -260,8 +260,8 @@ select
 from "a"."query_text_array"() as __query_text_array__(v);
 
 select
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__query_interval_array__.v) __entry__
   )::text as "0"
 from "a"."query_interval_array"() as __query_interval_array__(v);

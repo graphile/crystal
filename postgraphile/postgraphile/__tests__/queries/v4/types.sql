@@ -32,8 +32,8 @@ select
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "25",
   to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry__
   )::text as "28",
   __types__."money"::numeric::text as "29",
@@ -168,8 +168,8 @@ lateral (
     to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "25",
     to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
     to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest(__types__."interval_array") __entry__
     )::text as "28",
     __types__."money"::numeric::text as "29",
@@ -308,8 +308,8 @@ lateral (
     to_char(date '1970-01-01' + __type_function__."time", 'HH24:MI:SS.US'::text) as "25",
     to_char(date '1970-01-01' + __type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
     to_char(__type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest(__type_function__."interval_array") __entry__
     )::text as "28",
     __type_function__."money"::numeric::text as "29",
@@ -442,8 +442,8 @@ select
   to_char(date '1970-01-01' + __type_function_list__."time", 'HH24:MI:SS.US'::text) as "25",
   to_char(date '1970-01-01' + __type_function_list__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
   to_char(__type_function_list__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__type_function_list__."interval_array") __entry__
   )::text as "28",
   __type_function_list__."money"::numeric::text as "29",
@@ -577,8 +577,8 @@ lateral (
     to_char(date '1970-01-01' + __person_type_function__."time", 'HH24:MI:SS.US'::text) as "25",
     to_char(date '1970-01-01' + __person_type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
     to_char(__person_type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest(__person_type_function__."interval_array") __entry__
     )::text as "28",
     __person_type_function__."money"::numeric::text as "29",
@@ -688,8 +688,8 @@ lateral (
         to_char(date '1970-01-01' + __person_type_function_list__."time", 'HH24:MI:SS.US'::text) as "25",
         to_char(date '1970-01-01' + __person_type_function_list__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
         to_char(__person_type_function_list__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-        (
-          select array_agg(to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+        array(
+          select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
           from unnest(__person_type_function_list__."interval_array") __entry_2
         )::text as "28",
         __person_type_function_list__."money"::numeric::text as "29",
@@ -821,8 +821,8 @@ lateral (
         to_char(date '1970-01-01' + __person_type_function_connection__."time", 'HH24:MI:SS.US'::text) as "25",
         to_char(date '1970-01-01' + __person_type_function_connection__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
         to_char(__person_type_function_connection__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-        (
-          select array_agg(to_char(__entry_3, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+        array(
+          select to_char(__entry_3, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
           from unnest(__person_type_function_connection__."interval_array") __entry_3
         )::text as "28",
         __person_type_function_connection__."money"::numeric::text as "29",
@@ -901,8 +901,8 @@ lateral (
         __post_7."headline" as "102",
         __post_8."id"::text as "103",
         __post_8."headline" as "104",
-        (
-          select array_agg(to_char(__entry_4, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+        array(
+          select to_char(__entry_4, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
           from unnest(__person_type_function_connection__."interval_array") __entry_4
         )::text as "105",
         __frmcdc_compound_type_19."a"::text as "106",
@@ -1075,8 +1075,8 @@ lateral (
     to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "25",
     to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
     to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest(__types__."interval_array") __entry__
     )::text as "28",
     __types__."money"::numeric::text as "29",
@@ -1186,8 +1186,8 @@ lateral (
         to_char(date '1970-01-01' + __types_2."time", 'HH24:MI:SS.US'::text) as "25",
         to_char(date '1970-01-01' + __types_2."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
         to_char(__types_2."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-        (
-          select array_agg(to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+        array(
+          select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
           from unnest(__types_2."interval_array") __entry_2
         )::text as "28",
         __types_2."money"::numeric::text as "29",
@@ -1266,8 +1266,8 @@ lateral (
         __post_5."headline" as "102",
         __post_6."id"::text as "103",
         __post_6."headline" as "104",
-        (
-          select array_agg(to_char(__entry_3, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+        array(
+          select to_char(__entry_3, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
           from unnest(__types_2."interval_array") __entry_3
         )::text as "105",
         __frmcdc_compound_type_13."a"::text as "106",
@@ -1441,8 +1441,8 @@ select
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "25",
   to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry__
   )::text as "28",
   __types__."money"::numeric::text as "29",
@@ -1521,8 +1521,8 @@ select
   __post_3."headline" as "102",
   __post_4."id"::text as "103",
   __post_4."headline" as "104",
-  (
-    select array_agg(to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry_2
   )::text as "105",
   __frmcdc_compound_type_7."a"::text as "106",
@@ -1658,8 +1658,8 @@ select
   to_char(date '1970-01-01' + __type_function_connection__."time", 'HH24:MI:SS.US'::text) as "25",
   to_char(date '1970-01-01' + __type_function_connection__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
   to_char(__type_function_connection__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__type_function_connection__."interval_array") __entry__
   )::text as "28",
   __type_function_connection__."money"::numeric::text as "29",
@@ -1738,8 +1738,8 @@ select
   __post_3."headline" as "102",
   __post_4."id"::text as "103",
   __post_4."headline" as "104",
-  (
-    select array_agg(to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__type_function_connection__."interval_array") __entry_2
   )::text as "105",
   __frmcdc_compound_type_7."a"::text as "106",

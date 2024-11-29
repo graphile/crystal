@@ -356,8 +356,8 @@ lateral (
   select
     __post_many__."id"::text as "0",
     __post_many__."headline" as "1",
-    (
-      select array_agg(case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end)
+    array(
+      select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
       from unnest(__post_many__."comptypes") __comptype__
     )::text as "2",
     __post_many_identifiers__.idx as "3"
@@ -420,8 +420,8 @@ select
 from "a"."mutation_text_array"() as __mutation_text_array__(v);
 
 select
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__mutation_interval_array__.v) __entry__
   )::text as "0"
 from "a"."mutation_interval_array"() as __mutation_interval_array__(v);

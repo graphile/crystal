@@ -155,8 +155,8 @@ lateral (
       __post_identifiers__."id7"
     ) as "11",
     ("a"."post_computed_text_array"(__post__))::text as "12",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest("a"."post_computed_interval_array"(__post__)) __entry__
     )::text as "13",
     __post_identifiers__.idx as "14"
