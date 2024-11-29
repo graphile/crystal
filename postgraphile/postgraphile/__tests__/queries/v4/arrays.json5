@@ -108,7 +108,7 @@
         "2016-10-06T21:02:03.456789-04:00",
         "1999-01-08T08:05:06.000000-04:00",
       ],
-      compoundTypeArray: null,
+      compoundTypeArray: [],
       compoundTypeArrayNn: [
         {
           a: 1,
