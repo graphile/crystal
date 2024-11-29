@@ -222,11 +222,11 @@ const gatherBase = (
           `\`initialCache\` may not return a promise directly; instead set one of the keys on the object it returns to a promise and await that in \`initialState\` (which is allowed to be async)`,
         );
       }
-      const context: GatherPluginContext<any, any> = {
+      const context: GatherPluginContext<any, any> = Object.seal({
         ...contextBase,
         cache,
-        state: EMPTY_OBJECT,
-      };
+        state: EMPTY_OBJECT /* This will be overwritten before it's used */,
+      });
       pluginContext.set(plugin, context);
       helpers[specNamespace] = Object.create(null);
       if (spec.helpers != null) {
