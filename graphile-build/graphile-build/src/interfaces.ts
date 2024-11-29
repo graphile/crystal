@@ -57,9 +57,15 @@ export interface GatherPluginContext<
   /**
    * A copy of `import * from "grafast"` to avoid having to add grafast as a
    * dependency.
+   *
+   * @deprecated Use `lib.grafast` instead.
    */
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   grafast: typeof import("grafast");
 
+  /**
+   *
+   * @deprecated Use `lib.graphileBuild.EXPORTABLE` instead.
+   */
   EXPORTABLE: typeof EXPORTABLE;
 }
