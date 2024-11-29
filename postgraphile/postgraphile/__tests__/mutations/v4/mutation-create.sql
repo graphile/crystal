@@ -523,10 +523,10 @@ insert into "a"."default_value" as __default_value__ ("id", "null_value") values
 insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text", $2::"a"."comptype"[]) returning
   __post__."id"::text as "0",
   __post__."headline" as "1",
-  array(
+  (case when (__post__."comptypes") is not distinct from null then null::text else array(
     select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
-  )::text as "2";
+  )::text end) as "2";
 
 select __frmcdc_comptype_result__.*
 from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_identifiers__,
@@ -541,10 +541,10 @@ lateral (
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."headline" as "0",
-  array(
+  (case when (__post__."comptypes") is not distinct from null then null::text else array(
     select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
-  )::text as "1",
+  )::text end) as "1",
   __post__."id"::text as "2",
   __post__."author_id"::text as "3";
 

@@ -155,10 +155,10 @@ lateral (
       __post_identifiers__."id7"
     ) as "11",
     ("a"."post_computed_text_array"(__post__))::text as "12",
-    array(
+    (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
       select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-    )::text as "13",
+    )::text end) as "13",
     __post_identifiers__.idx as "14"
   from "a"."post" as __post__
   left outer join lateral (select (__post__).*) as __post_2

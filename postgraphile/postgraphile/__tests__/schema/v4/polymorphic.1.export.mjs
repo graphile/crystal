@@ -14346,7 +14346,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -15090,7 +15090,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   LogEntry: {
@@ -15620,7 +15620,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   AwsApplication: {
@@ -15782,7 +15782,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ApplicationsConnection: {
@@ -15798,7 +15798,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ApplicationsEdge: {
@@ -16437,7 +16437,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   GcpApplication: {
@@ -16998,7 +16998,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SingleTableItemsEdge: {
@@ -17632,7 +17632,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalItemRelationsConnection: {
@@ -17648,7 +17648,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalItemRelation: {
@@ -17699,7 +17699,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalItemRelationCompositePk: {
@@ -18543,7 +18543,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SingleTableItemRelation: {
@@ -18594,7 +18594,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SingleTableItemRelationCompositePk: {
@@ -19037,7 +19037,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -19499,7 +19499,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -19881,7 +19881,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -20265,7 +20265,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -24994,7 +24994,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ZeroImplementationsEdge: {
@@ -25140,7 +25140,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   OrganizationsEdge: {
@@ -25318,7 +25318,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PeopleEdge: {
@@ -25496,7 +25496,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PrioritiesEdge: {
@@ -25521,7 +25521,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalChecklistsEdge: {
@@ -26212,7 +26212,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalTopicsEdge: {
@@ -26903,7 +26903,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalChecklistItemsEdge: {
@@ -27651,7 +27651,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalDividersEdge: {
@@ -28399,7 +28399,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalPostsEdge: {
@@ -29204,7 +29204,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FirstPartyVulnerabilitiesEdge: {
@@ -29496,7 +29496,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ThirdPartyVulnerabilitiesEdge: {

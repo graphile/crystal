@@ -12323,7 +12323,7 @@ const getSelectPlanFromParentAndArgs16 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_c_person_friendsPgResource.codec)`${resource_c_person_friendsPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_c_person_friendsPgResource.codec, undefined)`${resource_c_person_friendsPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_c_person_friendsPgResource.execute(selectArgs);
@@ -12413,7 +12413,7 @@ const getSelectPlanFromParentAndArgs17 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_c_person_type_function_connectionPgResource.codec)`${resource_c_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_c_person_type_function_connectionPgResource.codec, undefined)`${resource_c_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_c_person_type_function_connectionPgResource.execute(selectArgs);
@@ -12792,7 +12792,7 @@ const getSelectPlanFromParentAndArgs18 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_post_computed_interval_setPgResource.codec)`${resource_post_computed_interval_setPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_post_computed_interval_setPgResource.codec, undefined)`${resource_post_computed_interval_setPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_post_computed_interval_setPgResource.execute(selectArgs);
@@ -28070,7 +28070,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_outPgResource.codec)`${resource_c_person_computed_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_outPgResource.codec, undefined)`${resource_c_person_computed_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_outPgResource.execute(selectArgs);
@@ -28114,7 +28114,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_first_namePgResource.codec)`${resource_c_person_first_namePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_first_namePgResource.codec, undefined)`${resource_c_person_first_namePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_first_namePgResource.execute(selectArgs);
@@ -28158,7 +28158,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_out_outPgResource.codec)`${resource_c_person_computed_out_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_out_outPgResource.codec, undefined)`${resource_c_person_computed_out_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_out_outPgResource.execute(selectArgs);
@@ -28203,7 +28203,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_inoutPgResource.codec)`${resource_c_person_computed_inoutPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_inoutPgResource.codec, undefined)`${resource_c_person_computed_inoutPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_inoutPgResource.execute(selectArgs);
@@ -28252,7 +28252,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_inout_outPgResource.codec)`${resource_c_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_inout_outPgResource.codec, undefined)`${resource_c_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_inout_outPgResource.execute(selectArgs);
@@ -28301,7 +28301,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_existsPgResource.codec)`${resource_c_person_existsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_existsPgResource.codec, undefined)`${resource_c_person_existsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_existsPgResource.execute(selectArgs);
@@ -28349,7 +28349,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_first_arg_inout_outPgResource.codec)`${resource_c_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_first_arg_inout_outPgResource.codec, undefined)`${resource_c_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
@@ -28394,7 +28394,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_1PgResource.codec)`${resource_c_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_1PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_1PgResource.execute(selectArgs);
@@ -28445,7 +28445,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_2PgResource.codec)`${resource_c_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_2PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_2PgResource.execute(selectArgs);
@@ -28496,7 +28496,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_3PgResource.codec)`${resource_c_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_3PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_3PgResource.execute(selectArgs);
@@ -28547,7 +28547,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_4PgResource.codec)`${resource_c_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_4PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_4PgResource.execute(selectArgs);
@@ -28598,7 +28598,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_5PgResource.codec)`${resource_c_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_5PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_5PgResource.execute(selectArgs);
@@ -28649,7 +28649,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_complexPgResource.codec)`${resource_c_person_computed_complexPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_complexPgResource.codec, undefined)`${resource_c_person_computed_complexPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_complexPgResource.execute(selectArgs);
@@ -28698,7 +28698,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_first_postPgResource.codec)`${resource_c_person_first_postPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_first_postPgResource.codec, undefined)`${resource_c_person_first_postPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_first_postPgResource.execute(selectArgs);
@@ -28742,7 +28742,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_first_arg_inoutPgResource.codec)`${resource_c_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_first_arg_inoutPgResource.codec, undefined)`${resource_c_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_first_arg_inoutPgResource.execute(selectArgs);
@@ -28849,7 +28849,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_type_functionPgResource.codec)`${resource_c_person_type_functionPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_type_functionPgResource.codec, undefined)`${resource_c_person_type_functionPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_type_functionPgResource.execute(selectArgs);
@@ -28897,7 +28897,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_type_function_listPgResource.codec)`${resource_c_person_type_function_listPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_type_function_listPgResource.codec, undefined)`${resource_c_person_type_function_listPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_type_function_listPgResource.execute(selectArgs);
@@ -29279,7 +29279,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_compound_type_computed_fieldPgResource.codec)`${resource_c_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_compound_type_computed_fieldPgResource.codec, undefined)`${resource_c_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_compound_type_computed_fieldPgResource.execute(selectArgs);
@@ -29323,7 +29323,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_b_compound_type_queryPgResource.codec)`${resource_b_compound_type_queryPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_b_compound_type_queryPgResource.codec, undefined)`${resource_b_compound_type_queryPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_b_compound_type_queryPgResource.execute(selectArgs);
@@ -29367,7 +29367,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_query_compound_type_arrayPgResource.codec)`${resource_query_compound_type_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_query_compound_type_arrayPgResource.codec, undefined)`${resource_query_compound_type_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_query_compound_type_arrayPgResource.execute(selectArgs);
@@ -29411,7 +29411,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_b_compound_type_array_queryPgResource.codec)`${resource_b_compound_type_array_queryPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_b_compound_type_array_queryPgResource.codec, undefined)`${resource_b_compound_type_array_queryPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_b_compound_type_array_queryPgResource.execute(selectArgs);
@@ -29557,7 +29557,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_post_computed_interval_arrayPgResource.codec)`${resource_post_computed_interval_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_post_computed_interval_arrayPgResource.codec, undefined)`${resource_post_computed_interval_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_post_computed_interval_arrayPgResource.execute(selectArgs);
@@ -29601,7 +29601,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_post_computed_text_arrayPgResource.codec)`${resource_post_computed_text_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_post_computed_text_arrayPgResource.codec, undefined)`${resource_post_computed_text_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_post_computed_text_arrayPgResource.execute(selectArgs);
@@ -29646,7 +29646,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_with_optional_argPgResource.codec)`${resource_post_computed_with_optional_argPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_with_optional_argPgResource.codec, undefined)`${resource_post_computed_with_optional_argPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_with_optional_argPgResource.execute(selectArgs);
@@ -29695,7 +29695,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_with_required_argPgResource.codec)`${resource_post_computed_with_required_argPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_with_required_argPgResource.codec, undefined)`${resource_post_computed_with_required_argPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_with_required_argPgResource.execute(selectArgs);
@@ -29744,7 +29744,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmedPgResource.codec)`${resource_post_headline_trimmedPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmedPgResource.codec, undefined)`${resource_post_headline_trimmedPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmedPgResource.execute(selectArgs);
@@ -29794,7 +29794,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmed_no_defaultsPgResource.codec)`${resource_post_headline_trimmed_no_defaultsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmed_no_defaultsPgResource.codec, undefined)`${resource_post_headline_trimmed_no_defaultsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmed_no_defaultsPgResource.execute(selectArgs);
@@ -29844,7 +29844,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmed_strictPgResource.codec)`${resource_post_headline_trimmed_strictPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmed_strictPgResource.codec, undefined)`${resource_post_headline_trimmed_strictPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmed_strictPgResource.execute(selectArgs);
@@ -29894,7 +29894,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_compound_type_arrayPgResource.codec)`${resource_post_computed_compound_type_arrayPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_compound_type_arrayPgResource.codec, undefined)`${resource_post_computed_compound_type_arrayPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_compound_type_arrayPgResource.execute(selectArgs);
@@ -30004,7 +30004,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PostComputedIntervalSetEdge: {
@@ -30189,7 +30189,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   BType: {
@@ -32585,7 +32585,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CPersonEdge: {
@@ -32660,7 +32660,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PostEdge: {
@@ -32952,7 +32952,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ForeignKey: {
@@ -33212,7 +33212,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CCompoundKeyEdge: {
@@ -33580,7 +33580,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutSetofEdge: {
@@ -33605,7 +33605,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   QueryIntervalSetEdge: {
@@ -33630,7 +33630,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   StaticBigIntegerEdge: {
@@ -33655,7 +33655,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncReturnsTableOneColEdge: {
@@ -33689,7 +33689,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutOutSetofRecord: {
@@ -33732,7 +33732,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CSearchTestSummariesRecord: {
@@ -33778,7 +33778,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CIntSetQueryEdge: {
@@ -33803,7 +33803,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncReturnsTableMultiColRecord: {
@@ -33884,7 +33884,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CCompoundTypeEdge: {
@@ -33933,7 +33933,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutComplexSetofRecord: {
@@ -33982,7 +33982,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   NonUpdatableView: {
@@ -34077,7 +34077,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   InputEdge: {
@@ -34198,7 +34198,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PatchEdge: {
@@ -34319,7 +34319,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedEdge: {
@@ -34440,7 +34440,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedPatchRecordEdge: {
@@ -34561,7 +34561,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedInputRecordEdge: {
@@ -34682,7 +34682,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   DefaultValueEdge: {
@@ -34860,7 +34860,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   NoPrimaryKeyEdge: {
@@ -35006,7 +35006,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   Testview: {
@@ -35221,7 +35221,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   UniqueForeignKeyEdge: {
@@ -35367,7 +35367,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CMyTableEdge: {
@@ -35545,7 +35545,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CPersonSecretEdge: {
@@ -35723,7 +35723,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ViewTableEdge: {
@@ -35958,7 +35958,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   BUpdatableView: {
@@ -36233,7 +36233,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SimilarTable1Edge: {
@@ -36525,7 +36525,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SimilarTable2Edge: {
@@ -36817,7 +36817,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CNullTestRecordEdge: {
@@ -37109,7 +37109,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CEdgeCase: {
@@ -37153,7 +37153,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_edge_case_computedPgResource.codec)`${resource_c_edge_case_computedPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_edge_case_computedPgResource.codec, undefined)`${resource_c_edge_case_computedPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_edge_case_computedPgResource.execute(selectArgs);
@@ -37368,7 +37368,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CLeftArmEdge: {
@@ -37660,7 +37660,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CIssue756Edge: {
@@ -38390,7 +38390,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   BListEdge: {
