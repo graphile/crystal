@@ -1,0 +1,154 @@
+{
+  allListsList: [
+    {
+      id: 1,
+      intArray: [
+        1,
+        2,
+        3,
+      ],
+      intArrayNn: [
+        1,
+        2,
+        3,
+      ],
+      enumArray: [
+        "GREEN",
+        "RED",
+      ],
+      enumArrayNn: [
+        "GREEN",
+        "RED",
+      ],
+      dateArray: [
+        "2016-10-07",
+        "1999-01-08",
+      ],
+      dateArrayNn: [
+        "2016-10-07",
+        "1999-01-08",
+      ],
+      timestamptzArray: [
+        "2016-10-06T21:02:03.456789-04:00",
+        "1999-01-08T08:05:06.000000-04:00",
+      ],
+      timestamptzArrayNn: [
+        "2016-10-06T21:02:03.456789-04:00",
+        "1999-01-08T08:05:06.000000-04:00",
+      ],
+      compoundTypeArray: [
+        {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+          d: "<UUID 1>",
+          e: "FOO_BAR",
+          f: "_EMPTY_",
+          fooBar: 8,
+        },
+        {
+          a: 2,
+          b: "3",
+          c: "GREEN",
+          d: "00000000-0000-0000-0000-000000000001",
+          e: "BAR_FOO",
+          f: "_EMPTY_",
+          fooBar: 4,
+        },
+      ],
+      compoundTypeArrayNn: [
+        {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+          d: "<UUID 1>",
+          e: "FOO_BAR",
+          f: "_EMPTY_",
+          fooBar: 8,
+        },
+        {
+          a: 2,
+          b: "3",
+          c: "GREEN",
+          d: "00000000-0000-0000-0000-000000000001",
+          e: "BAR_FOO",
+          f: "_EMPTY_",
+          fooBar: 4,
+        },
+      ],
+      byteaArray: [
+        "AAAA123400xXyYzZAAAA",
+        "1234AAAA567890abcdefGHIJKAAA",
+      ],
+      byteaArrayNn: [
+        "AAAA123400xXyYzZAAAA",
+        "1234AAAA567890abcdefGHIJKAAA",
+      ],
+    },
+    {
+      id: 2,
+      intArray: null,
+      intArrayNn: [
+        1,
+        2,
+        3,
+      ],
+      enumArray: null,
+      enumArrayNn: [
+        "GREEN",
+        "RED",
+      ],
+      dateArray: null,
+      dateArrayNn: [
+        "2016-10-07",
+        "1999-01-08",
+      ],
+      timestamptzArray: null,
+      timestamptzArrayNn: [
+        "2016-10-06T21:02:03.456789-04:00",
+        "1999-01-08T08:05:06.000000-04:00",
+      ],
+      compoundTypeArray: null,
+      compoundTypeArrayNn: [
+        {
+          a: 1,
+          b: "2",
+          c: "BLUE",
+          d: "<UUID 1>",
+          e: "FOO_BAR",
+          f: "_EMPTY_",
+          fooBar: 8,
+        },
+        {
+          a: 2,
+          b: "3",
+          c: "GREEN",
+          d: "00000000-0000-0000-0000-000000000001",
+          e: "BAR_FOO",
+          f: "_EMPTY_",
+          fooBar: 4,
+        },
+      ],
+      byteaArray: null,
+      byteaArrayNn: [
+        "AAAA123400xXyYzZAAAA",
+        "1234AAAA567890abcdefGHIJKAAA",
+      ],
+    },
+    {
+      id: 3,
+      intArray: [],
+      intArrayNn: [],
+      enumArray: [],
+      enumArrayNn: [],
+      dateArray: [],
+      dateArrayNn: [],
+      timestamptzArray: [],
+      timestamptzArrayNn: [],
+      compoundTypeArray: [],
+      compoundTypeArrayNn: [],
+      byteaArray: [],
+      byteaArrayNn: [],
+    },
+  ],
+}
