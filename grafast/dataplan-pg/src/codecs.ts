@@ -475,10 +475,10 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
       castFromPg,
       listCastFromPg(frag) {
         const identifier = sql.identifier(Symbol(name));
-        return sql`(${sql.indent(
-          sql`select array_agg(${castFromPg(
+        return sql`array(${sql.indent(
+          sql`select ${castFromPg(
             identifier,
-          )})\nfrom unnest(${frag}) ${identifier}`,
+          )}\nfrom unnest(${frag}) ${identifier}`,
         )})::text`;
       },
       fromPg: makeSQLValueToRecord(attributes, true),
@@ -683,11 +683,11 @@ export function listOfCodec<
           castFromPg: innerCodec.listCastFromPg,
           listCastFromPg(frag) {
             const identifier = sql.identifier(Symbol(`${name}_item`));
-            return sql`(${sql.indent(
-              sql`select array_agg(${innerCodec.listCastFromPg!.call(
+            return sql`array(${sql.indent(
+              sql`select ${innerCodec.listCastFromPg!.call(
                 this,
                 identifier,
-              )})\nfrom unnest(${frag}) ${identifier}`,
+              )}\nfrom unnest(${frag}) ${identifier}`,
             )})::text`;
           },
         }
@@ -832,10 +832,10 @@ export function rangeOfCodec<
           castFromPg,
           listCastFromPg(frag) {
             const identifier = sql.identifier(Symbol(name));
-            return sql`(${sql.indent(
-              sql`select array_agg(${castFromPg(
+            return sql`array(${sql.indent(
+              sql`select ${castFromPg(
                 identifier,
-              )})\nfrom unnest(${frag}) ${identifier}`,
+              )}\nfrom unnest(${frag}) ${identifier}`,
             )})::text`;
           },
         }
@@ -950,11 +950,11 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
     castFromPg,
     listCastFromPg(frag) {
       const identifier = sql.identifier(Symbol("entry"));
-      return sql`(${sql.indent(
-        sql`select array_agg(${castFromPg.call(
+      return sql`array(${sql.indent(
+        sql`select ${castFromPg.call(
           this,
           identifier,
-        )})\nfrom unnest(${frag}) ${identifier}`,
+        )}\nfrom unnest(${frag}) ${identifier}`,
       )})::text`;
     },
   };
