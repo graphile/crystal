@@ -1326,6 +1326,49 @@ export interface PgLanguage {
   lanacl: ReadonlyArray<PgAclItem> | null;
 }
 
+/**
+ * The catalog pg_policy stores row-level security policies for tables. A policy includes the kind of command that it
+ * applies to (possibly all commands), the roles that it applies to, the expression to be added as a security-barrier
+ * qualification to queries that include the table, and the expression to be added as a WITH CHECK option for queries
+ * that attempt to add new records to the table.
+ */
+export interface PgPolicy {
+  /* COMMON FIELDS */
+
+  /** The name of the policy */
+  polname: PgName;
+
+  /** The table to which the policy applies */
+  polrelid: PgOid;
+
+  /**
+   * The command type to which the policy is applied: r for [sql-select], a for [sql-insert], w for [sql-update], d for
+   * [sql-delete], or * for all
+   */
+  polcmd: string | null;
+
+  /** Is the policy permissive or restrictive? */
+  polpermissive: boolean | null;
+
+  /** The roles to which the policy is applied; zero means PUBLIC (and normally appears alone in the array) */
+  polroles: ReadonlyArray<PgOid> | null;
+
+  /** The expression tree to be added to the security barrier qualifications for queries that use the table */
+  polqual: string | null;
+
+  /** The expression tree to be added to the WITH CHECK qualifications for queries that attempt to add rows to the table */
+  polwithcheck: string | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * Row identifier
+   *
+   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x
+   */
+  _id?: PgOid | undefined;
+}
+
 /** The catalog pg_range stores information about range types. This is in addition to the types' entries in pg_type. */
 export interface PgRange {
   /* COMMON FIELDS */
@@ -1450,6 +1493,7 @@ export interface Introspection {
   indexes: Array<PgIndex>;
   inherits: Array<PgInherits>;
   languages: Array<PgLanguage>;
+  policies: Array<PgPolicy>;
   ranges: Array<PgRange>;
   depends: Array<PgDepend>;
   descriptions: Array<PgDescription>;
@@ -1491,6 +1535,7 @@ export type PgEntity =
   | PgIndex
   | PgInherits
   | PgLanguage
+  | PgPolicy
   | PgRange
   | PgDepend
   | PgDescription
@@ -1586,6 +1631,12 @@ with
     from pg_catalog.pg_language
   ),
 
+  policies as (
+    select *
+    from pg_catalog.pg_policy
+    where polrelid in (select classes._id from classes)
+  ),
+
   ranges as (
     select *
     from pg_catalog.pg_range
@@ -1669,6 +1720,9 @@ select json_build_object(
 
   'languages',
   (select coalesce((select json_agg(row_to_json(languages) order by lanname) from languages), '[]'::json)),
+
+  'policies',
+  (select coalesce((select json_agg(row_to_json(policies) order by polrelid, polname) from policies), '[]'::json)),
 
   'ranges',
   (select coalesce((select json_agg(row_to_json(ranges) order by rngtypid) from ranges), '[]'::json)),
