@@ -4,18 +4,18 @@ select
   __lists__."int_array_nn"::text as "2",
   __lists__."enum_array"::text as "3",
   __lists__."enum_array_nn"::text as "4",
-  array(
+  (case when (__lists__."date_array") is not distinct from null then null::text else array(
     select to_char(__entry__, 'YYYY-MM-DD'::text)
     from unnest(__lists__."date_array") __entry__
-  )::text as "5",
+  )::text end) as "5",
   array(
     select to_char(__entry_2, 'YYYY-MM-DD'::text)
     from unnest(__lists__."date_array_nn") __entry_2
   )::text as "6",
-  array(
+  (case when (__lists__."timestamptz_array") is not distinct from null then null::text else array(
     select to_char(__entry_3, 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text)
     from unnest(__lists__."timestamptz_array") __entry_3
-  )::text as "7",
+  )::text end) as "7",
   array(
     select to_char(__entry_4, 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text)
     from unnest(__lists__."timestamptz_array_nn") __entry_4
