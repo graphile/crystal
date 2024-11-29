@@ -8,7 +8,6 @@ import type {
   PgConstraint,
 } from "pg-introspection";
 import { parseSmartComment } from "pg-introspection";
-import { escapeSqlIdentifier } from "pg-sql2";
 
 import { version } from "../version.js";
 
@@ -276,6 +275,8 @@ async function processFk(
   pgClass: PgClass,
   rawSpec: string | true | (string | true)[],
 ) {
+  const { escapeSqlIdentifier } = info.lib.sql;
+
   const identity = () =>
     `${pgClass.getNamespace()!.nspname}.${pgClass.relname}`;
   const { serviceName, introspection } = event;

@@ -19,7 +19,6 @@ import {
 } from "@dataplan/pg";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
-import sql from "pg-sql2";
 
 import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
@@ -140,6 +139,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
     namespace: "pgProcedures",
     helpers: {
       async getResourceOptions(info, serviceName, pgProc) {
+        const { sql } = info.lib;
         let resourceOptionsByPgProc =
           info.state.resourceOptionsByPgProcByService.get(serviceName);
         if (!resourceOptionsByPgProc) {

@@ -7,7 +7,6 @@ import type {
   PgClass,
   PgConstraint,
 } from "pg-introspection";
-import { sql } from "pg-sql2";
 
 import { version } from "../version.js";
 
@@ -168,6 +167,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         return false;
       },
       async getIntrospectionData(info, serviceName, pgClass, attributes) {
+        const { sql } = info.lib;
         // Load data from the table/view.
         const query = sql.compile(
           sql.fragment`select ${sql.join(
