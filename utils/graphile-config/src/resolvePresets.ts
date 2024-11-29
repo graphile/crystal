@@ -274,13 +274,6 @@ function resolvePresetInternal(
  * @internal
  */
 
-function isPojo(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== "object") return false;
-  if (value === null) return false;
-  const proto = Object.getPrototypeOf(value);
-  return proto === null || proto === Object.prototype;
-}
-
 function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
   sourcePreset: Omit<GraphileConfig.Preset, "extends">,
@@ -339,24 +332,6 @@ function mergePreset(
       keyof GraphileConfig.Lib
     >) {
       const sourceValue = sourcePreset.lib[key];
-
-      // Enforce that sourceValue is a POJO - everything should be namespaced.
-      if (!isPojo(sourceValue)) {
-        throw new Error(
-          `Attempted to add '${key}' to preset.lib, but the value is not a plain JS object. Everything added to lib must be namespaced to avoid clashes, consider moving '${key}' inside an object using your initials or project name to avoid clashes:
-
-    const preset = {
-      lib: {
-        PROJECT_NAME: {
-          ${
-            /^[_$a-zA-Z][_$a-zA-Z0-9]*$/.test(key) ? key : JSON.stringify(key)
-          }: ...
-        }
-      }
-    };
-`,
-        );
-      }
 
       if (!(key in targetPreset.lib)) {
         (targetPreset.lib as Record<string, any>)[key] = sourceValue;
