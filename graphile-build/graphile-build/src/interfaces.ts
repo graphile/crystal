@@ -56,7 +56,7 @@ export interface GatherPluginContextBase {
 export interface GatherPluginContext<
   TState extends { [key: string]: any },
   TCache extends { [key: string]: any },
-> {
+> extends GatherPluginContextBase {
   /**
    * The state for this plugin specifically. State exists only for a single
    * 'gather' phase and is then discarded.
