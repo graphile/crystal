@@ -25,13 +25,27 @@ yarn
 yarn watch # or 'yarn build'
 ```
 
-**TODO:** check the following instructions work on a clean checkout.
-
 We assume you have a local PostgreSQL server running in "trust" authentication
 mode. Other options may or may not work - you may need to set `PGHOST`,
 `PGUSER`, `PGPASSWORD` and/or similar config variables.
 
-Run the tests with `yarn test`
+If you don't have such a server, you can use docker to run it locally:
+
+```bash
+docker run -v /var/run/postgresql/:/var/run/postgresql/ --network host -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_INITDB_ARGS='--auth-host=trust'  -d postgres
+# Make sure you set PGUSER in your shell session
+export PGUSER=postgres
+```
+
+We also assume you have `psql` on your machine, if you don't you may install it using your preferred package manager, for example:
+
+```bash
+sudo apt update && sudo apt install postgresql-client
+```
+
+First run the database reset procedure: `yarn pretest`
+
+Now you're ready to run the tests with `yarn test`
 
 If the above succeeds, you're good to go! If not, please try again after running
 `yarn install --force` and always feel free to reach out via
