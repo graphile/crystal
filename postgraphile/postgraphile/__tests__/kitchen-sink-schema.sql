@@ -2008,27 +2008,80 @@ END $$;
 
 create schema issue_2210;
 
-create table issue_2210.test_user (
+
+-- Asset
+create table issue_2210.test_asset (
   id uuid primary key
+, url varchar
+, created_at timestamptz default now()
+);
+
+create function issue_2210.test_asset_src (asset issue_2210.test_asset) returns varchar as $$
+begin
+  return asset.url;
+end;
+$$ language plpgsql stable;
+
+-- Account
+
+create table issue_2210.test_account (
+  id uuid primary key
+);
+
+alter table issue_2210.test_account enable row level security;
+
+-- User
+create table issue_2210.test_user (
+  test_account_id uuid primary key references issue_2210.test_account(id)
+, test_asset_id uuid references issue_2210.test_asset (id)
 , name varchar
 , created_at timestamptz default now()
 );
 
+alter table issue_2210.test_user enable row level security;
+
+create index test_user_test_account_id_idx on issue_2210.test_user(test_account_id);
+create index test_user_test_asset_id_idx on issue_2210.test_user(test_asset_id);
+
+comment on column issue_2210.test_user.test_account_id is E'@name id';
+
+-- Chat
+
+create table issue_2210.test_chat (
+  id uuid primary key
+);
+
+-- Message
+
 create table issue_2210.test_message (
   id uuid primary key
-, test_chat_id uuid
-, test_user_id uuid references issue_2210.test_user (id)
+, test_chat_id uuid references issue_2210.test_chat (id)
+, test_user_id uuid references issue_2210.test_user (test_account_id)
 , message text
 , created_at timestamptz
 );
+
+create index test_message_test_chat_id_idx on issue_2210.test_message(test_chat_id);
 create index test_message_test_user_id_idx on issue_2210.test_message(test_user_id);
 
-create function issue_2210.some_messages (test_chat_id uuid) returns setof issue_2210.test_message as $$
-  select m.*
-  from issue_2210.test_message m
-  where m.test_chat_id = $1
-  order by created_at desc;
-$$ language sql stable;
-
 comment on table issue_2210.test_message is E'@behaviour -connection';
-comment on function issue_2210.some_messages(uuid) is E'@behaviour +connection';
+
+-- Messages
+
+create function issue_2210.test_messages (test_chat_id uuid) returns setof issue_2210.test_message as $$
+declare
+  _aThing int;
+begin
+  select count(*) into _aThing
+    from issue_2210.test_message m
+   where m.test_chat_id = $1;
+
+  if _aThing > 100 then
+    raise exception 'Please don''t inline me';
+  else
+    return query select m.* from issue_2210.test_message m where m.test_chat_id = $1 order by created_at desc;
+  end if;
+end
+$$ language plpgsql stable;
+
+comment on function issue_2210.test_messages(uuid) is E'@behaviour +connection';

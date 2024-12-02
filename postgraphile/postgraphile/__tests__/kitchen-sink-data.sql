@@ -79,6 +79,9 @@ delete from d.post cascade;
 delete from d.person cascade;
 delete from issue_2210.test_message cascade;
 delete from issue_2210.test_user cascade;
+delete from issue_2210.test_asset cascade;
+delete from issue_2210.test_account cascade;
+delete from issue_2210.test_chat cascade;
 
 alter table b.types enable trigger user;
 
@@ -1010,9 +1013,20 @@ insert into space.static_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.temp_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;
 
-insert into issue_2210.test_user (id, name)
-values ('a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', 'Bob')
-     , ('935945c1-d824-4a98-93e5-c22215c58982', 'John');
+insert into issue_2210.test_asset (id, url)
+values ('f9c8397a-97bb-4ffe-be3f-86c1eb71c03d', 'https://picsum.photos/200');
+
+insert into issue_2210.test_account (id)
+values ('a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc')
+     , ('935945c1-d824-4a98-93e5-c22215c58982');
+
+insert into issue_2210.test_user (test_account_id, name, test_asset_id)
+values ('a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', 'Bob', 'f9c8397a-97bb-4ffe-be3f-86c1eb71c03d')
+     , ('935945c1-d824-4a98-93e5-c22215c58982', 'John', null);
+
+insert into issue_2210.test_chat (id)
+values ('0d126c0c-9710-478c-9aee-0be34b250573')
+     , ('c46b4b59-0a29-4211-8e0f-659cb3e01c2f');
 
 insert into issue_2210.test_message (id, test_chat_id, message, test_user_id, created_at)
 values ('e0849772-7070-4fdf-8438-1ef846fc0daf', '0d126c0c-9710-478c-9aee-0be34b250573', 'Bob says 3', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', now() - '1 minute'::interval)
