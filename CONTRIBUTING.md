@@ -37,11 +37,15 @@ If you don't have such a server, you can use docker to run it locally:
 
 ```bash
 # Run a temporary postgres instance on port 6432
-docker run --rm -it -e POSTGRES_USER=postgres -e POSTGRES_HOST_AUTH_METHOD=trust -p 6432:5432 postgres:17 -c wal_level=logical
+docker run --rm -it -e POSTGRES_HOST_AUTH_METHOD=trust -p 6432:5432 postgres:17 -c wal_level=logical
 ```
 
-And then in your test terminal be sure to set the required environmental
-variables:
+Note that this Docker will keep running until you kill it (e.g. with `Ctrl-C`)
+and thus you will need to continue with a different terminal window.
+
+Be sure to set the required environmental variables for this setup before you
+attempt to run the tests; you will need these for each terminal window that you
+attempt to run the tests from:
 
 ```bash
 export PGUSER=postgres
@@ -51,24 +55,34 @@ export PGPORT=6432
 
 > [!TIP]
 >
-> If you want to keep the data between sessions, or the above doesn't work for
-> you, this version mounts permanent storage into `/var/run/postgresql` and is
-> more explicit about some configuration options:
+> If you want to keep the data between sessions, run docker in the background,
+> or the above doesn't work for you, this version:
+>
+> - mounts permanent storage into `/var/run/postgresql`
+> - detaches (runs in background)
+> - explicitly uses host networking
 >
 > ```bash
 > docker run -v /var/run/postgresql/:/var/run/postgresql/ --network host -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_INITDB_ARGS='--auth-host=trust' -d postgres
 > ```
 >
-> These are the envvars you will need for this version:
+> You'll need to indicate the PostgreSQL user to use:
 >
 > ```bash
 > export PGUSER=postgres
+> ```
+>
+> If you previously set PGHOST/PGPORT then you will need to reset these for this
+> configuration too:
+>
+> ```bash
 > export PGHOST=/var/run/postgresql/
 > export PGPORT=5432
 > ```
 
-We also assume you have `psql` on your machine, if you don't you may install it
-using your preferred package manager, for example:
+The command `psql` should now work (exit with `Ctrl-D`). We require this utility
+to install the test fixtures; if you don't have `psql` installed, t you may
+install it using your preferred package manager, for example:
 
 ```bash
 sudo apt update && sudo apt install postgresql-client
