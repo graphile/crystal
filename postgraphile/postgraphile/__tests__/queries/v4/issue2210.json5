@@ -1,0 +1,64 @@
+{
+  testMessages: {
+    nodes: [
+      {
+        id: "<UUID 1>",
+        message: "Bob says 3",
+        createdAt: "2024-12-02T12:23:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 2>",
+          name: "Bob",
+        },
+      },
+      {
+        id: "<UUID 3>",
+        message: "John says 3",
+        createdAt: "2024-12-02T12:22:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 4>",
+          name: "John",
+        },
+      },
+      {
+        id: "<UUID 5>",
+        message: "Bob says 2",
+        createdAt: "2024-12-02T12:21:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 2>",
+          name: "Bob",
+        },
+      },
+      {
+        id: "<UUID 6>",
+        message: "John says 2",
+        createdAt: "2024-12-02T12:20:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 4>",
+          name: "John",
+        },
+      },
+      {
+        id: "<UUID 7>",
+        message: "Bob says 1",
+        createdAt: "2024-12-02T12:19:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 2>",
+          name: "Bob",
+        },
+      },
+      {
+        id: "<UUID 8>",
+        message: "John says 1",
+        createdAt: "2024-12-02T12:18:51.584871-04:00",
+        testUserByTestUserId: {
+          id: "<UUID 4>",
+          name: "John",
+        },
+      },
+    ],
+    pageInfo: {
+      hasNextPage: false,
+      endCursor: "WyJuYXR1cmFsIiw2XQ==",
+    },
+  },
+}
