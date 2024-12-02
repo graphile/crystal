@@ -142,7 +142,10 @@ result.
 ## Developing
 
 ### Testing
-Make sure you first follow the instructions in the root of the repository, then run the test with the following commands:
+
+Make sure you first follow the instructions in the
+[CONTRIBUTING.md file at the root of the repository](../../CONTRIBUTING.md),
+then run the test with the following commands:
 
 ```bash
 yarn prepack
