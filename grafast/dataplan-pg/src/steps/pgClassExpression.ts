@@ -64,7 +64,7 @@ export class PgClassExpressionStep<
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
-    private guaranteedNotNull: boolean | undefined,
+    private guaranteedNotNull?: boolean,
   ) {
     super();
     this.needsPolymorphicUnwrap =
@@ -279,7 +279,7 @@ function pgClassExpression<
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,
-  guaranteedNotNull: boolean | undefined,
+  guaranteedNotNull?: boolean,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>

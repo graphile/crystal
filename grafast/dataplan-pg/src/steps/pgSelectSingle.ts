@@ -276,7 +276,7 @@ export class PgSelectSingleStep<
   public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
-    guaranteedNotNull: boolean | undefined,
+    guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
     const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(
       this,

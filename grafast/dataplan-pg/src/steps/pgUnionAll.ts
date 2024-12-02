@@ -302,7 +302,7 @@ export class PgUnionAllSingleStep
   expression<TExpressionCodec extends PgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
-    guaranteedNotNull: boolean | undefined,
+    guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
     return this.select(expression, codec, guaranteedNotNull);
   }
@@ -320,7 +320,7 @@ export class PgUnionAllSingleStep
   public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
-    guaranteedNotNull: boolean | undefined,
+    guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
     const sqlExpr = pgClassExpression<TExpressionCodec, any>(
       this,

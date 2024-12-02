@@ -456,13 +456,13 @@ function listCastViaUnnest(
   name: string,
   frag: SQL,
   castFromPg: (identifier: SQL) => SQL,
-  guaranteedNonNull: boolean | undefined,
+  guaranteedNotNull?: boolean,
 ) {
   const identifier = sql.identifier(Symbol(name));
   const arraySql = sql`array(${sql.indent(
     sql`select ${castFromPg(identifier)}\nfrom unnest(${frag}) ${identifier}`,
   )})::text`;
-  if (guaranteedNonNull) {
+  if (guaranteedNotNull) {
     return arraySql;
   } else {
     return sql`(case when (${frag}) is not distinct from null then null::text else ${arraySql} end)`;
@@ -922,8 +922,8 @@ exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");
  * Helper type for common casting methods.
  */
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
-  castFromPg?(frag: SQL, guaranteedNotNull: boolean | undefined): SQL;
-  listCastFromPg?(frag: SQL, guaranteedNotNull: boolean | undefined): SQL;
+  castFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
+  listCastFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
   isBinary?: boolean;
