@@ -232,13 +232,17 @@ declare global {
   }
 }
 
+type RawIntrospectionResults = Array<{
+  pgService: GraphileConfig.PgServiceConfiguration;
+  introspectionText: string;
+}>;
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
   introspection: Introspection;
 }>;
 
 interface Cache {
-  introspectionResultsPromise: null | Promise<IntrospectionResults>;
+  introspectionResultsPromise: null | Promise<RawIntrospectionResults>;
   dirty: boolean;
 }
 
@@ -529,7 +533,15 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               info.cache.introspectionResultsPromise = null;
             });
 
-            const introspections = await introspectionPromise;
+            const rawIntrospections = await introspectionPromise;
+
+            const introspections: IntrospectionResults = rawIntrospections.map(
+              ({ pgService, introspectionText }) => ({
+                pgService,
+                // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
+                introspection: parseIntrospectionResults(introspectionText),
+              }),
+            );
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
             info.state.getIntrospectionPromise = introspections;
@@ -719,7 +731,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 
 function introspectPgServices(
   pgServices: ReadonlyArray<GraphileConfig.PgServiceConfiguration> | undefined,
-): Promise<IntrospectionResults> {
+): Promise<RawIntrospectionResults> {
   if (!pgServices) {
     return Promise.resolve([]);
   }
@@ -789,8 +801,7 @@ function introspectPgServices(
       if (!row) {
         throw new Error("Introspection failed");
       }
-      const introspection = parseIntrospectionResults(row.introspection);
-      return { pgService, introspection };
+      return { pgService, introspectionText: row.introspection };
     }),
   );
 }
