@@ -1,3 +1,4 @@
+import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { connection, constant, grafast } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
@@ -12,7 +13,6 @@ import {
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "../src/index.js";
-import { pgSelect, TYPES } from "@dataplan/pg";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
@@ -284,8 +284,8 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
     extends: [PostGraphileAmberPreset],
     plugins: [
       makeExtendSchemaPlugin((build) => {
-        const {users} = build.input.pgRegistry.pgResources
-        const { sql } = build
+        const { users } = build.input.pgRegistry.pgResources;
+        const { sql } = build;
         return {
           typeDefs: gql`
             extend type User {
@@ -298,34 +298,50 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
               one($user) {
                 const $one = pgSelect({
                   identifiers: [],
-                  name: 'one',
+                  name: "one",
                   resource: users,
                   args: [
-                    { step: $user.get('id'), pgCodec: TYPES.text, name: 'user_id' },
+                    {
+                      step: $user.get("id"),
+                      pgCodec: TYPES.text,
+                      name: "user_id",
+                    },
                   ],
                   from: ($userId) => {
-                    const usersTblId = sql.identifier(Symbol())
-                    return sql`(select * from ${users!.codec.sqlType} as ${usersTblId} where id != ${$userId.placeholder} order by ${usersTblId}.id limit 1)`
-                  }
-                })
-                $one.setOrderIsUnique()
-                return connection($one)
+                    const usersTblId = sql.identifier(Symbol());
+                    return sql`(select * from ${
+                      users!.codec.sqlType
+                    } as ${usersTblId} where id != ${
+                      $userId.placeholder
+                    } order by ${usersTblId}.id limit 1)`;
+                  },
+                });
+                $one.setOrderIsUnique();
+                return connection($one);
               },
               two($user) {
                 const $two = pgSelect({
                   identifiers: [],
-                  name: 'two',
+                  name: "two",
                   resource: users,
                   args: [
-                    { step: $user.get('id'), pgCodec: TYPES.text, name: 'user_id' },
+                    {
+                      step: $user.get("id"),
+                      pgCodec: TYPES.text,
+                      name: "user_id",
+                    },
                   ],
                   from: ($userId) => {
-                    const usersTblId = sql.identifier(Symbol())
-                    return sql`(select * from ${users!.codec.sqlType} as ${usersTblId} where id != ${$userId.placeholder} order by ${usersTblId}.id limit 1 offset 1)`
-                  }
-                })
-                $two.setOrderIsUnique()
-                return connection($two)
+                    const usersTblId = sql.identifier(Symbol());
+                    return sql`(select * from ${
+                      users!.codec.sqlType
+                    } as ${usersTblId} where id != ${
+                      $userId.placeholder
+                    } order by ${usersTblId}.id limit 1 offset 1)`;
+                  },
+                });
+                $two.setOrderIsUnique();
+                return connection($two);
               },
             },
           },
@@ -373,17 +389,17 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
             one: {
               nodes: [
                 {
-                  name: "Bob"
-                }
-              ]
+                  name: "Bob",
+                },
+              ],
             },
             two: {
               nodes: [
                 {
-                  name: "Caroline"
-                }
-              ]
-            }
+                  name: "Caroline",
+                },
+              ],
+            },
           },
         ],
       },
