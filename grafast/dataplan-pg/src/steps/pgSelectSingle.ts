@@ -31,7 +31,7 @@ import type {
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectMode } from "./pgSelect.js";
+import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
@@ -611,6 +611,10 @@ export class PgSelectSingleStep<
   }
 }
 
+function fromRecord(record: PgSelectArgumentDigest) {
+  return sql`(select (${record.placeholder}).*)`;
+}
+
 /**
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
@@ -634,7 +638,7 @@ export function pgSelectFromRecord<
   return new PgSelectStep<TResource>({
     resource: resource,
     identifiers: [],
-    from: (record) => sql`(select (${record.placeholder}).*)`,
+    from: fromRecord,
     args: [{ step: $record, pgCodec: resource.codec }],
     joinAsLateral: true,
   });

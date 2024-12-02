@@ -2195,6 +2195,9 @@ ${lateralText};`;
       if (p.resource !== this.resource) {
         return false;
       }
+      if (p.from !== this.from) {
+        return false;
+      }
 
       // Check mode matches
       if (p.mode !== this.mode) {

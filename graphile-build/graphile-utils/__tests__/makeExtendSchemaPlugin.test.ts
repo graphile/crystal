@@ -1,5 +1,6 @@
+import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
-import { constant, grafast } from "grafast";
+import { connection, constant, grafast } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import { GraphQLScalarType, printSchema } from "grafast/graphql";
 import { buildSchema, QueryPlugin } from "graphile-build";
@@ -271,6 +272,134 @@ it("supports unary steps in loadOne", async () => {
           {
             name: "Caroline",
             uppercaseName: "CAROLINE",
+          },
+        ],
+      },
+    },
+  });
+});
+
+it("supports arbitrary sql queries, does not dedup unrelated queries", async () => {
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    plugins: [
+      makeExtendSchemaPlugin((build) => {
+        const { users } = build.input.pgRegistry.pgResources;
+        const { sql } = build;
+        return {
+          typeDefs: gql`
+            extend type User {
+              one: UserConnection
+              two: UserConnection
+            }
+          `,
+          plans: {
+            User: {
+              one($user) {
+                const $one = pgSelect({
+                  identifiers: [],
+                  name: "one",
+                  resource: users,
+                  args: [
+                    {
+                      step: $user.get("id"),
+                      pgCodec: TYPES.text,
+                      name: "user_id",
+                    },
+                  ],
+                  from: ($userId) => {
+                    const usersTblId = sql.identifier(Symbol());
+                    return sql`(select * from ${
+                      users!.codec.sqlType
+                    } as ${usersTblId} where id != ${
+                      $userId.placeholder
+                    } order by ${usersTblId}.id limit 1)`;
+                  },
+                });
+                $one.setOrderIsUnique();
+                return connection($one);
+              },
+              two($user) {
+                const $two = pgSelect({
+                  identifiers: [],
+                  name: "two",
+                  resource: users,
+                  args: [
+                    {
+                      step: $user.get("id"),
+                      pgCodec: TYPES.text,
+                      name: "user_id",
+                    },
+                  ],
+                  from: ($userId) => {
+                    const usersTblId = sql.identifier(Symbol());
+                    return sql`(select * from ${
+                      users!.codec.sqlType
+                    } as ${usersTblId} where id != ${
+                      $userId.placeholder
+                    } order by ${usersTblId}.id limit 1 offset 1)`;
+                  },
+                });
+                $two.setOrderIsUnique();
+                return connection($two);
+              },
+            },
+          },
+        };
+      }),
+    ],
+    pgServices: [
+      makePgService({
+        pool: pgPool!,
+        schemas: ["graphile_utils"],
+      }),
+    ],
+  };
+  const { schema, resolvedPreset } = await makeSchema(preset);
+  const result = await grafast({
+    schema,
+    resolvedPreset,
+    requestContext: {},
+    source: /* GraphQL */ `
+      {
+        allUsers(first: 1) {
+          nodes {
+            name
+            one(orderBy: NATURAL) {
+              nodes {
+                name
+              }
+            }
+            two(orderBy: NATURAL) {
+              nodes {
+                name
+              }
+            }
+          }
+        }
+      }
+    `,
+  });
+  expect(result).toEqual({
+    data: {
+      allUsers: {
+        nodes: [
+          {
+            name: "Alice",
+            one: {
+              nodes: [
+                {
+                  name: "Bob",
+                },
+              ],
+            },
+            two: {
+              nodes: [
+                {
+                  name: "Caroline",
+                },
+              ],
+            },
           },
         ],
       },
