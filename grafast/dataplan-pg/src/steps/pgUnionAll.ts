@@ -132,6 +132,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
     codec: PgCodec;
+    notNull?: boolean;
   };
 };
 
@@ -1728,22 +1729,41 @@ from (${innerQuery}) as ${tableAlias}\
           return sql`${select.expression} as ${sql.identifier(String(i))}`;
         } else if (this.mode === "normal") {
           const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-          const codec =
-            select.type === "type"
-              ? TYPES.text
-              : select.type === "pk"
-              ? TYPES.json
-              : select.type === "order"
-              ? getFragmentAndCodecFromOrder(
-                  this.alias,
-                  this.getOrderBy()[select.orderIndex],
-                  memberCodecs,
-                )[1]
-              : select.type === "attribute"
-              ? this.spec.attributes![select.attribute].codec
-              : select.codec;
+          let codec: PgCodec;
+          let guaranteedNotNull: boolean | undefined;
+          switch (select.type) {
+            case "type": {
+              codec = TYPES.text;
+              break;
+            }
+            case "pk": {
+              codec = TYPES.json;
+              guaranteedNotNull = true;
+              break;
+            }
+            case "order": {
+              const order = this.getOrderBy()[select.orderIndex];
+              codec = getFragmentAndCodecFromOrder(
+                this.alias,
+                order,
+                memberCodecs,
+              )[1];
+              guaranteedNotNull = order.nullable === false;
+              break;
+            }
+            case "attribute": {
+              const attr = this.spec.attributes![select.attribute];
+              codec = attr.codec;
+              guaranteedNotNull = attr.notNull;
+              break;
+            }
+            default: {
+              codec = select.codec;
+            }
+          }
           return sql`${
-            codec.castFromPg?.(sqlSrc, false) ?? sql`${sqlSrc}::text`
+            codec.castFromPg?.(sqlSrc, guaranteedNotNull || codec.notNull) ??
+            sql`${sqlSrc}::text`
           } as ${sql.identifier(String(i))}`;
         } else {
           // PERF: eradicate this (aggregate mode) without breaking arrayMode

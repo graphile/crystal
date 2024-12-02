@@ -2474,12 +2474,12 @@ export function makeExampleSchema(
               const $expr1 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
-                false,
+                true,
               )`${$archivedAt} is not null`;
               const $expr2 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
-                false,
+                true,
               )`${$expr1} is true`;
               return $expr2;
             },
@@ -4533,6 +4533,7 @@ export function makeExampleSchema(
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
+                    notNull: false,
                   },
                 },
                 resourceByTypeName: {
@@ -4729,6 +4730,7 @@ export function makeExampleSchema(
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
+                    notNull: false,
                   },
                 },
                 resourceByTypeName: {
