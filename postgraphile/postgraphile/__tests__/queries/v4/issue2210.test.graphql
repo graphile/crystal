@@ -1,0 +1,24 @@
+## expect(errors).toBeFalsy();
+#> schema: ["issue_2210"]
+#> subscriptions: true
+query Test($after: Cursor) {
+  someMessages(
+    testChatId: "0d126c0c-9710-478c-9aee-0be34b250573"
+    first: 50
+    after: $after
+  ) {
+    nodes {
+      id
+      message
+      createdAt
+      testUserByTestUserId {
+        id
+        name
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

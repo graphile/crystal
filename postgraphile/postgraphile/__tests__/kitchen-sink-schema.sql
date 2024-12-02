@@ -21,7 +21,8 @@ drop schema if exists
   nested_arrays,
   composite_domains,
   refs,
-  space
+  space,
+  issue_2210
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -2002,3 +2003,32 @@ AS $$
 BEGIN
     RETURN $1.return_to_earth;
 END $$;
+
+--------------------------------------------------------------------------------
+
+create schema issue_2210;
+
+create table issue_2210.test_user (
+  id uuid primary key
+, name varchar
+, created_at timestamptz default now()
+);
+
+create table issue_2210.test_message (
+  id uuid primary key
+, test_chat_id uuid
+, test_user_id uuid references issue_2210.test_user (id)
+, message text
+, created_at timestamptz
+);
+create index test_message_test_user_id_idx on issue_2210.test_message(test_user_id);
+
+create function issue_2210.some_messages (test_chat_id uuid) returns setof issue_2210.test_message as $$
+  select m.*
+  from issue_2210.test_message m
+  where m.test_chat_id = $1
+  order by created_at desc;
+$$ language sql stable;
+
+comment on table issue_2210.test_message is E'@behaviour -connection';
+comment on function issue_2210.some_messages(uuid) is E'@behaviour +connection';
