@@ -15,6 +15,8 @@ We use `yarn` to manage this monorepo; we strongly recommend that you only use
 technologies are in any way inferior to `yarn`, simply because they're not 100%
 compatible with each other and we require that you use `yarn` to contribute.)
 
+### Install dependencies
+
 Install the dependencies with `yarn`, and then run `yarn watch` which will
 compile all the source code with `tsc` (TypeScript) and will keep watching the
 filesystem for changes. (You can do `yarn build` for a one-time build if you
@@ -25,13 +27,89 @@ yarn
 yarn watch # or 'yarn build'
 ```
 
-**TODO:** check the following instructions work on a clean checkout.
+### Ensure PostgreSQL is running
 
 We assume you have a local PostgreSQL server running in "trust" authentication
 mode. Other options may or may not work - you may need to set `PGHOST`,
 `PGUSER`, `PGPASSWORD` and/or similar config variables.
 
-Run the tests with `yarn test`
+If you don't have such a server, you can use docker to run it locally:
+
+```bash
+# Run a temporary postgres instance on port 6432
+docker run --rm -it -e POSTGRES_HOST_AUTH_METHOD=trust -p 6432:5432 postgres:17 -c wal_level=logical
+```
+
+Note that this Docker will keep running until you kill it (e.g. with `Ctrl-C`)
+and thus you will need to continue with a different terminal window.
+
+Be sure to set the required environmental variables for this setup before you
+attempt to run the tests; you will need these for each terminal window that you
+attempt to run the tests from:
+
+```bash
+export PGUSER=postgres
+export PGHOST=127.0.0.1
+export PGPORT=6432
+```
+
+> [!TIP]
+>
+> If you want to keep the data between sessions, run docker in the background,
+> or the above doesn't work for you, this version:
+>
+> - mounts permanent storage into `/var/run/postgresql`
+> - detaches (runs in background)
+> - explicitly uses host networking
+>
+> ```bash
+> docker run -v /var/run/postgresql/:/var/run/postgresql/ --network host -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_INITDB_ARGS='--auth-host=trust' -d postgres
+> ```
+>
+> You'll need to indicate the PostgreSQL user to use:
+>
+> ```bash
+> export PGUSER=postgres
+> ```
+>
+> If you previously set PGHOST/PGPORT then you will need to reset these for this
+> configuration too:
+>
+> ```bash
+> export PGHOST=/var/run/postgresql/
+> export PGPORT=5432
+> ```
+
+The command `psql` should now work (exit with `Ctrl-D`). We require this utility
+to install the test fixtures; if you don't have `psql` installed, t you may
+install it using your preferred package manager, for example:
+
+```bash
+sudo apt update && sudo apt install postgresql-client
+```
+
+### Setup the test database
+
+You do not need to run this every time, but if you make changes to the SQL test
+fixtures (or pull down any updates) then you will need to run it to apply your
+changes.
+
+```bash
+yarn pretest
+```
+
+### Run the tests
+
+Now you're ready to run the tests:
+
+```bash
+yarn test
+```
+
+> [!NOTE]
+>
+> This may make your fans (if you have any) spin a bit as it uses significant
+> concurrency.
 
 If the above succeeds, you're good to go! If not, please try again after running
 `yarn install --force` and always feel free to reach out via
@@ -41,9 +119,9 @@ If the above succeeds, you're good to go! If not, please try again after running
 
 #### macOS
 
-macOS comes with an older version of `diff` by standard. We rely on `diff` for
-snapshot testing. Should your snapshot tests fail unexpectedly (for instance,
-with varying line endings), consider updating `diff`.
+macOS comes with an older version of `diff`. We rely on `diff` for snapshot
+testing. Should your snapshot tests fail unexpectedly (for instance, with
+varying line endings), consider updating `diff`.
 
 You can make use of `homebrew` or other macOS package managers for this purpose.
 
