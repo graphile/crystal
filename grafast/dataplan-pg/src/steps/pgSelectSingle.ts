@@ -247,6 +247,7 @@ export class PgSelectSingleStep<
       attr === ""
         ? this.resource.codec
         : this.resource.codec.attributes![attr as string].codec,
+      resourceAttribute?.notNull,
     );
     const colPlan = resourceAttribute
       ? resourceAttribute.expression
@@ -275,8 +276,13 @@ export class PgSelectSingleStep<
   public select<TExpressionCodec extends PgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
+    guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
-    const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(this, codec);
+    const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(
+      this,
+      codec,
+      guaranteedNotNull,
+    );
     return sqlExpr`${fragment}`;
   }
 
@@ -398,6 +404,7 @@ export class PgSelectSingleStep<
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
+      undefined,
     )`${this.getClassStep().alias}`;
   }
 
@@ -417,10 +424,16 @@ export class PgSelectSingleStep<
               o,
               this.getClassStep().resource.codec,
             );
-            return this.select(frag, codec);
+            return this.select(frag, codec, o.nullable === false);
           })
         : // No ordering; so use row number
-          [this.select(sql`row_number() over (partition by 1)`, TYPES.int)],
+          [
+            this.select(
+              sql`row_number() over (partition by 1)`,
+              TYPES.int,
+              true,
+            ),
+          ],
     );
     return [digest, step];
   }

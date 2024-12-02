@@ -1,0 +1,38 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+query {
+  allListsList {
+    id
+    intArray
+    intArrayNn
+    enumArray
+    enumArrayNn
+    dateArray
+    dateArrayNn
+    timestamptzArray
+    timestamptzArrayNn
+    # There's a KNOWN ISSUE where null composite arrays become empty arrays.
+    # Listen... if you want to fix it, have at it, but make sure that your fix
+    # doesn't penalize anything else!
+    compoundTypeArray {
+      ...compoundType
+    }
+    compoundTypeArrayNn {
+      ...compoundType
+    }
+    byteaArray
+    byteaArrayNn
+  }
+}
+
+fragment compoundType on CompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
+}

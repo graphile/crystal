@@ -231,7 +231,11 @@ export class PgInsertSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression(this, resourceAttribute.codec);
+    const sqlExpr = pgClassExpression(
+      this,
+      resourceAttribute.codec,
+      resourceAttribute.notNull,
+    );
     const colPlan = resourceAttribute.expression
       ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
@@ -245,6 +249,7 @@ export class PgInsertSingleStep<
     return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
+      false,
     )`${this.alias}`;
   }
 

@@ -4411,7 +4411,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   TvShow: {
@@ -4504,7 +4504,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   TvEpisode: {
@@ -5057,7 +5057,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_full_namePgResource.codec)`${resource_person_full_namePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_full_namePgResource.codec, undefined)`${resource_person_full_namePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_full_namePgResource.execute(selectArgs);
@@ -5159,7 +5159,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PostsEdge: {
@@ -5394,7 +5394,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RenamedTable: {
@@ -5489,7 +5489,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FilmsEdge: {
@@ -5667,7 +5667,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   StudiosEdge: {
@@ -5845,7 +5845,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PeopleEdge: {

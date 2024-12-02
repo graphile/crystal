@@ -1136,6 +1136,7 @@ function modFields(
                     return pgClassExpression(
                       $row,
                       resource.codec,
+                      undefined,
                     )`${resource.from(...newSelectArgs)}`;
                   }
                   // PERF: or here, if scalar add select to `$row`?

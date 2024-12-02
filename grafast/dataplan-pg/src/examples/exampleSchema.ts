@@ -2178,7 +2178,7 @@ export function makeExampleSchema(
             $connection
               .cloneSubplanWithoutPagination("aggregate")
               .single()
-              .select(sql`count(*)`, TYPES.bigint),
+              .select(sql`count(*)`, TYPES.bigint, false),
           [TYPES, sql],
         ),
       },
@@ -2474,10 +2474,12 @@ export function makeExampleSchema(
               const $expr1 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
+                true,
               )`${$archivedAt} is not null`;
               const $expr2 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
+                true,
               )`${$expr1} is true`;
               return $expr2;
             },
@@ -4531,6 +4533,7 @@ export function makeExampleSchema(
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
+                    notNull: false,
                   },
                 },
                 resourceByTypeName: {
@@ -4727,6 +4730,7 @@ export function makeExampleSchema(
                 attributes: {
                   cvss_score: {
                     codec: TYPES.float,
+                    notNull: false,
                   },
                 },
                 resourceByTypeName: {

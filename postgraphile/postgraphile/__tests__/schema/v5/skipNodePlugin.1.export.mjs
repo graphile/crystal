@@ -2302,7 +2302,20 @@ const registryConfig_pgCodecs_CPersonComputedComplexRecord_CPersonComputedComple
   executor,
   isAnonymous: true
 });
-const bTypesIdentifier = sql.identifier("b", "types");
+const bListsIdentifier = sql.identifier("b", "lists");
+const pgCatalogInt4ArrayCodec = listOfCodec(TYPES.int, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_int4"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pgCatalogInt4Array"
+});
 const bColorArrayCodec = listOfCodec(bColorCodec, {
   extensions: {
     pg: {
@@ -2316,6 +2329,194 @@ const bColorArrayCodec = listOfCodec(bColorCodec, {
   description: undefined,
   name: "bColorArray"
 });
+const pgCatalogDateArrayCodec = listOfCodec(TYPES.date, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_date"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pgCatalogDateArray"
+});
+const pgCatalogTimestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_timestamptz"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pgCatalogTimestamptzArray"
+});
+const cCompoundTypeArrayCodec = listOfCodec(cCompoundTypeCodec, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "_compound_type"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "cCompoundTypeArray"
+});
+const pgCatalogByteaArrayCodec = listOfCodec(TYPES.bytea, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_bytea"
+    },
+    tags: Object.create(null)
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pgCatalogByteaArray"
+});
+const spec_bLists = {
+  name: "bLists",
+  identifier: bListsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    int_array: {
+      description: undefined,
+      codec: pgCatalogInt4ArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    int_array_nn: {
+      description: undefined,
+      codec: pgCatalogInt4ArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_array: {
+      description: undefined,
+      codec: bColorArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_array_nn: {
+      description: undefined,
+      codec: bColorArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    date_array: {
+      description: undefined,
+      codec: pgCatalogDateArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    date_array_nn: {
+      description: undefined,
+      codec: pgCatalogDateArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    timestamptz_array: {
+      description: undefined,
+      codec: pgCatalogTimestamptzArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    timestamptz_array_nn: {
+      description: undefined,
+      codec: pgCatalogTimestamptzArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    compound_type_array: {
+      description: undefined,
+      codec: cCompoundTypeArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    compound_type_array_nn: {
+      description: undefined,
+      codec: cCompoundTypeArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bytea_array: {
+      description: undefined,
+      codec: pgCatalogByteaArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bytea_array_nn: {
+      description: undefined,
+      codec: pgCatalogByteaArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "lists"
+    },
+    tags: Object.create(null)
+  },
+  executor: executor
+};
+const bListsCodec = recordCodec(spec_bLists);
+const bTypesIdentifier = sql.identifier("b", "types");
 const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
   description: undefined,
   extensions: {
@@ -2453,19 +2654,6 @@ const cInt8ArrayDomainCodec = domainOfCodec(pgCatalogInt8ArrayCodec, "cInt8Array
     tags: Object.create(null)
   },
   notNull: false
-});
-const pgCatalogByteaArrayCodec = listOfCodec(TYPES.bytea, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_bytea"
-    },
-    tags: Object.create(null)
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "pgCatalogByteaArray"
 });
 const spec_bTypes_attributes_ltree_codec_ltree = {
   name: "ltree",
@@ -2941,19 +3129,6 @@ const spec_bTypes = {
   executor: executor
 };
 const bTypesCodec = recordCodec(spec_bTypes);
-const pgCatalogInt4ArrayCodec = listOfCodec(TYPES.int, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int4"
-    },
-    tags: Object.create(null)
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "pgCatalogInt4Array"
-});
 const cFloatrangeCodec = rangeOfCodec(TYPES.float, "cFloatrange", sql.identifier("c", "floatrange"), {
   description: undefined,
   extensions: {
@@ -3487,6 +3662,14 @@ const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
+const b_listsUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
 const b_typesUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -3617,13 +3800,20 @@ const registry = makeRegistry({
     CMutationOutComplexRecord: registryConfig_pgCodecs_CMutationOutComplexRecord_CMutationOutComplexRecord,
     CMutationOutComplexSetofRecord: registryConfig_pgCodecs_CMutationOutComplexSetofRecord_CMutationOutComplexSetofRecord,
     CPersonComputedComplexRecord: registryConfig_pgCodecs_CPersonComputedComplexRecord_CPersonComputedComplexRecord,
-    bTypes: bTypesCodec,
+    bLists: bListsCodec,
+    pgCatalogInt4Array: pgCatalogInt4ArrayCodec,
     bColorArray: bColorArrayCodec,
+    pgCatalogDateArray: pgCatalogDateArrayCodec,
+    date: TYPES.date,
+    pgCatalogTimestamptzArray: pgCatalogTimestamptzArrayCodec,
+    cCompoundTypeArray: cCompoundTypeArrayCodec,
+    pgCatalogByteaArray: pgCatalogByteaArrayCodec,
+    bytea: TYPES.bytea,
+    bTypes: bTypesCodec,
     anInt: anIntCodec,
     bAnotherInt: bAnotherIntCodec,
     pgCatalogNumrange: pgCatalogNumrangeCodec,
     pgCatalogDaterange: pgCatalogDaterangeCodec,
-    date: TYPES.date,
     anIntRange: anIntRangeCodec,
     time: TYPES.time,
     timetz: TYPES.timetz,
@@ -3640,24 +3830,9 @@ const registry = makeRegistry({
     regdictionary: TYPES.regdictionary,
     cTextArrayDomain: cTextArrayDomainCodec,
     cInt8ArrayDomain: cInt8ArrayDomainCodec,
-    bytea: TYPES.bytea,
-    pgCatalogByteaArray: pgCatalogByteaArrayCodec,
     ltree: spec_bTypes_attributes_ltree_codec_ltree,
     "ltree[]": spec_bTypes_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
-    cCompoundTypeArray: listOfCodec(cCompoundTypeCodec, {
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "_compound_type"
-        },
-        tags: Object.create(null)
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "cCompoundTypeArray"
-    }),
     bJwtTokenArray: listOfCodec(bJwtTokenCodec, {
       extensions: {
         pg: {
@@ -3684,7 +3859,6 @@ const registry = makeRegistry({
       description: undefined,
       name: "bTypesArray"
     }),
-    pgCatalogInt4Array: pgCatalogInt4ArrayCodec,
     cFloatrange: cFloatrangeCodec,
     postArray: postArrayCodec,
     pgCatalogInt8Array: pgCatalogInt8ArrayCodec,
@@ -7941,6 +8115,28 @@ const registry = makeRegistry({
       },
       description: undefined
     }),
+    b_lists: {
+      executor: executor,
+      name: "b_lists",
+      identifier: "main.b.lists",
+      from: bListsIdentifier,
+      codec: bListsCodec,
+      uniques: b_listsUniques,
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "lists"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {}
+      }
+    },
     b_types: registryConfig_pgResources_b_types_b_types,
     b_type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_b_types_b_types, {
       name: "b_type_function_connection",
@@ -8512,6 +8708,7 @@ const resource_c_left_armPgResource = registry.pgResources["c_left_arm"];
 const resource_c_issue756PgResource = registry.pgResources["c_issue756"];
 const resource_postPgResource = registry.pgResources["post"];
 const resource_c_personPgResource = registry.pgResources["c_person"];
+const resource_b_listsPgResource = registry.pgResources["b_lists"];
 const resource_b_typesPgResource = registry.pgResources["b_types"];
 const argDetailsSimple = [];
 const makeArgs = (args, path = []) => {
@@ -12126,7 +12323,7 @@ const getSelectPlanFromParentAndArgs16 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_c_person_friendsPgResource.codec)`${resource_c_person_friendsPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_c_person_friendsPgResource.codec, undefined)`${resource_c_person_friendsPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_c_person_friendsPgResource.execute(selectArgs);
@@ -12216,7 +12413,7 @@ const getSelectPlanFromParentAndArgs17 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_c_person_type_function_connectionPgResource.codec)`${resource_c_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_c_person_type_function_connectionPgResource.codec, undefined)`${resource_c_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_c_person_type_function_connectionPgResource.execute(selectArgs);
@@ -12595,7 +12792,7 @@ const getSelectPlanFromParentAndArgs18 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_post_computed_interval_setPgResource.codec)`${resource_post_computed_interval_setPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_post_computed_interval_setPgResource.codec, undefined)`${resource_post_computed_interval_setPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_post_computed_interval_setPgResource.execute(selectArgs);
@@ -16156,6 +16353,9 @@ type Query {
   """Get a single \`CPerson\`."""
   cPersonByEmail(email: BEmail!): CPerson
 
+  """Get a single \`BList\`."""
+  bListByRowId(rowId: Int!): BList
+
   """Get a single \`BType\`."""
   bTypeByRowId(rowId: Int!): BType
   cCurrentUserId: Int
@@ -17143,6 +17343,35 @@ type Query {
     """
     condition: CPersonCondition
   ): CPersonConnection
+
+  """Reads and enables pagination through a set of \`BList\`."""
+  allBLists(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`BList\`."""
+    orderBy: [BListOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BListCondition
+  ): BListConnection
 
   """Reads and enables pagination through a set of \`BType\`."""
   allBTypes(
@@ -18417,6 +18646,22 @@ type CIssue756 {
 }
 
 scalar CNotNullTimestamp
+
+type BList {
+  rowId: Int!
+  intArray: [Int]
+  intArrayNn: [Int]!
+  enumArray: [BColor]
+  enumArrayNn: [BColor]!
+  dateArray: [Date]
+  dateArrayNn: [Date]!
+  timestamptzArray: [Datetime]
+  timestamptzArrayNn: [Datetime]!
+  compoundTypeArray: [CCompoundType]
+  compoundTypeArrayNn: [CCompoundType]!
+  byteaArray: [Base64EncodedBinary]
+  byteaArrayNn: [Base64EncodedBinary]!
+}
 
 """A connection to a list of \`Int\` values."""
 type CFuncOutSetofConnection {
@@ -19855,6 +20100,49 @@ input CPersonCondition {
   createdAt: Datetime
 }
 
+"""A connection to a list of \`BList\` values."""
+type BListConnection {
+  """A list of \`BList\` objects."""
+  nodes: [BList]!
+
+  """
+  A list of edges which contains the \`BList\` and cursor to aid in pagination.
+  """
+  edges: [BListEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`BList\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`BList\` edge in the connection."""
+type BListEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`BList\` at the end of the edge."""
+  node: BList
+}
+
+"""Methods to use when ordering \`BList\`."""
+enum BListOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+}
+
+"""
+A condition to be used against \`BList\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input BListCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
 """
 The root mutation type which contains root level fields which mutate data.
 """
@@ -20388,6 +20676,14 @@ type Mutation {
     input: CreateCPersonInput!
   ): CreateCPersonPayload
 
+  """Creates a single \`BList\`."""
+  createBList(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBListInput!
+  ): CreateBListPayload
+
   """Creates a single \`BType\`."""
   createBType(
     """
@@ -20564,6 +20860,14 @@ type Mutation {
     input: UpdateCPersonByEmailInput!
   ): UpdateCPersonPayload
 
+  """Updates a single \`BList\` using a unique key and a patch."""
+  updateBListByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBListByRowIdInput!
+  ): UpdateBListPayload
+
   """Updates a single \`BType\` using a unique key and a patch."""
   updateBTypeByRowId(
     """
@@ -20739,6 +21043,14 @@ type Mutation {
     """
     input: DeleteCPersonByEmailInput!
   ): DeleteCPersonPayload
+
+  """Deletes a single \`BList\` using a unique key."""
+  deleteBListByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBListByRowIdInput!
+  ): DeleteBListPayload
 
   """Deletes a single \`BType\` using a unique key."""
   deleteBTypeByRowId(
@@ -23210,6 +23522,58 @@ input BWrappedUrlInput {
   url: BNotNullUrl!
 }
 
+"""The output of our create \`BList\` mutation."""
+type CreateBListPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`BList\` that was created by this mutation."""
+  bList: BList
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`BList\`. May be used by Relay 1."""
+  bListEdge(
+    """The method to use when ordering \`BList\`."""
+    orderBy: [BListOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BListEdge
+}
+
+"""All input for the create \`BList\` mutation."""
+input CreateBListInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`BList\` to be created by this mutation."""
+  bList: BListInput!
+}
+
+"""An input for mutations affecting \`BList\`"""
+input BListInput {
+  rowId: Int
+  intArray: [Int]
+  intArrayNn: [Int]!
+  enumArray: [BColor]
+  enumArrayNn: [BColor]!
+  dateArray: [Date]
+  dateArrayNn: [Date]!
+  timestamptzArray: [Datetime]
+  timestamptzArrayNn: [Datetime]!
+  compoundTypeArray: [CCompoundTypeInput]
+  compoundTypeArrayNn: [CCompoundTypeInput]!
+  byteaArray: [Base64EncodedBinary]
+  byteaArrayNn: [Base64EncodedBinary]!
+}
+
 """The output of our create \`BType\` mutation."""
 type CreateBTypePayload {
   """
@@ -24286,6 +24650,63 @@ input UpdateCPersonByEmailInput {
   cPersonPatch: CPersonPatch!
 }
 
+"""The output of our update \`BList\` mutation."""
+type UpdateBListPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`BList\` that was updated by this mutation."""
+  bList: BList
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`BList\`. May be used by Relay 1."""
+  bListEdge(
+    """The method to use when ordering \`BList\`."""
+    orderBy: [BListOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BListEdge
+}
+
+"""All input for the \`updateBListByRowId\` mutation."""
+input UpdateBListByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`BList\` being updated.
+  """
+  bListPatch: BListPatch!
+}
+
+"""
+Represents an update to a \`BList\`. Fields that are set will be updated.
+"""
+input BListPatch {
+  rowId: Int
+  intArray: [Int]
+  intArrayNn: [Int]
+  enumArray: [BColor]
+  enumArrayNn: [BColor]
+  dateArray: [Date]
+  dateArrayNn: [Date]
+  timestamptzArray: [Datetime]
+  timestamptzArrayNn: [Datetime]
+  compoundTypeArray: [CCompoundTypeInput]
+  compoundTypeArrayNn: [CCompoundTypeInput]
+  byteaArray: [Base64EncodedBinary]
+  byteaArrayNn: [Base64EncodedBinary]
+}
+
 """The output of our update \`BType\` mutation."""
 type UpdateBTypePayload {
   """
@@ -25022,6 +25443,39 @@ input DeleteCPersonByEmailInput {
   email: BEmail!
 }
 
+"""The output of our delete \`BList\` mutation."""
+type DeleteBListPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`BList\` that was deleted by this mutation."""
+  bList: BList
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`BList\`. May be used by Relay 1."""
+  bListEdge(
+    """The method to use when ordering \`BList\`."""
+    orderBy: [BListOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BListEdge
+}
+
+"""All input for the \`deleteBListByRowId\` mutation."""
+input DeleteBListByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}
+
 """The output of our delete \`BType\` mutation."""
 type DeleteBTypePayload {
   """
@@ -25274,6 +25728,16 @@ export const plans = {
       },
       args: {
         email: undefined
+      }
+    },
+    bListByRowId: {
+      plan(_$root, args) {
+        return resource_b_listsPgResource.get({
+          id: args.get("rowId")
+        });
+      },
+      args: {
+        rowId: undefined
       }
     },
     bTypeByRowId: {
@@ -27310,6 +27774,59 @@ export const plans = {
         }
       }
     },
+    allBLists: {
+      plan() {
+        return connection(resource_b_listsPgResource.find());
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("BListOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
     allBTypes: {
       plan() {
         return connection(resource_b_typesPgResource.find());
@@ -27553,7 +28070,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_outPgResource.codec)`${resource_c_person_computed_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_outPgResource.codec, undefined)`${resource_c_person_computed_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_outPgResource.execute(selectArgs);
@@ -27597,7 +28114,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_first_namePgResource.codec)`${resource_c_person_first_namePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_first_namePgResource.codec, undefined)`${resource_c_person_first_namePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_first_namePgResource.execute(selectArgs);
@@ -27641,7 +28158,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_out_outPgResource.codec)`${resource_c_person_computed_out_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_out_outPgResource.codec, undefined)`${resource_c_person_computed_out_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_out_outPgResource.execute(selectArgs);
@@ -27686,7 +28203,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_inoutPgResource.codec)`${resource_c_person_computed_inoutPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_inoutPgResource.codec, undefined)`${resource_c_person_computed_inoutPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_inoutPgResource.execute(selectArgs);
@@ -27735,7 +28252,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_inout_outPgResource.codec)`${resource_c_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_inout_outPgResource.codec, undefined)`${resource_c_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_inout_outPgResource.execute(selectArgs);
@@ -27784,7 +28301,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_existsPgResource.codec)`${resource_c_person_existsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_existsPgResource.codec, undefined)`${resource_c_person_existsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_existsPgResource.execute(selectArgs);
@@ -27832,7 +28349,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_first_arg_inout_outPgResource.codec)`${resource_c_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_first_arg_inout_outPgResource.codec, undefined)`${resource_c_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
@@ -27877,7 +28394,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_1PgResource.codec)`${resource_c_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_1PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_1PgResource.execute(selectArgs);
@@ -27928,7 +28445,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_2PgResource.codec)`${resource_c_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_2PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_2PgResource.execute(selectArgs);
@@ -27979,7 +28496,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_3PgResource.codec)`${resource_c_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_3PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_3PgResource.execute(selectArgs);
@@ -28030,7 +28547,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_4PgResource.codec)`${resource_c_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_4PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_4PgResource.execute(selectArgs);
@@ -28081,7 +28598,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_optional_missing_middle_5PgResource.codec)`${resource_c_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_optional_missing_middle_5PgResource.codec, undefined)`${resource_c_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_optional_missing_middle_5PgResource.execute(selectArgs);
@@ -28132,7 +28649,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_computed_complexPgResource.codec)`${resource_c_person_computed_complexPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_computed_complexPgResource.codec, undefined)`${resource_c_person_computed_complexPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_computed_complexPgResource.execute(selectArgs);
@@ -28181,7 +28698,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_first_postPgResource.codec)`${resource_c_person_first_postPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_first_postPgResource.codec, undefined)`${resource_c_person_first_postPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_first_postPgResource.execute(selectArgs);
@@ -28225,7 +28742,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_computed_first_arg_inoutPgResource.codec)`${resource_c_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_computed_first_arg_inoutPgResource.codec, undefined)`${resource_c_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_computed_first_arg_inoutPgResource.execute(selectArgs);
@@ -28332,7 +28849,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_c_person_type_functionPgResource.codec)`${resource_c_person_type_functionPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_c_person_type_functionPgResource.codec, undefined)`${resource_c_person_type_functionPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_c_person_type_functionPgResource.execute(selectArgs);
@@ -28380,7 +28897,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_person_type_function_listPgResource.codec)`${resource_c_person_type_function_listPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_person_type_function_listPgResource.codec, undefined)`${resource_c_person_type_function_listPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_person_type_function_listPgResource.execute(selectArgs);
@@ -28762,7 +29279,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_compound_type_computed_fieldPgResource.codec)`${resource_c_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_compound_type_computed_fieldPgResource.codec, undefined)`${resource_c_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_compound_type_computed_fieldPgResource.execute(selectArgs);
@@ -28806,7 +29323,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_b_compound_type_queryPgResource.codec)`${resource_b_compound_type_queryPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_b_compound_type_queryPgResource.codec, undefined)`${resource_b_compound_type_queryPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_b_compound_type_queryPgResource.execute(selectArgs);
@@ -28850,7 +29367,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_query_compound_type_arrayPgResource.codec)`${resource_query_compound_type_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_query_compound_type_arrayPgResource.codec, undefined)`${resource_query_compound_type_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_query_compound_type_arrayPgResource.execute(selectArgs);
@@ -28894,7 +29411,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_b_compound_type_array_queryPgResource.codec)`${resource_b_compound_type_array_queryPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_b_compound_type_array_queryPgResource.codec, undefined)`${resource_b_compound_type_array_queryPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_b_compound_type_array_queryPgResource.execute(selectArgs);
@@ -29040,7 +29557,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_post_computed_interval_arrayPgResource.codec)`${resource_post_computed_interval_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_post_computed_interval_arrayPgResource.codec, undefined)`${resource_post_computed_interval_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_post_computed_interval_arrayPgResource.execute(selectArgs);
@@ -29084,7 +29601,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_post_computed_text_arrayPgResource.codec)`${resource_post_computed_text_arrayPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_post_computed_text_arrayPgResource.codec, undefined)`${resource_post_computed_text_arrayPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_post_computed_text_arrayPgResource.execute(selectArgs);
@@ -29129,7 +29646,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_with_optional_argPgResource.codec)`${resource_post_computed_with_optional_argPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_with_optional_argPgResource.codec, undefined)`${resource_post_computed_with_optional_argPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_with_optional_argPgResource.execute(selectArgs);
@@ -29178,7 +29695,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_with_required_argPgResource.codec)`${resource_post_computed_with_required_argPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_with_required_argPgResource.codec, undefined)`${resource_post_computed_with_required_argPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_with_required_argPgResource.execute(selectArgs);
@@ -29227,7 +29744,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmedPgResource.codec)`${resource_post_headline_trimmedPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmedPgResource.codec, undefined)`${resource_post_headline_trimmedPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmedPgResource.execute(selectArgs);
@@ -29277,7 +29794,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmed_no_defaultsPgResource.codec)`${resource_post_headline_trimmed_no_defaultsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmed_no_defaultsPgResource.codec, undefined)`${resource_post_headline_trimmed_no_defaultsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmed_no_defaultsPgResource.execute(selectArgs);
@@ -29327,7 +29844,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_headline_trimmed_strictPgResource.codec)`${resource_post_headline_trimmed_strictPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_headline_trimmed_strictPgResource.codec, undefined)`${resource_post_headline_trimmed_strictPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_headline_trimmed_strictPgResource.execute(selectArgs);
@@ -29377,7 +29894,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_post_computed_compound_type_arrayPgResource.codec)`${resource_post_computed_compound_type_arrayPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_post_computed_compound_type_arrayPgResource.codec, undefined)`${resource_post_computed_compound_type_arrayPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_post_computed_compound_type_arrayPgResource.execute(selectArgs);
@@ -29487,7 +30004,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PostComputedIntervalSetEdge: {
@@ -29672,7 +30189,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   BType: {
@@ -32068,7 +32585,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CPersonEdge: {
@@ -32143,7 +32660,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PostEdge: {
@@ -32435,7 +32952,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ForeignKey: {
@@ -32695,7 +33212,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CCompoundKeyEdge: {
@@ -33002,6 +33519,54 @@ export const plans = {
       return ast.value;
     }
   },
+  BList: {
+    __assertStep: assertPgClassSingleStep,
+    rowId($record) {
+      return $record.get("id");
+    },
+    intArray($record) {
+      return $record.get("int_array");
+    },
+    intArrayNn($record) {
+      return $record.get("int_array_nn");
+    },
+    enumArray($record) {
+      return $record.get("enum_array");
+    },
+    enumArrayNn($record) {
+      return $record.get("enum_array_nn");
+    },
+    dateArray($record) {
+      return $record.get("date_array");
+    },
+    dateArrayNn($record) {
+      return $record.get("date_array_nn");
+    },
+    timestamptzArray($record) {
+      return $record.get("timestamptz_array");
+    },
+    timestamptzArrayNn($record) {
+      return $record.get("timestamptz_array_nn");
+    },
+    compoundTypeArray($record) {
+      const $val = $record.get("compound_type_array");
+      const $select = pgSelectFromRecords(resource_frmcdc_cCompoundTypePgResource, $val);
+      $select.setTrusted();
+      return $select;
+    },
+    compoundTypeArrayNn($record) {
+      const $val = $record.get("compound_type_array_nn");
+      const $select = pgSelectFromRecords(resource_frmcdc_cCompoundTypePgResource, $val);
+      $select.setTrusted();
+      return $select;
+    },
+    byteaArray($record) {
+      return $record.get("bytea_array");
+    },
+    byteaArrayNn($record) {
+      return $record.get("bytea_array_nn");
+    }
+  },
   CFuncOutSetofConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -33015,7 +33580,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutSetofEdge: {
@@ -33040,7 +33605,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   QueryIntervalSetEdge: {
@@ -33065,7 +33630,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   StaticBigIntegerEdge: {
@@ -33090,7 +33655,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncReturnsTableOneColEdge: {
@@ -33124,7 +33689,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutOutSetofRecord: {
@@ -33167,7 +33732,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CSearchTestSummariesRecord: {
@@ -33213,7 +33778,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CIntSetQueryEdge: {
@@ -33238,7 +33803,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncReturnsTableMultiColRecord: {
@@ -33319,7 +33884,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CCompoundTypeEdge: {
@@ -33368,7 +33933,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CFuncOutComplexSetofRecord: {
@@ -33417,7 +33982,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   NonUpdatableView: {
@@ -33512,7 +34077,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   InputEdge: {
@@ -33633,7 +34198,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PatchEdge: {
@@ -33754,7 +34319,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedEdge: {
@@ -33875,7 +34440,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedPatchRecordEdge: {
@@ -33996,7 +34561,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ReservedInputRecordEdge: {
@@ -34117,7 +34682,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   DefaultValueEdge: {
@@ -34295,7 +34860,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   NoPrimaryKeyEdge: {
@@ -34441,7 +35006,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   Testview: {
@@ -34656,7 +35221,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   UniqueForeignKeyEdge: {
@@ -34802,7 +35367,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CMyTableEdge: {
@@ -34980,7 +35545,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CPersonSecretEdge: {
@@ -35158,7 +35723,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   ViewTableEdge: {
@@ -35393,7 +35958,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   BUpdatableView: {
@@ -35668,7 +36233,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SimilarTable1Edge: {
@@ -35960,7 +36525,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SimilarTable2Edge: {
@@ -36252,7 +36817,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CNullTestRecordEdge: {
@@ -36544,7 +37109,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CEdgeCase: {
@@ -36588,7 +37153,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_c_edge_case_computedPgResource.codec)`${resource_c_edge_case_computedPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_c_edge_case_computedPgResource.codec, undefined)`${resource_c_edge_case_computedPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_c_edge_case_computedPgResource.execute(selectArgs);
@@ -36803,7 +37368,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CLeftArmEdge: {
@@ -37095,7 +37660,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CIssue756Edge: {
@@ -37804,6 +38369,127 @@ export const plans = {
             attribute: "created_at",
             callback(expression) {
               return sql`${expression} = ${$condition.placeholder(val.get(), spec_cPerson.attributes.created_at.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  BListConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  BListEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  BListOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        b_listsUniques[0].attributes.forEach(attributeName => {
+          const attribute = bListsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        b_listsUniques[0].attributes.forEach(attributeName => {
+          const attribute = bListsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ROW_ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ROW_ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  BListCondition: {
+    rowId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_bLists.attributes.id.codec)}`;
             }
           });
         }
@@ -39157,6 +39843,23 @@ export const plans = {
         }
       }
     },
+    createBList: {
+      plan(_, args) {
+        const plan = object({
+          result: pgInsertSingle(resource_b_listsPgResource, Object.create(null))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
     createBType: {
       plan(_, args) {
         const plan = object({
@@ -39541,6 +40244,24 @@ export const plans = {
         const plan = object({
           result: pgUpdateSingle(resource_c_personPgResource, {
             email: args.get(['input', "email"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    updateBListByRowId: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgUpdateSingle(resource_b_listsPgResource, {
+            id: args.get(['input', "rowId"])
           })
         });
         args.apply(plan);
@@ -39939,6 +40660,24 @@ export const plans = {
         const plan = object({
           result: pgDeleteSingle(resource_c_personPgResource, {
             email: args.get(['input', "email"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    deleteBListByRowId: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgDeleteSingle(resource_b_listsPgResource, {
+            id: args.get(['input', "rowId"])
           })
         });
         args.apply(plan);
@@ -43305,6 +44044,160 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
+  CreateBListPayload: {
+    __assertStep: assertExecutableStep,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    bList($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    bListEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = b_listsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_b_listsPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("BListOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  CreateBListInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    bList: {
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  BListInput: {
+    "__inputPlan": function BListInput_inputPlan() {
+      return object(Object.create(null));
+    },
+    rowId: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    intArray: {
+      applyPlan($insert, val) {
+        $insert.set("int_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    intArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("int_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enumArray: {
+      applyPlan($insert, val) {
+        $insert.set("enum_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enumArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("enum_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    dateArray: {
+      applyPlan($insert, val) {
+        $insert.set("date_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    dateArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("date_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    timestamptzArray: {
+      applyPlan($insert, val) {
+        $insert.set("timestamptz_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    timestamptzArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("timestamptz_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    compoundTypeArray: {
+      applyPlan($insert, val) {
+        $insert.set("compound_type_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    compoundTypeArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("compound_type_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    byteaArray: {
+      applyPlan($insert, val) {
+        $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    byteaArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("bytea_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   CreateBTypePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
@@ -45299,6 +46192,159 @@ export const plans = {
       }
     }
   },
+  UpdateBListPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    bList($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    bListEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = b_listsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_b_listsPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("BListOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  UpdateBListByRowIdInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
+    },
+    rowId: undefined,
+    bListPatch: {
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
+    }
+  },
+  BListPatch: {
+    "__inputPlan": function BListPatch_inputPlan() {
+      return object(Object.create(null));
+    },
+    rowId: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    intArray: {
+      applyPlan($insert, val) {
+        $insert.set("int_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    intArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("int_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enumArray: {
+      applyPlan($insert, val) {
+        $insert.set("enum_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enumArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("enum_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    dateArray: {
+      applyPlan($insert, val) {
+        $insert.set("date_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    dateArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("date_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    timestamptzArray: {
+      applyPlan($insert, val) {
+        $insert.set("timestamptz_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    timestamptzArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("timestamptz_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    compoundTypeArray: {
+      applyPlan($insert, val) {
+        $insert.set("compound_type_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    compoundTypeArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("compound_type_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    byteaArray: {
+      applyPlan($insert, val) {
+        $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    byteaArrayNn: {
+      applyPlan($insert, val) {
+        $insert.set("bytea_array_nn", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   UpdateBTypePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
@@ -46628,6 +47674,57 @@ export const plans = {
       }
     },
     email: undefined
+  },
+  DeleteBListPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    bList($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    bListEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = b_listsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_b_listsPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("BListOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  DeleteBListByRowIdInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
+    },
+    rowId: undefined
   },
   DeleteBTypePayload: {
     __assertStep: ObjectStep,

@@ -737,6 +737,7 @@ export class PgResource<
           ($row as PgSelectSingleStep<any>).select(
             sqlPartitionByIndex,
             TYPES.int,
+            true,
           ),
         // Ordinality is 1-indexed but we want a 0-indexed number
         1,

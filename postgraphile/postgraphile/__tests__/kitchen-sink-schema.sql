@@ -323,6 +323,22 @@ create table b.types (
 
 comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';
 
+create table b.lists (
+  id serial primary key,
+  "int_array" int[],
+  "int_array_nn" int[] not null,
+  "enum_array" b.color[],
+  "enum_array_nn" b.color[] not null,
+  "date_array" date[],
+  "date_array_nn" date[] not null,
+  "timestamptz_array" timestamptz[],
+  "timestamptz_array_nn" timestamptz[] not null,
+  "compound_type_array" c.compound_type[],
+  "compound_type_array_nn" c.compound_type[] not null,
+  "bytea_array" bytea[],
+  "bytea_array_nn" bytea[] not null
+);
+
 create function b.throw_error() returns trigger as $$
 begin
   raise exception 'Nope.';
