@@ -135,9 +135,7 @@
             "plugin-gallery/types",
             "plugin-gallery/mutation-wrappers",
             "plugin-gallery/customisation",
-            "plugin-gallery/mutations",
-            "plugin-gallery/custom-queries",
-            "plugin-gallery/custom-mutations"
+            "plugin-gallery/other"
           ]
         }
       ]

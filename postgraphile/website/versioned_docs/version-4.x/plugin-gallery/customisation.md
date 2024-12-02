@@ -10,7 +10,7 @@ _This is a work in progress, in future these plugins will be automatically teste
 
 ## OmitMutationsByDefaultPlugin
 
-```graphql
+```ts
 /**
  * This plugin treats any table that doesn't have an `@omit` comment as if it
  * had `@omit create,update,delete` (thereby disabling mutations).
@@ -19,23 +19,14 @@ _This is a work in progress, in future these plugins will be automatically teste
  * mutations, do `COMMENT ON my_table IS E'@omit :';` (the `:` is special
  * syntax for "nothing").
  */
-module.exports = function OmitMutationsByDefaultPlugin(
-  builder
-) {
-  builder.hook("build", build => {
-    const {
-      pgIntrospectionResultsByKind,
-    } = build;
+module.exports = function OmitMutationsByDefaultPlugin(builder) {
+  builder.hook("build", (build) => {
+    const { pgIntrospectionResultsByKind } = build;
     pgIntrospectionResultsByKind.class
-      .filter(
-        table =>
-          table.isSelectable &&
-          table.namespace
-      )
-      .forEach(table => {
+      .filter((table) => table.isSelectable && table.namespace)
+      .forEach((table) => {
         if (!("omit" in table.tags)) {
-          table.tags.omit =
-            "create,update,delete";
+          table.tags.omit = "create,update,delete";
         }
       });
     return build;
@@ -44,7 +35,6 @@ module.exports = function OmitMutationsByDefaultPlugin(
 
 // Tested via:
 // npx postgraphile --append-plugins @graphile-contrib/pg-simplify-inflector,`pwd`/examples/plugins/0400_customisation/OmitMutationsByDefaultPlugin.js -c graphile_org_demo -s app_public
-
 ```
 
 Resulting GraphQL schema diff, showing all mutations omitted:
@@ -1041,7 +1031,7 @@ Resulting GraphQL schema diff, showing all mutations omitted:
 
 ## SanitizeHTMLTypePlugin
 
-```graphql
+```ts
 // Author: Benjie Gillam
 // License: https://benjie.mit-license.org/
 //
