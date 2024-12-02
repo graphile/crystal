@@ -134,7 +134,7 @@
             "plugin-gallery/inflector",
             "plugin-gallery/types",
             "plugin-gallery/mutation-wrappers",
-            "plugin-gallery/relations",
+            "plugin-gallery/customisation",
             "plugin-gallery/mutations",
             "plugin-gallery/custom-queries",
             "plugin-gallery/custom-mutations"
