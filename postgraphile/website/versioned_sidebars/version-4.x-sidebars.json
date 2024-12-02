@@ -133,11 +133,11 @@
           "items": [
             "plugin-gallery/inflector",
             "plugin-gallery/types",
+            "plugin-gallery/mutation-wrappers",
             "plugin-gallery/relations",
             "plugin-gallery/mutations",
             "plugin-gallery/custom-queries",
-            "plugin-gallery/custom-mutations",
-            "plugin-gallery/computed-columns"
+            "plugin-gallery/custom-mutations"
           ]
         }
       ]
