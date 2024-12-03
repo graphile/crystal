@@ -2690,6 +2690,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2712,6 +2713,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2735,6 +2737,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2758,6 +2761,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2780,6 +2784,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2803,6 +2808,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2826,6 +2832,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2848,6 +2855,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2870,6 +2878,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2897,6 +2906,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2925,6 +2935,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2953,6 +2964,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -2981,6 +2993,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3009,6 +3022,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3036,6 +3050,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3063,6 +3078,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3090,6 +3106,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3117,6 +3134,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3144,6 +3162,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3176,6 +3195,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3199,6 +3219,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3221,6 +3242,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3243,6 +3265,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3275,6 +3298,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3298,6 +3322,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3320,6 +3345,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3342,6 +3368,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3364,6 +3391,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3401,6 +3429,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3438,6 +3467,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3460,6 +3490,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3487,6 +3518,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3524,6 +3556,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3546,6 +3579,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3652,6 +3686,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3672,6 +3707,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3723,6 +3759,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3747,6 +3784,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3767,6 +3805,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3819,6 +3858,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3871,6 +3911,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3898,6 +3939,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3925,6 +3967,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3952,6 +3995,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3989,6 +4033,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4030,6 +4075,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4058,6 +4104,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4086,6 +4133,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4113,6 +4161,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4146,6 +4195,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4176,6 +4226,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4208,6 +4259,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4241,6 +4293,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4273,6 +4326,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4302,6 +4356,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4344,6 +4399,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4386,6 +4442,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4428,6 +4485,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4470,6 +4528,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4512,6 +4571,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4544,6 +4604,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4576,6 +4637,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4608,6 +4670,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4640,6 +4703,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4677,6 +4741,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4706,6 +4771,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4726,6 +4792,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4748,6 +4815,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4768,6 +4836,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4788,6 +4857,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4808,6 +4878,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4828,6 +4899,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4848,6 +4920,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4872,6 +4945,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4897,6 +4971,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4923,6 +4998,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4954,6 +5030,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4987,6 +5064,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5015,6 +5093,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7884,7 +7963,7 @@ const getSelectPlanFromParentAndArgs12 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_person_friendsPgResource.codec)`${resource_person_friendsPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_person_friendsPgResource.codec, undefined)`${resource_person_friendsPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_person_friendsPgResource.execute(selectArgs);
@@ -7974,7 +8053,7 @@ const getSelectPlanFromParentAndArgs13 = ($in, args, _info) => {
         };
       }
     });
-    return pgClassExpression($row, resource_person_type_function_connectionPgResource.codec)`${resource_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
+    return pgClassExpression($row, resource_person_type_function_connectionPgResource.codec, undefined)`${resource_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_person_type_function_connectionPgResource.execute(selectArgs);
@@ -16299,7 +16378,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_computed_outPgResource.codec)`${resource_person_computed_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_computed_outPgResource.codec, undefined)`${resource_person_computed_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_outPgResource.execute(selectArgs);
@@ -16343,7 +16422,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_first_namePgResource.codec)`${resource_person_first_namePgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_first_namePgResource.codec, undefined)`${resource_person_first_namePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_first_namePgResource.execute(selectArgs);
@@ -16387,7 +16466,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_computed_out_outPgResource.codec)`${resource_person_computed_out_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_computed_out_outPgResource.codec, undefined)`${resource_person_computed_out_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_out_outPgResource.execute(selectArgs);
@@ -16432,7 +16511,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_computed_inoutPgResource.codec)`${resource_person_computed_inoutPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_computed_inoutPgResource.codec, undefined)`${resource_person_computed_inoutPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_inoutPgResource.execute(selectArgs);
@@ -16481,7 +16560,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_computed_inout_outPgResource.codec)`${resource_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_computed_inout_outPgResource.codec, undefined)`${resource_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_inout_outPgResource.execute(selectArgs);
@@ -16530,7 +16609,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_existsPgResource.codec)`${resource_person_existsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_existsPgResource.codec, undefined)`${resource_person_existsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_existsPgResource.execute(selectArgs);
@@ -16578,7 +16657,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_computed_first_arg_inout_outPgResource.codec)`${resource_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_computed_first_arg_inout_outPgResource.codec, undefined)`${resource_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
@@ -16623,7 +16702,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_optional_missing_middle_1PgResource.codec)`${resource_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_1PgResource.codec, undefined)`${resource_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_optional_missing_middle_1PgResource.execute(selectArgs);
@@ -16674,7 +16753,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_optional_missing_middle_2PgResource.codec)`${resource_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_2PgResource.codec, undefined)`${resource_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_optional_missing_middle_2PgResource.execute(selectArgs);
@@ -16725,7 +16804,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_optional_missing_middle_3PgResource.codec)`${resource_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_3PgResource.codec, undefined)`${resource_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_optional_missing_middle_3PgResource.execute(selectArgs);
@@ -16776,7 +16855,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_optional_missing_middle_4PgResource.codec)`${resource_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_4PgResource.codec, undefined)`${resource_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_optional_missing_middle_4PgResource.execute(selectArgs);
@@ -16827,7 +16906,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_optional_missing_middle_5PgResource.codec)`${resource_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_5PgResource.codec, undefined)`${resource_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_optional_missing_middle_5PgResource.execute(selectArgs);
@@ -16878,7 +16957,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_computed_complexPgResource.codec)`${resource_person_computed_complexPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_computed_complexPgResource.codec, undefined)`${resource_person_computed_complexPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_complexPgResource.execute(selectArgs);
@@ -16927,7 +17006,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_first_postPgResource.codec)`${resource_person_first_postPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_first_postPgResource.codec, undefined)`${resource_person_first_postPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_first_postPgResource.execute(selectArgs);
@@ -16971,7 +17050,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_computed_first_arg_inoutPgResource.codec)`${resource_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_computed_first_arg_inoutPgResource.codec, undefined)`${resource_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
@@ -17153,7 +17232,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_person_type_functionPgResource.codec)`${resource_person_type_functionPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_person_type_functionPgResource.codec, undefined)`${resource_person_type_functionPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_type_functionPgResource.execute(selectArgs);
@@ -17201,7 +17280,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_person_type_function_listPgResource.codec)`${resource_person_type_function_listPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_person_type_function_listPgResource.codec, undefined)`${resource_person_type_function_listPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_type_function_listPgResource.execute(selectArgs);
@@ -17541,7 +17620,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec)`${resource_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec, undefined)`${resource_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_compound_type_computed_fieldPgResource.execute(selectArgs);
@@ -17744,7 +17823,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PeopleEdge: {
@@ -18231,7 +18310,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   Type: {
@@ -18707,7 +18786,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CompoundKey: {
@@ -19010,7 +19089,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FuncOutSetofEdge: {
@@ -19035,7 +19114,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FuncReturnsTableOneColEdge: {
@@ -19069,7 +19148,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FuncOutOutSetofRecord: {
@@ -19124,7 +19203,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   IntSetQueryEdge: {
@@ -19149,7 +19228,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FuncReturnsTableMultiColRecord: {
@@ -19239,7 +19318,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   CompoundTypesEdge: {
@@ -19288,7 +19367,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   FuncOutComplexSetofRecord: {
@@ -19772,7 +19851,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   MyTablesEdge: {
@@ -19950,7 +20029,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PersonSecretsEdge: {
@@ -20242,7 +20321,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   NullTestRecordsEdge: {
@@ -20295,7 +20374,7 @@ export const plans = {
             };
           }
         });
-        return pgClassExpression($row, resource_edge_case_computedPgResource.codec)`${resource_edge_case_computedPgResource.from(...newSelectArgs)}`;
+        return pgClassExpression($row, resource_edge_case_computedPgResource.codec, undefined)`${resource_edge_case_computedPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_edge_case_computedPgResource.execute(selectArgs);
@@ -20501,7 +20580,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   EdgeCasesEdge: {
@@ -20793,7 +20872,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   LeftArmsEdge: {
@@ -20971,7 +21050,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   Issue756SEdge: {

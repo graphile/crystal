@@ -31,8 +31,8 @@ lateral (
     to_char(date '1970-01-01' + __type_function_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
     to_char(date '1970-01-01' + __type_function_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
     to_char(__type_function_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-    (
-      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+    array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
       from unnest(__type_function_mutation__."interval_array") __entry__
     )::text as "24",
     __type_function_mutation__."money"::numeric::text as "25",
@@ -211,8 +211,8 @@ select
   to_char(date '1970-01-01' + __type_function_list_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
   to_char(date '1970-01-01' + __type_function_list_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__type_function_list_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__type_function_list_mutation__."interval_array") __entry__
   )::text as "24",
   __type_function_list_mutation__."money"::numeric::text as "25",
@@ -389,8 +389,8 @@ select
   to_char(date '1970-01-01' + __type_function_connection_mutation__."time", 'HH24:MI:SS.US'::text) as "21",
   to_char(date '1970-01-01' + __type_function_connection_mutation__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__type_function_connection_mutation__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__type_function_connection_mutation__."interval_array") __entry__
   )::text as "24",
   __type_function_connection_mutation__."money"::numeric::text as "25",
@@ -567,8 +567,8 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
   to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry__
   )::text as "24",
   __types__."money"::numeric::text as "25",
@@ -744,8 +744,8 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
   to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
   to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
   to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  (
-    select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry__
   )::text as "24",
   __types__."money"::numeric::text as "25",

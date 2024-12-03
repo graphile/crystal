@@ -225,6 +225,16 @@ export interface PgSelectOptions<
    * `resource.from`.
    */
   from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  /**
+   * You should never rely on implicit order - use explicit `ORDER BY` (via
+   * `$select.orderBy(...)`) instead. However, if you _are_ relying on implicit
+   * order in your `from` result (e.g. a subquery or function call that has its
+   * own internal ordering), setting this to `true` will prevent PgSelect from
+   * inlining some queries (joins) that it thinks might impact the order of
+   * results. Setting this to `true` does NOT guarantee that you can rely on
+   * your order being maintained, but it does increase the chances.
+   */
+  hasImplicitOrder?: false;
 
   /**
    * If you pass a custom `from` (or otherwise want to aid in debugging),
@@ -274,6 +284,7 @@ export class PgSelectStep<
   private readonly from:
     | SQL
     | ((...args: Array<PgSelectArgumentDigest>) => SQL);
+  private readonly hasImplicitOrder: boolean;
 
   /**
    * This defaults to the name of the resource but you can override it. Aids
@@ -481,6 +492,7 @@ export class PgSelectStep<
         identifiers,
         args: inArgs,
         from: inFrom = null,
+        hasImplicitOrder: inHasImplicitOrder,
         name: customName,
         mode: inMode,
         joinAsLateral: inJoinAsLateral = false,
@@ -493,6 +505,7 @@ export class PgSelectStep<
               resource: optionsOrCloneFrom.resource,
               identifiers: null,
               from: optionsOrCloneFrom.from,
+              hasImplicitOrder: optionsOrCloneFrom.hasImplicitOrder,
               args: null,
               name: optionsOrCloneFrom.name,
               mode: undefined,
@@ -549,6 +562,7 @@ export class PgSelectStep<
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
+    this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
@@ -2195,6 +2209,9 @@ ${lateralText};`;
       if (p.resource !== this.resource) {
         return false;
       }
+      if (p.from !== this.from) {
+        return false;
+      }
 
       // Check mode matches
       if (p.mode !== this.mode) {
@@ -2500,6 +2517,12 @@ ${lateralText};`;
 
           // Don't allow merging across a stream/defer/subscription boundary
           if (!stepsAreInSamePhase(t2, this)) {
+            continue;
+          }
+
+          // Don't want to make this a join as it can result in the order being
+          // messed up
+          if (t2.hasImplicitOrder && !this.joinAsLateral && this.isUnique) {
             continue;
           }
 

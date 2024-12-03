@@ -138,3 +138,16 @@ Docs: https://www.graphile.org/postgraphile/make-wrap-resolvers-plugin/
 Enables you to wrap the field resolvers in the generated GraphQL API, allowing
 you to take an action before or after the resolver, or even modify the resolver
 result.
+
+## Developing
+
+### Testing
+
+Make sure you first follow the instructions in the
+[CONTRIBUTING.md file at the root of the repository](../../CONTRIBUTING.md),
+then run the test with the following commands:
+
+```bash
+yarn prepack
+yarn test
+```

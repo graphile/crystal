@@ -22,6 +22,7 @@ delete from c.left_arm cascade;
 delete from c.edge_case cascade;
 delete from c.compound_key cascade;
 delete from b.types cascade;
+delete from b.lists cascade;
 delete from a.view_table cascade;
 delete from a.unique_foreign_key cascade;
 delete from a.similar_table_2 cascade;
@@ -76,6 +77,8 @@ delete from partitions.users cascade;
 
 delete from d.post cascade;
 delete from d.person cascade;
+delete from issue_2210.test_message cascade;
+delete from issue_2210.test_user cascade;
 
 alter table b.types enable trigger user;
 
@@ -245,6 +248,66 @@ insert into b.types values (
   array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
   'Top.Child1.Child2'::ltree,
   '{Top.Child1.Child2,Top.Child3.Child4}'::ltree[]
+);
+
+-- Arrays
+insert into b.lists values (
+  1,
+  ARRAY[1,2,3],
+  ARRAY[1,2,3],
+  ARRAY['green', 'red']::b.color[],
+  ARRAY['green', 'red']::b.color[],
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+),
+
+-- Nulls
+(
+  2,
+  null,
+  ARRAY[1,2,3],
+  null,
+  ARRAY['green', 'red']::b.color[],
+  null,
+  ARRAY['2016-10-07', '1999-01-08']::date[],
+  null,
+  ARRAY['2016-10-07T01:02:03.456789Z', '1999-01-08 04:05:06 -8:00']::timestamptz[],
+  null,
+  ARRAY[
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)::c.compound_type,
+    (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
+  ],
+  null,
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+),
+
+-- Empty arrays
+(
+  3,
+  ARRAY[]::int[],
+  ARRAY[]::int[],
+  ARRAY[]::b.color[],
+  ARRAY[]::b.color[],
+  ARRAY[]::date[],
+  ARRAY[]::date[],
+  ARRAY[]::timestamptz[],
+  ARRAY[]::timestamptz[],
+  ARRAY[]::c.compound_type[],
+  ARRAY[]::c.compound_type[],
+  ARRAY[]::bytea[],
+  ARRAY[]::bytea[]
 );
 
 insert into c.edge_case values
@@ -947,3 +1010,15 @@ insert into space.static_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.temp_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;
 
+insert into issue_2210.test_user (id, name)
+values ('a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', 'Bob')
+     , ('935945c1-d824-4a98-93e5-c22215c58982', 'John');
+
+insert into issue_2210.test_message (id, test_chat_id, message, test_user_id, created_at)
+values ('e0849772-7070-4fdf-8438-1ef846fc0daf', '0d126c0c-9710-478c-9aee-0be34b250573', 'Bob says 3', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', '2020-01-01T00:00:00Z'::timestamptz - '1 minute'::interval)
+     , ('c8a660af-7021-4360-b019-ee404014b3cb', '0d126c0c-9710-478c-9aee-0be34b250573', 'Bob says 2', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', '2020-01-01T00:00:00Z'::timestamptz - '3 minutes'::interval)
+     , ('6e2db5cb-8757-4b8a-9d19-a6a676a214d2', '0d126c0c-9710-478c-9aee-0be34b250573', 'John says 3', '935945c1-d824-4a98-93e5-c22215c58982', '2020-01-01T00:00:00Z'::timestamptz - '2 minutes'::interval)
+     , ('7dbc5c82-3c1f-463e-a97a-aaff09dc8a28', '0d126c0c-9710-478c-9aee-0be34b250573', 'Bob says 1', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', '2020-01-01T00:00:00Z'::timestamptz - '5 minutes'::interval)
+     , ('5751f977-209d-45ab-8620-b647ff67ded6', 'c46b4b59-0a29-4211-8e0f-659cb3e01c2f', 'A different chat', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', '2020-01-01T00:00:00Z'::timestamptz - '3 minutes 30 seconds'::interval)
+     , ('8b9e89dc-2e1b-461a-94d5-3afafa4f87ad', '0d126c0c-9710-478c-9aee-0be34b250573', 'John says 2', '935945c1-d824-4a98-93e5-c22215c58982', '2020-01-01T00:00:00Z'::timestamptz - '4 minutes'::interval)
+     , ('cc20ffeb-0701-4619-acc3-4a9b67671272', '0d126c0c-9710-478c-9aee-0be34b250573', 'John says 1', '935945c1-d824-4a98-93e5-c22215c58982', '2020-01-01T00:00:00Z'::timestamptz - '6 minutes'::interval)

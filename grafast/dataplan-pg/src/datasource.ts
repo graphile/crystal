@@ -200,6 +200,7 @@ export interface PgResourceOptions<
   isUnique?: boolean;
   sqlPartitionByIndex?: SQL;
   isMutation?: boolean;
+  hasImplicitOrder?: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
    * should be treated as having a predetermined and reasonable length rather
@@ -233,6 +234,7 @@ export interface PgFunctionResourceOptions<
   uniques?: TUniques;
   extensions?: PgResourceExtensions;
   isMutation?: boolean;
+  hasImplicitOrder?: boolean;
   selectAuth?:
     | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
     | null;
@@ -284,6 +286,7 @@ export class PgResource<
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
+  public readonly hasImplicitOrder: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
    * should be treated as having a predetermined and reasonable length rather
@@ -324,6 +327,7 @@ export class PgResource<
       isUnique,
       sqlPartitionByIndex,
       isMutation,
+      hasImplicitOrder,
       selectAuth,
       isList,
       isVirtual,
@@ -341,6 +345,7 @@ export class PgResource<
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
+    this.hasImplicitOrder = hasImplicitOrder ?? false;
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
@@ -443,6 +448,7 @@ export class PgResource<
       uniques,
       extensions,
       isMutation,
+      hasImplicitOrder,
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
@@ -463,6 +469,7 @@ export class PgResource<
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
+        hasImplicitOrder,
         selectAuth,
         description,
       };
@@ -486,6 +493,7 @@ export class PgResource<
         extensions,
         isUnique: false, // set now, not unique
         isMutation: Boolean(isMutation),
+        hasImplicitOrder,
         selectAuth,
         isList: true,
         description,
@@ -515,6 +523,7 @@ export class PgResource<
         isUnique: false, // set now, not unique
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
+        hasImplicitOrder,
         selectAuth,
         description,
       };
@@ -737,6 +746,7 @@ export class PgResource<
           ($row as PgSelectSingleStep<any>).select(
             sqlPartitionByIndex,
             TYPES.int,
+            true,
           ),
         // Ordinality is 1-indexed but we want a 0-indexed number
         1,

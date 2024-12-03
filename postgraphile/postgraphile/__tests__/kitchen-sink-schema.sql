@@ -21,7 +21,8 @@ drop schema if exists
   nested_arrays,
   composite_domains,
   refs,
-  space
+  space,
+  issue_2210
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -322,6 +323,22 @@ create table b.types (
 );
 
 comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';
+
+create table b.lists (
+  id serial primary key,
+  "int_array" int[],
+  "int_array_nn" int[] not null,
+  "enum_array" b.color[],
+  "enum_array_nn" b.color[] not null,
+  "date_array" date[],
+  "date_array_nn" date[] not null,
+  "timestamptz_array" timestamptz[],
+  "timestamptz_array_nn" timestamptz[] not null,
+  "compound_type_array" c.compound_type[],
+  "compound_type_array_nn" c.compound_type[] not null,
+  "bytea_array" bytea[],
+  "bytea_array_nn" bytea[] not null
+);
 
 create function b.throw_error() returns trigger as $$
 begin
@@ -1986,3 +2003,32 @@ AS $$
 BEGIN
     RETURN $1.return_to_earth;
 END $$;
+
+--------------------------------------------------------------------------------
+
+create schema issue_2210;
+
+create table issue_2210.test_user (
+  id uuid primary key
+, name varchar
+, created_at timestamptz default now()
+);
+
+create table issue_2210.test_message (
+  id uuid primary key
+, test_chat_id uuid
+, test_user_id uuid references issue_2210.test_user (id)
+, message text
+, created_at timestamptz
+);
+create index test_message_test_user_id_idx on issue_2210.test_message(test_user_id);
+
+create function issue_2210.some_messages (test_chat_id uuid) returns setof issue_2210.test_message as $$
+  select m.*
+  from issue_2210.test_message m
+  where m.test_chat_id = $1
+  order by created_at desc;
+$$ language sql stable;
+
+comment on table issue_2210.test_message is E'@behaviour -connection';
+comment on function issue_2210.some_messages(uuid) is E'@behaviour +connection';

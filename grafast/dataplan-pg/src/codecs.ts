@@ -452,6 +452,23 @@ export function recordCodec<
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
 
+function listCastViaUnnest(
+  name: string,
+  frag: SQL,
+  castFromPg: (identifier: SQL) => SQL,
+  guaranteedNotNull?: boolean,
+) {
+  const identifier = sql.identifier(Symbol(name));
+  const arraySql = sql`array(${sql.indent(
+    sql`select ${castFromPg(identifier)}\nfrom unnest(${frag}) ${identifier}`,
+  )})::text`;
+  if (guaranteedNotNull) {
+    return arraySql;
+  } else {
+    return sql`(case when (${frag}) is not distinct from null then null::text else ${arraySql} end)`;
+  }
+}
+
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
   name: string,
   attributes: TAttributes,
@@ -463,7 +480,7 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
         attributeDefs.map(([attrName, attr]) => {
           const expr = sql`((${fragment}).${sql.identifier(attrName)})`;
           if (attr.codec.castFromPg) {
-            return attr.codec.castFromPg(expr);
+            return attr.codec.castFromPg(expr, attr.codec.notNull);
           } else {
             return sql`(${expr})::text`;
           }
@@ -473,13 +490,8 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
     };
     return {
       castFromPg,
-      listCastFromPg(frag) {
-        const identifier = sql.identifier(Symbol(name));
-        return sql`(${sql.indent(
-          sql`select array_agg(${castFromPg(
-            identifier,
-          )})\nfrom unnest(${frag}) ${identifier}`,
-        )})::text`;
+      listCastFromPg(frag, guaranteedNotNull) {
+        return listCastViaUnnest(name, frag, castFromPg, guaranteedNotNull);
       },
       fromPg: makeSQLValueToRecord(attributes, true),
       toPg: makeRecordToSQLRawValue(attributes),
@@ -681,14 +693,18 @@ export function listOfCodec<
     ...(innerCodec.listCastFromPg
       ? {
           castFromPg: innerCodec.listCastFromPg,
-          listCastFromPg(frag) {
-            const identifier = sql.identifier(Symbol(`${name}_item`));
-            return sql`(${sql.indent(
-              sql`select array_agg(${innerCodec.listCastFromPg!.call(
-                this,
-                identifier,
-              )})\nfrom unnest(${frag}) ${identifier}`,
-            )})::text`;
+          listCastFromPg(frag, guaranteedNotNull) {
+            return listCastViaUnnest(
+              `${name}_item`,
+              frag,
+              (identifier) =>
+                innerCodec.listCastFromPg!.call(
+                  this,
+                  identifier,
+                  innerCodec.notNull,
+                ),
+              guaranteedNotNull,
+            );
           },
         }
       : null),
@@ -814,8 +830,10 @@ export function rangeOfCodec<
         return sql`json_build_array(${sql.indent(
           sql`lower_inc(${frag}),\n${innerCodec.castFromPg!(
             sql`lower(${frag})`,
+            innerCodec.notNull,
           )},\n${innerCodec.castFromPg!(
             sql`upper(${frag})`,
+            innerCodec.notNull,
           )},\nupper_inc(${frag})`,
         )})::text`;
       }
@@ -830,13 +848,8 @@ export function rangeOfCodec<
     ...(castFromPg
       ? {
           castFromPg,
-          listCastFromPg(frag) {
-            const identifier = sql.identifier(Symbol(name));
-            return sql`(${sql.indent(
-              sql`select array_agg(${castFromPg(
-                identifier,
-              )})\nfrom unnest(${frag}) ${identifier}`,
-            )})::text`;
+          listCastFromPg(frag, guaranteedNotNull) {
+            return listCastViaUnnest(name, frag, castFromPg, guaranteedNotNull);
           },
         }
       : null),
@@ -909,8 +922,8 @@ exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");
  * Helper type for common casting methods.
  */
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
-  castFromPg?(frag: SQL): SQL;
-  listCastFromPg?(frag: SQL): SQL;
+  castFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
+  listCastFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
   isBinary?: boolean;
@@ -948,14 +961,8 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   }
   return {
     castFromPg,
-    listCastFromPg(frag) {
-      const identifier = sql.identifier(Symbol("entry"));
-      return sql`(${sql.indent(
-        sql`select array_agg(${castFromPg.call(
-          this,
-          identifier,
-        )})\nfrom unnest(${frag}) ${identifier}`,
-      )})::text`;
+    listCastFromPg(frag, guaranteedNotNull) {
+      return listCastViaUnnest("entry", frag, castFromPg, guaranteedNotNull);
     },
   };
 };

@@ -249,6 +249,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -1358,7 +1359,7 @@ export const plans = {
               };
             }
           });
-          return pgClassExpression($row, resource_people_odd_petsPgResource.codec)`${resource_people_odd_petsPgResource.from(...newSelectArgs)}`;
+          return pgClassExpression($row, resource_people_odd_petsPgResource.codec, undefined)`${resource_people_odd_petsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_people_odd_petsPgResource.execute(selectArgs);
@@ -1475,7 +1476,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PetsEdge: {
@@ -1735,7 +1736,7 @@ export const plans = {
       return $connection.pageInfo();
     },
     totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   PeopleEdge: {

@@ -167,13 +167,13 @@ export interface PgCodec<
    * callback to provide your own casting - this could even include function
    * calls if you want.
    */
-  castFromPg?: (fragment: SQL) => SQL;
+  castFromPg?: (fragment: SQL, guaranteedNotNull?: boolean) => SQL;
 
   /**
    * If you provide `castFromPg` you probably ought to also specify
    * `listCastFromPg` so that a list of this type can be converted properly.
    */
-  listCastFromPg?: (fragment: SQL) => SQL;
+  listCastFromPg?: (fragment: SQL, guaranteedNotNull?: boolean) => SQL;
 
   /**
    * When we have an expression of this type, we can safely cast it within
