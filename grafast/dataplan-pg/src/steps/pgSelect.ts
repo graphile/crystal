@@ -1561,6 +1561,20 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     if (this.orders.length === 0) {
       return "natural";
     }
+    if (this.orders.length === 1) {
+      const o = this.orders[0];
+      if (
+        o.codec === TYPES.int &&
+        o.nullable === false &&
+        o.fragment === this.ordinalityAlias &&
+        o.direction === "ASC" &&
+        o.nulls === undefined &&
+        o.callback === undefined &&
+        o.attribute === undefined
+      ) {
+        return "natural";
+      }
+    }
     // The security of this hash is unimportant; the main aim is to protect the
     // user from themself. If they bypass this, that's their problem (it will
     // not introduce a security issue).
