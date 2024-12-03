@@ -302,8 +302,8 @@ export class PgSelectStep<
   } | null;
 
   /**
-   * For PostgreSQL functions that return sets, we can request `with
-   * ordinality`.
+   * Can we request `with ordinality` if we need to? Useful
+   * for PostgreSQL functions.
    */
   public readonly supportsOrdinality: boolean;
 
