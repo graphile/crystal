@@ -6,13 +6,7 @@ lateral (
     (select json_agg(s) from (
       select
         __person_friends__."person_full_name" as "0",
-        (select json_agg(s) from (
-          select
-            __person_friends_2."person_full_name" as "0",
-            "c"."person_first_name"(__person_friends_2) as "1"
-          from "c"."person_friends"(__person_friends__) as __person_friends_2
-          limit 1
-        ) s) as "1",
+        case when (__person_friends__) is not distinct from null then null::text else json_build_array((((__person_friends__)."id"))::text, ((__person_friends__)."person_full_name"), (((__person_friends__)."aliases"))::text, ((__person_friends__)."about"), ((__person_friends__)."email"), case when (((__person_friends__)."site")) is not distinct from null then null::text else json_build_array(((((__person_friends__)."site"))."url"))::text end, (((__person_friends__)."config"))::text, (((__person_friends__)."last_login_from_ip"))::text, (((__person_friends__)."last_login_from_subnet"))::text, (((__person_friends__)."user_mac"))::text, to_char(((__person_friends__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "1",
         "c"."person_first_name"(__person_friends__) as "2"
       from "c"."person_friends"(__person__) as __person_friends__
     ) s) as "1",
@@ -162,6 +156,17 @@ lateral (
   from "c"."person" as __person__
   order by __person__."id" asc
 ) as __person_result__;
+
+select __person_friends_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
+lateral (
+  select
+    __person_friends__."person_full_name" as "0",
+    "c"."person_first_name"(__person_friends__) as "1",
+    __person_friends_identifiers__.idx as "2"
+  from "c"."person_friends"(__person_friends_identifiers__."id0") as __person_friends__
+  limit 1
+) as __person_friends_result__;
 
 select __person_result__.*
 from (select 0 as idx, $1::"text" as "id0", $2::"text" as "id1") as __person_identifiers__,
