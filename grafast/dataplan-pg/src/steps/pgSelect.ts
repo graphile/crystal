@@ -225,7 +225,6 @@ export interface PgSelectOptions<
    * `resource.from`.
    */
   from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
-  supportsOrdinality?: boolean;
 
   /**
    * If you pass a custom `from` (or otherwise want to aid in debugging),
@@ -296,16 +295,6 @@ export class PgSelectStep<
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
-  private ordinality: {
-    columnName: string;
-    alias: SQL;
-  } | null;
-
-  /**
-   * Can we request `with ordinality` if we need to? Useful
-   * for PostgreSQL functions.
-   */
-  public readonly supportsOrdinality: boolean;
 
   /**
    * The resource from which we are selecting: table, view, etc
@@ -493,7 +482,6 @@ export class PgSelectStep<
         args: inArgs,
         from: inFrom = null,
         name: customName,
-        supportsOrdinality: customSupportsOrdinality,
         mode: inMode,
         joinAsLateral: inJoinAsLateral = false,
       },
@@ -507,7 +495,6 @@ export class PgSelectStep<
               from: optionsOrCloneFrom.from,
               args: null,
               name: optionsOrCloneFrom.name,
-              supportsOrdinality: optionsOrCloneFrom.supportsOrdinality,
               mode: undefined,
             },
           ]
@@ -547,16 +534,7 @@ export class PgSelectStep<
           this.locker.lockParameter("groupBy"),
         );
       } else {
-        this.locker.beforeLock("orderBy", () => {
-          if (
-            this.orders.length === 0 &&
-            this.supportsOrdinality &&
-            this.mode === "normal"
-          ) {
-            this.orderByOrdinality();
-          }
-          ensureOrderIsUnique(this);
-        });
+        this.locker.beforeLock("orderBy", ensureOrderIsUnique);
       }
     }
 
@@ -570,11 +548,6 @@ export class PgSelectStep<
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
-    this.ordinality = cloneFrom ? cloneFrom.ordinality : null;
-    this.supportsOrdinality = cloneFrom
-      ? cloneFrom.supportsOrdinality
-      : customSupportsOrdinality ??
-        (inFrom ? false : resource.supportsOrdinality);
     this.from = inFrom ?? resource.from;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
@@ -1031,24 +1004,6 @@ export class PgSelectStep<
     this.orders.push(order);
   }
 
-  orderByOrdinality(): void {
-    this.locker.assertParameterUnlocked("orderBy");
-    if (this.supportsOrdinality) {
-      const ordCol = "ordinality";
-      this.ordinality = {
-        columnName: ordCol,
-        alias: sql`${this.alias}.${sql.identifier(ordCol)}`,
-      };
-      this.orders.push({
-        codec: TYPES.int,
-        nullable: false,
-        fragment: this.ordinality.alias,
-        direction: "ASC",
-      });
-      this.setOrderIsUnique();
-    }
-  }
-
   orderIsUnique(): boolean {
     return this.isOrderUnique;
   }
@@ -1496,18 +1451,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildFrom() {
     this.locker.lockParameter("orderBy");
-    const ordinalityCol = this.ordinality?.columnName;
     return {
-      sql: sql`\nfrom ${this.fromExpression()}${
-        ordinalityCol ? sql` with ordinality` : sql.blank
-      } as ${this.alias}${
+      sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
         this.resource.codec.attributes
           ? sql.blank /* we could list columns here, followed by ordinality */
-          : sql`(v${
-              ordinalityCol
-                ? sql`, ${sql.identifier(ordinalityCol)}`
-                : sql.blank
-            })`
+          : sql`(v)`
       }`,
     };
   }
@@ -1583,21 +1531,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.locker.lockParameter("orderBy");
     if (this.orders.length === 0) {
       return "natural";
-    }
-    if (this.orders.length === 1) {
-      const o = this.orders[0];
-      if (
-        this.ordinality != null &&
-        o.codec === TYPES.int &&
-        o.nullable === false &&
-        o.fragment === this.ordinality.alias &&
-        o.direction === "ASC" &&
-        o.nulls === undefined &&
-        o.callback === undefined &&
-        o.attribute === undefined
-      ) {
-        return "natural";
-      }
     }
     // The security of this hash is unimportant; the main aim is to protect the
     // user from themself. If they bypass this, that's their problem (it will
@@ -2573,6 +2506,12 @@ ${lateralText};`;
 
           // Don't allow merging across a stream/defer/subscription boundary
           if (!stepsAreInSamePhase(t2, this)) {
+            continue;
+          }
+
+          // Don't want to make this a join as it can result in the order being
+          // messed up
+          if ((t2.resource as PgResource).hasImplicitOrder) {
             continue;
           }
 

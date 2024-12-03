@@ -418,16 +418,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const namespaceName = namespace.nspname;
           const procName = pgProc.proname;
 
+          const hasImplicitOrder =
+            returnsSetof; /* TODO: use smart tags to overrid this? */
+
           const sqlIdent = info.helpers.pgBasics.identifier(
             namespaceName,
             procName,
           );
           exportNameHint(sqlIdent, `${procName}FunctionIdentifer`);
-          const supportsOrdinality =
-            returnsSetof &&
-            !returnsArray &&
-            !isMutation &&
-            !!returnCodec.attributes;
           const fromCallback = EXPORTABLE(
             (sql, sqlFromArgDigests, sqlIdent) =>
               (...args: PgSelectArgumentDigest[]) =>
@@ -521,7 +519,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsArray,
               returnsSetof,
               isMutation,
-              supportsOrdinality,
+              hasImplicitOrder,
               extensions,
               description,
             };
@@ -559,6 +557,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 fromCallback,
                 identifier,
                 isMutation,
+                hasImplicitOrder,
                 name,
                 parameters,
                 returnCodec,
@@ -573,6 +572,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 codec: returnCodec,
                 uniques: [],
                 isMutation,
+                hasImplicitOrder,
                 extensions,
                 description,
               }),
@@ -583,6 +583,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 fromCallback,
                 identifier,
                 isMutation,
+                hasImplicitOrder,
                 name,
                 parameters,
                 returnCodec,
