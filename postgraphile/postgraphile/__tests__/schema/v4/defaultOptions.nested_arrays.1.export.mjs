@@ -273,6 +273,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",

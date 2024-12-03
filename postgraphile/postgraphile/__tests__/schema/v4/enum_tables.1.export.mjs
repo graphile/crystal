@@ -815,6 +815,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",

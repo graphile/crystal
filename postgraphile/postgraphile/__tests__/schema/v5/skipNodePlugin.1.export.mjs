@@ -4035,6 +4035,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4057,6 +4058,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4080,6 +4082,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4103,6 +4106,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4125,6 +4129,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4148,6 +4153,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4171,6 +4177,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4193,6 +4200,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4215,6 +4223,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4237,6 +4246,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4259,6 +4269,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4281,6 +4292,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4303,6 +4315,7 @@ const registry = makeRegistry({
       codec: TYPES.bigint,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4330,6 +4343,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4358,6 +4372,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4386,6 +4401,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4414,6 +4430,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4442,6 +4459,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4469,6 +4487,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4498,6 +4517,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4525,6 +4545,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4552,6 +4573,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4579,6 +4601,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4606,6 +4629,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4633,6 +4657,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4665,6 +4690,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4699,6 +4725,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4731,6 +4758,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4763,6 +4791,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4795,6 +4824,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4827,6 +4857,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4859,6 +4890,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4891,6 +4923,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4923,6 +4956,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4955,6 +4989,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -4987,6 +5022,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5019,6 +5055,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5051,6 +5088,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5083,6 +5121,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5106,6 +5145,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutOutRecord_CFuncOutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5128,6 +5168,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutOutSetofRecord_CFuncOutOutSetofRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5150,6 +5191,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutOutUnnamedRecord_CFuncOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5182,6 +5224,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5205,6 +5248,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutOutRecord_CMutationOutOutRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5227,6 +5271,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutOutSetofRecord_CMutationOutOutSetofRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5249,6 +5294,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutOutUnnamedRecord_CMutationOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5271,6 +5317,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CSearchTestSummariesRecord_CSearchTestSummariesRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5310,6 +5357,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5347,6 +5395,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5384,6 +5433,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5421,6 +5471,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5458,6 +5509,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5480,6 +5532,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutUnnamedOutOutUnnamedRecord_CFuncOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5517,6 +5570,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5554,6 +5608,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5576,6 +5631,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutUnnamedOutOutUnnamedRecord_CMutationOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5603,6 +5659,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationReturnsTableMultiColRecord_CMutationReturnsTableMultiColRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5640,6 +5697,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncReturnsTableMultiColRecord_CFuncReturnsTableMultiColRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5667,6 +5725,7 @@ const registry = makeRegistry({
       codec: bGuidCodec,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5689,6 +5748,7 @@ const registry = makeRegistry({
       codec: pgCatalogIntervalArrayCodec,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5711,6 +5771,7 @@ const registry = makeRegistry({
       codec: pgCatalogIntervalArrayCodec,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5733,6 +5794,7 @@ const registry = makeRegistry({
       codec: pgCatalogTextArrayCodec,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -5755,6 +5817,7 @@ const registry = makeRegistry({
       codec: pgCatalogTextArrayCodec,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6155,6 +6218,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6175,6 +6239,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6212,6 +6277,7 @@ const registry = makeRegistry({
       codec: pgCatalogUuidArrayCodec,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6255,6 +6321,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6290,6 +6357,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6319,6 +6387,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6342,6 +6411,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6362,6 +6432,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6397,6 +6468,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6455,6 +6527,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6507,6 +6580,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6559,6 +6633,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6586,6 +6661,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6613,6 +6689,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6640,6 +6717,7 @@ const registry = makeRegistry({
       codec: pgCatalogIntervalArrayCodec,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6667,6 +6745,7 @@ const registry = makeRegistry({
       codec: pgCatalogTextArrayCodec,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6699,6 +6778,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6734,6 +6814,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6764,6 +6845,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutOutCompoundTypeRecord_CFuncOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6791,6 +6873,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutOutCompoundTypeRecord_CMutationOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6828,6 +6911,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6865,6 +6949,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6902,6 +6987,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6939,6 +7025,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CQueryOutputTwoRowsRecord_CQueryOutputTwoRowsRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6960,6 +7047,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -6985,6 +7073,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7010,6 +7099,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7035,6 +7125,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7060,6 +7151,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7085,6 +7177,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7115,6 +7208,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7142,6 +7236,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7167,6 +7262,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7192,6 +7288,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7217,6 +7314,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7247,6 +7345,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7272,6 +7371,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7299,6 +7399,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7331,6 +7432,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7360,6 +7462,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CPersonComputedOutOutRecord_CPersonComputedOutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7392,6 +7495,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7425,6 +7529,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CPersonComputedInoutOutRecord_CPersonComputedInoutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7457,6 +7562,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7486,6 +7592,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CPersonComputedFirstArgInoutOutRecord_CPersonComputedFirstArgInoutOutRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7528,6 +7635,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7570,6 +7678,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7612,6 +7721,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7654,6 +7764,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7696,6 +7807,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7728,6 +7840,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutComplexRecord_CFuncOutComplexRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7760,6 +7873,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CFuncOutComplexSetofRecord_CFuncOutComplexSetofRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7792,6 +7906,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutComplexRecord_CMutationOutComplexRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7824,6 +7939,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CMutationOutComplexSetofRecord_CMutationOutComplexSetofRecord,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7861,6 +7977,7 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CPersonComputedComplexRecord_CPersonComputedComplexRecord,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7886,6 +8003,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7907,6 +8025,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7929,6 +8048,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7949,6 +8069,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7969,6 +8090,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7989,6 +8111,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8009,6 +8132,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8029,6 +8153,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8052,6 +8177,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8077,6 +8203,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8103,6 +8230,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8148,6 +8276,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8168,6 +8297,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8193,6 +8323,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8218,6 +8349,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8243,6 +8375,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8273,6 +8406,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8293,6 +8427,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8313,6 +8448,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8338,6 +8474,7 @@ const registry = makeRegistry({
       returnsArray: true,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",

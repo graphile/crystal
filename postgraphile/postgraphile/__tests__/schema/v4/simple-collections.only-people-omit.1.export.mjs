@@ -255,6 +255,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
