@@ -1844,7 +1844,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
     const query = options.asJsonAgg
       ? // 's' for 'subquery'
-        sql`array(${sql.indent(baseQuery)})`
+        sql`array(${sql.indent(baseQuery)})::text`
       : baseQuery;
 
     return { sql: query, extraSelectIndexes };
