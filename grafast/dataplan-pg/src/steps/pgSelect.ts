@@ -1449,9 +1449,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const aliases = sql.join(sqlAliases, "");
 
     const selection = options.asJsonAgg
-      ? sql`\n${sql.indent`array[${sql.indent(
-          sql.join(selects, ",\n"),
-        )}]::text[]`}`
+      ? selects.length === 0
+        ? // Postgres "cannot accumulate empty arrays"
+          sql`\n${sql.indent`array[null::text]`}`
+        : sql`\n${sql.indent`array[${sql.indent(
+            sql.join(selects, ",\n"),
+          )}]::text[]`}`
       : selects.length > 0
       ? sql`\n${sql.indent(sql.join(selects.map(withIndexes), ",\n"))}`
       : sql` /* NOTHING?! */`;
