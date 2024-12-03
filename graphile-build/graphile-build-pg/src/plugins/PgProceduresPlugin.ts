@@ -414,7 +414,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           }
 
           const returnsSetof = pgProc.proretset;
-          const returnsArray = !!returnCodec.arrayOfCodec;
           const namespaceName = namespace.nspname;
           const procName = pgProc.proname;
 
@@ -469,6 +468,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               console.log(`Failed to get returnPgType for '${debugProcName}'`);
               return null;
             }
+            const returnsArray = !!returnCodec.arrayOfCodec;
             const pgType = returnsArray
               ? await info.helpers.pgIntrospection.getType(
                   serviceName,

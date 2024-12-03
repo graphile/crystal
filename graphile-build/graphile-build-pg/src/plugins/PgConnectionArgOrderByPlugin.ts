@@ -112,7 +112,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     grafast: {
                       // NATURAL means to not change the sort order
-                      applyPlan: EXPORTABLE(() => (): void => {}, []),
+                      applyPlan: EXPORTABLE(() => () => {}, []),
                     },
                   },
                 },
