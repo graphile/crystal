@@ -2522,7 +2522,7 @@ ${lateralText};`;
 
           // Don't want to make this a join as it can result in the order being
           // messed up
-          if (t2.hasImplicitOrder && !this.joinAsLateral) {
+          if (t2.hasImplicitOrder && !this.joinAsLateral && this.isUnique) {
             continue;
           }
 
