@@ -548,7 +548,11 @@ export class PgSelectStep<
         );
       } else {
         this.locker.beforeLock("orderBy", () => {
-          if (this.orders.length === 0 && this.supportsOrdinality) {
+          if (
+            this.orders.length === 0 &&
+            this.supportsOrdinality &&
+            this.mode === "normal"
+          ) {
             this.orderByOrdinality();
           }
           ensureOrderIsUnique(this);
