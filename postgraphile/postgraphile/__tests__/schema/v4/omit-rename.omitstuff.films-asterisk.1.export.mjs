@@ -720,6 +720,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -765,6 +766,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: true,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -871,6 +873,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: false,
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -904,6 +907,7 @@ const registry = makeRegistry({
       codec: TYPES.varchar,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -933,6 +937,7 @@ const registry = makeRegistry({
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",

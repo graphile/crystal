@@ -417,6 +417,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const namespaceName = namespace.nspname;
           const procName = pgProc.proname;
 
+          // TODO: use smart tags to override this one way or the other?
+          // Perhaps `@forceOrder` or `@ignoreOrder`?
+          const hasImplicitOrder = returnsSetof;
+
           const sqlIdent = info.helpers.pgBasics.identifier(
             namespaceName,
             procName,
@@ -516,6 +520,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsArray,
               returnsSetof,
               isMutation,
+              hasImplicitOrder,
               extensions,
               description,
             };
@@ -551,6 +556,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 executor,
                 extensions,
                 fromCallback,
+                hasImplicitOrder,
                 identifier,
                 isMutation,
                 name,
@@ -567,6 +573,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 codec: returnCodec,
                 uniques: [],
                 isMutation,
+                hasImplicitOrder,
                 extensions,
                 description,
               }),
@@ -575,6 +582,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 executor,
                 extensions,
                 fromCallback,
+                hasImplicitOrder,
                 identifier,
                 isMutation,
                 name,

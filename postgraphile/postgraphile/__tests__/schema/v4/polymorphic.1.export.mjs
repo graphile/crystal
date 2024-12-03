@@ -3163,6 +3163,7 @@ const registryConfig = {
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3193,6 +3194,7 @@ const registryConfig = {
       codec: TYPES.boolean,
       uniques: [],
       isMutation: true,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3222,6 +3224,7 @@ const registryConfig = {
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3243,6 +3246,7 @@ const registryConfig = {
       returnsArray: false,
       returnsSetof: true,
       isMutation: false,
+      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -3268,6 +3272,7 @@ const registryConfig = {
       returnsArray: false,
       returnsSetof: false,
       isMutation: false,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
