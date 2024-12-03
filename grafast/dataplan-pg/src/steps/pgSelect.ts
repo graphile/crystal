@@ -1450,12 +1450,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildFrom() {
-    this.locker.lockParameter("orderBy");
     return {
       sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
-        this.resource.codec.attributes
-          ? sql.blank /* we could list columns here, followed by ordinality */
-          : sql`(v)`
+        this.resource.codec.attributes ? sql.blank : sql`(v)`
       }`,
     };
   }
