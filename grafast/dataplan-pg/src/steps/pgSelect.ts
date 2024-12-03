@@ -1491,6 +1491,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildFrom() {
+    this.locker.lockParameter("orderBy");
     const ordinalityCol = this.ordinality?.columnName;
     return {
       sql: sql`\nfrom ${this.fromExpression()}${
