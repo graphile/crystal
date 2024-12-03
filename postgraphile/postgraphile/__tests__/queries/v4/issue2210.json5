@@ -1,5 +1,5 @@
 {
-  testMessages: {
+  someMessages: {
     nodes: [
       {
         id: "<UUID 1>",
