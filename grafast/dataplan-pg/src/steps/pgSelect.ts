@@ -225,6 +225,7 @@ export interface PgSelectOptions<
    * `resource.from`.
    */
   from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  supportsOrdinality?: boolean;
 
   /**
    * If you pass a custom `from` (or otherwise want to aid in debugging),
@@ -295,12 +296,16 @@ export class PgSelectStep<
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
+  private ordinality: {
+    columnName: string;
+    alias: SQL;
+  } | null;
 
   /**
    * For PostgreSQL functions that return sets, we can request `with
-   * ordinality` - if so, this stores the alias to that ordinal.
+   * ordinality`.
    */
-  public readonly ordinalityAlias: SQL | null;
+  public readonly supportsOrdinality: boolean;
 
   /**
    * The resource from which we are selecting: table, view, etc
@@ -488,6 +493,7 @@ export class PgSelectStep<
         args: inArgs,
         from: inFrom = null,
         name: customName,
+        supportsOrdinality: customSupportsOrdinality,
         mode: inMode,
         joinAsLateral: inJoinAsLateral = false,
       },
@@ -501,6 +507,7 @@ export class PgSelectStep<
               from: optionsOrCloneFrom.from,
               args: null,
               name: optionsOrCloneFrom.name,
+              supportsOrdinality: optionsOrCloneFrom.supportsOrdinality,
               mode: undefined,
             },
           ]
@@ -541,7 +548,7 @@ export class PgSelectStep<
         );
       } else {
         this.locker.beforeLock("orderBy", () => {
-          if (this.orders.length === 0 && this.ordinalityAlias) {
+          if (this.orders.length === 0 && this.supportsOrdinality) {
             this.orderByOrdinality();
           }
           ensureOrderIsUnique(this);
@@ -559,7 +566,11 @@ export class PgSelectStep<
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
-    this.ordinalityAlias = cloneFrom ? cloneFrom.ordinalityAlias : null;
+    this.ordinality = cloneFrom ? cloneFrom.ordinality : null;
+    this.supportsOrdinality = cloneFrom
+      ? cloneFrom.supportsOrdinality
+      : customSupportsOrdinality ??
+        (inFrom ? false : resource.supportsOrdinality);
     this.from = inFrom ?? resource.from;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
@@ -1016,20 +1027,18 @@ export class PgSelectStep<
     this.orders.push(order);
   }
 
-  setOrdinalityAlias(alias: SQL): void {
-    if (this.ordinalityAlias) {
-      throw new Error(`ordinalityAlias may only be set once.`);
-    }
-    (this.ordinalityAlias as any) = alias;
-  }
-
   orderByOrdinality(): void {
     this.locker.assertParameterUnlocked("orderBy");
-    if (this.ordinalityAlias) {
+    if (this.supportsOrdinality) {
+      const ordCol = "ordinality";
+      this.ordinality = {
+        columnName: ordCol,
+        alias: sql`${this.alias}.${sql.identifier(ordCol)}`,
+      };
       this.orders.push({
         codec: TYPES.int,
         nullable: false,
-        fragment: this.ordinalityAlias,
+        fragment: this.ordinality.alias,
         direction: "ASC",
       });
       this.setOrderIsUnique();
@@ -1482,9 +1491,18 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildFrom() {
+    const ordinalityCol = this.ordinality?.columnName;
     return {
-      sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
-        this.resource.codec.attributes ? sql.blank : sql`(v)`
+      sql: sql`\nfrom ${this.fromExpression()}${
+        ordinalityCol ? sql` with ordinality` : sql.blank
+      } as ${this.alias}${
+        this.resource.codec.attributes
+          ? sql.blank /* we could list columns here, followed by ordinality */
+          : sql`(v${
+              ordinalityCol
+                ? sql`, ${sql.identifier(ordinalityCol)}`
+                : sql.blank
+            })`
       }`,
     };
   }
@@ -1564,9 +1582,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     if (this.orders.length === 1) {
       const o = this.orders[0];
       if (
+        this.ordinality != null &&
         o.codec === TYPES.int &&
         o.nullable === false &&
-        o.fragment === this.ordinalityAlias &&
+        o.fragment === this.ordinality.alias &&
         o.direction === "ASC" &&
         o.nulls === undefined &&
         o.callback === undefined &&

@@ -200,7 +200,7 @@ export interface PgResourceOptions<
   isUnique?: boolean;
   sqlPartitionByIndex?: SQL;
   isMutation?: boolean;
-  ordinalityAlias?: SQL;
+  supportsOrdinality?: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
    * should be treated as having a predetermined and reasonable length rather
@@ -234,7 +234,7 @@ export interface PgFunctionResourceOptions<
   uniques?: TUniques;
   extensions?: PgResourceExtensions;
   isMutation?: boolean;
-  ordinalityAlias?: SQL;
+  supportsOrdinality?: boolean;
   selectAuth?:
     | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
     | null;
@@ -286,7 +286,7 @@ export class PgResource<
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
-  public readonly ordinalityAlias: SQL | undefined;
+  public readonly supportsOrdinality: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
    * should be treated as having a predetermined and reasonable length rather
@@ -327,7 +327,7 @@ export class PgResource<
       isUnique,
       sqlPartitionByIndex,
       isMutation,
-      ordinalityAlias,
+      supportsOrdinality,
       selectAuth,
       isList,
       isVirtual,
@@ -345,7 +345,7 @@ export class PgResource<
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
-    this.ordinalityAlias = ordinalityAlias;
+    this.supportsOrdinality = supportsOrdinality ?? false;
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
     this.selectAuth = selectAuth;
@@ -448,7 +448,7 @@ export class PgResource<
       uniques,
       extensions,
       isMutation,
-      ordinalityAlias,
+      supportsOrdinality,
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
@@ -469,7 +469,7 @@ export class PgResource<
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
-        ordinalityAlias,
+        supportsOrdinality,
         selectAuth,
         description,
       };
@@ -493,7 +493,7 @@ export class PgResource<
         extensions,
         isUnique: false, // set now, not unique
         isMutation: Boolean(isMutation),
-        ordinalityAlias,
+        supportsOrdinality,
         selectAuth,
         isList: true,
         description,
@@ -523,7 +523,7 @@ export class PgResource<
         isUnique: false, // set now, not unique
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
-        ordinalityAlias,
+        supportsOrdinality,
         selectAuth,
         description,
       };
@@ -752,11 +752,6 @@ export class PgResource<
         1,
       );
     } else {
-      if (!this.isMutation && mode !== "mutation" && this.ordinalityAlias) {
-        $select.setOrdinalityAlias(
-          sql`${$select.alias}.${this.ordinalityAlias}`,
-        );
-      }
       return $select;
     }
   }

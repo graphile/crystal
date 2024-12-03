@@ -423,21 +423,16 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             procName,
           );
           exportNameHint(sqlIdent, `${procName}FunctionIdentifer`);
-          const includesOrdinality =
+          const supportsOrdinality =
             returnsSetof &&
             !returnsArray &&
             !isMutation &&
-            returnCodec.attributes;
-          const ordinalityAlias = includesOrdinality
-            ? sql`ordinality`
-            : undefined;
+            !!returnCodec.attributes;
           const fromCallback = EXPORTABLE(
-            (includesOrdinality, sql, sqlFromArgDigests, sqlIdent) =>
+            (sql, sqlFromArgDigests, sqlIdent) =>
               (...args: PgSelectArgumentDigest[]) =>
-                sql`${sqlIdent}(${sqlFromArgDigests(args)})${
-                  includesOrdinality ? sql` with ordinality` : sql.blank
-                }`,
-            [includesOrdinality, sql, sqlFromArgDigests, sqlIdent],
+                sql`${sqlIdent}(${sqlFromArgDigests(args)})`,
+            [sql, sqlFromArgDigests, sqlIdent],
           );
 
           const extensions: PgResourceExtensions = {
@@ -526,7 +521,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               returnsArray,
               returnsSetof,
               isMutation,
-              ordinalityAlias,
+              supportsOrdinality,
               extensions,
               description,
             };
