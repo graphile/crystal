@@ -5,12 +5,14 @@ import type {
   PgCodec,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
-  PgSelectStep,
 } from "@dataplan/pg";
+import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type {
   ConnectionStep,
+  ExecutableStep,
   GrafastFieldConfigArgumentMap,
   InputStep,
+  ModifierStep,
 } from "grafast";
 import { getEnumValueConfig, SafeError } from "grafast";
 import type { GraphQLEnumType, GraphQLSchema } from "grafast/graphql";
@@ -112,7 +114,19 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                   extensions: {
                     grafast: {
                       // NATURAL means to not change the sort order
-                      applyPlan: EXPORTABLE(() => () => {}, []),
+                      applyPlan: EXPORTABLE(
+                        (PgSelectStep, PgUnionAllStep) =>
+                          (plan: ExecutableStep | ModifierStep): void => {
+                            if (plan instanceof PgSelectStep) {
+                              plan.orderByOrdinality();
+                            } else if (!(plan instanceof PgUnionAllStep)) {
+                              throw new Error(
+                                "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
+                              );
+                            }
+                          },
+                        [PgSelectStep, PgUnionAllStep],
+                      ),
                     },
                   },
                 },

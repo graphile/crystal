@@ -297,6 +297,12 @@ export class PgSelectStep<
   public readonly alias: SQL;
 
   /**
+   * For PostgreSQL functions that return sets, we can request `with
+   * ordinality` - if so, this stores the alias to that ordinal.
+   */
+  public readonly ordinalityAlias: SQL | null;
+
+  /**
    * The resource from which we are selecting: table, view, etc
    */
   public readonly resource: TResource;
@@ -534,7 +540,12 @@ export class PgSelectStep<
           this.locker.lockParameter("groupBy"),
         );
       } else {
-        this.locker.beforeLock("orderBy", ensureOrderIsUnique);
+        this.locker.beforeLock("orderBy", () => {
+          if (this.orders.length === 0 && this.ordinalityAlias) {
+            this.orderByOrdinality();
+          }
+          ensureOrderIsUnique(this);
+        });
       }
     }
 
@@ -548,6 +559,7 @@ export class PgSelectStep<
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.ordinalityAlias = cloneFrom ? cloneFrom.ordinalityAlias : null;
     this.from = inFrom ?? resource.from;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.placeholderValues = cloneFrom
@@ -1002,6 +1014,26 @@ export class PgSelectStep<
   orderBy(order: PgOrderSpec): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(order);
+  }
+
+  setOrdinalityAlias(alias: SQL): void {
+    if (this.ordinalityAlias) {
+      throw new Error(`ordinalityAlias may only be set once.`);
+    }
+    (this.ordinalityAlias as any) = alias;
+  }
+
+  orderByOrdinality(): void {
+    this.locker.assertParameterUnlocked("orderBy");
+    if (this.ordinalityAlias) {
+      this.orders.push({
+        codec: TYPES.int,
+        nullable: false,
+        fragment: this.ordinalityAlias,
+        direction: "ASC",
+      });
+      this.setOrderIsUnique();
+    }
   }
 
   orderIsUnique(): boolean {
