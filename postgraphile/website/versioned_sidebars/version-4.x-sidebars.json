@@ -122,8 +122,22 @@
         "make-pg-smart-tags-plugin",
         "make-plugin-by-combining-plugins",
         "extending-raw",
-        "plugin-gallery",
-        "community-plugins"
+        "community-plugins",
+        {
+          "type": "category",
+          "label": "Plugin Gallery",
+          "link": {
+            "type": "doc",
+            "id": "plugin-gallery/index"
+          },
+          "items": [
+            "plugin-gallery/inflector",
+            "plugin-gallery/types",
+            "plugin-gallery/mutation-wrappers",
+            "plugin-gallery/customisation",
+            "plugin-gallery/other"
+          ]
+        }
       ]
     },
     "plugins",
