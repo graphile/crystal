@@ -1,0 +1,159 @@
+{
+  "version": "v1.0.0",
+
+  // Required. The entity associated with the project, soliciting funds.
+  // This can be an individual, organisation, community etc.
+  "entity": {
+    "type": "organisation", // Required. [individual, group, organisation, other]. Use the closest approximation.
+    "role": "owner", // Required. [owner, steward, maintainer, contributor, other]. Use the closest approximation.
+    "name": "Graphile", // Required. Name of the entity. Max len 250.
+    "email": "team@graphile.com", // Required. Max len 250.
+    "phone": "", // Optional. Generally suitable for organisations. Max len 32.
+    "description": "At Graphile we love GraphQL so much we named ourselves for our love of it!", // Required. Information about the entity. Max len 2000.
+    "webpageUrl": {
+      "url": "https://graphile.org", // Required. Webpage with information about the entity. Starts with https:// or http://. Max len 250.
+      "wellKnown": "" // Optional. Required if the above url and the URL of the funding.json manifest do not have the same hostname. Starts with https:// or http://. Max len 250.
+    }
+  },
+
+  // Optional. One or more projects for which the funding is solicited.
+  "projects": [
+    {
+      "guid": "graphile-worker", // Required. A short unique ID for the project. Lowercase-alphanumeric-dashes only. eg: my-cool-project. Max len 32.
+      "name": "Graphile Worker", // Required. Name of the project. Max len 250.
+      "description": "Job queue for PostgreSQL running on Node.js - allows you to run jobs (e.g. sending emails, performing calculations, generating PDFs, etc) in the background so that your HTTP response/application code is not held up. Can be used with any PostgreSQL-backed application.", // Required. Description of the project. Max len 2000.
+      "webpageUrl": {
+        "url": "https://worker.graphile.org/", // Required. Webpage with information about the project. Starts with https:// or http://. Max len 250.
+        "wellKnown": "" // Optional. Required if the above url and the URL of the funding.json manifest do not have the same hostname. Starts with https:// or http://. Max len 250.
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/worker", // Required. URL of the repository where the project's source code and other assets are available. Starts with https:// or http://. Max len 250.
+        "wellKnown": "" // Optional. Required if the above url and the URL of the funding.json manifest do not have the same hostname. Starts with https:// or http://. Max len 250.
+      },
+      "licenses": ["spdx:MIT"], // Required. The project's licenses (up to 5). For standard licenses, use the license ID from the SDPX index prefixed by "spdx:". eg: "spdx:GPL-3.0", "spdx:CC-BY-SA-4.0"
+      "tags": [
+        "developer-tools",
+        "development",
+        "programming",
+        "software-engineering",
+        "web-development"
+      ] // Required. Up to 10 general tags describing the project. Lowercase-alphanumeric-dashes (max 32 chars). eg: ["programming", "developer-tools"]. For reference, see tags.txt
+    },
+    {
+      "guid": "postgraphile", // Required. A short unique ID for the project. Lowercase-alphanumeric-dashes only. eg: my-cool-project. Max len 32.
+      "name": "PostGraphile", // Required. Name of the project. Max len 250.
+      "description": "An incredibly low-effort way to build a well structured and high-performance GraphQL API backed primarily by a PostgreSQL database. Our main focusses are performance, automatic best-practices and customisability/extensibility. Use this if you have a PostgreSQL database and you want to use it as the source of truth for an auto-generated GraphQL API (which you can still make significant changes to).", // Required. Description of the project. Max len 2000.
+      "webpageUrl": {
+        "url": "https://postgraphile.org/", // Required. Webpage with information about the project. Starts with https:// or http://. Max len 250.
+        "wellKnown": "" // Optional. Required if the above url and the URL of the funding.json manifest do not have the same hostname. Starts with https:// or http://. Max len 250.
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/postgraphile/postgraphile", // Required. URL of the repository where the project's source code and other assets are available. Starts with https:// or http://. Max len 250.
+        "wellKnown": "" // Optional. Required if the above url and the URL of the funding.json manifest do not have the same hostname. Starts with https:// or http://. Max len 250.
+      },
+      "licenses": ["spdx:MIT"], // Required. The project's licenses (up to 5). For standard licenses, use the license ID from the SDPX index prefixed by "spdx:". eg: "spdx:GPL-3.0", "spdx:CC-BY-SA-4.0"
+      "tags": [
+        "developer-tools",
+        "development",
+        "programming",
+        "software-engineering",
+        "web-development"
+      ] // Required. Up to 10 general tags describing the project. Lowercase-alphanumeric-dashes (max 32 chars). eg: ["programming", "developer-tools"]. For reference, see tags.txt
+    }
+  ],
+
+  // Required.
+  "funding": {
+    // Required. This describes one or more channels via which the entity can receive funds.
+    "channels": [
+      {
+        "guid": "github-sponsors", // Required. A short unique ID for the channel. Lowercase-alphanumeric-dashes only. eg: mybank, my-paypal. Max len 32.
+        "type": "payment-provider", // Required. [bank, payment-provider, cheque, cash, other].
+        "address": "", // Optional. A short unstructured textual representation of the payment address for the channel. eg: "Account: 12345 (branch: ABCX)", "mypaypal@domain.com", "https://payment-url.com", or a physical address for cheques. Max len 250.
+        "description": "We prefer GitHub sponsors due to their low fees" // Optional. Any additional description or instructions for the payment channel. Max len 500.
+      },
+      {
+        "guid": "bespoke", // Required. A short unique ID for the channel. Lowercase-alphanumeric-dashes only. eg: mybank, my-paypal. Max len 32.
+        "type": "bank", // Required. [bank, payment-provider, cheque, cash, other].
+        "address": "", // Optional. A short unstructured textual representation of the payment address for the channel. eg: "Account: 12345 (branch: ABCX)", "mypaypal@domain.com", "https://payment-url.com", or a physical address for cheques. Max len 250.
+        "description": "Bespoke invoicing arrangements for larger sponsor amounts (USD 1500 or above)" // Optional. Any additional description or instructions for the payment channel. Max len 500.
+      }
+    ],
+
+    // Required. One or more funding and payment plans.
+    "plans": [
+      {
+        "guid": "sponsors", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Sponsor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "Your name on the Sponsors page of the website, and in our SPONSORS.md file. Your name among those randomly featured in the PostGraphile CLI. Permission to post job opportunities to our Discord community", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 25, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "monthly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["github-sponsors"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      },
+      {
+        "guid": "production", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Production Sponsor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "Access to private security announcements. Free access to @graphile/pro. Your avatar featured on our website, plus benefits of lower tiers", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 100, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "monthly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["github-sponsors"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      },
+      {
+        "guid": "featured", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Featured Sponsor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "Your name and avatar featured in the READMEs of Graphile projects, plus benefits of lower tiers", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 500, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "monthly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["github-sponsors"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      },
+      {
+        "guid": "advisor", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Private Advisor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "A complementary support contract is offered (more detail on request), plus benefits of lower tiers", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 1500, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "monthly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["github-sponsors"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      },
+      {
+        "guid": "bespoke-advisor", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Private Advisor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "A complementary support contract is offered (more detail on request), plus benefits of lower tiers", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 4500, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "quarterly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["bespoke"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      },
+      {
+        "guid": "bespoke", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
+        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
+        "name": "Bespoke Agreement", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
+        "description": "A complementary support or consultancy contract can be offered (more detail on request), plus benefits of lower tiers", // Optional. Any additional description or instructions for the funding plan.
+        "amount": 0, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
+        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
+        "frequency": "other", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
+        "channels": ["bespoke"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
+      }
+    ],
+
+    // Optional. A simple summary of funding history. Only include if at least one, either income or expenses, have to be communicated.
+    "history": [
+      {
+        "year": 2024, // Required. Year (fiscal, preferably).
+        "income": 0, // Optional.
+        "expenses": 0, // Optional.
+        "taxes": 0, // Optional.
+        "currency": "", // Required. Three letter ISO 4217 currency code. eg: USD
+        "description": "" // Optional. Any additional description. Max length 500.
+      }
+    ]
+  }
+}
