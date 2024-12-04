@@ -150,7 +150,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
               // Undo rename of 'id' to 'rowId'
               _attributeName(previous, options, details) {
                 const name = previous!(details);
-                if (name === "row_id") {
+                if (!details.skipRowId && name === "row_id") {
                   const { codec, attributeName } = details;
                   const attribute = codec.attributes[attributeName];
                   const baseName =

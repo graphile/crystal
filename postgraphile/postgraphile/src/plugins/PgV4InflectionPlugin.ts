@@ -137,18 +137,18 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         );
       },
 
-      // V4 had a bug where even though `id` was renamed to `rowId`, we'd
-      // still use `ID_ASC`/`ID_DESC` when generating ordering.
       orderByAttributeEnum(
         _previous,
         options,
         { codec, attributeName, variant },
       ) {
-        // const fieldName = this._attributeName({ attributeName, codec });
-        const attribute = codec.attributes[attributeName];
-        const name = attribute.extensions?.tags?.name || attributeName;
-        const fieldName = this.coerceToGraphQLName(name);
-
+        const fieldName = this._attributeName({
+          attributeName,
+          codec,
+          // V4 had a bug where even though `id` was renamed to `rowId`, we'd
+          // still use `ID_ASC`/`ID_DESC` when generating ordering.
+          skipRowId: true,
+        });
         return this.constantCase(`${fieldName}-${variant}`);
       },
     },

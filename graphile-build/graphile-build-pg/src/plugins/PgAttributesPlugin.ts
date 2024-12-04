@@ -271,12 +271,15 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      _attributeName(options, { attributeName, codec }) {
+      _attributeName(options, { attributeName, codec, skipRowId }) {
         const attribute = codec.attributes[attributeName];
         const name = attribute.extensions?.tags?.name || attributeName;
         // Avoid conflict with 'id' field used for Relay.
-        const nonconflictName =
-          name === "id" && !codec.isAnonymous ? "row_id" : name;
+        const nonconflictName = skipRowId
+          ? name
+          : name === "id" && !codec.isAnonymous
+          ? "row_id"
+          : name;
         return this.coerceToGraphQLName(nonconflictName);
       },
 
