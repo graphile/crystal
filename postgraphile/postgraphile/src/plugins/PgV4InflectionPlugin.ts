@@ -128,15 +128,6 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      _joinAttributeNames(_previous, options, codec, names) {
-        return (
-          names
-            // V5 uses this._attributeName here; V4 needs the old style .attribute
-            .map((attributeName) => this.attribute({ attributeName, codec }))
-            .join("-and-")
-        );
-      },
-
       orderByAttributeEnum(
         _previous,
         options,
