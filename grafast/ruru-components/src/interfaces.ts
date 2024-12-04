@@ -3,6 +3,13 @@ import type { GraphiQLProps } from "graphiql";
 
 export { Fetcher };
 
+/**
+ * The `EventSource` specification only specifies the `withCredentials` option,
+ * but some implementations support additional options. Our configuration
+ * allows arbitrary options.
+ */
+interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
+
 export interface RuruProps {
   /**
    * Optionally override the fetcher.
@@ -65,7 +72,13 @@ export interface RuruProps {
   onEditVariables?: GraphiQLProps["onEditVariables"];
 
   /**
-   * Options to pass to `new EventSource(url, eventSourceInit)`.
+   * Will be passed to `new EventSource(url, eventSourceInit)`.
+   *
+   * Per the specification, the only option is `withCredentials`; however, some
+   * implementations support additional options. For example:
+   *
+   * - `reconnectInterval: 1000`
+   * - `maxReconnectAttempts: 3`
    */
-  eventSourceInit?: EventSourceInit;
+  eventSourceInit?: RuruEventSourceInit;
 }

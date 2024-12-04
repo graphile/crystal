@@ -60,9 +60,7 @@ const baseBodyInitScript = `\
  * but some implementations support additional options. Our configuration
  * allows arbitrary options.
  */
-export interface RuruEventSourceInit
-  extends EventSourceInit,
-    Record<string, any> {}
+interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
 
 export interface RuruServerConfig {
   /**
