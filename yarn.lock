@@ -3962,6 +3962,7 @@ __metadata:
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
+    react-error-boundary: "npm:^4.1.2"
     sqlite3: "npm:^5.1.6"
   languageName: unknown
   linkType: soft
@@ -18291,6 +18292,17 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
   checksum: 7c5b915fb793d63563cec1f721e059e6ff0e2855ac116ab5cb7450b6c59398f5e25f95c960ce5cb93504cc58ab724a75a78e99282354e702a0e667d0d787d028
+  languageName: node
+  linkType: hard
+
+"react-error-boundary@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "react-error-boundary@npm:4.1.2"
+  dependencies:
+    "@babel/runtime": "npm:^7.12.5"
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: b0adb5de94acfe625a1ff62b55ce9b3f0b5e486f1ce17132ebe4486ee14082917fe28a24c69b57a758cd487e1a8eb41ffbf15e1349a8fbb544cf85ba5d6149f5
   languageName: node
   linkType: hard
 

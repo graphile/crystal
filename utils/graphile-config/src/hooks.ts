@@ -7,7 +7,8 @@ import type {
   UnwrapCallback,
 } from "./interfaces.js";
 
-const isDev = process.env.GRAPHILE_ENV === "development";
+const isDev =
+  typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
 
 export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   callbacks: {
