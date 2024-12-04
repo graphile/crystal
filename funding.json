@@ -70,28 +70,18 @@
         "guid": "github-sponsors", // Required. A short unique ID for the channel. Lowercase-alphanumeric-dashes only. eg: mybank, my-paypal. Max len 32.
         "type": "payment-provider", // Required. [bank, payment-provider, cheque, cash, other].
         "address": "", // Optional. A short unstructured textual representation of the payment address for the channel. eg: "Account: 12345 (branch: ABCX)", "mypaypal@domain.com", "https://payment-url.com", or a physical address for cheques. Max len 250.
-        "description": "We prefer GitHub sponsors due to their low fees" // Optional. Any additional description or instructions for the payment channel. Max len 500.
+        "description": "We prefer GitHub sponsors due to their low fees. Pay by credit card as an individual or organisation." // Optional. Any additional description or instructions for the payment channel. Max len 500.
       },
       {
         "guid": "bespoke", // Required. A short unique ID for the channel. Lowercase-alphanumeric-dashes only. eg: mybank, my-paypal. Max len 32.
         "type": "bank", // Required. [bank, payment-provider, cheque, cash, other].
         "address": "", // Optional. A short unstructured textual representation of the payment address for the channel. eg: "Account: 12345 (branch: ABCX)", "mypaypal@domain.com", "https://payment-url.com", or a physical address for cheques. Max len 250.
-        "description": "Bespoke invoicing arrangements for larger sponsor amounts (USD 1500 or above)" // Optional. Any additional description or instructions for the payment channel. Max len 500.
+        "description": "Bespoke invoicing arrangements for larger sponsor amounts (USD 1500 or above). Please get in touch." // Optional. Any additional description or instructions for the payment channel. Max len 500.
       }
     ],
 
     // Required. One or more funding and payment plans.
     "plans": [
-      {
-        "guid": "sponsors", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
-        "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
-        "name": "Sponsor", // Required. Name of the funding plan. eg: "Starter support plan", "Infra hosting", "Monthly funding plan".
-        "description": "Your name on the Sponsors page of the website, and in our SPONSORS.md file. Your name among those randomly featured in the PostGraphile CLI. Permission to post job opportunities to our Discord community", // Optional. Any additional description or instructions for the funding plan.
-        "amount": 25, // Required. The solicited amount for this plan. 0 is a wildcard that indicates "any amount".
-        "currency": "USD", // Required. Three letter ISO 4217 currency code. eg: USD
-        "frequency": "monthly", // Required. [one-time, weekly, fortnightly, monthly, yearly, other]
-        "channels": ["github-sponsors"] // Required. One or more channel IDs defined in channels[] via which this plan can accept payments.
-      },
       {
         "guid": "production", // Required. A short unique ID for the plan. Lowercase-alphanumeric-dashes only. eg: mybank, paypal. Max len 32.
         "status": "active", // Required. [active, inactive]. Indicates whether this plan is currently active or inactive.
