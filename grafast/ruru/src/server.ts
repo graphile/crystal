@@ -55,6 +55,13 @@ const baseBodyInitScript = `\
   root.render(tree);
 </script>`;
 
+/**
+ * The `EventSource` specification only specifies the `withCredentials` option,
+ * but some implementations support additional options. Our configuration
+ * allows arbitrary options.
+ */
+interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
+
 export interface RuruServerConfig {
   /**
    * The URL to the GraphQL endpoint.
@@ -74,6 +81,17 @@ export interface RuruServerConfig {
    * plan - output the plan executed
    */
   debugTools?: Array<"explain" | "plan">;
+
+  /**
+   * Will be passed to `new EventSource(url, eventSourceInit)`.
+   *
+   * Per the specification, the only option is `withCredentials`; however, some
+   * implementations support additional options. For example:
+   *
+   * - `reconnectInterval: 1000`
+   * - `maxReconnectAttempts: 3`
+   */
+  eventSourceInit?: RuruEventSourceInit;
 }
 
 /**

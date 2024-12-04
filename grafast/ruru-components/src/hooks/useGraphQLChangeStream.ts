@@ -14,7 +14,7 @@ export const useGraphQLChangeStream = (
   // Starts listening to the event stream at the `sourceUrl`.
   useEffect(() => {
     eventSourceRef.current = streamEndpoint
-      ? new EventSource(streamEndpoint)
+      ? new EventSource(streamEndpoint, props.eventSourceInit)
       : null;
     const eventSource = eventSourceRef.current;
     return () => {
@@ -34,7 +34,8 @@ export const useGraphQLChangeStream = (
   useEffect(() => {
     if (eventSource) {
       if (eventSource.readyState === eventSource.CLOSED) {
-        throw new Error("Lifecycle management error for EventSource");
+        console.warn("Ruru: EventSource is closed, reopening");
+        setError(new Error("Ruru: EventSource is closed, reopening"));
       }
 
       const onOpen = () => {
