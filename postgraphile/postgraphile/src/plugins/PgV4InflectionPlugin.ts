@@ -128,6 +128,9 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         }
       },
 
+      // V4 had a bug where even though `id` was renamed to `rowId`, we'd still
+      // use `ID_ASC`/`ID_DESC` when generating ordering - so we have to enable
+      // skipRowId.
       orderByAttributeEnum(
         _previous,
         options,
@@ -136,8 +139,6 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         const fieldName = this._attributeName({
           attributeName,
           codec,
-          // V4 had a bug where even though `id` was renamed to `rowId`, we'd
-          // still use `ID_ASC`/`ID_DESC` when generating ordering.
           skipRowId: true,
         });
         return this.constantCase(`${fieldName}-${variant}`);
