@@ -1,5 +1,20 @@
 # postgraphile
 
+## 5.0.0-beta.35
+
+### Patch Changes
+
+- [#2269](https://github.com/graphile/crystal/pull/2269)
+  [`bee1db4f4`](https://github.com/graphile/crystal/commit/bee1db4f442502b62cb05cd0f7092990328497b8)
+  Thanks [@benjie](https://github.com/benjie)! - Hotfix to inflection changes in
+  beta.34 - fixes behavior of `orderByAttributeEnum` and removes V4 override of
+  `_joinAttributeNames` which shouldn't be necessary (and seems to do more harm
+  than good).
+- Updated dependencies
+  [[`bee1db4f4`](https://github.com/graphile/crystal/commit/bee1db4f442502b62cb05cd0f7092990328497b8)]:
+  - graphile-build-pg@5.0.0-beta.34
+  - graphile-utils@5.0.0-beta.34
+
 ## 5.0.0-beta.34
 
 ### Patch Changes
