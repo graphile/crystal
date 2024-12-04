@@ -63,4 +63,9 @@ export interface RuruProps {
    * Callback executed when the variables change.
    */
   onEditVariables?: GraphiQLProps["onEditVariables"];
+
+  /**
+   * Options to pass to `new EventSource(url, eventSourceInit)`.
+   */
+  eventSourceInit?: EventSourceInit;
 }

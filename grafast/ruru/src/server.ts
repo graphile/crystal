@@ -55,10 +55,13 @@ const baseBodyInitScript = `\
   root.render(tree);
 </script>`;
 
-interface RuruEventSourceInit
+/**
+ * The `EventSource` specification only specifies the `withCredentials` option,
+ * but some implementations support additional options. Our configuration
+ * allows arbitrary options.
+ */
+export interface RuruEventSourceInit
   extends EventSourceInit,
-    // In EventSource specification there is only `withCredentials` option,
-    // but some implementations support more options, so we add them here.
     Record<string, any> {}
 
 export interface RuruServerConfig {
@@ -84,10 +87,11 @@ export interface RuruServerConfig {
   /**
    * Will be passed to `new EventSource(url, eventSourceInit)`.
    *
-   * By specification, the only option is `withCredentials`, but some
-   * implementations support more options. For example,
-   * `reconnectInterval: 1000`
-   * `maxReconnectAttempts: 3`
+   * Per the specification, the only option is `withCredentials`; however, some
+   * implementations support additional options. For example:
+   *
+   * - `reconnectInterval: 1000`
+   * - `maxReconnectAttempts: 3`
    */
   eventSourceInit?: RuruEventSourceInit;
 }
