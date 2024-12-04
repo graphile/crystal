@@ -144,17 +144,24 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     inflection: {
       ignoreReplaceIfNotExists: ["nodeIdFieldName"],
       replace: {
-        // Don't rename 'id' to 'rowId' (we might undo this in `attribute()` later)
-        _attributeName(previous, options, details) {
-          const { codec, attributeName } = details;
-          const attribute = codec.attributes[attributeName];
-          const baseName = attribute.extensions?.tags?.name || attributeName;
-          const name = previous!(details);
-          if (baseName === "id" && name === "row_id" && !codec.isAnonymous) {
-            return "id";
-          }
-          return name;
-        },
+        ...(classicIds
+          ? null
+          : {
+              // Undo rename of 'id' to 'rowId'
+              _attributeName(previous, options, details) {
+                const name = previous!(details);
+                if (!details.skipRowId && name === "row_id") {
+                  const { codec, attributeName } = details;
+                  const attribute = codec.attributes[attributeName];
+                  const baseName =
+                    attribute.extensions?.tags?.name || attributeName;
+                  if (baseName === "id" && !codec.isAnonymous) {
+                    return "id";
+                  }
+                }
+                return name;
+              },
+            }),
         ...(classicIds ||
         options.skipPlugins?.some((p) => p.name === "NodePlugin")
           ? null
@@ -164,24 +171,6 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
               nodeIdFieldName() {
                 return "nodeId";
               },
-            }),
-        ...(classicIds
-          ? {
-              // Do rename 'id' to 'rowId', but do it in `attribute()` not `_attributeName`
-              attribute(previous, options, details) {
-                const { codec, attributeName } = details;
-                const attribute = codec.attributes[attributeName];
-                const baseName =
-                  attribute.extensions?.tags?.name || attributeName;
-                const name = previous!(details);
-                if (baseName === "id" && name === "id" && !codec.isAnonymous) {
-                  return "rowId";
-                }
-                return name;
-              },
-            }
-          : {
-              // No action required
             }),
       },
     },

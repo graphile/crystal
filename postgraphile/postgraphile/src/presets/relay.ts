@@ -37,7 +37,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
       },
       _attributeName(previous, options, details) {
         const name = previous!(details);
-        if (name === "id") return "row_id";
+        if (!details.skipRowId && name === "id") return "row_id";
         return name;
       },
     },

@@ -128,13 +128,20 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         }
       },
 
-      _joinAttributeNames(_previous, options, codec, names) {
-        return (
-          names
-            // V5 uses this._attributeName here; V4 needs the old style .attribute
-            .map((attributeName) => this.attribute({ attributeName, codec }))
-            .join("-and-")
-        );
+      // V4 had a bug where even though `id` was renamed to `rowId`, we'd still
+      // use `ID_ASC`/`ID_DESC` when generating ordering - so we have to enable
+      // skipRowId.
+      orderByAttributeEnum(
+        _previous,
+        options,
+        { codec, attributeName, variant },
+      ) {
+        const fieldName = this._attributeName({
+          attributeName,
+          codec,
+          skipRowId: true,
+        });
+        return this.constantCase(`${fieldName}-${variant}`);
       },
     },
   },
