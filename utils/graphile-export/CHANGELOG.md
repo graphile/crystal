@@ -1,5 +1,15 @@
 # graphile-export
 
+## 0.0.2-beta.22
+
+### Patch Changes
+
+- Updated dependencies
+  [[`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8),
+  [`7bf045282`](https://github.com/graphile/crystal/commit/7bf04528264c3b9c509f148253fed96d3394141d)]:
+  - grafast@0.1.1-beta.17
+  - pg-sql2@5.0.0-beta.7
+
 ## 0.0.2-beta.21
 
 ### Patch Changes

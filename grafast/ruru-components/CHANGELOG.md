@@ -1,5 +1,18 @@
 # ruru-components
 
+## 2.0.0-beta.25
+
+### Patch Changes
+
+- [#2266](https://github.com/graphile/crystal/pull/2266)
+  [`38163c86a`](https://github.com/graphile/crystal/commit/38163c86ae628fed84cf38fc6a1cc76a7bc7932a)
+  Thanks [@hos](https://github.com/hos)! - Fix white-screen-of-death caused by
+  EventSource disconnection. Instead, handle errors gracefully. Also, allow
+  overriding of the EventSource configuration options.
+- Updated dependencies
+  [[`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8)]:
+  - grafast@0.1.1-beta.17
+
 ## 2.0.0-beta.24
 
 ### Patch Changes

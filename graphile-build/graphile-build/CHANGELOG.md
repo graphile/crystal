@@ -1,5 +1,64 @@
 # graphile-build
 
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#2251](https://github.com/graphile/crystal/pull/2251)
+  [`555d65cce`](https://github.com/graphile/crystal/commit/555d65ccecb875f1e34cb40108176f0ddc11df64)
+  Thanks [@benjie](https://github.com/benjie)! - We now enforce GraphQL name
+  checks earlier and supply more information to better reveal where any invalid
+  names are originating.
+
+- [#2251](https://github.com/graphile/crystal/pull/2251)
+  [`efa25d97d`](https://github.com/graphile/crystal/commit/efa25d97df2e00f13bc29806d396a8366a121031)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Inflection changes!** V4
+  preset should be (mostly) unaffected, but Amber preset will likely have
+  changes between `ID` and `ROW_ID` in various places, plus missing underscores
+  may reappear/etc. Be sure to diff your schema before/after this update (as you
+  should with every update... and to be honest, with everything else that
+  changes your schema).
+
+  Normally `camelCase`/`upperCamelCase`/`constantCase`/etc are the final step
+  before we name a field/type/enumValue/etc; however it turns out that some
+  inflectors were using the camel-cased output as input to their own
+  inflection - for example, when calculating the name of a relation it would
+  take the column names _camel-cased_ and then combine them into a string which
+  was then camel-cased again. Even worse, when these values are then used in an
+  enum, it would then be _constant-cased_, so you end up with string 👉
+  camel-case 👉 concatenate 👉 camel-case 👉 concatenate 👉 constant-case. This
+  lead to certain edge cases where fields with numbers or underscores may come
+  out in unexpected ways.
+
+  This release creates "raw" backing inflectors for a few things that remove the
+  final step (camel-casing) so that later usage may choose to use the raw value
+  rather than the camel-cased value. And due to this, we've also moved the `id`
+  👉 `rowId` tweaks from the `attribute()` inflector into the `_attributeName()`
+  inflector - which is where most of the changes have come from. We've undone
+  this change in the V4 preset, so if you don't use the V5 preset but need to
+  undo this change, please check out the V4 overrides of:
+
+  - [`_attributeName`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L135-L145)
+  - [`_joinAttributeNames`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/plugins/PgV4InflectionPlugin.ts#L131-L138)
+  - [`attribute`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L158-L169)
+
+  Note: the V4 preset is fairly stable, but the Amber preset is being constantly
+  iterated to improve the OOTB V5 experience - it will only be stable once
+  V5.0.0 is released.
+
+- [#2250](https://github.com/graphile/crystal/pull/2250)
+  [`86e228299`](https://github.com/graphile/crystal/commit/86e22829996a745dc1f8cbaf32e709b1bd346e79)
+  Thanks [@benjie](https://github.com/benjie)! - Integrate preset.lib into build
+  and gather context so plugins can use modules without needing to install
+  dependencies (and thus avoiding the dual package hazard).
+- Updated dependencies
+  [[`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8),
+  [`d13b76f0f`](https://github.com/graphile/crystal/commit/d13b76f0fef2a58466ecb44880af62d25910e83e),
+  [`b167bd849`](https://github.com/graphile/crystal/commit/b167bd8499be5866b71bac6594d55bd768fda1d0),
+  [`6a13ecbd4`](https://github.com/graphile/crystal/commit/6a13ecbd45534c39c846c1d8bc58242108426dd1)]:
+  - grafast@0.1.1-beta.17
+  - graphile-config@0.0.1-beta.12
+
 ## 5.0.0-beta.28
 
 ### Patch Changes

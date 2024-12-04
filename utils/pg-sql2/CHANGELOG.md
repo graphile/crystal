@@ -1,5 +1,13 @@
 # pg-sql2
 
+## 5.0.0-beta.7
+
+### Patch Changes
+
+- [#2250](https://github.com/graphile/crystal/pull/2250)
+  [`7bf045282`](https://github.com/graphile/crystal/commit/7bf04528264c3b9c509f148253fed96d3394141d)
+  Thanks [@benjie](https://github.com/benjie)! - Export version number.
+
 ## 5.0.0-beta.6
 
 ### Patch Changes

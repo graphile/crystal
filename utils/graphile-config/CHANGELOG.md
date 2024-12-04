@@ -1,5 +1,28 @@
 # graphile-config
 
+## 0.0.1-beta.12
+
+### Patch Changes
+
+- [#2240](https://github.com/graphile/crystal/pull/2240)
+  [`d13b76f0f`](https://github.com/graphile/crystal/commit/d13b76f0fef2a58466ecb44880af62d25910e83e)
+  Thanks [@benjie](https://github.com/benjie)! - Adds
+  `MiddlewareHandlers<TActivities>` type to help with adding middleware to
+  configs
+
+- [#2253](https://github.com/graphile/crystal/pull/2253)
+  [`b167bd849`](https://github.com/graphile/crystal/commit/b167bd8499be5866b71bac6594d55bd768fda1d0)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `{}` is no longer a valid
+  `GraphileConfig.ResolvedPreset`; use `resolvePreset({})`
+
+  Also: adds `resolvePreset(preset)` and deprecates `resolvePresets(presets)`.
+
+- [#2250](https://github.com/graphile/crystal/pull/2250)
+  [`6a13ecbd4`](https://github.com/graphile/crystal/commit/6a13ecbd45534c39c846c1d8bc58242108426dd1)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for 'preset.lib'
+  which can be used to store global module references to help avoid the dual
+  package hazard.
+
 ## 0.0.1-beta.11
 
 ### Patch Changes

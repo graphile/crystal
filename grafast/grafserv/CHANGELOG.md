@@ -1,5 +1,30 @@
 # grafserv
 
+## 0.1.1-beta.19
+
+### Patch Changes
+
+- [#2252](https://github.com/graphile/crystal/pull/2252)
+  [`866673e14`](https://github.com/graphile/crystal/commit/866673e14f7ad76b6f6d83d1b4e3a4eff8fdba37)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul maskError types to
+  return GraphQLFormattedError.
+
+- [#2240](https://github.com/graphile/crystal/pull/2240)
+  [`9a0f9e78c`](https://github.com/graphile/crystal/commit/9a0f9e78c4ee46f50f49bb068baddef7e1de4119)
+  Thanks [@benjie](https://github.com/benjie)! - Adopt new MiddlewareHandlers
+  type for simplicity, and in doing so fix type of middleware (for plugins) that
+  incorrectly unwrapped promise resulting in TypeScript incorrectly suggesting
+  that `await` was not necessary.
+- Updated dependencies
+  [[`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8),
+  [`38163c86a`](https://github.com/graphile/crystal/commit/38163c86ae628fed84cf38fc6a1cc76a7bc7932a),
+  [`d13b76f0f`](https://github.com/graphile/crystal/commit/d13b76f0fef2a58466ecb44880af62d25910e83e),
+  [`b167bd849`](https://github.com/graphile/crystal/commit/b167bd8499be5866b71bac6594d55bd768fda1d0),
+  [`6a13ecbd4`](https://github.com/graphile/crystal/commit/6a13ecbd45534c39c846c1d8bc58242108426dd1)]:
+  - grafast@0.1.1-beta.17
+  - ruru@2.0.0-beta.17
+  - graphile-config@0.0.1-beta.12
+
 ## 0.1.1-beta.18
 
 ### Patch Changes

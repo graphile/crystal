@@ -1,5 +1,14 @@
 # pg-introspection
 
+## 0.0.1-beta.10
+
+### Patch Changes
+
+- [#2256](https://github.com/graphile/crystal/pull/2256)
+  [`dc5746594`](https://github.com/graphile/crystal/commit/dc5746594d7870a13296f405f4327f89d17dac1e)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for introspecting
+  RLS policies.
+
 ## 0.0.1-beta.9
 
 ### Patch Changes

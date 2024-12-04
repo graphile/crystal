@@ -1,5 +1,20 @@
 # grafast
 
+## 0.1.1-beta.17
+
+### Patch Changes
+
+- [#2240](https://github.com/graphile/crystal/pull/2240)
+  [`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8)
+  Thanks [@benjie](https://github.com/benjie)! - Internal: adopt new
+  MiddlewareHandlers type for simplicity.
+
+- Updated dependencies
+  [[`d13b76f0f`](https://github.com/graphile/crystal/commit/d13b76f0fef2a58466ecb44880af62d25910e83e),
+  [`b167bd849`](https://github.com/graphile/crystal/commit/b167bd8499be5866b71bac6594d55bd768fda1d0),
+  [`6a13ecbd4`](https://github.com/graphile/crystal/commit/6a13ecbd45534c39c846c1d8bc58242108426dd1)]:
+  - graphile-config@0.0.1-beta.12
+
 ## 0.1.1-beta.16
 
 ### Patch Changes

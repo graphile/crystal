@@ -1,5 +1,107 @@
 # graphile-build-pg
 
+## 5.0.0-beta.33
+
+### Patch Changes
+
+- [#2251](https://github.com/graphile/crystal/pull/2251)
+  [`555d65cce`](https://github.com/graphile/crystal/commit/555d65ccecb875f1e34cb40108176f0ddc11df64)
+  Thanks [@benjie](https://github.com/benjie)! - We now enforce GraphQL name
+  checks earlier and supply more information to better reveal where any invalid
+  names are originating.
+
+- [#2251](https://github.com/graphile/crystal/pull/2251)
+  [`efa25d97d`](https://github.com/graphile/crystal/commit/efa25d97df2e00f13bc29806d396a8366a121031)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Inflection changes!** V4
+  preset should be (mostly) unaffected, but Amber preset will likely have
+  changes between `ID` and `ROW_ID` in various places, plus missing underscores
+  may reappear/etc. Be sure to diff your schema before/after this update (as you
+  should with every update... and to be honest, with everything else that
+  changes your schema).
+
+  Normally `camelCase`/`upperCamelCase`/`constantCase`/etc are the final step
+  before we name a field/type/enumValue/etc; however it turns out that some
+  inflectors were using the camel-cased output as input to their own
+  inflection - for example, when calculating the name of a relation it would
+  take the column names _camel-cased_ and then combine them into a string which
+  was then camel-cased again. Even worse, when these values are then used in an
+  enum, it would then be _constant-cased_, so you end up with string 👉
+  camel-case 👉 concatenate 👉 camel-case 👉 concatenate 👉 constant-case. This
+  lead to certain edge cases where fields with numbers or underscores may come
+  out in unexpected ways.
+
+  This release creates "raw" backing inflectors for a few things that remove the
+  final step (camel-casing) so that later usage may choose to use the raw value
+  rather than the camel-cased value. And due to this, we've also moved the `id`
+  👉 `rowId` tweaks from the `attribute()` inflector into the `_attributeName()`
+  inflector - which is where most of the changes have come from. We've undone
+  this change in the V4 preset, so if you don't use the V5 preset but need to
+  undo this change, please check out the V4 overrides of:
+
+  - [`_attributeName`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L135-L145)
+  - [`_joinAttributeNames`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/plugins/PgV4InflectionPlugin.ts#L131-L138)
+  - [`attribute`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L158-L169)
+
+  Note: the V4 preset is fairly stable, but the Amber preset is being constantly
+  iterated to improve the OOTB V5 experience - it will only be stable once
+  V5.0.0 is released.
+
+- [#2261](https://github.com/graphile/crystal/pull/2261)
+  [`a202145c5`](https://github.com/graphile/crystal/commit/a202145c5af3e5467424e6772d532c2db1eb67c6)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug causing modifications
+  to introspection results (e.g. fake constraints) to be persisted to next watch
+  tick via gather cache.
+
+- [#2257](https://github.com/graphile/crystal/pull/2257)
+  [`2a37fb99a`](https://github.com/graphile/crystal/commit/2a37fb99a04784647dff6ab8c5bfffb072cc6e8a)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul how PostgreSQL arrays
+  are handled, and fix the "empty arrays become null" bug caused by using
+  `array_agg()`.
+
+- [#2265](https://github.com/graphile/crystal/pull/2265)
+  [`5d9f2de85`](https://github.com/graphile/crystal/commit/5d9f2de8519b216732b17464d0b326ec8d7c58de)
+  Thanks [@benjie](https://github.com/benjie)! - Prevents inlining (via joins)
+  child PgSelect queries into parents when the parent is relying on implicit
+  ordering coming from a function or suitably flagged subquery.
+
+- [#2251](https://github.com/graphile/crystal/pull/2251)
+  [`84f07626d`](https://github.com/graphile/crystal/commit/84f07626d9dd9e22f6ae6a1045053df046fbc4ea)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `orderByAttributeEnum`
+  inflector no longer requires/provides attribute - it can be trivially fetched
+  from `codec` and `attributeName` via
+  `const attribute = codec.attributes[attributeName]`
+
+- [#2250](https://github.com/graphile/crystal/pull/2250)
+  [`86e228299`](https://github.com/graphile/crystal/commit/86e22829996a745dc1f8cbaf32e709b1bd346e79)
+  Thanks [@benjie](https://github.com/benjie)! - Integrate preset.lib into build
+  and gather context so plugins can use modules without needing to install
+  dependencies (and thus avoiding the dual package hazard).
+
+- [#2249](https://github.com/graphile/crystal/pull/2249)
+  [`933786868`](https://github.com/graphile/crystal/commit/9337868689f4f05ab5faf2d4bb18a8ad8e23e189)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `PgCodec.extensions.pg.serviceName` is now nullable to indicate natively
+  supported PG types.
+- Updated dependencies
+  [[`555d65cce`](https://github.com/graphile/crystal/commit/555d65ccecb875f1e34cb40108176f0ddc11df64),
+  [`69ab227b5`](https://github.com/graphile/crystal/commit/69ab227b5e1c057a6fc8ebba87bde80d5aa7f3c8),
+  [`efa25d97d`](https://github.com/graphile/crystal/commit/efa25d97df2e00f13bc29806d396a8366a121031),
+  [`d13b76f0f`](https://github.com/graphile/crystal/commit/d13b76f0fef2a58466ecb44880af62d25910e83e),
+  [`b167bd849`](https://github.com/graphile/crystal/commit/b167bd8499be5866b71bac6594d55bd768fda1d0),
+  [`dc5746594`](https://github.com/graphile/crystal/commit/dc5746594d7870a13296f405f4327f89d17dac1e),
+  [`7bf045282`](https://github.com/graphile/crystal/commit/7bf04528264c3b9c509f148253fed96d3394141d),
+  [`2a37fb99a`](https://github.com/graphile/crystal/commit/2a37fb99a04784647dff6ab8c5bfffb072cc6e8a),
+  [`5d9f2de85`](https://github.com/graphile/crystal/commit/5d9f2de8519b216732b17464d0b326ec8d7c58de),
+  [`6a13ecbd4`](https://github.com/graphile/crystal/commit/6a13ecbd45534c39c846c1d8bc58242108426dd1),
+  [`86e228299`](https://github.com/graphile/crystal/commit/86e22829996a745dc1f8cbaf32e709b1bd346e79),
+  [`cba6ee06d`](https://github.com/graphile/crystal/commit/cba6ee06d38ec5ae4ef4dafa58569fad61f239ac)]:
+  - graphile-build@5.0.0-beta.29
+  - grafast@0.1.1-beta.17
+  - graphile-config@0.0.1-beta.12
+  - pg-introspection@0.0.1-beta.10
+  - pg-sql2@5.0.0-beta.7
+  - @dataplan/pg@0.0.1-beta.28
+
 ## 5.0.0-beta.32
 
 ### Patch Changes
