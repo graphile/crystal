@@ -17,9 +17,9 @@ export default function Playground() {
           <div>
             <h2>Something went wrong</h2>
             <p>
-              Sorry about this. Grafast isn't really intended for usage on the
-              web and we seem to break the playground quite frequently as a
-              consequence. Please{" "}
+              Sorry about this. Grafast isn&apos;t really intended for usage on
+              the web yet and we seem to break the playground quite frequently
+              as a consequence. Please{" "}
               <strong>
                 <a
                   href={`https://github.com/graphile/crystal/issues/new?title=${encodeURIComponent(
