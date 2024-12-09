@@ -186,7 +186,7 @@ export async function executeQuery(
   // Validate the GraphQL document against the schema:
   const errors = validate(schema, document);
   if (errors.length > 0) {
-    throw new Error(`Validation error(s) occurred`, { cause: errors });
+    return { errors };
   }
 
   // Prepare the execution arguments:
@@ -233,7 +233,7 @@ export async function executeDocument<TData = any, TVariables = any>(
   // Validate the GraphQL document against the schema:
   const errors = validate(schema, document);
   if (errors.length > 0) {
-    throw new Error(`Validation error(s) occurred`, { cause: errors });
+    return { errors };
   }
 
   // Prepare the execution arguments:
