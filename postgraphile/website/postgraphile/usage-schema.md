@@ -104,37 +104,31 @@ call `hookArgs()`.
 Here's a full example:
 
 ```ts
-import { getPreset } from "src/graphile.config.js";
 import { postgraphile } from "postgraphile";
-import { DocumentNode, ExecutionResult, validate } from "postgraphile/graphql";
-import { execute, hookArgs } from "postgraphile/grafast";
-// Optionally, if you're using GraphQL Code Generator with client-preset,
-// you have use TypedDocumentNode to make the gqlQuery function type-safe.
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { parse, validate } from "postgraphile/graphql";
+import { hookArgs, execute } from "postgraphile/grafast";
 
-const preset = getPreset();
+import preset from "./graphile.config.js";
 
+// Build a `pgl` instance, with helpers and schema based on our preset.
 const pgl = postgraphile(preset);
-// Or if you don't have `pgl`, you can also use makeSchema:
-/**
- * import { makeSchema } from 'postgraphile';
- * const { schema, resolvedPreset } = await makeSchema(preset);
- */
 
 /**
  * Given a request context `requestContext`, GraphQL query text `source` and
  * optionally variable values and operation name, execute the given GraphQL
  * operation against our schema and return the result.
  */
-export async function gqlQuery<TData = any, TVariables = any>(
+export async function executeQuery(
   requestContext: Partial<Grafast.RequestContext>,
-  document: DocumentNode | TypedDocumentNode<TData, TVariables>,
+  source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
-): Promise<ExecutionResult<TData, TVariables>> {
-  // Finish loading the schema:
-  const schema = await pgl.getSchema();
-  const resolvedPreset = await pgl.getResolvedPreset();
+) {
+  // We might get a newer schema in "watch" mode
+  const { schema, resolvedPreset } = await pgl.getSchemaResult();
+
+  // Parse the GraphQL query text:
+  const document = parse(source);
 
   // Validate the GraphQL document against the schema:
   const errors = validate(schema, document);
@@ -142,7 +136,7 @@ export async function gqlQuery<TData = any, TVariables = any>(
     throw new Error(`Validation error(s) occurred`, { cause: errors });
   }
 
-  // Execute the request using Grafast:
+  // Prepare the execution arguments:
   const args = await hookArgs({
     schema,
     document,
@@ -152,6 +146,7 @@ export async function gqlQuery<TData = any, TVariables = any>(
     requestContext,
   });
 
-  return (await execute(args)) as ExecutionResult<TData, TVariables>;
+  // Execute the request using Grafast:
+  return await execute(args);
 }
 ```
