@@ -21,11 +21,11 @@ First you will need a PostGraphile instance, typically called `pgl`. If you're
 already using PostGraphile somewhere, you can likely import it from there;
 but if not you can create it yourself:
 
-```js
+```js title="pgl.js"
 import { postgraphile } from "postgraphile";
 import preset from "./graphile.config.js";
 
-const pgl = postgraphile(preset);
+export const pgl = postgraphile(preset);
 ```
 
 You can then get the schema result from this instance; this is an object
@@ -35,6 +35,8 @@ consisting of:
 - `resolvedPreset` - the resolved preset
 
 ```js
+import { pgl } from "./pgl.js";
+
 const { schema, resolvedPreset } = await pgl.getSchemaResult();
 ```
 
@@ -62,7 +64,7 @@ Now that you have `schema` and `resolvedPreset`, you can execute a GraphQL
 query via:
 
 ```js
-import { grafast } from "grafast";
+import { grafast } from "postgraphile/grafast";
 
 const { data, errors } = await grafast({
   schema,
@@ -97,7 +99,7 @@ Different servers and situations may add alternative or additional information.
 
 :::
 
-### Normal example
+### Full example
 
 Here's a full example:
 
@@ -106,7 +108,10 @@ import { postgraphile } from "postgraphile";
 import { grafast } from "postgraphile/grafast";
 import preset from "./graphile.config.js";
 
+// Make a new PostGraphile instance:
 const pgl = postgraphile(preset);
+// Or import a shared instance:
+//   import { pgl } from "./pgl.js"
 
 /**
  * Given a request context `requestContext`, GraphQL query text `source` and
