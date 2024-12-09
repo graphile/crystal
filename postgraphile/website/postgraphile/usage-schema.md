@@ -145,10 +145,10 @@ execution function type safe. In this case, rather than passing in a raw
 automatically reflect the correct types thanks to graphql-codegen:
 
 ```ts
+import type { DocumentNode, ExecutionResult } from "postgraphile/graphql";
+import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { postgraphile } from "postgraphile";
 import { grafast } from "postgraphile/grafast";
-import { DocumentNode, ExecutionResult } from "postgraphile/graphql";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import preset from "./graphile.config.js";
 
 const pgl = postgraphile(preset);
