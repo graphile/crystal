@@ -17,12 +17,13 @@ Here's a simple example:
 
 ```ts
 import { exportSchema } from "graphile-export";
-import { makeSchema } from "postgraphile";
+import { postgraphile } from "postgraphile";
 import config from "./graphile.config.js";
 import * as jsonwebtoken from "jsonwebtoken";
 
+const pgl = postgraphile(config);
 async function main() {
-  const { schema, resolvedPreset } = await makeSchema(config);
+  const { schema, resolvedPreset } = await pgl.getSchemaResult();
   const exportFileLocation = `${__dirname}/exported-schema.mjs`;
   await exportSchema(schema, exportFileLocation, {
     mode: "graphql-js",
@@ -34,10 +35,12 @@ async function main() {
   });
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main()
+  .finally(() => pgl.release())
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 ```
 
 Run this file, and you should see a `exported-schema.mjs` file containing your
@@ -119,3 +122,15 @@ serv.addTo(server);
 server.listen(5555);
 console.log("Listening on http://localhost:5555/");
 ```
+
+:::note Only import what you need!
+
+You'll notice that we import the `node` grafserv adaptor, our exported schema,
+and our preset, but no other PostGraphile-specific imports. The schema export
+itself will pull in a few other modules, but there should be no need to import
+`postgraphile` itself or the `graphile-build` system, since the schema has
+already built. This helps to keep runtime memory usage down, and importing
+less code should make for faster startup (and smaller bundles if you bundle
+your server, e.g. for serverless applications).
+
+:::

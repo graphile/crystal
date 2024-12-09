@@ -17,30 +17,43 @@ network roundtrip, check out
 
 ## Getting the schema
 
-The first function you will need is `makeSchema` (or `watchSchema` if you want
-to get a new schema each time the database is updated) which creates your
-PostGraphile GraphQL schema by introspecting your database.
+First you will need a PostGraphile instance, typically called `pgl`. If you're
+already using PostGraphile somewhere, you can likely import it from there;
+but if not you can create it yourself:
 
-The `makeSchema` function accepts a [configuration preset](./config.mdx) and
-returns a promise to a SchemaResult, which is an object containing:
+```js title="pgl.js"
+import { postgraphile } from "postgraphile";
+import preset from "./graphile.config.js";
+
+export const pgl = postgraphile(preset);
+```
+
+You can then get the schema result from this instance; this is an object
+consisting of:
 
 - `schema` - the GraphQL schema
 - `resolvedPreset` - the resolved preset
+
+```js
+import { pgl } from "./pgl.js";
+
+const { schema, resolvedPreset } = await pgl.getSchemaResult();
+```
+
+You should call the above function whenever you need the schema, rather than
+caching the result - the reason is that in "watch" mode the schema (and preset)
+may change over time, so this is a safe way to get the latest schema.
+
+:::info
+
+If you want to get a schema with minimal overhead and are not concerned
+about supporting "watch" mode, you can instead call `makeSchema` directly:
 
 ```js
 import { makeSchema } from "postgraphile";
 import preset from "./graphile.config.js";
 
 const { schema, resolvedPreset } = await makeSchema(preset);
-```
-
-:::tip
-
-If you already have a PostGraphile instance (`pgl`), you can instead get the
-GraphQL schema and `resolvedPreset` via:
-
-```js
-const { schema, resolvedPreset } = await pgl.getSchemaResult();
 ```
 
 :::
@@ -51,7 +64,7 @@ Now that you have `schema` and `resolvedPreset`, you can execute a GraphQL
 query via:
 
 ```js
-import { grafast } from "grafast";
+import { grafast } from "postgraphile/grafast";
 
 const { data, errors } = await grafast({
   schema,
@@ -86,12 +99,50 @@ Different servers and situations may add alternative or additional information.
 
 :::
 
+### Full example
+
+Here's a full example:
+
+```ts
+import { postgraphile } from "postgraphile";
+import { grafast } from "postgraphile/grafast";
+import preset from "./graphile.config.js";
+
+// Make a new PostGraphile instance:
+const pgl = postgraphile(preset);
+// Or import a shared instance:
+//   import { pgl } from "./pgl.js"
+
+/**
+ * Given a request context `requestContext`, GraphQL query text `source` and
+ * optionally variable values and operation name, execute the given GraphQL
+ * operation against our schema and return the result.
+ */
+export async function executeQuery(
+  requestContext: Partial<Grafast.RequestContext>,
+  source: string,
+  variableValues?: Record<string, unknown> | null,
+  operationName?: string,
+) {
+  const { schema, resolvedPreset } = await pgl.getSchemaResult();
+  return await grafast({
+    schema,
+    source,
+    variableValues,
+    operationName,
+    resolvedPreset,
+    requestContext,
+  });
+}
+```
+
 ## Execution with `hookArgs()`
 
-If you do not (or can not) pass these parameters to `grafast()` then you will
-need to call `hookArgs()` yourself to build the GraphQL context that PostGraphile
-will need in order to communicate with the database. This also means that
-you're taking care of parsing and validating the GraphQL request yourself.
+If you do not (or can not) pass the `requestContext` and `resolvedPreset`
+parameters to `grafast()` then you will need to call `hookArgs()` yourself to
+build the GraphQL context that PostGraphile will need in order to communicate
+with the database. This also means that you're taking care of parsing and
+validating the GraphQL request yourself.
 
 :::tip
 
@@ -101,17 +152,19 @@ call `hookArgs()`.
 
 :::
 
-Here's a full example:
+### hookArgs example
+
+Here's an example using hookArgs:
 
 ```ts
-import { makeSchema } from "postgraphile";
+import { postgraphile } from "postgraphile";
 import { parse, validate } from "postgraphile/graphql";
-import { hookArgs, execute } from "postgraphile/grafast";
+import { execute, hookArgs } from "postgraphile/grafast";
 
 import preset from "./graphile.config.js";
 
-// Trigger schema building outside of `executeQuery` so we only do it once:
-const schemaResultPromise = makeSchema(preset);
+// Build a `pgl` instance, with helpers and schema based on our preset.
+const pgl = postgraphile(preset);
 
 /**
  * Given a request context `requestContext`, GraphQL query text `source` and
@@ -119,13 +172,13 @@ const schemaResultPromise = makeSchema(preset);
  * operation against our schema and return the result.
  */
 export async function executeQuery(
-  requestContext: Grafast.RequestContext,
+  requestContext: Partial<Grafast.RequestContext>,
   source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
 ) {
-  // Finish loading the schema:
-  const { schema, resolvedPreset } = await schemaResultPromise;
+  // We might get a newer schema in "watch" mode
+  const { schema, resolvedPreset } = await pgl.getSchemaResult();
 
   // Parse the GraphQL query text:
   const document = parse(source);
@@ -137,18 +190,16 @@ export async function executeQuery(
   }
 
   // Prepare the execution arguments:
-  const args = await hookArgs(
-    {
-      schema,
-      document,
-      variableValues,
-      operationName,
-    },
+  const args = await hookArgs({
+    schema,
+    document,
+    variableValues,
+    operationName,
     resolvedPreset,
     requestContext,
-  );
+  });
 
   // Execute the request using Grafast:
-  return await execute(args, resolvedPreset);
+  return await execute(args);
 }
 ```
