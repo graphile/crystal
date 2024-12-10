@@ -1180,9 +1180,6 @@ export class OperationPlan {
               mutationIndex: ++mutationIndex,
             })
           : outputPlan.layerPlan;
-        if (isMutation) {
-          this.resetCache();
-        }
         const objectFieldArgs = objectField.args;
         const trackedArguments =
           objectFieldArgs.length > 0
