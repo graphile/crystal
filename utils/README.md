@@ -14,16 +14,20 @@ _**Graphile\* - the stars we forge to build our universe**_
 A collection of useful utilities which work in tandem with the rest of the
 Graphile suite of open source developer tools.
 
-- **Graphile Config** - provides a standard plugin interface and helpers that
-  can be used across the entire of the Graphile suite.
-- **Graphile Export** - enables you to export a GraphQL Schema (or other code)
-  as executable JavaScript code.
-- **tamedevil** - Eval is evil, this module helps tame it!
-- **pg-sql2** - Create highly dynamic SQL in a powerful and flexible manner
-  without opening yourself to SQL injection attacks.
-- **pg introspection** - A strongly-typed PostgreSQL introspection library for
-  PostgreSQL built automatically from the PostgreSQL system catalog
-  documentation.
+- **[graphile-config](https://github.com/graphile/crystal/tree/main/utils/graphile-config)** -
+  provides a standard plugin interface and helpers that can be used across the
+  entire of the Graphile suite.
+- **[graphile-export(https://github.com/graphile/crystal/tree/main/utils/graphile-export)]** -
+  enables you to export a GraphQL Schema (or other code) as executable
+  JavaScript code.
+- **[tamedevil](https://github.com/graphile/crystal/tree/main/utils/tamedevil)** -
+  Eval is evil, this module helps tame it!
+- **[pg-sql2](https://github.com/graphile/crystal/tree/main/utils/pg-sql2)** -
+  Create highly dynamic SQL in a powerful and flexible manner without opening
+  yourself to SQL injection attacks.
+- **[pg introspection](https://github.com/graphile/crystal/tree/main/utils/pg-introspection)** -
+  A strongly-typed PostgreSQL introspection library for PostgreSQL built
+  automatically from the PostgreSQL system catalog documentation.
 
 <!-- SPONSORS_BEGIN -->
 
