@@ -40,6 +40,7 @@ export class StepTracker {
   } = [];
   /** @internal */
   public stepsWithNoDependenciesByConstructor = new Map<
+    // eslint-disable-next-line @typescript-eslint/ban-types
     Function,
     Set<ExecutableStep>
   >();
