@@ -23,6 +23,7 @@ export class ToPgStep extends UnbatchedExecutableStep<any> {
   ) {
     super();
     this.addDependency($value);
+    this.peerKey = codec.name;
   }
   deduplicate(peers: ToPgStep[]): ToPgStep[] {
     return peers.filter((peer) => peer.codec === this.codec);

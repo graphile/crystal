@@ -18,7 +18,7 @@ graph TD
     __Value2 --> Access16
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
-    Connection40{{"Connection[40∈0] ➊<br />ᐸ36ᐳ"}}:::plan
+    Connection38{{"Connection[38∈0] ➊<br />ᐸ36ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸtestviewᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
@@ -37,29 +37,29 @@ graph TD
     PgSelectSingle21 --> PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression27
-    PgSelect41[["PgSelect[41∈4] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object17 & Connection40 --> PgSelect41
-    __Item42[/"__Item[42∈5]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelect41 ==> __Item42
-    PgSelectSingle43{{"PgSelectSingle[43∈5]<br />ᐸtestviewᐳ"}}:::plan
-    __Item42 --> PgSelectSingle43
-    PgCursor44{{"PgCursor[44∈6]"}}:::plan
-    List46{{"List[46∈6]<br />ᐸ45ᐳ"}}:::plan
-    List46 --> PgCursor44
-    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression45
-    PgClassExpression45 --> List46
-    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression47
-    PgClassExpression49{{"PgClassExpression[49∈6]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression49
+    PgSelect39[["PgSelect[39∈4] ➊<br />ᐸtestviewᐳ"]]:::plan
+    Object17 & Connection38 --> PgSelect39
+    __Item40[/"__Item[40∈5]<br />ᐸ39ᐳ"\]:::itemplan
+    PgSelect39 ==> __Item40
+    PgSelectSingle41{{"PgSelectSingle[41∈5]<br />ᐸtestviewᐳ"}}:::plan
+    __Item40 --> PgSelectSingle41
+    PgCursor42{{"PgCursor[42∈6]"}}:::plan
+    List44{{"List[44∈6]<br />ᐸ43ᐳ"}}:::plan
+    List44 --> PgCursor42
+    PgClassExpression43{{"PgClassExpression[43∈6]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
+    PgSelectSingle41 --> PgClassExpression43
+    PgClassExpression43 --> List44
+    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgSelectSingle41 --> PgClassExpression45
+    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
+    PgSelectSingle41 --> PgClassExpression47
 
     %% define steps
 
     subgraph "Buckets for queries/v4/view"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection40 bucket0
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection38 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19 bucket1
@@ -69,15 +69,15 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸtestviewᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor22,PgClassExpression23,List24,PgClassExpression25,PgClassExpression26,PgClassExpression27 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 40<br /><br />ROOT Connectionᐸ36ᐳ[40]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 38<br /><br />ROOT Connectionᐸ36ᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect41 bucket4
-    Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ41ᐳ[42]"):::bucket
+    class Bucket4,PgSelect39 bucket4
+    Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ39ᐳ[40]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item42,PgSelectSingle43 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{5}ᐸtestviewᐳ[43]"):::bucket
+    class Bucket5,__Item40,PgSelectSingle41 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{5}ᐸtestviewᐳ[41]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgCursor44,PgClassExpression45,List46,PgClassExpression47,PgClassExpression49 bucket6
+    class Bucket6,PgCursor42,PgClassExpression43,List44,PgClassExpression45,PgClassExpression47 bucket6
     Bucket0 --> Bucket1 & Bucket4
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

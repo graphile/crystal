@@ -52,5 +52,10 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
 export function first<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): FirstStep<TData> {
-  return new FirstStep(plan);
+  return plan.operationPlan.cacheStep(
+    plan,
+    "GrafastInternal:first()",
+    "",
+    () => new FirstStep(plan),
+  );
 }

@@ -95,7 +95,10 @@ import type {
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
-import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
+import {
+  currentLayerPlan,
+  withGlobalLayerPlan,
+} from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
@@ -369,6 +372,7 @@ export class OperationPlan {
 
     if (isDev) {
       this.phase = "validate";
+      this.resetCache();
       // Helpfully check steps don't do forbidden things.
       this.validateSteps();
 
@@ -376,6 +380,7 @@ export class OperationPlan {
     }
 
     this.phase = "optimize";
+    this.resetCache();
 
     // Get rid of temporary steps before `optimize` triggers side-effects.
     // (Critical due to steps that may have been discarded due to field errors
@@ -398,6 +403,7 @@ export class OperationPlan {
     this.lap("inlineSteps");
 
     this.phase = "finalize";
+    this.resetCache();
 
     this.stepTracker.finalizeSteps();
 
@@ -451,6 +457,7 @@ export class OperationPlan {
     this.lap("finalizeOutputPlans");
 
     this.phase = "ready";
+    this.resetCache();
 
     // this.walkFinalizedPlans();
     // this.preparePrefetches();
@@ -2310,17 +2317,22 @@ export class OperationPlan {
       dependencyOnReject: onReject,
       layerPlan: layerPlan,
       constructor: stepConstructor,
+      peerKey,
     } = sudo(step);
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
       let allPeers: ExecutableStep[] | null = null;
-      for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
+      const stepsWithNoDependencies =
+        this.stepTracker.stepsWithNoDependenciesByConstructor.get(
+          step.constructor,
+        ) ?? new Set();
+      for (const possiblyPeer of stepsWithNoDependencies) {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.constructor === stepConstructor
+          possiblyPeer.peerKey === peerKey
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2350,6 +2362,15 @@ export class OperationPlan {
         dependencyIndex: peerDependencyIndex,
         step: rawPossiblyPeer,
       } of dep.dependents) {
+        if (
+          peerDependencyIndex !== 0 ||
+          rawPossiblyPeer === step ||
+          rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer.constructor !== stepConstructor ||
+          rawPossiblyPeer.peerKey !== peerKey
+        ) {
+          continue;
+        }
         const possiblyPeer = sudo(rawPossiblyPeer);
         const {
           layerPlan: peerLayerPlan,
@@ -2357,12 +2378,8 @@ export class OperationPlan {
           dependencyOnReject: peerOnReject,
         } = possiblyPeer;
         if (
-          possiblyPeer !== step &&
-          peerDependencyIndex === 0 &&
-          !possiblyPeer.hasSideEffects &&
-          possiblyPeer.constructor === stepConstructor &&
           peerLayerPlan.depth >= minDepth &&
-          sudo(possiblyPeer).dependencies.length === dependencyCount &&
+          possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
           peerFlags[0] === flags[0] &&
           peerOnReject[0] === onReject[0]
@@ -2388,10 +2405,11 @@ export class OperationPlan {
        */
       let minDepth = deferBoundaryDepth;
       const possiblePeers: ExecutableStep[] = [];
+      // Loop backwards since last dependency is most likely to be most unique
       for (
-        let dependencyIndex = 0;
-        dependencyIndex < dependencyCount;
-        dependencyIndex++
+        let dependencyIndex = dependencyCount - 1;
+        dependencyIndex >= 0;
+        dependencyIndex--
       ) {
         const dep = deps[dependencyIndex];
         const dl = dep.dependents.length;
@@ -2408,6 +2426,15 @@ export class OperationPlan {
             dependencyIndex: peerDependencyIndex,
             step: rawPossiblyPeer,
           } of dep.dependents) {
+            if (
+              peerDependencyIndex !== dependencyIndex ||
+              rawPossiblyPeer === step ||
+              rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer.constructor !== stepConstructor ||
+              rawPossiblyPeer.peerKey !== peerKey
+            ) {
+              continue;
+            }
             const possiblyPeer = sudo(rawPossiblyPeer);
             const {
               layerPlan: peerLayerPlan,
@@ -2416,10 +2443,6 @@ export class OperationPlan {
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
-              possiblyPeer !== step &&
-              peerDependencyIndex === dependencyIndex &&
-              !possiblyPeer.hasSideEffects &&
-              possiblyPeer.constructor === stepConstructor &&
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[0] === flags[0] &&
@@ -3708,6 +3731,58 @@ export class OperationPlan {
       }
     }
     return matches;
+  }
+
+  private _cacheStepStoreByLayerPlanAndActionKey: Record<
+    string,
+    Record<symbol | string | number, any> | undefined
+  > = Object.create(null);
+  /**
+   * Cache a generated step by a given identifier (cacheKey) such that we don't
+   * need to regenerate it on future calls, significantly reducing the load on
+   * deduplication later.
+   *
+   * @experimental
+   */
+  cacheStep<T extends ExecutableStep>(
+    ownerStep: ExecutableStep,
+    actionKey: string,
+    cacheKey: symbol | string | number,
+    cb: () => T,
+  ): T {
+    const layerPlan = currentLayerPlan();
+    const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
+    ] ??= Object.create(null));
+
+    const cacheIt = () => {
+      const stepToCache = cb();
+      if (!(stepToCache instanceof ExecutableStep)) {
+        throw new Error(
+          `The callback passed to cacheStep must always return an ExecutableStep; but this call from ${ownerStep} returned instead ${inspect(
+            stepToCache,
+          )}`,
+        );
+      }
+      cache[cacheKey] = stepToCache.id;
+      return stepToCache;
+    };
+
+    if (!(cacheKey in cache)) {
+      return cacheIt();
+    }
+
+    const cachedStepId = cache[cacheKey];
+    const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
+    return cachedStep ?? cacheIt();
+  }
+
+  /**
+   * Clears the cache, typically due to side effects having taken place. Called
+   * from setting hasSideEffects on an ExecutableStep, among other places.
+   */
+  public resetCache() {
+    this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
   }
 }
 
