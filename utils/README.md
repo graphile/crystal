@@ -11,8 +11,8 @@ _**Graphile\* - the stars we forge to build our universe**_
 
 ## About
 
-A collection of useful utilities we built whilst working on the Graphile suite of
-open source developer tools, that may well be useful for your projects too.
+A collection of useful utilities we built whilst working on the Graphile suite
+of open source developer tools, that may well be useful for your projects too.
 
 - **[graphile-config](https://github.com/graphile/crystal/tree/main/utils/graphile-config)** -
   provides a standard plugin interface and helpers that can be used across the
