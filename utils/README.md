@@ -17,7 +17,7 @@ Graphile suite of open source developer tools.
 - **[graphile-config](https://github.com/graphile/crystal/tree/main/utils/graphile-config)** -
   provides a standard plugin interface and helpers that can be used across the
   entire of the Graphile suite.
-- **[graphile-export(https://github.com/graphile/crystal/tree/main/utils/graphile-export)]** -
+- **[graphile-export](https://github.com/graphile/crystal/tree/main/utils/graphile-export)** -
   enables you to export a GraphQL Schema (or other code) as executable
   JavaScript code.
 - **[tamedevil](https://github.com/graphile/crystal/tree/main/utils/tamedevil)** -
