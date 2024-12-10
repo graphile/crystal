@@ -1143,7 +1143,8 @@ export function isTuple<T extends readonly [...(readonly any[])]>(
  */
 export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
   let str = "";
-  for (const item of keys) {
+  for (let i = 0, l = keys.length; i < l; i++) {
+    const item = keys[i];
     if (typeof item === "string") {
       // str += `|§${item.replace(/§/g, "§§")}§`;
       str += `§${item.length}:${item}`;
