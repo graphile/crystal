@@ -1,8 +1,9 @@
 # Graphile\*
 
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=#EA4AAA&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Follow](https://img.shields.io/badge/twitter-@GrafastHQ-blueviolet.svg)](https://twitter.com/GrafastHQ)
+[![Mastodon Follow](https://img.shields.io/mastodon/follow/109982006777922021?domain=https%3A%2F%2Ffosstodon.org&style=flat&label=mastodon&color=%236364FF)](https://fosstodon.org/@graphile)
+[![Static Badge](https://img.shields.io/badge/bsky-graphile.org-blue?style=flat&color=%230285FF)(https://bsky.app/profile/graphile.org)]
 
 _**Graphile\* - the stars we forge to build our universe**_
 
