@@ -244,7 +244,10 @@ export function access<TData>(
     : rawPath != null
     ? [rawPath]
     : [];
-  if (typeof fallback === "undefined") {
+  if (
+    typeof fallback === "undefined" &&
+    !path.some((k) => typeof k === "symbol")
+  ) {
     const pathKey = JSON.stringify(path);
     return parentPlan.operationPlan.cacheStep(
       parentPlan,
