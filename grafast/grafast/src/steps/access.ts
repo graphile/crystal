@@ -236,27 +236,22 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
  */
 export function access<TData>(
   parentPlan: ExecutableStep<unknown>,
-  path?: (string | number | symbol)[] | string | number | symbol,
+  rawPath?: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {
+  const path = Array.isArray(rawPath)
+    ? rawPath
+    : rawPath != null
+    ? [rawPath]
+    : [];
   if (typeof fallback === "undefined") {
-    const pathKey = Array.isArray(path)
-      ? path.length === 1
-        ? path[0]
-        : null
-      : path;
-    if (typeof pathKey === "string" || typeof pathKey === "number") {
-      return parentPlan.operationPlan.cacheStep(
-        parentPlan,
-        "GrafastInternal:access()",
-        pathKey,
-        () => new AccessStep<TData>(parentPlan, [pathKey]),
-      );
-    }
+    const pathKey = JSON.stringify(path);
+    return parentPlan.operationPlan.cacheStep(
+      parentPlan,
+      "GrafastInternal:access()",
+      pathKey,
+      () => new AccessStep<TData>(parentPlan, path),
+    );
   }
-  return new AccessStep<TData>(
-    parentPlan,
-    Array.isArray(path) ? path : path != null ? [path] : [],
-    fallback,
-  );
+  return new AccessStep<TData>(parentPlan, path, fallback);
 }
