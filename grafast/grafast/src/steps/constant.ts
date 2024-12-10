@@ -18,6 +18,15 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     public readonly isSensitive = typeof data !== "boolean" && data != null,
   ) {
     super();
+    const t = typeof data;
+    if (
+      data == null ||
+      t === "boolean" ||
+      t === "number" ||
+      (t === "string" && t.length < 200)
+    ) {
+      this.peerKey = t + "|" + String(data);
+    }
   }
   toStringMeta() {
     // ENHANCE: use nicer simplification

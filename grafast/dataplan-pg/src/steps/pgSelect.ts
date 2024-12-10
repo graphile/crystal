@@ -660,6 +660,8 @@ export class PgSelectStep<
       }
     });
 
+    this.peerKey = this.resource.name;
+
     debugPlanVerbose(
       `%s (%s) constructor (%s; %s)`,
       this,

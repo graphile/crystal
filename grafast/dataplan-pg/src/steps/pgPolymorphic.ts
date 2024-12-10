@@ -27,7 +27,7 @@ export interface PgPolymorphicTypeMap<
   TTypeSpecifierStep extends
     ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 > {
-  [typeName: string]: {
+  readonly [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
     plan($specifier: TTypeSpecifierStep, $item: TItemStep): ExecutableStep;
   };
@@ -56,12 +56,12 @@ export class PgPolymorphicStep<
 
   private typeSpecifierStepId: number;
   private itemStepId: number;
-  private types: string[];
+  private readonly types: readonly string[];
 
   constructor(
     $item: TItemStep,
     $typeSpecifier: TTypeSpecifierStep,
-    private possibleTypes: PgPolymorphicTypeMap<
+    private readonly possibleTypes: PgPolymorphicTypeMap<
       TItemStep,
       TTypeSpecifier,
       TTypeSpecifierStep
@@ -71,6 +71,7 @@ export class PgPolymorphicStep<
     this.itemStepId = this.addDependency($item);
     this.typeSpecifierStepId = this.addDependency($typeSpecifier);
     this.types = Object.keys(possibleTypes);
+    this.peerKey = JSON.stringify(this.types);
   }
 
   deduplicate(

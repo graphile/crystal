@@ -108,6 +108,7 @@ export class PgSelectSingleStep<
     this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
+    this.peerKey = this.resource.name;
   }
 
   public coalesceToEmptyObject(): void {

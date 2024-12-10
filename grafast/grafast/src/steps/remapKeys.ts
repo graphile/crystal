@@ -66,19 +66,22 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   allowMultipleOptimizations = true;
 
   private mapper!: (obj: object | null) => object | null;
+  private readonly actualKeyByDesiredKeyString: string;
   constructor(
     $plan: ExecutableStep,
-    private actualKeyByDesiredKey: ActualKeyByDesiredKey,
+    private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
     this.addDependency($plan);
+    this.actualKeyByDesiredKeyString = JSON.stringify(actualKeyByDesiredKey);
+    this.peerKey = this.actualKeyByDesiredKeyString;
   }
 
   toStringMeta(): string {
     return (
       chalk.bold.yellow(String(this.dependencies[0].id)) +
       ":" +
-      JSON.stringify(this.actualKeyByDesiredKey)
+      this.actualKeyByDesiredKeyString
     );
   }
 
@@ -113,10 +116,8 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   }
 
   deduplicate(peers: RemapKeysStep[]): RemapKeysStep[] {
-    const myMap = JSON.stringify(this.actualKeyByDesiredKey);
-    return peers.filter(
-      (p) => JSON.stringify(p.actualKeyByDesiredKey) === myMap,
-    );
+    const myMapString = this.actualKeyByDesiredKeyString;
+    return peers.filter((p) => p.actualKeyByDesiredKeyString === myMapString);
   }
 }
 
