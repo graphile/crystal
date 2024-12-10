@@ -372,6 +372,7 @@ export class OperationPlan {
 
     if (isDev) {
       this.phase = "validate";
+      this.resetCache();
       // Helpfully check steps don't do forbidden things.
       this.validateSteps();
 
@@ -379,6 +380,7 @@ export class OperationPlan {
     }
 
     this.phase = "optimize";
+    this.resetCache();
 
     // Get rid of temporary steps before `optimize` triggers side-effects.
     // (Critical due to steps that may have been discarded due to field errors
@@ -401,6 +403,7 @@ export class OperationPlan {
     this.lap("inlineSteps");
 
     this.phase = "finalize";
+    this.resetCache();
 
     this.stepTracker.finalizeSteps();
 
@@ -454,6 +457,7 @@ export class OperationPlan {
     this.lap("finalizeOutputPlans");
 
     this.phase = "ready";
+    this.resetCache();
 
     // this.walkFinalizedPlans();
     // this.preparePrefetches();
