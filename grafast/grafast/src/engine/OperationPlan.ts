@@ -3736,9 +3736,9 @@ export class OperationPlan {
     return matches;
   }
 
-  private _cacheStepStoreByLayerPlan: Record<
-    number,
-    Record<number, Record<symbol | string | number, any> | undefined>
+  private _cacheStepStoreByLayerPlanAndActionKey: Record<
+    string,
+    Record<symbol | string | number, any> | undefined
   > = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
@@ -3749,13 +3749,14 @@ export class OperationPlan {
    */
   cacheStep<T extends ExecutableStep>(
     ownerStep: ExecutableStep,
+    actionKey: string,
     cacheKey: symbol | string | number,
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
-    const cacheStepStore = (this._cacheStepStoreByLayerPlan[layerPlan.id] ??=
-      Object.create(null));
-    const cache = (cacheStepStore[ownerStep.id] ??= Object.create(null));
+    const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
+    ] ??= Object.create(null));
 
     const cacheIt = () => {
       const stepToCache = cb();
@@ -3784,7 +3785,7 @@ export class OperationPlan {
    * from setting hasSideEffects on an ExecutableStep, among other places.
    */
   public resetCache() {
-    this._cacheStepStoreByLayerPlan = Object.create(null);
+    this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
   }
 }
 

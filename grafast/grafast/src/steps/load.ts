@@ -122,7 +122,7 @@ export class LoadedRecordStep<
     return this.sourceDescription ?? null;
   }
   get(attr: keyof TItem & (string | number)) {
-    return this.cacheStep(attr, () => this._getInner(attr));
+    return this.cacheStep("get", attr, () => this._getInner(attr));
   }
   private _getInner(attr: keyof TItem & (string | number)) {
     // Allow auto-collapsing of the waterfall by knowing keys are equivalent

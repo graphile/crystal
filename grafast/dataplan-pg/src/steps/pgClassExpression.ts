@@ -167,7 +167,7 @@ export class PgClassExpressionStep<
     GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
     TResource
   > {
-    return this.cacheStep(attributeName, () =>
+    return this.cacheStep("get", attributeName, () =>
       this._getInternal(attributeName),
     );
   }

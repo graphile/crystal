@@ -429,10 +429,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * @experimental
    */
   protected cacheStep<T extends ExecutableStep>(
+    actionKey: string,
     cacheKey: symbol | string | number,
     cb: () => T,
   ): T {
-    return this.operationPlan.cacheStep(this, cacheKey, cb);
+    return this.operationPlan.cacheStep(this, actionKey, cacheKey, cb);
   }
 
   public toString(): string {

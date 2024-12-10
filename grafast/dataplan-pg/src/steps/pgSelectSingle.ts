@@ -169,7 +169,7 @@ export class PgSelectSingleStep<
       : never,
     TResource
   > {
-    return this.cacheStep(attr, () => this.getInternal(attr));
+    return this.cacheStep("get", attr, () => this.getInternal(attr));
   }
 
   private getInternal<TAttr extends keyof GetPgResourceAttributes<TResource>>(

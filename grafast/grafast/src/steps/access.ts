@@ -173,6 +173,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
     return this.cacheStep(
+      "get",
       attrName,
       () => new AccessStep(this.getDep(0), [...this.path, attrName]),
     );
@@ -186,6 +187,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
     return this.cacheStep(
+      "at",
       index,
       () => new AccessStep(this.getDep(0), [...this.path, index]),
     );
@@ -254,6 +256,7 @@ export function access<TData>(
     if (typeof pathKey === "string" || typeof pathKey === "number") {
       return parentPlan.operationPlan.cacheStep(
         parentPlan,
+        "GrafastInternal:access()",
         pathKey,
         () => new AccessStep<TData>(parentPlan, [pathKey]),
       );
