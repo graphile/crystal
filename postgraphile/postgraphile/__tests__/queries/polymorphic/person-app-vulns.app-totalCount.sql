@@ -6,7 +6,7 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
@@ -45,7 +45,7 @@ lateral (
               __gcp_applications__."id" asc
           ) as "n"
         from "polymorphic"."gcp_applications" as __gcp_applications__
-        where __gcp_applications__."person_id" = __union_identifiers__."id1"
+        where __gcp_applications__."person_id" = __union_identifiers__."id0"
         order by
           __gcp_applications__."id" asc
       ) as __gcp_applications__

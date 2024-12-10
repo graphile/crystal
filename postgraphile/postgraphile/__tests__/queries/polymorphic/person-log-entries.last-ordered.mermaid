@@ -10,8 +10,8 @@ graph TD
 
     %% plan dependencies
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant39 --> Connection18
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Constant38 --> Connection18
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Object17{{"Object[17∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -28,12 +28,12 @@ graph TD
     __Item20 --> PgSelectSingle21
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression27
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression37
-    Access38{{"Access[38∈3]<br />ᐸ20.0ᐳ"}}:::plan
-    __Item20 --> Access38
-    __Item32[/"__Item[32∈4]<br />ᐸ38ᐳ"\]:::itemplan
-    Access38 ==> __Item32
+    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression36
+    Access37{{"Access[37∈3]<br />ᐸ20.0ᐳ"}}:::plan
+    __Item20 --> Access37
+    __Item32[/"__Item[32∈4]<br />ᐸ37ᐳ"\]:::itemplan
+    Access37 ==> __Item32
     PgSelectSingle33{{"PgSelectSingle[33∈4]<br />ᐸlog_entriesᐳ"}}:::plan
     __Item32 --> PgSelectSingle33
     PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
@@ -46,7 +46,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries.last-ordered"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection18,Constant39 bucket0
+    class Bucket0,__Value2,__Value4,Connection18,Constant38 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]<br />1: <br />ᐳ: Access[15], Access[16], Object[17]<br />2: PgSelect[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access15,Access16,Object17,PgSelect19 bucket1
@@ -55,8 +55,8 @@ graph TD
     class Bucket2,__Item20,PgSelectSingle21 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression27,PgClassExpression37,Access38 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ38ᐳ[32]"):::bucket
+    class Bucket3,PgClassExpression27,PgClassExpression36,Access37 bucket3
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ37ᐳ[32]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item32,PgSelectSingle33,PgClassExpression34,PgClassExpression35 bucket4
     Bucket0 --> Bucket1
