@@ -337,6 +337,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
           hasSideEffects = value;
           if (value === true) {
             this.layerPlan.latestSideEffectStep = this;
+            this.operationPlan.resetCache();
           } else if (value !== true && hasSideEffects === true) {
             throw new Error(
               `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
@@ -405,6 +406,20 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       $dep = $dep[$$deepDepSkip]();
     }
     return $dep;
+  }
+
+  /**
+   * Cache a generated step by a given identifier (cacheKey) such that we don't
+   * need to regenerate it on future calls, significantly reducing the load on
+   * deduplication later.
+   *
+   * @experimental
+   */
+  protected cacheStep<T extends ExecutableStep>(
+    cacheKey: symbol | string | number,
+    cb: () => T,
+  ): T {
+    return this.operationPlan.cacheStep(this, cacheKey, cb);
   }
 
   public toString(): string {

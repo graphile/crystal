@@ -1173,6 +1173,9 @@ export class OperationPlan {
               mutationIndex: ++mutationIndex,
             })
           : outputPlan.layerPlan;
+        if (isMutation) {
+          this.resetCache();
+        }
         const objectFieldArgs = objectField.args;
         const trackedArguments =
           objectFieldArgs.length > 0
@@ -3708,6 +3711,54 @@ export class OperationPlan {
       }
     }
     return matches;
+  }
+
+  _cacheStepStore: Record<
+    number,
+    Record<symbol | string | number, any> | undefined
+  > = Object.create(null);
+  /**
+   * Cache a generated step by a given identifier (cacheKey) such that we don't
+   * need to regenerate it on future calls, significantly reducing the load on
+   * deduplication later.
+   *
+   * @experimental
+   */
+  cacheStep<T extends ExecutableStep>(
+    ownerStep: ExecutableStep,
+    cacheKey: symbol | string | number,
+    cb: () => T,
+  ): T {
+    const cache = (this._cacheStepStore[ownerStep.id] ??= Object.create(null));
+
+    const cacheIt = () => {
+      const stepToCache = cb();
+      if (!(stepToCache instanceof ExecutableStep)) {
+        throw new Error(
+          `The callback passed to cacheStep must always return an ExecutableStep; but this call from ${ownerStep} returned instead ${inspect(
+            stepToCache,
+          )}`,
+        );
+      }
+      cache[cacheKey] = stepToCache.id;
+      return stepToCache;
+    };
+
+    if (!(cacheKey in cache)) {
+      return cacheIt();
+    }
+
+    const cachedStepId = cache[cacheKey];
+    const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
+    return cachedStep ?? cacheIt();
+  }
+
+  /**
+   * Clears the cache, typically due to side effects having taken place. Called
+   * from setting hasSideEffects on an ExecutableStep, among other places.
+   */
+  public resetCache() {
+    this._cacheStepStore = Object.create(null);
   }
 }
 

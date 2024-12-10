@@ -171,7 +171,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof attrName !== "string") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getDep(0), [...this.path, attrName]);
+    return this.cacheStep(
+      attrName,
+      () => new AccessStep(this.getDep(0), [...this.path, attrName]),
+    );
   }
 
   /**
@@ -181,7 +184,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof index !== "number") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getDep(0), [...this.path, index]);
+    return this.cacheStep(
+      index,
+      () => new AccessStep(this.getDep(0), [...this.path, index]),
+    );
   }
 
   // An access of an access can become a single access
