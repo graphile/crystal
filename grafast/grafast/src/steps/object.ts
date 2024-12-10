@@ -64,7 +64,6 @@ export class ObjectStep<
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
   private readonly keys: ReadonlyArray<keyof TPlans & string> = [];
-  private readonly keysString: string = "[]";
 
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
@@ -88,13 +87,12 @@ export class ObjectStep<
 
   private _setKeys(keys: ReadonlyArray<keyof TPlans & string>) {
     (this.keys as readonly string[]) = keys;
-    (this.keysString as string) = digestKeys(keys);
-    this.peerKey = this.keysString;
+    this.peerKey = digestKeys(keys);
     this.metaKey =
       this.cacheSize <= 0
         ? undefined
         : this.cacheConfig?.identifier
-        ? `object|${this.keysString}|${this.cacheConfig.identifier}`
+        ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
         : this.id;
   }
 
