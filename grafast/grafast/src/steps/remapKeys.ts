@@ -73,10 +73,10 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   ) {
     super();
     this.addDependency($plan);
-    this.peerKey = `${digestKeys([
+    this.peerKey = digestKeys([
       ...Object.keys(this.actualKeyByDesiredKey),
       ...Object.values(this.actualKeyByDesiredKey),
-    ])}`;
+    ]);
   }
 
   toStringMeta(): string {
