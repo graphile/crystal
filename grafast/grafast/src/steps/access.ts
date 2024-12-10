@@ -145,6 +145,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
 
   allowMultipleOptimizations = true;
   public readonly path: (string | number | symbol)[];
+  private readonly pathJSONString: string;
 
   constructor(
     parentPlan: ExecutableStep<unknown>,
@@ -153,6 +154,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.path = path;
+    this.pathJSONString = JSON.stringify(this.path);
     this.addDependency(parentPlan);
   }
 
@@ -211,9 +213,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {
-    const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
-      (p) => p.fallback === this.fallback && JSON.stringify(p.path) === myPath,
+      (p) =>
+        p.fallback === this.fallback &&
+        p.pathJSONString === this.pathJSONString,
     );
     debugAccessPlanVerbose(
       "%c deduplicate: peers with same path %o = %c",
