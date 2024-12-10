@@ -245,6 +245,20 @@ export function access<TData>(
   path?: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {
+  if (typeof fallback === "undefined") {
+    const pathKey = Array.isArray(path)
+      ? path.length === 1
+        ? path[0]
+        : null
+      : path;
+    if (typeof pathKey === "string" || typeof pathKey === "number") {
+      return parentPlan.operationPlan.cacheStep(
+        parentPlan,
+        pathKey,
+        () => new AccessStep<TData>(parentPlan, [pathKey]),
+      );
+    }
+  }
   return new AccessStep<TData>(
     parentPlan,
     Array.isArray(path) ? path : path != null ? [path] : [],
