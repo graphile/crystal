@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import debugFactory from "debug";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
@@ -7,6 +6,7 @@ import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { arraysMatch } from "../utils.js";
 
 /** @internal */
 export const expressionSymbol = Symbol("expression");
@@ -125,9 +125,6 @@ return (_meta, value) => value?.${te.join(access, "?.")}${
   }
 }
 
-const debugAccessPlan = debugFactory("grafast:AccessStep");
-const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
-
 /**
  * Accesses a (potentially nested) property from the result of a plan.
  *
@@ -145,7 +142,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
 
   allowMultipleOptimizations = true;
   public readonly path: (string | number | symbol)[];
-  private readonly pathJSONString: string;
+  private readonly hasSymbols: boolean;
 
   constructor(
     parentPlan: ExecutableStep<unknown>,
@@ -154,8 +151,11 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.path = path;
-    this.pathJSONString = JSON.stringify(this.path);
-    this.peerKey = this.pathJSONString;
+    this.hasSymbols = this.path.some((k) => typeof k === "symbol");
+    this.peerKey =
+      (this.fallback === "undefined" ? "U" : "D") +
+      (this.hasSymbols ? "§" : ".") +
+      JSON.stringify(this.path);
     this.addDependency(parentPlan);
   }
 
@@ -214,19 +214,24 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {
-    if (peers.length === 0) return peers as never[];
-    const peersWithSamePath = peers.filter(
-      (p) =>
-        p.fallback === this.fallback &&
-        p.pathJSONString === this.pathJSONString,
-    );
-    debugAccessPlanVerbose(
-      "%c deduplicate: peers with same path %o = %c",
-      this,
-      this.path,
-      peersWithSamePath,
-    );
-    return peersWithSamePath as AccessStep<TData>[];
+    if (peers.length === 0) {
+      return peers as never[];
+    } else if (!this.hasSymbols && this.fallback === undefined) {
+      // Rely entirely on peerKey
+      return peers as AccessStep<TData>[];
+    } else if (!this.hasSymbols) {
+      // Rely on peerKey for path, but check fallback
+      const { fallback } = this;
+      return peers.filter(
+        (p) => p.fallback === fallback,
+      ) as AccessStep<TData>[];
+    } else {
+      // Check both fallback and path
+      const { fallback, path } = this;
+      return peers.filter(
+        (p) => p.fallback === fallback && arraysMatch(p.path, path),
+      ) as AccessStep<TData>[];
+    }
   }
 }
 
