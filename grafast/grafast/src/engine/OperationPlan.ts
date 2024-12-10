@@ -2358,6 +2358,15 @@ export class OperationPlan {
         dependencyIndex: peerDependencyIndex,
         step: rawPossiblyPeer,
       } of dep.dependents) {
+        if (
+          peerDependencyIndex !== 0 ||
+          rawPossiblyPeer === step ||
+          rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer.constructor !== stepConstructor ||
+          rawPossiblyPeer.peerKey !== peerKey
+        ) {
+          continue;
+        }
         const possiblyPeer = sudo(rawPossiblyPeer);
         const {
           layerPlan: peerLayerPlan,
@@ -2365,13 +2374,8 @@ export class OperationPlan {
           dependencyOnReject: peerOnReject,
         } = possiblyPeer;
         if (
-          possiblyPeer !== step &&
-          peerDependencyIndex === 0 &&
-          !possiblyPeer.hasSideEffects &&
-          possiblyPeer.constructor === stepConstructor &&
-          possiblyPeer.peerKey === peerKey &&
           peerLayerPlan.depth >= minDepth &&
-          sudo(possiblyPeer).dependencies.length === dependencyCount &&
+          possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
           peerFlags[0] === flags[0] &&
           peerOnReject[0] === onReject[0]
@@ -2418,6 +2422,15 @@ export class OperationPlan {
             dependencyIndex: peerDependencyIndex,
             step: rawPossiblyPeer,
           } of dep.dependents) {
+            if (
+              peerDependencyIndex !== dependencyIndex ||
+              rawPossiblyPeer === step ||
+              rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer.constructor !== stepConstructor ||
+              rawPossiblyPeer.peerKey !== peerKey
+            ) {
+              continue;
+            }
             const possiblyPeer = sudo(rawPossiblyPeer);
             const {
               layerPlan: peerLayerPlan,
@@ -2426,11 +2439,6 @@ export class OperationPlan {
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
-              possiblyPeer !== step &&
-              peerDependencyIndex === dependencyIndex &&
-              !possiblyPeer.hasSideEffects &&
-              possiblyPeer.constructor === stepConstructor &&
-              possiblyPeer.peerKey === peerKey &&
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[0] === flags[0] &&
