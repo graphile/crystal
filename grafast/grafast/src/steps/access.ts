@@ -155,6 +155,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     super();
     this.path = path;
     this.pathJSONString = JSON.stringify(this.path);
+    this.peerKey = this.pathJSONString;
     this.addDependency(parentPlan);
   }
 

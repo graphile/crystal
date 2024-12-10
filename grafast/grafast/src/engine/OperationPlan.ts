@@ -2313,6 +2313,7 @@ export class OperationPlan {
       dependencyOnReject: onReject,
       layerPlan: layerPlan,
       constructor: stepConstructor,
+      peerKey,
     } = sudo(step);
     const dependencyCount = deps.length;
 
@@ -2326,7 +2327,8 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan === layerPlan
+          possiblyPeer.layerPlan === layerPlan &&
+          possiblyPeer.peerKey === peerKey
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2367,6 +2369,7 @@ export class OperationPlan {
           peerDependencyIndex === 0 &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.constructor === stepConstructor &&
+          possiblyPeer.peerKey === peerKey &&
           peerLayerPlan.depth >= minDepth &&
           sudo(possiblyPeer).dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
@@ -2427,6 +2430,7 @@ export class OperationPlan {
               peerDependencyIndex === dependencyIndex &&
               !possiblyPeer.hasSideEffects &&
               possiblyPeer.constructor === stepConstructor &&
+              possiblyPeer.peerKey === peerKey &&
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[0] === flags[0] &&

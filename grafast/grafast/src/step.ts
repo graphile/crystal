@@ -295,6 +295,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public optimizeMetaKey: number | string | symbol | undefined;
 
   /**
+   * If the peerKey of two steps do not match, then they are definitely not
+   * peers. Use this to reduce the load on deduplicate by more quickly
+   * eradicating definitely-not-peers.
+   *
+   * Note: we may well change this to be a function in future, so it's advised
+   * that you don't use this unless you're working inside the graphile/crystal
+   * core codebase.
+   *
+   * @experimental
+   */
+  public peerKey: string | null = null;
+
+  /**
    * Set this true for plans that implement mutations; this will prevent them
    * from being tree-shaken.
    */
