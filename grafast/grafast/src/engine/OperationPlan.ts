@@ -2391,10 +2391,11 @@ export class OperationPlan {
        */
       let minDepth = deferBoundaryDepth;
       const possiblePeers: ExecutableStep[] = [];
+      // Loop backwards since last dependency is most likely to be most unique
       for (
-        let dependencyIndex = 0;
-        dependencyIndex < dependencyCount;
-        dependencyIndex++
+        let dependencyIndex = dependencyCount - 1;
+        dependencyIndex >= 0;
+        dependencyIndex--
       ) {
         const dep = deps[dependencyIndex];
         const dl = dep.dependents.length;
