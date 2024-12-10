@@ -25,8 +25,8 @@ graph TD
     __Item14 --> PgSelectSingle15
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression16
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    PgSelectSingle15 --> PgClassExpression26
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
+    PgSelectSingle15 --> PgClassExpression24
 
     %% define steps
 
@@ -42,7 +42,7 @@ graph TD
     class Bucket2,PgClassExpression16 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression26 bucket3
+    class Bucket3,PgClassExpression24 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
     end
