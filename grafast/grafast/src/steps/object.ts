@@ -11,6 +11,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
 import type { SetterCapableStep } from "./setter.js";
 
@@ -69,28 +70,30 @@ export class ObjectStep<
   optimizeMetaKey = "ObjectStep";
   private cacheSize: number;
 
-  constructor(obj: TPlans, cacheConfig?: ObjectStepCacheConfig) {
+  constructor(
+    obj: TPlans,
+    private cacheConfig?: ObjectStepCacheConfig,
+  ) {
     super();
     this.cacheSize =
       cacheConfig?.cacheSize ??
       (cacheConfig?.identifier ? DEFAULT_CACHE_SIZE : 0);
-    this.metaKey =
-      this.cacheSize <= 0
-        ? undefined
-        : cacheConfig?.identifier
-        ? `object|${this.keysString}|${cacheConfig.identifier}`
-        : this.id;
-
-    this._setKeys(Object.keys(obj));
     for (let i = 0, l = this.keys.length; i < l; i++) {
       this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
     }
+    this._setKeys(Object.keys(obj));
   }
 
   private _setKeys(keys: ReadonlyArray<keyof TPlans & string>) {
     (this.keys as readonly string[]) = keys;
-    (this.keysString as string) = JSON.stringify(keys);
+    (this.keysString as string) = digestKeys(keys);
     this.peerKey = this.keysString;
+    this.metaKey =
+      this.cacheSize <= 0
+        ? undefined
+        : this.cacheConfig?.identifier
+        ? `object|${this.keysString}|${this.cacheConfig.identifier}`
+        : this.id;
   }
 
   /**

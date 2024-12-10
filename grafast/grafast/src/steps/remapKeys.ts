@@ -9,6 +9,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { digestKeys } from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -66,22 +67,23 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   allowMultipleOptimizations = true;
 
   private mapper!: (obj: object | null) => object | null;
-  private readonly actualKeyByDesiredKeyString: string;
   constructor(
     $plan: ExecutableStep,
     private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
     this.addDependency($plan);
-    this.actualKeyByDesiredKeyString = JSON.stringify(actualKeyByDesiredKey);
-    this.peerKey = this.actualKeyByDesiredKeyString;
+    this.peerKey = `${digestKeys([
+      ...Object.keys(this.actualKeyByDesiredKey),
+      ...Object.values(this.actualKeyByDesiredKey),
+    ])}`;
   }
 
   toStringMeta(): string {
     return (
       chalk.bold.yellow(String(this.dependencies[0].id)) +
       ":" +
-      this.actualKeyByDesiredKeyString
+      JSON.stringify(this.actualKeyByDesiredKey)
     );
   }
 
@@ -116,8 +118,8 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   }
 
   deduplicate(peers: RemapKeysStep[]): RemapKeysStep[] {
-    const myMapString = this.actualKeyByDesiredKeyString;
-    return peers.filter((p) => p.actualKeyByDesiredKeyString === myMapString);
+    // Handled by peerKey
+    return peers;
   }
 }
 

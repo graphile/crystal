@@ -6,7 +6,7 @@ import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { arraysMatch } from "../utils.js";
+import { arraysMatch, digestKeys } from "../utils.js";
 
 /** @internal */
 export const expressionSymbol = Symbol("expression");
@@ -155,7 +155,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     this.peerKey =
       (this.fallback === "undefined" ? "U" : "D") +
       (this.hasSymbols ? "§" : ".") +
-      JSON.stringify(this.path);
+      digestKeys(this.path);
     this.addDependency(parentPlan);
   }
 
@@ -253,7 +253,7 @@ export function access<TData>(
     typeof fallback === "undefined" &&
     !path.some((k) => typeof k === "symbol")
   ) {
-    const pathKey = JSON.stringify(path);
+    const pathKey = digestKeys(path);
     return parentPlan.operationPlan.cacheStep(
       parentPlan,
       "GrafastInternal:access()",
