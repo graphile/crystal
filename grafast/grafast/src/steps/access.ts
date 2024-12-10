@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import debugFactory from "debug";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
@@ -7,6 +6,7 @@ import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { arraysMatch, digestKeys } from "../utils.js";
 
 /** @internal */
 export const expressionSymbol = Symbol("expression");
@@ -125,9 +125,6 @@ return (_meta, value) => value?.${te.join(access, "?.")}${
   }
 }
 
-const debugAccessPlan = debugFactory("grafast:AccessStep");
-const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
-
 /**
  * Accesses a (potentially nested) property from the result of a plan.
  *
@@ -145,6 +142,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
 
   allowMultipleOptimizations = true;
   public readonly path: (string | number | symbol)[];
+  private readonly hasSymbols: boolean;
 
   constructor(
     parentPlan: ExecutableStep<unknown>,
@@ -153,6 +151,11 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.path = path;
+    this.hasSymbols = this.path.some((k) => typeof k === "symbol");
+    this.peerKey =
+      (this.fallback === "undefined" ? "U" : "D") +
+      (this.hasSymbols ? "§" : ".") +
+      digestKeys(this.path);
     this.addDependency(parentPlan);
   }
 
@@ -169,7 +172,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof attrName !== "string") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getDep(0), [...this.path, attrName]);
+    return access(this.getDep(0), [...this.path, attrName]);
   }
 
   /**
@@ -179,7 +182,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     if (typeof index !== "number") {
       throw new Error(`AccessStep::get can only be called with string values`);
     }
-    return new AccessStep(this.getDep(0), [...this.path, index]);
+    return access(this.getDep(0), [...this.path, index]);
   }
 
   // An access of an access can become a single access
@@ -211,17 +214,24 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {
-    const myPath = JSON.stringify(this.path);
-    const peersWithSamePath = peers.filter(
-      (p) => p.fallback === this.fallback && JSON.stringify(p.path) === myPath,
-    );
-    debugAccessPlanVerbose(
-      "%c deduplicate: peers with same path %o = %c",
-      this,
-      this.path,
-      peersWithSamePath,
-    );
-    return peersWithSamePath as AccessStep<TData>[];
+    if (peers.length === 0) {
+      return peers as never[];
+    } else if (!this.hasSymbols && this.fallback === undefined) {
+      // Rely entirely on peerKey
+      return peers as AccessStep<TData>[];
+    } else if (!this.hasSymbols) {
+      // Rely on peerKey for path, but check fallback
+      const { fallback } = this;
+      return peers.filter(
+        (p) => p.fallback === fallback,
+      ) as AccessStep<TData>[];
+    } else {
+      // Check both fallback and path
+      const { fallback, path } = this;
+      return peers.filter(
+        (p) => p.fallback === fallback && arraysMatch(p.path, path),
+      ) as AccessStep<TData>[];
+    }
   }
 }
 
@@ -231,12 +241,25 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
  */
 export function access<TData>(
   parentPlan: ExecutableStep<unknown>,
-  path?: (string | number | symbol)[] | string | number | symbol,
+  rawPath?: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {
-  return new AccessStep<TData>(
-    parentPlan,
-    Array.isArray(path) ? path : path != null ? [path] : [],
-    fallback,
-  );
+  const path = Array.isArray(rawPath)
+    ? rawPath
+    : rawPath != null
+    ? [rawPath]
+    : [];
+  if (
+    typeof fallback === "undefined" &&
+    !path.some((k) => typeof k === "symbol")
+  ) {
+    const pathKey = digestKeys(path);
+    return parentPlan.operationPlan.cacheStep(
+      parentPlan,
+      "GrafastInternal:access()",
+      pathKey,
+      () => new AccessStep<TData>(parentPlan, path),
+    );
+  }
+  return new AccessStep<TData>(parentPlan, path, fallback);
 }

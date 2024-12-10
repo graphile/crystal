@@ -58,7 +58,7 @@ lateral (
 ) as __first_party_vulnerabilities_result__;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __applications__."0" as "0",
@@ -104,7 +104,7 @@ lateral (
         on (
           __gcp_applications__."id" = __gcp_application_first_party_vulnerabilities__."gcp_application_id"
         )
-        where __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id" = __union_identifiers__."id1"
+        where __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id" = __union_identifiers__."id0"
         order by
           __gcp_applications__."id" asc
       ) as __gcp_applications__
@@ -115,7 +115,7 @@ lateral (
 ) as __union_result__;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1", (ids.value->>2)::"int4" as "id2", (ids.value->>3)::"int4" as "id3" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __owners__."0" as "0",
@@ -169,7 +169,7 @@ lateral (
         on (
           __organizations__."organization_id" = __aws_applications_2."organization_id"
         )
-        where __aws_application_first_party_vulnerabilities_2."first_party_vulnerability_id" = __union_identifiers__."id1"
+        where __aws_application_first_party_vulnerabilities_2."first_party_vulnerability_id" = __union_identifiers__."id0"
         order by
           __organizations__."organization_id" asc
       ) as __organizations__
@@ -195,7 +195,7 @@ lateral (
         on (
           __people_2."person_id" = __gcp_applications__."person_id"
         )
-        where __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id" = __union_identifiers__."id2"
+        where __gcp_application_first_party_vulnerabilities__."first_party_vulnerability_id" = __union_identifiers__."id0"
         order by
           __people_2."person_id" asc
       ) as __people_2
@@ -221,7 +221,7 @@ lateral (
         on (
           __organizations_2."organization_id" = __gcp_applications_2."organization_id"
         )
-        where __gcp_application_first_party_vulnerabilities_2."first_party_vulnerability_id" = __union_identifiers__."id3"
+        where __gcp_application_first_party_vulnerabilities_2."first_party_vulnerability_id" = __union_identifiers__."id0"
         order by
           __organizations_2."organization_id" asc
       ) as __organizations_2

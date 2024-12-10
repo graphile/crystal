@@ -17,9 +17,9 @@ graph TD
     __Value2 --> Access15
     __Value2 --> Access16
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ[Object: null prototype] {   id: 9001,   person_id: 99,   leᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ[Object: null prototype] {   id: 9001,   person_id: 99,   leᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
-    Object17 & Constant33 --> PgSelect14
+    Object17 & Constant32 --> PgSelect14
     First18{{"First[18∈1] ➊"}}:::plan
     PgSelect14 --> First18
     PgSelectSingle19{{"PgSelectSingle[19∈1] ➊<br />ᐸleft_arm_identityᐳ"}}:::plan
@@ -33,20 +33,20 @@ graph TD
     PgSelectSingle19 --> PgClassExpression22
     Lambda24{{"Lambda[24∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List23 --> Lambda24
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgSelectSingle19 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression28
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/rbac.leftArmIdentity"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Constant33 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 33<br /><br />1: PgSelect[14]<br />2: <br />ᐳ: 18, 19, 20"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Constant32 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 32<br /><br />1: PgSelect[14]<br />2: <br />ᐳ: 18, 19, 20"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,First18,PgSelectSingle19,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
@@ -54,7 +54,7 @@ graph TD
     class Bucket2 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[19]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,Constant21,PgClassExpression22,List23,Lambda24,PgClassExpression26,PgClassExpression27,PgClassExpression28 bucket3
+    class Bucket3,Constant21,PgClassExpression22,List23,Lambda24,PgClassExpression25,PgClassExpression26,PgClassExpression27 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

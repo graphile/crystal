@@ -36,15 +36,15 @@ graph TD
     PgUnionAll25 --> First29
     PgUnionAllSingle30["PgUnionAllSingle[30∈3]"]:::plan
     First29 --> PgUnionAllSingle30
-    Access31{{"Access[31∈3]<br />ᐸ30.1ᐳ"}}:::plan
-    PgUnionAllSingle30 --> Access31
     PgSelect34[["PgSelect[34∈4]<br />ᐸorganizationsᐳ<br />ᐳOrganization"]]:::plan
     Access33{{"Access[33∈4]<br />ᐸ32.0ᐳ"}}:::plan
     Object17 & Access33 --> PgSelect34
-    PgSelect44[["PgSelect[44∈4]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
-    Access43{{"Access[43∈4]<br />ᐸ42.0ᐳ"}}:::plan
-    Object17 & Access43 --> PgSelect44
-    JSONParse32[["JSONParse[32∈4]<br />ᐸ31ᐳ<br />ᐳOrganization"]]:::plan
+    PgSelect43[["PgSelect[43∈4]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
+    Access42{{"Access[42∈4]<br />ᐸ41.0ᐳ"}}:::plan
+    Object17 & Access42 --> PgSelect43
+    Access31{{"Access[31∈4]<br />ᐸ30.1ᐳ<br />ᐳOrganization"}}:::plan
+    PgUnionAllSingle30 --> Access31
+    JSONParse32[["JSONParse[32∈4]<br />ᐸ31ᐳ"]]:::plan
     Access31 --> JSONParse32
     JSONParse32 --> Access33
     First38{{"First[38∈4]"}}:::plan
@@ -53,15 +53,15 @@ graph TD
     First38 --> PgSelectSingle39
     PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
-    JSONParse42[["JSONParse[42∈4]<br />ᐸ31ᐳ<br />ᐳPerson"]]:::plan
-    Access31 --> JSONParse42
-    JSONParse42 --> Access43
-    First48{{"First[48∈4]"}}:::plan
-    PgSelect44 --> First48
-    PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸpeopleᐳ"}}:::plan
-    First48 --> PgSelectSingle49
-    PgClassExpression50{{"PgClassExpression[50∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression50
+    JSONParse41[["JSONParse[41∈4]<br />ᐸ31ᐳ<br />ᐳPerson"]]:::plan
+    Access31 --> JSONParse41
+    JSONParse41 --> Access42
+    First45{{"First[45∈4]"}}:::plan
+    PgSelect43 --> First45
+    PgSelectSingle46{{"PgSelectSingle[46∈4]<br />ᐸpeopleᐳ"}}:::plan
+    First45 --> PgSelectSingle46
+    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle46 --> PgClassExpression47
 
     %% define steps
 
@@ -75,12 +75,12 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item20,PgSelectSingle21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 17<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24<br />2: PgUnionAll[25]<br />ᐳ: First[29]<br />3: PgUnionAllSingle[30]<br />ᐳ: Access[31]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 17<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24<br />2: PgUnionAll[25]<br />ᐳ: First[29]<br />3: PgUnionAllSingle[30]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgUnionAll25,First29,PgUnionAllSingle30,Access31 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 31, 17, 30<br />ᐳOrganization<br />ᐳPerson<br /><br />1: JSONParse[32], JSONParse[42]<br />ᐳ: Access[33], Access[43]<br />2: PgSelect[34], PgSelect[44]<br />ᐳ: 38, 39, 40, 48, 49, 50"):::bucket
+    class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgUnionAll25,First29,PgUnionAllSingle30 bucket3
+    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 30, 17<br />ᐳOrganization<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[31]<br />2: JSONParse[32], JSONParse[41]<br />ᐳ: Access[33], Access[42]<br />3: PgSelect[34], PgSelect[43]<br />ᐳ: 38, 39, 40, 45, 46, 47"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,JSONParse32,Access33,PgSelect34,First38,PgSelectSingle39,PgClassExpression40,JSONParse42,Access43,PgSelect44,First48,PgSelectSingle49,PgClassExpression50 bucket4
+    class Bucket4,Access31,JSONParse32,Access33,PgSelect34,First38,PgSelectSingle39,PgClassExpression40,JSONParse41,Access42,PgSelect43,First45,PgSelectSingle46,PgClassExpression47 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

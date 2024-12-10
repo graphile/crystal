@@ -11,6 +11,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
 import type { SetterCapableStep } from "./setter.js";
 
@@ -62,27 +63,37 @@ export class ObjectStep<
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
-  private keys: Array<keyof TPlans & string>;
+  private readonly keys: ReadonlyArray<keyof TPlans & string> = [];
 
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
   private cacheSize: number;
 
-  constructor(obj: TPlans, cacheConfig?: ObjectStepCacheConfig) {
+  constructor(
+    obj: TPlans,
+    private cacheConfig?: ObjectStepCacheConfig,
+  ) {
     super();
     this.cacheSize =
       cacheConfig?.cacheSize ??
       (cacheConfig?.identifier ? DEFAULT_CACHE_SIZE : 0);
+
+    const keys = Object.keys(obj);
+    this._setKeys(keys);
+    for (let i = 0, l = this.keys.length; i < l; i++) {
+      this.addDependency({ step: obj[keys[i]], skipDeduplication: true });
+    }
+  }
+
+  private _setKeys(keys: ReadonlyArray<keyof TPlans & string>) {
+    (this.keys as readonly string[]) = keys;
+    this.peerKey = digestKeys(keys);
     this.metaKey =
       this.cacheSize <= 0
         ? undefined
-        : cacheConfig?.identifier
-        ? `object|${JSON.stringify(Object.keys(obj))}|${cacheConfig.identifier}`
+        : this.cacheConfig?.identifier
+        ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
         : this.id;
-    this.keys = Object.keys(obj);
-    for (let i = 0, l = this.keys.length; i < l; i++) {
-      this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
-    }
   }
 
   /**
@@ -90,7 +101,7 @@ export class ObjectStep<
    * handy.
    */
   public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
-    this.keys.push(key as string);
+    this._setKeys([...this.keys, key as keyof TPlans & string]);
     this.addDependency({ step: plan, skipDeduplication: true });
   }
 
@@ -261,8 +272,8 @@ ${inner}
   }
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
-    const myKeys = JSON.stringify(this.keys);
-    return peers.filter((p) => JSON.stringify(p.keys) === myKeys);
+    // Managed through peerKey
+    return peers;
   }
 
   optimize(opts: StepOptimizeOptions) {

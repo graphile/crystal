@@ -9,9 +9,9 @@ graph TD
 
 
     %% plan dependencies
-    Lambda15{{"Lambda[15∈0] ➊<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant14{{"Constant[14∈0] ➊<br />ᐸ'query'ᐳ"}}:::plan
-    Constant14 --> Lambda15
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant12{{"Constant[12∈0] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant12 --> Lambda13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
@@ -19,5 +19,5 @@ graph TD
     subgraph "Buckets for queries/v4/directives"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value4,Constant14,Lambda15 bucket0
+    class Bucket0,__Value4,Constant12,Lambda13 bucket0
     end

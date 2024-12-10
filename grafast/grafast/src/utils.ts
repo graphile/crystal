@@ -1135,3 +1135,24 @@ export function isTuple<T extends readonly [...(readonly any[])]>(
 ): t is T {
   return Array.isArray(t);
 }
+
+/**
+ * Turns an array of keys into a digest, avoiding conflicts.
+ * Symbols are treated as equivalent. (Theoretically faster
+ * than JSON.stringify().)
+ */
+export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
+  let str = "";
+  for (let i = 0, l = keys.length; i < l; i++) {
+    const item = keys[i];
+    if (typeof item === "string") {
+      // str += `|§${item.replace(/§/g, "§§")}§`;
+      str += `§${item.length}:${item}`;
+    } else if (typeof item === "number") {
+      str += `N${item}`;
+    } else {
+      str += "!";
+    }
+  }
+  return str;
+}

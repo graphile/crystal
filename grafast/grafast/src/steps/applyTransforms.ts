@@ -219,7 +219,12 @@ export class ApplyTransformsStep extends ExecutableStep {
  */
 export function applyTransforms($step: ExecutableStep) {
   if (isListCapableStep($step)) {
-    return new ApplyTransformsStep($step);
+    return $step.operationPlan.cacheStep(
+      $step,
+      "GrafastInternal:applyTransforms()",
+      "",
+      () => new ApplyTransformsStep($step),
+    );
   } else {
     // No eval necessary
     return $step;

@@ -108,6 +108,7 @@ export class PgSelectSingleStep<
     this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
+    this.peerKey = this.resource.name;
   }
 
   public coalesceToEmptyObject(): void {
@@ -157,7 +158,21 @@ export class PgSelectSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  public get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+    attr: TAttr,
+  ): PgClassExpressionStep<
+    GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
+      infer UCodec,
+      any
+    >
+      ? UCodec
+      : never,
+    TResource
+  > {
+    return this.cacheStep("get", attr, () => this._getInternal(attr));
+  }
+
+  private _getInternal<TAttr extends keyof GetPgResourceAttributes<TResource>>(
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<

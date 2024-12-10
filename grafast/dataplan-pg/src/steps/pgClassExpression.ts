@@ -167,6 +167,18 @@ export class PgClassExpressionStep<
     GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
     TResource
   > {
+    return this.cacheStep("get", attributeName, () =>
+      this._getInternal(attributeName),
+    );
+  }
+  private _getInternal<
+    TAttr extends keyof GetPgCodecAttributes<TExpressionCodec>,
+  >(
+    attributeName: TAttr,
+  ): PgClassExpressionStep<
+    GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
+    TResource
+  > {
     const attributes = this.pgCodec.attributes;
     if (attributes === undefined) {
       // Fall back to access, since this could be a 'point' or similar type that doesn't have attributes in Postgres but does in JS.

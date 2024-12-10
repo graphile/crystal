@@ -19,49 +19,49 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
     Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
+    Constant33{{"Constant[33∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression16 & Constant34 & Constant35 & Constant36 --> PgInsertSingle17
+    Object15 & PgClassExpression16 & Constant33 & Constant34 & Constant35 --> PgInsertSingle17
     PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object15 & Constant10 & Constant11 --> PgInsertSingle12
     PgInsertSingle12 --> PgClassExpression16
     PgClassExpression21{{"PgClassExpression[21∈1] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression21
-    PgSelect24[["PgSelect[24∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgSelect23[["PgSelect[23∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈2] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression22 --> PgSelect24
+    Object15 & PgClassExpression22 --> PgSelect23
     PgInsertSingle17 --> PgClassExpression22
-    First28{{"First[28∈2] ➊"}}:::plan
-    PgSelect24 --> First28
-    PgSelectSingle29{{"PgSelectSingle[29∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First28 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression33
+    First27{{"First[27∈2] ➊"}}:::plan
+    PgSelect23 --> First27
+    PgSelectSingle28{{"PgSelectSingle[28∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First27 --> PgSelectSingle28
+    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression29
+    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression30
+    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression31
+    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression32
 
     %% define steps
 
     subgraph "Buckets for mutations/basics/create-relational-post-null-description"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant34,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 34, 35, 36<br /><br />1: PgInsertSingle[12]<br />2: PgClassExpression[16]<br />3: PgInsertSingle[17]<br />4: <br />ᐳ: PgClassExpression[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant33,Constant34,Constant35 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 33, 34, 35<br /><br />1: PgInsertSingle[12]<br />2: PgClassExpression[16]<br />3: PgInsertSingle[17]<br />4: <br />ᐳ: PgClassExpression[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,PgClassExpression16,PgInsertSingle17,PgClassExpression21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: PgClassExpression[22]<br />2: PgSelect[24]<br />ᐳ: First[28], PgSelectSingle[29]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: PgClassExpression[22]<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression22,PgSelect24,First28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[29]"):::bucket
+    class Bucket2,PgClassExpression22,PgSelect23,First27,PgSelectSingle28 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket3
+    class Bucket3,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -9,6 +9,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { digestKeys } from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -68,10 +69,14 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   private mapper!: (obj: object | null) => object | null;
   constructor(
     $plan: ExecutableStep,
-    private actualKeyByDesiredKey: ActualKeyByDesiredKey,
+    private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
     this.addDependency($plan);
+    this.peerKey = digestKeys([
+      ...Object.keys(this.actualKeyByDesiredKey),
+      ...Object.values(this.actualKeyByDesiredKey),
+    ]);
   }
 
   toStringMeta(): string {
@@ -113,10 +118,8 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   }
 
   deduplicate(peers: RemapKeysStep[]): RemapKeysStep[] {
-    const myMap = JSON.stringify(this.actualKeyByDesiredKey);
-    return peers.filter(
-      (p) => JSON.stringify(p.actualKeyByDesiredKey) === myMap,
-    );
+    // Handled by peerKey
+    return peers;
   }
 }
 
