@@ -220,6 +220,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   deduplicate(peers: AccessStep<unknown>[]): AccessStep<TData>[] {
+    if (peers.length === 0) return peers as never[];
     const peersWithSamePath = peers.filter(
       (p) =>
         p.fallback === this.fallback &&

@@ -62,7 +62,8 @@ export class ObjectStep<
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
-  private keys: Array<keyof TPlans & string>;
+  private readonly keys: ReadonlyArray<keyof TPlans & string> = [];
+  private readonly keysString: string = "[]";
 
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
@@ -77,12 +78,19 @@ export class ObjectStep<
       this.cacheSize <= 0
         ? undefined
         : cacheConfig?.identifier
-        ? `object|${JSON.stringify(Object.keys(obj))}|${cacheConfig.identifier}`
+        ? `object|${this.keysString}|${cacheConfig.identifier}`
         : this.id;
-    this.keys = Object.keys(obj);
+
+    this._setKeys(Object.keys(obj));
     for (let i = 0, l = this.keys.length; i < l; i++) {
       this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
     }
+  }
+
+  private _setKeys(keys: ReadonlyArray<keyof TPlans & string>) {
+    (this.keys as readonly string[]) = keys;
+    (this.keysString as string) = JSON.stringify(keys);
+    this.peerKey = this.keysString;
   }
 
   /**
@@ -90,7 +98,7 @@ export class ObjectStep<
    * handy.
    */
   public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
-    this.keys.push(key as string);
+    this._setKeys([...this.keys, key as keyof TPlans & string]);
     this.addDependency({ step: plan, skipDeduplication: true });
   }
 
@@ -261,8 +269,8 @@ ${inner}
   }
 
   deduplicate(peers: ObjectStep<any>[]): ObjectStep<TPlans>[] {
-    const myKeys = JSON.stringify(this.keys);
-    return peers.filter((p) => JSON.stringify(p.keys) === myKeys);
+    // Managed through peerKey
+    return peers;
   }
 
   optimize(opts: StepOptimizeOptions) {
