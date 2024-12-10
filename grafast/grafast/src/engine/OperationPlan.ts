@@ -95,7 +95,10 @@ import type {
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
-import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
+import {
+  currentLayerPlan,
+  withGlobalLayerPlan,
+} from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
@@ -3729,9 +3732,9 @@ export class OperationPlan {
     return matches;
   }
 
-  _cacheStepStore: Record<
+  private _cacheStepStoreByLayerPlan: Record<
     number,
-    Record<symbol | string | number, any> | undefined
+    Record<number, Record<symbol | string | number, any> | undefined>
   > = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
@@ -3745,7 +3748,10 @@ export class OperationPlan {
     cacheKey: symbol | string | number,
     cb: () => T,
   ): T {
-    const cache = (this._cacheStepStore[ownerStep.id] ??= Object.create(null));
+    const layerPlan = currentLayerPlan();
+    const cacheStepStore = (this._cacheStepStoreByLayerPlan[layerPlan.id] ??=
+      Object.create(null));
+    const cache = (cacheStepStore[ownerStep.id] ??= Object.create(null));
 
     const cacheIt = () => {
       const stepToCache = cb();
@@ -3774,7 +3780,7 @@ export class OperationPlan {
    * from setting hasSideEffects on an ExecutableStep, among other places.
    */
   public resetCache() {
-    this._cacheStepStore = Object.create(null);
+    this._cacheStepStoreByLayerPlan = Object.create(null);
   }
 }
 
