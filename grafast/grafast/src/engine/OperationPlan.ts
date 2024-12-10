@@ -2318,12 +2318,15 @@ export class OperationPlan {
 
     if (dependencyCount === 0) {
       let allPeers: ExecutableStep[] | null = null;
-      for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
+      const stepsWithNoDependencies =
+        this.stepTracker.stepsWithNoDependenciesByConstructor.get(
+          step.constructor,
+        ) ?? new Set();
+      for (const possiblyPeer of stepsWithNoDependencies) {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.constructor === stepConstructor
+          possiblyPeer.layerPlan === layerPlan
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];

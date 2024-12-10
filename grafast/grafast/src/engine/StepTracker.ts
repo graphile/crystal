@@ -39,7 +39,10 @@ export class StepTracker {
     [stepId: number]: Array<number> | undefined;
   } = [];
   /** @internal */
-  public stepsWithNoDependencies = new Set<ExecutableStep>();
+  public stepsWithNoDependenciesByConstructor = new Map<
+    Function,
+    Set<ExecutableStep>
+  >();
 
   /** @internal */
   public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
@@ -102,7 +105,17 @@ export class StepTracker {
   public addStep($step: ExecutableStep): number {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
-    this.stepsWithNoDependencies.add($step);
+    const ctor = $step.constructor;
+    let stepsWithNoDependencies =
+      this.stepsWithNoDependenciesByConstructor.get(ctor);
+    if (!stepsWithNoDependencies) {
+      stepsWithNoDependencies ??= new Set();
+      this.stepsWithNoDependenciesByConstructor.set(
+        ctor,
+        stepsWithNoDependencies,
+      );
+    }
+    stepsWithNoDependencies.add($step);
     this.stepById[stepId] = $step;
     this.aliasesById[stepId] = undefined;
     this.addStepToItsLayerPlan($step);
@@ -338,7 +351,9 @@ export class StepTracker {
 
     const forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
 
-    this.stepsWithNoDependencies.delete($dependent);
+    this.stepsWithNoDependenciesByConstructor
+      .get($dependent.constructor)
+      ?.delete($dependent);
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
     dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
     dependentDependencyOnReject[dependencyIndex] = onReject;
@@ -687,7 +702,9 @@ export class StepTracker {
       }
     }
 
-    this.stepsWithNoDependencies.delete($original);
+    this.stepsWithNoDependenciesByConstructor
+      .get($original.constructor)
+      ?.delete($original);
     this.outputPlansByRootStep.delete($original);
     this.layerPlansByRootStep.delete($original);
     this.layerPlansByParentStep.delete($original);
