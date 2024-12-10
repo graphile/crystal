@@ -1145,7 +1145,8 @@ export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
   let str = "";
   for (const item of keys) {
     if (typeof item === "string") {
-      str += `|§${item.replace(/§/g, "§§")}§`;
+      // str += `|§${item.replace(/§/g, "§§")}§`;
+      str += `|§${item.length}§${item}`;
     } else if (typeof item === "number") {
       str += `|${item}`;
     } else {
