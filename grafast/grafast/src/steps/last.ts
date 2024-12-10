@@ -44,5 +44,10 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
 export function last<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): LastStep<TData> {
-  return new LastStep(plan);
+  return plan.operationPlan.cacheStep(
+    plan,
+    "GrafastInternal:last()",
+    "",
+    () => new LastStep(plan),
+  );
 }

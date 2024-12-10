@@ -66,5 +66,10 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
 export function reverse<TData>(
   plan: ExecutableStep<readonly TData[]>,
 ): ReverseStep<TData> {
-  return new ReverseStep<TData>(plan);
+  return plan.operationPlan.cacheStep(
+    plan,
+    "GrafastInternal:reverse()",
+    "",
+    () => new ReverseStep<TData>(plan),
+  );
 }
