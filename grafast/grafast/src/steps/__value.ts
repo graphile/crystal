@@ -41,10 +41,10 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
   }
 
   get<TAttr extends keyof TData>(attrName: TAttr): AccessStep<TData[TAttr]> {
-    return access(this, [attrName as string]);
+    return this.cacheStep(attrName, () => access(this, [attrName as string]));
   }
 
   at<TIndex extends keyof TData>(index: TIndex): AccessStep<TData[TIndex]> {
-    return access(this, [index as number]);
+    return this.cacheStep(index, () => access(this, [index as number]));
   }
 }
