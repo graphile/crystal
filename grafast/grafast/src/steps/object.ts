@@ -78,10 +78,12 @@ export class ObjectStep<
     this.cacheSize =
       cacheConfig?.cacheSize ??
       (cacheConfig?.identifier ? DEFAULT_CACHE_SIZE : 0);
+
+    const keys = Object.keys(obj);
+    this._setKeys(keys);
     for (let i = 0, l = this.keys.length; i < l; i++) {
-      this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
+      this.addDependency({ step: obj[keys[i]], skipDeduplication: true });
     }
-    this._setKeys(Object.keys(obj));
   }
 
   private _setKeys(keys: ReadonlyArray<keyof TPlans & string>) {
