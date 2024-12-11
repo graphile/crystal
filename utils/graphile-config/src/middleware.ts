@@ -5,13 +5,13 @@ import type {
 } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
-export interface MiddlewareNext<
-  TRawResult,
-  TAwaitedResult = Awaited<TRawResult>,
-> {
+export interface MiddlewareNext<TRawResult> {
   (): TRawResult;
   callback(
-    callback: (error: object | null, result: TAwaitedResult) => TRawResult,
+    callback: (
+      error: object | null,
+      result: Awaited<TRawResult>,
+    ) => TRawResult | Awaited<TRawResult>,
   ): TRawResult;
 }
 
@@ -131,10 +131,7 @@ function executeMiddleware<
           ),
   );
   const middleware = middlewareList[idx];
-  const result = middleware(
-    next as MiddlewareNext<unknown, unknown>,
-    arg,
-  ) as any;
+  const result = middleware(next as MiddlewareNext<unknown>, arg) as any;
   if (!allowAsync && isPromiseLike(result)) {
     throw new Error(
       `'${String(
@@ -145,28 +142,25 @@ function executeMiddleware<
   return result;
 }
 
-function makeNext<TRawResult, TAwaitedResult = Awaited<TRawResult>>(
+function makeNext<TRawResult>(
   fn: () => TRawResult,
-): MiddlewareNext<TRawResult, TAwaitedResult> {
+): MiddlewareNext<TRawResult> {
   let called = false;
-  const next = fn as MiddlewareNext<TRawResult, TAwaitedResult>;
+  const next = fn as MiddlewareNext<TRawResult>;
   next.callback = (callback) => {
     if (called) {
       throw new Error(`next() was already called; don't call it twice!`);
     }
     called = true;
-    let result: PromiseOrDirect<TAwaitedResult>;
+    let result: PromiseOrDirect<Awaited<TRawResult>>;
     try {
-      result = fn() as PromiseOrDirect<TAwaitedResult>;
+      result = fn() as PromiseOrDirect<Awaited<TRawResult>>;
     } catch (error) {
       return callback(error, undefined as any);
     }
     if (isPromiseLike(result)) {
       return result.then(
-        (result) =>
-          callback(null, result) as
-            | TAwaitedResult
-            | PromiseLike<TAwaitedResult>,
+        (result) => callback(null, result) as Awaited<TRawResult> | TRawResult,
         callback as any,
       ) as TRawResult;
     } else {
