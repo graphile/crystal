@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-beta.13
+
+### Patch Changes
+
+- [#2270](https://github.com/graphile/crystal/pull/2270)
+  [`7580bc16a`](https://github.com/graphile/crystal/commit/7580bc16a050fd8d916c6dabe9d1ded980090349)
+  Thanks [@benjie](https://github.com/benjie)! - Check that `process` exists
+  before reading from it.
+
 ## 0.0.1-beta.12
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # grafast
 
+## 0.1.1-beta.18
+
+### Patch Changes
+
+- [#2279](https://github.com/graphile/crystal/pull/2279)
+  [`b336a5829`](https://github.com/graphile/crystal/commit/b336a58291cfec7aef884d3843172d408abfaf3c)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce step caching to
+  reduce deduplication workload safely, thereby reducing planning time for many
+  larger queries.
+- Updated dependencies
+  [[`7580bc16a`](https://github.com/graphile/crystal/commit/7580bc16a050fd8d916c6dabe9d1ded980090349)]:
+  - graphile-config@0.0.1-beta.13
+
 ## 0.1.1-beta.17
 
 ### Patch Changes
