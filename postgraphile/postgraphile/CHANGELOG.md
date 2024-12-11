@@ -1,5 +1,26 @@
 # postgraphile
 
+## 5.0.0-beta.36
+
+### Patch Changes
+
+- [#2279](https://github.com/graphile/crystal/pull/2279)
+  [`b336a5829`](https://github.com/graphile/crystal/commit/b336a58291cfec7aef884d3843172d408abfaf3c)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce step caching to
+  reduce deduplication workload safely, thereby reducing planning time for many
+  larger queries.
+- Updated dependencies
+  [[`7580bc16a`](https://github.com/graphile/crystal/commit/7580bc16a050fd8d916c6dabe9d1ded980090349),
+  [`b336a5829`](https://github.com/graphile/crystal/commit/b336a58291cfec7aef884d3843172d408abfaf3c)]:
+  - graphile-config@0.0.1-beta.13
+  - @dataplan/pg@0.0.1-beta.29
+  - grafast@0.1.1-beta.18
+  - grafserv@0.1.1-beta.20
+  - graphile-build@5.0.0-beta.30
+  - graphile-build-pg@5.0.0-beta.35
+  - graphile-utils@5.0.0-beta.35
+  - @dataplan/json@0.0.1-beta.27
+
 ## 5.0.0-beta.35
 
 ### Patch Changes
