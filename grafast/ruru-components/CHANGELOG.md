@@ -1,5 +1,12 @@
 # ruru-components
 
+## 2.0.0-beta.27
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafast@0.1.1-beta.19
+
 ## 2.0.0-beta.26
 
 ### Patch Changes

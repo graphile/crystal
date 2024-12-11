@@ -1,5 +1,12 @@
 # graphile-export
 
+## 0.0.2-beta.24
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafast@0.1.1-beta.19
+
 ## 0.0.2-beta.23
 
 ### Patch Changes

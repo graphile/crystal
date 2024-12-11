@@ -1,5 +1,12 @@
 # @dataplan/json
 
+## 0.0.1-beta.28
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafast@0.1.1-beta.19
+
 ## 0.0.1-beta.27
 
 ### Patch Changes

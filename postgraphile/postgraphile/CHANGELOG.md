@@ -1,5 +1,20 @@
 # postgraphile
 
+## 5.0.0-beta.37
+
+### Patch Changes
+
+- Updated dependencies
+  [[`83c546509`](https://github.com/graphile/crystal/commit/83c546509d24be2955a56120981363ad3c3a5f3f)]:
+  - graphile-config@0.0.1-beta.14
+  - @dataplan/pg@0.0.1-beta.30
+  - grafast@0.1.1-beta.19
+  - grafserv@0.1.1-beta.21
+  - graphile-build@5.0.0-beta.31
+  - graphile-build-pg@5.0.0-beta.36
+  - graphile-utils@5.0.0-beta.36
+  - @dataplan/json@0.0.1-beta.28
+
 ## 5.0.0-beta.36
 
 ### Patch Changes

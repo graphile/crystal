@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-beta.14
+
+### Patch Changes
+
+- [#2280](https://github.com/graphile/crystal/pull/2280)
+  [`83c546509`](https://github.com/graphile/crystal/commit/83c546509d24be2955a56120981363ad3c3a5f3f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix TypeScript types of
+  MiddlewareNext
+
 ## 0.0.1-beta.13
 
 ### Patch Changes

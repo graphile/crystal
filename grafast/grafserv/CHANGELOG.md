@@ -1,5 +1,15 @@
 # grafserv
 
+## 0.1.1-beta.21
+
+### Patch Changes
+
+- Updated dependencies
+  [[`83c546509`](https://github.com/graphile/crystal/commit/83c546509d24be2955a56120981363ad3c3a5f3f)]:
+  - graphile-config@0.0.1-beta.14
+  - grafast@0.1.1-beta.19
+  - ruru@2.0.0-beta.19
+
 ## 0.1.1-beta.20
 
 ### Patch Changes
