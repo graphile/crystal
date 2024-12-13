@@ -6,7 +6,7 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "Graphile Config",
-    imgsrc: "/img/config.png",
+    imgsrc: "/img/graphile-config.svg",
     link: "/graphile-config/",
     description: (
       <>
@@ -17,7 +17,7 @@ const FeatureList = [
   },
   {
     title: "Graphile Export",
-    imgsrc: "/img/export.png",
+    imgsrc: "/img/graphile-export.svg",
     link: "/graphile-export/",
     description: (
       <>
@@ -27,13 +27,13 @@ const FeatureList = [
   },
   {
     title: "tamedevil",
-    imgsrc: "/img/tamedevil.png",
+    imgsrc: "/img/tamedevil.svg",
     link: "/tamedevil/",
     description: <>Eval is evil, this module helps tame it!</>,
   },
   {
     title: "pg-sql2",
-    imgsrc: "/img/pgsql2.png",
+    imgsrc: "/img/pg-sql2.svg",
     link: "/pg-sql2/",
     description: (
       <>
@@ -44,7 +44,7 @@ const FeatureList = [
   },
   {
     title: "pg-introspection",
-    imgsrc: "/img/introspection.png",
+    imgsrc: "/img/pg-introspection.svg",
     link: "/pg-introspection/",
     description: (
       <>
@@ -55,7 +55,7 @@ const FeatureList = [
   },
   {
     title: "Sponsor Graphile",
-    imgsrc: "/img/sponsor.png",
+    imgsrc: "/img/sponsor.svg",
     link: "https://graphile.org/sponsor",
     description: (
       <>
