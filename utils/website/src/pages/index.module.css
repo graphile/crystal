@@ -4,20 +4,16 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 0;
   text-align: center;
   position: relative;
   overflow: hidden;
-  background-color: var(--ifm-color-primary-darker);
-  color: #ffffff;
-  background-image: url("/img/stars.png"), url("/img/star-background.png");
-  background-position: center center;
-  background-size: auto 100%;
-  background-repeat: no-repeat, repeat;
-}
-
-[data-theme="dark"] .heroBanner {
-  background-color: var(--ifm-color-primary-darkest);
+  background-color: var(--graphile-color-background);
+  color: var(--graphile-color-text);
+  background-image: url("/img/sky-light.svg");
+  background-position: top right;
+  background-size: auto;
+  background-repeat: no-repeat;
 }
 
 @media screen and (max-width: 996px) {

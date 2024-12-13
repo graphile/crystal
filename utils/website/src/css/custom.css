@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
+  /* Docusaurus variables */
   --ifm-color-primary: #1368aa;
   --ifm-color-primary-dark: #033270;
   --ifm-color-primary-darker: #01263d;
@@ -14,14 +15,26 @@
   --ifm-color-primary-lighter: #9dcee2;
   --ifm-color-primary-lightest: #9dcee2;
   --ifm-code-font-size: 95%;
-  --ifm-footer-background-color: #01263d;
+  --ifm-font-family-base: Rubik, Helvetica, Verdana, Arial, sans-serif;
+  --ifm-footer-background-color: #1a0003;
   --ifm-footer-color: #ffffff;
-  --ifm-footer-link-color: #e05f47;
+  --ifm-footer-link-color: #fe8052;
+  --ifm-navbar-background-color: var(--ifm-footer-background-color);
+  --ifm-navbar-link-color: var(--ifm-footer-color);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Graphile variables*/
+  --graphile-color-background: #fcfcbf;
+  --graphile-color-text: #1a0003;
+
+  /* global styling choices */
+  background-color: var(--graphile-color-background);
+  color: var(--graphile-color-text);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
+  /* Docusaurus variables */
   --ifm-color-primary: #e05f47;
   --ifm-color-primary-dark: #4091c9;
   --ifm-color-primary-darker: #1368aa;
@@ -30,4 +43,8 @@
   --ifm-color-primary-lighter: #9dcee2;
   --ifm-color-primary-lightest: #ffffff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  /* Graphile variables*/
+  --graphile-color-background: #08434a;
+  --graphile-color-text: #ffffff;
 }
