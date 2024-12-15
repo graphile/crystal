@@ -11,7 +11,7 @@ Graphile Config helps Node.js library authors make their libraries configurable
 and _extensible_. Graphile Config is used across the Graphile suite to provide a
 standard configuration and plugin interface.
 
-# Features
+## Features
 
 - Define and document strongly typed configuration options for your library.
 - Allow users to extend the functionality of your library via plugins.
@@ -22,7 +22,7 @@ standard configuration and plugin interface.
 - View the available options and resolved values of a preset with the `graphile`
   CLI.
 
-# Different Users
+## Different Users
 
 As a user of Graphile Config, you may not need to understand everything. There
 are three common levels of usage, in order of the amount of knowledge required:
