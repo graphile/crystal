@@ -20,7 +20,8 @@ standard configuration and plugin interface.
 - You and your users can compose presets with preset extension.
 - Allow your users to share a preset across a CLI mode and library mode.
 - View the available options and resolved values of a preset with the `graphile`
-  CLI.
+  CLI
+  ([available to sponsors](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)).
 
 ## Different Users
 
