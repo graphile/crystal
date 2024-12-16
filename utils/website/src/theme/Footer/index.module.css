@@ -1,0 +1,10 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+.footerImage {
+  background-position: center center;
+  background-repeat: repeat;
+  background-image: url("/img/trees.svg");
+  height: 200px;
+}
