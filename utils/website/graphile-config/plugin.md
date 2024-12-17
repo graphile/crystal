@@ -347,7 +347,7 @@ declare global {
   declare namespace GraphileConfig {
     interface SendgridOptions {
       apiKey?: string;
-      someOtherConfig?: number;
+      someOtherOption?: number;
     }
 
     interface Preset {
@@ -362,6 +362,8 @@ export const MySendgridPlugin: GraphileConfig.Plugin = {
     middleware: {
       foo(next, event) {
         new SendgridSdk(
+          // This assumes that the library passes in the resolved preset via
+          // the event object. This will vary depending on the library.
           event.ctx.resolvedPreset.sendgrid.apiKey,
         ).makeSomeCall();
       },
@@ -373,7 +375,7 @@ export const MySendgridPreset: GraphileConfig.Preset = {
   plugins: [MySendgridPlugin],
   sendgrid: {
     apiKey: process.env.SENDGRID_API_KEY,
-    someOtherConfig: 2,
+    someOtherOption: 2,
   },
 };
 ```
