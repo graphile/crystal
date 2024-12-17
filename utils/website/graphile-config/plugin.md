@@ -29,8 +29,8 @@ Beyond scoped middleware, a Graphile Config Plugin has the following properties:
 - `provides` (optional `string[]`): an optional list of "feature labels" that
   this plugin provides. This is used to govern the order in which the plugin is
   registered. Feature labels must be unique across all plugins used in a single
-  preset. If unspecified, defaults to the plugin name. See
-  [Plugin order](#plugin-order)
+  preset. Graphile Config will append the plugin name to any feature labels
+  here. See [Plugin order](#plugin-order)
 - `after` (optional `string[]`): indicates that this plugin should be loaded
   after plugins with these feature labels if these feature labels are present in
   other plugins in the preset.
@@ -75,15 +75,10 @@ are used.
 
 By adding to a plugin's `before` and `after` properties, you can guarantee its
 loading position relative to other plugins if those other plugins are present.
-
 If you have multiple different plugins that provide the same feature, you should
-use the `provides` property. The property has two benefits:
-
-1.  Any other plugin that needs to guarantee its position relative to that
-    feature does not need to list every possible plugin name that provides that
-    feature. Instead those other plugins can list a single feature label.
-2.  You guarantee that a library user does not accidentally load plugins that
-    provide overlapping functionality.
+use the `provides` property. `provides` allows other plugins that need to
+guarantee their position relative to this feature to do so simply with a single
+feature label.
 
 For example, imagine `PluginD` and `PluginE` each include implementations of a
 subscriptions feature. By including the `subscriptions` feature label in their
@@ -174,9 +169,6 @@ middleware functions call `next()`, the next registered middleware is run. Once
 there are no more registered middleware functions for that action, `next()` will
 perform the underlying action that the library defines.
 
-Middleware are registered and executed in the order the plugins are loaded. See
-[Plugin order](#plugin-order).
-
 **Most libraries and most middleware will not function correctly if you omit
 `next()`, call `next()` more than once, or change the `event` in an unexpected
 way.** Refer to the documentation for the appropriate library to see the
@@ -218,8 +210,8 @@ they are not necessary, and it allows your function to be used as either
 synchronous or asynchronous middleware.
 
 ```ts
-export const MySomeActionLogPlugin: GraphileConfig.Plugin = {
-  name: "MySomeActionLogPlugin",
+export const MySpecialPlugin: GraphileConfig.Plugin = {
+  name: "MySpecialPlugin",
   libraryName: {
     middleware: {
       someAction(next, event) {
@@ -243,3 +235,64 @@ export const MySomeActionLogPlugin: GraphileConfig.Plugin = {
   },
 };
 ```
+
+### Middleware order
+
+Most middleware are registered and executed in
+[the order the plugins are loaded](#plugin-order). Sometimes, middleware in the
+same plugin have varying requirements for when they are run. For this reason,
+middleware also support `before`, `after`, and `provides`. These properties
+function similarly to how they are used to [order plugins](#plugin-order), but
+Graphile Config uses them to individually sort the middleware for each scoped
+action.
+
+In the following example, the `bar` middleware in the `libraryName` scope has an
+order constraint at the middleware level. The `bar` middleware in `MyPlugin`
+will be run after the `bar` middleware in `OtherPlugin` if both plugins are used
+in the same resolved preset.
+
+```ts
+export const MyPlugin: GraphileConfig.Plugin = {
+  name: "MyPlugin",
+  // Plugins can have order constraints at the plugin level and at the
+  // middleware level. All middleware in MyPlugin will be executed before any
+  // middleware in plugins that have `provides: ["featureA" ]`
+  before: ["featureA"],
+  libraryName: {
+    middleware: {
+      foo(next) {
+        // ... do something
+        return next();
+      },
+      bar: {
+        after: ["featureB"],
+        callback: (next) => {
+          // ... do something
+          // Will be executed after middleware that set
+          // `provides: ['featureB']`
+          return next();
+        },
+      },
+      // ... any other middleware
+    },
+  },
+};
+
+export const OtherPlugin: GraphileConfig.Plugin = {
+  name: "OtherPlugin",
+  libraryName: {
+    middleware: {
+      bar: {
+        provides: ["featureB"],
+        callback: (next) => {
+          // ... do something
+          return next();
+        },
+      },
+    },
+  },
+};
+```
+
+Similar to plugins' `provides` property, Graphile Config appends the plugin
+`name` to the `provides` property for all middleware.

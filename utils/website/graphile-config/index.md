@@ -15,7 +15,7 @@ standard configuration and plugin interface.
 
 - Define and document strongly typed configuration options for your library.
 - Allow users to extend the functionality of your library via plugins.
-- Plugins can add their own additional configuration options. TODO: how?
+- Plugins can add their own additional configuration options.
 - Bundle configuration options and plugins into default presets for your users.
 - You and your users can compose presets with preset extension.
 - Allow your users to share a preset across a CLI mode and library mode.
