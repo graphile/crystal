@@ -28,8 +28,7 @@ Beyond scoped middleware, a Graphile Config Plugin has the following properties:
   [CommonMark](https://commonmark.org/) (markdown) format.
 - `provides` (optional `string[]`): an optional list of "feature labels" that
   this plugin provides. This is used to govern the order in which the plugin is
-  registered. Feature labels must be unique across all plugins used in a single
-  preset. Graphile Config will append the plugin name to any feature labels
+  registered. Graphile Config will append the plugin name to any feature labels
   here. See [Plugin order](#plugin-order)
 - `after` (optional `string[]`): indicates that this plugin should be loaded
   after plugins with these feature labels if these feature labels are present in
@@ -296,3 +295,85 @@ export const OtherPlugin: GraphileConfig.Plugin = {
 
 Similar to plugins' `provides` property, Graphile Config appends the plugin
 `name` to the `provides` property for all middleware.
+
+## Adding config options
+
+Plugins can add additional config options with
+[declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
+Exactly what interfaces you need to extend will depend on how the library author
+has organized the types. For example, if you want to add an option to the
+`worker` scope used in
+[Graphile Worker](https://github.com/graphile/worker/blob/aa417401838e010ef92c63e15a3173ee494eaae2/src/index.ts#L62),
+you need to extend `GraphileConfig.WorkerOptions`:
+
+```ts
+declare global {
+  declare namespace GraphileConfig {
+    interface WorkerOptions {
+      myNewConfigOption?: string;
+    }
+  }
+}
+```
+
+You can also add a new scope:
+
+```ts
+declare global {
+  declare namespace GraphileConfig {
+    interface SendgridOptions {
+      apiKey?: string;
+    }
+
+    interface Preset {
+      sendgrid?: SendgridOptions;
+    }
+  }
+}
+```
+
+The options you add should be optional. If the file containing these additions
+to the `GraphileConfig` types is imported, but the plugin is not used in the
+preset, the interfaces are still extended. Additionally, even if you want to
+ensure that the **resolved** preset has some value for some option, you do not
+want to force every (unresolved) preset to have a value.
+
+If you are building a plugin to share with others, you may also want to export a
+preset that sets options to sane defaults or uses secrets from environment
+variables.
+
+```ts title=my-sendgrid-plugin.ts
+declare global {
+  declare namespace GraphileConfig {
+    interface SendgridOptions {
+      apiKey?: string;
+      someOtherConfig?: number;
+    }
+
+    interface Preset {
+      sendgrid?: SendgridOptions;
+    }
+  }
+}
+
+export const MySendgridPlugin: GraphileConfig.Plugin = {
+  name: "MySendgridPlugin",
+  libraryName: {
+    middleware: {
+      foo(next, event) {
+        new SendgridSdk(
+          event.ctx.resolvedPreset.sendgrid.apiKey,
+        ).makeSomeCall();
+      },
+    },
+  },
+};
+
+export const MySendgridPreset: GraphileConfig.Preset = {
+  plugins: [MySendgridPlugin],
+  sendgrid: {
+    apiKey: process.env.SENDGRID_API_KEY,
+    someOtherConfig: 2,
+  },
+};
+```
