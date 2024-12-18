@@ -9,9 +9,9 @@ Target Audience: plugin authors 🔌 and library authors 📚
 
 Plugins allow you to extend the functionality of libraries that use Graphile
 Config. Each library that uses Graphile Config may register plugin scopes that
-can contain optional [middleware](#middleware).
+enable expanded functionality, including through [middleware](#middleware).
 
-Beyond scoped middleware, a Graphile Config Plugin has the following properties:
+Beyond these scopes, a Graphile Config Plugin has the following properties:
 
 - `name` (`string`): The name of the plugin. This must be unique among all
   plugins that a library user uses with a library. Thus, names should be
@@ -68,29 +68,35 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-If you use the preset in `graphile-config.ts`, the resolved plugins will be
-loaded in the order `[PluginA, PluginB, PluginC]`, unless `before` and `after`
-are used.
+If you use the preset in `graphile.config.ts` and none of the plugins specify
+`before` or `after` then the resolved plugins will typically be loaded in the
+order `[PluginA, PluginB, PluginC]`; however, this ordering is not guaranteed
+and should not be relied upon.
 
-By adding to a plugin's `before` and `after` properties, you can guarantee its
-loading position relative to other plugins if those other plugins are present.
-If you have multiple different plugins that provide the same feature, you should
-use the `provides` property. `provides` allows other plugins that need to
-guarantee their position relative to this feature to do so simply with a single
-feature label.
+If the order in which a plugin is loaded is significant, it must be stated
+explicitly by adding to a plugin's `before` and `after` properties. These
+properties guarantee its loading position relative to other plugins that provide
+those features.
+
+If multiple different plugins provide the same feature they should indicate this
+via the `provides` property, thereby allowing other plugins to guarantee their
+position relative to all the plugins providing this feature with a single
+feature label in `before` or `after`.
 
 For example, imagine `PluginD` and `PluginE` each include implementations of a
 subscriptions feature. By including the `subscriptions` feature label in their
 `provides` property, `PluginD` and `PluginE` allow `PluginF` to ensure it is
 loaded before any plugin that provides subscriptions by setting
-`before: ['subscriptions']`. This also prevents library users from loading both
-`PluginD` and `PluginE` in the same preset.
+`before: ['subscriptions']`.
 
-:::note
+:::note Unknown features are ignored.
 
-Note that `before` and `after` do not guarantee that those feature labels are
-present in a preset. There currently is no built-in way for a plugin to declare
-dependencies on other plugins.
+Adding a feature label to `before` or `after` does not guarantee that that
+feature label is present in a preset; if a feature label is not provided by any
+plugins then it will have no impact on ordering.
+
+There currently is no standard way for a plugin to declare explicit dependencies
+on other plugins.
 
 :::
 
@@ -177,8 +183,10 @@ available actions around which you can add middleware, the structure of the
 
 :::note The underlying procedure might be a no-op
 
-Some libraries may call middleware with a no-op underlying action. This has no
-effect on how you should write a middleware function for these actions.
+Some libraries may call middleware with no underlying action (aka no operation
+or "no-op"); typically this allows for middleware to be called at a "point in
+time" rather than _around_ a specific procedure. This has no effect on how you
+should write a middleware function for these actions.
 
 :::
 

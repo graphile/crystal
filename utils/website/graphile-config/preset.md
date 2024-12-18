@@ -43,12 +43,14 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-:::note
+:::note Importing Graphile Config types is recommended
 
-Adding the import statement tells TypeScript about the `GraphileConfig` global
-namespace. No code from the `graphile-config` library will be included in the
-output JavaScript for `graphile.config.ts` above. See the TypeScript docs for
-more info about
+Adding the `import type {} from "graphile-config"` statement tells TypeScript
+about the `GraphileConfig` global namespace; this may or may not be necessary
+depending on the other imports that you have, but we generally recommend it.
+
+No code from the `graphile-config` library will be included in the output
+JavaScript for `graphile.config.ts` above; see the TypeScript docs for more on
 [type-only imports](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export).
 
 :::
@@ -195,9 +197,13 @@ to avoid unexpected behavior.
 
 ## `graphile` CLI
 
-:::tip
+:::tip Sponsorship has perks: the `graphile` CLI!
 
-The `graphile` CLI is only available to sponsors. See the
+Graphile's open source projects only exist thanks to the sponsorship of
+individuals and organizations that use them. To help convince your boss to fund
+the ongoing development of the OSS that your company relies on, sponsorship
+comes with perks. One such perk is the `graphile` CLI which is only licensed for
+usage by sponsors. See the
 [README](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)
 for more details.
 
