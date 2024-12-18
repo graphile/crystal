@@ -87,9 +87,9 @@ Then run your command again.
 
 Libraries that use Graphile Config define scopes. Scopes are properties in a
 Graphile Config preset within which configuration options can be set. For
-example, [Postgraphile](https://postgraphile.org/) defines `postgraphile`,
-`pgServices` and other scopes. [Graphile Worker](https://worker.graphile.org/)
-defines a `worker` scope.
+example, [Postgraphile](https://postgraphile.org/)'s dependencies define scopes
+including `pgServices`, `schema`, `grafast`, `grafserv`, and more.
+[Graphile Worker](https://worker.graphile.org/) defines a `worker` scope.
 
 Scopes are also used in plugins. Plugin authors 🔌 should see [Plugin](./plugin)
 for more details.
@@ -128,10 +128,9 @@ party code, take caution to ensure you can trust the code you are importing.
 
 ## Preset resolution
 
-Some libraries that use Graphile Config allow consumers to provide more than one
-preset. Presets may also compose (extend) other presets. When a library is
-passed a list of presets, it resolves the preset using the `ResolvePresets`
-algorithm below.
+Presets may compose (extend) zero or more other presets. When a library is
+passed a preset, it resolves the preset using the `ResolvePreset` algorithm
+below.
 
 TL;DR:
 
