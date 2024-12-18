@@ -171,12 +171,12 @@ export const MySpecialPlugin: GraphileConfig.Plugin = {
 ## Middleware order
 
 Most middleware are registered and executed in
-[the order the plugins are loaded](./index.md#plugin-order). Sometimes, middleware in the
-same plugin have varying requirements for when they are run. For this reason,
-middleware also support `before`, `after`, and `provides`. These properties
-function similarly to how they are used to [order plugins](./index.md#plugin-order), but
-Graphile Config uses them to individually sort the middleware for each scoped
-action.
+[the order the plugins are loaded](./index.md#plugin-order). Sometimes,
+middleware in the same plugin have varying requirements for when they are run.
+For this reason, middleware also support `before`, `after`, and `provides`.
+These properties function similarly to how they are used to
+[order plugins](./index.md#plugin-order), but Graphile Config uses them to
+individually sort the middleware for each scoped action.
 
 In the following example, the `bar` middleware in the `libraryName` scope has an
 order constraint at the middleware level. The `bar` middleware in `MyPlugin`
