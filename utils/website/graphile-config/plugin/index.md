@@ -17,7 +17,7 @@ Beyond these scopes, a Graphile Config Plugin has the following properties:
   plugins that a library user uses with a library. Thus, names should be
   descriptive to limit conflicts and confusion with other plugins in that
   library's ecosystem. Names are used to deduplicate plugins in the
-  [preset resolution algorithm](./preset.md#preset-resolution).
+  [preset resolution algorithm](../preset.md#preset-resolution).
 - `version` (optional `string`): a semver-compliant version for the plugin. This
   would normally match the version in the `package.json`, but it does not need
   to (e.g. if the module in question contains multiple plugins). Today, this
@@ -40,7 +40,7 @@ Beyond these scopes, a Graphile Config Plugin has the following properties:
 ## Plugin order
 
 Plugins are ordered first according to the
-[preset resolution algorithm](./preset.md#preset-resolution). Consider the
+[preset resolution algorithm](../preset.md#preset-resolution). Consider the
 following presets:
 
 ```ts title=some-default-preset.ts

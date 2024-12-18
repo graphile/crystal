@@ -146,7 +146,7 @@ TL;DR:
    1. Let {resolvedPreset} be {ResolvePreset(preset)}.
    1. Let {finalPreset} be {MergePreset(finalPreset, resolvedPreset)}.
 1. Let {finalPreset.plugins} be
-   {[sortWithBeforeAfterProvides](./plugin.md#plugin-order)(finalPreset.plugins)}.
+   {[sortWithBeforeAfterProvides](./plugin/index.md#plugin-order)(finalPreset.plugins)}.
 1. Return {finalPreset}.
 
 **ResolvePreset(preset):**
