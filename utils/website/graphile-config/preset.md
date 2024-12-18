@@ -116,7 +116,7 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-:::info
+:::info Define your own presets to share your preferred defaults
 
 As a library consumer, you can build and share presets with your collaborators
 or even extend 3rd party presets provided by the community. As with any 3rd
@@ -131,7 +131,7 @@ preset. Presets may also compose (extend) other presets. When a library is
 passed a list of presets, it resolves the preset using the `ResolvePresets`
 algorithm below.
 
-tl;dr:
+TL;DR:
 
 - All the presets in `extends` are resolved in order (order is important!).
 - The plugins are merged as a set (each plugin will only be included once) and
@@ -160,7 +160,7 @@ tl;dr:
 1. Let {finalPreset} be an empty preset.
 1. Assert: {basePreset} has an empty or non-existent {extends} property.
 1. Let {plugins} be the list of plugins defined in {basePreset} appended with
-   the list of plugins in {extendingPreset}.
+   those in {extendingPreset} that aren't already present in {basePreset}.
 1. Let the list of plugins for {finalPreset} be {plugins}.
 1. Let {scopes} be the list of scopes defined in {basePreset} union the list of
    scopes in {extendingPreset}.
@@ -179,7 +179,7 @@ tl;dr:
 
 If the following are true:
 
-1. You provide two presets - PresetA and PresetB - to a library.
+1. A preset extends two other presets - PresetA and PresetB.
 2. Both PresetA and PresetB `extends` the same underlying preset - PresetBASE.
 3. Both PresetA and PresetB apply some overrides to options set in PresetBASE.
 

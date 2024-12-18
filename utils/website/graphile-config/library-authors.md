@@ -13,7 +13,7 @@ reduce the likelihood of future conflicts with features we may wish to add.
 
 ## Naming scopes
 
-By convention, scopes are camelcase strings. Scopes should be descriptive enough
+By convention, scopes are camelCase strings. Scopes should be descriptive enough
 to reduce the chance of either conflicts across libraries or conflicts with
 future additions to Graphile Config.
 
@@ -24,12 +24,20 @@ preset scopes or plugin scopes:
 - appendPlugins (to avoid confusion with Postgraphile v4 plugins)
 - before
 - callback
+- description
 - default (to enable compatibility with the various ESM emulations)
 - disablePlugins
 - experimental
+- export
+- exports
+- extend
 - extends
 - functionality
 - id
+- import
+- imports
+- include
+- includes
 - label
 - name
 - plugin

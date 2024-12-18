@@ -102,7 +102,7 @@ in the context of some underlying action. Libraries include an `event` object
 which is passed to your middleware function alongside a `next` callback
 function.
 
-By adding middleware to a plugin, you can...
+By adding middleware to a plugin, you can:
 
 - run logic before the library's underlying action by including code before
   `next()`.
@@ -175,7 +175,7 @@ available actions around which you can add middleware, the structure of the
 `event`, and whether the middleware are
 [synchronous or asynchronous](#synchronous-middleware).
 
-:::note
+:::note The underlying procedure might be a no-op
 
 Some libraries may call middleware with a no-op underlying action. This has no
 effect on how you should write a middleware function for these actions.
@@ -265,7 +265,7 @@ export const MyPlugin: GraphileConfig.Plugin = {
       },
       bar: {
         after: ["featureB"],
-        callback: (next) => {
+        callback(next) {
           // ... do something
           // Will be executed after middleware that set
           // `provides: ['featureB']`
@@ -283,7 +283,7 @@ export const OtherPlugin: GraphileConfig.Plugin = {
     middleware: {
       bar: {
         provides: ["featureB"],
-        callback: (next) => {
+        callback(next) {
           // ... do something
           return next();
         },
@@ -308,7 +308,7 @@ you need to extend `GraphileConfig.WorkerOptions`:
 
 ```ts
 declare global {
-  declare namespace GraphileConfig {
+  namespace GraphileConfig {
     interface WorkerOptions {
       myNewConfigOption?: string;
     }
@@ -320,7 +320,7 @@ You can also add a new scope:
 
 ```ts
 declare global {
-  declare namespace GraphileConfig {
+  namespace GraphileConfig {
     interface SendgridOptions {
       apiKey?: string;
     }
@@ -339,12 +339,12 @@ ensure that the **resolved** preset has some value for some option, you do not
 want to force every (unresolved) preset to have a value.
 
 If you are building a plugin to share with others, you may also want to export a
-preset that sets options to sane defaults or uses secrets from environment
+preset that sets options to sensible defaults or uses secrets from environment
 variables.
 
 ```ts title=my-sendgrid-plugin.ts
 declare global {
-  declare namespace GraphileConfig {
+  namespace GraphileConfig {
     interface SendgridOptions {
       apiKey?: string;
       someOtherOption?: number;
