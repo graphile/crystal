@@ -5,36 +5,40 @@ title: "Middleware"
 
 # Middleware
 
-Target Audience: plugin authors 🔌 and library authors 📚
+_Target Audience: plugin authors 🔌 and library authors 📚_
 
-Some libraries may choose to make a middleware system available to plugins.
-Adding middleware to a plugin allows you to wrap specific procedures in the
-library's execution with your own code, and even to skip the execution or
-replace the result of these procedures. Middleware functions are called with a
-`next` function to be used to invoke the underlying procedure, and a mutable
-`event` object that describes the context under which the middleware is being
-called; they return the result of calling `next`, or a replacement result to use
-in its place.
+Some libraries may choose to make a middleware system available to plugins,
+allowing plugin authors to wrap specific library procedures with their own
+code, and even to skip the execution or replace the result of these procedures.
+
+Each procedure that a library exposes through the middleware system is called
+an "action", and has a unique name, the "action name." A plugin may register a
+callback, called a "middleware function" or simply a "middleware," against zero
+or more actions. Middleware functions are called with a `next` function which
+invokes the underlying action, and a mutable `event` object that describes the
+context under which the middleware is being called; they return the result of
+calling `next`, or a replacement result to use in its place.
 
 By adding middleware to a plugin, you can:
 
 - run logic before the library's underlying action by including code before
-  `next()`.
+  `next()`,
 - run logic after the library's underlying action by including code after
-  `next()` but before returning.
+  `next()` but before returning,
 - omit calling the underlying action and further middleware by not calling
-  `next()` (not recommended unless the library notes this is expected)
+  `next()` (not recommended unless the library notes this is expected),
 - call the underlying action and following middleware more than once by calling
   `next()` multiple times (not recommended unless the library notes this is
-  expected)
+  expected), and
 - mutate the `event` object to change the behaviour of further middleware and
-  the underlying procedure (not recommended unless the library notes this is
-  expected, typically in the TSDoc comments for the various event properties)
+  the underlying action (not recommended unless the library notes this is
+  expected, typically in the TSDoc comments for the various event properties).
 
-The following example plugin includes middleware that adds a naive retry and
-backoff to the underlying action. Note that this example would only be safe if
-the library and other middleware explicitly supported calling `next()` more than
-once.
+The following example plugin includes a middleware that adds a naive retry and
+backoff to the underlying `someAction` action. Note that this example would
+only be safe if the library explicitly states that calling `next()` more than
+once is safe (and even then, it may be unsafe if other middleware don't handle
+this well).
 
 ```ts title="my-some-action-retry-plugin.ts"
 export const MySomeActionRetryPlugin: GraphileConfig.Plugin = {
@@ -63,19 +67,24 @@ export const MySomeActionRetryPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-Middleware functions are executed when libraries call `middelware.run()` or
+Middleware functions are executed when libraries call `middleware.run()` or
 `middleware.runSync()`. For example:
 
 ```ts
 const actionResult = await middleware.run(
-  "someAction", // The "action name"
-  { someParameter: 42 }, // The `event` object
-  // The "underlying action"
-  // This function is what will be retried if the MySomeActionRetryPlugin is
-  // included in a preset.
+  // The "action name"
+  "someAction",
+
+  // The `event` object
+  { someParameter: 42 },
+
+  // The "underlying action"; this function is what will be retried if the
+  // MySomeActionRetryPlugin is included in a preset.
   async (event) => {
     // Extract the (possibly modified) values from the event
     const { someParameter } = event;
+
+    // Do something:
     return doTheThing(someParameter);
   },
 );
@@ -89,10 +98,10 @@ perform the underlying action that the library defines.
 :::warning Here be dragons
 
 When you write a middleware, you are explicitly choosing to change the way in
-which a library functions - and your demands may not be compatible with the
-expectations of the library, which may result in subtle and not-so-subtle bugs.
-In particular, most libraries and most middleware will not function correctly if
-you:
+which a library functions&mdash;your modified behaviour may not be compatible
+with the expectations of the library, which may result in subtle and
+not-so-subtle bugs. In particular, most libraries and most middleware will not
+function correctly if you:
 
 - omit `next()`,
 - call `next()` more than once,
@@ -106,11 +115,11 @@ whether the middleware are
 
 :::
 
-:::note The underlying procedure might be a no-op
+:::note The underlying action might be a no-op
 
 Some libraries may call middleware with no underlying action (aka no operation
 or "no-op"); typically this allows for middleware to be called at a "point in
-time" rather than _around_ a specific procedure. This has no effect on how you
+time" rather than _around_ a specific action. This has no effect on how you
 should write a middleware function for these actions.
 
 :::
