@@ -195,9 +195,10 @@ in the same resolved preset.
 ```ts
 export const MyPlugin: GraphileConfig.Plugin = {
   name: "MyPlugin",
-  // Plugins can have order constraints at the plugin level and at the
-  // middleware level. All middleware in MyPlugin will be executed before any
-  // middleware in plugins that have `provides: ["featureA" ]`
+  // Plugins can have default order constraints at the plugin level and can
+  // override them at the middleware level.
+  // This states that by default, middleware in MyPlugin will be executed
+  // before any other plugins' middleware that provides 'featureA'.
   before: ["featureA"],
   libraryName: {
     middleware: {
@@ -205,16 +206,19 @@ export const MyPlugin: GraphileConfig.Plugin = {
         // ... do something
         return next();
       },
+
       bar: {
         after: ["featureB"],
-        callback(next) {
-          // ... do something
-          // Will be executed after middleware that set
-          // `provides: ['featureB']`
-          return next();
+        async callback(next) {
+          // Executed after middleware that provides 'featureB'
+          console.log("MyPlugin");
+          try {
+            return await next();
+          } finally {
+            console.log("/MyPlugin");
+          }
         },
       },
-      // ... any other middleware
     },
   },
 };
@@ -225,14 +229,27 @@ export const OtherPlugin: GraphileConfig.Plugin = {
     middleware: {
       bar: {
         provides: ["featureB"],
-        callback(next) {
-          // ... do something
-          return next();
+        async callback(next) {
+          console.log("OtherPlugin");
+          try {
+            return await next();
+          } finally {
+            console.log("/OtherPlugin");
+          }
         },
       },
     },
   },
 };
+
+/* Result of executing the `bar` action:
+
+OtherPlugin
+MyPlugin
+/MyPlugin
+/OtherPlugin
+
+*/
 ```
 
 Similar to plugins' `provides` property, Graphile Config appends the plugin
