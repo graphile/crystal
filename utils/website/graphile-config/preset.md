@@ -191,18 +191,34 @@ below.
       `extendingScope` actually exist.
 1. Return `mergedPreset`.
 
-:::info
+:::warning Order of composition is important
 
-If the following are true:
+Consider a preset, APreset, that extends two other presets: Preset1 and
+Preset2, each of which `extends` the same preset, Preset0:
 
-1. A preset extends two other presets - PresetA and PresetB.
-2. Both PresetA and PresetB `extends` the same underlying preset - PresetBASE.
-3. Both PresetA and PresetB apply some overrides to options set in PresetBASE.
+```ts
+const Preset0 = { myScope: { option1: false, option2: false } };
+const Preset1 = { extends: [Preset0], myScope: { option1: true } };
+const Preset2 = { extends: [Preset0], myScope: { option2: true } };
+const APreset = { extends: [Preset1, Preset2] };
+```
 
-Then the overrides in PresetA will be overridden by re-applying PresetBASE
-again. For this reason, presets that are expected to be combined with other
-presets should not `extends` common or shared presets. Instead, the end user
-should be expected to add these presets themselves.
+Any overrides to the options set in Preset0 by Preset1 will be reset in APreset
+since they will be overridden when Preset2 applies the Preset0 options again:
+
+```ts
+// Resolving the presets operates depth first:
+const Preset0 = { myScope: { option1: false, option2: false } };
+const Preset1 = { myScope: { ...Preset0.myScope, option1: true } };
+const Preset2 = { myScope: { ...Preset0.myScope, option2: true } };
+const APreset = { myScope: { ...Preset1.myScope, ...Preset2.myScope } };
+// Thus:
+const APreset = { myScope: { option1: false, option2: true } };
+```
+
+For this reason, presets that are expected to be combined with other presets
+should not `extends` common or shared presets; instead, the end user should be
+expected to add these presets themselves.
 
 Said another way, the tree of presets should only ever have a depth of 2 or less
 to avoid unexpected behavior.
