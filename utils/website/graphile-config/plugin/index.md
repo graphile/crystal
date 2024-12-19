@@ -14,69 +14,75 @@ enable expanded functionality, including through [middleware](#middleware).
 Beyond these scopes, a Graphile Config Plugin has the following properties:
 
 - `name` (`string`): The name of the plugin. This must be unique among all
-  plugins that a library user uses with a library. Thus, names should be
-  descriptive to limit conflicts and confusion with other plugins in that
-  library's ecosystem. Names are used to deduplicate plugins in the
-  [preset resolution algorithm](../preset.md#preset-resolution).
-- `version` (optional `string`): a semver-compliant version for the plugin. This
-  would normally match the version in the `package.json`, but it does not need
-  to (e.g. if the module in question contains multiple plugins). Today, this
-  isn't used for much. It is only displayed in the output of
-  `graphile config print`, but it may be used in the future to allow plugins to
+  plugins used (directly or indirectly) in a given preset. Names should be
+  descriptive to limit conflicts and confusion with other plugins. The plugin
+  name is automatically added to `provides` below.
+- `version` (optional `string`): a semver-compliant version for the plugin.
+  This would normally match the version in the `package.json`, but it does not
+  need to. Today, this isn't used for much (it is displayed in the output of
+  `graphile config print`) but it may be used in the future to allow plugins to
   express dependencies on other plugins.
 - `description` (optional `string`): human-readable description of the plugin in
   [CommonMark](https://commonmark.org/) (markdown) format.
-- `provides` (optional `string[]`): an optional list of "feature labels" that
-  this plugin provides. This is used to govern the order in which the plugin is
-  registered. Graphile Config will append the plugin name to any feature labels
-  here. See [Plugin order](#plugin-order)
-- `after` (optional `string[]`): indicates that this plugin should be loaded
-  after plugins with these feature labels if these feature labels are present in
-  other plugins in the preset.
-- `before` (optional `string[]`): indicates that this plugin should be loaded
-  before plugins with these feature labels if these feature labels are present
-  in other plugins in the preset.
+- `provides` (optional `string[]`): an optional list of "feature labels" this
+  plugin provides, used to govern the [order in which the plugin is
+  registered](#plugin-order). Graphile Config will append the plugin name to
+  any feature labels here.
+- `after` (optional `string[]`): indicates this plugin should be loaded
+  after any plugins with these feature labels.
+- `before` (optional `string[]`): indicates this plugin should be loaded
+  before any plugins with these feature labels.
 
 ## Plugin order
 
-Plugins are ordered first according to the
-[preset resolution algorithm](../preset.md#preset-resolution). Consider the
-following presets:
-
-```ts title=some-default-preset.ts
-import type {} from "graphile-config";
-import PluginA from "./plugin-a";
-
-const preset: GraphileConfig.Preset = {
-  plugins: [PluginA],
-};
-
-export default preset;
-```
+Consider the following set of plugins and presets:
 
 ```ts title=graphile.config.ts
 import type {} from "graphile-config";
-import PluginB from "./plugin-b";
-import PluginC from "./plugin-c";
-import SomeDefaultPreset from "./some-default-preset";
 
-const preset: GraphileConfig.Preset = {
-  extends: [SomeDefaultPreset],
-  plugins: [PluginB, PluginC],
+const PluginA: GraphileConfig.Plugin = { name: "PluginA" };
+const PluginB: GraphileConfig.Plugin = { name: "PluginB" };
+const PluginC: GraphileConfig.Plugin = { name: "PluginC" };
+
+const Preset1: GraphileConfig.Preset = {
+  plugins: [PluginA],
 };
 
-export default preset;
+const Preset2: GraphileConfig.Preset = {
+  extends: [Preset1],
+  plugins: [PluginB, PluginC],
+};
 ```
 
-If you use the preset in `graphile.config.ts` and none of the plugins specify
-`before` or `after` then the resolved plugins will typically be loaded in the
-order `[PluginA, PluginB, PluginC]`; however, this ordering is not guaranteed
-and should not be relied upon.
+Plugins are currently ordered first according to the [preset resolution
+algorithm](../preset.md#preset-resolution). Since none of the plugin in
+`graphile.config.ts` specify `before` or `after`, the plugins in `Preset2`,
+once resolved, will be ordered `[PluginA, PluginB, PluginC]`. However, this
+ordering is not guaranteed and should not be relied upon.
 
 If the order in which a plugin is loaded is significant, it must be stated
 explicitly by adding to a plugin's `before` and `after` properties. These
 properties guarantee its loading position relative to other plugins that provide
-those features.
+those features:
+
+```ts title=graphile.config.ts
+import type {} from "graphile-config";
+
+const PluginA: GraphileConfig.Plugin = { name: "PluginA", after: ["PluginC"] };
+const PluginB: GraphileConfig.Plugin = { name: "PluginB", before: ["PluginA"] };
+const PluginC: GraphileConfig.Plugin = { name: "PluginC", after: ["PluginB"] };
+
+const Preset1: GraphileConfig.Preset = {
+  plugins: [PluginA],
+};
+
+const Preset2: GraphileConfig.Preset = {
+  extends: [Preset1],
+  plugins: [PluginB, PluginC],
+};
+
+// Resulting order: PluginB, PluginC, PluginA
+```
 
 If multiple different plugins provide the same feature they should indicate this
 via the `provides` property, thereby allowing other plugins to guarantee their
@@ -125,12 +131,12 @@ You can also add a new scope:
 ```ts
 declare global {
   namespace GraphileConfig {
-    interface SendgridOptions {
-      apiKey?: string;
-    }
-
     interface Preset {
       sendgrid?: SendgridOptions;
+    }
+
+    interface SendgridOptions {
+      apiKey?: string;
     }
   }
 }
@@ -149,13 +155,13 @@ variables.
 ```ts title=my-sendgrid-plugin.ts
 declare global {
   namespace GraphileConfig {
+    interface Preset {
+      sendgrid?: SendgridOptions;
+    }
+
     interface SendgridOptions {
       apiKey?: string;
       someOtherOption?: number;
-    }
-
-    interface Preset {
-      sendgrid?: SendgridOptions;
     }
   }
 }
