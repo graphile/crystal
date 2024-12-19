@@ -5,38 +5,34 @@ sidebar_position: 1
 # Graphile Config
 
 **PRERELEASE**: this is pre-release software; use at your own risk. This will
-likely change a lot before it's ultimately released.
+likely change a lot before it is ultimately released.
 
-`graphile-config` provides a standard plugin interface and helpers that can be
-used across the entire of the Graphile suite. Primarily users will only use this
-as `import type Plugin from 'graphile-config';` so that they can export plugins.
+Graphile Config helps Node.js library authors make their libraries configurable
+and _extensible_. Graphile Config is used across the Graphile suite to provide a
+standard configuration and plugin interface.
 
-This package provides two interfaces: `Plugin` and `Preset`
+## Features
 
-## Supporting TypeScript ESM
+- Define and document strongly typed configuration options for your library.
+- Allow users to extend the functionality of your library via plugins.
+- Plugins can add their own additional configuration options.
+- Bundle configuration options and plugins into default presets for your users.
+- You and your users can compose presets with preset extension.
+- Allow your users to share configuration across multiple modes (e.g. CLI and library).
+- Powerful middleware system to make your library extensible.
+- Users don't need to put plugins in a particular order, thanks to the ordering system.
+- View the available options and resolved values of a preset with the `graphile`
+  CLI
+  ([available to sponsors](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)).
 
-You can specify a `graphile.config.ts` file; but if that uses `export default`
-and your TypeScript is configured to export ESM then you'll get an error telling
-you that you cannot `require` an ES Module:
+## Different Users
 
-```js
-Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: /path/to/graphile.config.ts
-require() of ES modules is not supported.
-require() of /path/to/graphile.config.ts from /path/to/node_modules/graphile-config/dist/loadConfig.js is an ES module file as it is a .ts file whose nearest parent package.json contains "type": "module" which defines all .ts files in that package scope as ES modules.
-Instead change the requiring code to use import(), or remove "type": "module" from /path/to/package.json.
-```
+As a user of Graphile Config, you may not need to understand everything. There
+are three common levels of usage, in order of the amount of knowledge required:
 
-Or, in newer versions, an error saying unknown file extension:
+1. Library consumers ⚙️
+2. Plugin authors 🔌
+3. Library authors 📚
 
-```js
-TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /path/to/graphile.config.ts
-```
-
-To solve this, use the experimental loaders API to add support for TS ESM via
-the `ts-node/esm` loader:
-
-```js
-export NODE_OPTIONS="$NODE_OPTIONS --loader ts-node/esm"
-```
-
-Then run your command again.
+Each section in the Graphile Config docs will indicate the intended audience.
+Feel free to learn only what you need, or learn it all!
