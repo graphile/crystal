@@ -19,6 +19,8 @@ standard configuration and plugin interface.
 - Bundle configuration options and plugins into default presets for your users.
 - You and your users can compose presets with preset extension.
 - Allow your users to share configuration across multiple modes (e.g. CLI and library).
+- Powerful middleware system to make your library extensible.
+- Users don't need to put plugins in a particular order, thanks to the ordering system.
 - View the available options and resolved values of a preset with the `graphile`
   CLI
   ([available to sponsors](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)).
