@@ -17,9 +17,14 @@ By convention, scopes are camelCase strings. Scopes should be descriptive enough
 to reduce the chance of either conflicts across libraries or conflicts with
 future additions to Graphile Config.
 
+<details>
+
+<summary>Click for specifically reserved scope names</summary>
+
 The following strings are reserved by Graphile Config, and should not be used as
 preset scopes or plugin scopes:
 
+- Anything beginning with an underscore (`_`)
 - after
 - appendPlugins (to avoid confusion with PostGraphile v4 plugins)
 - before
@@ -47,6 +52,8 @@ preset scopes or plugin scopes:
 - skipPlugins (to avoid confusion with PostGraphile v4 plugins)
 - title
 
+</details>
+
 ## Middleware
 
 (This section was primarily written by Benjie for Benjie... so you may want to
@@ -56,9 +63,7 @@ If you need to create a middleware system for your library, you might follow
 something along these lines (replacing `libraryName` with the name of your
 library):
 
-```ts
-/***** interfaces.ts *****/
-
+```ts title="src/interfaces.ts"
 // Define the middlewares that you support, their event type and their return type
 export interface MyMiddleware {
   someAction(event: SomeActionEvent): PromiseOrDirect<SomeActionResult>;
@@ -78,9 +83,9 @@ interface SomeActionEvent {
 type SomeActionResult = number;
 
 export type PromiseOrDirect<T> = Promise<T> | T;
+```
 
-/***** index.ts *****/
-
+```ts title="src/index.ts"
 import type { MiddlewareHandlers } from "graphile-config";
 
 // Extend Plugin with support for registering handlers for the middleware activities:
@@ -89,24 +94,13 @@ declare global {
     interface Plugin {
       libraryName?: {
         middleware?: MiddlewareHandlers<MyMiddleware>;
-
-        // Prior to graphile-config@0.0.1-beta.12, a more verbose alternative was required:
-        /*
-        middleware?: {
-          [key in keyof MyMiddleware]?: CallbackOrDescriptor<
-            MyMiddleware[key] extends (...args: infer UArgs) => infer UResult
-              ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
-              : never
-          >;
-        };
-        */
       };
     }
   }
 }
+```
 
-/***** getMiddleware.ts *****/
-
+```ts title="src/getMiddleware.ts"
 import { Middleware, orderedApply, resolvePreset } from "graphile-config";
 
 export function getMiddleware(resolvedPreset: GraphileConfig.ResolvedPreset) {
@@ -122,9 +116,9 @@ export function getMiddleware(resolvedPreset: GraphileConfig.ResolvedPreset) {
     },
   );
 }
+```
 
-/***** main.ts *****/
-
+```ts title="src/main.ts"
 // Get the user's Graphile Config from somewhere, e.g.
 import config from "./graphile.config.js";
 
@@ -140,10 +134,12 @@ const result = await middleware.run(
   "someAction",
   { someParameter: 42 }, // < `event` object
   async (event) => {
-    // Call the underlying method to perform the action.
     // Note: `event` will be the same object as above, but its contents may
     // have been modified by middlewares.
-    return await someAction(event.someParameter);
+    const { someParameter } = event;
+
+    // Call the underlying method to perform the action.
+    return await someAction(someParameter);
   },
 );
 // The value of `result` should match the return value of `someAction(...)`
