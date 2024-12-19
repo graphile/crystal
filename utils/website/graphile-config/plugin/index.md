@@ -5,7 +5,7 @@ title: "Plugin"
 
 # Graphile Config Plugin
 
-Target Audience: plugin authors 🔌 and library authors 📚
+_Target Audience: plugin authors 🔌 and library authors 📚_
 
 Plugins allow you to extend the functionality of libraries that use Graphile
 Config. Each library that uses Graphile Config may register plugin scopes that
