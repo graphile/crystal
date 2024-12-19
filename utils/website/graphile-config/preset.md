@@ -142,7 +142,7 @@ below.
 
 #### TL;DR:
 
-- All the presets in `extends` are resolved in order (order is important!).
+- All the presets in `extends` are resolved, recursively, depth-first, in order (order is important!).
 - The plugins are merged as a set (each plugin will only be included once) and
   sorted according to `before`/`after`.
 - The options are merged such that options specified last win.
@@ -172,7 +172,8 @@ below.
 
 #### `ExtendPreset(basePreset, extensionPreset):`
 
-1. Assert: `basePreset` has an empty or non-existent `extends` property.
+1. Note: this algorithm ignores the `extends` property of both `basePreset` and
+   `extensionPreset`, assuming they has already been resolved elsewhere.
 1. Let `mergedPreset` be an empty preset.
 1. Let `plugins` be the unique list of plugins defined in `basePreset` followed
    those defined in `extensionPreset` and not already defined in `basePreset`.
