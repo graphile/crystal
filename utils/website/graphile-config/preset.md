@@ -61,6 +61,8 @@ You can specify a `graphile.config.ts` file, but if that uses `export default`,
 and your TypeScript is configured to export ESM, then you may get an error
 telling you that you cannot `require` an ES Module:
 
+<div className="wrapcode">
+
 ```
 Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: /path/to/graphile.config.ts
 require() of ES modules is not supported.
@@ -68,11 +70,17 @@ require() of /path/to/graphile.config.ts from /path/to/node_modules/graphile-con
 Instead change the requiring code to use import(), or remove "type": "module" from /path/to/package.json.
 ```
 
+</div>
+
 Or, in newer versions, an error saying unknown file extension:
 
-```js
+<div className="wrapcode">
+
+```
 TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /path/to/graphile.config.ts
 ```
+
+</div>
 
 To solve this, use the experimental loaders API to add support for TS ESM via
 the `ts-node/esm` loader:
