@@ -3,9 +3,9 @@ sidebar_position: 2
 title: Preset
 ---
 
-# Graphile Config Preset
+# GraphileConfig.Preset
 
-Target Audience: all Graphile Config users ⚙️🔌📚
+_Target Audience: all Graphile Config users ⚙️🔌📚_
 
 A preset bundles together a list of options and plugins to configure and extend
 a library. `GraphileConfig.Preset` is the primary interface that most Graphile
@@ -104,7 +104,7 @@ for more details.
 
 ## Preset composition
 
-Library authors create Graphile Config presets that allow consumers to easily
+Library authors can create Graphile Config presets that allow consumers to easily
 use the library with default or recommended settings. The `extends` property in
 a preset allows library consumers to extend one or more presets with their own
 configuration values or plugins. Extending presets resolves values according to
@@ -126,7 +126,7 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-:::info Define your own presets to share your preferred defaults
+:::tip Define your own presets to share your preferred defaults
 
 As a library consumer, you can build and share presets with your collaborators
 or even extend 3rd party presets provided by the community. As with any 3rd
