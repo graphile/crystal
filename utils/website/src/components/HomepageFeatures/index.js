@@ -10,8 +10,8 @@ const FeatureList = [
     link: "/graphile-config/",
     description: (
       <>
-        Provides a standard plugin interface and helpers which can be used
-        across the entire Graphile suite
+        Helps Node.js module authors make their libraries configurable and
+        extensible.
       </>
     ),
   },
