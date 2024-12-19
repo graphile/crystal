@@ -87,7 +87,7 @@ Then run your command again.
 
 Libraries that use Graphile Config define scopes. Scopes are properties in a
 Graphile Config preset within which configuration options can be set. For
-example, [Postgraphile](https://postgraphile.org/)'s dependencies define scopes
+example, [PostGraphile](https://postgraphile.org/)'s dependencies define scopes
 including `pgServices`, `schema`, `grafast`, `grafserv`, and more.
 [Graphile Worker](https://worker.graphile.org/) defines a `worker` scope.
 

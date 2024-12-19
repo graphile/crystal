@@ -21,7 +21,7 @@ The following strings are reserved by Graphile Config, and should not be used as
 preset scopes or plugin scopes:
 
 - after
-- appendPlugins (to avoid confusion with Postgraphile v4 plugins)
+- appendPlugins (to avoid confusion with PostGraphile v4 plugins)
 - before
 - callback
 - description
@@ -42,9 +42,9 @@ preset scopes or plugin scopes:
 - name
 - plugin
 - plugins
-- prependPlugins (to avoid confusion with Postgraphile v4 plugins)
+- prependPlugins (to avoid confusion with PostGraphile v4 plugins)
 - provides
-- skipPlugins (to avoid confusion with Postgraphile v4 plugins)
+- skipPlugins (to avoid confusion with PostGraphile v4 plugins)
 - title
 
 ## Middleware
