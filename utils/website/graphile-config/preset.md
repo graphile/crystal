@@ -140,49 +140,55 @@ Presets may compose (extend) zero or more other presets. When a library is
 passed a preset, it resolves the preset using the `ResolvePreset` algorithm
 below.
 
-TL;DR:
+#### TL;DR:
 
 - All the presets in `extends` are resolved in order (order is important!).
 - The plugins are merged as a set (each plugin will only be included once) and
   sorted according to `before`/`after`.
 - The options are merged such that options specified last win.
 
-**ResolvePresets(presets):**
+#### `ResolvePreset(preset):`
 
-1. Let {finalPreset} be an empty preset.
-1. For each {preset} in {presets}:
-   1. Let {resolvedPreset} be {ResolvePreset(preset)}.
-   1. Let {finalPreset} be {MergePreset(finalPreset, resolvedPreset)}.
-1. Let {finalPreset.plugins} be
-   {[sortWithBeforeAfterProvides](./plugin/index.md#plugin-order)(finalPreset.plugins)}.
-1. Return {finalPreset}.
+1. Let `flattenedPreset` be `FlattenPreset(preset)`.
+1. Let `resolvedPreset` be a copy of `flattenedPreset` with the `plugins`
+   property sorted according to the [plugin ordering
+   rules](./plugin/index.md#plugin-order).
+1. Return `resolvedPreset`.
 
-**ResolvePreset(preset):**
+#### `FlattenPreset(preset):`
 
-1. Let {extendedPresets} be the list specified in the {extends} property of
-   {preset} (or an empty list if none specified).
-1. Let {basePreset} be {ResolvePresets(extendedPresets)}.
-1. Return {MergePreset(basePreset, preset)}.
+1. Let `extends` be the list specified in the `extends` property of `preset`
+   (or an empty list if none specified).
+1. Let `extendsPreset` be `MergePresets(extends)`.
+1. Return `ExtendPreset(preset, extendsPreset)`.
 
-**MergePreset(basePreset, extendingPreset):**
+#### `MergePresets(presets):`
 
-1. Let {finalPreset} be an empty preset.
-1. Assert: {basePreset} has an empty or non-existent {extends} property.
-1. Let {plugins} be the list of plugins defined in {basePreset} appended with
-   those in {extendingPreset} that aren't already present in {basePreset}.
-1. Let the list of plugins for {finalPreset} be {plugins}.
-1. Let {scopes} be the list of scopes defined in {basePreset} union the list of
-   scopes in {extendingPreset}.
-1. For each {scope} in {scopes}:
-   1. Let {baseScope} be the {scope} in {basePreset}.
-   1. Let {extendingScope} be the {scope} in {extendingPreset}.
-   1. If {baseScope} and {extendingScope} both exist:
-      1. Let {scope} in {finalPreset} be the result of merging {baseScope} and
-         {extendingScope} akin to
+1. Let `mergedPreset` be an empty preset.
+1. For each `preset` in `presets`:
+   1. Let `flattenedPreset` be `FlattenPreset(preset)`.
+   1. Let `mergedPreset` be `ExtendPreset(mergedPreset, flattenedPreset)`.
+1. Return `mergedPreset`.
+
+#### `ExtendPreset(basePreset, extensionPreset):`
+
+1. Assert: `basePreset` has an empty or non-existent `extends` property.
+1. Let `mergedPreset` be an empty preset.
+1. Let `plugins` be the unique list of plugins defined in `basePreset` followed
+   those defined in `extensionPreset` and not already defined in `basePreset`.
+1. Let the list of plugins in `mergedPreset` be `plugins`.
+1. Let `scopes` be the set of scopes defined in `basePreset` union those
+   defined in `extensionPreset`.
+1. For each `scope` in `scopes`:
+   1. Let `baseScope` be the value of the `scope` in `basePreset`.
+   1. Let `extendingScope` be the value of the `scope` in `extensionPreset`.
+   1. If `baseScope` and `extendingScope` both exist:
+      1. Let `scope` in `mergedPreset` be the result of merging `baseScope` and
+         `extendingScope` akin to
          `Object.assign({}, baseScope, extendingScope)`.
-   1. Else: let {scope} in {finalPreset} be whichever of {baseScope} and
-      {extendingScope} actually exist.
-1. Return {finalPreset}.
+   1. Otherwise: let `scope` in `mergedPreset` be whichever of `baseScope` and
+      `extendingScope` actually exist.
+1. Return `mergedPreset`.
 
 :::info
 
