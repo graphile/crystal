@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
-import { grafserv } from "../src/servers/node/index.js";
+import { grafserv } from "../src/servers/whtatwg-node-server";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {
@@ -36,8 +36,7 @@ export async function makeExampleServer(
   });
 
   const serv = grafserv({ schema, preset });
-  const server = createServer();
-  serv.addTo(server);
+  const server = createServer(serv.createHandler());
   const promise = new Promise<void>((resolve, reject) => {
     server.on("listening", () => {
       server.off("error", reject);
