@@ -1,10 +1,12 @@
-import { createServer } from "node:http";
+import { createServer, Server } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
-import { grafserv } from "../src/servers/whtatwg-node-server";
+import { grafserv as grafservNode } from "../src/servers/node/index.js";
+import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node-server";
+import { GrafservBase } from "../src/index.js";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {
@@ -14,6 +16,7 @@ export async function makeExampleServer(
       dangerouslyAllowAllCORSRequests: true,
     },
   },
+  type?: 'node' | 'whatwg'
 ) {
   const resolvedPreset = resolvePreset(preset);
   const schema = makeGrafastSchema({
@@ -35,8 +38,22 @@ export async function makeExampleServer(
     },
   });
 
-  const serv = grafserv({ schema, preset });
-  const server = createServer(serv.createHandler());
+  let serv: GrafservBase
+  let server: ReturnType<typeof createServer>
+  switch (type) {
+    case 'whatwg':
+      const servWhatwg = grafservWhatwg({schema, preset})
+      server = createServer(servWhatwg.createHandler());
+      serv = servWhatwg
+      break;
+    case 'node':
+    default:
+      const servNode = grafservNode({ schema, preset });
+      server = createServer();
+      servNode.addTo(server);
+      serv = servNode
+      break;
+  }
   const promise = new Promise<void>((resolve, reject) => {
     server.on("listening", () => {
       server.off("error", reject);

@@ -90,6 +90,7 @@
   },
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
+    "@whatwg-node/server": "^0.9.64",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
@@ -98,6 +99,9 @@
   },
   "peerDependenciesMeta": {
     "@envelop/core": {
+      "optional": true
+    },
+    "@whatwg-node/server": {
       "optional": true
     },
     "h3": {

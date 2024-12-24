@@ -2,16 +2,54 @@ import { createServerAdapter } from '@whatwg-node/server'
 
 import { GrafservBase } from "../../core/base.js";
 import type {
+  GrafservBody,
   GrafservConfig,
   RequestDigest,
   Result,
 } from "../../interfaces.js";
+
+import { OptionsFromConfig } from '../../options.js';
+import { httpError } from '../../utils.js';
+
+export function getBodyFromRequest(
+  req: Request /* IncomingMessage */,
+  maxLength: number,
+): Promise<GrafservBody> {
+  return new Promise(async (resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let len = 0;
+    const handleDataCb = (chunk: Uint8Array<ArrayBufferLike>) => {
+      chunks.push(Buffer.from(chunk));
+      len += chunk.length;
+      if (len > maxLength) {
+        reject(httpError(413, "Too much data"));
+      }
+    };
+    const doneCb = () => {
+      resolve({ type: "buffer", buffer: Buffer.concat(chunks) });
+    };
+    const reader = req.body?.getReader()
+    if (!reader) {
+      return doneCb()
+    }
+    while (true) {
+      const {done, value} = await reader?.read()
+      if (value) {
+        handleDataCb(value)
+      }
+      if (done) {
+        return doneCb()
+      }
+    }
+  });
+}
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Grafast {
     interface RequestContext {
         whatwg: {
+            version:string
             request: Request
         }
     }
@@ -21,13 +59,14 @@ declare global {
 /** @experimental */
 export class WhatwgGrafserv extends GrafservBase {
   protected whatwgRequestToGrafserv(
+    dynamicOptions: OptionsFromConfig,
     request: Request
   ): RequestDigest {
     const url = new URL(request.url);
     return {
       httpVersionMajor: 1,
-      httpVersionMinor: 0,
-      isSecure: url.protocol === 'https://',
+      httpVersionMinor: 1,
+      isSecure: url.protocol === 'https:',
       method:  request.method,
       path: url.pathname,
       headers: this.processHeaders(request.headers),
@@ -35,14 +74,13 @@ export class WhatwgGrafserv extends GrafservBase {
         return Object.fromEntries(url.searchParams.entries()) as Record<string, string>;
       },
       async getBody() {
-        const text = await request.text()
-        return {
-          type: "text",
-          text,
-        };
+        return getBodyFromRequest(request, dynamicOptions.maxRequestLength)
       },
       requestContext: {
-        whatwg: {request}
+        whatwg: {
+          version:'whatwgv1',
+          request
+        }
       },
       preferJSON: true,
     };
@@ -72,7 +110,7 @@ export class WhatwgGrafserv extends GrafservBase {
       case "buffer": {
         const { statusCode, headers, buffer } = response;
         const respHeaders = new Headers(headers)
-        return new Response(buffer.toString('utf8'), {status: statusCode, headers:respHeaders})
+        return new Response(buffer, {status: statusCode, headers:respHeaders})
       }
 
       case "json": {
@@ -92,10 +130,11 @@ export class WhatwgGrafserv extends GrafservBase {
   createHandler() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     return createServerAdapter(async (request: Request): Promise<Response> => {
+      const dynamicOptions = this.dynamicOptions;
       return this.grafservResponseToWhatwg(
         await this.processWhatwgRequest(
           request,
-          this.whatwgRequestToGrafserv(request),
+          this.whatwgRequestToGrafserv(dynamicOptions, request),
         ),
       );
     })
