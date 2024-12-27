@@ -104,11 +104,11 @@ for more details.
 
 ## Preset composition
 
-Library authors can create Graphile Config presets that allow consumers to easily
-use the library with default or recommended settings. The `extends` property in
-a preset allows library consumers to extend one or more presets with their own
-configuration values or plugins. Extending presets resolves values according to
-the [preset resolution algorithm](#preset-resolution).
+Library authors can create Graphile Config presets that allow consumers to
+easily use the library with default or recommended settings. The `extends`
+property in a preset allows library consumers to extend one or more presets with
+their own configuration values or plugins. Extending presets resolves values
+according to the [preset resolution algorithm](#preset-resolution).
 
 The following is a simple example of a Graphile Config preset that could be used
 to configure usage of [Graphile Worker](https://worker.graphile.org/):
@@ -142,7 +142,8 @@ below.
 
 #### TL;DR:
 
-- All the presets in `extends` are resolved, recursively, depth-first, in order (order is important!).
+- All the presets in `extends` are resolved, recursively, depth-first, in order
+  (order is important!).
 - The plugins are merged as a set (each plugin will only be included once) and
   sorted according to `before`/`after`.
 - The options are merged such that options specified last win.
@@ -151,14 +152,14 @@ below.
 
 1. Let `flattenedPreset` be `FlattenPreset(preset)`.
 1. Let `resolvedPreset` be a copy of `flattenedPreset` with the `plugins`
-   property sorted according to the [plugin ordering
-   rules](./plugin/index.md#plugin-order).
+   property sorted according to the
+   [plugin ordering rules](./plugin/index.md#plugin-order).
 1. Return `resolvedPreset`.
 
 #### `FlattenPreset(preset):`
 
-1. Let `extends` be the list specified in the `extends` property of `preset`
-   (or an empty list if none specified).
+1. Let `extends` be the list specified in the `extends` property of `preset` (or
+   an empty list if none specified).
 1. Let `extendsPreset` be `MergePresets(extends)`.
 1. Return `ExtendPreset(preset, extendsPreset)`.
 
@@ -178,8 +179,8 @@ below.
 1. Let `plugins` be the unique list of plugins defined in `basePreset` followed
    those defined in `extensionPreset` and not already defined in `basePreset`.
 1. Let the list of plugins in `mergedPreset` be `plugins`.
-1. Let `scopes` be the set of scopes defined in `basePreset` union those
-   defined in `extensionPreset`.
+1. Let `scopes` be the set of scopes defined in `basePreset` union those defined
+   in `extensionPreset`.
 1. For each `scope` in `scopes`:
    1. Let `baseScope` be the value of the `scope` in `basePreset`.
    1. Let `extendingScope` be the value of the `scope` in `extensionPreset`.
@@ -191,10 +192,24 @@ below.
       `extendingScope` actually exist.
 1. Return `mergedPreset`.
 
+:::note Merging exists-but-undefined options
+
+When extending presets, Graphile Config merges options scopes with
+`Object.assign({}, baseScope, extendingScope)`. This has the following
+implications:
+
+1. When an option is set to `undefined` or `null`, it will overwrite the value
+   in the extended preset. Depending on the library behavior, this may result in
+   the library default being used for the option.
+2. When an option is not set in a scope, the resolved value will be that of the
+   extended preset.
+
+:::
+
 :::warning Order of composition is important
 
-Consider a preset, APreset, that extends two other presets: Preset1 and
-Preset2, each of which `extends` the same preset, Preset0:
+Consider a preset, APreset, that extends two other presets: Preset1 and Preset2,
+each of which `extends` the same preset, Preset0:
 
 ```ts
 const Preset0 = { myScope: { option1: false, option2: false } };
