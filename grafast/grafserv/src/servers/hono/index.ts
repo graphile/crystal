@@ -1,28 +1,19 @@
-import { PassThrough } from "node:stream";
-import { Hono, Context as HonoContext } from "hono";
-
-//@ts-expect-error type imports.
-import type { Hooks, Peer } from "crossws";
-import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
-import type { App, H3Event } from "h3";
+import type { Context as HonoContext, Hono } from "hono";
+import type { StatusCode } from "hono/utils/http-status";
 
 import {
   convertHandlerResultToResult,
   GrafservBase,
-  makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../index.js";
 import type {
   EventStreamHeandlerResult,
-  GrafservBodyBuffer,
   GrafservBodyJSON,
   GrafservConfig,
   RequestDigest,
   Result,
 } from "../../interfaces.js";
-import { StatusCode } from "hono/utils/http-status";
-import { UpgradeWebSocket } from "hono/ws";
 
 declare global {
   namespace Grafast {

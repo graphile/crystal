@@ -1,11 +1,12 @@
-import { Hono } from "hono";
-import { serverAudits } from "graphql-http";
-import { grafserv } from "../src/servers/hono/index.js";
-import type { GrafservConfig } from "../src/interfaces.js";
-import { constant, makeGrafastSchema } from "grafast";
-import { error } from "console";
 import { serve } from "@hono/node-server";
+import { error } from "console";
+import { constant, makeGrafastSchema } from "grafast";
+import { serverAudits } from "graphql-http";
+import { Hono } from "hono";
 import { AddressInfo } from "net";
+
+import type { GrafservConfig } from "../src/interfaces.js";
+import { grafserv } from "../src/servers/hono/index.js";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
