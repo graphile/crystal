@@ -194,15 +194,15 @@ below.
 
 :::note Merging exists-but-undefined options
 
-When extending presets, Graphile Config merges options scopes with
-`Object.assign({}, baseScope, extendingScope)`. This has the following
-implications:
+When extending presets, Graphile Config merges options scopes with logic
+equivalent to `Object.assign({}, baseScope, extendingScope)`. This has the
+following implications:
 
-1. When an option is set to `undefined` or `null`, it will overwrite the value
-   in the extended preset. Depending on the library behavior, this may result in
-   the library default being used for the option.
-2. When an option is not set in a scope, the resolved value will be that of the
-   extended preset.
+1. When an option is set to `undefined` or `null` in the extending preset, it
+   will override the value in the base preset. Depending on the library
+   behavior, this may result in the library default being used for the option.
+2. When an option is _not present_ in the extending scope, the resolved value
+   will be that of the option in the base scope (if any).
 
 :::
 
