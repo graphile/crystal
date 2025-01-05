@@ -212,6 +212,17 @@ export class HonoGrafserv extends GrafservBase {
   public async addTo(app: Hono) {
     const dynamicOptions = this.dynamicOptions;
 
+    if (this.resolvedPreset.grafserv?.websockets && !this.upgradeWebSocket) {
+      throw new Error(
+        "grafserv.websockets is enabled but no upgradeWebSocket was provided",
+      );
+    }
+    if (!this.resolvedPreset.grafserv?.websockets && this.upgradeWebSocket) {
+      console.warn(
+        "UpgradeWebSocket was provided but grafserv.websockets is disabled - websockets will not be activated",
+      );
+    }
+
     app.post(this.dynamicOptions.graphqlPath, (c) =>
       this.handleGraphQLEvent(c),
     );

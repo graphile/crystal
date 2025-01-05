@@ -1,14 +1,14 @@
 import { serve } from "@hono/node-server";
+import { createNodeWebSocket } from "@hono/node-ws";
 import { error } from "console";
 import { constant, makeGrafastSchema } from "grafast";
 import { serverAudits } from "graphql-http";
-import { Hono } from "hono";
-import { createNodeWebSocket } from "@hono/node-ws";
 import { createClient } from "graphql-ws";
+import { Hono } from "hono";
+import { WebSocket } from "ws";
 
 import type { GrafservConfig } from "../src/interfaces.js";
 import { grafserv } from "../src/servers/hono/v4/index.js";
-import { WebSocket } from "ws";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
@@ -32,8 +32,8 @@ const schema = makeGrafastSchema({
     },
     Subscription: {
       subscriptionTest: {
+        // eslint-disable-next-line graphile-export/export-methods
         subscribe: async function* () {
-          console.log("subscriptionTest");
           yield { subscriptionTest: "test1" };
           yield { subscriptionTest: "test2" };
         },
@@ -143,5 +143,21 @@ describe("Hono Adapter with websockets", () => {
     expect(value).toEqual({ data: { subscriptionTest: "test1" } });
     const { value: value2 } = await query.next();
     expect(value2).toEqual({ data: { subscriptionTest: "test2" } });
+  });
+
+  it("SHOULD throw an error is websocket is enabled but no upgradeWebSocket was provided", async () => {
+    const config: GrafservConfig = {
+      schema, // Mock schema for testing
+      preset: {
+        grafserv: {
+          graphqlOverGET: true,
+          websockets: true,
+        },
+      },
+    };
+    const honoGrafserv = grafserv(config);
+    expect(async () => {
+      await honoGrafserv.addTo(app);
+    }).rejects.toThrow();
   });
 });
