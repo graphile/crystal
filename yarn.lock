@@ -12012,7 +12012,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.22.0"
-    graphql-ws: "npm:^5.16.0"
+    graphql-ws: "npm:^5.14.0"
     h3: "npm:^1.13.0"
     hono: "npm:^4.6.15"
     jest: "npm:^29.6.4"
@@ -12031,11 +12031,14 @@ __metadata:
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     h3: ^1.13.0
+    hono: ^4.6.15
     ws: ^8.12.1
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
     h3:
+      optional: true
+    hono:
       optional: true
     ws:
       optional: true

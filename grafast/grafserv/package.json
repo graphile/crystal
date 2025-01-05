@@ -85,8 +85,7 @@
     "debug": "^4.3.4",
     "eventemitter3": "^5.0.1",
     "graphile-config": "workspace:^",
-    "graphql-ws": "^5.16.0",
-    "hono": "^4.6.15",
+    "graphql-ws": "^5.14.0",
     "ruru": "workspace:^",
     "tslib": "^2.6.2"
   },
@@ -99,6 +98,7 @@
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "h3": "^1.13.0",
+    "hono": "^4.6.15",
     "ws": "^8.12.1"
   },
   "peerDependenciesMeta": {
@@ -106,6 +106,9 @@
       "optional": true
     },
     "h3": {
+      "optional": true
+    },
+    "hono": {
       "optional": true
     },
     "ws": {
@@ -126,6 +129,7 @@
     "grafast": "workspace:^",
     "graphql-http": "^1.22.0",
     "h3": "^1.13.0",
+    "hono": "^4.6.15",
     "jest": "^29.6.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "koa": "^2.14.2",

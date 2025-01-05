@@ -7,14 +7,14 @@ import {
   makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
-} from "../../index.js";
+} from "../../../index.js";
 import type {
   EventStreamHeandlerResult,
   GrafservBodyJSON,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../interfaces.js";
+} from "../../../interfaces.js";
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import { UpgradeWebSocket } from "hono/ws";
 import { web } from "webpack";

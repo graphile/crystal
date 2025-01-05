@@ -7,7 +7,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { createClient } from "graphql-ws";
 
 import type { GrafservConfig } from "../src/interfaces.js";
-import { grafserv } from "../src/servers/hono/index.js";
+import { grafserv } from "../src/servers/hono/v4/index.js";
 import { WebSocket } from "ws";
 
 const schema = makeGrafastSchema({
