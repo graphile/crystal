@@ -1,5 +1,3 @@
-// TODO: update the link in this code
-
 /**
  * The "watch" schema that enables PostGraphile to look for changes in the
  * database. This used to be an SQL file in V4, but to make it more compatible
