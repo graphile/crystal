@@ -1,5 +1,7 @@
-import type { Context as HonoContext, Hono, MiddlewareHandler } from "hono";
+import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
+import type { Context as Ctx, Hono, MiddlewareHandler } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
+import type { UpgradeWebSocket, WSContext } from "hono/ws";
 
 import {
   convertHandlerResultToResult,
@@ -15,27 +17,24 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
-import { UpgradeWebSocket } from "hono/ws";
-import { web } from "webpack";
 
 declare global {
   namespace Grafast {
     interface RequestContext {
-      Hono: {
-        honoContext: HonoContext;
+      honov4: {
+        ctx: Ctx;
       };
     }
   }
 }
 
-function getDigest(honoContext: HonoContext): RequestDigest {
-  const req = honoContext.req;
-  const res = honoContext.res;
+function getDigest(ctx: Ctx): RequestDigest {
+  const req = ctx.req;
+  const res = ctx.res;
   return {
     httpVersionMajor: 1, // Hono uses Fetch API, which doesn't expose HTTP version
     httpVersionMinor: 1,
-    isSecure: req.url.startsWith("https"),
+    isSecure: req.url.startsWith("https:"),
     method: req.method,
     path: req.path,
     headers: processHeaders(req.header()),
@@ -53,8 +52,8 @@ function getDigest(honoContext: HonoContext): RequestDigest {
       } as GrafservBodyJSON;
     },
     requestContext: {
-      hono: {
-        context: honoContext,
+      honov4: {
+        ctx: ctx,
       },
       node: {
         // @ts-expect-error type imports
@@ -78,32 +77,45 @@ export class HonoGrafserv extends GrafservBase {
     return upgradeWebSocket((c) => {
       let onMessage: ((data: string) => void) | undefined;
       let onClose: ((code: number, reason: string) => void) | undefined;
+      let isOpened = false;
+
+      const initGraphqlServer = (ws: WSContext) => {
+        onClose = graphqlWsServer.opened(
+          {
+            protocol: ws.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL,
+            send(data) {
+              ws.send(data);
+            },
+            close(code, reason) {
+              console.log("close", code, reason);
+              ws.close(code, reason);
+              isOpened = false;
+            },
+            onMessage(cb) {
+              onMessage = cb;
+            },
+          },
+          { socket: ws, request: c.req },
+        );
+        isOpened = true;
+      };
+
       return {
         onOpen(evt, ws) {
-          onClose = graphqlWsServer.opened(
-            {
-              protocol: ws.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL,
-              send(data) {
-                ws.send(data);
-              },
-              close(code, reason) {
-                console.log("close", code, reason);
-                ws.close(code, reason);
-              },
-              onMessage(cb) {
-                onMessage = cb;
-              },
-            },
-            { socket: ws, request: c.req },
-          );
+          initGraphqlServer(ws);
         },
         onMessage(evt, ws) {
+          // cloudflare workers don't support the open event
+          // so we initialize the server on the first message
+          if (!isOpened) {
+            initGraphqlServer(ws);
+          }
           onMessage?.(evt.data);
         },
-        onClose(evt, ws) {
+        onClose(evt) {
           onClose?.(evt.code, evt.reason);
         },
-        onError(evt, ws) {
+        onError(evt) {
           console.error("An error occured in the websocket:", evt);
         },
       };
@@ -113,31 +125,31 @@ export class HonoGrafserv extends GrafservBase {
   /**
    * @deprecated use handleGraphQLEvent instead
    */
-  public async handleEvent(honoContext: HonoContext) {
-    return this.handleGraphQLEvent(honoContext);
+  public async handleEvent(ctx: Ctx) {
+    return this.handleGraphQLEvent(ctx);
   }
 
-  public async handleGraphQLEvent(honoContext: HonoContext) {
-    const digest = getDigest(honoContext);
+  public async handleGraphQLEvent(ctx: Ctx) {
+    const digest = getDigest(ctx);
 
     const handlerResult = await this.graphqlHandler(
       normalizeRequest(digest),
       this.graphiqlHandler,
     );
     const result = await convertHandlerResultToResult(handlerResult);
-    return this.send(honoContext, result);
+    return this.send(ctx, result);
   }
 
-  public async handleGraphiqlEvent(honoContext: HonoContext) {
-    const digest = getDigest(honoContext);
+  public async handleGraphiqlEvent(ctx: Ctx) {
+    const digest = getDigest(ctx);
 
     const handlerResult = await this.graphiqlHandler(normalizeRequest(digest));
     const result = await convertHandlerResultToResult(handlerResult);
-    return this.send(honoContext, result);
+    return this.send(ctx, result);
   }
 
-  public async handleEventStreamEvent(honoContext: HonoContext) {
-    const digest = getDigest(honoContext);
+  public async handleEventStreamEvent(ctx: Ctx) {
+    const digest = getDigest(ctx);
 
     const handlerResult: EventStreamHeandlerResult = {
       type: "event-stream",
@@ -147,21 +159,21 @@ export class HonoGrafserv extends GrafservBase {
       statusCode: 200,
     };
     const result = await convertHandlerResultToResult(handlerResult);
-    return this.send(honoContext, result);
+    return this.send(ctx, result);
   }
 
-  public async send(honoContext: HonoContext, result: Result | null) {
+  public async send(ctx: Ctx, result: Result | null) {
     if (result === null) {
       // 404
-      honoContext.status(404);
-      return honoContext.text("¯\\_(ツ)_/¯");
+      ctx.status(404);
+      return ctx.text("¯\\_(ツ)_/¯");
     }
 
     switch (result.type) {
       case "error": {
         const { statusCode, headers } = result;
-        this.setResponseHeaders(honoContext, headers);
-        honoContext.status(statusCode as StatusCode);
+        this.setResponseHeaders(ctx, headers);
+        ctx.status(statusCode as StatusCode);
         const errorWithStatus = Object.assign(result.error, {
           status: statusCode,
         });
@@ -169,29 +181,29 @@ export class HonoGrafserv extends GrafservBase {
       }
       case "buffer": {
         const { statusCode, headers, buffer } = result;
-        this.setResponseHeaders(honoContext, headers);
-        honoContext.status(statusCode as StatusCode);
-        return honoContext.body(buffer);
+        this.setResponseHeaders(ctx, headers);
+        ctx.status(statusCode as StatusCode);
+        return ctx.body(buffer);
       }
       case "json": {
         const { statusCode, headers, json } = result;
-        this.setResponseHeaders(honoContext, headers);
-        honoContext.status(statusCode as StatusCode);
-        return honoContext.json(json);
+        this.setResponseHeaders(ctx, headers);
+        ctx.status(statusCode as StatusCode);
+        return ctx.json(json);
       }
       case "noContent": {
         const { statusCode, headers } = result;
-        this.setResponseHeaders(honoContext, headers);
-        honoContext.status(statusCode as StatusCode);
-        return honoContext.body(null);
+        this.setResponseHeaders(ctx, headers);
+        ctx.status(statusCode as StatusCode);
+        return ctx.body(null);
       }
       // TODO : handle bufferStream ?
       default: {
         const never = result;
         console.log("Unhandled:");
         console.dir(never);
-        this.setResponseHeaders(honoContext, { "Content-Type": "text/plain" });
-        honoContext.status(501);
+        this.setResponseHeaders(ctx, { "Content-Type": "text/plain" });
+        ctx.status(501);
         return "Server hasn't implemented this yet";
       }
     }
@@ -236,18 +248,19 @@ export class HonoGrafserv extends GrafservBase {
     }
   }
 
-  private setResponseHeaders(
-    honoContext: HonoContext,
-    headers: Record<string, string>,
-  ) {
+  private setResponseHeaders(ctx: Ctx, headers: Record<string, string>) {
     for (const key in headers) {
-      honoContext.header(key, headers[key]);
+      ctx.header(key, headers[key]);
     }
   }
 }
 
 export function grafserv(
   config: GrafservConfig,
+  /**
+   * Required when using websockets. Hono uses upgradeWebsocket helper depending
+   * on the environment. Check https://hono.dev/docs/helpers/websocket
+   */
   upgradeWebSocket?: UpgradeWebSocket,
 ) {
   return new HonoGrafserv(config, upgradeWebSocket);
