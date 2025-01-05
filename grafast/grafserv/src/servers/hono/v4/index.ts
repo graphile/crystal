@@ -266,13 +266,18 @@ export class HonoGrafserv extends GrafservBase {
   }
 }
 
-export function grafserv(
+/**
+ * Creates a new instance of HonoGrafserv.
+ *
+ * @param config - The configuration object for Grafserv.
+ * @param upgradeWebSocket - Optional parameter required when using websockets.
+ *        Hono uses the upgradeWebsocket helper depending on the environment.
+ *        Refer to https://hono.dev/docs/helpers/websocket for more details.
+ * @returns An instance of HonoGrafserv.
+ */
+export const grafserv = (
   config: GrafservConfig,
-  /**
-   * Required when using websockets. Hono uses upgradeWebsocket helper depending
-   * on the environment. Check https://hono.dev/docs/helpers/websocket
-   */
   upgradeWebSocket?: UpgradeWebSocket,
-) {
+) => {
   return new HonoGrafserv(config, upgradeWebSocket);
-}
+};

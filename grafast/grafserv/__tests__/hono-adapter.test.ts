@@ -150,7 +150,6 @@ describe("Hono Adapter with websockets", () => {
       schema, // Mock schema for testing
       preset: {
         grafserv: {
-          graphqlOverGET: true,
           websockets: true,
         },
       },
