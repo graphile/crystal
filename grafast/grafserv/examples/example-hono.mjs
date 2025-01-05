@@ -9,6 +9,8 @@ import { serve } from "@hono/node-server";
 const app = new Hono();
 
 // Create a Grafserv instance
+// the second argument is an optional websocket upgrade handler
+// see https://hono.dev/docs/helpers/websocket
 const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
@@ -17,5 +19,5 @@ serv.addTo(server).catch((e) => {
   process.exit(1);
 });
 
-// Start the Node server
+// Start the server with the chosen Hono adapter - here Node.js
 serve(app);

@@ -3504,6 +3504,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hono/node-ws@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@hono/node-ws@npm:1.0.5"
+  dependencies:
+    ws: "npm:^8.17.0"
+  peerDependencies:
+    "@hono/node-server": ^1.11.1
+  checksum: 0126850d73984ab71211c3841731fc493abaf92a8d15a17e36d5ddda8d85d04efcd29c0cff894cad19dc69c6bcca8ebdae9ed0bc43e3782322474231db5dc604
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.10":
   version: 0.11.11
   resolution: "@humanwhocodes/config-array@npm:0.11.11"
@@ -6042,6 +6053,15 @@ __metadata:
   version: 3.0.0
   resolution: "@types/which@npm:3.0.0"
   checksum: 601467cc37d5667026067fa4e7a59d456310c67dbb313fc1a3408981265e9b00f487f1806c25c170027813113fedac97d47bfabdb63720a0bcd595915adeb008
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:^8":
+  version: 8.5.13
+  resolution: "@types/ws@npm:8.5.13"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 8604665cd238ae0aae420fbdbb8065d8cefb5eb461a5108022102ace01eac662bf29a0a440bd6caf8f135d5ffac470e668705d44140e6b6a9d43cf561dff5a36
   languageName: node
   linkType: hard
 
@@ -12004,6 +12024,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
+    ws: "npm:^8.12.1"
   peerDependencies:
     "@envelop/core": ^5.0.0
     grafast: "workspace:^"
@@ -19100,6 +19121,7 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.24.7"
     "@changesets/changelog-github": "npm:^0.4.8"
     "@changesets/cli": "npm:^2.26.2"
+    "@hono/node-ws": "npm:^1.0.5"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
     "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
     "@localrepo/prettier2-for-jest": "npm:prettier@^2"
@@ -19108,6 +19130,7 @@ __metadata:
     "@types/mock-fs": "npm:4.13.1"
     "@types/node": "npm:^20.5.7"
     "@types/rimraf": "npm:^4.0.5"
+    "@types/ws": "npm:^8"
     "@typescript-eslint/eslint-plugin": "npm:^6.5.0"
     "@typescript-eslint/parser": "npm:^6.5.0"
     "@typescript-eslint/typescript-estree": "npm:^6.5.0"
@@ -19127,6 +19150,7 @@ __metadata:
     eslint_d: "npm:^12.2.1"
     glob: "npm:^10.3.4"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql-ws: "npm:^5.16.0"
     jest: "npm:^29.6.4"
     mock-fs: "npm:^5.2.0"
     pg: "npm:^8.11.3"
@@ -19136,6 +19160,7 @@ __metadata:
     typedoc-monorepo-link-types: "npm:^0.0.4"
     typescript: "npm:^5.2.2"
     webpack: "npm:^5.94.0"
+    ws: "npm:^8.18.0"
     zx: "npm:^7.2.3"
   languageName: unknown
   linkType: soft
@@ -22426,7 +22451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.0.0, ws@npm:^8.13.0, ws@npm:^8.17.1":
+"ws@npm:^8.0.0, ws@npm:^8.12.1, ws@npm:^8.13.0, ws@npm:^8.17.0, ws@npm:^8.17.1, ws@npm:^8.18.0":
   version: 8.18.0
   resolution: "ws@npm:8.18.0"
   peerDependencies:

@@ -3,16 +3,22 @@ import { error } from "console";
 import { constant, makeGrafastSchema } from "grafast";
 import { serverAudits } from "graphql-http";
 import { Hono } from "hono";
-import { AddressInfo } from "net";
+import { createNodeWebSocket } from "@hono/node-ws";
+import { createClient } from "graphql-ws";
 
 import type { GrafservConfig } from "../src/interfaces.js";
 import { grafserv } from "../src/servers/hono/index.js";
+import { WebSocket } from "ws";
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
     type Query {
       hello: String!
       throwAnError: String
+    }
+
+    type Subscription {
+      subscriptionTest: String!
     }
   `,
   plans: {
@@ -22,6 +28,15 @@ const schema = makeGrafastSchema({
       },
       throwAnError() {
         return error(new Error("You asked for an error... Here it is."));
+      },
+    },
+    Subscription: {
+      subscriptionTest: {
+        subscribe: async function* () {
+          console.log("subscriptionTest");
+          yield { subscriptionTest: "test1" };
+          yield { subscriptionTest: "test2" };
+        },
       },
     },
   },
@@ -86,4 +101,47 @@ describe("Hono Adapter", () => {
       }
     });
   }
+});
+
+describe("Hono Adapter with websockets", () => {
+  // setup test server
+  const app = new Hono();
+  const config: GrafservConfig = {
+    schema, // Mock schema for testing
+    preset: {
+      grafserv: {
+        graphqlOverGET: true,
+        websockets: true,
+      },
+    },
+  };
+  const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
+
+  const honoGrafserv = grafserv(config, upgradeWebSocket);
+  honoGrafserv.addTo(app);
+
+  const server = serve({
+    fetch: app.fetch,
+    port: 7778,
+  });
+  injectWebSocket(server);
+
+  const url = `ws://0.0.0.0:7778/graphql`;
+
+  it("SHOULD work for a simple subscription", async () => {
+    // make a graphql subscription
+    const client = createClient({
+      url,
+      webSocketImpl: WebSocket,
+    });
+
+    const query = client.iterate({
+      query: "subscription { subscriptionTest }",
+    });
+
+    const { value } = await query.next();
+    expect(value).toEqual({ data: { subscriptionTest: "test1" } });
+    const { value: value2 } = await query.next();
+    expect(value2).toEqual({ data: { subscriptionTest: "test2" } });
+  });
 });

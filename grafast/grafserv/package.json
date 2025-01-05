@@ -132,7 +132,8 @@
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "ws": "^8.12.1"
   },
   "files": [
     "dist",

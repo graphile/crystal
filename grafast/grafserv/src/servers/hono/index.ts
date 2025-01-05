@@ -1,9 +1,10 @@
-import type { Context as HonoContext, Hono } from "hono";
+import type { Context as HonoContext, Hono, MiddlewareHandler } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
 
 import {
   convertHandlerResultToResult,
   GrafservBase,
+  makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../index.js";
@@ -14,6 +15,9 @@ import type {
   RequestDigest,
   Result,
 } from "../../interfaces.js";
+import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
+import { UpgradeWebSocket } from "hono/ws";
+import { web } from "webpack";
 
 declare global {
   namespace Grafast {
@@ -62,8 +66,48 @@ function getDigest(honoContext: HonoContext): RequestDigest {
 }
 
 export class HonoGrafserv extends GrafservBase {
-  constructor(config: GrafservConfig) {
+  constructor(
+    config: GrafservConfig,
+    private upgradeWebSocket?: UpgradeWebSocket,
+  ) {
     super(config);
+  }
+
+  public makeWsHandler(upgradeWebSocket: UpgradeWebSocket): MiddlewareHandler {
+    const graphqlWsServer = makeServer(makeGraphQLWSConfig(this));
+    return upgradeWebSocket((c) => {
+      let onMessage: ((data: string) => void) | undefined;
+      let onClose: ((code: number, reason: string) => void) | undefined;
+      return {
+        onOpen(evt, ws) {
+          onClose = graphqlWsServer.opened(
+            {
+              protocol: ws.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL,
+              send(data) {
+                ws.send(data);
+              },
+              close(code, reason) {
+                console.log("close", code, reason);
+                ws.close(code, reason);
+              },
+              onMessage(cb) {
+                onMessage = cb;
+              },
+            },
+            { socket: ws, request: c.req },
+          );
+        },
+        onMessage(evt, ws) {
+          onMessage?.(evt.data);
+        },
+        onClose(evt, ws) {
+          onClose?.(evt.code, evt.reason);
+        },
+        onError(evt, ws) {
+          console.error("An error occured in the websocket:", evt);
+        },
+      };
+    });
   }
 
   /**
@@ -156,19 +200,27 @@ export class HonoGrafserv extends GrafservBase {
   public async addTo(app: Hono) {
     const dynamicOptions = this.dynamicOptions;
 
-    app.on(
-      this.dynamicOptions.graphqlOverGET ||
-        this.dynamicOptions.graphiqlOnGraphQLGET
-        ? ["GET", "POST"]
-        : ["POST"],
-      this.dynamicOptions.graphqlPath,
-      (c) => this.handleGraphQLEvent(c),
+    app.post(this.dynamicOptions.graphqlPath, (c) =>
+      this.handleGraphQLEvent(c),
     );
 
-    if (this.resolvedPreset.grafserv?.websockets) {
-      console.warn(
-        "You have enabled websockets, but the hono adapter doesn't support websockets yet.",
-      );
+    const websocketHandler =
+      this.resolvedPreset.grafserv?.websockets && this.upgradeWebSocket
+        ? this.makeWsHandler(this.upgradeWebSocket)
+        : undefined;
+
+    const shouldServeGetHandler =
+      this.dynamicOptions.graphqlOverGET ||
+      this.dynamicOptions.graphiqlOnGraphQLGET ||
+      websocketHandler;
+
+    if (shouldServeGetHandler) {
+      app.get(this.dynamicOptions.graphqlPath, (c, next) => {
+        if (c.req.header("Upgrade") === "websocket" && websocketHandler) {
+          return websocketHandler(c, next);
+        }
+        return this.handleGraphQLEvent(c);
+      });
     }
 
     if (dynamicOptions.graphiql) {
@@ -194,6 +246,9 @@ export class HonoGrafserv extends GrafservBase {
   }
 }
 
-export function grafserv(config: GrafservConfig) {
-  return new HonoGrafserv(config);
+export function grafserv(
+  config: GrafservConfig,
+  upgradeWebSocket?: UpgradeWebSocket,
+) {
+  return new HonoGrafserv(config, upgradeWebSocket);
 }
