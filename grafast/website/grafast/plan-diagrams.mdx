@@ -254,5 +254,18 @@ or you can render it directly from the JSON response. You can convert the plan
 JSON into mermaid format via the `planToMermaid` function so you can load them
 into the [mermaid live editor][].
 
+Use the `grafast.explain` option in your preset to expose plans from your
+server:
+
+```ts title="graphile.config.mjs"
+export default {
+  grafast: {
+    explain: ["plan"],
+    // Setting explain: true will expose all explain types
+    // explain: true,
+  }
+}
+```
+
 [ruru]: /ruru
 [mermaid live editor]: https://mermaid-js.github.io/mermaid-live-editor/edit
