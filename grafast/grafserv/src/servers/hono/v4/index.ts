@@ -204,7 +204,7 @@ export class HonoGrafserv extends GrafservBase {
         console.dir(never);
         this.setResponseHeaders(ctx, { "Content-Type": "text/plain" });
         ctx.status(501);
-        return "Server hasn't implemented this yet";
+        return ctx.text("Server hasn't implemented this yet");
       }
     }
   }
