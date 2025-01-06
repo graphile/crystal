@@ -39,8 +39,8 @@
       "default": "./dist/servers/h3/v1/index.js"
     },
     "./hono/v4": {
-      "types": "./dist/hono/v4/index.d.ts",
-      "default": "./dist/hono/v4/index.js"
+      "types": "./dist/servers/hono/v4/index.d.ts",
+      "default": "./dist/servers/hono/v4/index.js"
     },
     "./ruru": {
       "types": "./fwd/ruru/index.d.ts",
