@@ -8,6 +8,7 @@ import {
   ConnectionStep,
   constant,
   first,
+  lambda,
   last,
   UnbatchedExecutableStep,
 } from "grafast";
@@ -86,20 +87,23 @@ export class PgPageInfoStep<
    */
   public hasNextPage(): ExecutableStep<boolean> {
     const $connection = this.getConnectionStep();
-    const first = $connection.getFirst();
-    const last = $connection.getLast();
-    if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
-      return constant(false);
-    }
-    const firstExists =
-      first && !first.evalIs(null) && !first.evalIs(undefined);
-    const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
-    if (firstExists && !lastExists) {
-      const nodePlan = $connection.cloneSubplanWithPagination();
-      return nodePlan.hasMore();
-    } else {
-      return constant(false);
-    }
+    const $first = $connection.getFirst() ?? constant(undefined);
+    const $last = $connection.getLast() ?? constant(undefined);
+    const $node = $connection.cloneSubplanWithPagination();
+    const $hasMore = $node.hasMore();
+    return lambda(
+      { first: $first, last: $last, hasMore: $hasMore },
+      ({ first, last, hasMore }) => {
+        if (first === 0 || last === 0) {
+          return false;
+        } else if (first != null && last == null) {
+          return hasMore;
+        } else {
+          return false;
+        }
+      },
+      true,
+    );
   }
 
   /**
