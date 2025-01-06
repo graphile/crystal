@@ -1,0 +1,38 @@
+# Unary dependency expected
+
+:::info What is a unary step?
+
+See [unary steps](/grafast/#unary-steps) in the introduction to remind yourself
+that a unary step always represents exactly one value, typically an input to
+the GraphQL request (variables, context), a constant, or a derivative thereof.
+
+:::
+
+Some steps may require that certain of their dependencies must be unary, this
+means that different values for this step do not need to be factored into
+batching, which can significantly simplify the logic. Typically this is used
+when the dependency is expected to either be a constant or something provided
+via GraphQL field arguments.
+
+If you've received an error pointing to this webpage it is likely because the
+step in question has received a normal (non-unary) step where a unary step is
+expected. Depending on the reason this has occurred, there are a number of
+potential solutions.
+
+## Unary not required
+
+Maybe when writing the step you used `this.addUnaryDependency($step)` by
+mistake, and instead you meant the more general `this.addDependency($step)`. If
+so, simply fix your typo!
+
+## connection()
+
+The `connection()` step expects `first`, `last`, `offset`, `before` and `after`
+to be unary steps &mdash; this is because the GraphQL Cursor Connection
+Specification only needs these values to be supplied via GraphQL field
+arguments (which are unary) and so requiring them to be unary can simplify the
+underlying collection logic. If you're received this error with a
+`connection()` step, you're probably using the `connection()` step wrong;
+[consider re-reading its
+documentation](/grafast/step-library/standard-steps/connection).
+
