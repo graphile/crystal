@@ -8,6 +8,7 @@ import type {
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
+import { constant } from "./constant.js";
 import { each } from "./each.js";
 
 type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
@@ -71,13 +72,13 @@ export interface ConnectionCapableStep<
       any
     >,
   ): PageInfoCapableStep;
-  setFirst($plan: InputStep): void;
-  setLast($plan: InputStep): void;
-  setOffset($plan: InputStep): void;
+  setFirst(first: ExecutableStep<number | null | undefined> | number): void;
+  setLast(last: ExecutableStep<number | null | undefined> | number): void;
+  setOffset(offset: ExecutableStep<number | null | undefined> | number): void;
 
-  parseCursor($plan: InputStep): TCursorStep | null | undefined;
-  setBefore($plan: TCursorStep): void;
-  setAfter($plan: TCursorStep): void;
+  parseCursor(cursor: ExecutableStep<string>): TCursorStep | null | undefined;
+  setBefore(before: TCursorStep): void;
+  setAfter(after: TCursorStep): void;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -142,51 +143,64 @@ export class ConnectionStep<
     return String(this.subplanId);
   }
 
-  public getFirst(): InputStep | null {
-    return this._firstDepId != null
-      ? (this.getDep(this._firstDepId) as InputStep)
-      : null;
+  public getFirst(): ExecutableStep | null {
+    return this._firstDepId != null ? this.getDep(this._firstDepId) : null;
   }
-  public setFirst($firstPlan: InputStep) {
+  public setFirst(first: ExecutableStep<number | null | undefined> | number) {
     if (this._firstDepId != null) {
       throw new Error(`${this}->setFirst already called`);
     }
-    this._firstDepId = this.addDependency($firstPlan);
+    const $first = typeof first === "number" ? constant(first) : first;
+    this._firstDepId = this.addUnaryDependency({
+      step: $first,
+      nonUnaryMessage: () =>
+        `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
+    });
   }
-  public getLast(): InputStep | null {
-    return this._lastDepId != null
-      ? (this.getDep(this._lastDepId) as InputStep)
-      : null;
+  public getLast(): ExecutableStep | null {
+    return this._lastDepId != null ? this.getDep(this._lastDepId) : null;
   }
-  public setLast($lastPlan: InputStep) {
+  public setLast(last: ExecutableStep<number | null | undefined> | number) {
     if (this._lastDepId != null) {
       throw new Error(`${this}->setLast already called`);
     }
-    this._lastDepId = this.addDependency($lastPlan);
+    const $last = typeof last === "number" ? constant(last) : last;
+    this._lastDepId = this.addUnaryDependency({
+      step: $last,
+      nonUnaryMessage: () =>
+        `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
+    });
   }
-  public getOffset(): InputStep | null {
-    return this._offsetDepId != null
-      ? (this.getDep(this._offsetDepId) as InputStep)
-      : null;
+  public getOffset(): ExecutableStep | null {
+    return this._offsetDepId != null ? this.getDep(this._offsetDepId) : null;
   }
-  public setOffset($offsetPlan: InputStep) {
+  public setOffset(offset: ExecutableStep<number | null | undefined> | number) {
     if (this._offsetDepId != null) {
       throw new Error(`${this}->setOffset already called`);
     }
-    this._offsetDepId = this.addDependency($offsetPlan);
+    const $offset = typeof offset === "number" ? constant(offset) : offset;
+    this._offsetDepId = this.addUnaryDependency({
+      step: $offset,
+      nonUnaryMessage: () =>
+        `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
+    });
   }
   public getBefore(): TCursorStep | null {
     return this._beforeDepId != null
       ? (this.getDep(this._beforeDepId) as TCursorStep)
       : null;
   }
-  public setBefore($beforePlan: InputStep) {
+  public setBefore($beforePlan: ExecutableStep) {
     if (this._beforeDepId !== undefined) {
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan = this.getSubplan().parseCursor($beforePlan);
     this._beforeDepId = $parsedBeforePlan
-      ? this.addDependency($parsedBeforePlan)
+      ? this.addUnaryDependency({
+          step: $parsedBeforePlan,
+          nonUnaryMessage: () =>
+            `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
+        })
       : null;
   }
   public getAfter(): TCursorStep | null {
@@ -194,13 +208,17 @@ export class ConnectionStep<
       ? (this.getDep(this._afterDepId) as TCursorStep)
       : null;
   }
-  public setAfter($afterPlan: InputStep) {
+  public setAfter($afterPlan: ExecutableStep) {
     if (this._afterDepId !== undefined) {
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan = this.getSubplan().parseCursor($afterPlan);
     this._afterDepId = $parsedAfterPlan
-      ? this.addDependency($parsedAfterPlan)
+      ? this.addUnaryDependency({
+          step: $parsedAfterPlan,
+          nonUnaryMessage: () =>
+            `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
+        })
       : null;
   }
 
