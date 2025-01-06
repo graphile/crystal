@@ -945,6 +945,10 @@ export interface AddDependencyOptions {
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: null | Error | undefined;
+  nonUnaryMessage?: (
+    $dependent: ExecutableStep,
+    $dependency: ExecutableStep,
+  ) => string;
 }
 /**
  * @internal
