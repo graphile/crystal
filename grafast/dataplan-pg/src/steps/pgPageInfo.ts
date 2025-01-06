@@ -93,15 +93,7 @@ export class PgPageInfoStep<
     const $hasMore = $node.hasMore();
     return lambda(
       { first: $first, last: $last, hasMore: $hasMore },
-      ({ first, last, hasMore }) => {
-        if (first === 0 || last === 0) {
-          return false;
-        } else if (first != null && last == null) {
-          return hasMore;
-        } else {
-          return false;
-        }
-      },
+      hasNextPageCb,
       true,
     );
   }
@@ -119,28 +111,16 @@ export class PgPageInfoStep<
    */
   public hasPreviousPage(): ExecutableStep<boolean> {
     const $connection = this.getConnectionStep();
-    const first = $connection.getFirst();
-    const last = $connection.getLast();
-    if ((first && first.evalIs(0)) || (last && last.evalIs(0))) {
-      return constant(false);
-    }
-    const offset = $connection.getOffset();
-    const firstExists =
-      first && !first.evalIs(null) && !first.evalIs(undefined);
-    const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
-    if (lastExists && !firstExists) {
-      const nodePlan = $connection.cloneSubplanWithPagination();
-      return nodePlan.hasMore();
-    } else if (
-      offset &&
-      !offset.evalIs(null) &&
-      !offset.evalIs(undefined) &&
-      !offset.evalIs(0)
-    ) {
-      return constant(true);
-    } else {
-      return constant(false);
-    }
+    const $first = $connection.getFirst() ?? constant(undefined);
+    const $last = $connection.getLast() ?? constant(undefined);
+    const $offset = $connection.getOffset() ?? constant(undefined);
+    const $node = $connection.cloneSubplanWithPagination();
+    const $hasMore = $node.hasMore();
+    return lambda(
+      { first: $first, last: $last, offset: $offset, hasMore: $hasMore },
+      hasPreviousPageCb,
+      true,
+    );
   }
 
   startCursor(): PgCursorStep<PgSelectSingleStep<any> | PgUnionAllSingleStep> {
@@ -175,4 +155,32 @@ export function pgPageInfo<
   connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, TStep, any>,
 ): PgPageInfoStep<TStep> {
   return new PgPageInfoStep(connectionPlan);
+}
+
+function hasNextPageCb(parts: {
+  first: number | null | undefined;
+  last: number | null | undefined;
+  hasMore: boolean;
+}) {
+  const { first, last, hasMore } = parts;
+  return first != null && last == null && first !== 0 ? hasMore : false;
+}
+
+function hasPreviousPageCb(parts: {
+  first: number | null | undefined;
+  last: number | null | undefined;
+  offset: number | null | undefined;
+  hasMore: boolean;
+}) {
+  const { first, last, offset, hasMore } = parts;
+  if (first === 0 || last === 0) {
+    return false;
+  }
+  if (last != null && first == null) {
+    return hasMore;
+  } else if (offset != null && offset !== 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
