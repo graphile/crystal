@@ -18,6 +18,7 @@ export interface GrafastPlanStepJSONv1 {
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;
   hasSideEffects: boolean | undefined;
+  stream: { initialCount: number } | undefined;
   extra?: Record<string, JSONValue | undefined>;
 }
 

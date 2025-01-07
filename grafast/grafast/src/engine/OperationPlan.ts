@@ -3606,6 +3606,9 @@ export class OperationPlan {
         supportsUnbatched:
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
+        stream: step._stepOptions.stream
+          ? { initialCount: step._stepOptions.stream.initialCount }
+          : undefined,
         extra: step.planJSONExtra(),
       };
     }

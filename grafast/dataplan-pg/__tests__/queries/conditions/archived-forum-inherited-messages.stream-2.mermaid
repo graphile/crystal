@@ -27,11 +27,11 @@ graph TD
     Constant60{{"Constant[60∈1] ➊<br />ᐸfalseᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression16
-    PgSelect29[["PgSelect[29∈3]<br />ᐸmessagesᐳ"]]:::plan
+    PgSelect29[["PgSelect[29∈3@s]<br />ᐸmessagesᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
     Object13 & PgClassExpression22 & PgClassExpression28 & Connection27 --> PgSelect29
-    PgSelect42[["PgSelect[42∈3]<br />ᐸmessagesᐳ"]]:::plan
+    PgSelect42[["PgSelect[42∈3@s]<br />ᐸmessagesᐳ"]]:::plan
     Object13 & PgClassExpression22 & PgClassExpression28 & Connection27 --> PgSelect42
     PgSelectSingle15 --> PgClassExpression22
     PgSelectSingle15 --> PgClassExpression28

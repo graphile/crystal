@@ -448,10 +448,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
       }${this._isUnary ? "➊" : ""}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}]`,
+        this._stepOptions.stream
+          ? `@s${
+              this._stepOptions.stream.initialCount > 0
+                ? this._stepOptions.stream.initialCount
+                : ""
+            }`
+          : ""
+      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
+        this.id,
+        { colors: true },
+      )}]`,
     );
   }
 
