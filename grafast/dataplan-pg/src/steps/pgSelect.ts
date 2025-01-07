@@ -5,6 +5,7 @@ import type {
   ConnectionCapableStep,
   ConnectionStep,
   ExecutionDetails,
+  ExecutionValue,
   GrafastResultsList,
   GrafastResultStreamList,
   InputStep,
@@ -13,6 +14,7 @@ import type {
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
+  UnaryExecutionValue,
 } from "grafast";
 import {
   __InputListStep,
@@ -336,8 +338,8 @@ export class PgSelectStep<
 
   // LIMIT
 
-  private first: number | null;
-  private last: number | null;
+  private firstStepId: number | null;
+  private lastStepId: number | null;
   private fetchOneExtra: boolean;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
   private lowerIndexStepId: number | null;
@@ -348,7 +350,7 @@ export class PgSelectStep<
 
   // OFFSET
 
-  private offset: number | null;
+  private offsetStepId: number | null;
 
   // CURSORS
 
@@ -463,9 +465,6 @@ export class PgSelectStep<
 
     // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
-
-    // If last but not first, reverse order.
-    shouldReverseOrder: boolean;
 
     // For prepared queries
     name?: string;
@@ -631,12 +630,18 @@ export class PgSelectStep<
     this.isOrderUnique = cloneFromMatchingMode
       ? cloneFromMatchingMode.isOrderUnique
       : false;
-    this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
-    this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
+    this.firstStepId = cloneFromMatchingMode
+      ? cloneFromMatchingMode.firstStepId
+      : null;
+    this.lastStepId = cloneFromMatchingMode
+      ? cloneFromMatchingMode.lastStepId
+      : null;
     this.fetchOneExtra = cloneFromMatchingMode
       ? cloneFromMatchingMode.fetchOneExtra
       : false;
-    this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
+    this.offsetStepId = cloneFromMatchingMode
+      ? cloneFromMatchingMode.offsetStepId
+      : null;
 
     // dependencies were already added, so we can just copy the dependency references
     this.beforeStepId = cloneFromMatchingMode?.beforeStepId ?? null;
@@ -709,7 +714,7 @@ export class PgSelectStep<
   public setFirst(first: InputStep): this {
     this.locker.assertParameterUnlocked("first");
     // PERF: don't eval
-    this.first = first.eval() ?? null;
+    this.firstStepId = this.addUnaryDependency(first);
     this.locker.lockParameter("first");
     return this;
   }
@@ -718,20 +723,14 @@ export class PgSelectStep<
     this.assertCursorPaginationAllowed();
     this.locker.assertParameterUnlocked("orderBy");
     this.locker.assertParameterUnlocked("last");
-    this.last = last.eval() ?? null;
+    this.lastStepId = this.addUnaryDependency(last);
     this.locker.lockParameter("last");
     return this;
   }
 
   public setOffset(offset: InputStep): this {
     this.locker.assertParameterUnlocked("offset");
-    this.offset = offset.eval() ?? null;
-    if (this.offset !== null) {
-      this.locker.lockParameter("last");
-      if (this.last != null) {
-        throw new SafeError("Cannot use 'offset' with 'last'");
-      }
-    }
+    this.offsetStepId = this.addUnaryDependency(offset);
     this.locker.lockParameter("offset");
     return this;
   }
@@ -1192,8 +1191,36 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     return pgPageInfo($connectionPlan);
   }
 
-  isNullFetch() {
-    return this.first === 0 || this.last === 0;
+  private getExecutionCommon(executionDetails: ExecutionDetails) {
+    const { values } = executionDetails;
+    const first =
+      this.firstStepId != null
+        ? (values[this.firstStepId] as UnaryExecutionValue<number | null>).value
+        : null;
+    const last =
+      this.lastStepId != null
+        ? (values[this.lastStepId] as UnaryExecutionValue<number | null>).value
+        : null;
+    const offset =
+      this.offsetStepId != null
+        ? (values[this.offsetStepId] as UnaryExecutionValue<number | null>)
+            .value
+        : null;
+    if (offset != null && last != null) {
+      throw new SafeError("Cannot use 'offset' with 'last'");
+    }
+
+    /**
+     * If `last` is in use then we reverse the order from the database and then
+     * re-reverse it in JS-land.
+     */
+    const shouldReverseOrder =
+      !this.streamOptions &&
+      first == null &&
+      last != null &&
+      this.lowerIndexStepId == null &&
+      this.upperIndexStepId == null;
+    return { first, last, offset, shouldReverseOrder };
   }
 
   /**
@@ -1208,24 +1235,28 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute({
-    indexMap,
-    count,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+    const { first, last, offset, shouldReverseOrder } =
+      this.getExecutionCommon(executionDetails);
+    const {
+      indexMap,
+      count,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
+    if (first === 0 || last === 0) {
+      return arrayOfLength(count, Object.freeze([]));
+    }
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
-    }
-    if (this.isNullFetch()) {
-      return arrayOfLength(count, Object.freeze([]));
     }
     const {
       text,
       textForSingle,
       rawSqlValues,
       identifierIndex,
-      shouldReverseOrder,
       name,
       nameForSingle,
     } = this.finalizeResults;
@@ -1265,22 +1296,19 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       if (allVals == null || isPromiseLike(allVals)) {
         return allVals;
       }
-      const limit = this.first ?? this.last;
-      const firstAndLast =
-        this.first != null && this.last != null && this.last < this.first;
+      const limit = first ?? last;
+      const firstAndLast = first != null && last != null && last < first;
       const hasMore =
         this.fetchOneExtra && limit != null && allVals.length > limit;
       const trimFromStart =
-        !shouldReverseOrder && this.last != null && this.first == null;
+        !shouldReverseOrder && last != null && first == null;
       const limitedRows = hasMore
         ? trimFromStart
           ? allVals.slice(Math.max(0, allVals.length - limit!))
           : allVals.slice(0, limit!)
         : allVals;
       const slicedRows =
-        firstAndLast && this.last != null
-          ? limitedRows.slice(-this.last)
-          : limitedRows;
+        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
@@ -1294,11 +1322,20 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   /**
    * Like `execute`, but stream the results via async iterables.
    */
-  async stream({
-    indexMap,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
+  async stream(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultStreamList<unknown[]>> {
+    const { first, last, offset, shouldReverseOrder } =
+      this.getExecutionCommon(executionDetails);
+    const {
+      indexMap,
+      count,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
+    if (first === 0 || last === 0) {
+      return arrayOfLength(count, Object.freeze([]));
+    }
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
@@ -1308,7 +1345,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       textForDeclare,
       rawSqlValuesForDeclare,
       identifierIndex,
-      shouldReverseOrder,
       streamInitialCount,
     } = this.finalizeResults;
 
@@ -1570,19 +1606,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     return this.orders;
   }
 
-  /**
-   * If `last` is in use then we reverse the order from the database and then
-   * re-reverse it in JS-land.
-   */
-  private shouldReverseOrder() {
-    return (
-      this.first == null &&
-      this.last != null &&
-      this.lowerIndexStepId == null &&
-      this.upperIndexStepId == null
-    );
-  }
-
   private buildGroupBy() {
     this.locker.lockParameter("groupBy");
     const groups = this.groups;
@@ -1636,156 +1659,102 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private limitAndOffsetSQL: SQL | null = null;
   private planLimitAndOffset() {
-    if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
-      /*
-       * When using cursor-base pagination with 'natural' cursors, we are actually
-       * applying limit/offset under the hood (presumably because we're paginating
-       * something that has no explicit order, like a function).
-       *
-       * If you have:
-       * - first: 3
-       * - after: ['natural', 4]
-       *
-       * Then we want `limit 3 offset 4`.
-       * With `fetchOneExtra` it'd be `limit 4 offset 4`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 4`
-       * With `fetchOneExtra` it'd be `limit 3 offset 3`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 3]
-       *
-       * We want `limit 2`
-       * With `fetchOneExtra` it'd still be `limit 2`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 4]
-       *
-       * We want `limit 2 offset 1`
-       * With `fetchOneExtra` it'd be `limit 3`.
-       *
-       * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
-       *
-       * For:
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 4 offset 2`
-       * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
-       *
-       * For:
-       * - first: 2
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 2`
-       * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
-       */
+    /*
+     * When using cursor-base pagination with 'natural' cursors, we are actually
+     * applying limit/offset under the hood (presumably because we're paginating
+     * something that has no explicit order, like a function).
+     *
+     * If you have:
+     * - first: 3
+     * - after: ['natural', 4]
+     *
+     * Then we want `limit 3 offset 4`.
+     * With `fetchOneExtra` it'd be `limit 4 offset 4`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 6]
+     *
+     * We want `limit 2 offset 4`
+     * With `fetchOneExtra` it'd be `limit 3 offset 3`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 3]
+     *
+     * We want `limit 2`
+     * With `fetchOneExtra` it'd still be `limit 2`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 4]
+     *
+     * We want `limit 2 offset 1`
+     * With `fetchOneExtra` it'd be `limit 3`.
+     *
+     * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
+     *
+     * For:
+     * - after: ['natural', 2]
+     * - before: ['natural', 6]
+     *
+     * We want `limit 4 offset 2`
+     * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
+     *
+     * For:
+     * - first: 2
+     * - after: ['natural', 2]
+     * - before: ['natural', 6]
+     *
+     * We want `limit 2 offset 2`
+     * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
+     */
 
-      const $lower =
-        this.lowerIndexStepId != null
-          ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
-      const $upper =
-        this.upperIndexStepId != null
-          ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
+    const $lower =
+      this.lowerIndexStepId != null
+        ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
+            number | null | undefined
+          >)
+        : constant(null);
+    const $upper =
+      this.upperIndexStepId != null
+        ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
+            number | null | undefined
+          >)
+        : constant(null);
 
-      const limitAndOffsetLambda = lambda(
-        [$lower, $upper],
-        ([cursorLower, cursorUpper]) => {
-          /** lower bound - exclusive (1-indexed) */
-          let lower = 0;
-          /** upper bound - exclusive (1-indexed) */
-          let upper = Infinity;
+    const $first =
+      this.firstStepId != null
+        ? (this.getDep(this.firstStepId) as ExecutableStep<
+            number | null | undefined
+          >)
+        : constant(null);
+    const $last =
+      this.lastStepId != null
+        ? (this.getDep(this.lastStepId) as ExecutableStep<
+            number | null | undefined
+          >)
+        : constant(null);
+    const $offset =
+      this.offsetStepId != null
+        ? (this.getDep(this.offsetStepId) as ExecutableStep<
+            number | null | undefined
+          >)
+        : constant(null);
+    const $fetchOneExtra = constant(this.fetchOneExtra);
 
-          // Apply 'after', if present
-          if (cursorLower != null) {
-            lower = Math.max(0, cursorLower);
-          }
-
-          // Apply 'before', if present
-          if (cursorUpper != null) {
-            upper = cursorUpper;
-          }
-
-          // Cannot go beyond these bounds
-          const maxUpper = upper;
-
-          // Apply 'first', if present
-          if (this.first != null) {
-            upper = Math.min(upper, lower + this.first + 1);
-          }
-
-          // Apply 'last', if present
-          if (this.last != null) {
-            lower = Math.max(0, lower, upper - this.last - 1);
-          }
-
-          // Apply 'offset', if present
-          if (this.offset != null && this.offset > 0) {
-            lower = Math.min(lower + this.offset, maxUpper);
-            upper = Math.min(upper + this.offset, maxUpper);
-          }
-
-          // If 'fetch one extra', adjust:
-          if (this.fetchOneExtra) {
-            if (this.first != null) {
-              upper = upper + 1;
-            } else if (this.last != null) {
-              lower = Math.max(0, lower - 1);
-            }
-          }
-
-          /** lower, but 0-indexed and inclusive */
-          const lower0 = lower - 1 + 1;
-          /** upper, but 0-indexed and inclusive */
-          const upper0 = upper - 1 - 1;
-
-          // Calculate the final limit/offset
-          const limit = isFinite(upper0)
-            ? Math.max(0, upper0 - lower0 + 1)
-            : null;
-          const offset = lower0;
-
-          return [limit, offset];
-        },
-        true,
-      );
-      this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
-      const limitLambda = access(limitAndOffsetLambda, [0]);
-      const offsetLambda = access(limitAndOffsetLambda, [1]);
-      return sql`\nlimit ${this.placeholder(
-        limitLambda,
-        TYPES.int,
-      )}\noffset ${this.placeholder(offsetLambda, TYPES.int)}`;
-    } else {
-      const limit =
-        this.first != null
-          ? sql`\nlimit ${sql.literal(
-              this.first + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : this.last != null
-          ? sql`\nlimit ${sql.literal(
-              this.last + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-      const offset =
-        this.offset != null
-          ? sql`\noffset ${sql.literal(this.offset)}`
-          : sql.blank;
-      return sql`${limit}${offset}`;
-    }
+    const limitAndOffsetLambda = lambda(
+      [$lower, $upper, $first, $last, $offset, $fetchOneExtra],
+      calculateLimits,
+      true,
+    );
+    this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
+    const limitLambda = access(limitAndOffsetLambda, [0]);
+    const offsetLambda = access(limitAndOffsetLambda, [1]);
+    return sql`\nlimit ${this.placeholder(
+      limitLambda,
+      TYPES.int,
+    )}\noffset ${this.placeholder(offsetLambda, TYPES.int)}`;
   }
 
   private buildLimitAndOffset() {
@@ -2480,7 +2449,6 @@ ${lateralText};`;
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
       !stream &&
-      !this.isNullFetch() &&
       !this.joins.some((j) => j.type !== "left")
     ) {
       // Inline ourself into our parent if we can.
@@ -3048,4 +3016,74 @@ export function getFragmentAndCodecFromOrder(
   } else {
     return [order.fragment, order.codec, order.nullable];
   }
+}
+
+function calculateLimits([
+  cursorLower,
+  cursorUpper,
+  first,
+  last,
+  offset,
+  fetchOneExtra,
+]: readonly [
+  number | null | undefined,
+  number | null | undefined,
+  number | null | undefined,
+  number | null | undefined,
+  number | null | undefined,
+  boolean,
+]) {
+  /** lower bound - exclusive (1-indexed) */
+  let lower = 0;
+  /** upper bound - exclusive (1-indexed) */
+  let upper = Infinity;
+
+  // Apply 'after', if present
+  if (cursorLower != null) {
+    lower = Math.max(0, cursorLower);
+  }
+
+  // Apply 'before', if present
+  if (cursorUpper != null) {
+    upper = cursorUpper;
+  }
+
+  // Cannot go beyond these bounds
+  const maxUpper = upper;
+
+  // Apply 'first', if present
+  if (first != null) {
+    upper = Math.min(upper, lower + first + 1);
+  }
+
+  // Apply 'last', if present
+  if (last != null) {
+    lower = Math.max(0, lower, upper - last - 1);
+  }
+
+  // Apply 'offset', if present
+  if (offset != null && offset > 0) {
+    lower = Math.min(lower + offset, maxUpper);
+    upper = Math.min(upper + offset, maxUpper);
+  }
+
+  // If 'fetch one extra', adjust:
+  if (fetchOneExtra) {
+    if (first != null) {
+      upper = upper + 1;
+    } else if (last != null) {
+      lower = Math.max(0, lower - 1);
+    }
+  }
+
+  /** lower, but 0-indexed and inclusive */
+  const lower0 = lower - 1 + 1;
+  /** upper, but 0-indexed and inclusive */
+  const upper0 = upper - 1 - 1;
+
+  // Calculate the final limit/offset
+  const limit = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
+  const newOffset = lower0;
+
+  return [limit, newOffset];
 }
