@@ -2311,6 +2311,7 @@ export class OperationPlan {
       return EMPTY_ARRAY;
     }
 
+    const sstep = sudo(step);
     const {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
@@ -2318,7 +2319,8 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
-    } = sudo(step);
+    } = sstep;
+    const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
@@ -2332,7 +2334,8 @@ export class OperationPlan {
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.peerKey === peerKey
+          possiblyPeer.peerKey === peerKey &&
+          possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2367,7 +2370,9 @@ export class OperationPlan {
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
           rawPossiblyPeer.constructor !== stepConstructor ||
-          rawPossiblyPeer.peerKey !== peerKey
+          rawPossiblyPeer.peerKey !== peerKey ||
+          rawPossiblyPeer._stepOptions.stream?.initialCount !==
+            streamInitialCount
         ) {
           continue;
         }
@@ -2431,7 +2436,9 @@ export class OperationPlan {
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
               rawPossiblyPeer.constructor !== stepConstructor ||
-              rawPossiblyPeer.peerKey !== peerKey
+              rawPossiblyPeer.peerKey !== peerKey ||
+              rawPossiblyPeer._stepOptions.stream?.initialCount !==
+                streamInitialCount
             ) {
               continue;
             }
