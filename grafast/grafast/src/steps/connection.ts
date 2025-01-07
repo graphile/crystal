@@ -338,8 +338,7 @@ export class ConnectionStep<
   }
 
   public pageInfo(): PageInfoCapableStep {
-    const plan = this.getStep(this.subplanId) as TStep;
-    return plan.pageInfo(this);
+    return this.cloneSubplanWithPagination().pageInfo(this);
   }
 
   /*
