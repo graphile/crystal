@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(12);
+## expect(queries).toHaveLength(13);
 {
   forums(includeArchived: EXCLUSIVELY) {
     name
