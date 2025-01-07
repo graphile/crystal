@@ -1193,9 +1193,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   isNullFetch() {
-    return (
-      (this.first === 0 || this.last === 0) && this.fetchOneExtra === false
-    );
+    return this.first === 0 || this.last === 0;
   }
 
   /**
