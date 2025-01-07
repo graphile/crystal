@@ -24,11 +24,23 @@ graph TD
     PgSelect10 ==> __Item14
     PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item14 --> PgSelectSingle15
-    Constant31{{"Constant[31∈1] ➊<br />ᐸfalseᐳ"}}:::plan
+    Constant6{{"Constant[6∈1] ➊<br />ᐸundefinedᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression16
+    Object42{{"Object[42∈3]<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Access34{{"Access[34∈3]<br />ᐸ44.hasMoreᐳ"}}:::plan
+    Constant6 & Constant6 & Constant6 & Access34 --> Object42
+    Object35{{"Object[35∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Constant6 & Constant6 & Access34 --> Object35
     PgPageInfo30{{"PgPageInfo[30∈3] ➊"}}:::plan
     Connection27 --> PgPageInfo30
+    Access44{{"Access[44∈3]<br />ᐸ14.1ᐳ"}}:::plan
+    Access44 --> Access34
+    Lambda36{{"Lambda[36∈3]<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object35 --> Lambda36
+    Lambda43{{"Lambda[43∈3]<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    Object42 --> Lambda43
+    __Item14 --> Access44
 
     %% define steps
 
@@ -38,13 +50,13 @@ graph TD
     class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,Connection27 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 27<br /><br />ROOT __Item{1}ᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item14,PgSelectSingle15,Constant31 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 27, 31<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
+    class Bucket1,Constant6,__Item14,PgSelectSingle15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 27, 6, 14<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 31<br /><br />ROOT Connectionᐸ23ᐳ[27]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 6, 14<br /><br />ROOT Connectionᐸ23ᐳ[27]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgPageInfo30 bucket3
+    class Bucket3,PgPageInfo30,Access34,Object35,Lambda36,Object42,Lambda43,Access44 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
