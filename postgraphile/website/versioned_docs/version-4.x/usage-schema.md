@@ -87,7 +87,7 @@ a GraphQLSchema object.
 The returned GraphQLSchema will **not** be updated when your database changes -
 if you require "watch" functionality, please use `watchPostGraphileSchema`
 instead (see below). The below options are valid
-for <tt>postgraphile@4.12.3</tt>.
+for <tt>`postgraphile@4.12.3`</tt>.
 
 - **`pgConfig`**: An object or string that will be passed to the [`pg`][]
   library and used to connect to a PostgreSQL backend. If you already have a
