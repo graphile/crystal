@@ -331,9 +331,18 @@ function isSQLable(value: any): value is SQLable {
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
 function enforceValidNode(node: SQLNode, where?: string): SQLNode;
 function enforceValidNode(node: SQL | SQLable, where?: string): SQL;
+function enforceValidNode(node: unknown, where?: string): SQL;
 function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
+  }
+  if (_userTransformer) {
+    const transformed = _userTransformer(node, where);
+    if (transformed !== node) {
+      return enforceValidNode(transformed);
+    } else {
+      // Continue onward; `node` is unchanged
+    }
   }
   if (isSQLable(node)) {
     return enforceValidNode(node[$$toSQL](), where);
@@ -343,7 +352,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
       where ? ` at ${where}` : ""
     } but received '${inspect(
       node,
-    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
+    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal. Alternatively, perhaps you forgot to call sql.withTransformer() when building your SQL?`,
   );
 }
 
@@ -1213,6 +1222,26 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
+export type Transformer = <TValue>(
+  value: TValue,
+  where?: string,
+) => SQL | TValue;
+
+let _userTransformer: Transformer | null = null;
+
+export function withTransformer<TResult>(
+  transformer: Transformer,
+  callback: (sql: PgSQL) => TResult,
+): TResult {
+  const oldTransformer = _userTransformer;
+  _userTransformer = transformer;
+  try {
+    return callback(sql);
+  } finally {
+    _userTransformer = oldTransformer;
+  }
+}
+
 export const sql = sqlBase as PgSQL;
 export default sql;
 
@@ -1249,6 +1278,10 @@ export interface PgSQL {
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
   sql: PgSQL;
+  withTransformer<T>(
+    transformer: (value: unknown) => SQL,
+    callback: (sql: PgSQL) => T,
+  ): SQL;
 }
 
 const attributes = {
@@ -1274,6 +1307,7 @@ const attributes = {
   null: nullNode,
   replaceSymbol,
   isSQL,
+  withTransformer,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
