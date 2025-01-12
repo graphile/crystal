@@ -44,6 +44,7 @@ import type {
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
+import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
@@ -296,6 +297,19 @@ export class PgUnionAllSingleStep
 
   public node() {
     return this;
+  }
+
+  public scopedSQL = makeScopedSQL(this);
+
+  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
+  ): SQL {
+    return overrideCodec
+      ? this.getClassStep().placeholder($step, overrideCodec)
+      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
   }
 
   /**
@@ -1032,6 +1046,8 @@ on (${sql.indent(
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
   }
+
+  public scopedSQL = makeScopedSQL(this);
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
