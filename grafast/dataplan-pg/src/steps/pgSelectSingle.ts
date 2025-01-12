@@ -28,6 +28,7 @@ import type {
   PgRegistry,
   PgTypedExecutableStep,
 } from "../interfaces.js";
+import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
@@ -310,6 +311,8 @@ export class PgSelectSingleStep<
   public selectAndReturnIndex(fragment: SQL): number {
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
+
+  public scopedSQL = makeScopedSQL(this);
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
