@@ -56,6 +56,7 @@ import type {
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
+import { makeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
@@ -762,6 +763,8 @@ export class PgSelectStep<
   public unique(): boolean {
     return this.isUnique;
   }
+
+  public scopedSQL = makeScopedSQL(this);
 
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
   public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
