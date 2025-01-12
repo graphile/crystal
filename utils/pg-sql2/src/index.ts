@@ -338,7 +338,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
   }
   for (let i = _userTransformers.length - 1; i >= 0; i--) {
     const transformer = _userTransformers[i];
-    const transformed = transformer(node, where);
+    const transformed = transformer(sql, node, where);
     if (transformed !== node) {
       return enforceValidNode(transformed);
     } else {
@@ -1224,6 +1224,7 @@ function getSubstitute(
 }
 
 export type Transformer<TNewEmbed> = <TValue>(
+  sql: PgSQL,
   value: TNewEmbed | TValue,
   where?: string,
 ) => SQL | TValue;
