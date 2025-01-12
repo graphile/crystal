@@ -1285,7 +1285,7 @@ export interface PgSQL<TEmbed = never> {
   withTransformer<TNewEmbed, TResult = SQL>(
     transformer: Transformer<TNewEmbed>,
     callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
-  ): SQL;
+  ): TResult;
 }
 
 const attributes = {
