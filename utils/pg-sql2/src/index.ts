@@ -336,8 +336,9 @@ function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
   }
-  if (_userTransformer) {
-    const transformed = _userTransformer(node, where);
+  for (let i = _userTransformers.length - 1; i >= 0; i--) {
+    const transformer = _userTransformers[i];
+    const transformed = transformer(node, where);
     if (transformed !== node) {
       return enforceValidNode(transformed);
     } else {
@@ -1222,23 +1223,22 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
-export type Transformer = <TValue>(
-  value: TValue,
+export type Transformer<TNewEmbed> = <TValue>(
+  value: TNewEmbed | TValue,
   where?: string,
 ) => SQL | TValue;
 
-let _userTransformer: Transformer | null = null;
+const _userTransformers: Transformer<any>[] = [];
 
-export function withTransformer<TResult>(
-  transformer: Transformer,
-  callback: (sql: PgSQL) => TResult,
+export function withTransformer<TNewEmbed, TResult = SQL>(
+  transformer: Transformer<TNewEmbed>,
+  callback: (sql: PgSQL<TNewEmbed>) => TResult,
 ): TResult {
-  const oldTransformer = _userTransformer;
-  _userTransformer = transformer;
+  _userTransformers.push(transformer);
   try {
-    return callback(sql);
+    return callback(sql as PgSQL<TNewEmbed>);
   } finally {
-    _userTransformer = oldTransformer;
+    _userTransformers.pop();
   }
 }
 
@@ -1254,12 +1254,15 @@ export {
   trueNode as true,
 };
 
-export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL | SQLable>): SQL;
+export interface PgSQL<TEmbed = never> {
+  (
+    strings: TemplateStringsArray,
+    ...values: Array<SQL | SQLable | TEmbed>
+  ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
-  query: PgSQL;
+  query: PgSQL<TEmbed>;
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
@@ -1271,16 +1274,16 @@ export interface PgSQL {
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
-  fragment: PgSQL;
+  fragment: PgSQL<TEmbed>;
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
-  sql: PgSQL;
-  withTransformer<T>(
-    transformer: (value: unknown) => SQL,
-    callback: (sql: PgSQL) => T,
+  sql: PgSQL<TEmbed>;
+  withTransformer<TNewEmbed, TResult = SQL>(
+    transformer: Transformer<TNewEmbed>,
+    callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
   ): SQL;
 }
 
