@@ -58,10 +58,9 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
-
-const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgUnionAll placeholder! */`;
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
@@ -189,23 +188,6 @@ interface QueryValue {
   codec: PgCodec;
   alreadyEncoded: boolean;
 }
-
-/**
- * Sometimes we want to refer to something that might change later - e.g. we
- * might have SQL that specifies a list of explicit values, or it might later
- * want to be replaced with a reference to an existing table value (e.g. when a
- * query is being inlined). PgSelectPlaceholder allows for this kind of
- * flexibility. It's really important to keep in mind that the same placeholder
- * might be used in multiple different SQL queries, and in the different
- * queries it might end up with different values - this is particularly
- * relevant when using `@stream`/`@defer`, for example.
- */
-type PgUnionAllPlaceholder = {
-  dependencyIndex: number;
-  codec: PgCodec;
-  symbol: symbol;
-  alreadyEncoded: boolean;
-};
 
 export class PgUnionAllSingleStep
   extends ExecutableStep
@@ -418,7 +400,7 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >
-  extends ExecutableStep
+  extends PgStmtBaseStep<unknown>
   implements
     ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
@@ -470,7 +452,6 @@ export class PgUnionAllStep<
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<PgUnionAllPlaceholder>;
   private placeholderValues: Map<symbol, SQL>;
 
   // GROUP BY
@@ -542,8 +523,6 @@ export class PgUnionAllStep<
 
   public readonly mode: PgUnionAllMode;
 
-  private locker: PgLocker<this> = new PgLocker(this);
-
   private memberDigests: MemberDigest<TTypeNames>[];
   private _limitToTypes: string[] | undefined;
 
@@ -587,7 +566,9 @@ export class PgUnionAllStep<
       this.selects = cloneFromMatchingMode
         ? [...cloneFromMatchingMode.selects]
         : [];
-      this.placeholders = [...cloneFrom.placeholders];
+      for (const placeholder of cloneFrom.placeholders) {
+        this.placeholders.push(placeholder);
+      }
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.groups = cloneFromMatchingMode
@@ -670,7 +651,6 @@ export class PgUnionAllStep<
       this.alias = sql.identifier(this.symbol);
 
       this.selects = [];
-      this.placeholders = [];
       this.queryValues = [];
       this.placeholderValues = new Map();
       this.groups = [];
@@ -1045,51 +1025,6 @@ on (${sql.indent(
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
-  }
-
-  public scopedSQL = makeScopedSQL(this);
-
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder(
-    $step: ExecutableStep,
-    codec: PgCodec,
-    alreadyEncoded?: boolean,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec,
-    alreadyEncoded = false,
-  ): SQL {
-    if (this.locker.locked) {
-      throw new Error(`${this}: cannot add placeholders once plan is locked`);
-    }
-    if (this.placeholders.length >= 100000) {
-      throw new Error(
-        `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
-      );
-    }
-
-    const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
-    if (!codec) {
-      throw new Error(
-        `Step ${$step} does not contain pgCodec information, please wrap ` +
-          `it in \`pgCast\`. E.g. \`pgCast($step, TYPES.boolean)\``,
-      );
-    }
-
-    const dependencyIndex = this.addDependency($step);
-    const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
-    const p: PgUnionAllPlaceholder = {
-      dependencyIndex,
-      codec,
-      symbol,
-      alreadyEncoded,
-    };
-    this.placeholders.push(p);
-    // This allows us to replace the SQL that will be compiled, for example
-    // when we're inlining this into a parent query.
-    return sqlPlaceholder;
   }
 
   private applyConditionFromCursor(
