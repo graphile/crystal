@@ -1826,7 +1826,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
     const placeholderValues = new Map<symbol, SQL>(this.fixedPlaceholderValues);
 
-    const placeholders: PgStmtDeferredPlaceholder[] = [];
     const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
