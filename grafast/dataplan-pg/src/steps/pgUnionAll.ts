@@ -172,6 +172,12 @@ export interface PgUnionAllStepConfig<
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
   name?: string;
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  forceIdentity?: boolean;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -523,6 +529,13 @@ export class PgUnionAllStep<
   private memberDigests: MemberDigest<TTypeNames>[];
   private _limitToTypes: string[] | undefined;
 
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  public forceIdentity: boolean;
+
   constructor(
     cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
     mode?: PgUnionAllMode,
@@ -547,6 +560,7 @@ export class PgUnionAllStep<
       this._limitToTypes = cloneFrom._limitToTypes
         ? [...cloneFrom._limitToTypes]
         : undefined;
+      this.forceIdentity = cloneFrom.forceIdentity;
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency({
@@ -618,12 +632,14 @@ export class PgUnionAllStep<
     } else {
       const spec = specOrCloneFrom;
       this.mode = overrideMode ?? spec.mode ?? "normal";
+
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
         );
       }
       this.spec = spec;
+      this.forceIdentity = false;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -1796,20 +1812,21 @@ ${unionHaving}\
       return innerQuery;
     };
 
-    const queryValues: Array<QueryValue> = [];
-    const placeholderValues = new Map<symbol, SQL>();
-
-    const { text, rawSqlValues, identifierIndex } = ((): {
+    const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
       text: string;
       rawSqlValues: SQLRawValue[];
       textForSingle?: string;
       identifierIndex: number | null;
+      queryValues: Array<QueryValue>;
     } => {
+      const queryValues: Array<QueryValue> = [];
+      const placeholderValues = new Map<symbol, SQL>();
+
+      const wrapperSymbol = Symbol("union_result");
+      const wrapperAlias = sql.identifier(wrapperSymbol);
+      const identifiersSymbol = Symbol("union_identifiers");
+      const identifiersAlias = sql.identifier(identifiersSymbol);
       if (this.placeholders.length > 0) {
-        const wrapperSymbol = Symbol("union_result");
-        const wrapperAlias = sql.identifier(wrapperSymbol);
-        const identifiersSymbol = Symbol("union_identifiers");
-        const identifiersAlias = sql.identifier(identifiersSymbol);
         this.placeholders.forEach((placeholder) => {
           const { symbol, dependencyIndex, codec, alreadyEncoded } =
             placeholder;
@@ -1852,7 +1869,9 @@ ${unionHaving}\
             );
           }
         });
+      }
 
+      if (queryValues.length > 0 || this.forceIdentity || this.hasSideEffects) {
         const identifierIndex = this.selectAndReturnIndex(
           sql`${identifiersAlias}.idx`,
         );
@@ -1914,13 +1933,19 @@ from (select 0 as idx${
         }) as ${identifiersAliasText},
 ${lateralText};`;
 
-        return { text, textForSingle, rawSqlValues, identifierIndex };
+        return {
+          text,
+          textForSingle,
+          rawSqlValues,
+          identifierIndex,
+          queryValues,
+        };
       } else {
         const query = makeQuery();
         const { text, values: rawSqlValues } = sql.compile(query, {
           placeholderValues,
         });
-        return { text, rawSqlValues, identifierIndex: null };
+        return { text, rawSqlValues, identifierIndex: null, queryValues };
       }
     })();
 
