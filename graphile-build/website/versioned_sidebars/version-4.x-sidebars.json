@@ -20,7 +20,6 @@
     "schema-builder",
     "plugin-options",
     "default-plugins",
-    "look-ahead",
     {
       "type": "html",
       "value": "<h4>BUILDING A PLUGIN</h4>",
@@ -28,7 +27,6 @@
     },
     "all-hooks",
     "build-object",
-    "context-object",
-    "schema-builder"
+    "context-object"
   ]
 }

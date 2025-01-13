@@ -1,10 +1,9 @@
 ---
-layout: page
-path: /graphile-build/look-ahead/
-title: "Advanced: Look Ahead"
+title: "Look Ahead"
 ---
 
-<p class="intro">
+# Advanced: Look Ahead
+
 Traditionally in GraphQL APIs DataLoader is used to batch requests to minimize
 the impact of N+1 queries. DataLoader can be use with Graphile Engine in the same
 way as it is with GraphQL. However, sometimes DataLoader isn't the best
@@ -13,7 +12,6 @@ functionality you can use to optimize your GraphQL queries. This is
 particularly well suited to environments that allow you to specify complex
 structures to be returned (such as databases or other GraphQL APIs), but is
 generic enough that it can be used for many use-cases.
-</p>
 
 ### Seeing which sub-fields were requested
 
@@ -82,18 +80,20 @@ will be passed the methods:
 - `addDataGeneratorForField(fieldName, generatorFn)` - will associate the data
   generator with the field
 
-```js{6-10,22-25}
+```js
 const MyObject = newWithHooks(GraphQLObjectType, {
   name: "MyObject",
   fields: ({ addDataGeneratorForField }) => {
     addDataGeneratorForField("id", ({ alias }) => {
       return {
-        map: obj => ({ [alias]: obj.ID }),
+        /* highlight-start */
+        map: (obj) => ({ [alias]: obj.ID }),
       };
     });
     addDataGeneratorForField("caps", ({ alias }) => {
       return {
-        map: obj => ({ [alias]: obj.CAPS }),
+        /* highlight-end */
+        map: (obj) => ({ [alias]: obj.CAPS }),
       };
     });
     addDataGeneratorForField("random", ({ alias }) => {
@@ -104,10 +104,12 @@ const MyObject = newWithHooks(GraphQLObjectType, {
     return {
       id: {
         type: new GraphQLNonNull(GraphQLString),
+        /* highlight-start */
         resolve: resolveAlias,
       },
       caps: {
         type: new GraphQLNonNull(GraphQLString),
+        /* highlight-end */
         resolve: resolveAlias,
       },
       random: {
@@ -123,15 +125,16 @@ const MyObject = newWithHooks(GraphQLObjectType, {
 
 You can use the `fieldWithHooks` helper, passing it a function:
 
-```js{5-15}
+```js
 const MyObject = newWithHooks(GraphQLObjectType, {
   name: "MyObject",
   fields: ({ fieldWithHooks }) => {
     return {
+      /* highlight-start */
       id: fieldWithHooks("id", ({ addDataGenerator }) => {
         addDataGenerator(({ alias }) => {
           return {
-            map: obj => ({ [alias]: obj.ID }),
+            map: (obj) => ({ [alias]: obj.ID }),
           };
         });
         return {
@@ -139,10 +142,11 @@ const MyObject = newWithHooks(GraphQLObjectType, {
           resolve: resolveAlias,
         };
       }),
+      /* highlight-end */
       caps: fieldWithHooks("caps", ({ addDataGenerator }) => {
         addDataGenerator(({ alias }) => {
           return {
-            map: obj => ({ [alias]: obj.CAPS }),
+            map: (obj) => ({ [alias]: obj.CAPS }),
           };
         });
         return {
@@ -171,19 +175,21 @@ const MyObject = newWithHooks(GraphQLObjectType, {
 Arguments also influence what we should do, so we can use `addArgDataGenerator`
 to provide look-ahead data based on the arguments received.
 
-```js{7-12}
+```js
 const MyObject = newWithHooks(GraphQLObjectType, {
   name: "MyObject",
   fields: ({ fieldWithHooks }) => {
     return {
       connection: fieldWithHooks("connection", ({ addArgDataGenerator }) => {
         addArgDataGenerator(function connectionFirst({ first }) {
+          /* highlight-start */
           if (first) {
             return { limit: [first] };
           }
         });
         return {
           type: ConnectionType,
+          /* highlight-end */
           args: {
             first: {
               type: GraphQLInt,
@@ -201,7 +207,7 @@ const MyObject = newWithHooks(GraphQLObjectType, {
 Hooks can also associate metadata with a field; they are passed
 `addDataGenerator` on the Context argument, for example:
 
-```js{10-14}
+```js
 function MyObjectAddIdDataGeneratorPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field",
@@ -211,11 +217,13 @@ function MyObjectAddIdDataGeneratorPlugin(builder) {
       }
       addDataGenerator(({ alias }) => {
         return {
-          map: obj => ({ [alias]: obj.ID }),
+          /* highlight-start */
+          map: (obj) => ({ [alias]: obj.ID }),
         };
       });
       return field;
-    }
+    },
+    /* highlight-end */
   );
 }
 ```
@@ -233,7 +241,7 @@ method:
 Given a `parseResolveInfoFragment` and an expected return type, this will return
 the metadata associated with this field.
 
-```js{9,21-24,30-32}
+```js
 const Query = newWithHooks(GraphQLObjectType, {
   name: "Query",
   fields: ({ fieldWithHooks }) => ({
@@ -242,6 +250,7 @@ const Query = newWithHooks(GraphQLObjectType, {
       ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
         addArgDataGenerator(function connectionFirst({ first }) {
           if (first) {
+            /* highlight-next-line */
             return { limit: [first] };
           }
         });
@@ -254,18 +263,22 @@ const Query = newWithHooks(GraphQLObjectType, {
           },
           resolve(data, args, context, resolveInfo) {
             const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+            /* highlight-start */
             const resolveData = getDataFromParsedResolveInfoFragment(
               parsedResolveInfoFragment,
               MyConnection
             );
+            /* highlight-end */
 
             // For example, if this is called with (limit: 3)
             // then we'd have:
             //
             // resolveData = {
+            /* highlight-start */
             //   limit: [
             //     3
             //   ]
+            /* highlight-end */
             // }
 
             // TODO: generate and return connection

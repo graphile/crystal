@@ -1,11 +1,11 @@
 ---
-layout: page
-path: /graphile-build/schema-builder/
-title: SchemaBuilder instance
+title: SchemaBuilder
 ---
 
+# SchemaBuilder instance
+
 The SchemaBuilder instance returned by
-[`getBuilder`](/graphile-build/graphile-build/) has a number of methods on it
+[`getBuilder`](./graphile-build) has a number of methods on it
 that may be of interest:
 
 ### Consumer methods
@@ -42,8 +42,8 @@ class SchemaBuilder {
 #### `createBuild()`
 
 This synchronous function returns a fresh
-[`Build` object](/graphile-build/build-object/) which you can use to build other
-objects (such as the `GraphQLSchema` created above). Be aware the the build will
+[`Build` object](./build-object) which you can use to build other
+objects (such as the `GraphQLSchema` created above). Be aware: the build will
 store created objects, so it is not safe to use the same `build` object to
 create a GraphQL object with the same name multiple times - each time should use
 a fresh build object.
@@ -58,16 +58,16 @@ Example: this hook will log the name of each GraphQLObjectType that is built:
 
 ```js
 function GraphQLObjectTypeLogNamePlugin(builder) {
-  builder.hook("GraphQLObjectType", spec => {
+  builder.hook("GraphQLObjectType", (spec) => {
     console.log(
       "A new GraphQLObjectType is being constructed with name: ",
-      spec.name
+      spec.name,
     );
   });
 }
 ```
 
-See [Hooks](/graphile-build/hooks/) for details
+See [Hooks](./hooks/) for details
 
 #### `registerWatcher(watcher, unwatcher)`
 
@@ -81,11 +81,11 @@ https://github.com/graphile/graphile-engine/blob/83ee6948c5ab9f202773bf7518ea4d2
 
 ```js
 builder.registerWatcher(
-  triggerRebuild => {
+  (triggerRebuild) => {
     eventEmitter.on("change", triggerRebuild);
   },
-  triggerRebuild => {
+  (triggerRebuild) => {
     eventEmitter.removeListener("change", triggerRebuild);
-  }
+  },
 );
 ```

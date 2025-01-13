@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /graphile-build/default-plugins/
 title: Default Plugins
 ---
 
@@ -37,7 +35,7 @@ function MyPlugin(builder) {
       return extend(spec, {
         //... Add new query fields here
       });
-    }
+    },
   );
 }
 ```
@@ -59,7 +57,7 @@ function MyPlugin(builder) {
       return extend(spec, {
         //... Add new mutation fields here
       });
-    }
+    },
   );
 }
 ```

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /graphile-build/getting-started/
 title: Getting Started
 ---
 
@@ -15,9 +13,9 @@ npm install --save graphile-build graphql
 
 ### Building your Schema
 
-The [`buildSchema`](/graphile-build/schema-builder/#buildSchema) method will
+The [`buildSchema`](./schema-builder#buildSchema) method will
 (asynchronously) build a GraphQL schema from a list of plugins. We ship a number
-of [default plugins](/graphile-build/default-plugins/) that are sufficient to
+of [default plugins](./default-plugins) that are sufficient to
 create a simple schema, like so:
 
 <!-- source: examples/empty-schema.js -->
@@ -26,7 +24,7 @@ create a simple schema, like so:
 const { buildSchema, defaultPlugins } = require("graphile-build");
 const { printSchema } = require("graphql/utilities");
 
-buildSchema(defaultPlugins).then(schema => {
+buildSchema(defaultPlugins).then((schema) => {
   console.log(printSchema(schema));
 });
 // ES2017: const schema = await buildSchema(defaultPlugins);
@@ -59,6 +57,6 @@ type Query implements Node {
 }
 ```
 
-(See [Omitting Plugins](/graphile-build/omitting-plugins/) for how to make this
+(See [Omitting Plugins](./omitting-plugins) for how to make this
 schema even simpler by omitting the Node interface, and
-[Options](/graphile-build/plugin-options/) for how to pass options to plugins.)
+[Options](./plugin-options) for how to pass options to plugins.)

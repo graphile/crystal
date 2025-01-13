@@ -79,12 +79,10 @@ currently). More specifically, the types for each hook are:
 
 - inflection - a plain object with some core inflection methods, built in
   [`makeNewBuild`](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build/src/makeNewBuild.js#L929-L997)
-- build - a [`Build` object](/graphile-build/build-object/)
+- build - a [`Build` object](./build-object)
 - init - an opaque object, please just return it verbatim
-
 - GraphQLSchema -
   [`GraphQLSchemaConfig`](http://graphql.org/graphql-js/type/#graphqlschema)
-
 - GraphQLObjectType -
   [`GraphQLObjectTypeConfig`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
 - GraphQLObjectType:interfaces -
@@ -95,21 +93,18 @@ currently). More specifically, the types for each hook are:
   [`GraphQLFieldConfig`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
 - GraphQLObjectType:fields:field:args -
   [`GraphQLFieldConfigArgumentMap`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
-
 - GraphQLInputObjectType -
   [`GraphQLInputObjectTypeConfig`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
 - GraphQLInputObjectType:fields -
   [`GraphQLInputObjectConfigFieldMap`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
 - GraphQLInputObjectType:fields:field -
   [`GraphQLInputObjectFieldConfig`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
-
 - GraphQLEnumType -
   [`GraphQLEnumTypeConfig`](http://graphql.org/graphql-js/type/#graphqlenumtype)
 - GraphQLEnumType:values -
   [`GraphQLEnumValueConfigMap`](http://graphql.org/graphql-js/type/#graphqlenumtype)
 - GraphQLEnumType:values:value -
   [`GraphQLEnumValueConfig`](http://graphql.org/graphql-js/type/#graphqlenumtype)
-
 - finalize -
   [`GraphQLSchema`](http://graphql.org/graphql-js/type/#graphqlschema)
 

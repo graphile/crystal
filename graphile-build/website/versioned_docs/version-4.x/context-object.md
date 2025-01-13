@@ -23,24 +23,27 @@ shallower hooks (such as `GraphQLObjectType`) are merged in.
 For example you might use a hook such as this to add a description to the
 `clientMutationId` field on all mutation input objects:
 
-```js{5,7-11}
+```js
 builder.hook(
   "GraphQLInputObjectType:fields:field",
   (field, { extend }, { scope: { isMutationInput, fieldName } }) => {
     if (
+      /* highlight-next-line */
       !isMutationInput ||
       fieldName !== "clientMutationId" ||
+      /* highlight-start */
       field.description != null
     ) {
       return field;
     }
     return extend(field, {
+      /* highlight-end */
       description:
         "An arbitrary string value with no semantic meaning. " +
         "Will be included in the payload verbatim. " +
         "May be used to track mutations by the client.",
     });
-  }
+  },
 );
 ```
 
@@ -59,15 +62,17 @@ Available on hooks `GraphQLObjectType:fields` and
 (for example if you need to call `addDataGenerator(...)`). If you don't call
 this, it will be called for you at a later time.
 
-```js{5,9-19}
+```js
 builder.hook("GraphQLInputObjectType:fields",
   (
     fields,
     { extend, resolveAlias },
+    /* highlight-next-line */
     { fieldWithHooks }
   ) => {
     // TODO: if (...) return fields;
     return extend(fields, {
+      /* highlight-start */
       id: fieldWithHooks("id", ({ addDataGenerator }) => {
         addDataGenerator(({ alias }) => {
           return {
@@ -79,6 +84,7 @@ builder.hook("GraphQLInputObjectType:fields",
           resolve: resolveAlias,
         };
       }),
+      /* highlight-end */
     };
   },
 });

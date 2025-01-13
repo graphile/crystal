@@ -1,11 +1,11 @@
 ---
-layout: page
-path: /graphile-build/plugin-options/
-title: Plugin Options
+title: Options
 ---
 
+# Plugin Options
+
 The second argument to
-[`buildSchema` and `getBuilder`](/graphile-build/graphile-build/#the-graphile-build-module)
+[`buildSchema` and `getBuilder`](./graphile-build#the-graphile-build-module)
 is an **`options`** object with arbitrary properties which is made available to
 every plugin as its second argument.
 
@@ -19,7 +19,7 @@ The following options apply to the default plugins:
   non-introspection fields that begin with `__`)
 
 Plugins may expect further options if they wish, for example see
-[those of `graphile-build-pg`](/graphile-build-pg/settings/). To prevent
+[those of `graphile-build-pg`](../graphile-build-pg/settings/). To prevent
 collisions between the property names, the plugins should follow some
 namespacing conventions.
 
@@ -34,7 +34,7 @@ from the default `id` to `flibble`:
 const { buildSchema, defaultPlugins } = require("graphile-build");
 const { printSchema } = require("graphql/utilities");
 
-buildSchema(defaultPlugins, { nodeIdFieldName: "flibble" }).then(schema => {
+buildSchema(defaultPlugins, { nodeIdFieldName: "flibble" }).then((schema) => {
   console.log(printSchema(schema));
 });
 ```

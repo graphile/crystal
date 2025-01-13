@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /graphile-build/plugins/
 title: Plugins
 ---
 
@@ -12,9 +10,9 @@ add plugins, remove plugins, even replace the entire stack if you so desire.
 ## Loading Plugins
 
 Plugins are loaded when you call
-[`buildSchema(plugins, options)`](/graphile-build/graphile-build/#buildschemaplugins-options)
+[`buildSchema(plugins, options)`](./graphile-build#buildschemaplugins-options)
 or
-[`getBuilder(plugins, options)`](/graphile-build/graphile-build/#getbuilderplugins-options).
+[`getBuilder(plugins, options)`](./graphile-build#getbuilderplugins-options).
 They may be asynchronous thus these functions return a promise; Graphile Engine
 will wait for each plugin to finish loading before attempting to load the next
 plugin - so the order in which you specify the plugins may be important.
@@ -30,7 +28,7 @@ const plugins = [
   // Add more plugins here!
 ];
 
-buildSchema(plugins).then(schema => {
+buildSchema(plugins).then((schema) => {
   console.log(printSchema(schema));
 });
 ```
@@ -38,9 +36,9 @@ buildSchema(plugins).then(schema => {
 ## Writing Plugins
 
 Graphile Engine plugins are simple functions that interact with
-[the `SchemaBuilder`](/graphile-build/schema-builder/), most commonly by
+[the `SchemaBuilder`](./schema-builder), most commonly by
 registering hooks. When you perform
-[`buildSchema(plugins)`](/graphile-build/graphile-build/) we create a new
+[`buildSchema(plugins)`](./graphile-build) we create a new
 `SchemaBuilder` instance and then load each of the plugins against it.
 
 If a plugin returns a `Promise` (e.g. an asynchronous plugin) then we will wait
@@ -64,7 +62,7 @@ which you can load into your schema like so:
 const { buildSchema, defaultPlugins } = require("graphile-build");
 const { printSchema } = require("graphql/utilities");
 
-buildSchema([...defaultPlugins, NoopPlugin]).then(schema => {
+buildSchema([...defaultPlugins, NoopPlugin]).then((schema) => {
   console.log(printSchema(schema));
 });
 ```
@@ -102,17 +100,17 @@ type Query implements Node {
 ### Plugin actions
 
 Whilst a plugin is being executed it can perform actions on the
-[`builder` object](/graphile-build/schema-builder/), its first argument.
+[`builder` object](./schema-builder), its first argument.
 
 The most common actions for a plugin are:
 
-- Register a [**Hook**](/graphile-build/hooks/) callback to perform
+- Register a [**Hook**](./hooks) callback to perform
   transformations at a specific step in the build, using
   `builder.hook(hookName, hookFunction)`. Through the use of hooks, a plugin
   might provide functionality for other plugins, overwrite functionality that
   was exposed by other plugins, or add things to specific parts of the schema.
 - Add watch-mode event listeners, using
-  [`builder.registerWatcher(watcher, unwatcher)`](/graphile-build/schema-builder/#registerwatcherwatcher-unwatcher)
+  [`builder.registerWatcher(watcher, unwatcher)`](./schema-builder#registerwatcherwatcher-unwatcher)
 
 ### An example plugin
 
@@ -124,14 +122,14 @@ that is generated with hooks:
 
 module.exports = function MyRandomFieldPlugin(
   builder,
-  { myDefaultMin = 1, myDefaultMax = 100 }
+  { myDefaultMin = 1, myDefaultMax = 100 },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
       fields, // input object
       { extend, graphql: { GraphQLInt } }, // Build
-      context // Context
+      context, // Context
     ) => {
       return extend(fields, {
         random: {
@@ -149,7 +147,7 @@ module.exports = function MyRandomFieldPlugin(
           },
         },
       });
-    }
+    },
   );
 };
 ```
@@ -157,19 +155,19 @@ module.exports = function MyRandomFieldPlugin(
 First it registers a hook on `GraphQLObjectType:fields` which will be called for
 the `fields` property of every `GraphQLObjectType` that is constructed.
 
-The callback to this [hook](/graphile-build/hooks/) is passed the three standard
+The callback to this [hook](./hooks) is passed the three standard
 options:
 
 - input object, `fields`, which is basically a
-  [`GraphQLFieldConfigMap` from graphql-js](http://graphql.org/graphql-js/type/#graphqlobjecttype).
-- [`Build` object](/graphile-build/build-object/) (from which we're using
-  `extend` and `graphql.GraphQLInt`
-- [`Context` object](/graphile-build/context-object/) which it is ignoring; but
+  [`GraphQLFieldConfigMap` from graphql-js](http://graphql.org/graphql-js/type/#graphqlobjecttype)
+- [`Build` object](./build-object) (from which we're using
+  `extend` and `graphql.GraphQLInt`)
+- [`Context` object](./context-object) which it is ignoring; but
   if we wanted to filter which objects get the `random` field added this would
   be what we'd use
 
 Finally we're returning a derivative of the `fields` that were input by adding
-an additonal property `field` which is a standard GraphQL field config
+an additional property `field` which is a standard GraphQL field config
 `GraphQLFieldConfig` - see the
 [GraphQL-js documentation](http://graphql.org/graphql-js/type/#graphqlobjecttype).
 
@@ -177,7 +175,7 @@ an additonal property `field` which is a standard GraphQL field config
 
 Plugins are called with just two arguments:
 
-- `builder` - the instance of [`SchemaBuilder`](/graphile-build/graphile-build/)
+- `builder` - the instance of [`SchemaBuilder`](./graphile-build)
   the plugin is being loaded against
-- `options` - [the options](/graphile-build/plugin-options/) that were passed to
+- `options` - [the options](./plugin-options) that were passed to
   `buildSchema(plugins, options)` (or `getBuilder(plugins, options)`)
