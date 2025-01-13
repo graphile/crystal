@@ -1,31 +1,26 @@
-select __forums_result__.*
-from (select 0 as idx) as __forums_identifiers__,
-lateral (
-  select
-    __forums__."name" as "0",
-    __forums__."id" as "1",
-    to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2",
-    __forums_identifiers__.idx as "3"
-  from app_public.forums as __forums__
-  where
-    (
-      __forums__.archived_at is null
-    ) and (
-      exists(
-        select 1
-        from app_public.messages as __messages_filter__
-        where
-          (
-            __forums__."id" = __messages_filter__."forum_id"
-          ) and (
-            __messages_filter__.featured = $1::"bool"
-          )
-      )
-    ) and (
-      true /* authorization checks */
+select
+  __forums__."name" as "0",
+  __forums__."id" as "1",
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2"
+from app_public.forums as __forums__
+where
+  (
+    __forums__.archived_at is null
+  ) and (
+    exists(
+      select 1
+      from app_public.messages as __messages_filter__
+      where
+        (
+          __forums__."id" = __messages_filter__."forum_id"
+        ) and (
+          __messages_filter__.featured = $1::"bool"
+        )
     )
-  order by __forums__."id" asc
-) as __forums_result__;
+  ) and (
+    true /* authorization checks */
+  )
+order by __forums__."id" asc;
 
 select __messages_result__.*
 from (select 0 as idx, $3::"uuid" as "id0") as __messages_identifiers__,

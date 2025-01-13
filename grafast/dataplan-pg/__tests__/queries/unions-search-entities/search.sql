@@ -1,17 +1,12 @@
-select __entity_search_result__.*
-from (select 0 as idx) as __entity_search_identifiers__,
-lateral (
-  select
-    __entity_search__."person_id"::text as "0",
-    __entity_search__."post_id"::text as "1",
-    __entity_search__."comment_id"::text as "2",
-    (not (__entity_search__ is null))::text as "3",
-    __entity_search_identifiers__.idx as "4"
-  from interfaces_and_unions.search("query" := $1::"text") as __entity_search__
-  where (
-    true /* authorization checks */
-  )
-) as __entity_search_result__;
+select
+  __entity_search__."person_id"::text as "0",
+  __entity_search__."post_id"::text as "1",
+  __entity_search__."comment_id"::text as "2",
+  (not (__entity_search__ is null))::text as "3"
+from interfaces_and_unions.search("query" := $1::"text") as __entity_search__
+where (
+  true /* authorization checks */
+);
 
 select __people_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,

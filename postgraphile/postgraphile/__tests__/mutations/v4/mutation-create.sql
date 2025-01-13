@@ -42,51 +42,41 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   __types__."text_array_domain"::text as "32",
   __types__."int8_array_domain"::text as "33";
 
-select __frmcdc_compound_type_result__.*
-from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
-select __frmcdc_nested_compound_type_result__.*
-from (select 0 as idx) as __frmcdc_nested_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_2."a"::text as "8",
-    __frmcdc_compound_type_2."b" as "9",
-    __frmcdc_compound_type_2."c"::text as "10",
-    __frmcdc_compound_type_2."d" as "11",
-    __frmcdc_compound_type_2."e"::text as "12",
-    __frmcdc_compound_type_2."f"::text as "13",
-    __frmcdc_compound_type_2."foo_bar"::text as "14",
-    (not (__frmcdc_compound_type_2 is null))::text as "15",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
-    __frmcdc_nested_compound_type_identifiers__.idx as "18"
-  from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__
-  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
-  on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
-  on TRUE
-) as __frmcdc_nested_compound_type_result__;
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7",
+  __frmcdc_compound_type_2."a"::text as "8",
+  __frmcdc_compound_type_2."b" as "9",
+  __frmcdc_compound_type_2."c"::text as "10",
+  __frmcdc_compound_type_2."d" as "11",
+  __frmcdc_compound_type_2."e"::text as "12",
+  __frmcdc_compound_type_2."f"::text as "13",
+  __frmcdc_compound_type_2."foo_bar"::text as "14",
+  (not (__frmcdc_compound_type_2 is null))::text as "15",
+  __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "17"
+from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__
+left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
+on TRUE
+left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
+on TRUE;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -200,18 +190,13 @@ lateral (
   order by __person__."email" desc, __person__."id" desc
 ) as __person_result__;
 
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_exists"(
-      __person__,
-      $1::"b"."email"
-    ))::text as "0",
-    __person__."id"::text as "1",
-    __person_identifiers__.idx as "2"
-  from (select ($2::"c"."person").*) as __person__
-) as __person_result__;
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -325,18 +310,13 @@ lateral (
   order by __person__."email" desc, __person__."id" desc
 ) as __person_result__;
 
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_exists"(
-      __person__,
-      $1::"b"."email"
-    ))::text as "0",
-    __person__."id"::text as "1",
-    __person_identifiers__.idx as "2"
-  from (select ($2::"c"."person").*) as __person__
-) as __person_result__;
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
   __compound_key__."extra"::text as "0",
@@ -487,34 +467,24 @@ lateral (
   order by __person__."email" desc, __person__."id" desc
 ) as __person_result__;
 
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_exists"(
-      __person__,
-      $1::"b"."email"
-    ))::text as "0",
-    __person__."id"::text as "1",
-    __person_identifiers__.idx as "2"
-  from (select ($2::"c"."person").*) as __person__
-) as __person_result__;
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0";
 
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_exists"(
-      __person__,
-      $1::"b"."email"
-    ))::text as "0",
-    __person__."id"::text as "1",
-    __person_identifiers__.idx as "2"
-  from (select ($2::"c"."person").*) as __person__
-) as __person_result__;
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "a"."default_value" as __default_value__ ("id", "null_value") values ($1::"int4", $2::"text") returning
   __default_value__."id"::text as "0",
@@ -528,16 +498,11 @@ insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text",
     from unnest(__post__."comptypes") __comptype__
   )::text end) as "2";
 
-select __frmcdc_comptype_result__.*
-from (select 0 as idx) as __frmcdc_comptype_identifiers__,
-lateral (
-  select
-    to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
-    __frmcdc_comptype__."is_optimised"::text as "1",
-    (not (__frmcdc_comptype__ is null))::text as "2",
-    __frmcdc_comptype_identifiers__.idx as "3"
-  from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__
-) as __frmcdc_comptype_result__;
+select
+  to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+  __frmcdc_comptype__."is_optimised"::text as "1",
+  (not (__frmcdc_comptype__ is null))::text as "2"
+from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."headline" as "0",
@@ -586,13 +551,8 @@ lateral (
   order by __post__."id" asc
 ) as __post_result__;
 
-select __frmcdc_comptype_result__.*
-from (select 0 as idx) as __frmcdc_comptype_identifiers__,
-lateral (
-  select
-    to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
-    __frmcdc_comptype__."is_optimised"::text as "1",
-    (not (__frmcdc_comptype__ is null))::text as "2",
-    __frmcdc_comptype_identifiers__.idx as "3"
-  from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__
-) as __frmcdc_comptype_result__;
+select
+  to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+  __frmcdc_comptype__."is_optimised"::text as "1",
+  (not (__frmcdc_comptype__ is null))::text as "2"
+from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;

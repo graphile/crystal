@@ -14,15 +14,10 @@ lateral (
     )
 ) as __forums_result__;
 
-select __forums_random_user_result__.*
-from (select 0 as idx) as __forums_random_user_identifiers__,
-lateral (
-  select
-    __forums_random_user__."username" as "0",
-    __forums_random_user__."gravatar_url" as "1",
-    __forums_random_user_identifiers__.idx as "2"
-  from app_public.forums_random_user($1::app_public.forums) as __forums_random_user__
-  where (
-    true /* authorization checks */
-  )
-) as __forums_random_user_result__;
+select
+  __forums_random_user__."username" as "0",
+  __forums_random_user__."gravatar_url" as "1"
+from app_public.forums_random_user($1::app_public.forums) as __forums_random_user__
+where (
+  true /* authorization checks */
+);

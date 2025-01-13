@@ -271,142 +271,137 @@ lateral (
   )
 ) as __types_result__;
 
-select __type_function_result__.*
-from (select 0 as idx) as __type_function_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __type_function__."id"::text as "2",
-    __post_2."id"::text as "3",
-    __post_2."headline" as "4",
-    __type_function__."smallint"::text as "5",
-    __type_function__."bigint"::text as "6",
-    __type_function__."numeric"::text as "7",
-    __type_function__."decimal"::text as "8",
-    __type_function__."boolean"::text as "9",
-    __type_function__."varchar" as "10",
-    __type_function__."enum"::text as "11",
-    __type_function__."enum_array"::text as "12",
-    __type_function__."domain"::text as "13",
-    __type_function__."domain2"::text as "14",
-    __type_function__."text_array"::text as "15",
-    __type_function__."json"::text as "16",
-    __type_function__."jsonb"::text as "17",
-    __type_function__."nullable_range"::text as "18",
-    __type_function__."numrange"::text as "19",
-    json_build_array(
-      lower_inc(__type_function__."daterange"),
-      to_char(lower(__type_function__."daterange"), 'YYYY-MM-DD'::text),
-      to_char(upper(__type_function__."daterange"), 'YYYY-MM-DD'::text),
-      upper_inc(__type_function__."daterange")
-    )::text as "20",
-    __type_function__."an_int_range"::text as "21",
-    to_char(__type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "22",
-    to_char(__type_function__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "23",
-    to_char(__type_function__."date", 'YYYY-MM-DD'::text) as "24",
-    to_char(date '1970-01-01' + __type_function__."time", 'HH24:MI:SS.US'::text) as "25",
-    to_char(date '1970-01-01' + __type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
-    to_char(__type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
-    array(
-      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-      from unnest(__type_function__."interval_array") __entry__
-    )::text as "28",
-    __type_function__."money"::numeric::text as "29",
-    __frmcdc_compound_type__."a"::text as "30",
-    __frmcdc_compound_type__."b" as "31",
-    __frmcdc_compound_type__."c"::text as "32",
-    __frmcdc_compound_type__."d" as "33",
-    __frmcdc_compound_type__."e"::text as "34",
-    __frmcdc_compound_type__."f"::text as "35",
-    __frmcdc_compound_type__."foo_bar"::text as "36",
-    (not (__frmcdc_compound_type__ is null))::text as "37",
-    __frmcdc_compound_type_2."a"::text as "38",
-    __frmcdc_compound_type_2."b" as "39",
-    __frmcdc_compound_type_2."c"::text as "40",
-    __frmcdc_compound_type_2."d" as "41",
-    __frmcdc_compound_type_2."e"::text as "42",
-    __frmcdc_compound_type_2."f"::text as "43",
-    __frmcdc_compound_type_2."foo_bar"::text as "44",
-    (not (__frmcdc_compound_type_2 is null))::text as "45",
-    __frmcdc_compound_type_3."a"::text as "46",
-    __frmcdc_compound_type_3."b" as "47",
-    __frmcdc_compound_type_3."c"::text as "48",
-    __frmcdc_compound_type_3."d" as "49",
-    __frmcdc_compound_type_3."e"::text as "50",
-    __frmcdc_compound_type_3."f"::text as "51",
-    __frmcdc_compound_type_3."foo_bar"::text as "52",
-    (not (__frmcdc_compound_type_3 is null))::text as "53",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "54",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "55",
-    __frmcdc_compound_type_4."a"::text as "56",
-    __frmcdc_compound_type_4."b" as "57",
-    __frmcdc_compound_type_4."c"::text as "58",
-    __frmcdc_compound_type_4."d" as "59",
-    __frmcdc_compound_type_4."e"::text as "60",
-    __frmcdc_compound_type_4."f"::text as "61",
-    __frmcdc_compound_type_4."foo_bar"::text as "62",
-    (not (__frmcdc_compound_type_4 is null))::text as "63",
-    __frmcdc_compound_type_5."a"::text as "64",
-    __frmcdc_compound_type_5."b" as "65",
-    __frmcdc_compound_type_5."c"::text as "66",
-    __frmcdc_compound_type_5."d" as "67",
-    __frmcdc_compound_type_5."e"::text as "68",
-    __frmcdc_compound_type_5."f"::text as "69",
-    __frmcdc_compound_type_5."foo_bar"::text as "70",
-    (not (__frmcdc_compound_type_5 is null))::text as "71",
-    __frmcdc_compound_type_6."a"::text as "72",
-    __frmcdc_compound_type_6."b" as "73",
-    __frmcdc_compound_type_6."c"::text as "74",
-    __frmcdc_compound_type_6."d" as "75",
-    __frmcdc_compound_type_6."e"::text as "76",
-    __frmcdc_compound_type_6."f"::text as "77",
-    __frmcdc_compound_type_6."foo_bar"::text as "78",
-    (not (__frmcdc_compound_type_6 is null))::text as "79",
-    __frmcdc_nested_compound_type_2."baz_buz"::text as "80",
-    (not (__frmcdc_nested_compound_type_2 is null))::text as "81",
-    __type_function__."point"::text as "82",
-    __type_function__."nullablePoint"::text as "83",
-    __type_function__."inet"::text as "84",
-    __type_function__."cidr"::text as "85",
-    __type_function__."macaddr"::text as "86",
-    __type_function__."regproc"::text as "87",
-    __type_function__."regprocedure"::text as "88",
-    __type_function__."regoper"::text as "89",
-    __type_function__."regoperator"::text as "90",
-    __type_function__."regclass"::text as "91",
-    __type_function__."regtype"::text as "92",
-    __type_function__."regconfig"::text as "93",
-    __type_function__."regdictionary"::text as "94",
-    __type_function__."text_array_domain"::text as "95",
-    __type_function__."int8_array_domain"::text as "96",
-    __type_function__."bytea"::text as "97",
-    __type_function__."bytea_array"::text as "98",
-    __type_function__."ltree"::text as "99",
-    __type_function__."ltree_array"::text as "100",
-    __type_function_identifiers__.idx as "101"
-  from "b"."type_function"($1::"int4") as __type_function__
-  left outer join "a"."post" as __post__
-  on (__type_function__."id"::"int4" = __post__."id")
-  left outer join "a"."post" as __post_2
-  on (__type_function__."smallint"::"int4" = __post_2."id")
-  left outer join lateral (select (__type_function__."compound_type").*) as __frmcdc_compound_type__
-  on TRUE
-  left outer join lateral (select (__type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-  on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-  on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-  on TRUE
-  left outer join lateral (select (__type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
-  on TRUE
-  left outer join lateral (select (__type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-  on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-  on TRUE
-  left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
-  on TRUE
-) as __type_function_result__;
+select
+  __post__."id"::text as "0",
+  __post__."headline" as "1",
+  __type_function__."id"::text as "2",
+  __post_2."id"::text as "3",
+  __post_2."headline" as "4",
+  __type_function__."smallint"::text as "5",
+  __type_function__."bigint"::text as "6",
+  __type_function__."numeric"::text as "7",
+  __type_function__."decimal"::text as "8",
+  __type_function__."boolean"::text as "9",
+  __type_function__."varchar" as "10",
+  __type_function__."enum"::text as "11",
+  __type_function__."enum_array"::text as "12",
+  __type_function__."domain"::text as "13",
+  __type_function__."domain2"::text as "14",
+  __type_function__."text_array"::text as "15",
+  __type_function__."json"::text as "16",
+  __type_function__."jsonb"::text as "17",
+  __type_function__."nullable_range"::text as "18",
+  __type_function__."numrange"::text as "19",
+  json_build_array(
+    lower_inc(__type_function__."daterange"),
+    to_char(lower(__type_function__."daterange"), 'YYYY-MM-DD'::text),
+    to_char(upper(__type_function__."daterange"), 'YYYY-MM-DD'::text),
+    upper_inc(__type_function__."daterange")
+  )::text as "20",
+  __type_function__."an_int_range"::text as "21",
+  to_char(__type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "22",
+  to_char(__type_function__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "23",
+  to_char(__type_function__."date", 'YYYY-MM-DD'::text) as "24",
+  to_char(date '1970-01-01' + __type_function__."time", 'HH24:MI:SS.US'::text) as "25",
+  to_char(date '1970-01-01' + __type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "26",
+  to_char(__type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "27",
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest(__type_function__."interval_array") __entry__
+  )::text as "28",
+  __type_function__."money"::numeric::text as "29",
+  __frmcdc_compound_type__."a"::text as "30",
+  __frmcdc_compound_type__."b" as "31",
+  __frmcdc_compound_type__."c"::text as "32",
+  __frmcdc_compound_type__."d" as "33",
+  __frmcdc_compound_type__."e"::text as "34",
+  __frmcdc_compound_type__."f"::text as "35",
+  __frmcdc_compound_type__."foo_bar"::text as "36",
+  (not (__frmcdc_compound_type__ is null))::text as "37",
+  __frmcdc_compound_type_2."a"::text as "38",
+  __frmcdc_compound_type_2."b" as "39",
+  __frmcdc_compound_type_2."c"::text as "40",
+  __frmcdc_compound_type_2."d" as "41",
+  __frmcdc_compound_type_2."e"::text as "42",
+  __frmcdc_compound_type_2."f"::text as "43",
+  __frmcdc_compound_type_2."foo_bar"::text as "44",
+  (not (__frmcdc_compound_type_2 is null))::text as "45",
+  __frmcdc_compound_type_3."a"::text as "46",
+  __frmcdc_compound_type_3."b" as "47",
+  __frmcdc_compound_type_3."c"::text as "48",
+  __frmcdc_compound_type_3."d" as "49",
+  __frmcdc_compound_type_3."e"::text as "50",
+  __frmcdc_compound_type_3."f"::text as "51",
+  __frmcdc_compound_type_3."foo_bar"::text as "52",
+  (not (__frmcdc_compound_type_3 is null))::text as "53",
+  __frmcdc_nested_compound_type__."baz_buz"::text as "54",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "55",
+  __frmcdc_compound_type_4."a"::text as "56",
+  __frmcdc_compound_type_4."b" as "57",
+  __frmcdc_compound_type_4."c"::text as "58",
+  __frmcdc_compound_type_4."d" as "59",
+  __frmcdc_compound_type_4."e"::text as "60",
+  __frmcdc_compound_type_4."f"::text as "61",
+  __frmcdc_compound_type_4."foo_bar"::text as "62",
+  (not (__frmcdc_compound_type_4 is null))::text as "63",
+  __frmcdc_compound_type_5."a"::text as "64",
+  __frmcdc_compound_type_5."b" as "65",
+  __frmcdc_compound_type_5."c"::text as "66",
+  __frmcdc_compound_type_5."d" as "67",
+  __frmcdc_compound_type_5."e"::text as "68",
+  __frmcdc_compound_type_5."f"::text as "69",
+  __frmcdc_compound_type_5."foo_bar"::text as "70",
+  (not (__frmcdc_compound_type_5 is null))::text as "71",
+  __frmcdc_compound_type_6."a"::text as "72",
+  __frmcdc_compound_type_6."b" as "73",
+  __frmcdc_compound_type_6."c"::text as "74",
+  __frmcdc_compound_type_6."d" as "75",
+  __frmcdc_compound_type_6."e"::text as "76",
+  __frmcdc_compound_type_6."f"::text as "77",
+  __frmcdc_compound_type_6."foo_bar"::text as "78",
+  (not (__frmcdc_compound_type_6 is null))::text as "79",
+  __frmcdc_nested_compound_type_2."baz_buz"::text as "80",
+  (not (__frmcdc_nested_compound_type_2 is null))::text as "81",
+  __type_function__."point"::text as "82",
+  __type_function__."nullablePoint"::text as "83",
+  __type_function__."inet"::text as "84",
+  __type_function__."cidr"::text as "85",
+  __type_function__."macaddr"::text as "86",
+  __type_function__."regproc"::text as "87",
+  __type_function__."regprocedure"::text as "88",
+  __type_function__."regoper"::text as "89",
+  __type_function__."regoperator"::text as "90",
+  __type_function__."regclass"::text as "91",
+  __type_function__."regtype"::text as "92",
+  __type_function__."regconfig"::text as "93",
+  __type_function__."regdictionary"::text as "94",
+  __type_function__."text_array_domain"::text as "95",
+  __type_function__."int8_array_domain"::text as "96",
+  __type_function__."bytea"::text as "97",
+  __type_function__."bytea_array"::text as "98",
+  __type_function__."ltree"::text as "99",
+  __type_function__."ltree_array"::text as "100"
+from "b"."type_function"($1::"int4") as __type_function__
+left outer join "a"."post" as __post__
+on (__type_function__."id"::"int4" = __post__."id")
+left outer join "a"."post" as __post_2
+on (__type_function__."smallint"::"int4" = __post_2."id")
+left outer join lateral (select (__type_function__."compound_type").*) as __frmcdc_compound_type__
+on TRUE
+left outer join lateral (select (__type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+on TRUE
+left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+on TRUE
+left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+on TRUE
+left outer join lateral (select (__type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
+on TRUE
+left outer join lateral (select (__type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+on TRUE
+left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+on TRUE
+left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+on TRUE;
 
 select
   __post__."id"::text as "0",

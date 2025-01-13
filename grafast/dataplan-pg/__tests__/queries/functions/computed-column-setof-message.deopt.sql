@@ -14,14 +14,9 @@ lateral (
     )
 ) as __forums_result__;
 
-select __forums_featured_messages_result__.*
-from (select 0 as idx) as __forums_featured_messages_identifiers__,
-lateral (
-  select
-    __forums_featured_messages__."body" as "0",
-    __forums_featured_messages_identifiers__.idx as "1"
-  from app_public.forums_featured_messages($1::app_public.forums) as __forums_featured_messages__
-  where (
-    true /* authorization checks */
-  )
-) as __forums_featured_messages_result__;
+select
+  __forums_featured_messages__."body" as "0"
+from app_public.forums_featured_messages($1::app_public.forums) as __forums_featured_messages__
+where (
+  true /* authorization checks */
+);
