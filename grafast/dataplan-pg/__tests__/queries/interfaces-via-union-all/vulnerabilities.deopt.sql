@@ -1,5 +1,5 @@
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"float8" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx from json_array_elements($3::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __vulnerabilities__."0"::text as "0",
@@ -23,7 +23,7 @@ lateral (
               __first_party_vulnerabilities__."id" asc
           ) as "n"
         from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
-        where __first_party_vulnerabilities__."cvss_score" > __union_identifiers__."id0"
+        where __first_party_vulnerabilities__."cvss_score" > $1::"float8"
         order by
           __first_party_vulnerabilities__."cvss_score" desc,
           __first_party_vulnerabilities__."id" asc
@@ -46,7 +46,7 @@ lateral (
               __third_party_vulnerabilities__."id" asc
           ) as "n"
         from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
-        where __third_party_vulnerabilities__."cvss_score" > __union_identifiers__."id0"
+        where __third_party_vulnerabilities__."cvss_score" > $2::"float8"
         order by
           __third_party_vulnerabilities__."cvss_score" desc,
           __third_party_vulnerabilities__."id" asc
