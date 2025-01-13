@@ -43,9 +43,14 @@ lateral (
   from "c"."jsonb_identity_mutation_plpgsql"($1::"jsonb") as __jsonb_identity_mutation_plpgsql__(v)
 ) as __jsonb_identity_mutation_plpgsql_result__;
 
-select
-  __jsonb_identity_mutation_plpgsql_with_default__.v::text as "0"
-from "c"."jsonb_identity_mutation_plpgsql_with_default"() as __jsonb_identity_mutation_plpgsql_with_default__(v);
+select __jsonb_identity_mutation_plpgsql_with_default_resul__.*
+from (select 0 as idx) as __jsonb_identity_mutation_plpgsql_with_default_ident__,
+lateral (
+  select
+    __jsonb_identity_mutation_plpgsql_with_default__.v::text as "0",
+    __jsonb_identity_mutation_plpgsql_with_default_ident__.idx as "1"
+  from "c"."jsonb_identity_mutation_plpgsql_with_default"() as __jsonb_identity_mutation_plpgsql_with_default__(v)
+) as __jsonb_identity_mutation_plpgsql_with_default_resul__;
 
 select __jsonb_identity_mutation_plpgsql_with_default_resul__.*
 from (select 0 as idx) as __jsonb_identity_mutation_plpgsql_with_default_ident__,
@@ -307,9 +312,14 @@ lateral (
   order by __post__."id" asc
 ) as __post_result__;
 
-select
-  __table_set_mutation__."person_full_name" as "0"
-from "c"."table_set_mutation"() as __table_set_mutation__;
+select __table_set_mutation_result__.*
+from (select 0 as idx) as __table_set_mutation_identifiers__,
+lateral (
+  select
+    __table_set_mutation__."person_full_name" as "0",
+    __table_set_mutation_identifiers__.idx as "1"
+  from "c"."table_set_mutation"() as __table_set_mutation__
+) as __table_set_mutation_result__;
 
 select __int_set_mutation_result__.*
 from (select 0 as idx) as __int_set_mutation_identifiers__,
@@ -324,13 +334,23 @@ lateral (
   ) as __int_set_mutation__(v)
 ) as __int_set_mutation_result__;
 
-select
-  __no_args_mutation__.v::text as "0"
-from "c"."no_args_mutation"() as __no_args_mutation__(v);
+select __no_args_mutation_result__.*
+from (select 0 as idx) as __no_args_mutation_identifiers__,
+lateral (
+  select
+    __no_args_mutation__.v::text as "0",
+    __no_args_mutation_identifiers__.idx as "1"
+  from "c"."no_args_mutation"() as __no_args_mutation__(v)
+) as __no_args_mutation_result__;
 
-select
-  __return_void_mutation__.v::text as "0"
-from "a"."return_void_mutation"() as __return_void_mutation__(v);
+select __return_void_mutation_result__.*
+from (select 0 as idx) as __return_void_mutation_identifiers__,
+lateral (
+  select
+    __return_void_mutation__.v::text as "0",
+    __return_void_mutation_identifiers__.idx as "1"
+  from "a"."return_void_mutation"() as __return_void_mutation__(v)
+) as __return_void_mutation_result__;
 
 select __guid_fn_result__.*
 from (select 0 as idx) as __guid_fn_identifiers__,
@@ -388,15 +408,25 @@ lateral (
   ) as __post_with_suffix__
 ) as __post_with_suffix_result__;
 
-select
-  __issue756_mutation__."id"::text as "0",
-  to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
-from "c"."issue756_mutation"() as __issue756_mutation__;
+select __issue756_mutation_result__.*
+from (select 0 as idx) as __issue756_mutation_identifiers__,
+lateral (
+  select
+    __issue756_mutation__."id"::text as "0",
+    to_char(__issue756_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1",
+    __issue756_mutation_identifiers__.idx as "2"
+  from "c"."issue756_mutation"() as __issue756_mutation__
+) as __issue756_mutation_result__;
 
-select
-  __issue756_set_mutation__."id"::text as "0",
-  to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
-from "c"."issue756_set_mutation"() as __issue756_set_mutation__;
+select __issue756_set_mutation_result__.*
+from (select 0 as idx) as __issue756_set_mutation_identifiers__,
+lateral (
+  select
+    __issue756_set_mutation__."id"::text as "0",
+    to_char(__issue756_set_mutation__."ts", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1",
+    __issue756_set_mutation_identifiers__.idx as "2"
+  from "c"."issue756_set_mutation"() as __issue756_set_mutation__
+) as __issue756_set_mutation_result__;
 
 select __mutation_compound_type_array_result__.*
 from (select 0 as idx) as __mutation_compound_type_array_identifiers__,
@@ -415,17 +445,32 @@ lateral (
   from unnest("a"."mutation_compound_type_array"($1::"c"."compound_type")) as __mutation_compound_type_array__
 ) as __mutation_compound_type_array_result__;
 
-select
-  __mutation_text_array__.v::text as "0"
-from "a"."mutation_text_array"() as __mutation_text_array__(v);
+select __mutation_text_array_result__.*
+from (select 0 as idx) as __mutation_text_array_identifiers__,
+lateral (
+  select
+    __mutation_text_array__.v::text as "0",
+    __mutation_text_array_identifiers__.idx as "1"
+  from "a"."mutation_text_array"() as __mutation_text_array__(v)
+) as __mutation_text_array_result__;
 
-select
-  (case when (__mutation_interval_array__.v) is not distinct from null then null::text else array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__mutation_interval_array__.v) __entry__
-  )::text end) as "0"
-from "a"."mutation_interval_array"() as __mutation_interval_array__(v);
+select __mutation_interval_array_result__.*
+from (select 0 as idx) as __mutation_interval_array_identifiers__,
+lateral (
+  select
+    (case when (__mutation_interval_array__.v) is not distinct from null then null::text else array(
+      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+      from unnest(__mutation_interval_array__.v) __entry__
+    )::text end) as "0",
+    __mutation_interval_array_identifiers__.idx as "1"
+  from "a"."mutation_interval_array"() as __mutation_interval_array__(v)
+) as __mutation_interval_array_result__;
 
-select
-  to_char(__mutation_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
-from "a"."mutation_interval_set"() as __mutation_interval_set__(v);
+select __mutation_interval_set_result__.*
+from (select 0 as idx) as __mutation_interval_set_identifiers__,
+lateral (
+  select
+    to_char(__mutation_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
+    __mutation_interval_set_identifiers__.idx as "1"
+  from "a"."mutation_interval_set"() as __mutation_interval_set__(v)
+) as __mutation_interval_set_result__;

@@ -96,77 +96,72 @@ left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __fr
 on TRUE
 order by __types__."id" asc;
 
-select __post_result__.*
-from (select 0 as idx) as __post_identifiers__,
-lateral (
-  select
-    __post__."headline" as "0",
-    "a"."post_headline_trimmed_no_defaults"(
-      __post_2,
-      $1::"int4",
-      $2::"text"
-    ) as "1",
-    __post_2."id"::text as "2",
-    (select json_agg(s) from (
-      select
-        __post_computed_compound_type_array__."a"::text as "0",
-        __post_computed_compound_type_array__."b" as "1",
-        __post_computed_compound_type_array__."c"::text as "2",
-        __post_computed_compound_type_array__."d" as "3",
-        __post_computed_compound_type_array__."e"::text as "4",
-        __post_computed_compound_type_array__."f"::text as "5",
-        to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-        __post_computed_compound_type_array__."foo_bar"::text as "7",
-        (not (__post_computed_compound_type_array__ is null))::text as "8"
-      from unnest("a"."post_computed_compound_type_array"(
-        __post_3,
-        $3::"c"."compound_type"
-      )) as __post_computed_compound_type_array__
-    ) s) as "3",
-    (select json_agg(s) from (
-      select
-        to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
-        (row_number() over (partition by 1))::text as "1"
-      from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-    ) s) as "4",
-    "a"."post_headline_trimmed"(__post__) as "5",
-    "a"."post_headline_trimmed"(
-      __post__,
-      $4::"int4"
-    ) as "6",
-    "a"."post_headline_trimmed"(
-      __post__,
-      $5::"int4",
-      $6::"text"
-    ) as "7",
-    "a"."post_headline_trimmed_strict"(__post__) as "8",
-    "a"."post_headline_trimmed_strict"(
-      __post__,
-      $7::"int4"
-    ) as "9",
-    "a"."post_headline_trimmed_strict"(
-      __post__,
-      $8::"int4",
-      $9::"text"
-    ) as "10",
-    "a"."post_headline_trimmed_no_defaults"(
-      __post__,
-      $10::"int4",
-      $11::"text"
-    ) as "11",
-    ("a"."post_computed_text_array"(__post__))::text as "12",
-    (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
-      select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-      from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-    )::text end) as "13",
-    __post_identifiers__.idx as "14"
-  from "a"."post" as __post__
-  left outer join lateral (select (__post__).*) as __post_2
-  on TRUE
-  left outer join lateral (select (__post__).*) as __post_3
-  on TRUE
-  order by __post__."id" asc
-) as __post_result__;
+select
+  __post__."headline" as "0",
+  "a"."post_headline_trimmed_no_defaults"(
+    __post_2,
+    $1::"int4",
+    $2::"text"
+  ) as "1",
+  __post_2."id"::text as "2",
+  (select json_agg(s) from (
+    select
+      __post_computed_compound_type_array__."a"::text as "0",
+      __post_computed_compound_type_array__."b" as "1",
+      __post_computed_compound_type_array__."c"::text as "2",
+      __post_computed_compound_type_array__."d" as "3",
+      __post_computed_compound_type_array__."e"::text as "4",
+      __post_computed_compound_type_array__."f"::text as "5",
+      to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+      __post_computed_compound_type_array__."foo_bar"::text as "7",
+      (not (__post_computed_compound_type_array__ is null))::text as "8"
+    from unnest("a"."post_computed_compound_type_array"(
+      __post_3,
+      $3::"c"."compound_type"
+    )) as __post_computed_compound_type_array__
+  ) s) as "3",
+  (select json_agg(s) from (
+    select
+      to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
+      (row_number() over (partition by 1))::text as "1"
+    from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
+  ) s) as "4",
+  "a"."post_headline_trimmed"(__post__) as "5",
+  "a"."post_headline_trimmed"(
+    __post__,
+    $4::"int4"
+  ) as "6",
+  "a"."post_headline_trimmed"(
+    __post__,
+    $5::"int4",
+    $6::"text"
+  ) as "7",
+  "a"."post_headline_trimmed_strict"(__post__) as "8",
+  "a"."post_headline_trimmed_strict"(
+    __post__,
+    $7::"int4"
+  ) as "9",
+  "a"."post_headline_trimmed_strict"(
+    __post__,
+    $8::"int4",
+    $9::"text"
+  ) as "10",
+  "a"."post_headline_trimmed_no_defaults"(
+    __post__,
+    $10::"int4",
+    $11::"text"
+  ) as "11",
+  ("a"."post_computed_text_array"(__post__))::text as "12",
+  (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest("a"."post_computed_interval_array"(__post__)) __entry__
+  )::text end) as "13"
+from "a"."post" as __post__
+left outer join lateral (select (__post__).*) as __post_2
+on TRUE
+left outer join lateral (select (__post__).*) as __post_3
+on TRUE
+order by __post__."id" asc;
 
 select
   __person__."person_full_name" as "0",

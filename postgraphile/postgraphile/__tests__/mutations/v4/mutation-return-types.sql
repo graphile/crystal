@@ -19,9 +19,14 @@ lateral (
   from "c"."mutation_in_out"($1::"int4") as __mutation_in_out__(v)
 ) as __mutation_in_out_result__;
 
-select
-  __mutation_out__.v::text as "0"
-from "c"."mutation_out"() as __mutation_out__(v);
+select __mutation_out_result__.*
+from (select 0 as idx) as __mutation_out_identifiers__,
+lateral (
+  select
+    __mutation_out__.v::text as "0",
+    __mutation_out_identifiers__.idx as "1"
+  from "c"."mutation_out"() as __mutation_out__(v)
+) as __mutation_out_result__;
 
 select __mutation_out_complex_result__.*
 from (select 0 as idx) as __mutation_out_complex_identifiers__,
@@ -38,36 +43,26 @@ lateral (
   ) as __mutation_out_complex__
 ) as __mutation_out_complex_result__;
 
-select __frmcdc_compound_type_result__.*
-from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    (not (__frmcdc_compound_type__ is null))::text as "3",
-    __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  (not (__frmcdc_compound_type__ is null))::text as "3"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    (select json_agg(s) from (
-      select
-        __post__."id"::text as "0"
-      from "a"."post" as __post__
-      where (
-        __person__."id"::"int4" = __post__."author_id"
-      )
-      order by __post__."id" asc
-    ) s) as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from (select ($1::"c"."person").*) as __person__
-) as __person_result__;
+select
+  (select json_agg(s) from (
+    select
+      __post__."id"::text as "0"
+    from "a"."post" as __post__
+    where (
+      __person__."id"::"int4" = __post__."author_id"
+    )
+    order by __post__."id" asc
+  ) s) as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from (select ($1::"c"."person").*) as __person__;
 
 select __mutation_out_complex_setof_result__.*
 from (select 0 as idx) as __mutation_out_complex_setof_identifiers__,
@@ -84,42 +79,37 @@ lateral (
   ) as __mutation_out_complex_setof__
 ) as __mutation_out_complex_setof_result__;
 
-select __frmcdc_compound_type_result__.*
-from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    (not (__frmcdc_compound_type__ is null))::text as "3",
-    __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
-
-select __person_result__.*
-from (select 0 as idx) as __person_identifiers__,
-lateral (
-  select
-    (select json_agg(s) from (
-      select
-        __post__."id"::text as "0"
-      from "a"."post" as __post__
-      where (
-        __person__."id"::"int4" = __post__."author_id"
-      )
-      order by __post__."id" asc
-    ) s) as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from (select ($1::"c"."person").*) as __person__
-) as __person_result__;
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  (not (__frmcdc_compound_type__ is null))::text as "3"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
-  __mutation_out_out__."first_out"::text as "0",
-  __mutation_out_out__."second_out" as "1",
-  (not (__mutation_out_out__ is null))::text as "2"
-from "c"."mutation_out_out"() as __mutation_out_out__;
+  (select json_agg(s) from (
+    select
+      __post__."id"::text as "0"
+    from "a"."post" as __post__
+    where (
+      __person__."id"::"int4" = __post__."author_id"
+    )
+    order by __post__."id" asc
+  ) s) as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from (select ($1::"c"."person").*) as __person__;
+
+select __mutation_out_out_result__.*
+from (select 0 as idx) as __mutation_out_out_identifiers__,
+lateral (
+  select
+    __mutation_out_out__."first_out"::text as "0",
+    __mutation_out_out__."second_out" as "1",
+    (not (__mutation_out_out__ is null))::text as "2",
+    __mutation_out_out_identifiers__.idx as "3"
+  from "c"."mutation_out_out"() as __mutation_out_out__
+) as __mutation_out_out_result__;
 
 select __mutation_out_out_compound_type_result__.*
 from (select 0 as idx) as __mutation_out_out_compound_type_identifiers__,
@@ -132,52 +122,82 @@ lateral (
   from "c"."mutation_out_out_compound_type"($1::"int4") as __mutation_out_out_compound_type__
 ) as __mutation_out_out_compound_type_result__;
 
-select __frmcdc_compound_type_result__.*
-from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  (not (__frmcdc_compound_type__ is null))::text as "3"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select __mutation_out_out_setof_result__.*
+from (select 0 as idx) as __mutation_out_out_setof_identifiers__,
 lateral (
   select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    (not (__frmcdc_compound_type__ is null))::text as "3",
-    __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
+    __mutation_out_out_setof__."o1"::text as "0",
+    __mutation_out_out_setof__."o2" as "1",
+    (not (__mutation_out_out_setof__ is null))::text as "2",
+    __mutation_out_out_setof_identifiers__.idx as "3"
+  from "c"."mutation_out_out_setof"() as __mutation_out_out_setof__
+) as __mutation_out_out_setof_result__;
 
-select
-  __mutation_out_out_setof__."o1"::text as "0",
-  __mutation_out_out_setof__."o2" as "1",
-  (not (__mutation_out_out_setof__ is null))::text as "2"
-from "c"."mutation_out_out_setof"() as __mutation_out_out_setof__;
+select __mutation_out_out_unnamed_result__.*
+from (select 0 as idx) as __mutation_out_out_unnamed_identifiers__,
+lateral (
+  select
+    __mutation_out_out_unnamed__."column1"::text as "0",
+    __mutation_out_out_unnamed__."column2" as "1",
+    (not (__mutation_out_out_unnamed__ is null))::text as "2",
+    __mutation_out_out_unnamed_identifiers__.idx as "3"
+  from "c"."mutation_out_out_unnamed"() as __mutation_out_out_unnamed__
+) as __mutation_out_out_unnamed_result__;
 
-select
-  __mutation_out_out_unnamed__."column1"::text as "0",
-  __mutation_out_out_unnamed__."column2" as "1",
-  (not (__mutation_out_out_unnamed__ is null))::text as "2"
-from "c"."mutation_out_out_unnamed"() as __mutation_out_out_unnamed__;
+select __mutation_out_setof_result__.*
+from (select 0 as idx) as __mutation_out_setof_identifiers__,
+lateral (
+  select
+    __mutation_out_setof__.v::text as "0",
+    __mutation_out_setof_identifiers__.idx as "1"
+  from "c"."mutation_out_setof"() as __mutation_out_setof__(v)
+) as __mutation_out_setof_result__;
 
-select
-  __mutation_out_setof__.v::text as "0"
-from "c"."mutation_out_setof"() as __mutation_out_setof__(v);
+select __mutation_out_table_result__.*
+from (select 0 as idx) as __mutation_out_table_identifiers__,
+lateral (
+  select
+    __mutation_out_table__."id"::text as "0",
+    __mutation_out_table_identifiers__.idx as "1"
+  from "c"."mutation_out_table"() as __mutation_out_table__
+) as __mutation_out_table_result__;
 
-select
-  __mutation_out_table__."id"::text as "0"
-from "c"."mutation_out_table"() as __mutation_out_table__;
+select __mutation_out_table_setof_result__.*
+from (select 0 as idx) as __mutation_out_table_setof_identifiers__,
+lateral (
+  select
+    __mutation_out_table_setof__."id"::text as "0",
+    __mutation_out_table_setof_identifiers__.idx as "1"
+  from "c"."mutation_out_table_setof"() as __mutation_out_table_setof__
+) as __mutation_out_table_setof_result__;
 
-select
-  __mutation_out_table_setof__."id"::text as "0"
-from "c"."mutation_out_table_setof"() as __mutation_out_table_setof__;
+select __mutation_out_unnamed_result__.*
+from (select 0 as idx) as __mutation_out_unnamed_identifiers__,
+lateral (
+  select
+    __mutation_out_unnamed__.v::text as "0",
+    __mutation_out_unnamed_identifiers__.idx as "1"
+  from "c"."mutation_out_unnamed"() as __mutation_out_unnamed__(v)
+) as __mutation_out_unnamed_result__;
 
-select
-  __mutation_out_unnamed__.v::text as "0"
-from "c"."mutation_out_unnamed"() as __mutation_out_unnamed__(v);
-
-select
-  __mutation_out_unnamed_out_out_unnamed__."column1"::text as "0",
-  __mutation_out_unnamed_out_out_unnamed__."column3"::text as "1",
-  __mutation_out_unnamed_out_out_unnamed__."o2" as "2",
-  (not (__mutation_out_unnamed_out_out_unnamed__ is null))::text as "3"
-from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__;
+select __mutation_out_unnamed_out_out_unnamed_result__.*
+from (select 0 as idx) as __mutation_out_unnamed_out_out_unnamed_identifiers__,
+lateral (
+  select
+    __mutation_out_unnamed_out_out_unnamed__."column1"::text as "0",
+    __mutation_out_unnamed_out_out_unnamed__."column3"::text as "1",
+    __mutation_out_unnamed_out_out_unnamed__."o2" as "2",
+    (not (__mutation_out_unnamed_out_out_unnamed__ is null))::text as "3",
+    __mutation_out_unnamed_out_out_unnamed_identifiers__.idx as "4"
+  from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__
+) as __mutation_out_unnamed_out_out_unnamed_result__;
 
 select __mutation_returns_table_multi_col_result__.*
 from (select 0 as idx) as __mutation_returns_table_multi_col_identifiers__,

@@ -27,12 +27,7 @@ lateral (
   )
 ) as __person_result__;
 
-select __frmcdc_jwt_token_result__.*
-from (select 0 as idx) as __frmcdc_jwt_token_identifiers__,
-lateral (
-  select
-    case when (__frmcdc_jwt_token__) is not distinct from null then null::text else json_build_array(((__frmcdc_jwt_token__)."role"), (((__frmcdc_jwt_token__)."exp"))::text, (((__frmcdc_jwt_token__)."a"))::text, (((__frmcdc_jwt_token__)."b"))::text, (((__frmcdc_jwt_token__)."c"))::text)::text end as "0",
-    (not (__frmcdc_jwt_token__ is null))::text as "1",
-    __frmcdc_jwt_token_identifiers__.idx as "2"
-  from (select ($1::"b"."jwt_token").*) as __frmcdc_jwt_token__
-) as __frmcdc_jwt_token_result__;
+select
+  case when (__frmcdc_jwt_token__) is not distinct from null then null::text else json_build_array(((__frmcdc_jwt_token__)."role"), (((__frmcdc_jwt_token__)."exp"))::text, (((__frmcdc_jwt_token__)."a"))::text, (((__frmcdc_jwt_token__)."b"))::text, (((__frmcdc_jwt_token__)."c"))::text)::text end as "0",
+  (not (__frmcdc_jwt_token__ is null))::text as "1"
+from (select ($1::"b"."jwt_token").*) as __frmcdc_jwt_token__;
