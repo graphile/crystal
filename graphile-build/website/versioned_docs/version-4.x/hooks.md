@@ -58,7 +58,7 @@ methods in the source code.
     types found in the introspection results.
 5.  The schema is constructed using `newWithHooks(GraphQLSchema, …)`, where the
     `query`, `mutation` and `subscription` root operations are configured by the
-    respective [default plugins](.default-plugins) and
+    respective [default plugins](./default-plugins) and
     [other schema options](https://github.com/graphql/graphql-js/blob/v14.5.6/src/type/schema.js#L318-L324)
     can be adjusted.
 6.  The `finalize` hook allows plugins to replace the schema that has been built
@@ -74,7 +74,7 @@ which may cause them to run in a nested fashion.
 This hook system makes the library both powerful and flexible, at the expense of
 traceability - instead of having a clear declarative `import`, the origin of a
 called method might be in any of the used plugins, or even multiple ones. See
-[PostGraphile's _Debugging_ instructions](/postgraphile/debugging/#debug-envvars)
+[PostGraphile's _Debugging_ instructions](https://postgraphile.org/debugging)
 for how to alleviate this.
 
 ### What to do when that hook fires: `hookFunction`
