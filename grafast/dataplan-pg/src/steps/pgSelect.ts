@@ -1832,17 +1832,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
      * parameters for conditions or orders, etc.
      */
     const queryValues: Array<QueryValue> = [];
+    const extraWheres: SQL[] = [];
 
-    for (const identifierMatch of this.identifierMatches) {
-      const { dependencyIndex, codec } = identifierMatch;
-      queryValues.push({
-        dependencyIndex,
-        codec,
-      });
-    }
     const placeholderValues = new Map<symbol, SQL>(this.fixedPlaceholderValues);
 
-    this.placeholders.forEach((placeholder) => {
+    const placeholders: PgStmtDeferredPlaceholder[] = [];
+    const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
       const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
@@ -1873,7 +1868,23 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
         );
       }
-    });
+    };
+
+    // Handle identifiers
+    for (const identifierMatch of this.identifierMatches) {
+      const { expression, dependencyIndex } = identifierMatch;
+      const symbol = Symbol(`dep-${dependencyIndex}`);
+      extraWheres.push(sql`${expression} = ${sql.placeholder(symbol)}`);
+      // Now it's essentially a placeholder:
+      handlePlaceholder({
+        ...identifierMatch,
+        symbol,
+        alreadyEncoded: false,
+      });
+    }
+
+    // Handle placeholders
+    this.placeholders.forEach(handlePlaceholder);
 
     const makeQuery = ({
       limit,
@@ -1894,7 +1905,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         (count !== 1 && (this.forceIdentity || this.hasSideEffects))
       ) {
         const extraSelects: SQL[] = [];
-        const extraWheres: SQL[] = [];
 
         const identifierIndexOffset =
           extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
@@ -1907,12 +1917,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               ) - 1
             : -1;
 
-        extraWheres.push(
-          ...this.identifierMatches.map(
-            ({ expression: frag }, idx) =>
-              sql`${frag} = ${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-          ),
-        );
         const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
           extraSelects,
           extraWheres,
@@ -2016,6 +2020,7 @@ ${lateralText};`;
 
         const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
           extraSelects,
+          extraWheres,
         });
         const rowNumberIndex =
           rowNumberIndexOffset >= 0
@@ -2057,7 +2062,7 @@ ${lateralText};`;
         );
         return { text, rawSqlValues, identifierIndex: null };
       } else {
-        const { sql: query } = this.buildQuery();
+        const { sql: query } = this.buildQuery({ extraWheres });
         const { text, values: rawSqlValues } = sql.compile(
           sql`${query};`,
           options,
