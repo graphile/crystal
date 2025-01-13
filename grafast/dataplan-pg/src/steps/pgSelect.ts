@@ -2346,7 +2346,7 @@ ${lateralText};`;
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, codec } = placeholder;
+      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
       const dep = this.getDep(dependencyIndex);
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
@@ -2371,7 +2371,7 @@ ${lateralText};`;
           dependencyIndex: newPlanIndex,
           codec,
           symbol,
-          alreadyEncoded: false,
+          alreadyEncoded,
         });
       } else if (dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
