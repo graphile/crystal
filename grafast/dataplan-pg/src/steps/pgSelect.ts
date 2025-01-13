@@ -1840,9 +1840,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         const value = val.at(0);
         placeholderValues.set(
           symbol,
-          sql`(${sql.value(value == null ? null : codec.toPg(value))}::${
+          sql`${sql.value(value == null ? null : codec.toPg(value))}::${
             codec.sqlType
-          })`,
+          }`,
         );
       } else {
         // Fine a existing match for this dependency of this type
