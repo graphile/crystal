@@ -1843,7 +1843,7 @@ ${unionHaving}\
           const { symbol, dependencyIndex, codec, alreadyEncoded } =
             placeholder;
           const ev = values[dependencyIndex];
-          if (!ev.isBatch || count == 1) {
+          if (!ev.isBatch || count === 1) {
             const value = ev.at(0);
             placeholderValues.set(
               symbol,
