@@ -1821,21 +1821,13 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     // at the end.
     this.locker.locked = false;
 
-    if (!this.isFinalized) {
-    }
-
     this.locker.locked = true;
 
     super.finalize();
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { count, values } = executionDetails;
     const identifiersSymbol = Symbol(this.name + "_identifiers");
     const identifiersAlias = sql.identifier(identifiersSymbol);
 
@@ -2647,7 +2639,7 @@ ${lateralText};`;
               this.conditions,
             );
             const conditions = [
-              ...this.identifierMatches.map((identifierMatch, i) => {
+              ...this.identifierMatches.map((identifierMatch) => {
                 const { dependencyIndex, codec, expression } = identifierMatch;
                 const step = this.getDep(dependencyIndex);
                 if (step instanceof PgClassExpressionStep) {
@@ -2709,7 +2701,7 @@ ${lateralText};`;
           parent.getClassStep().mode !== "aggregate"
         ) {
           const parent2 = parent.getItemStep();
-          this.identifierMatches.forEach((identifierMatch, i) => {
+          this.identifierMatches.forEach((identifierMatch) => {
             const { dependencyIndex, codec, expression } = identifierMatch;
             const step = this.getDep(dependencyIndex);
             if (step instanceof PgClassExpressionStep) {

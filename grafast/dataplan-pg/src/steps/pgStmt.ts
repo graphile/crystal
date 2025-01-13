@@ -1,8 +1,8 @@
 import { applyTransforms, ExecutableStep } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import type { PgCodec, PgTypedExecutableStep } from "..";
-import type { PgLocker } from "../pgLocker";
+import type { PgCodec, PgTypedExecutableStep } from "../interfaces.js";
+import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 
 /**
