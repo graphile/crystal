@@ -407,7 +407,6 @@ function cloneDigests<TTypeNames extends string = string>(
 interface QueryBuildResult {
   // The SQL query text
   text: string;
-  textForSingle?: string;
 
   // The values to feed into the query
   rawSqlValues: SQLRawValue[];
@@ -429,7 +428,6 @@ interface QueryBuildResult {
 
   // For prepared queries
   name?: string;
-  nameForSingle?: string;
 
   queryValues: Array<QueryValue>;
 }
@@ -1822,7 +1820,6 @@ ${unionHaving}\
     const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
       text: string;
       rawSqlValues: SQLRawValue[];
-      textForSingle?: string;
       identifierIndex: number | null;
       queryValues: Array<QueryValue>;
     } => {
@@ -1897,7 +1894,6 @@ ${unionHaving}\
         const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
         const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
 
-        let lastPlaceholder = rawSqlValues.length;
         /*
          * IMPORTANT: these wrapper queries are necessary so that queries
          * that have a limit/offset get the limit/offset applied _per
@@ -1916,33 +1912,13 @@ from (select ids.ordinality - 1 as idx${
                 })
                 .join(", ")}`
             : ""
-        } from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
-${lateralText};`;
-
-        lastPlaceholder = rawSqlValues.length;
-        /**
-         * This is an optimized query to use when there's only one value to
-         * feed in, PostgreSQL seems to be able to execute queries using this
-         * _significantly_ faster (up to 3x or 200ms faster).
-         */
-        const textForSingle = `\
-select ${wrapperAliasText}.*
-from (select 0 as idx${
-          queryValues.length > 0
-            ? `, ${queryValues
-                .map(({ codec }, idx) => {
-                  return `$${++lastPlaceholder}::${
-                    sql.compile(codec.sqlType).text
-                  } as "id${idx}"`;
-                })
-                .join(", ")}`
-            : ""
-        }) as ${identifiersAliasText},
+        } from json_array_elements($${
+          rawSqlValues.length + 1
+        }::json) with ordinality as ids) as ${identifiersAliasText},
 ${lateralText};`;
 
         return {
           text,
-          textForSingle,
           rawSqlValues,
           identifierIndex,
           queryValues,
@@ -1960,16 +1936,12 @@ ${lateralText};`;
 
     // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
 
-    const textForSingle = undefined;
-
     return {
       text,
-      textForSingle,
       rawSqlValues,
       identifierIndex,
       shouldReverseOrder,
       name: hash(text),
-      nameForSingle: textForSingle ? hash(textForSingle) : undefined,
       queryValues,
     };
   }

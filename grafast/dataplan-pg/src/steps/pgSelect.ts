@@ -251,8 +251,6 @@ export interface PgSelectOptions<
 interface QueryBuildResult {
   // The SQL query text
   text: string;
-  // An optimized SQL query to use when there's only one input
-  textForSingle?: string;
 
   // The values to feed into the query
   rawSqlValues: SQLRawValue[];
@@ -274,7 +272,6 @@ interface QueryBuildResult {
 
   // For prepared queries
   name?: string;
-  nameForSingle?: string;
 
   queryValues: Array<QueryValue>;
 }
@@ -1189,12 +1186,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     }
     const {
       text,
-      textForSingle,
       rawSqlValues,
       identifierIndex,
       shouldReverseOrder,
       name,
-      nameForSingle,
       queryValues,
     } = this.buildTheQuery(executionDetails);
     const contextDep = values[this.contextId];
@@ -1219,11 +1214,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         : "executeWithoutCache";
     const executionResult = await this.resource[executeMethod](specs, {
       text,
-      textForSingle,
       rawSqlValues,
       identifierIndex,
       name,
-      nameForSingle,
       eventEmitter,
       useTransaction: this.mode === "mutation",
     });
@@ -1893,7 +1886,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     } = {}): {
       text: string;
       rawSqlValues: SQLRawValue[];
-      textForSingle?: string;
       identifierIndex: number | null;
     } => {
       const forceOrder = this.streamOptions && this.shouldReverseOrder();
@@ -1979,8 +1971,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
         const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
 
-        let lastPlaceholder = rawSqlValues.length;
-
         /*
          * IMPORTANT: these wrapper queries are necessary so that queries
          * that have a limit/offset get the limit/offset applied _per
@@ -1999,31 +1989,12 @@ from (select ids.ordinality - 1 as idx${
                 })
                 .join(", ")}`
             : ""
-        } from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+        } from json_array_elements($${
+          rawSqlValues.length + 1
+        }::json) with ordinality as ids) as ${identifiersAliasText},
 ${lateralText};`;
 
-        lastPlaceholder = rawSqlValues.length;
-        /**
-         * This is an optimized query to use when there's only one value to
-         * feed in, PostgreSQL seems to be able to execute queries using this
-         * _significantly_ faster (up to 3x or 200ms faster).
-         */
-        const textForSingle = `\
-select ${wrapperAliasText}.*
-from (select 0 as idx${
-          queryValues.length > 0
-            ? `, ${queryValues
-                .map(({ codec }, idx) => {
-                  return `$${++lastPlaceholder}::${
-                    sql.compile(codec.sqlType).text
-                  } as "id${idx}"`;
-                })
-                .join(", ")}`
-            : ""
-        }) as ${identifiersAliasText},
-${lateralText};`;
-
-        return { text, textForSingle, rawSqlValues, identifierIndex };
+        return { text, rawSqlValues, identifierIndex };
       } else if (
         (limit != null && limit >= 0) ||
         (offset != null && offset > 0)
@@ -2167,19 +2138,17 @@ ${lateralText};`;
         };
       }
     } else {
-      const { text, rawSqlValues, textForSingle, identifierIndex } = makeQuery({
+      const { text, rawSqlValues, identifierIndex } = makeQuery({
         options: {
           placeholderValues,
         },
       });
       return {
         text,
-        textForSingle,
         rawSqlValues,
         identifierIndex,
         shouldReverseOrder: this.shouldReverseOrder(),
         name: hash(text),
-        nameForSingle: textForSingle ? hash(textForSingle) : undefined,
         queryValues,
       };
     }
