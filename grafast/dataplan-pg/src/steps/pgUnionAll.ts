@@ -58,6 +58,7 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
 import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
@@ -452,6 +453,8 @@ export class PgUnionAllStep<
   /**
    * Values used in this plan.
    */
+  protected placeholders: Array<PgStmtDeferredPlaceholder>;
+  protected deferreds: Array<PgStmtDeferredSQL>;
   private placeholderValues: Map<symbol, SQL>;
 
   // GROUP BY
@@ -523,6 +526,8 @@ export class PgUnionAllStep<
 
   public readonly mode: PgUnionAllMode;
 
+  protected locker: PgLocker<this> = new PgLocker(this);
+
   private memberDigests: MemberDigest<TTypeNames>[];
   private _limitToTypes: string[] | undefined;
 
@@ -566,9 +571,8 @@ export class PgUnionAllStep<
       this.selects = cloneFromMatchingMode
         ? [...cloneFromMatchingMode.selects]
         : [];
-      for (const placeholder of cloneFrom.placeholders) {
-        this.placeholders.push(placeholder);
-      }
+      this.placeholders = [...cloneFrom.placeholders];
+      this.deferreds = [...cloneFrom.deferreds];
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.groups = cloneFromMatchingMode
@@ -651,6 +655,8 @@ export class PgUnionAllStep<
       this.alias = sql.identifier(this.symbol);
 
       this.selects = [];
+      this.placeholders = [];
+      this.deferreds = [];
       this.queryValues = [];
       this.placeholderValues = new Map();
       this.groups = [];
