@@ -4,6 +4,7 @@ import type {
   __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
+  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -21,9 +22,7 @@ import {
   __ItemStep,
   __TrackedValueStep,
   access,
-  applyTransforms,
   arrayOfLength,
-  ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
@@ -55,8 +54,6 @@ import type {
   PgOrderSpec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
-import { PgLocker } from "../pgLocker.js";
-import { makeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
@@ -67,11 +64,10 @@ import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
-
-const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgSelect placeholder! */`;
 
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
@@ -126,22 +122,6 @@ type PgSelectPlanJoin =
       conditions: SQL[];
       lateral?: boolean;
     };
-
-/**
- * Sometimes we want to refer to something that might change later - e.g. we
- * might have SQL that specifies a list of explicit values, or it might later
- * want to be replaced with a reference to an existing table value (e.g. when a
- * query is being inlined). PgSelectPlaceholder allows for this kind of
- * flexibility. It's really important to keep in mind that the same placeholder
- * might be used in multiple different SQL queries, and in the different
- * queries it might end up with different values - this is particularly
- * relevant when using `@stream`/`@defer`, for example.
- */
-type PgSelectPlaceholder = {
-  dependencyIndex: number;
-  codec: PgCodec;
-  symbol: symbol;
-};
 
 export type PgSelectIdentifierSpec =
   | {
@@ -264,7 +244,7 @@ export interface PgSelectOptions<
 export class PgSelectStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends ExecutableStep<
+  extends PgStmtBaseStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
@@ -383,10 +363,6 @@ export class PgSelectStep<
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
-  /**
-   * Values used in this plan.
-   */
-  private placeholders: Array<PgSelectPlaceholder>;
   private placeholderValues: Map<symbol, SQL>;
 
   /**
@@ -477,8 +453,6 @@ export class PgSelectStep<
 
   public readonly mode: PgSelectMode;
 
-  private locker: PgLocker<this> = new PgLocker(this);
-
   constructor(options: PgSelectOptions<TResource>);
   constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
   constructor(
@@ -564,7 +538,11 @@ export class PgSelectStep<
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
-    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    if (cloneFrom) {
+      for (const placeholder of cloneFrom.deferreds) {
+        this.deferreds.push(placeholder);
+      }
+    }
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
       : new Map();
@@ -762,47 +740,6 @@ export class PgSelectStep<
 
   public unique(): boolean {
     return this.isUnique;
-  }
-
-  public scopedSQL = makeScopedSQL(this);
-
-  public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
-  public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<PgCodec>,
-    overrideCodec?: PgCodec,
-  ): SQL {
-    if (this.locker.locked) {
-      throw new Error(`${this}: cannot add placeholders once plan is locked`);
-    }
-    if (this.placeholders.length >= 100000) {
-      throw new Error(
-        `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
-      );
-    }
-
-    const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
-    if (!codec) {
-      console.trace(`${this}.placeholder(${$step}) call, no codec`);
-      throw new Error(
-        `Step ${$step} does not contain pgCodec information, please pass the codec explicitly to the 'placeholder' method.`,
-      );
-    }
-
-    const $evalledStep = applyTransforms($step);
-
-    const dependencyIndex = this.addDependency($evalledStep);
-    const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
-    const p: PgSelectPlaceholder = {
-      dependencyIndex,
-      codec,
-      symbol,
-    };
-    this.placeholders.push(p);
-    // This allows us to replace the SQL that will be compiled, for example
-    // when we're inlining this into a parent query.
-    return sqlPlaceholder;
   }
 
   /**
@@ -2406,7 +2343,7 @@ ${lateralText};`;
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, codec } = placeholder;
+      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
       const dep = this.getDep(dependencyIndex);
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
@@ -2431,6 +2368,7 @@ ${lateralText};`;
           dependencyIndex: newPlanIndex,
           codec,
           symbol,
+          alreadyEncoded,
         });
       } else if (dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
