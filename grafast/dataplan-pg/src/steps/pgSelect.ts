@@ -1860,15 +1860,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.placeholders.forEach((placeholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
-      const { symbol, dependencyIndex, codec } = placeholder;
+      const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
       const ev = values[dependencyIndex];
       if (!ev.isBatch || count == 1) {
         const value = ev.at(0);
         placeholderValues.set(
           symbol,
-          sql`${sql.value(value == null ? null : codec.toPg(value))}::${
-            codec.sqlType
-          }`,
+          sql`${sql.value(
+            value == null ? null : alreadyEncoded ? value : codec.toPg(value),
+          )}::${codec.sqlType}`,
         );
       } else {
         // Fine a existing match for this dependency of this type
