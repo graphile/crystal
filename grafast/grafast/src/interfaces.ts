@@ -849,6 +849,8 @@ export type ExecutionValue<TData = any> =
 interface ExecutionValueBase<TData = any> {
   at(i: number): TData;
   isBatch: boolean;
+  /** Returns this.value for a unary execution value; throws if non-unary */
+  unaryValue(): TData;
   /** @internal */
   _flagsAt(i: number): ExecutionEntryFlags;
   /** bitwise OR of all the entry states @internal */
@@ -866,6 +868,8 @@ export interface BatchExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: true;
   entries: ReadonlyArray<TData>;
+  /** Always throws, since this should only be called on unary execution values */
+  unaryValue(): never;
   /** @internal */
   readonly _flags: Array<ExecutionEntryFlags>;
 }
@@ -873,6 +877,8 @@ export interface UnaryExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: false;
   value: TData;
+  /** Same as getting .value */
+  unaryValue(): TData;
   /** @internal */
   _entryFlags: ExecutionEntryFlags;
 }
