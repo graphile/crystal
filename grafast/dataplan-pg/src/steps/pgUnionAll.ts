@@ -1863,7 +1863,10 @@ ${unionHaving}\
         });
       }
 
-      if (queryValues.length > 0 || this.forceIdentity || this.hasSideEffects) {
+      if (
+        queryValues.length > 0 ||
+        (count !== 1 && (this.forceIdentity || this.hasSideEffects))
+      ) {
         const identifierIndex = this.selectAndReturnIndex(
           sql`${identifiersAlias}.idx`,
         );
