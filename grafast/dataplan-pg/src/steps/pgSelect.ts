@@ -1149,12 +1149,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute({
-    indexMap,
-    count,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+    const {
+      indexMap,
+      count,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
     if (this.isNullFetch()) {
       return arrayOfLength(count, Object.freeze([]));
     }
@@ -1167,7 +1170,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       name,
       nameForSingle,
       queryValues,
-    } = this.buildTheQuery();
+    } = this.buildTheQuery(executionDetails);
     const contextDep = values[this.contextId];
 
     const specs = indexMap<PgExecutorInput<any>>((i) => {
@@ -1233,11 +1236,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   /**
    * Like `execute`, but stream the results via async iterables.
    */
-  async stream({
-    indexMap,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
+  async stream(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultStreamList<unknown[]>> {
+    const {
+      indexMap,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
     const {
       text,
       rawSqlValues,
@@ -1247,7 +1253,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       shouldReverseOrder,
       streamInitialCount,
       queryValues,
-    } = this.buildTheQuery();
+    } = this.buildTheQuery(executionDetails);
 
     if (shouldReverseOrder !== false) {
       throw new Error("shouldReverseOrder must be false for stream");
@@ -1797,7 +1803,13 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     super.finalize();
   }
 
-  private buildTheQuery(): QueryBuildResult {
+  private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
+    const {
+      indexMap,
+      count,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
     const identifiersSymbol = Symbol(this.name + "_identifiers");
     const identifiersAlias = sql.identifier(identifiersSymbol);
 
@@ -1822,28 +1834,31 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.placeholders.forEach((placeholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
-      // Fine a existing match for this dependency of this type
-      const existingIndex = queryValues.findIndex((v) => {
-        return (
-          v.dependencyIndex === placeholder.dependencyIndex &&
-          v.codec === placeholder.codec
+      const { symbol, dependencyIndex, codec } = placeholder;
+      const val = values[dependencyIndex];
+      if (!val.isBatch || count == 1) {
+        placeholderValues.set(
+          symbol,
+          sql`(${sql.value(codec.toPg(val.value))}::${codec.sqlType})`,
         );
-      });
+      } else {
+        // Fine a existing match for this dependency of this type
+        const existingIndex = queryValues.findIndex((v) => {
+          return v.dependencyIndex === dependencyIndex && v.codec === codec;
+        });
 
-      // If none exists, add one to our query values
-      const idx =
-        existingIndex >= 0
-          ? existingIndex
-          : queryValues.push({
-              dependencyIndex: placeholder.dependencyIndex,
-              codec: placeholder.codec,
-            }) - 1;
+        // If none exists, add one to our query values
+        const idx =
+          existingIndex >= 0
+            ? existingIndex
+            : queryValues.push({ dependencyIndex, codec }) - 1;
 
-      // Finally alias this symbol to a reference to this placeholder
-      placeholderValues.set(
-        placeholder.symbol,
-        sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-      );
+        // Finally alias this symbol to a reference to this placeholder
+        placeholderValues.set(
+          symbol,
+          sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
+        );
+      }
     });
 
     const makeQuery = ({
@@ -1953,15 +1968,17 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
          */
         const text = `\
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx, ${queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(
-            ", ",
-          )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+from (select ids.ordinality - 1 as idx${
+          queryValues.length > 0
+            ? `, ${queryValues
+                .map(({ codec }, idx) => {
+                  return `(ids.value->>${idx})::${
+                    sql.compile(codec.sqlType).text
+                  } as "id${idx}"`;
+                })
+                .join(", ")}`
+            : ""
+        } from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
 ${lateralText};`;
 
         lastPlaceholder = rawSqlValues.length;
@@ -1972,13 +1989,17 @@ ${lateralText};`;
          */
         const textForSingle = `\
 select ${wrapperAliasText}.*
-from (select 0 as idx, ${queryValues
-          .map(({ codec }, idx) => {
-            return `$${++lastPlaceholder}::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}) as ${identifiersAliasText},
+from (select 0 as idx${
+          queryValues.length > 0
+            ? `, ${queryValues
+                .map(({ codec }, idx) => {
+                  return `$${++lastPlaceholder}::${
+                    sql.compile(codec.sqlType).text
+                  } as "id${idx}"`;
+                })
+                .join(", ")}`
+            : ""
+        }) as ${identifiersAliasText},
 ${lateralText};`;
 
         return { text, textForSingle, rawSqlValues, identifierIndex };
