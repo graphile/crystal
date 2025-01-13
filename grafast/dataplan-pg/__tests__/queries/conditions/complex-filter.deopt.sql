@@ -22,21 +22,16 @@ where
   )
 order by __forums__."id" asc;
 
-select __messages_result__.*
-from (select 0 as idx, $3::"uuid" as "id0") as __messages_identifiers__,
-lateral (
-  select
-    __messages__."body" as "0",
-    __messages__."featured"::text as "1",
-    __messages_identifiers__.idx as "2"
-  from app_public.messages as __messages__
-  where
-    (
-      __messages__.featured <> $1::"bool"
-    ) and (
-      (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-    ) and (
-      __messages__."forum_id" = __messages_identifiers__."id0"
-    )
-  order by __messages__."id" asc
-) as __messages_result__;
+select
+  __messages__."body" as "0",
+  __messages__."featured"::text as "1"
+from app_public.messages as __messages__
+where
+  (
+    __messages__.featured <> $1::"bool"
+  ) and (
+    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
+  ) and (
+    __messages__."forum_id" = $3::"uuid"
+  )
+order by __messages__."id" asc;

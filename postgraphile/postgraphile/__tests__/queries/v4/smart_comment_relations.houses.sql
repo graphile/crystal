@@ -1,21 +1,16 @@
-select __houses_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __houses_identifiers__,
-lateral (
-  select
-    __houses__."building_name" as "0",
-    __houses__."property_name_or_number" as "1",
-    __houses__."street_name" as "2",
-    __houses__."street_id"::text as "3",
-    __houses__."property_id"::text as "4",
-    __houses_identifiers__.idx as "5"
-  from "smart_comment_relations"."houses" as __houses__
-  where
-    (
-      __houses__."street_id" = __houses_identifiers__."id0"
-    ) and (
-      __houses__."property_id" = __houses_identifiers__."id1"
-    )
-) as __houses_result__;
+select
+  __houses__."building_name" as "0",
+  __houses__."property_name_or_number" as "1",
+  __houses__."street_name" as "2",
+  __houses__."street_id"::text as "3",
+  __houses__."property_id"::text as "4"
+from "smart_comment_relations"."houses" as __houses__
+where
+  (
+    __houses__."street_id" = $1::"int4"
+  ) and (
+    __houses__."property_id" = $2::"int4"
+  );
 
 select
   __streets__."id"::text as "0",

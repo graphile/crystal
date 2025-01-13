@@ -49,18 +49,13 @@ lateral (
     )
 ) as __messages_result__;
 
-select __users_result__.*
-from (select 0 as idx, $1::"uuid" as "id0") as __users_identifiers__,
-lateral (
-  select
-    __users__."username" as "0",
-    __users__."gravatar_url" as "1",
-    __users_identifiers__.idx as "2"
-  from app_public.users as __users__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __users__."id" = __users_identifiers__."id0"
-    )
-) as __users_result__;
+select
+  __users__."username" as "0",
+  __users__."gravatar_url" as "1"
+from app_public.users as __users__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __users__."id" = $1::"uuid"
+  );

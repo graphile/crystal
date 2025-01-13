@@ -100,19 +100,14 @@ from (
 ) __vulnerability__
 
 
-select __first_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __first_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __first_party_vulnerabilities__."id"::text as "0",
-    __first_party_vulnerabilities__."name" as "1",
-    __first_party_vulnerabilities__."cvss_score"::text as "2",
-    __first_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-  where (
-    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
-  )
-) as __first_party_vulnerabilities_result__;
+select
+  __first_party_vulnerabilities__."id"::text as "0",
+  __first_party_vulnerabilities__."name" as "1",
+  __first_party_vulnerabilities__."cvss_score"::text as "2"
+from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+where (
+  __first_party_vulnerabilities__."id" = $1::"int4"
+);
 
 select __third_party_vulnerabilities_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __third_party_vulnerabilities_identifiers__,

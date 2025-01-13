@@ -1,53 +1,48 @@
-select __person_result__.*
-from (select 0 as idx, $16::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_optional_missing_middle_4"(
-      __person__,
-      $1::"int4",
-      $2::"int4",
-      $3::"int4"
-    ))::text as "0",
-    __person__."id"::text as "1",
-    ("c"."person_optional_missing_middle_5"(
-      __person_2,
-      $4::"int4",
-      $5::"int4",
-      $6::"int4"
-    ))::text as "2",
-    __person_2."id"::text as "3",
-    ("c"."person_optional_missing_middle_1"(
-      __person_3,
-      $7::"int4",
-      "c" := $8::"int4"
-    ))::text as "4",
-    ("c"."person_optional_missing_middle_1"(
-      __person_3,
-      $9::"int4",
-      $10::"int4",
-      $11::"int4"
-    ))::text as "5",
-    ("c"."person_optional_missing_middle_2"(
-      __person_3,
-      $12::"int4",
-      "c" := $13::"int4"
-    ))::text as "6",
-    ("c"."person_optional_missing_middle_3"(
-      __person_3,
-      $14::"int4",
-      "c" := $15::"int4"
-    ))::text as "7",
-    __person_3."id"::text as "8",
-    __person_identifiers__.idx as "9"
-  from "c"."person" as __person_3
-  left outer join lateral (select (__person_3).*) as __person__
-  on TRUE
-  left outer join lateral (select (__person_3).*) as __person_2
-  on TRUE
-  where (
-    __person_3."id" = __person_identifiers__."id0"
-  )
-) as __person_result__;
+select
+  ("c"."person_optional_missing_middle_4"(
+    __person__,
+    $1::"int4",
+    $2::"int4",
+    $3::"int4"
+  ))::text as "0",
+  __person__."id"::text as "1",
+  ("c"."person_optional_missing_middle_5"(
+    __person_2,
+    $4::"int4",
+    $5::"int4",
+    $6::"int4"
+  ))::text as "2",
+  __person_2."id"::text as "3",
+  ("c"."person_optional_missing_middle_1"(
+    __person_3,
+    $7::"int4",
+    "c" := $8::"int4"
+  ))::text as "4",
+  ("c"."person_optional_missing_middle_1"(
+    __person_3,
+    $9::"int4",
+    $10::"int4",
+    $11::"int4"
+  ))::text as "5",
+  ("c"."person_optional_missing_middle_2"(
+    __person_3,
+    $12::"int4",
+    "c" := $13::"int4"
+  ))::text as "6",
+  ("c"."person_optional_missing_middle_3"(
+    __person_3,
+    $14::"int4",
+    "c" := $15::"int4"
+  ))::text as "7",
+  __person_3."id"::text as "8"
+from "c"."person" as __person_3
+left outer join lateral (select (__person_3).*) as __person__
+on TRUE
+left outer join lateral (select (__person_3).*) as __person_2
+on TRUE
+where (
+  __person_3."id" = $16::"int4"
+);
 
 select
   __frmcdc_compound_type__."a"::text as "0",

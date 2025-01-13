@@ -77,15 +77,10 @@ lateral (
   ) __applications__
 ) as __union_result__;
 
-select __aws_applications_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __aws_applications_identifiers__,
-lateral (
-  select
-    __aws_applications__."id"::text as "0",
-    __aws_applications__."name" as "1",
-    __aws_applications_identifiers__.idx as "2"
-  from "polymorphic"."aws_applications" as __aws_applications__
-  where (
-    __aws_applications__."id" = __aws_applications_identifiers__."id0"
-  )
-) as __aws_applications_result__;
+select
+  __aws_applications__."id"::text as "0",
+  __aws_applications__."name" as "1"
+from "polymorphic"."aws_applications" as __aws_applications__
+where (
+  __aws_applications__."id" = $1::"int4"
+);

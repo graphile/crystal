@@ -87,17 +87,12 @@ lateral (
   )
 ) as __aws_applications_result__;
 
-select __gcp_applications_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __gcp_applications_identifiers__,
-lateral (
-  select
-    __gcp_applications__."id"::text as "0",
-    __gcp_applications_identifiers__.idx as "1"
-  from "polymorphic"."gcp_applications" as __gcp_applications__
-  where (
-    __gcp_applications__."id" = __gcp_applications_identifiers__."id0"
-  )
-) as __gcp_applications_result__;
+select
+  __gcp_applications__."id"::text as "0"
+from "polymorphic"."gcp_applications" as __gcp_applications__
+where (
+  __gcp_applications__."id" = $1::"int4"
+);
 
 select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
@@ -216,7 +211,7 @@ from (
 
 
 select __first_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __first_party_vulnerabilities_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __first_party_vulnerabilities_identifiers__,
 lateral (
   select
     __first_party_vulnerabilities__."id"::text as "0",
@@ -227,14 +222,9 @@ lateral (
   )
 ) as __first_party_vulnerabilities_result__;
 
-select __first_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __first_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __first_party_vulnerabilities__."id"::text as "0",
-    __first_party_vulnerabilities_identifiers__.idx as "1"
-  from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-  where (
-    __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
-  )
-) as __first_party_vulnerabilities_result__;
+select
+  __first_party_vulnerabilities__."id"::text as "0"
+from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+where (
+  __first_party_vulnerabilities__."id" = $1::"int4"
+);
