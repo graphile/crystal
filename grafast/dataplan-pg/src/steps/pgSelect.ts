@@ -1837,9 +1837,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const { symbol, dependencyIndex, codec } = placeholder;
       const val = values[dependencyIndex];
       if (!val.isBatch || count == 1) {
+        const value = val.at(0);
         placeholderValues.set(
           symbol,
-          sql`(${sql.value(codec.toPg(val.value))}::${codec.sqlType})`,
+          sql`(${sql.value(value == null ? null : codec.toPg(value))}::${
+            codec.sqlType
+          })`,
         );
       } else {
         // Fine a existing match for this dependency of this type
