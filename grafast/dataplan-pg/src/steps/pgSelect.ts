@@ -1889,7 +1889,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex: number | null;
     } => {
       const forceOrder = this.streamOptions && this.shouldReverseOrder();
-      if (queryValues.length > 0 || this.forceIdentity || this.hasSideEffects) {
+      if (
+        queryValues.length > 0 ||
+        (count !== 1 && (this.forceIdentity || this.hasSideEffects))
+      ) {
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
