@@ -196,6 +196,13 @@ export interface PgSelectOptions<
   identifiers: Array<PgSelectIdentifierSpec>;
 
   /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  forceIdentity?: boolean;
+
+  /**
    * If your `from` (or resource.from if omitted) is a function, the arguments
    * to pass to the function.
    */
@@ -391,6 +398,13 @@ export class PgSelectStep<
   }[];
 
   /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  public forceIdentity: boolean;
+
+  /**
    * If the resource is a function, this is the names of the arguments to pass
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
@@ -474,6 +488,7 @@ export class PgSelectStep<
         name: customName,
         mode: inMode,
         joinAsLateral: inJoinAsLateral = false,
+        forceIdentity: inForceIdentity = false,
       },
     ] =
       optionsOrCloneFrom instanceof PgSelectStep
@@ -487,6 +502,7 @@ export class PgSelectStep<
               args: null,
               name: optionsOrCloneFrom.name,
               mode: undefined,
+              forceIdentity: optionsOrCloneFrom.forceIdentity,
             },
           ]
         : [null, optionsOrCloneFrom];
@@ -549,6 +565,7 @@ export class PgSelectStep<
     this.joinAsLateral =
       (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
       !!this.resource.parameters;
+    this.forceIdentity = inForceIdentity;
     if (cloneFrom !== null) {
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
       this.arguments = Object.freeze(cloneFrom.arguments);
@@ -1879,7 +1896,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex: number | null;
     } => {
       const forceOrder = this.streamOptions && this.shouldReverseOrder();
-      if (queryValues.length || this.placeholders.length) {
+      if (queryValues.length || this.forceIdentity || this.hasSideEffects) {
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
