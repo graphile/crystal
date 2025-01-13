@@ -54,6 +54,7 @@ import type {
   PgOrderSpec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
+import { PgLocker } from "../pgLocker.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
@@ -64,6 +65,7 @@ import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
 import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 
@@ -363,6 +365,8 @@ export class PgSelectStep<
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
+  protected placeholders: Array<PgStmtDeferredPlaceholder>;
+  protected deferreds: Array<PgStmtDeferredSQL>;
   private placeholderValues: Map<symbol, SQL>;
 
   /**
@@ -453,6 +457,8 @@ export class PgSelectStep<
 
   public readonly mode: PgSelectMode;
 
+  protected locker: PgLocker<this> = new PgLocker(this);
+
   constructor(options: PgSelectOptions<TResource>);
   constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
   constructor(
@@ -538,11 +544,8 @@ export class PgSelectStep<
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
-    if (cloneFrom) {
-      for (const placeholder of cloneFrom.deferreds) {
-        this.deferreds.push(placeholder);
-      }
-    }
+    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    this.deferreds = cloneFrom ? [...cloneFrom.deferreds] : [];
     this.placeholderValues = cloneFrom
       ? new Map(cloneFrom.placeholderValues)
       : new Map();
