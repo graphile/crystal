@@ -265,6 +265,8 @@ interface QueryBuildResult {
   // For prepared queries
   name?: string;
   nameForSingle?: string;
+
+  queryValues: Array<QueryValue>;
 }
 
 /**
@@ -377,21 +379,16 @@ export class PgSelectStep<
   // --------------------
 
   /**
-   * Since this is effectively like a DataLoader it processes the data for many
-   * different resolvers at once. This list of (hopefully scalar) plans is used
-   * to represent queryValues the query will need such as identifiers for which
-   * records in the result set should be returned to which GraphQL resolvers,
-   * parameters for conditions or orders, etc.
-   */
-  private queryValues: Array<QueryValue>;
-
-  /**
    * This is the list of SQL fragments in the result that are compared to some
    * of the above `queryValues` to determine if there's a match or not. Typically
    * this will be a list of columns (e.g. primary or foreign keys on the
    * table).
    */
-  private identifierMatches: readonly SQL[];
+  private identifierMatches: readonly {
+    dependencyIndex: number;
+    expression: SQL;
+    codec: PgCodec;
+  }[];
 
   /**
    * If the resource is a function, this is the names of the arguments to pass
@@ -553,15 +550,17 @@ export class PgSelectStep<
       (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
       !!this.resource.parameters;
     if (cloneFrom !== null) {
-      this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
       this.arguments = Object.freeze(cloneFrom.arguments);
     } else {
       if (!identifiers) {
         throw new Error("Invalid construction of PgSelectStep");
       }
-      const queryValues: QueryValue[] = [];
-      const identifierMatches: SQL[] = [];
+      const identifierMatches: {
+        dependencyIndex: number;
+        expression: SQL;
+        codec: PgCodec;
+      }[] = [];
       let args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
@@ -572,11 +571,11 @@ export class PgSelectStep<
         const codec =
           identifier.codec ||
           (identifier.step as PgTypedExecutableStep<any>).pgCodec;
-        queryValues.push({
+        identifierMatches.push({
+          expression: matches(this.alias),
           dependencyIndex: this.addDependency(step),
           codec,
         });
-        identifierMatches.push(matches(this.alias));
       });
       if (inArgs != null) {
         const { digests: newArgs, argIndex: newArgIndex } =
@@ -584,7 +583,6 @@ export class PgSelectStep<
         args = newArgs;
         argIndex = newArgIndex;
       }
-      this.queryValues = queryValues;
       this.identifierMatches = identifierMatches;
       this.arguments = args;
     }
@@ -1168,6 +1166,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       shouldReverseOrder,
       name,
       nameForSingle,
+      queryValues,
     } = this.buildTheQuery();
     const contextDep = values[this.contextId];
 
@@ -1178,7 +1177,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         context,
         queryValues:
           identifierIndex != null
-            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+            ? queryValues.map(({ dependencyIndex, codec }) => {
                 const val = values[dependencyIndex].at(i);
                 return val == null ? null : codec.toPg(val);
               })
@@ -1247,6 +1246,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex,
       shouldReverseOrder,
       streamInitialCount,
+      queryValues,
     } = this.buildTheQuery();
 
     if (shouldReverseOrder !== false) {
@@ -1266,7 +1266,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           context,
           queryValues:
             identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
+              ? queryValues.map(({ dependencyIndex, codec }) => {
                   const val = values[dependencyIndex].at(i);
                   return val == null ? null : codec.toPg(val);
                 })
@@ -1293,7 +1293,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         context,
         queryValues:
           identifierIndex != null
-            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+            ? queryValues.map(({ dependencyIndex, codec }) => {
                 const val = values[dependencyIndex].at(i);
                 return val == null ? val : codec.toPg(val);
               })
@@ -1796,11 +1796,28 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const identifiersSymbol = Symbol(this.name + "_identifiers");
     const identifiersAlias = sql.identifier(identifiersSymbol);
 
+    /**
+     * Since this is effectively like a DataLoader it processes the data for many
+     * different resolvers at once. This list of (hopefully scalar) plans is used
+     * to represent queryValues the query will need such as identifiers for which
+     * records in the result set should be returned to which GraphQL resolvers,
+     * parameters for conditions or orders, etc.
+     */
+    const queryValues: Array<QueryValue> = [];
+
+    for (const identifierMatch of this.identifierMatches) {
+      const { dependencyIndex, codec } = identifierMatch;
+      queryValues.push({
+        dependencyIndex,
+        codec,
+      });
+    }
+
     this.placeholders.forEach((placeholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
       // Fine a existing match for this dependency of this type
-      const existingIndex = this.queryValues.findIndex((v) => {
+      const existingIndex = queryValues.findIndex((v) => {
         return (
           v.dependencyIndex === placeholder.dependencyIndex &&
           v.codec === placeholder.codec
@@ -1811,7 +1828,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const idx =
         existingIndex >= 0
           ? existingIndex
-          : this.queryValues.push({
+          : queryValues.push({
               dependencyIndex: placeholder.dependencyIndex,
               codec: placeholder.codec,
             }) - 1;
@@ -1838,7 +1855,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex: number | null;
     } => {
       const forceOrder = this.streamOptions && this.shouldReverseOrder();
-      if (this.queryValues.length || this.placeholders.length) {
+      if (queryValues.length || this.placeholders.length) {
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
@@ -1855,7 +1872,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
         extraWheres.push(
           ...this.identifierMatches.map(
-            (frag, idx) =>
+            ({ expression: frag }, idx) =>
               sql`${frag} = ${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
           ),
         );
@@ -1930,7 +1947,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
          */
         const text = `\
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx, ${this.queryValues
+from (select ids.ordinality - 1 as idx, ${queryValues
           .map(({ codec }, idx) => {
             return `(ids.value->>${idx})::${
               sql.compile(codec.sqlType).text
@@ -1949,7 +1966,7 @@ ${lateralText};`;
          */
         const textForSingle = `\
 select ${wrapperAliasText}.*
-from (select 0 as idx, ${this.queryValues
+from (select 0 as idx, ${queryValues
           .map(({ codec }, idx) => {
             return `$${++lastPlaceholder}::${
               sql.compile(codec.sqlType).text
@@ -2068,6 +2085,7 @@ ${lateralText};`;
           identifierIndex,
           shouldReverseOrder: false,
           streamInitialCount: this.streamOptions.initialCount,
+          queryValues,
         };
       } else {
         /*
@@ -2097,6 +2115,7 @@ ${lateralText};`;
           identifierIndex: streamIdentifierIndex,
           shouldReverseOrder: false,
           streamInitialCount: 0,
+          queryValues,
         };
       }
     } else {
@@ -2113,6 +2132,7 @@ ${lateralText};`;
         shouldReverseOrder: this.shouldReverseOrder(),
         name: hash(text),
         nameForSingle: textForSingle ? hash(textForSingle) : undefined,
+        queryValues,
       };
     }
   }
@@ -2210,7 +2230,10 @@ ${lateralText};`;
         !arraysMatch(
           this.identifierMatches,
           p.identifierMatches,
-          sqlIsEquivalent,
+          (matchA, matchB) =>
+            matchA.codec === matchB.codec &&
+            matchA.dependencyIndex === matchB.dependencyIndex &&
+            sqlIsEquivalent(matchA.expression, matchB.expression),
         )
       ) {
         return false;
@@ -2568,17 +2591,12 @@ ${lateralText};`;
             );
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
-                const { dependencyIndex, codec } = this.queryValues[i];
+                const { dependencyIndex, codec, expression } = identifierMatch;
                 const step = this.getDep(dependencyIndex);
                 if (step instanceof PgClassExpressionStep) {
-                  return sql`${step.toSQL()}::${
-                    codec.sqlType
-                  } = ${identifierMatch}`;
+                  return sql`${step.toSQL()}::${codec.sqlType} = ${expression}`;
                 } else {
-                  return sql`${this.placeholder(
-                    step,
-                    codec,
-                  )} = ${identifierMatch}`;
+                  return sql`${this.placeholder(step, codec)} = ${expression}`;
                 }
               }),
               // Note the WHERE is now part of the JOIN condition (since
@@ -2635,15 +2653,15 @@ ${lateralText};`;
         ) {
           const parent2 = parent.getItemStep();
           this.identifierMatches.forEach((identifierMatch, i) => {
-            const { dependencyIndex, codec } = this.queryValues[i];
+            const { dependencyIndex, codec, expression } = identifierMatch;
             const step = this.getDep(dependencyIndex);
             if (step instanceof PgClassExpressionStep) {
               return this.where(
-                sql`${step.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
+                sql`${step.toSQL()}::${codec.sqlType} = ${expression}`,
               );
             } else {
               return this.where(
-                sql`${this.placeholder(step, codec)} = ${identifierMatch}`,
+                sql`${this.placeholder(step, codec)} = ${expression}`,
               );
             }
           });
