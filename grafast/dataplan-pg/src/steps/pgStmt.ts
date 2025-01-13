@@ -2,7 +2,7 @@ import { applyTransforms, ExecutableStep } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type { PgCodec, PgTypedExecutableStep } from "..";
-import { PgLocker } from "../pgLocker";
+import type { PgLocker } from "../pgLocker";
 import { makeScopedSQL } from "../utils";
 
 /**
@@ -15,14 +15,14 @@ import { makeScopedSQL } from "../utils";
  * queries it might end up with different values - this is particularly
  * relevant when using `@stream`/`@defer`, for example.
  */
-type PgStmtDeferredPlaceholder = {
+export type PgStmtDeferredPlaceholder = {
   symbol: symbol;
   dependencyIndex: number;
   codec: PgCodec;
   alreadyEncoded: boolean;
 };
 
-type PgStmtDeferredSQL = {
+export type PgStmtDeferredSQL = {
   symbol: symbol;
   dependencyIndex: number;
 };
@@ -35,13 +35,13 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     exportName: "PgStmtBaseStep",
   };
 
-  protected locker: PgLocker<this> = new PgLocker(this);
+  protected abstract locker: PgLocker<any>;
 
   /**
    * Values used in this plan.
    */
-  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
-  protected deferreds: Array<PgStmtDeferredSQL> = [];
+  protected abstract placeholders: Array<PgStmtDeferredPlaceholder>;
+  protected abstract deferreds: Array<PgStmtDeferredSQL>;
 
   public scopedSQL = makeScopedSQL(this);
 
