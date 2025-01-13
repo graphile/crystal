@@ -2,7 +2,6 @@
 layout: page
 path: /graphile-build/build-object/
 title: The Build Object
-sidebar_position: 6
 ---
 
 The build object contains a number of helpers and sources of information
@@ -12,29 +11,13 @@ every time a new schema is generated a new build object will be used.
 The following properties/methods are available on the initial build object (more
 may be added by plugins via the `build` hook):
 
-## `registerObjectType(typeName, scope, specGenerator, origin)`
+## `newWithHooks(type, spec, scope)`
 
-The bread-and-butter of Graphile Engine, this method is how we register hooked
+The bread-and-butter of Graphile Engine, this method is how we build hooked
 GraphQL objects:
 
 ```js
-build.registerObjectType(
-  "MyType",
-  { isMyType: true },
-  () => {
-    return {
-      fields: {
-        meaningOfLife: {
-          type: graphql.GraphQLInt,
-          plan() {
-            return constant(42);
-          },
-        },
-      },
-    };
-  },
-  "MyType from MyPlugin",
-);
+const MyType = newWithHooks(type, spec, scope);
 ```
 
 - `type` is a GraphQL object type, such as `GraphQLEnumType` or
@@ -46,22 +29,12 @@ build.registerObjectType(
   the `scope` property in the context object passed to hooks (see `Context`
   below)
 
-## `getTypeByName(typeName)`
+## `extend(input, extensions)`
 
-The counterpart to `register*Type`, this is how we retrieve or build the GraphQL
-types that we registered previously.
-
-```js
-const MyType = build.getTypeByName("MyType");
-```
-
-## `extend(input, extensions, origin)`
-
-Returns the input object with `extensions` merged in **without overwriting**.
-If any clashes occur an error will be throw. It is advisable to use this
-instead of `Object.assign` or `{...input, ...extensions}` because it will warn
-you if you're accidentally overwriting something. The origin helps users to
-deal with clashes by determining what this call related to.
+Returns a new object by merging the properties of `input` and `extensions`
+**without overwriting**. If any clashes occur an error will be throw. It is
+advisable to use this instead of `Object.assign` or `{...input, ...extensions}`
+because it will warn you if you're accidentally overwriting something.
 
 ## `graphql`
 
@@ -69,3 +42,36 @@ Equivalent to `require('graphql')`, by using this property you don't have to
 import graphql and you're less likely to get version conflicts which are hard to
 diagnose and resolve. Use of this property over importing `graphql` yourself is
 highly recommended.
+
+## `getTypeByName(typeName)`
+
+Returns the GraphQL type associated with the given name, if it is known to the
+current build, or `null` otherwise. Objects built with `newWithHooks` are
+automatically registered, but external objects must be registered via:
+
+## `addType(type: GraphQLNamedType)`
+
+Registers an external (un-hooked) GraphQL type with the system so that it may be
+referenced via `getTypeByName()`
+
+## `getAliasFromResolveInfo(resolveInfo)`
+
+Use this in your resolver to quickly retrieve the alias that this field was
+requested as.
+
+From
+[`graphql-parse-resolve-info`](https://github.com/graphile/graphile-engine/tree/master/packages/graphql-parse-resolve-info#getaliasfromresolveinforesolveinfo)
+
+<!-- TODO: example -->
+
+## `resolveAlias`
+
+Can be used in place of the `resolve` method for a field if you wish it to
+resolve to the alias the field was requested as (as opposed to its name).
+
+```js
+resolveAlias(data, _args, _context, resolveInfo) {
+  const alias = getAliasFromResolveInfo(resolveInfo);
+  return data[alias];
+}
+```

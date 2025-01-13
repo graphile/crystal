@@ -2,116 +2,89 @@
 layout: page
 path: /graphile-build/context-object/
 title: The Context Object
-sidebar_position: 7
 ---
 
 Whereas the `Build` object is the same for all hooks (except the `build` hook
 which constructs it) within an individual build, the `Context` object changes
 for each hook. Different hooks have different values available to them on the
-`Context` object; you can explore what they are through TypeScript auto-completion.
+`Context` object and sadly we've not documented all these yet so you may have to
+do some inspection!
 
 The main ones are:
 
 ### `scope`
 
-An object based on the second argument to `register*Type` or `fieldWithHooks` -
+An object based on the third argument to `newWithHooks` or `fieldWithHooks` -
 this is useful for filtering which objects a particular hook should apply to.
 
-For deeper hooks (such as `GraphQLObjectType_fields_field`) the scope from
-shallower hooks (such as `GraphQLObjectType`) are merged in; it's thus
-advisable to ensure that field hooks contain the word `field` in each of the
-scopes added, and so on.
+For deeper hooks (such as `GraphQLObjectType:fields:field`) the scope from
+shallower hooks (such as `GraphQLObjectType`) are merged in.
 
 For example you might use a hook such as this to add a description to the
 `clientMutationId` field on all mutation input objects:
 
-```js
-const MyPlugin = {
-  name: "MyPlugin",
-  version: "0.0.0",
-
-  schema: {
-    hooks: {
-      GraphQLInputObjectType_fields_field(
-        field,
-        { extend },
-        { scope: { isMutationInput, fieldName } },
-      ) {
-        // highlight-start
-        if (
-          !isMutationInput ||
-          fieldName !== "clientMutationId" ||
-          field.description != null
-        ) {
-          return field;
-        }
-        return extend(field, {
-          description:
-            "An arbitrary string value with no semantic meaning. " +
-            "Will be included in the payload verbatim. " +
-            "May be used to track mutations by the client.",
-        });
-        // highlight-end
-      },
-    },
-  },
-};
+```js{5,7-11}
+builder.hook(
+  "GraphQLInputObjectType:fields:field",
+  (field, { extend }, { scope: { isMutationInput, fieldName } }) => {
+    if (
+      !isMutationInput ||
+      fieldName !== "clientMutationId" ||
+      field.description != null
+    ) {
+      return field;
+    }
+    return extend(field, {
+      description:
+        "An arbitrary string value with no semantic meaning. " +
+        "Will be included in the payload verbatim. " +
+        "May be used to track mutations by the client.",
+    });
+  }
+);
 ```
 
 ### `Self`
 
 Whilst only available on hooks that are called after the object is created (e.g.
-`GraphQLObjectType_fields`), this field is useful because it contains the object
+`GraphQLObjectType:fields`), this field is useful because it contains the object
 that has been created; allowing circular references to be built. A common
 use-case for this is the root `Query` object referencing itself with the `query`
 field to work around some issues in Relay 1.
 
-### `fieldWithHooks(scope, spec)`
+### `fieldWithHooks(fieldName, spec, scope = {})`
 
-Available on hooks `GraphQLObjectType_fields` and
-`GraphQLInputObjectType_fields`, this function is useful for providing scopes
-so that fields can be hooked by other plugins. If you don't call this, it will
-be called for you at a later time.
+Available on hooks `GraphQLObjectType:fields` and
+`GraphQLInputObjectType:fields`, this function is useful for adding hooks early
+(for example if you need to call `addDataGenerator(...)`). If you don't call
+this, it will be called for you at a later time.
 
-```js
-const MyPlugin = {
-  name: "MyPlugin",
-  version: "0.0.0",
-
-  schema: {
-    hooks: {
-      GraphQLInputObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: { GraphQLNonNull, GraphQLString },
-        } = build;
-        // highlight-next-line
-        const { fieldWithHooks } = context;
-        // TODO: if (...) return fields;
-        return extend(
-          fields,
-          {
-            // highlight-start
-            helloWorld: fieldWithHooks(
-              // The scope
-              { fieldName: "helloWorld", isHelloWorldField: true },
-
-              // The spec generator
-              () => ({
-                type: new GraphQLNonNull(GraphQLString),
-                plan() {
-                  return constant("Hello World");
-                },
-              }),
-            ),
-            // highlight-end
-          },
-          "Adding helloWorld from 'MyPlugin'",
-        );
-      },
-    },
+```js{5,9-19}
+builder.hook("GraphQLInputObjectType:fields",
+  (
+    fields,
+    { extend, resolveAlias },
+    { fieldWithHooks }
+  ) => {
+    // TODO: if (...) return fields;
+    return extend(fields, {
+      id: fieldWithHooks("id", ({ addDataGenerator }) => {
+        addDataGenerator(({ alias }) => {
+          return {
+            map: obj => ({ [alias]: obj.ID }),
+          };
+        });
+        return {
+          type: new GraphQLNonNull(GraphQLString),
+          resolve: resolveAlias,
+        };
+      }),
+    };
   },
-};
+});
 ```
+
+See also:
+[Look ahead](/graphile-build/look-ahead/#when-creating-an-individual-field).
 
 <!-- TODO: add more context properties -->
