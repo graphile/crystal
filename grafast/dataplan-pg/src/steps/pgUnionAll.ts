@@ -1542,12 +1542,7 @@ and ${condition(i + 1)}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { count, values } = executionDetails;
     const { typeIdx, reverse } = this;
 
     const memberCodecs = this.memberDigests.map(
