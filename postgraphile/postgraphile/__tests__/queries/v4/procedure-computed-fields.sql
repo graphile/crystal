@@ -1,47 +1,42 @@
-select __person_result__.*
-from (select 0 as idx, $16::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    ("c"."person_optional_missing_middle_1"(
-      __person__,
-      $1::"int4",
-      "c" := $2::"int4"
-    ))::text as "0",
-    ("c"."person_optional_missing_middle_1"(
-      __person__,
-      $3::"int4",
-      $4::"int4",
-      $5::"int4"
-    ))::text as "1",
-    ("c"."person_optional_missing_middle_2"(
-      __person__,
-      $6::"int4",
-      "c" := $7::"int4"
-    ))::text as "2",
-    ("c"."person_optional_missing_middle_3"(
-      __person__,
-      $8::"int4",
-      "c" := $9::"int4"
-    ))::text as "3",
-    ("c"."person_optional_missing_middle_4"(
-      __person__,
-      $10::"int4",
-      $11::"int4",
-      $12::"int4"
-    ))::text as "4",
-    ("c"."person_optional_missing_middle_5"(
-      __person__,
-      $13::"int4",
-      $14::"int4",
-      $15::"int4"
-    ))::text as "5",
-    __person__."id"::text as "6",
-    __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-) as __person_result__;
+select
+  ("c"."person_optional_missing_middle_1"(
+    __person__,
+    $1::"int4",
+    "c" := $2::"int4"
+  ))::text as "0",
+  ("c"."person_optional_missing_middle_1"(
+    __person__,
+    $3::"int4",
+    $4::"int4",
+    $5::"int4"
+  ))::text as "1",
+  ("c"."person_optional_missing_middle_2"(
+    __person__,
+    $6::"int4",
+    "c" := $7::"int4"
+  ))::text as "2",
+  ("c"."person_optional_missing_middle_3"(
+    __person__,
+    $8::"int4",
+    "c" := $9::"int4"
+  ))::text as "3",
+  ("c"."person_optional_missing_middle_4"(
+    __person__,
+    $10::"int4",
+    $11::"int4",
+    $12::"int4"
+  ))::text as "4",
+  ("c"."person_optional_missing_middle_5"(
+    __person__,
+    $13::"int4",
+    $14::"int4",
+    $15::"int4"
+  ))::text as "5",
+  __person__."id"::text as "6"
+from "c"."person" as __person__
+where (
+  __person__."id" = $16::"int4"
+);
 
 select
   __frmcdc_compound_type__."a"::text as "0",

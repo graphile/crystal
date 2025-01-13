@@ -29,21 +29,16 @@ where (
   true /* authorization checks */
 );
 
-select __people_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
-lateral (
-  select
-    __people__."person_id"::text as "0",
-    __people__."username" as "1",
-    __people_identifiers__.idx as "2"
-  from interfaces_and_unions.people as __people__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __people__."person_id" = __people_identifiers__."id0"
-    )
-) as __people_result__;
+select
+  __people__."person_id"::text as "0",
+  __people__."username" as "1"
+from interfaces_and_unions.people as __people__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __people__."person_id" = $1::"int4"
+  );
 
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning
   __relational_posts__."id"::text as "0",

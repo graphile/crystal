@@ -84,38 +84,28 @@ from (
 ) __vulnerabilities__
 
 
-select __first_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __first_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __first_party_vulnerabilities__."cvss_score"::text as "0",
-    __first_party_vulnerabilities__."id"::text as "1",
-    __first_party_vulnerabilities__."name" as "2",
-    __first_party_vulnerabilities__."team_name" as "3",
-    __first_party_vulnerabilities_identifiers__.idx as "4"
-  from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
-    )
-) as __first_party_vulnerabilities_result__;
+select
+  __first_party_vulnerabilities__."cvss_score"::text as "0",
+  __first_party_vulnerabilities__."id"::text as "1",
+  __first_party_vulnerabilities__."name" as "2",
+  __first_party_vulnerabilities__."team_name" as "3"
+from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __first_party_vulnerabilities__."id" = $1::"int4"
+  );
 
-select __third_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __third_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __third_party_vulnerabilities__."cvss_score"::text as "0",
-    __third_party_vulnerabilities__."id"::text as "1",
-    __third_party_vulnerabilities__."name" as "2",
-    __third_party_vulnerabilities__."vendor_name" as "3",
-    __third_party_vulnerabilities_identifiers__.idx as "4"
-  from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
-    )
-) as __third_party_vulnerabilities_result__;
+select
+  __third_party_vulnerabilities__."cvss_score"::text as "0",
+  __third_party_vulnerabilities__."id"::text as "1",
+  __third_party_vulnerabilities__."name" as "2",
+  __third_party_vulnerabilities__."vendor_name" as "3"
+from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __third_party_vulnerabilities__."id" = $1::"int4"
+  );

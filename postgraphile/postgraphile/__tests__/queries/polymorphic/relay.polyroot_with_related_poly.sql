@@ -92,17 +92,12 @@ lateral (
   )
 ) as __relational_dividers_result__;
 
-select __relational_checklists_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __relational_checklists_identifiers__,
-lateral (
-  select
-    __relational_checklists__."checklist_item_id"::text as "0",
-    __relational_checklists_identifiers__.idx as "1"
-  from "polymorphic"."relational_checklists" as __relational_checklists__
-  where (
-    __relational_checklists__."checklist_item_id" = __relational_checklists_identifiers__."id0"
-  )
-) as __relational_checklists_result__;
+select
+  __relational_checklists__."checklist_item_id"::text as "0"
+from "polymorphic"."relational_checklists" as __relational_checklists__
+where (
+  __relational_checklists__."checklist_item_id" = $1::"int4"
+);
 
 select __relational_checklist_items_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklist_items_identifiers__,
@@ -115,6 +110,13 @@ lateral (
     __relational_checklist_items__."checklist_item_item_id" = __relational_checklist_items_identifiers__."id0"
   )
 ) as __relational_checklist_items_result__;
+
+select
+  __relational_checklist_items__."checklist_item_item_id"::text as "0"
+from "polymorphic"."relational_checklist_items" as __relational_checklist_items__
+where (
+  __relational_checklist_items__."checklist_item_item_id" = $1::"int4"
+);
 
 select __relational_items_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_items_identifiers__,
@@ -185,3 +187,22 @@ lateral (
     __relational_items_2."id" = __relational_items_identifiers__."id0"
   )
 ) as __relational_items_result__;
+
+select
+  __relational_posts__."post_item_id"::text as "0"
+from "polymorphic"."relational_posts" as __relational_posts__
+where (
+  __relational_posts__."post_item_id" = $1::"int4"
+);
+
+select __relational_checklists_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklists_identifiers__,
+lateral (
+  select
+    __relational_checklists__."checklist_item_id"::text as "0",
+    __relational_checklists_identifiers__.idx as "1"
+  from "polymorphic"."relational_checklists" as __relational_checklists__
+  where (
+    __relational_checklists__."checklist_item_id" = __relational_checklists_identifiers__."id0"
+  )
+) as __relational_checklists_result__;

@@ -89,106 +89,71 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "7",
   __person__."id"::text as "8";
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" asc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc, __person__."id" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc, __person__."id" desc;
 
 select
   ("c"."person_exists"(
@@ -209,106 +174,71 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "7",
   __person__."id"::text as "8";
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" asc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc, __person__."id" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc, __person__."id" desc;
 
 select
   ("c"."person_exists"(
@@ -323,31 +253,21 @@ insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1"
   __compound_key__."person_id_1"::text as "1",
   __compound_key__."person_id_2"::text as "2";
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
 
 insert into "c"."edge_case" as __edge_case__ ("not_null_has_default") values ($1::"bool") returning
   __edge_case__."not_null_has_default"::text as "0";
@@ -366,106 +286,71 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "7",
   __person__."id"::text as "8";
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person_identifiers__.idx as "2"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."id" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" asc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" asc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc;
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."email" as "0",
-    __person__."id"::text as "1",
-    __person__."person_full_name" as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-  order by __person__."email" desc, __person__."id" desc
-) as __person_result__;
+select
+  __person__."email" as "0",
+  __person__."id"::text as "1",
+  __person__."person_full_name" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+)
+order by __person__."email" desc, __person__."id" desc;
 
 select
   ("c"."person_exists"(
@@ -513,43 +398,33 @@ insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values
   __post__."id"::text as "2",
   __post__."author_id"::text as "3";
 
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."email" as "1",
-    to_char(__person__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "2",
-    __person_identifiers__.idx as "3"
-  from "c"."person" as __person__
-  where (
-    __person__."id" = __person_identifiers__."id0"
-  )
-) as __person_result__;
+select
+  __person__."id"::text as "0",
+  __person__."email" as "1",
+  to_char(__person__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
 
-select __post_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    (select json_agg(s) from (
-      select
-        to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
-        __frmcdc_comptype__."is_optimised"::text as "1",
-        (not (__frmcdc_comptype__ is null))::text as "2"
-      from unnest(__post__."comptypes") as __frmcdc_comptype__
-    ) s) as "2",
-    __person__."person_full_name" as "3",
-    __post_identifiers__.idx as "4"
-  from "a"."post" as __post__
-  left outer join "c"."person" as __person__
-  on (__post__."author_id"::"int4" = __person__."id")
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-  order by __post__."id" asc
-) as __post_result__;
+select
+  __post__."id"::text as "0",
+  __post__."headline" as "1",
+  (select json_agg(s) from (
+    select
+      to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+      __frmcdc_comptype__."is_optimised"::text as "1",
+      (not (__frmcdc_comptype__ is null))::text as "2"
+    from unnest(__post__."comptypes") as __frmcdc_comptype__
+  ) s) as "2",
+  __person__."person_full_name" as "3"
+from "a"."post" as __post__
+left outer join "c"."person" as __person__
+on (__post__."author_id"::"int4" = __person__."id")
+where (
+  __post__."id" = $1::"int4"
+)
+order by __post__."id" asc;
 
 select
   to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
