@@ -866,7 +866,6 @@ export interface BatchExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: true;
   entries: ReadonlyArray<TData>;
-  value?: never;
   /** @internal */
   readonly _flags: Array<ExecutionEntryFlags>;
 }
@@ -874,7 +873,6 @@ export interface UnaryExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: false;
   value: TData;
-  entries?: never;
   /** @internal */
   _entryFlags: ExecutionEntryFlags;
 }
