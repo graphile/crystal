@@ -1,25 +1,41 @@
-# Graphile Build pg
+# Overview
 
 `graphile-build-pg` is a collection of [graphile-build](/graphile-build) plugins that extend
 your GraphQL schema with types and fields based on the tables, views, functions
 and other resources in your PostgreSQL database.
 
-This is achieved by introspecting your database with [pg-introspection](https://star.graphile.org/pg-introspection/) and
-then building a [@dataplan/pg](https://grafast.org/grafast/step-library/dataplan-pg/) registry (composed of codecs, resources and
-relations) for these entities. Then our plugins inspect this registry and
-creates the relevant GraphQL types, fields, and [Gra*fast*](https://grafast.org) plan resolver
-functions. The result is a high-performance, powerful, auto-generated but highly
-flexible GraphQL schema.
+## About
 
-If you don't want to use your database introspection results to generate the
-schema, you can instead build the registry yourself giving you full control over
-what goes into your GraphQL API whilst still saving you significant effort
-versus writing the schema without auto-generation.
+Thanks to Graphile Engine's advanced [query look-ahead](../graphile-build/look-ahead) features, the plugins in this package do not exhibit the N+1 query problem common in many database-based GraphQL APIs. For all but the flattest GraphQL queries, these plugins typically outperform `DataLoader`-based solutions.
 
-`graphile-build-pg` is a core component of [PostGraphile](https://postgraphile.org), a library that
-helps you craft your ideal, incredibly performant, best practices GraphQL API
-backed primarily by a PostgreSQL database with minimal developer effort.
+An example of an application built on `graphile-build-pg` is [PostGraphile](http://postgraphile.org) which with one command connects to your PostgreSQL database and provides a full highly performant standards-compliant GraphQL API.
 
-# About
+**It is recommended that you use PostGraphile directly unless you really want to get low level access to this library.**
 
-Thanks to Gra*fast*&lsquo;s query planning capabilities, the plugins in this package do not exhibit the N+1 query problem common in many database-based GraphQL APIs; for all but the flattest GraphQL queries these plugins typically significantly outperform `DataLoader`-based solutions &mdash; and the more complex your GraphQL query becomes the greater the benefit.
+If you prefer to use the plugins yourself it's advised that you use the `defaultPlugins` export from `graphile-build-pg` and then create a new array based on that into which you may insert or remove specific plugins. This is because it is ordered in a way to ensure the plugins work correctly (and we may still split up or restructure the plugins).
+
+### Export: defaultPlugins
+
+An array of graphql-build plugins in the correct order to generate a well-thought-out GraphQL object tree based on your PostgreSQL schema. This is the array that postgraphile-core uses.
+
+### Manual usage
+
+```js
+import { defaultPlugins, getBuilder } from "graphile-build";
+import { defaultPlugins as pgDefaultPlugins } from "graphile-build-pg";
+
+async function getSchema(
+  pgConfig = process.env.DATABASE_URL,
+  pgSchemas = ["public"],
+  additionalPlugins = [],
+) {
+  return getBuilder(
+    [...defaultPlugins, ...pgDefaultPlugins, ...additionalPlugins],
+    {
+      pgConfig,
+      pgSchemas,
+      pgExtendedTypes: true,
+    },
+  );
+}
+```
