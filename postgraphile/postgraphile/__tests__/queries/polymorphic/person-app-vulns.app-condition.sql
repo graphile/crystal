@@ -6,7 +6,7 @@ order by __people__."person_id" asc
 limit 4;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"text" as "id1", (ids.value->>2)::"text" as "id2", (ids.value->>3)::"json" as "id3" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($5::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __applications__."0" as "0",
@@ -27,13 +27,13 @@ lateral (
           ) as "n"
         from "polymorphic"."aws_applications" as __aws_applications__
         where __aws_applications__."person_id" = __union_identifiers__."id0"
-        and __aws_applications__."name" = __union_identifiers__."id1"
+        and __aws_applications__."name" = $1::"text"
         and (
-          ('AwsApplication' > __union_identifiers__."id2")
+          ('AwsApplication' > $2::"text")
           or (
-            'AwsApplication' = __union_identifiers__."id2"
+            'AwsApplication' = $2::"text"
             and (
-              __aws_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
+              __aws_applications__."id" > ($3::"json"->>0)::"int4"
             )
           )
         )
@@ -56,13 +56,13 @@ lateral (
           ) as "n"
         from "polymorphic"."gcp_applications" as __gcp_applications__
         where __gcp_applications__."person_id" = __union_identifiers__."id0"
-        and __gcp_applications__."name" = __union_identifiers__."id1"
+        and __gcp_applications__."name" = $4::"text"
         and (
-          ('GcpApplication' > __union_identifiers__."id2")
+          ('GcpApplication' > $2::"text")
           or (
-            'GcpApplication' = __union_identifiers__."id2"
+            'GcpApplication' = $2::"text"
             and (
-              __gcp_applications__."id" > (__union_identifiers__."id3"->>0)::"int4"
+              __gcp_applications__."id" > ($3::"json"->>0)::"int4"
             )
           )
         )

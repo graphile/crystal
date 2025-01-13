@@ -15,7 +15,7 @@ lateral (
 ) as __union_items_result__;
 
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from (select ids.ordinality - 1 as idx from json_array_elements($2::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
     __union__."0" as "0",
@@ -35,7 +35,7 @@ lateral (
               __union_topics__."id" asc
           ) as "n"
         from interfaces_and_unions.union_topics as __union_topics__
-        where __union_topics__.id = __union_identifiers__."id0"
+        where __union_topics__.id = $1::"int4"
         order by
           __union_topics__."id" asc
       ) as __union_topics__
@@ -53,7 +53,7 @@ lateral (
               __union_posts__."id" asc
           ) as "n"
         from interfaces_and_unions.union_posts as __union_posts__
-        where __union_posts__.id = __union_identifiers__."id0"
+        where __union_posts__.id = $1::"int4"
         order by
           __union_posts__."id" asc
       ) as __union_posts__
@@ -71,7 +71,7 @@ lateral (
               __union_dividers__."id" asc
           ) as "n"
         from interfaces_and_unions.union_dividers as __union_dividers__
-        where __union_dividers__.id = __union_identifiers__."id0"
+        where __union_dividers__.id = $1::"int4"
         order by
           __union_dividers__."id" asc
       ) as __union_dividers__
@@ -89,7 +89,7 @@ lateral (
               __union_checklists__."id" asc
           ) as "n"
         from interfaces_and_unions.union_checklists as __union_checklists__
-        where __union_checklists__.id = __union_identifiers__."id0"
+        where __union_checklists__.id = $1::"int4"
         order by
           __union_checklists__."id" asc
       ) as __union_checklists__
@@ -107,7 +107,7 @@ lateral (
               __union_checklist_items__."id" asc
           ) as "n"
         from interfaces_and_unions.union_checklist_items as __union_checklist_items__
-        where __union_checklist_items__.id = __union_identifiers__."id0"
+        where __union_checklist_items__.id = $1::"int4"
         order by
           __union_checklist_items__."id" asc
       ) as __union_checklist_items__
