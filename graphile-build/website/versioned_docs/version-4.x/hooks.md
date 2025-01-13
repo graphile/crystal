@@ -1,7 +1,6 @@
 ---
-layout: page
-path: /graphile-build/hooks/
 title: Hooks
+toc_max_heading_level: 4
 ---
 
 The most common thing for a plugin to do is to add hooks to the builder.

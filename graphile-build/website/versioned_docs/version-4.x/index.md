@@ -1,6 +1,5 @@
 ---
 title: "Overview"
-sidebar_position: 1
 hide_table_of_contents: true
 ---
 
@@ -10,11 +9,11 @@ Proof of concept was built by [@Benjie](https://benjie.dev) in 2017, growing out
 
 In versions later than 4.x, Graphile Engine has been rewritten and split into two parts: the _engine_ became the basis for [Gra*fast*](https://grafast.org) and the remaining project renamed Graphile Build.
 
-## Graphile Engine for pluggable GraphQL APIs
+### Graphile Engine for pluggable GraphQL APIs
 
 Using Graphile Engine's plugin architecture you can rapidly generate high-performance extensible GraphQL schemas by combining plugins and leveraging advanced look-ahead features.
 
-##### Build your schema with plugins
+#### Build your schema with plugins
 
 ```js
 buildSchema(plugins);
@@ -30,7 +29,7 @@ type Person {
   #...
 ```
 
-##### Transform your schema with ease
+#### Transform your schema with ease
 
 ```js
 buildSchema([...plugins, DeprecateFromCommentPlugin]);
@@ -47,7 +46,7 @@ type Person {
   #...
 ```
 
-## Graphile Engine for GraphQL performance
+### Graphile Engine for GraphQL performance
 
 Say Goodbye to the N+1 problem; fewer round-trips means higher performance.
 
@@ -59,7 +58,7 @@ leading to fewer round-trips and higher performance.
 nested requests with just one SQL query. Result: significantly reduced query
 latency and massive performance increase.
 
-## Automatically build GraphQL objects and fields through database introspection
+### Automatically build GraphQL objects and fields through database introspection
 
 The core `graphile-build` library treats GraphQL as a first-class target, and
 out of the box does not discriminate between your datastore. By using plugins to
@@ -75,12 +74,12 @@ the core of [PostGraphile 4.0](https://postgraphile.org).
 
 You can build plugins for anything that Node.js can communicate with.
 
-## Straightforward integration
+### Straightforward integration
 
 If you're already building with the reference implementation of GraphQL from
 Facebook then adding hooks is fairly straightforward:
 
-##### `graphql`
+#### `graphql`
 
 ```js
 const MyType =
@@ -91,7 +90,7 @@ const MyType =
       // ...
 ```
 
-##### `graphile-build`
+#### `graphile-build`
 
 ```js
 const MyType =
@@ -102,23 +101,23 @@ const MyType =
       // ...
 ```
 
-## Fully GraphQL compatible
+### Fully GraphQL compatible
 
-Graphile uses the <a href="http://graphql.org/graphql-js/">reference GraphQL
+Graphile Engine uses the <a href="http://graphql.org/graphql-js/">reference GraphQL
 implementation</a> under the hood, so you know it's spec compliant.
 
 This also means you can mix it into existing GraphQL APIs, or mix existing
 GraphQL object types into it (so long as they use the reference GraphQL
 implementation too).
 
-## Automatically update your running GraphQL schema without the need to restart
+### Automatically update your running GraphQL schema without the need to restart
 
 For example: when your underlying data structure changes your Graphile Build
 plugins can [trigger a rebuild](./schema-builder#registerwatcherwatcher-unwatcher) event and you'll automatically be supplied with a
 fresh new GraphQL schema to replace the out-of-date one - no need to restart
 your server!
 
-## Quick to start
+### Quick to start
 
 ```js
 import { buildSchema, defaultPreset } from "graphile-build";

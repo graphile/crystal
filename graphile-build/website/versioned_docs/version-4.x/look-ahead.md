@@ -27,7 +27,7 @@ is actually called with 4 arguments:
 This 4th argument is the one we're interested in because it contains a number of
 goodies. But some of these are hard to digest, so we give you some helpers...
 
-##### `parseResolveInfo(resolveInfo)`
+#### `parseResolveInfo(resolveInfo)`
 
 Will take the AST from the GraphQLResolveInfo and extract from it a nested
 object consisting of:
@@ -48,7 +48,7 @@ From
 
 <!-- TODO: example -->
 
-##### `simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, graphQLType)`
+#### `simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, graphQLType)`
 
 If you know the precise named type that your field will return you can pass the
 result of `parseResolveInfo(resolveInfo)` to this method along with the named

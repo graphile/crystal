@@ -1,13 +1,12 @@
 ---
 title: Plugins
+toc_max_heading_level: 4
 ---
 
-<p class="intro">
 Almost everything in Graphile Engine is accomplished through plugins. You can
 add plugins, remove plugins, even replace the entire stack if you so desire.
-</p>
 
-## Loading Plugins
+### Loading Plugins
 
 Plugins are loaded when you call
 [`buildSchema(plugins, options)`](./graphile-build#buildschemaplugins-options)
@@ -33,7 +32,7 @@ buildSchema(plugins).then((schema) => {
 });
 ```
 
-## Writing Plugins
+### Writing Plugins
 
 Graphile Engine plugins are simple functions that interact with
 [the `SchemaBuilder`](./schema-builder), most commonly by
@@ -97,7 +96,7 @@ type Query implements Node {
 
 </details>
 
-### Plugin actions
+#### Plugin actions
 
 Whilst a plugin is being executed it can perform actions on the
 [`builder` object](./schema-builder), its first argument.
@@ -112,7 +111,7 @@ The most common actions for a plugin are:
 - Add watch-mode event listeners, using
   [`builder.registerWatcher(watcher, unwatcher)`](./schema-builder#registerwatcherwatcher-unwatcher)
 
-### An example plugin
+#### An example plugin
 
 This plugin will add a field `random(sides: Int)` to every GraphQLObjectType
 that is generated with hooks:
@@ -171,7 +170,7 @@ an additional property `field` which is a standard GraphQL field config
 `GraphQLFieldConfig` - see the
 [GraphQL-js documentation](http://graphql.org/graphql-js/type/#graphqlobjecttype).
 
-### Plugin arguments
+#### Plugin arguments
 
 Plugins are called with just two arguments:
 
