@@ -1835,9 +1835,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       // NOTE: we're NOT adding to `this.identifierMatches`.
 
       const { symbol, dependencyIndex, codec } = placeholder;
-      const val = values[dependencyIndex];
-      if (!val.isBatch || count == 1) {
-        const value = val.unaryValue();
+      const ev = values[dependencyIndex];
+      if (!ev.isBatch || count == 1) {
+        const value = ev.at(0);
         placeholderValues.set(
           symbol,
           sql`${sql.value(value == null ? null : codec.toPg(value))}::${
