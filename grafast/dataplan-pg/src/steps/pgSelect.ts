@@ -400,7 +400,7 @@ export class PgSelectStep<
 
   protected placeholders: Array<PgStmtDeferredPlaceholder>;
   protected deferreds: Array<PgStmtDeferredSQL>;
-  private placeholderValues: Map<symbol, SQL>;
+  private fixedPlaceholderValues: Map<symbol, SQL>;
 
   /**
    * If true, we don't need to add any of the security checks from the
@@ -546,8 +546,8 @@ export class PgSelectStep<
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.deferreds = cloneFrom ? [...cloneFrom.deferreds] : [];
-    this.placeholderValues = cloneFrom
-      ? new Map(cloneFrom.placeholderValues)
+    this.fixedPlaceholderValues = cloneFrom
+      ? new Map(cloneFrom.fixedPlaceholderValues)
       : new Map();
     this.joinAsLateral =
       (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
@@ -1502,9 +1502,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             o,
             this.resource.codec,
           );
-          return sql.compile(frag, {
-            placeholderValues: this.placeholderValues,
-          }).text;
+          const placeholderValues = new Map<symbol, SQL>(
+            this.fixedPlaceholderValues,
+          );
+          for (let i = 0; i < this.placeholders.length; i++) {
+            const { symbol } = this.placeholders[i];
+            placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+          }
+          return sql.compile(frag, { placeholderValues }).text;
         }),
       ),
     );
@@ -1822,6 +1827,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         codec,
       });
     }
+    const placeholderValues = new Map<symbol, SQL>(this.fixedPlaceholderValues);
 
     this.placeholders.forEach((placeholder) => {
       // NOTE: we're NOT adding to `this.identifierMatches`.
@@ -1844,7 +1850,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             }) - 1;
 
       // Finally alias this symbol to a reference to this placeholder
-      this.placeholderValues.set(
+      placeholderValues.set(
         placeholder.symbol,
         sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
       );
@@ -2071,7 +2077,7 @@ ${lateralText};`;
           identifierIndex: initialFetchIdentifierIndex,
         } = makeQuery({
           limit: this.streamOptions.initialCount,
-          options: { placeholderValues: this.placeholderValues },
+          options: { placeholderValues },
         });
         const {
           text: textForDeclare,
@@ -2079,7 +2085,7 @@ ${lateralText};`;
           identifierIndex: streamIdentifierIndex,
         } = makeQuery({
           offset: this.streamOptions.initialCount,
-          options: { placeholderValues: this.placeholderValues },
+          options: { placeholderValues },
         });
         if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
           throw new Error(
@@ -2110,7 +2116,7 @@ ${lateralText};`;
         } = makeQuery({
           offset: 0,
           options: {
-            placeholderValues: this.placeholderValues,
+            placeholderValues,
           },
         });
         return {
@@ -2131,7 +2137,7 @@ ${lateralText};`;
     } else {
       const { text, rawSqlValues, textForSingle, identifierIndex } = makeQuery({
         options: {
-          placeholderValues: this.placeholderValues,
+          placeholderValues,
         },
       });
       return {
@@ -2401,7 +2407,7 @@ ${lateralText};`;
         });
       } else if (dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
-        otherPlan.placeholderValues.set(placeholder.symbol, dep.toSQL());
+        otherPlan.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
       } else {
         throw new Error(
           `Could not merge placeholder from unsupported plan type: ${dep}`,
@@ -2411,16 +2417,17 @@ ${lateralText};`;
     for (const [
       sqlPlaceholder,
       placeholderValue,
-    ] of this.placeholderValues.entries()) {
+    ] of this.fixedPlaceholderValues.entries()) {
       if (
-        otherPlan.placeholderValues.has(sqlPlaceholder) &&
-        otherPlan.placeholderValues.get(sqlPlaceholder) !== placeholderValue
+        otherPlan.fixedPlaceholderValues.has(sqlPlaceholder) &&
+        otherPlan.fixedPlaceholderValues.get(sqlPlaceholder) !==
+          placeholderValue
       ) {
         throw new Error(
           `${otherPlan} already has an identical placeholder with a different value when trying to mergePlaceholdersInto it from ${this}`,
         );
       }
-      otherPlan.placeholderValues.set(sqlPlaceholder, placeholderValue);
+      otherPlan.fixedPlaceholderValues.set(sqlPlaceholder, placeholderValue);
     }
   }
 
