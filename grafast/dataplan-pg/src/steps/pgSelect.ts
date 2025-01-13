@@ -505,6 +505,7 @@ export class PgSelectStep<
               args: null,
               name: optionsOrCloneFrom.name,
               mode: undefined,
+              joinAsLateral: optionsOrCloneFrom.joinAsLateral,
               forceIdentity: optionsOrCloneFrom.forceIdentity,
             },
           ]
@@ -565,9 +566,7 @@ export class PgSelectStep<
     this.fixedPlaceholderValues = cloneFrom
       ? new Map(cloneFrom.fixedPlaceholderValues)
       : new Map();
-    this.joinAsLateral =
-      (cloneFrom ? cloneFrom.joinAsLateral : inJoinAsLateral) ??
-      !!this.resource.parameters;
+    this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
     this.forceIdentity = inForceIdentity;
     if (cloneFrom !== null) {
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
