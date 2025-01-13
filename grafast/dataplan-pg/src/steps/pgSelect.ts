@@ -1847,7 +1847,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const { symbol, dependencyIndex, codec } = placeholder;
       const val = values[dependencyIndex];
       if (!val.isBatch || count == 1) {
-        const value = val.at(0);
+        const value = val.unaryValue();
         placeholderValues.set(
           symbol,
           sql`${sql.value(value == null ? null : codec.toPg(value))}::${
