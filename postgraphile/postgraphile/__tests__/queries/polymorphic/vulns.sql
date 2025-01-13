@@ -129,182 +129,173 @@ lateral (
   )
 ) as __third_party_vulnerabilities_result__;
 
-select __union_result__.*
-from (select ids.ordinality - 1 as idx from json_array_elements($4::json) with ordinality as ids) as __union_identifiers__,
-lateral (
-  select
-    __vulnerability__."0"::text as "0",
-    __vulnerability__."1" as "1",
-    __vulnerability__."2"::text as "2",
-    __union_identifiers__.idx as "3"
-  from (
+select
+  __vulnerability__."0"::text as "0",
+  __vulnerability__."1" as "1",
+  __vulnerability__."2"::text as "2"
+from (
+    select
+      __first_party_vulnerabilities__."0",
+      __first_party_vulnerabilities__."1",
+      __first_party_vulnerabilities__."2",
+      "n"
+    from (
       select
-        __first_party_vulnerabilities__."0",
-        __first_party_vulnerabilities__."1",
-        __first_party_vulnerabilities__."2",
-        "n"
-      from (
-        select
-          __first_party_vulnerabilities__."cvss_score" as "0",
-          'FirstPartyVulnerability' as "1",
-          json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
-          row_number() over (
-            order by
-              __first_party_vulnerabilities__."cvss_score" desc,
-              __first_party_vulnerabilities__."id" asc
-          ) as "n"
-        from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-        where (
-          (__first_party_vulnerabilities__."cvss_score" < $1::"float8")
-          or (
-            __first_party_vulnerabilities__."cvss_score" = $1::"float8"
-            and (
-              ('FirstPartyVulnerability' > $2::"text")
-              or (
-                'FirstPartyVulnerability' = $2::"text"
-                and (
-                  __first_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
-                )
+        __first_party_vulnerabilities__."cvss_score" as "0",
+        'FirstPartyVulnerability' as "1",
+        json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __first_party_vulnerabilities__."cvss_score" desc,
+            __first_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+      where (
+        (__first_party_vulnerabilities__."cvss_score" < $1::"float8")
+        or (
+          __first_party_vulnerabilities__."cvss_score" = $1::"float8"
+          and (
+            ('FirstPartyVulnerability' > $2::"text")
+            or (
+              'FirstPartyVulnerability' = $2::"text"
+              and (
+                __first_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
               )
             )
           )
         )
-        order by
-          __first_party_vulnerabilities__."cvss_score" desc,
-          __first_party_vulnerabilities__."id" asc
-        limit 3
-      ) as __first_party_vulnerabilities__
-    union all
+      )
+      order by
+        __first_party_vulnerabilities__."cvss_score" desc,
+        __first_party_vulnerabilities__."id" asc
+      limit 3
+    ) as __first_party_vulnerabilities__
+  union all
+    select
+      __third_party_vulnerabilities__."0",
+      __third_party_vulnerabilities__."1",
+      __third_party_vulnerabilities__."2",
+      "n"
+    from (
       select
-        __third_party_vulnerabilities__."0",
-        __third_party_vulnerabilities__."1",
-        __third_party_vulnerabilities__."2",
-        "n"
-      from (
-        select
-          __third_party_vulnerabilities__."cvss_score" as "0",
-          'ThirdPartyVulnerability' as "1",
-          json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
-          row_number() over (
-            order by
-              __third_party_vulnerabilities__."cvss_score" desc,
-              __third_party_vulnerabilities__."id" asc
-          ) as "n"
-        from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-        where (
-          (__third_party_vulnerabilities__."cvss_score" < $1::"float8")
-          or (
-            __third_party_vulnerabilities__."cvss_score" = $1::"float8"
-            and (
-              ('ThirdPartyVulnerability' > $2::"text")
-              or (
-                'ThirdPartyVulnerability' = $2::"text"
-                and (
-                  __third_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
-                )
+        __third_party_vulnerabilities__."cvss_score" as "0",
+        'ThirdPartyVulnerability' as "1",
+        json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __third_party_vulnerabilities__."cvss_score" desc,
+            __third_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+      where (
+        (__third_party_vulnerabilities__."cvss_score" < $1::"float8")
+        or (
+          __third_party_vulnerabilities__."cvss_score" = $1::"float8"
+          and (
+            ('ThirdPartyVulnerability' > $2::"text")
+            or (
+              'ThirdPartyVulnerability' = $2::"text"
+              and (
+                __third_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
               )
             )
           )
         )
-        order by
-          __third_party_vulnerabilities__."cvss_score" desc,
-          __third_party_vulnerabilities__."id" asc
-        limit 3
-      ) as __third_party_vulnerabilities__
-    order by
-      "0" desc,
-      "1" asc,
-      "n" asc
-    limit 3
-  ) __vulnerability__
-) as __union_result__;
+      )
+      order by
+        __third_party_vulnerabilities__."cvss_score" desc,
+        __third_party_vulnerabilities__."id" asc
+      limit 3
+    ) as __third_party_vulnerabilities__
+  order by
+    "0" desc,
+    "1" asc,
+    "n" asc
+  limit 3
+) __vulnerability__
 
-select __union_result__.*
-from (select ids.ordinality - 1 as idx from json_array_elements($4::json) with ordinality as ids) as __union_identifiers__,
-lateral (
-  select
-    __vulnerability__."0"::text as "0",
-    __vulnerability__."1" as "1",
-    __vulnerability__."2"::text as "2",
-    __union_identifiers__.idx as "3"
-  from (
+
+select
+  __vulnerability__."0"::text as "0",
+  __vulnerability__."1" as "1",
+  __vulnerability__."2"::text as "2"
+from (
+    select
+      __first_party_vulnerabilities__."0",
+      __first_party_vulnerabilities__."1",
+      __first_party_vulnerabilities__."2",
+      "n"
+    from (
       select
-        __first_party_vulnerabilities__."0",
-        __first_party_vulnerabilities__."1",
-        __first_party_vulnerabilities__."2",
-        "n"
-      from (
-        select
-          __first_party_vulnerabilities__."cvss_score" as "0",
-          'FirstPartyVulnerability' as "1",
-          json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
-          row_number() over (
-            order by
-              __first_party_vulnerabilities__."cvss_score" desc,
-              __first_party_vulnerabilities__."id" asc
-          ) as "n"
-        from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-        where (
-          (__first_party_vulnerabilities__."cvss_score" < $1::"float8")
-          or (
-            __first_party_vulnerabilities__."cvss_score" = $1::"float8"
-            and (
-              ('FirstPartyVulnerability' > $2::"text")
-              or (
-                'FirstPartyVulnerability' = $2::"text"
-                and (
-                  __first_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
-                )
+        __first_party_vulnerabilities__."cvss_score" as "0",
+        'FirstPartyVulnerability' as "1",
+        json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __first_party_vulnerabilities__."cvss_score" desc,
+            __first_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
+      where (
+        (__first_party_vulnerabilities__."cvss_score" < $1::"float8")
+        or (
+          __first_party_vulnerabilities__."cvss_score" = $1::"float8"
+          and (
+            ('FirstPartyVulnerability' > $2::"text")
+            or (
+              'FirstPartyVulnerability' = $2::"text"
+              and (
+                __first_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
               )
             )
           )
         )
-        order by
-          __first_party_vulnerabilities__."cvss_score" desc,
-          __first_party_vulnerabilities__."id" asc
-        limit 4
-      ) as __first_party_vulnerabilities__
-    union all
+      )
+      order by
+        __first_party_vulnerabilities__."cvss_score" desc,
+        __first_party_vulnerabilities__."id" asc
+      limit 4
+    ) as __first_party_vulnerabilities__
+  union all
+    select
+      __third_party_vulnerabilities__."0",
+      __third_party_vulnerabilities__."1",
+      __third_party_vulnerabilities__."2",
+      "n"
+    from (
       select
-        __third_party_vulnerabilities__."0",
-        __third_party_vulnerabilities__."1",
-        __third_party_vulnerabilities__."2",
-        "n"
-      from (
-        select
-          __third_party_vulnerabilities__."cvss_score" as "0",
-          'ThirdPartyVulnerability' as "1",
-          json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
-          row_number() over (
-            order by
-              __third_party_vulnerabilities__."cvss_score" desc,
-              __third_party_vulnerabilities__."id" asc
-          ) as "n"
-        from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-        where (
-          (__third_party_vulnerabilities__."cvss_score" < $1::"float8")
-          or (
-            __third_party_vulnerabilities__."cvss_score" = $1::"float8"
-            and (
-              ('ThirdPartyVulnerability' > $2::"text")
-              or (
-                'ThirdPartyVulnerability' = $2::"text"
-                and (
-                  __third_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
-                )
+        __third_party_vulnerabilities__."cvss_score" as "0",
+        'ThirdPartyVulnerability' as "1",
+        json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
+        row_number() over (
+          order by
+            __third_party_vulnerabilities__."cvss_score" desc,
+            __third_party_vulnerabilities__."id" asc
+        ) as "n"
+      from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
+      where (
+        (__third_party_vulnerabilities__."cvss_score" < $1::"float8")
+        or (
+          __third_party_vulnerabilities__."cvss_score" = $1::"float8"
+          and (
+            ('ThirdPartyVulnerability' > $2::"text")
+            or (
+              'ThirdPartyVulnerability' = $2::"text"
+              and (
+                __third_party_vulnerabilities__."id" > ($3::"json"->>0)::"int4"
               )
             )
           )
         )
-        order by
-          __third_party_vulnerabilities__."cvss_score" desc,
-          __third_party_vulnerabilities__."id" asc
-        limit 4
-      ) as __third_party_vulnerabilities__
-    order by
-      "0" desc,
-      "1" asc,
-      "n" asc
-    limit 4
-  ) __vulnerability__
-) as __union_result__;
+      )
+      order by
+        __third_party_vulnerabilities__."cvss_score" desc,
+        __third_party_vulnerabilities__."id" asc
+      limit 4
+    ) as __third_party_vulnerabilities__
+  order by
+    "0" desc,
+    "1" asc,
+    "n" asc
+  limit 4
+) __vulnerability__
