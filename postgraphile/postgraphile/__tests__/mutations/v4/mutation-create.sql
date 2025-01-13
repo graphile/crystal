@@ -43,7 +43,7 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
   __types__."int8_array_domain"::text as "33";
 
 select __frmcdc_compound_type_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
+from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -55,11 +55,11 @@ lateral (
     __frmcdc_compound_type__."foo_bar"::text as "6",
     (not (__frmcdc_compound_type__ is null))::text as "7",
     __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
 select __frmcdc_nested_compound_type_result__.*
-from (select 0 as idx, $1::"b"."nested_compound_type" as "id0") as __frmcdc_nested_compound_type_identifiers__,
+from (select 0 as idx) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -81,7 +81,7 @@ lateral (
     __frmcdc_nested_compound_type__."baz_buz"::text as "16",
     (not (__frmcdc_nested_compound_type__ is null))::text as "17",
     __frmcdc_nested_compound_type_identifiers__.idx as "18"
-  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__
   left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
   on TRUE
   left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
@@ -201,16 +201,16 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"b"."email"
     ))::text as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($2::"c"."person").*) as __person__
 ) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
@@ -326,16 +326,16 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"b"."email"
     ))::text as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($2::"c"."person").*) as __person__
 ) as __person_result__;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
@@ -488,32 +488,32 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"b"."email"
     ))::text as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($2::"c"."person").*) as __person__
 ) as __person_result__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0";
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"b"."email"
     ))::text as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($2::"c"."person").*) as __person__
 ) as __person_result__;
 
 insert into "a"."default_value" as __default_value__ ("id", "null_value") values ($1::"int4", $2::"text") returning
@@ -529,14 +529,14 @@ insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text",
   )::text end) as "2";
 
 select __frmcdc_comptype_result__.*
-from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_identifiers__,
+from (select 0 as idx) as __frmcdc_comptype_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __frmcdc_comptype__."is_optimised"::text as "1",
     (not (__frmcdc_comptype__ is null))::text as "2",
     __frmcdc_comptype_identifiers__.idx as "3"
-  from unnest(__frmcdc_comptype_identifiers__."id0") as __frmcdc_comptype__
+  from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__
 ) as __frmcdc_comptype_result__;
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
@@ -587,12 +587,12 @@ lateral (
 ) as __post_result__;
 
 select __frmcdc_comptype_result__.*
-from (select 0 as idx, $1::"a"."comptype"[] as "id0") as __frmcdc_comptype_identifiers__,
+from (select 0 as idx) as __frmcdc_comptype_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
     __frmcdc_comptype__."is_optimised"::text as "1",
     (not (__frmcdc_comptype__ is null))::text as "2",
     __frmcdc_comptype_identifiers__.idx as "3"
-  from unnest(__frmcdc_comptype_identifiers__."id0") as __frmcdc_comptype__
+  from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__
 ) as __frmcdc_comptype_result__;

@@ -1,5 +1,5 @@
 select __some_messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0") as __some_messages_identifiers__,
+from (select 0 as idx) as __some_messages_identifiers__,
 lateral (
   select
     __some_messages__."id" as "0",
@@ -8,7 +8,7 @@ lateral (
     __some_messages__."test_user_id" as "3",
     (row_number() over (partition by 1))::text as "4",
     __some_messages_identifiers__.idx as "5"
-  from "issue_2210"."some_messages"(__some_messages_identifiers__."id0") as __some_messages__
+  from "issue_2210"."some_messages"($1::"uuid") as __some_messages__
   limit 51
 ) as __some_messages_result__;
 

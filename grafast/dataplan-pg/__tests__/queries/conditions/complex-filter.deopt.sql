@@ -1,5 +1,5 @@
 select __forums_result__.*
-from (select 0 as idx, $1::"bool" as "id0") as __forums_identifiers__,
+from (select 0 as idx) as __forums_identifiers__,
 lateral (
   select
     __forums__."name" as "0",
@@ -18,7 +18,7 @@ lateral (
           (
             __forums__."id" = __messages_filter__."forum_id"
           ) and (
-            __messages_filter__.featured = __forums_identifiers__."id0"
+            __messages_filter__.featured = $1::"bool"
           )
       )
     ) and (
@@ -28,7 +28,7 @@ lateral (
 ) as __forums_result__;
 
 select __messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"bool" as "id1", $3::"timestamptz" as "id2") as __messages_identifiers__,
+from (select 0 as idx, $3::"uuid" as "id0") as __messages_identifiers__,
 lateral (
   select
     __messages__."body" as "0",
@@ -37,9 +37,9 @@ lateral (
   from app_public.messages as __messages__
   where
     (
-      __messages__.featured <> __messages_identifiers__."id1"
+      __messages__.featured <> $1::"bool"
     ) and (
-      (__messages__.archived_at is null) = (__messages_identifiers__."id2" is null)
+      (__messages__.archived_at is null) = ($2::"timestamptz" is null)
     ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )

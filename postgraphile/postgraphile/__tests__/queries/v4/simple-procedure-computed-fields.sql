@@ -1,5 +1,5 @@
 select __person_result__.*
-from (select 0 as idx, $1::"text" as "id0", $2::"text" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     __person__."person_full_name" as "0",
@@ -85,7 +85,7 @@ lateral (
       from "a"."post" as __post_3
       where
         (
-          __post_3."headline" = __person_identifiers__."id0"
+          __post_3."headline" = $1::"text"
         ) and (
           __person__."id"::"int4" = __post_3."author_id"
         )
@@ -111,7 +111,7 @@ lateral (
       from "a"."post" as __post_4
       where
         (
-          __post_4."headline" = __person_identifiers__."id1"
+          __post_4."headline" = $2::"text"
         ) and (
           __person__."id"::"int4" = __post_4."author_id"
         )
@@ -164,7 +164,7 @@ lateral (
 ) as __person_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"text" as "id0", $2::"text" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -235,7 +235,7 @@ lateral (
       from "a"."post" as __post_3
       where
         (
-          __post_3."headline" = __person_identifiers__."id0"
+          __post_3."headline" = $1::"text"
         ) and (
           __person__."id"::"int4" = __post_3."author_id"
         )
@@ -261,7 +261,7 @@ lateral (
       from "a"."post" as __post_4
       where
         (
-          __post_4."headline" = __person_identifiers__."id1"
+          __post_4."headline" = $2::"text"
         ) and (
           __person__."id"::"int4" = __post_4."author_id"
         )

@@ -1,5 +1,5 @@
 select __forums_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"bool" as "id1", $3::"bool" as "id2", $4::"bool" as "id3") as __forums_identifiers__,
+from (select 0 as idx, $4::"uuid" as "id0") as __forums_identifiers__,
 lateral (
   select
     __forums_unique_author_count__.v::text as "0",
@@ -10,7 +10,7 @@ lateral (
   from app_public.forums as __forums__
   left outer join app_public.forums_unique_author_count(
     __forums__,
-    __forums_identifiers__."id1"
+    $1::"bool"
   ) as __forums_unique_author_count__(v)
   on (
   /* WHERE becoming ON */ (
@@ -18,7 +18,7 @@ lateral (
   ))
   left outer join app_public.forums_unique_author_count(
     __forums__,
-    __forums_identifiers__."id2"
+    $2::"bool"
   ) as __forums_unique_author_count_2(v)
   on (
   /* WHERE becoming ON */ (
@@ -26,7 +26,7 @@ lateral (
   ))
   left outer join app_public.forums_unique_author_count(
     __forums__,
-    __forums_identifiers__."id3"
+    $3::"bool"
   ) as __forums_unique_author_count_3(v)
   on (
   /* WHERE becoming ON */ (

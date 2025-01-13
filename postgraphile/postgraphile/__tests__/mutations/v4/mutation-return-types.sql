@@ -1,22 +1,22 @@
 select __mutation_in_inout_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __mutation_in_inout_identifiers__,
+from (select 0 as idx) as __mutation_in_inout_identifiers__,
 lateral (
   select
     __mutation_in_inout__.v::text as "0",
     __mutation_in_inout_identifiers__.idx as "1"
   from "c"."mutation_in_inout"(
-    __mutation_in_inout_identifiers__."id0",
-    __mutation_in_inout_identifiers__."id1"
+    $1::"int4",
+    $2::"int4"
   ) as __mutation_in_inout__(v)
 ) as __mutation_in_inout_result__;
 
 select __mutation_in_out_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __mutation_in_out_identifiers__,
+from (select 0 as idx) as __mutation_in_out_identifiers__,
 lateral (
   select
     __mutation_in_out__.v::text as "0",
     __mutation_in_out_identifiers__.idx as "1"
-  from "c"."mutation_in_out"(__mutation_in_out_identifiers__."id0") as __mutation_in_out__(v)
+  from "c"."mutation_in_out"($1::"int4") as __mutation_in_out__(v)
 ) as __mutation_in_out_result__;
 
 select
@@ -24,7 +24,7 @@ select
 from "c"."mutation_out"() as __mutation_out__(v);
 
 select __mutation_out_complex_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_out_complex_identifiers__,
+from (select 0 as idx) as __mutation_out_complex_identifiers__,
 lateral (
   select
     __mutation_out_complex__."x"::text as "0",
@@ -33,13 +33,13 @@ lateral (
     (not (__mutation_out_complex__ is null))::text as "3",
     __mutation_out_complex_identifiers__.idx as "4"
   from "c"."mutation_out_complex"(
-    __mutation_out_complex_identifiers__."id0",
-    __mutation_out_complex_identifiers__."id1"
+    $1::"int4",
+    $2::"text"
   ) as __mutation_out_complex__
 ) as __mutation_out_complex_result__;
 
 select __frmcdc_compound_type_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
+from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -47,11 +47,11 @@ lateral (
     __frmcdc_compound_type__."c"::text as "2",
     (not (__frmcdc_compound_type__ is null))::text as "3",
     __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -66,11 +66,11 @@ lateral (
     __person__."id"::text as "1",
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($1::"c"."person").*) as __person__
 ) as __person_result__;
 
 select __mutation_out_complex_setof_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_out_complex_setof_identifiers__,
+from (select 0 as idx) as __mutation_out_complex_setof_identifiers__,
 lateral (
   select
     __mutation_out_complex_setof__."x"::text as "0",
@@ -79,13 +79,13 @@ lateral (
     (not (__mutation_out_complex_setof__ is null))::text as "3",
     __mutation_out_complex_setof_identifiers__.idx as "4"
   from "c"."mutation_out_complex_setof"(
-    __mutation_out_complex_setof_identifiers__."id0",
-    __mutation_out_complex_setof_identifiers__."id1"
+    $1::"int4",
+    $2::"text"
   ) as __mutation_out_complex_setof__
 ) as __mutation_out_complex_setof_result__;
 
 select __frmcdc_compound_type_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
+from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -93,11 +93,11 @@ lateral (
     __frmcdc_compound_type__."c"::text as "2",
     (not (__frmcdc_compound_type__ is null))::text as "3",
     __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -112,7 +112,7 @@ lateral (
     __person__."id"::text as "1",
     __person__."person_full_name" as "2",
     __person_identifiers__.idx as "3"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($1::"c"."person").*) as __person__
 ) as __person_result__;
 
 select
@@ -122,18 +122,18 @@ select
 from "c"."mutation_out_out"() as __mutation_out_out__;
 
 select __mutation_out_out_compound_type_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __mutation_out_out_compound_type_identifiers__,
+from (select 0 as idx) as __mutation_out_out_compound_type_identifiers__,
 lateral (
   select
     __mutation_out_out_compound_type__."o1"::text as "0",
     case when (__mutation_out_out_compound_type__."o2") is not distinct from null then null::text else json_build_array((((__mutation_out_out_compound_type__."o2")."a"))::text, ((__mutation_out_out_compound_type__."o2")."b"), (((__mutation_out_out_compound_type__."o2")."c"))::text, ((__mutation_out_out_compound_type__."o2")."d"), (((__mutation_out_out_compound_type__."o2")."e"))::text, (((__mutation_out_out_compound_type__."o2")."f"))::text, to_char(((__mutation_out_out_compound_type__."o2")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__mutation_out_out_compound_type__."o2")."foo_bar"))::text)::text end as "1",
     (not (__mutation_out_out_compound_type__ is null))::text as "2",
     __mutation_out_out_compound_type_identifiers__.idx as "3"
-  from "c"."mutation_out_out_compound_type"(__mutation_out_out_compound_type_identifiers__."id0") as __mutation_out_out_compound_type__
+  from "c"."mutation_out_out_compound_type"($1::"int4") as __mutation_out_out_compound_type__
 ) as __mutation_out_out_compound_type_result__;
 
 select __frmcdc_compound_type_result__.*
-from (select 0 as idx, $1::"c"."compound_type" as "id0") as __frmcdc_compound_type_identifiers__,
+from (select 0 as idx) as __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -141,7 +141,7 @@ lateral (
     __frmcdc_compound_type__."c"::text as "2",
     (not (__frmcdc_compound_type__ is null))::text as "3",
     __frmcdc_compound_type_identifiers__.idx as "4"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+  from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
 select
@@ -180,21 +180,21 @@ select
 from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__;
 
 select __mutation_returns_table_multi_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __mutation_returns_table_multi_col_identifiers__,
+from (select 0 as idx) as __mutation_returns_table_multi_col_identifiers__,
 lateral (
   select
     __mutation_returns_table_multi_col__."col1"::text as "0",
     __mutation_returns_table_multi_col__."col2" as "1",
     (not (__mutation_returns_table_multi_col__ is null))::text as "2",
     __mutation_returns_table_multi_col_identifiers__.idx as "3"
-  from "c"."mutation_returns_table_multi_col"(__mutation_returns_table_multi_col_identifiers__."id0") as __mutation_returns_table_multi_col__
+  from "c"."mutation_returns_table_multi_col"($1::"int4") as __mutation_returns_table_multi_col__
 ) as __mutation_returns_table_multi_col_result__;
 
 select __mutation_returns_table_one_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __mutation_returns_table_one_col_identifiers__,
+from (select 0 as idx) as __mutation_returns_table_one_col_identifiers__,
 lateral (
   select
     __mutation_returns_table_one_col__.v::text as "0",
     __mutation_returns_table_one_col_identifiers__.idx as "1"
-  from "c"."mutation_returns_table_one_col"(__mutation_returns_table_one_col_identifiers__."id0") as __mutation_returns_table_one_col__(v)
+  from "c"."mutation_returns_table_one_col"($1::"int4") as __mutation_returns_table_one_col__(v)
 ) as __mutation_returns_table_one_col_result__;

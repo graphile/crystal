@@ -1,5 +1,5 @@
 select __authenticate_payload_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"numeric" as "id1", $3::"int8" as "id2") as __authenticate_payload_identifiers__,
+from (select 0 as idx) as __authenticate_payload_identifiers__,
 lateral (
   select
     case when (__authenticate_payload__."jwt") is not distinct from null then null::text else json_build_array(((__authenticate_payload__."jwt")."role"), (((__authenticate_payload__."jwt")."exp"))::text, (((__authenticate_payload__."jwt")."a"))::text, (((__authenticate_payload__."jwt")."b"))::text, (((__authenticate_payload__."jwt")."c"))::text)::text end as "0",
@@ -8,9 +8,9 @@ lateral (
     (not (__authenticate_payload__ is null))::text as "3",
     __authenticate_payload_identifiers__.idx as "4"
   from "b"."authenticate_payload"(
-    __authenticate_payload_identifiers__."id0",
-    __authenticate_payload_identifiers__."id1",
-    __authenticate_payload_identifiers__."id2"
+    $1::"int4",
+    $2::"numeric",
+    $3::"int8"
   ) as __authenticate_payload__
 ) as __authenticate_payload_result__;
 
@@ -28,11 +28,11 @@ lateral (
 ) as __person_result__;
 
 select __frmcdc_jwt_token_result__.*
-from (select 0 as idx, $1::"b"."jwt_token" as "id0") as __frmcdc_jwt_token_identifiers__,
+from (select 0 as idx) as __frmcdc_jwt_token_identifiers__,
 lateral (
   select
     case when (__frmcdc_jwt_token__) is not distinct from null then null::text else json_build_array(((__frmcdc_jwt_token__)."role"), (((__frmcdc_jwt_token__)."exp"))::text, (((__frmcdc_jwt_token__)."a"))::text, (((__frmcdc_jwt_token__)."b"))::text, (((__frmcdc_jwt_token__)."c"))::text)::text end as "0",
     (not (__frmcdc_jwt_token__ is null))::text as "1",
     __frmcdc_jwt_token_identifiers__.idx as "2"
-  from (select (__frmcdc_jwt_token_identifiers__."id0").*) as __frmcdc_jwt_token__
+  from (select ($1::"b"."jwt_token").*) as __frmcdc_jwt_token__
 ) as __frmcdc_jwt_token_result__;

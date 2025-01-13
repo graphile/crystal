@@ -272,7 +272,7 @@ lateral (
 ) as __types_result__;
 
 select __type_function_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __type_function_identifiers__,
+from (select 0 as idx) as __type_function_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -385,7 +385,7 @@ lateral (
     __type_function__."ltree"::text as "99",
     __type_function__."ltree_array"::text as "100",
     __type_function_identifiers__.idx as "101"
-  from "b"."type_function"(__type_function_identifiers__."id0") as __type_function__
+  from "b"."type_function"($1::"int4") as __type_function__
   left outer join "a"."post" as __post__
   on (__type_function__."id"::"int4" = __post__."id")
   left outer join "a"."post" as __post_2
@@ -541,7 +541,7 @@ left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __fr
 on TRUE;
 
 select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __person_identifiers__,
+from (select 0 as idx, $2::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -994,7 +994,7 @@ lateral (
   from "c"."person" as __person__
   left outer join "c"."person_type_function"(
     __person__,
-    __person_identifiers__."id1"
+    $1::"int4"
   ) as __person_type_function__
   on TRUE
   left outer join "a"."post" as __post__

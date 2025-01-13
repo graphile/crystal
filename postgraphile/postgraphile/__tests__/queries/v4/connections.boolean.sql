@@ -11,7 +11,7 @@ select
 from "c"."compound_key" as __compound_key__;
 
 select __compound_key_result__.*
-from (select 0 as idx, $1::"bool" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __compound_key_identifiers__,
+from (select 0 as idx) as __compound_key_identifiers__,
 lateral (
   select
     __compound_key__."extra"::text as "0",
@@ -20,15 +20,15 @@ lateral (
     __compound_key_identifiers__.idx as "3"
   from "c"."compound_key" as __compound_key__
   where (
-    (((__compound_key__."extra" > __compound_key_identifiers__."id0") or (__compound_key__."extra" is not null and __compound_key_identifiers__."id0" is null)))
+    (((__compound_key__."extra" > $1::"bool") or (__compound_key__."extra" is not null and $1::"bool" is null)))
     or (
-      __compound_key__."extra" is not distinct from __compound_key_identifiers__."id0"
+      __compound_key__."extra" is not distinct from $1::"bool"
       and 
-        ((__compound_key__."person_id_1" > __compound_key_identifiers__."id1")
+        ((__compound_key__."person_id_1" > $2::"int4")
         or (
-          __compound_key__."person_id_1" = __compound_key_identifiers__."id1"
+          __compound_key__."person_id_1" = $2::"int4"
           and 
-            (__compound_key__."person_id_2" > __compound_key_identifiers__."id2")
+            (__compound_key__."person_id_2" > $3::"int4")
         ))
     )
   )

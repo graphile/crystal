@@ -13,12 +13,12 @@ lateral (
 ) as __relational_items_result__;
 
 select __custom_delete_relational_item_result__.*
-from (select 0 as idx, $1::"polymorphic"."relational_items" as "id0") as __custom_delete_relational_item_identifiers__,
+from (select 0 as idx) as __custom_delete_relational_item_identifiers__,
 lateral (
   select
     __custom_delete_relational_item__.v::text as "0",
     __custom_delete_relational_item_identifiers__.idx as "1"
-  from "polymorphic"."custom_delete_relational_item"(__custom_delete_relational_item_identifiers__."id0") as __custom_delete_relational_item__(v)
+  from "polymorphic"."custom_delete_relational_item"($1::"polymorphic"."relational_items") as __custom_delete_relational_item__(v)
 ) as __custom_delete_relational_item_result__;
 
 select

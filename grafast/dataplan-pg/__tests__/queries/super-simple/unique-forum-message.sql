@@ -1,5 +1,5 @@
 select __forums_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"uuid" as "id1") as __forums_identifiers__,
+from (select 0 as idx, $2::"uuid" as "id0") as __forums_identifiers__,
 lateral (
   select
     __messages__."body" as "0",
@@ -13,7 +13,7 @@ lateral (
     (
       __forums__."id"::"uuid" = __messages__."forum_id"
     ) and (
-      __forums_identifiers__."id1" = __messages__."id"
+      $1::"uuid" = __messages__."id"
     ) and (
       /* WHERE becoming ON */ (
         true /* authorization checks */

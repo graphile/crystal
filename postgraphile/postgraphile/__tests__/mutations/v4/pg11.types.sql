@@ -6,7 +6,7 @@ update "pg11"."types" as __types__ set "regrole" = $1::"regrole", "regnamespace"
   case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4";
 
 select __frmcdc_domain_constrained_compound_type_result__.*
-from (select 0 as idx, $1::"pg11"."domain_constrained_compound_type" as "id0") as __frmcdc_domain_constrained_compound_type_identifier__,
+from (select 0 as idx) as __frmcdc_domain_constrained_compound_type_identifier__,
 lateral (
   select
     __frmcdc_domain_constrained_compound_type__."a"::text as "0",
@@ -18,7 +18,7 @@ lateral (
     __frmcdc_domain_constrained_compound_type__."foo_bar"::text as "6",
     (not (__frmcdc_domain_constrained_compound_type__ is null))::text as "7",
     __frmcdc_domain_constrained_compound_type_identifier__.idx as "8"
-  from (select (__frmcdc_domain_constrained_compound_type_identifier__."id0").*) as __frmcdc_domain_constrained_compound_type__
+  from (select ($1::"pg11"."domain_constrained_compound_type").*) as __frmcdc_domain_constrained_compound_type__
 ) as __frmcdc_domain_constrained_compound_type_result__;
 
 insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_domain_array_domain", "domain_constrained_compound_type") values ($1::"regrole", $2::"regnamespace", $3::"c"."bigint_domain_array_domain", $4::"pg11"."domain_constrained_compound_type") returning
@@ -29,7 +29,7 @@ insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_doma
   case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4";
 
 select __frmcdc_domain_constrained_compound_type_result__.*
-from (select 0 as idx, $1::"pg11"."domain_constrained_compound_type" as "id0") as __frmcdc_domain_constrained_compound_type_identifier__,
+from (select 0 as idx) as __frmcdc_domain_constrained_compound_type_identifier__,
 lateral (
   select
     __frmcdc_domain_constrained_compound_type__."a"::text as "0",
@@ -41,5 +41,5 @@ lateral (
     __frmcdc_domain_constrained_compound_type__."foo_bar"::text as "6",
     (not (__frmcdc_domain_constrained_compound_type__ is null))::text as "7",
     __frmcdc_domain_constrained_compound_type_identifier__.idx as "8"
-  from (select (__frmcdc_domain_constrained_compound_type_identifier__."id0").*) as __frmcdc_domain_constrained_compound_type__
+  from (select ($1::"pg11"."domain_constrained_compound_type").*) as __frmcdc_domain_constrained_compound_type__
 ) as __frmcdc_domain_constrained_compound_type_result__;

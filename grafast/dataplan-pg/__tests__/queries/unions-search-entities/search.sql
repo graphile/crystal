@@ -1,5 +1,5 @@
 select __entity_search_result__.*
-from (select 0 as idx, $1::"text" as "id0") as __entity_search_identifiers__,
+from (select 0 as idx) as __entity_search_identifiers__,
 lateral (
   select
     __entity_search__."person_id"::text as "0",
@@ -7,7 +7,7 @@ lateral (
     __entity_search__."comment_id"::text as "2",
     (not (__entity_search__ is null))::text as "3",
     __entity_search_identifiers__.idx as "4"
-  from interfaces_and_unions.search("query" := __entity_search_identifiers__."id0") as __entity_search__
+  from interfaces_and_unions.search("query" := $1::"text") as __entity_search__
   where (
     true /* authorization checks */
   )

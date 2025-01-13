@@ -1,5 +1,5 @@
 select __forums_result__.*
-from (select 0 as idx, $1::"bool" as "id0") as __forums_identifiers__,
+from (select 0 as idx) as __forums_identifiers__,
 lateral (
   select
     __forums__."name" as "0",
@@ -34,7 +34,7 @@ lateral (
       )
       where
         (
-          __messages__.featured = __forums_identifiers__."id0"
+          __messages__.featured = $1::"bool"
         ) and (
           (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
@@ -49,7 +49,7 @@ lateral (
       from app_public.messages as __messages__
       where
         (
-          __messages__.featured = __forums_identifiers__."id0"
+          __messages__.featured = $1::"bool"
         ) and (
           (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (

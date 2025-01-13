@@ -1,5 +1,5 @@
 select __person_result__.*
-from (select 0 as idx, $1::"text" as "id0") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -14,7 +14,7 @@ lateral (
     __person_identifiers__.idx as "9"
   from "d"."person" as __person__
   where (
-    __person__."col_no_create" = __person_identifiers__."id0"
+    __person__."col_no_create" = $1::"text"
   )
   order by __person__."id" asc
 ) as __person_result__;
