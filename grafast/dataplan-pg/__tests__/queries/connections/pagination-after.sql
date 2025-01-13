@@ -1,5 +1,5 @@
 select __messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0") as __messages_identifiers__,
+from (select 0 as idx) as __messages_identifiers__,
 lateral (
   select
     __messages__."id" as "0",
@@ -24,7 +24,7 @@ lateral (
     ) and (
       true /* authorization checks */
     ) and (
-      __messages__."id" > __messages_identifiers__."id0"
+      __messages__."id" > $1::"uuid"
     )
   order by __messages__."id" asc
   limit 4

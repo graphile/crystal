@@ -1,22 +1,22 @@
 select __func_in_inout_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1") as __func_in_inout_identifiers__,
+from (select 0 as idx) as __func_in_inout_identifiers__,
 lateral (
   select
     __func_in_inout__.v::text as "0",
     __func_in_inout_identifiers__.idx as "1"
   from "c"."func_in_inout"(
-    __func_in_inout_identifiers__."id0",
-    __func_in_inout_identifiers__."id1"
+    $1::"int4",
+    $2::"int4"
   ) as __func_in_inout__(v)
 ) as __func_in_inout_result__;
 
 select __func_in_out_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_in_out_identifiers__,
+from (select 0 as idx) as __func_in_out_identifiers__,
 lateral (
   select
     __func_in_out__.v::text as "0",
     __func_in_out_identifiers__.idx as "1"
-  from "c"."func_in_out"(__func_in_out_identifiers__."id0") as __func_in_out__(v)
+  from "c"."func_in_out"($1::"int4") as __func_in_out__(v)
 ) as __func_in_out_result__;
 
 select
@@ -24,7 +24,7 @@ select
 from "c"."func_out"() as __func_out__(v);
 
 select __func_out_complex_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_identifiers__,
+from (select 0 as idx) as __func_out_complex_identifiers__,
 lateral (
   select
     __func_out_complex__."x"::text as "0",
@@ -46,8 +46,8 @@ lateral (
     (not (__func_out_complex__ is null))::text as "8",
     __func_out_complex_identifiers__.idx as "9"
   from "c"."func_out_complex"(
-    __func_out_complex_identifiers__."id0",
-    __func_out_complex_identifiers__."id1"
+    $1::"int4",
+    $2::"text"
   ) as __func_out_complex__
   left outer join lateral (select (__func_out_complex__."y").*) as __frmcdc_compound_type__
   on TRUE
@@ -62,7 +62,7 @@ select
 from "c"."func_out_out"() as __func_out_out__;
 
 select __func_out_out_compound_type_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_out_out_compound_type_identifiers__,
+from (select 0 as idx) as __func_out_out_compound_type_identifiers__,
 lateral (
   select
     __func_out_out_compound_type__."o1"::text as "0",
@@ -72,7 +72,7 @@ lateral (
     (not (__frmcdc_compound_type__ is null))::text as "4",
     (not (__func_out_out_compound_type__ is null))::text as "5",
     __func_out_out_compound_type_identifiers__.idx as "6"
-  from "c"."func_out_out_compound_type"(__func_out_out_compound_type_identifiers__."id0") as __func_out_out_compound_type__
+  from "c"."func_out_out_compound_type"($1::"int4") as __func_out_out_compound_type__
   left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __frmcdc_compound_type__
   on TRUE
 ) as __func_out_out_compound_type_result__;
@@ -99,7 +99,7 @@ select
 from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
 
 select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1", $3::"int4" as "id2", $4::"text" as "id3", $5::"text" as "id4") as __person_identifiers__,
+from (select 0 as idx, $5::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     __person__."id"::text as "0",
@@ -135,15 +135,15 @@ lateral (
     (not (__person_computed_out_out__ is null))::text as "22",
     "c"."person_computed_inout"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"text"
     ) as "23",
     "c"."person_computed_out"(__person__) as "24",
     __person_identifiers__.idx as "25"
   from "c"."person" as __person__
   left outer join "c"."person_computed_complex"(
     __person__,
-    __person_identifiers__."id2",
-    __person_identifiers__."id3"
+    $2::"int4",
+    $3::"text"
   ) as __person_computed_complex__
   on TRUE
   left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type__
@@ -158,7 +158,7 @@ lateral (
   on TRUE
   left outer join "c"."person_computed_inout_out"(
     __person__,
-    __person_identifiers__."id4"
+    $4::"text"
   ) as __person_computed_inout_out__
   on TRUE
   left outer join "c"."person_computed_out_out"(__person__) as __person_computed_out_out__
@@ -169,7 +169,7 @@ lateral (
 ) as __person_result__;
 
 select __query_output_two_rows_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2") as __query_output_two_rows_identifiers__,
+from (select 0 as idx) as __query_output_two_rows_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -189,9 +189,9 @@ lateral (
     (not (__query_output_two_rows__ is null))::text as "14",
     __query_output_two_rows_identifiers__.idx as "15"
   from "c"."query_output_two_rows"(
-    __query_output_two_rows_identifiers__."id0",
-    __query_output_two_rows_identifiers__."id1",
-    __query_output_two_rows_identifiers__."id2"
+    $1::"int4",
+    $2::"int4",
+    $3::"text"
   ) as __query_output_two_rows__
   left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
   on TRUE
@@ -208,7 +208,7 @@ lateral (
 ) as __query_output_two_rows_result__;
 
 select __query_output_two_rows_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2") as __query_output_two_rows_identifiers__,
+from (select 0 as idx) as __query_output_two_rows_identifiers__,
 lateral (
   select
     __left_arm__."id"::text as "0",
@@ -228,9 +228,9 @@ lateral (
     (not (__query_output_two_rows__ is null))::text as "14",
     __query_output_two_rows_identifiers__.idx as "15"
   from "c"."query_output_two_rows"(
-    __query_output_two_rows_identifiers__."id0",
-    __query_output_two_rows_identifiers__."id1",
-    __query_output_two_rows_identifiers__."id2"
+    $1::"int4",
+    $2::"int4",
+    $3::"text"
   ) as __query_output_two_rows__
   left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
   on TRUE
@@ -253,7 +253,7 @@ select
 from "c"."search_test_summaries"() as __search_test_summaries__;
 
 select __func_out_complex_setof_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_setof_identifiers__,
+from (select 0 as idx) as __func_out_complex_setof_identifiers__,
 lateral (
   select
     __func_out_complex_setof__."x"::text as "0",
@@ -275,8 +275,8 @@ lateral (
     (not (__func_out_complex_setof__ is null))::text as "8",
     __func_out_complex_setof_identifiers__.idx as "9"
   from "c"."func_out_complex_setof"(
-    __func_out_complex_setof_identifiers__."id0",
-    __func_out_complex_setof_identifiers__."id1"
+    $1::"int4",
+    $2::"text"
   ) as __func_out_complex_setof__
   left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type__
   on TRUE
@@ -285,14 +285,14 @@ lateral (
 ) as __func_out_complex_setof_result__;
 
 select __func_out_complex_setof_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __func_out_complex_setof_identifiers__,
+from (select 0 as idx) as __func_out_complex_setof_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
     __func_out_complex_setof_identifiers__.idx as "1"
   from "c"."func_out_complex_setof"(
-    __func_out_complex_setof_identifiers__."id0",
-    __func_out_complex_setof_identifiers__."id1"
+    $1::"int4",
+    $2::"text"
   ) as __func_out_complex_setof__
 ) as __func_out_complex_setof_result__;
 
@@ -323,39 +323,39 @@ select
 from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select __func_returns_table_multi_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx) as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     __func_returns_table_multi_col__."col1"::text as "0",
     __func_returns_table_multi_col__."col2" as "1",
     (not (__func_returns_table_multi_col__ is null))::text as "2",
     __func_returns_table_multi_col_identifiers__.idx as "3"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+  from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_multi_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx) as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
     __func_returns_table_multi_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+  from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_one_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_one_col_identifiers__,
+from (select 0 as idx) as __func_returns_table_one_col_identifiers__,
 lateral (
   select
     __func_returns_table_one_col__.v::text as "0",
     __func_returns_table_one_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
+  from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v)
 ) as __func_returns_table_one_col_result__;
 
 select __func_returns_table_one_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_one_col_identifiers__,
+from (select 0 as idx) as __func_returns_table_one_col_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
     __func_returns_table_one_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_one_col"(__func_returns_table_one_col_identifiers__."id0") as __func_returns_table_one_col__(v)
+  from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v)
 ) as __func_returns_table_one_col_result__;

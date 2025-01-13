@@ -12,7 +12,7 @@ from "polymorphic"."relational_items" as __relational_items__
 order by __relational_items__."id" asc;
 
 select __single_table_item_relations_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __single_table_item_relations_identifiers__,
+from (select 0 as idx) as __single_table_item_relations_identifiers__,
 lateral (
   select
     __single_table_item_relations__."id"::text as "0",
@@ -27,13 +27,13 @@ lateral (
   left outer join "polymorphic"."single_table_items" as __single_table_items_2
   on (__single_table_item_relations__."parent_id"::"int4" = __single_table_items_2."id")
   where (
-    ((__single_table_item_relations_identifiers__."id0" is null and __single_table_item_relations__."child_id" is null) or (__single_table_item_relations_identifiers__."id0" is not null and __single_table_item_relations__."child_id" = __single_table_item_relations_identifiers__."id0"))
+    (($1::"int4" is null and __single_table_item_relations__."child_id" is null) or ($1::"int4" is not null and __single_table_item_relations__."child_id" = $1::"int4"))
   )
   order by __single_table_item_relations__."id" asc
 ) as __single_table_item_relations_result__;
 
 select __relational_item_relations_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __relational_item_relations_identifiers__,
+from (select 0 as idx) as __relational_item_relations_identifiers__,
 lateral (
   select
     __relational_item_relations__."id"::text as "0",
@@ -48,7 +48,7 @@ lateral (
   left outer join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_item_relations__."parent_id"::"int4" = __relational_items_2."id")
   where (
-    ((__relational_item_relations_identifiers__."id0" is null and __relational_item_relations__."child_id" is null) or (__relational_item_relations_identifiers__."id0" is not null and __relational_item_relations__."child_id" = __relational_item_relations_identifiers__."id0"))
+    (($1::"int4" is null and __relational_item_relations__."child_id" is null) or ($1::"int4" is not null and __relational_item_relations__."child_id" = $1::"int4"))
   )
   order by __relational_item_relations__."id" asc
 ) as __relational_item_relations_result__;
@@ -172,7 +172,7 @@ lateral (
 ) as __relational_items_result__;
 
 select __relational_items_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __relational_items_identifiers__,
+from (select 0 as idx) as __relational_items_identifiers__,
 lateral (
   select
     __relational_items__."id"::text as "0",
@@ -182,7 +182,7 @@ lateral (
   inner join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_items__."id" = __relational_items_2."parent_id")
   where (
-    __relational_items_2."id" = __relational_items_identifiers__."id0"
+    __relational_items_2."id" = $1::"int4"
   )
 ) as __relational_items_result__;
 

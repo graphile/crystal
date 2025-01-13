@@ -1,39 +1,39 @@
 select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"int4" as "id5", $7::"int4" as "id6", $8::"int4" as "id7", $9::"int4" as "id8", $10::"int4" as "id9", $11::"int4" as "id10", $12::"int4" as "id11", $13::"int4" as "id12", $14::"int4" as "id13", $15::"int4" as "id14") as __person_identifiers__,
+from (select 0 as idx, $16::"int4" as "id0") as __person_identifiers__,
 lateral (
   select
     ("c"."person_optional_missing_middle_1"(
       __person__,
-      __person_identifiers__."id1",
-      "c" := __person_identifiers__."id2"
+      $1::"int4",
+      "c" := $2::"int4"
     ))::text as "0",
     ("c"."person_optional_missing_middle_1"(
       __person__,
-      __person_identifiers__."id3",
-      __person_identifiers__."id4",
-      __person_identifiers__."id5"
+      $3::"int4",
+      $4::"int4",
+      $5::"int4"
     ))::text as "1",
     ("c"."person_optional_missing_middle_2"(
       __person__,
-      __person_identifiers__."id6",
-      "c" := __person_identifiers__."id7"
+      $6::"int4",
+      "c" := $7::"int4"
     ))::text as "2",
     ("c"."person_optional_missing_middle_3"(
       __person__,
-      __person_identifiers__."id8",
-      "c" := __person_identifiers__."id9"
+      $8::"int4",
+      "c" := $9::"int4"
     ))::text as "3",
     ("c"."person_optional_missing_middle_4"(
       __person__,
-      __person_identifiers__."id10",
-      __person_identifiers__."id11",
-      __person_identifiers__."id12"
+      $10::"int4",
+      $11::"int4",
+      $12::"int4"
     ))::text as "4",
     ("c"."person_optional_missing_middle_5"(
       __person__,
-      __person_identifiers__."id13",
-      __person_identifiers__."id11",
-      __person_identifiers__."id14"
+      $13::"int4",
+      $14::"int4",
+      $15::"int4"
     ))::text as "5",
     __person__."id"::text as "6",
     __person_identifiers__.idx as "7"
@@ -91,7 +91,7 @@ on TRUE
 order by __types__."id" asc;
 
 select __post_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"text" as "id5", $7::"int4" as "id6", $8::"text" as "id7", $9::"int4" as "id8", $10::"text" as "id9", $11::"c"."compound_type" as "id10") as __post_identifiers__,
+from (select 0 as idx) as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -108,7 +108,7 @@ lateral (
         (not (__post_computed_compound_type_array__ is null))::text as "8"
       from unnest("a"."post_computed_compound_type_array"(
         __post_2,
-        __post_identifiers__."id10"
+        $1::"c"."compound_type"
       )) as __post_computed_compound_type_array__
     ) s) as "1",
     (select json_agg(s) from (
@@ -120,32 +120,32 @@ lateral (
     "a"."post_headline_trimmed"(__post__) as "3",
     "a"."post_headline_trimmed"(
       __post__,
-      __post_identifiers__."id0"
+      $2::"int4"
     ) as "4",
     "a"."post_headline_trimmed"(
       __post__,
-      __post_identifiers__."id1",
-      __post_identifiers__."id2"
+      $3::"int4",
+      $4::"text"
     ) as "5",
     "a"."post_headline_trimmed_strict"(__post__) as "6",
     "a"."post_headline_trimmed_strict"(
       __post__,
-      __post_identifiers__."id3"
+      $5::"int4"
     ) as "7",
     "a"."post_headline_trimmed_strict"(
       __post__,
-      __post_identifiers__."id4",
-      __post_identifiers__."id5"
+      $6::"int4",
+      $7::"text"
     ) as "8",
     "a"."post_headline_trimmed_no_defaults"(
       __post__,
-      __post_identifiers__."id6",
-      __post_identifiers__."id7"
+      $8::"int4",
+      $9::"text"
     ) as "9",
     "a"."post_headline_trimmed_no_defaults"(
       __post__,
-      __post_identifiers__."id8",
-      __post_identifiers__."id9"
+      $10::"int4",
+      $11::"text"
     ) as "10",
     ("a"."post_computed_text_array"(__post__))::text as "11",
     (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(

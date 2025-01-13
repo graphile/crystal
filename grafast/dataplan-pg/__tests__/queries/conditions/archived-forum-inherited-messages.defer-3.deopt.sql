@@ -12,7 +12,7 @@ where
 order by __forums__."id" asc;
 
 select __messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"timestamptz" as "id1") as __messages_identifiers__,
+from (select 0 as idx, $2::"uuid" as "id0") as __messages_identifiers__,
 lateral (
   select
     __messages__."body" as "0",
@@ -21,7 +21,7 @@ lateral (
   from app_public.messages as __messages__
   where
     (
-      (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
+      (__messages__.archived_at is null) = ($1::"timestamptz" is null)
     ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
@@ -29,7 +29,7 @@ lateral (
 ) as __messages_result__;
 
 select __messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"timestamptz" as "id1") as __messages_identifiers__,
+from (select 0 as idx, $2::"uuid" as "id0") as __messages_identifiers__,
 lateral (
   select
     __messages__."id" as "0",
@@ -39,7 +39,7 @@ lateral (
   from app_public.messages as __messages__
   where
     (
-      (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
+      (__messages__.archived_at is null) = ($1::"timestamptz" is null)
     ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )

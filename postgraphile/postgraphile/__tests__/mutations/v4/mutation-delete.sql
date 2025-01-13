@@ -111,16 +111,16 @@ delete from "c"."person" as __person__ where (__person__."email" = $1::"b"."emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "3";
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0", $2::"b"."email" as "id1") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     ("c"."person_exists"(
       __person__,
-      __person_identifiers__."id1"
+      $1::"b"."email"
     ))::text as "0",
     __person__."id"::text as "1",
     __person_identifiers__.idx as "2"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($2::"c"."person").*) as __person__
 ) as __person_result__;
 
 delete from "c"."person" as __person__ where (__person__."id" = $1::"int4") returning
@@ -128,13 +128,13 @@ delete from "c"."person" as __person__ where (__person__."id" = $1::"int4") retu
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "1";
 
 select __person_result__.*
-from (select 0 as idx, $1::"c"."person" as "id0") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     "c"."person_first_name"(__person__) as "0",
     __person__."id"::text as "1",
     __person__."email" as "2",
     __person_identifiers__.idx as "3"
-  from (select (__person_identifiers__."id0").*) as __person__
+  from (select ($1::"c"."person").*) as __person__
   order by "c"."person_first_name"(__person__) asc, __person__."id" asc
 ) as __person_result__;

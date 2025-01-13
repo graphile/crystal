@@ -1,5 +1,5 @@
 select __forums_result__.*
-from (select 0 as idx, $1::"uuid" as "id0", $2::"bool" as "id1") as __forums_identifiers__,
+from (select 0 as idx, $2::"uuid" as "id0") as __forums_identifiers__,
 lateral (
   select
     __forums_random_user__."username" as "0",
@@ -26,7 +26,7 @@ lateral (
   on TRUE
   left outer join app_public.forums_unique_author_count(
     __users_most_recent_forum__,
-    __forums_identifiers__."id1"
+    $1::"bool"
   ) as __forums_unique_author_count__(v)
   on (
   /* WHERE becoming ON */ (

@@ -1,5 +1,5 @@
 select __people_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
+from (select 0 as idx) as __people_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -18,7 +18,7 @@ lateral (
     __people_identifiers__.idx as "3"
   from "polymorphic"."people" as __people__
   where (
-    __people__."person_id" > __people_identifiers__."id0"
+    __people__."person_id" > $1::"int4"
   )
   order by __people__."person_id" asc
   limit 2

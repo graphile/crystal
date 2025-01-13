@@ -3,7 +3,7 @@ delete from interfaces_and_unions.relational_posts as __relational_posts__ where
   case when (__relational_posts__) is not distinct from null then null::text else json_build_array((((__relational_posts__)."id"))::text, ((__relational_posts__)."title"), ((__relational_posts__)."description"), ((__relational_posts__)."note"))::text end as "1";
 
 select __relational_posts_result__.*
-from (select 0 as idx, $1::interfaces_and_unions.relational_posts as "id0") as __relational_posts_identifiers__,
+from (select 0 as idx) as __relational_posts_identifiers__,
 lateral (
   select
     __relational_items__."author_id"::text as "0",
@@ -13,7 +13,7 @@ lateral (
     __relational_posts__."note" as "4",
     __relational_posts_title_lower__.v as "5",
     __relational_posts_identifiers__.idx as "6"
-  from (select (__relational_posts_identifiers__."id0").*) as __relational_posts__
+  from (select ($1::interfaces_and_unions.relational_posts).*) as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
   on (
     (

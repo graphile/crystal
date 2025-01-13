@@ -28,7 +28,7 @@ from "c"."person" as __person__
 order by __person__."person_full_name" desc, __person__."id" asc;
 
 select __post_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
+from (select 0 as idx) as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -36,13 +36,13 @@ lateral (
     __post_identifiers__.idx as "2"
   from "a"."post" as __post__
   where (
-    __post__."author_id" = __post_identifiers__."id0"
+    __post__."author_id" = $1::"int4"
   )
   order by __post__."id" asc
 ) as __post_result__;
 
 select __post_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
+from (select 0 as idx) as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -50,7 +50,7 @@ lateral (
     __post_identifiers__.idx as "2"
   from "a"."post" as __post__
   where (
-    __post__."author_id" = __post_identifiers__."id0"
+    __post__."author_id" = $1::"int4"
   )
   order by __post__."id" asc
   limit 2

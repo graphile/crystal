@@ -1,5 +1,5 @@
 select __person_result__.*
-from (select 0 as idx, $1::"text" as "id0") as __person_identifiers__,
+from (select 0 as idx) as __person_identifiers__,
 lateral (
   select
     (select json_agg(s) from (
@@ -20,7 +20,7 @@ lateral (
       from "a"."post" as __post_2
       where
         (
-          __post_2."headline" = __person_identifiers__."id0"
+          __post_2."headline" = $1::"text"
         ) and (
           __person__."id"::"int4" = __post_2."author_id"
         )
