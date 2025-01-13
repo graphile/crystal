@@ -1,4 +1,6 @@
-# Overview
+---
+title: Overview
+---
 
 `graphile-build-pg` is a collection of [graphile-build](/graphile-build) plugins that extend
 your GraphQL schema with types and fields based on the tables, views, functions

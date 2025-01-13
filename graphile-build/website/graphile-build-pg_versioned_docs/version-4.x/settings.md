@@ -1,8 +1,5 @@
 ---
-layout: page
-path: /graphile-build-pg/settings/
 title: Settings
-# TODO: rename to "Options"?
 ---
 
 The following settings are supported:
