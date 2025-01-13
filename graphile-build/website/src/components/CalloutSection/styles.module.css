@@ -41,6 +41,6 @@
 }
 
 [data-theme="dark"] .button {
-  border: 1px solid var(--ifm-color-primary);
-  background-color: var(--ifm-color-primary);
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
 }
