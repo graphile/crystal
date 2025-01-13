@@ -4,7 +4,11 @@ sidebar_position: 1
 hide_table_of_contents: true
 ---
 
-Graphile Engine is a library for constructing high-performance pluggable GraphQL APIs. In versions later than 4.x, Graphile Engine was rewritten and split into two parts: the _engine_ became the basis for [Gra*fast*](https://grafast.org) and the remaining project renamed Graphile Build.
+Graphile Engine enables you to build high-performance easily-extensible GraphQL schemas by combining plugins.
+
+Proof of concept was built by [@Benjie](https://benjie.dev) in 2017, growing out of a need for greater performance, easier extensibility and greater customisation in what was then known as [PostGraphQL](https://postgraphile.org). Over the next year thanks to the input of the community and ongoing development and testing, Graphile Engine matured into the production-ready system it is today.
+
+In versions later than 4.x, Graphile Engine has been rewritten and split into two parts: the _engine_ became the basis for [Gra*fast*](https://grafast.org) and the remaining project renamed Graphile Build.
 
 ## Graphile Engine for pluggable GraphQL APIs
 
