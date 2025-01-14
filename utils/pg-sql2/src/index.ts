@@ -531,7 +531,10 @@ export function compile(
               "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
             );
           }
-          sqlFragments.push(print(resolvedPlaceholder, indent));
+          const resolved = print(resolvedPlaceholder, indent);
+          if (resolved !== "") {
+            sqlFragments.push(resolved);
+          }
           break;
         }
         default: {
