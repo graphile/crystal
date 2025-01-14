@@ -2861,6 +2861,9 @@ export class OperationPlan {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
       // entries to be garbage collected).
+      // HOWEVER! There may be lifecycle parts that need to be called... So
+      // call the function with an empty array; ignore the result.
+      step.deduplicate!(EMPTY_ARRAY);
       return null;
     }
 
