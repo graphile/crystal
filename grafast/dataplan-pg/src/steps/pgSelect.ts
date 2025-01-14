@@ -1996,6 +1996,7 @@ ${lateralText};`;
   }
 
   deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TResource>[] {
+    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
     if (!this.isTrusted) {
       this.resource.applyAuthorizationChecksToPlan(this);
       this.isTrusted = true;
@@ -2304,9 +2305,6 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    // TODO: should this be in 'beforeLock'? Or 'deduplicate'?
-    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
-
     // In case we have any lock actions in future:
     this.lock();
 
