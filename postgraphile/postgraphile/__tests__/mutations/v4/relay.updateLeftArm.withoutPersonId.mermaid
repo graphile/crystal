@@ -14,27 +14,30 @@ graph TD
     Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
     Lambda13{{"Lambda[13∈0] ➊<br />ᐸdecode_LeftArm_base64JSONᐳ"}}:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ"}}:::plan
-    Constant38 --> Lambda13
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ"}}:::plan
+    Constant46 --> Lambda13
     Access14{{"Access[14∈0] ➊<br />ᐸ13.1ᐳ"}}:::plan
     Lambda13 --> Access14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access17
     __Value2 --> Access18
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ0.71ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸ0.71ᐳ"}}:::plan
     PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸleft_arm(id;length_in_metres)ᐳ"]]:::sideeffectplan
     Object19 -->|rejectNull| PgUpdateSingle16
-    Access14 & Constant39 --> PgUpdateSingle16
+    Access14 & Constant47 --> PgUpdateSingle16
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle16 --> Object20
+    Lambda45{{"Lambda[45∈2] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant48{{"Constant[48∈2] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant48 --> Lambda45
+    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    Object19 & PgClassExpression25 & Lambda45 --> PgSelect26
     List23{{"List[23∈3] ➊<br />ᐸ21,22ᐳ"}}:::plan
     Constant21{{"Constant[21∈3] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant21 & PgClassExpression22 --> List23
-    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    Object19 & PgClassExpression25 --> PgSelect26
     PgUpdateSingle16 --> PgClassExpression22
     Lambda24{{"Lambda[24∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List23 --> Lambda24
@@ -60,14 +63,14 @@ graph TD
     subgraph "Buckets for mutations/v4/relay.updateLeftArm.withoutPersonId"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Lambda13,Access14,Access17,Access18,Object19,Constant38,Constant39 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 14, 39<br /><br />1: PgUpdateSingle[16]<br />2: <br />ᐳ: Object[20]"):::bucket
+    class Bucket0,__Value2,__Value4,Lambda13,Access14,Access17,Access18,Object19,Constant46,Constant47 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 14, 47<br /><br />1: PgUpdateSingle[16]<br />2: <br />ᐳ: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle16,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 16, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 19<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;length_in_metres)ᐳ[16]<br />1: <br />ᐳ: 21, 22, 25, 32, 36, 37, 23, 24<br />2: PgSelect[26]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
+    class Bucket2,Lambda45,Constant48 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 19, 45<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;length_in_metres)ᐳ[16]<br />1: <br />ᐳ: 21, 22, 25, 32, 36, 37, 23, 24<br />2: PgSelect[26]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,Constant21,PgClassExpression22,List23,Lambda24,PgClassExpression25,PgSelect26,First30,PgSelectSingle31,Constant32,PgClassExpression36,PgClassExpression37 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31, 32<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[31]"):::bucket

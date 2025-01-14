@@ -9,12 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object9 & Lambda40 --> PgSelect6
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
-    Object9 --> PgSelect6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
@@ -22,48 +23,50 @@ graph TD
     PgSelect6 --> First10
     PgSelectSingle11{{"PgSelectSingle[11∈0] ➊<br />ᐸusersᐳ"}}:::plan
     First10 --> PgSelectSingle11
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant42 --> Lambda40
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
     GraphQLResolver14[["GraphQLResolver[14∈1] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
     PgClassExpression12{{"PgClassExpression[12∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
-    PgClassExpression12 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver14
+    PgClassExpression12 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver14
     PgSelectSingle11 --> PgClassExpression12
     GraphQLResolver16[["GraphQLResolver[16∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver14 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver16
+    GraphQLResolver14 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver16
     GraphQLResolver18[["GraphQLResolver[18∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver14 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver18
+    GraphQLResolver14 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver18
     GraphQLResolver20[["GraphQLResolver[20∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver14 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver20
+    GraphQLResolver14 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver20
     GraphQLResolver22[["GraphQLResolver[22∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver20 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver22
+    GraphQLResolver20 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver22
     GraphQLResolver28[["GraphQLResolver[28∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver20 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver28
+    GraphQLResolver20 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver28
     GraphQLResolver30[["GraphQLResolver[30∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver20 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver30
+    GraphQLResolver20 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver30
     GraphQLResolver32[["GraphQLResolver[32∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver20 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver32
+    GraphQLResolver20 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver32
     GraphQLResolver24[["GraphQLResolver[24∈4] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver22 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver24
+    GraphQLResolver22 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver24
     GraphQLResolver26[["GraphQLResolver[26∈4] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
-    GraphQLResolver22 & Constant33 & __Value2 & __Value0 & __Value4 --> GraphQLResolver26
+    GraphQLResolver22 & Constant41 & __Value2 & __Value0 & __Value4 --> GraphQLResolver26
 
     %% define steps
 
     subgraph "Buckets for queries/resolvers/basics-object-recursive"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 33, 9<br />2: PgSelect[6]<br />ᐳ: First[10], PgSelectSingle[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 41, 42, 9, 40<br />2: PgSelect[6]<br />ᐳ: First[10], PgSelectSingle[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectSingle11,Constant33 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 33, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[11]<br />1: <br />ᐳ: PgClassExpression[12]<br />2: GraphQLResolver[14]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectSingle11,Lambda40,Constant41,Constant42 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 41, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[11]<br />1: <br />ᐳ: PgClassExpression[12]<br />2: GraphQLResolver[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression12,GraphQLResolver14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 33, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸresolveᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 41, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸresolveᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 33, 2, 0, 4<br /><br />ROOT GraphQLResolver{2}ᐸresolveᐳ[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 41, 2, 0, 4<br /><br />ROOT GraphQLResolver{2}ᐸresolveᐳ[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,GraphQLResolver22,GraphQLResolver28,GraphQLResolver30,GraphQLResolver32 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 22, 33, 2, 0, 4<br /><br />ROOT GraphQLResolver{3}ᐸresolveᐳ[22]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 22, 41, 2, 0, 4<br /><br />ROOT GraphQLResolver{3}ᐸresolveᐳ[22]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,GraphQLResolver24,GraphQLResolver26 bucket4
     Bucket0 --> Bucket1

@@ -16,11 +16,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
+    Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant64 --> Lambda55
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
     Connection38{{"Connection[38∈0] ➊<br />ᐸ36ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object17 & Connection18 --> PgSelect19
+    Object17 & Connection18 & Lambda55 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸtestviewᐳ"}}:::plan
@@ -38,7 +41,7 @@ graph TD
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression27
     PgSelect39[["PgSelect[39∈4] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object17 & Connection38 --> PgSelect39
+    Object17 & Connection38 & Lambda55 --> PgSelect39
     __Item40[/"__Item[40∈5]<br />ᐸ39ᐳ"\]:::itemplan
     PgSelect39 ==> __Item40
     PgSelectSingle41{{"PgSelectSingle[41∈5]<br />ᐸtestviewᐳ"}}:::plan
@@ -59,8 +62,8 @@ graph TD
     subgraph "Buckets for queries/v4/view"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection38 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection38,Lambda55,Constant64 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 55<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
@@ -69,7 +72,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸtestviewᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor22,PgClassExpression23,List24,PgClassExpression25,PgClassExpression26,PgClassExpression27 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 38<br /><br />ROOT Connectionᐸ36ᐳ[38]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 38, 55<br /><br />ROOT Connectionᐸ36ᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect39 bucket4
     Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ39ᐳ[40]"):::bucket

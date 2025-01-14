@@ -9,34 +9,49 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect65[["PgSelect[65∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant164{{"Constant[164∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Lambda161{{"Lambda[161∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Constant164 & Lambda161 --> PgSelect65
+    PgSelect82[["PgSelect[82∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Lambda169{{"Lambda[169∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Constant164 & Lambda169 --> PgSelect82
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object13 & Lambda161 --> PgSelect10
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    PgSelect65[["PgSelect[65∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Constant154{{"Constant[154∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Object13 & Constant154 --> PgSelect65
-    PgSelect82[["PgSelect[82∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object13 & Constant154 --> PgSelect82
-    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect10
+    PgSelect23[["PgSelect[23∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object13 & Lambda169 --> PgSelect23
+    PgSelect35[["PgSelect[35∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object13 & Lambda161 --> PgSelect35
+    PgSelect47[["PgSelect[47∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object13 & Lambda161 --> PgSelect47
+    PgSelect92[["PgSelect[92∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Lambda209{{"Lambda[209∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Lambda209 --> PgSelect92
+    PgSelect103[["PgSelect[103∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Lambda217{{"Lambda[217∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Lambda217 --> PgSelect103
+    PgSelect135[["PgSelect[135∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object13 & Lambda161 --> PgSelect135
+    PgSelect148[["PgSelect[148∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Lambda233{{"Lambda[233∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Lambda233 --> PgSelect148
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    PgSelect23[["PgSelect[23∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect23
-    PgSelect35[["PgSelect[35∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect35
-    PgSelect47[["PgSelect[47∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect47
-    PgSelect92[["PgSelect[92∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect92
-    PgSelect103[["PgSelect[103∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect103
-    PgSelect135[["PgSelect[135∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 --> PgSelect135
-    PgSelect148[["PgSelect[148∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object13 --> PgSelect148
+    Constant236{{"Constant[236∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant236 --> Lambda161
+    Constant237{{"Constant[237∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant237 --> Lambda169
+    Constant238{{"Constant[238∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant238 --> Lambda209
+    Constant239{{"Constant[239∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant239 --> Lambda217
+    Constant240{{"Constant[240∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant240 --> Lambda233
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelect10 ==> __Item14
@@ -136,9 +151,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-collections"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 154, 13<br />2: 10, 23, 35, 47, 65, 82, 92, 103, 135, 148"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 164, 236, 237, 238, 239, 240, 13, 161, 169, 209, 217, 233<br />2: 10, 23, 35, 47, 65, 82, 92, 103, 135, 148"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,PgSelect23,PgSelect35,PgSelect47,PgSelect65,PgSelect82,PgSelect92,PgSelect103,PgSelect135,PgSelect148,Constant154 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,PgSelect23,PgSelect35,PgSelect47,PgSelect65,PgSelect82,PgSelect92,PgSelect103,PgSelect135,PgSelect148,Lambda161,Constant164,Lambda169,Lambda209,Lambda217,Lambda233,Constant236,Constant237,Constant238,Constant239,Constant240 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,PgSelectSingle15,PgClassExpression16,PgClassExpression17,PgClassExpression18 bucket1

@@ -9,41 +9,48 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect20[["PgSelect[20∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant234{{"Constant[234∈0] ➊<br />ᐸ'Copper Wire'ᐳ"}}:::plan
+    Lambda129{{"Lambda[129∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Constant234 & Lambda129 --> PgSelect20
+    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
+    Constant235{{"Constant[235∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Object13 & Constant235 & Lambda129 --> PgSelect27
+    PgSelect34[["PgSelect[34∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
+    Constant236{{"Constant[236∈0] ➊<br />ᐸ'Iron Mine'ᐳ"}}:::plan
+    Object13 & Constant236 & Lambda129 --> PgSelect34
+    PgSelect52[["PgSelect[52∈0] ➊<br />ᐸyieldᐳ"]]:::plan
+    Constant237{{"Constant[237∈0] ➊<br />ᐸ'UK'ᐳ"}}:::plan
+    Object13 & Constant237 & Lambda129 --> PgSelect52
+    PgSelect59[["PgSelect[59∈0] ➊<br />ᐸyieldᐳ"]]:::plan
+    Object13 & Constant235 & Lambda129 --> PgSelect59
+    PgSelect77[["PgSelect[77∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
+    Constant239{{"Constant[239∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Object13 & Constant239 & Lambda129 --> PgSelect77
+    PgSelect84[["PgSelect[84∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
+    Constant240{{"Constant[240∈0] ➊<br />ᐸ'VCS'ᐳ"}}:::plan
+    Object13 & Constant240 & Lambda129 --> PgSelect84
+    PgSelect102[["PgSelect[102∈0] ➊<br />ᐸnullᐳ"]]:::plan
+    Constant241{{"Constant[241∈0] ➊<br />ᐸ'10 am'ᐳ"}}:::plan
+    Object13 & Constant241 & Lambda129 --> PgSelect102
+    PgSelect109[["PgSelect[109∈0] ➊<br />ᐸnullᐳ"]]:::plan
+    Constant242{{"Constant[242∈0] ➊<br />ᐸ'flat'ᐳ"}}:::plan
+    Object13 & Constant242 & Lambda129 --> PgSelect109
+    PgSelect116[["PgSelect[116∈0] ➊<br />ᐸnullᐳ"]]:::plan
+    Constant243{{"Constant[243∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Object13 & Constant243 & Lambda129 --> PgSelect116
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
+    Object13 & Lambda129 --> PgSelect10
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    PgSelect20[["PgSelect[20∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸ'Copper Wire'ᐳ"}}:::plan
-    Object13 & Constant122 --> PgSelect20
-    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant123{{"Constant[123∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Object13 & Constant123 --> PgSelect27
-    PgSelect34[["PgSelect[34∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ'Iron Mine'ᐳ"}}:::plan
-    Object13 & Constant124 --> PgSelect34
-    PgSelect52[["PgSelect[52∈0] ➊<br />ᐸyieldᐳ"]]:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ'UK'ᐳ"}}:::plan
-    Object13 & Constant125 --> PgSelect52
-    PgSelect59[["PgSelect[59∈0] ➊<br />ᐸyieldᐳ"]]:::plan
-    Object13 & Constant123 --> PgSelect59
-    PgSelect77[["PgSelect[77∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object13 & Constant127 --> PgSelect77
-    PgSelect84[["PgSelect[84∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ'VCS'ᐳ"}}:::plan
-    Object13 & Constant128 --> PgSelect84
-    PgSelect102[["PgSelect[102∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ'10 am'ᐳ"}}:::plan
-    Object13 & Constant129 --> PgSelect102
-    PgSelect109[["PgSelect[109∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant130{{"Constant[130∈0] ➊<br />ᐸ'flat'ᐳ"}}:::plan
-    Object13 & Constant130 --> PgSelect109
-    PgSelect116[["PgSelect[116∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant131{{"Constant[131∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Object13 & Constant131 --> PgSelect116
-    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Object13 --> PgSelect10
+    PgSelect44[["PgSelect[44∈0] ➊<br />ᐸyieldᐳ"]]:::plan
+    Object13 & Lambda129 --> PgSelect44
+    PgSelect69[["PgSelect[69∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
+    Object13 & Lambda129 --> PgSelect69
+    PgSelect94[["PgSelect[94∈0] ➊<br />ᐸnullᐳ"]]:::plan
+    Object13 & Lambda129 --> PgSelect94
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
@@ -59,8 +66,6 @@ graph TD
     PgSelect34 --> First36
     PgSelectSingle37{{"PgSelectSingle[37∈0] ➊<br />ᐸconstructorᐳ"}}:::plan
     First36 --> PgSelectSingle37
-    PgSelect44[["PgSelect[44∈0] ➊<br />ᐸyieldᐳ"]]:::plan
-    Object13 --> PgSelect44
     First54{{"First[54∈0] ➊"}}:::plan
     PgSelect52 --> First54
     PgSelectSingle55{{"PgSelectSingle[55∈0] ➊<br />ᐸyieldᐳ"}}:::plan
@@ -69,8 +74,6 @@ graph TD
     PgSelect59 --> First61
     PgSelectSingle62{{"PgSelectSingle[62∈0] ➊<br />ᐸyieldᐳ"}}:::plan
     First61 --> PgSelectSingle62
-    PgSelect69[["PgSelect[69∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
-    Object13 --> PgSelect69
     First79{{"First[79∈0] ➊"}}:::plan
     PgSelect77 --> First79
     PgSelectSingle80{{"PgSelectSingle[80∈0] ➊<br />ᐸ__proto__ᐳ"}}:::plan
@@ -79,8 +82,6 @@ graph TD
     PgSelect84 --> First86
     PgSelectSingle87{{"PgSelectSingle[87∈0] ➊<br />ᐸ__proto__ᐳ"}}:::plan
     First86 --> PgSelectSingle87
-    PgSelect94[["PgSelect[94∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Object13 --> PgSelect94
     First104{{"First[104∈0] ➊"}}:::plan
     PgSelect102 --> First104
     PgSelectSingle105{{"PgSelectSingle[105∈0] ➊<br />ᐸnullᐳ"}}:::plan
@@ -93,6 +94,8 @@ graph TD
     PgSelect116 --> First118
     PgSelectSingle119{{"PgSelectSingle[119∈0] ➊<br />ᐸnullᐳ"}}:::plan
     First118 --> PgSelectSingle119
+    Constant244{{"Constant[244∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant244 --> Lambda129
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelect10 ==> __Item14
@@ -178,9 +181,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/js-reserved-table-names"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 122, 123, 124, 125, 127, 128, 129, 130, 131, 13<br />2: 10, 20, 27, 34, 44, 52, 59, 69, 77, 84, 94, 102, 109, 116<br />ᐳ: 22, 23, 29, 30, 36, 37, 54, 55, 61, 62, 79, 80, 86, 87, 104, 105, 111, 112, 118, 119"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 234, 235, 236, 237, 239, 240, 241, 242, 243, 244, 13, 129<br />2: 10, 20, 27, 34, 44, 52, 59, 69, 77, 84, 94, 102, 109, 116<br />ᐳ: 22, 23, 29, 30, 36, 37, 54, 55, 61, 62, 79, 80, 86, 87, 104, 105, 111, 112, 118, 119"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,PgSelect20,First22,PgSelectSingle23,PgSelect27,First29,PgSelectSingle30,PgSelect34,First36,PgSelectSingle37,PgSelect44,PgSelect52,First54,PgSelectSingle55,PgSelect59,First61,PgSelectSingle62,PgSelect69,PgSelect77,First79,PgSelectSingle80,PgSelect84,First86,PgSelectSingle87,PgSelect94,PgSelect102,First104,PgSelectSingle105,PgSelect109,First111,PgSelectSingle112,PgSelect116,First118,PgSelectSingle119,Constant122,Constant123,Constant124,Constant125,Constant127,Constant128,Constant129,Constant130,Constant131 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,PgSelect20,First22,PgSelectSingle23,PgSelect27,First29,PgSelectSingle30,PgSelect34,First36,PgSelectSingle37,PgSelect44,PgSelect52,First54,PgSelectSingle55,PgSelect59,First61,PgSelectSingle62,PgSelect69,PgSelect77,First79,PgSelectSingle80,PgSelect84,First86,PgSelectSingle87,PgSelect94,PgSelect102,First104,PgSelectSingle105,PgSelect109,First111,PgSelectSingle112,PgSelect116,First118,PgSelectSingle119,Lambda129,Constant234,Constant235,Constant236,Constant237,Constant239,Constant240,Constant241,Constant242,Constant243,Constant244 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,PgSelectSingle15,PgClassExpression16,PgClassExpression17,PgClassExpression18 bucket1

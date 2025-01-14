@@ -13,7 +13,8 @@ graph TD
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access33{{"Access[33∈0] ➊<br />ᐸ0.forumFilter.messages.some.featured.equalToᐳ"}}:::plan
     Access56{{"Access[56∈0] ➊<br />ᐸ0.messagesFilter.featured.notEqualToᐳ"}}:::plan
-    Object14 & Access33 & Access56 --> PgSelect11
+    Lambda74{{"Lambda[74∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object14 & Access33 & Access56 & Lambda74 & Lambda74 --> PgSelect11
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
@@ -23,6 +24,8 @@ graph TD
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access33
     __Value0 --> Access56
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant84 --> Lambda74
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item39[/"__Item[39∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item39
@@ -30,10 +33,10 @@ graph TD
     __Item39 --> PgSelectSingle40
     PgClassExpression41{{"PgClassExpression[41∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
-    Access67{{"Access[67∈2]<br />ᐸ39.1ᐳ"}}:::plan
-    __Item39 --> Access67
-    __Item63[/"__Item[63∈3]<br />ᐸ67ᐳ"\]:::itemplan
-    Access67 ==> __Item63
+    Access75{{"Access[75∈2]<br />ᐸ39.1ᐳ"}}:::plan
+    __Item39 --> Access75
+    __Item63[/"__Item[63∈3]<br />ᐸ75ᐳ"\]:::itemplan
+    Access75 ==> __Item63
     PgSelectSingle64{{"PgSelectSingle[64∈3]<br />ᐸmessagesᐳ"}}:::plan
     __Item63 --> PgSelectSingle64
     PgClassExpression65{{"PgClassExpression[65∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
@@ -44,16 +47,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/conditions/complex-filter-via-variables"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 12, 13, 33, 56, 14<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 12, 13, 33, 56, 84, 14, 74<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,PgSelect11,Access12,Access13,Object14,Access33,Access56 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,PgSelect11,Access12,Access13,Object14,Access33,Access56,Lambda74,Constant84 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ11ᐳ[39]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item39,PgSelectSingle40 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 40, 39<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[40]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression41,Access67 bucket2
-    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ67ᐳ[63]"):::bucket
+    class Bucket2,PgClassExpression41,Access75 bucket2
+    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ75ᐳ[63]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item63,PgSelectSingle64 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[64]"):::bucket

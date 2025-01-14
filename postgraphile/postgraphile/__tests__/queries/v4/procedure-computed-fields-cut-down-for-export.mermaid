@@ -11,9 +11,10 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    Object10 & Constant39 & Constant40 --> PgSelect7
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant63 & Constant64 & Lambda43 & Lambda43 & Lambda43 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -24,28 +25,30 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First11 --> PgSelectSingle12
+    Constant65{{"Constant[65∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant65 --> Lambda43
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
-    Access36{{"Access[36∈1] ➊<br />ᐸ37.0ᐳ"}}:::plan
-    RemapKeys37{{"RemapKeys[37∈1] ➊<br />ᐸ12:{”0”:1}ᐳ"}}:::plan
-    RemapKeys37 --> Access36
-    PgSelectSingle12 --> RemapKeys37
-    __Item34[/"__Item[34∈2]<br />ᐸ36ᐳ"\]:::itemplan
-    Access36 ==> __Item34
+    Access44{{"Access[44∈1] ➊<br />ᐸ53.0ᐳ"}}:::plan
+    RemapKeys53{{"RemapKeys[53∈1] ➊<br />ᐸ12:{”0”:1}ᐳ"}}:::plan
+    RemapKeys53 --> Access44
+    PgSelectSingle12 --> RemapKeys53
+    __Item34[/"__Item[34∈2]<br />ᐸ44ᐳ"\]:::itemplan
+    Access44 ==> __Item34
     PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
     __Item34 --> PgSelectSingle35
 
     %% define steps
 
     subgraph "Buckets for queries/v4/procedure-computed-fields-cut-down-for-export"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 39, 40, 10<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 63, 64, 65, 10, 43<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Constant39,Constant40 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda43,Constant63,Constant64,Constant65 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸpostᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression13,Access36,RemapKeys37 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ36ᐳ[34]"):::bucket
+    class Bucket1,PgClassExpression13,Access44,RemapKeys53 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ44ᐳ[34]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item34,PgSelectSingle35 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[35]"):::bucket

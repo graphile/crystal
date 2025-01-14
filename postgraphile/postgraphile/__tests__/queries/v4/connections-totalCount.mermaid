@@ -16,12 +16,15 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
+    Lambda74{{"Lambda[74∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant100{{"Constant[100∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant100 --> Lambda74
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
     Connection33{{"Connection[33∈0] ➊<br />ᐸ31ᐳ"}}:::plan
     Connection62{{"Connection[62∈0] ➊<br />ᐸ60ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    Object17 & Connection18 --> PgSelect19
+    Object17 & Connection18 & Lambda74 --> PgSelect19
     First20{{"First[20∈1] ➊"}}:::plan
     PgSelect19 --> First20
     PgSelectSingle21{{"PgSelectSingle[21∈1] ➊<br />ᐸpersonᐳ"}}:::plan
@@ -29,22 +32,22 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
     PgSelect34[["PgSelect[34∈2] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object17 & Connection33 --> PgSelect34
+    Object17 & Connection33 & Lambda74 & Lambda74 --> PgSelect34
     Connection48{{"Connection[48∈2] ➊<br />ᐸ44ᐳ"}}:::plan
     __Item35[/"__Item[35∈3]<br />ᐸ34ᐳ"\]:::itemplan
     PgSelect34 ==> __Item35
     PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸpersonᐳ"}}:::plan
     __Item35 --> PgSelectSingle36
     First50{{"First[50∈4]"}}:::plan
-    Access67{{"Access[67∈4]<br />ᐸ35.0ᐳ"}}:::plan
-    Access67 --> First50
+    Access83{{"Access[83∈4]<br />ᐸ35.0ᐳ"}}:::plan
+    Access83 --> First50
     PgSelectSingle51{{"PgSelectSingle[51∈4]<br />ᐸperson_friendsᐳ"}}:::plan
     First50 --> PgSelectSingle51
     PgClassExpression52{{"PgClassExpression[52∈4]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression52
-    __Item35 --> Access67
+    __Item35 --> Access83
     PgSelect63[["PgSelect[63∈5] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
-    Object17 & Connection62 --> PgSelect63
+    Object17 & Connection62 & Lambda74 --> PgSelect63
     First64{{"First[64∈5] ➊"}}:::plan
     PgSelect63 --> First64
     PgSelectSingle65{{"PgSelectSingle[65∈5] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
@@ -57,11 +60,11 @@ graph TD
     subgraph "Buckets for queries/v4/connections-totalCount"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection33,Connection62 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection33,Connection62,Lambda74,Constant100 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 74<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,First20,PgSelectSingle21,PgClassExpression22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 33<br /><br />ROOT Connectionᐸ31ᐳ[33]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 33, 74<br /><br />ROOT Connectionᐸ31ᐳ[33]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect34,Connection48 bucket2
     Bucket3("Bucket 3 (listItem)<br />Deps: 48<br /><br />ROOT __Item{3}ᐸ34ᐳ[35]"):::bucket
@@ -69,8 +72,8 @@ graph TD
     class Bucket3,__Item35,PgSelectSingle36 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 35, 36, 48<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[36]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,First50,PgSelectSingle51,PgClassExpression52,Access67 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 17, 62<br /><br />ROOT Connectionᐸ60ᐳ[62]"):::bucket
+    class Bucket4,First50,PgSelectSingle51,PgClassExpression52,Access83 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 17, 62, 74<br /><br />ROOT Connectionᐸ60ᐳ[62]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect63,First64,PgSelectSingle65,PgClassExpression66 bucket5
     Bucket0 --> Bucket1 & Bucket2 & Bucket5

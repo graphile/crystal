@@ -11,24 +11,25 @@ graph TD
     %% plan dependencies
     PgSelect24[["PgSelect[24∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Object10 & Constant48 & Constant49 --> PgSelect24
+    Constant88{{"Constant[88∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Lambda53{{"Lambda[53∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant88 & Constant89 & Lambda53 --> PgSelect24
     PgSelect32[["PgSelect[32∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Object10 & Constant50 & Constant50 --> PgSelect32
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Object10 & Constant90 & Constant90 & Lambda53 --> PgSelect32
     PgSelect40[["PgSelect[40∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ100ᐳ"}}:::plan
-    Object10 & Constant48 & Constant53 --> PgSelect40
+    Constant93{{"Constant[93∈0] ➊<br />ᐸ100ᐳ"}}:::plan
+    Object10 & Constant88 & Constant93 & Lambda53 --> PgSelect40
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
-    Object10 & Constant46 --> PgSelect7
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    Object10 & Constant86 & Lambda53 --> PgSelect7
+    PgSelect16[["PgSelect[16∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸ'does.not.exist@email.com'ᐳ"}}:::plan
+    Object10 & Constant87 & Lambda53 --> PgSelect16
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect16[["PgSelect[16∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ'does.not.exist@email.com'ᐳ"}}:::plan
-    Object10 & Constant47 --> PgSelect16
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -52,6 +53,8 @@ graph TD
     PgSelect40 --> First42
     PgSelectSingle43{{"PgSelectSingle[43∈0] ➊<br />ᐸcompound_keyᐳ"}}:::plan
     First42 --> PgSelectSingle43
+    Constant94{{"Constant[94∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant94 --> Lambda53
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
@@ -77,9 +80,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/unique-constraints"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 46, 47, 48, 49, 50, 53, 10<br />2: 7, 16, 24, 32, 40<br />ᐳ: 11, 12, 18, 19, 26, 27, 34, 35, 42, 43"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 86, 87, 88, 89, 90, 93, 94, 10, 53<br />2: 7, 16, 24, 32, 40<br />ᐳ: 11, 12, 18, 19, 26, 27, 34, 35, 42, 43"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgSelect16,First18,PgSelectSingle19,PgSelect24,First26,PgSelectSingle27,PgSelect32,First34,PgSelectSingle35,PgSelect40,First42,PgSelectSingle43,Constant46,Constant47,Constant48,Constant49,Constant50,Constant53 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgSelect16,First18,PgSelectSingle19,PgSelect24,First26,PgSelectSingle27,PgSelect32,First34,PgSelectSingle35,PgSelect40,First42,PgSelectSingle43,Lambda53,Constant86,Constant87,Constant88,Constant89,Constant90,Constant93,Constant94 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,PgClassExpression14 bucket1

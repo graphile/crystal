@@ -9,15 +9,16 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect63[["PgSelect[63∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant180{{"Constant[180∈0] ➊<br />ᐸ'B'ᐳ"}}:::plan
+    Lambda131{{"Lambda[131∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object17 & Constant180 & Lambda131 --> PgSelect63
+    PgSelect72[["PgSelect[72∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
+    Object17 & Constant180 & Lambda131 --> PgSelect72
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect63[["PgSelect[63∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ'B'ᐳ"}}:::plan
-    Object17 & Constant124 --> PgSelect63
-    PgSelect72[["PgSelect[72∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Constant124 --> PgSelect72
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
@@ -29,15 +30,17 @@ graph TD
     PgSelect72 --> First74
     PgSelectSingle75{{"PgSelectSingle[75∈0] ➊<br />ᐸletter_descriptionsᐳ"}}:::plan
     First74 --> PgSelectSingle75
+    Constant184{{"Constant[184∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant184 --> Lambda131
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
     Connection36{{"Connection[36∈0] ➊<br />ᐸ34ᐳ"}}:::plan
     Connection54{{"Connection[54∈0] ➊<br />ᐸ52ᐳ"}}:::plan
     Connection94{{"Connection[94∈0] ➊<br />ᐸ92ᐳ"}}:::plan
     Connection116{{"Connection[116∈0] ➊<br />ᐸ114ᐳ"}}:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
+    Constant182{{"Constant[182∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Connection18 --> PgSelect19
+    Object17 & Connection18 & Lambda131 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸletter_descriptionsᐳ"}}:::plan
@@ -51,7 +54,7 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression25
     PgSelect37[["PgSelect[37∈4] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Connection36 --> PgSelect37
+    Object17 & Connection36 & Lambda131 --> PgSelect37
     __Item38[/"__Item[38∈5]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelect37 ==> __Item38
     PgSelectSingle39{{"PgSelectSingle[39∈5]<br />ᐸletter_descriptionsᐳ"}}:::plan
@@ -65,7 +68,7 @@ graph TD
     PgClassExpression43{{"PgClassExpression[43∈6]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression43
     PgSelect55[["PgSelect[55∈7] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Connection54 --> PgSelect55
+    Object17 & Connection54 & Lambda131 --> PgSelect55
     __Item56[/"__Item[56∈8]<br />ᐸ55ᐳ"\]:::itemplan
     PgSelect55 ==> __Item56
     PgSelectSingle57{{"PgSelectSingle[57∈8]<br />ᐸletter_descriptionsᐳ"}}:::plan
@@ -95,7 +98,7 @@ graph TD
     PgClassExpression79{{"PgClassExpression[79∈11] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle75 --> PgClassExpression79
     PgSelect95[["PgSelect[95∈12] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Constant126 & Connection94 --> PgSelect95
+    Object17 & Constant182 & Connection94 & Lambda131 --> PgSelect95
     __Item96[/"__Item[96∈13]<br />ᐸ95ᐳ"\]:::itemplan
     PgSelect95 ==> __Item96
     PgSelectSingle97{{"PgSelectSingle[97∈13]<br />ᐸletter_descriptionsᐳ"}}:::plan
@@ -109,7 +112,7 @@ graph TD
     PgClassExpression101{{"PgClassExpression[101∈14]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle97 --> PgClassExpression101
     PgSelect117[["PgSelect[117∈15] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object17 & Constant126 & Connection116 --> PgSelect117
+    Object17 & Constant182 & Connection116 & Lambda131 --> PgSelect117
     __Item118[/"__Item[118∈16]<br />ᐸ117ᐳ"\]:::itemplan
     PgSelect117 ==> __Item118
     PgSelectSingle119{{"PgSelectSingle[119∈16]<br />ᐸletter_descriptionsᐳ"}}:::plan
@@ -126,10 +129,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/enum_tables.queries"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 18, 36, 54, 94, 116, 124, 126, 17<br />2: PgSelect[63], PgSelect[72]<br />ᐳ: 65, 66, 74, 75"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 18, 36, 54, 94, 116, 180, 182, 184, 17, 131<br />2: PgSelect[63], PgSelect[72]<br />ᐳ: 65, 66, 74, 75"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection36,Connection54,PgSelect63,First65,PgSelectSingle66,PgSelect72,First74,PgSelectSingle75,Connection94,Connection116,Constant124,Constant126 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Connection36,Connection54,PgSelect63,First65,PgSelectSingle66,PgSelect72,First74,PgSelectSingle75,Connection94,Connection116,Lambda131,Constant180,Constant182,Constant184 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 131<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
@@ -138,7 +141,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸletter_descriptionsᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 36<br /><br />ROOT Connectionᐸ34ᐳ[36]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 36, 131<br /><br />ROOT Connectionᐸ34ᐳ[36]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect37 bucket4
     Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ37ᐳ[38]"):::bucket
@@ -147,7 +150,7 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{5}ᐸletter_descriptionsᐳ[39]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression40,PgClassExpression41,PgClassExpression42,PgClassExpression43 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 17, 54<br /><br />ROOT Connectionᐸ52ᐳ[54]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 17, 54, 131<br /><br />ROOT Connectionᐸ52ᐳ[54]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelect55 bucket7
     Bucket8("Bucket 8 (listItem)<br /><br />ROOT __Item{8}ᐸ55ᐳ[56]"):::bucket
@@ -162,7 +165,7 @@ graph TD
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 75<br /><br />ROOT PgSelectSingleᐸletter_descriptionsᐳ[75]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression76,PgClassExpression77,PgClassExpression78,PgClassExpression79 bucket11
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 17, 126, 94<br /><br />ROOT Connectionᐸ92ᐳ[94]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 17, 182, 94, 131<br /><br />ROOT Connectionᐸ92ᐳ[94]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgSelect95 bucket12
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ95ᐳ[96]"):::bucket
@@ -171,7 +174,7 @@ graph TD
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 97<br /><br />ROOT PgSelectSingle{13}ᐸletter_descriptionsᐳ[97]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgClassExpression98,PgClassExpression99,PgClassExpression100,PgClassExpression101 bucket14
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 17, 126, 116<br /><br />ROOT Connectionᐸ114ᐳ[116]"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 17, 182, 116, 131<br /><br />ROOT Connectionᐸ114ᐳ[116]"):::bucket
     classDef bucket15 stroke:#ff00ff
     class Bucket15,PgSelect117 bucket15
     Bucket16("Bucket 16 (listItem)<br /><br />ROOT __Item{16}ᐸ117ᐳ[118]"):::bucket

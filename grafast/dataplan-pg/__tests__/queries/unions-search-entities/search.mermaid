@@ -11,8 +11,9 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸentity_searchᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
-    Object10 & Constant66 --> PgSelect7
+    Constant122{{"Constant[122∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
+    Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant122 & Lambda67 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -21,6 +22,8 @@ graph TD
     __Value2 --> Access9
     __ListTransform11[["__ListTransform[11∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
     PgSelect7 --> __ListTransform11
+    Constant123{{"Constant[123∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant123 --> Lambda67
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ7ᐳ"\]:::itemplan
     PgSelect7 -.-> __Item12
@@ -40,12 +43,12 @@ graph TD
     PgSelectSingle15 --> PgClassExpression16
     PgSelectSingle15 --> PgClassExpression17
     PgSelectSingle15 --> PgClassExpression18
-    PgSelect21[["PgSelect[21∈3]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
-    Object10 & PgClassExpression16 --> PgSelect21
-    PgSelect29[["PgSelect[29∈3]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect29
     PgSelect41[["PgSelect[41∈3]<br />ᐸcommentsᐳ<br />ᐳComment"]]:::plan
-    Object10 & PgClassExpression18 --> PgSelect41
+    Object10 & PgClassExpression18 & Lambda67 & Lambda67 & Lambda67 --> PgSelect41
+    PgSelect29[["PgSelect[29∈3]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
+    Object10 & PgClassExpression17 & Lambda67 & Lambda67 --> PgSelect29
+    PgSelect21[["PgSelect[21∈3]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
+    Object10 & PgClassExpression16 & Lambda67 --> PgSelect21
     First25{{"First[25∈3]"}}:::plan
     PgSelect21 --> First25
     PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸpeopleᐳ"}}:::plan
@@ -61,8 +64,8 @@ graph TD
     PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
     PgSelectSingle38{{"PgSelectSingle[38∈3]<br />ᐸpeopleᐳ"}}:::plan
-    RemapKeys60{{"RemapKeys[60∈3]<br />ᐸ32:{”0”:1}ᐳ"}}:::plan
-    RemapKeys60 --> PgSelectSingle38
+    RemapKeys76{{"RemapKeys[76∈3]<br />ᐸ32:{”0”:1}ᐳ"}}:::plan
+    RemapKeys76 --> PgSelectSingle38
     PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression40
     First43{{"First[43∈3]"}}:::plan
@@ -72,16 +75,16 @@ graph TD
     PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
     PgSelectSingle44 --> PgClassExpression45
     PgSelectSingle50{{"PgSelectSingle[50∈3]<br />ᐸpeopleᐳ"}}:::plan
-    RemapKeys62{{"RemapKeys[62∈3]<br />ᐸ44:{”0”:1}ᐳ"}}:::plan
-    RemapKeys62 --> PgSelectSingle50
+    RemapKeys94{{"RemapKeys[94∈3]<br />ᐸ44:{”0”:1}ᐳ"}}:::plan
+    RemapKeys94 --> PgSelectSingle50
     PgSelectSingle56{{"PgSelectSingle[56∈3]<br />ᐸpostsᐳ"}}:::plan
-    RemapKeys64{{"RemapKeys[64∈3]<br />ᐸ44:{”0”:2,”1”:3}ᐳ"}}:::plan
-    RemapKeys64 --> PgSelectSingle56
+    RemapKeys104{{"RemapKeys[104∈3]<br />ᐸ44:{”0”:2,”1”:3}ᐳ"}}:::plan
+    RemapKeys104 --> PgSelectSingle56
     PgClassExpression59{{"PgClassExpression[59∈3]<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle44 --> PgClassExpression59
-    PgSelectSingle32 --> RemapKeys60
-    PgSelectSingle44 --> RemapKeys62
-    PgSelectSingle44 --> RemapKeys64
+    PgSelectSingle32 --> RemapKeys76
+    PgSelectSingle44 --> RemapKeys94
+    PgSelectSingle44 --> RemapKeys104
     PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression39
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
@@ -94,18 +97,18 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/unions-search-entities/search"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 66, 10<br />2: PgSelect[7]<br />3: __ListTransform[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 122, 123, 10, 67<br />2: PgSelect[7]<br />3: __ListTransform[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,Constant66 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,Lambda67,Constant122,Constant123 bucket0
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 10<br /><br />ROOT __Item{2}ᐸ11ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 10, 67<br /><br />ROOT __Item{2}ᐸ11ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item14,PgSelectSingle15,PgClassExpression16,PgClassExpression17,PgClassExpression18,List19,PgPolymorphic20 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 10, 16, 17, 18, 20<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 10, 16, 67, 17, 18, 20<br />ᐳPerson<br />ᐳPost<br />ᐳComment"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgClassExpression28,PgSelect29,First31,PgSelectSingle32,PgClassExpression33,PgSelectSingle38,PgClassExpression40,PgSelect41,First43,PgSelectSingle44,PgClassExpression45,PgSelectSingle50,PgSelectSingle56,PgClassExpression59,RemapKeys60,RemapKeys62,RemapKeys64 bucket3
+    class Bucket3,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgClassExpression28,PgSelect29,First31,PgSelectSingle32,PgClassExpression33,PgSelectSingle38,PgClassExpression40,PgSelect41,First43,PgSelectSingle44,PgClassExpression45,PgSelectSingle50,PgSelectSingle56,PgClassExpression59,RemapKeys76,RemapKeys94,RemapKeys104 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[38]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression39 bucket4

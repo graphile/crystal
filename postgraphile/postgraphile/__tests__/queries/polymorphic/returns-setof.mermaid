@@ -12,12 +12,13 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
     Object14{{"Object[14∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda27{{"Lambda[27∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object14 & Connection15 & Lambda27 --> PgSelect16
     Access12{{"Access[12∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
-    Object14 & Connection15 --> PgSelect16
     __Value2 --> Access12
     __Value2 --> Access13
     First17{{"First[17∈1] ➊"}}:::plan
@@ -26,6 +27,8 @@ graph TD
     First17 --> PgSelectSingle18
     PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
+    Constant28{{"Constant[28∈1] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant28 --> Lambda27
 
     %% define steps
 
@@ -33,8 +36,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Connection15 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 15<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[16]<br />ᐳ: 17, 18, 19"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 15<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: <br />ᐳ: 12, 13, 28, 14, 27<br />2: PgSelect[16]<br />ᐳ: 17, 18, 19"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access12,Access13,Object14,PgSelect16,First17,PgSelectSingle18,PgClassExpression19 bucket1
+    class Bucket1,Access12,Access13,Object14,PgSelect16,First17,PgSelectSingle18,PgClassExpression19,Lambda27,Constant28 bucket1
     Bucket0 --> Bucket1
     end

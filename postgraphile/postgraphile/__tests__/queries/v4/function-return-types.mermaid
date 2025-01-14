@@ -11,30 +11,45 @@ graph TD
     %% plan dependencies
     PgSelect269[["PgSelect[269∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant558{{"Constant[558∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant559{{"Constant[559∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
-    Object11 & Constant558 & Constant559 & Constant558 & Constant559 & Constant559 --> PgSelect269
+    Constant990{{"Constant[990∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant991{{"Constant[991∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
+    Lambda509{{"Lambda[509∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Constant990 & Constant991 & Constant990 & Constant991 & Lambda509 & Lambda509 & Lambda509 & Lambda509 & Constant991 & Lambda509 & Lambda509 & Lambda509 --> PgSelect269
     PgSelect373[["PgSelect[373∈0] ➊<br />ᐸquery_output_two_rowsᐳ"]]:::plan
-    Constant570{{"Constant[570∈0] ➊<br />ᐸ42ᐳ"}}:::plan
-    Constant572{{"Constant[572∈0] ➊<br />ᐸ'Hi'ᐳ"}}:::plan
-    Object11 & Constant570 & Constant558 & Constant572 --> PgSelect373
+    Constant1002{{"Constant[1002∈0] ➊<br />ᐸ42ᐳ"}}:::plan
+    Constant1004{{"Constant[1004∈0] ➊<br />ᐸ'Hi'ᐳ"}}:::plan
+    Object11 & Constant1002 & Constant990 & Constant1004 & Lambda509 & Lambda509 & Lambda509 & Lambda509 --> PgSelect373
     PgSelect434[["PgSelect[434∈0] ➊<br />ᐸquery_output_two_rowsᐳ"]]:::plan
-    Constant573{{"Constant[573∈0] ➊<br />ᐸ999999999ᐳ"}}:::plan
-    Constant575{{"Constant[575∈0] ➊<br />ᐸ”Don't fail me now...”ᐳ"}}:::plan
-    Object11 & Constant573 & Constant573 & Constant575 --> PgSelect434
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸfunc_in_inoutᐳ"]]:::plan
-    Constant555{{"Constant[555∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant556{{"Constant[556∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Object11 & Constant555 & Constant556 --> PgSelect8
+    Constant1005{{"Constant[1005∈0] ➊<br />ᐸ999999999ᐳ"}}:::plan
+    Constant1007{{"Constant[1007∈0] ➊<br />ᐸ”Don't fail me now...”ᐳ"}}:::plan
+    Object11 & Constant1005 & Constant1005 & Constant1007 & Lambda509 & Lambda509 & Lambda509 & Lambda509 --> PgSelect434
     PgSelect28[["PgSelect[28∈0] ➊<br />ᐸfunc_out_complexᐳ"]]:::plan
-    Object11 & Constant558 & Constant559 --> PgSelect28
+    Object11 & Constant990 & Constant991 & Lambda509 & Lambda509 & Lambda509 --> PgSelect28
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸfunc_in_inoutᐳ"]]:::plan
+    Constant987{{"Constant[987∈0] ➊<br />ᐸ10ᐳ"}}:::plan
+    Constant988{{"Constant[988∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Object11 & Constant987 & Constant988 & Lambda509 --> PgSelect8
+    PgSelect138[["PgSelect[138∈0] ➊<br />ᐸfunc_out_out_compound_typeᐳ"]]:::plan
+    Object11 & Constant987 & Lambda509 & Lambda509 --> PgSelect138
+    PgSelect16[["PgSelect[16∈0] ➊<br />ᐸfunc_in_outᐳ"]]:::plan
+    Object11 & Constant987 & Lambda509 --> PgSelect16
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect16[["PgSelect[16∈0] ➊<br />ᐸfunc_in_outᐳ"]]:::plan
-    Object11 & Constant555 --> PgSelect16
-    PgSelect138[["PgSelect[138∈0] ➊<br />ᐸfunc_out_out_compound_typeᐳ"]]:::plan
-    Object11 & Constant555 --> PgSelect138
+    PgSelect21[["PgSelect[21∈0] ➊<br />ᐸfunc_outᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect21
+    PgSelect131[["PgSelect[131∈0] ➊<br />ᐸfunc_out_outᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect131
+    PgSelect170[["PgSelect[170∈0] ➊<br />ᐸfunc_out_out_unnamedᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect170
+    PgSelect192[["PgSelect[192∈0] ➊<br />ᐸfunc_out_tableᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect192
+    PgSelect219[["PgSelect[219∈0] ➊<br />ᐸfunc_out_unnamedᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect219
+    PgSelect224[["PgSelect[224∈0] ➊<br />ᐸfunc_out_unnamed_out_out_unnamedᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect224
+    PgSelect494[["PgSelect[494∈0] ➊<br />ᐸsearch_test_summariesᐳ"]]:::plan
+    Object11 & Lambda509 --> PgSelect494
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -50,8 +65,6 @@ graph TD
     First18 --> PgSelectSingle19
     PgClassExpression20{{"PgClassExpression[20∈0] ➊<br />ᐸ__func_in_out__.vᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression20
-    PgSelect21[["PgSelect[21∈0] ➊<br />ᐸfunc_outᐳ"]]:::plan
-    Object11 --> PgSelect21
     First23{{"First[23∈0] ➊"}}:::plan
     PgSelect21 --> First23
     PgSelectSingle24{{"PgSelectSingle[24∈0] ➊<br />ᐸfunc_outᐳ"}}:::plan
@@ -62,8 +75,6 @@ graph TD
     PgSelect28 --> First30
     PgSelectSingle31{{"PgSelectSingle[31∈0] ➊<br />ᐸfunc_out_complexᐳ"}}:::plan
     First30 --> PgSelectSingle31
-    PgSelect131[["PgSelect[131∈0] ➊<br />ᐸfunc_out_outᐳ"]]:::plan
-    Object11 --> PgSelect131
     First133{{"First[133∈0] ➊"}}:::plan
     PgSelect131 --> First133
     PgSelectSingle134{{"PgSelectSingle[134∈0] ➊<br />ᐸfunc_out_outᐳ"}}:::plan
@@ -72,28 +83,20 @@ graph TD
     PgSelect138 --> First140
     PgSelectSingle141{{"PgSelectSingle[141∈0] ➊<br />ᐸfunc_out_out_compound_typeᐳ"}}:::plan
     First140 --> PgSelectSingle141
-    PgSelect170[["PgSelect[170∈0] ➊<br />ᐸfunc_out_out_unnamedᐳ"]]:::plan
-    Object11 --> PgSelect170
     First172{{"First[172∈0] ➊"}}:::plan
     PgSelect170 --> First172
     PgSelectSingle173{{"PgSelectSingle[173∈0] ➊<br />ᐸfunc_out_out_unnamedᐳ"}}:::plan
     First172 --> PgSelectSingle173
-    PgSelect192[["PgSelect[192∈0] ➊<br />ᐸfunc_out_tableᐳ"]]:::plan
-    Object11 --> PgSelect192
     First194{{"First[194∈0] ➊"}}:::plan
     PgSelect192 --> First194
     PgSelectSingle195{{"PgSelectSingle[195∈0] ➊<br />ᐸfunc_out_tableᐳ"}}:::plan
     First194 --> PgSelectSingle195
-    PgSelect219[["PgSelect[219∈0] ➊<br />ᐸfunc_out_unnamedᐳ"]]:::plan
-    Object11 --> PgSelect219
     First221{{"First[221∈0] ➊"}}:::plan
     PgSelect219 --> First221
     PgSelectSingle222{{"PgSelectSingle[222∈0] ➊<br />ᐸfunc_out_unnamedᐳ"}}:::plan
     First221 --> PgSelectSingle222
     PgClassExpression223{{"PgClassExpression[223∈0] ➊<br />ᐸ__func_out_unnamed__.vᐳ"}}:::plan
     PgSelectSingle222 --> PgClassExpression223
-    PgSelect224[["PgSelect[224∈0] ➊<br />ᐸfunc_out_unnamed_out_out_unnamedᐳ"]]:::plan
-    Object11 --> PgSelect224
     First226{{"First[226∈0] ➊"}}:::plan
     PgSelect224 --> First226
     PgSelectSingle227{{"PgSelectSingle[227∈0] ➊<br />ᐸfunc_out_unnamed_out_out_unnamedᐳ"}}:::plan
@@ -110,8 +113,8 @@ graph TD
     PgSelect434 --> First436
     PgSelectSingle437{{"PgSelectSingle[437∈0] ➊<br />ᐸquery_output_two_rowsᐳ"}}:::plan
     First436 --> PgSelectSingle437
-    PgSelect494[["PgSelect[494∈0] ➊<br />ᐸsearch_test_summariesᐳ"]]:::plan
-    Object11 --> PgSelect494
+    Constant1008{{"Constant[1008∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant1008 --> Lambda509
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant48{{"Constant[48∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     Constant69{{"Constant[69∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
@@ -121,17 +124,17 @@ graph TD
     Connection207{{"Connection[207∈0] ➊<br />ᐸ205ᐳ"}}:::plan
     Connection241{{"Connection[241∈0] ➊<br />ᐸ239ᐳ"}}:::plan
     Connection259{{"Connection[259∈0] ➊<br />ᐸ257ᐳ"}}:::plan
-    Constant563{{"Constant[563∈0] ➊<br />ᐸ20ᐳ"}}:::plan
+    Constant995{{"Constant[995∈0] ➊<br />ᐸ20ᐳ"}}:::plan
     PgClassExpression32{{"PgClassExpression[32∈1] ➊<br />ᐸ__func_out...plex__.”x”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression32
     PgSelectSingle39{{"PgSelectSingle[39∈1] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    RemapKeys502{{"RemapKeys[502∈1] ➊<br />ᐸ31:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
-    RemapKeys502 --> PgSelectSingle39
+    RemapKeys534{{"RemapKeys[534∈1] ➊<br />ᐸ31:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
+    RemapKeys534 --> PgSelectSingle39
     PgSelectSingle47{{"PgSelectSingle[47∈1] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys505{{"RemapKeys[505∈1] ➊<br />ᐸ31:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
-    RemapKeys505 --> PgSelectSingle47
-    PgSelectSingle31 --> RemapKeys502
-    PgSelectSingle31 --> RemapKeys505
+    RemapKeys553{{"RemapKeys[553∈1] ➊<br />ᐸ31:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
+    RemapKeys553 --> PgSelectSingle47
+    PgSelectSingle31 --> RemapKeys534
+    PgSelectSingle31 --> RemapKeys553
     Connection65{{"Connection[65∈1] ➊<br />ᐸ61ᐳ"}}:::plan
     PgClassExpression40{{"PgClassExpression[40∈2] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
@@ -147,10 +150,10 @@ graph TD
     List50 --> Lambda51
     PgClassExpression52{{"PgClassExpression[52∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression52
-    Access504{{"Access[504∈3] ➊<br />ᐸ505.0ᐳ"}}:::plan
-    RemapKeys505 --> Access504
-    __Item67[/"__Item[67∈4]<br />ᐸ504ᐳ"\]:::itemplan
-    Access504 ==> __Item67
+    Access544{{"Access[544∈3] ➊<br />ᐸ553.0ᐳ"}}:::plan
+    RemapKeys553 --> Access544
+    __Item67[/"__Item[67∈4]<br />ᐸ544ᐳ"\]:::itemplan
+    Access544 ==> __Item67
     PgSelectSingle68{{"PgSelectSingle[68∈4]<br />ᐸpostᐳ"}}:::plan
     __Item67 --> PgSelectSingle68
     List71{{"List[71∈5]<br />ᐸ69,70ᐳ"}}:::plan
@@ -160,9 +163,9 @@ graph TD
     Lambda72{{"Lambda[72∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List71 --> Lambda72
     PgSelect83[["PgSelect[83∈6] ➊<br />ᐸfunc_out_complex_setofᐳ"]]:::plan
-    Object11 & Constant558 & Constant559 & Connection82 --> PgSelect83
+    Object11 & Constant990 & Constant991 & Connection82 & Lambda509 & Lambda509 & Lambda509 --> PgSelect83
     PgSelect127[["PgSelect[127∈6] ➊<br />ᐸfunc_out_complex_setof(aggregate)ᐳ"]]:::plan
-    Object11 & Constant558 & Constant559 & Connection82 --> PgSelect127
+    Object11 & Constant990 & Constant991 & Connection82 & Lambda509 --> PgSelect127
     First128{{"First[128∈6] ➊"}}:::plan
     PgSelect127 --> First128
     PgSelectSingle129{{"PgSelectSingle[129∈6] ➊<br />ᐸfunc_out_complex_setofᐳ"}}:::plan
@@ -177,13 +180,13 @@ graph TD
     PgClassExpression86{{"PgClassExpression[86∈8]<br />ᐸ__func_out...etof__.”x”ᐳ"}}:::plan
     PgSelectSingle85 --> PgClassExpression86
     PgSelectSingle93{{"PgSelectSingle[93∈8]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    RemapKeys507{{"RemapKeys[507∈8]<br />ᐸ85:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
-    RemapKeys507 --> PgSelectSingle93
+    RemapKeys571{{"RemapKeys[571∈8]<br />ᐸ85:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
+    RemapKeys571 --> PgSelectSingle93
     PgSelectSingle101{{"PgSelectSingle[101∈8]<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys510{{"RemapKeys[510∈8]<br />ᐸ85:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
-    RemapKeys510 --> PgSelectSingle101
-    PgSelectSingle85 --> RemapKeys507
-    PgSelectSingle85 --> RemapKeys510
+    RemapKeys590{{"RemapKeys[590∈8]<br />ᐸ85:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
+    RemapKeys590 --> PgSelectSingle101
+    PgSelectSingle85 --> RemapKeys571
+    PgSelectSingle85 --> RemapKeys590
     PgClassExpression94{{"PgClassExpression[94∈9]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle93 --> PgClassExpression94
     PgClassExpression95{{"PgClassExpression[95∈9]<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -198,10 +201,10 @@ graph TD
     List104 --> Lambda105
     PgClassExpression106{{"PgClassExpression[106∈10]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle101 --> PgClassExpression106
-    Access509{{"Access[509∈10]<br />ᐸ510.0ᐳ"}}:::plan
-    RemapKeys510 --> Access509
-    __Item121[/"__Item[121∈11]<br />ᐸ509ᐳ"\]:::itemplan
-    Access509 ==> __Item121
+    Access581{{"Access[581∈10]<br />ᐸ590.0ᐳ"}}:::plan
+    RemapKeys590 --> Access581
+    __Item121[/"__Item[121∈11]<br />ᐸ581ᐳ"\]:::itemplan
+    Access581 ==> __Item121
     PgSelectSingle122{{"PgSelectSingle[122∈11]<br />ᐸpostᐳ"}}:::plan
     __Item121 --> PgSelectSingle122
     List125{{"List[125∈12]<br />ᐸ69,124ᐳ"}}:::plan
@@ -217,9 +220,9 @@ graph TD
     PgClassExpression142{{"PgClassExpression[142∈14] ➊<br />ᐸ__func_out...ype__.”o1”ᐳ"}}:::plan
     PgSelectSingle141 --> PgClassExpression142
     PgSelectSingle149{{"PgSelectSingle[149∈14] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    RemapKeys512{{"RemapKeys[512∈14] ➊<br />ᐸ141:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
-    RemapKeys512 --> PgSelectSingle149
-    PgSelectSingle141 --> RemapKeys512
+    RemapKeys624{{"RemapKeys[624∈14] ➊<br />ᐸ141:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
+    RemapKeys624 --> PgSelectSingle149
+    PgSelectSingle141 --> RemapKeys624
     PgClassExpression150{{"PgClassExpression[150∈15] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle149 --> PgClassExpression150
     PgClassExpression151{{"PgClassExpression[151∈15] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -227,9 +230,9 @@ graph TD
     PgClassExpression152{{"PgClassExpression[152∈15] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
     PgSelectSingle149 --> PgClassExpression152
     PgSelect161[["PgSelect[161∈16] ➊<br />ᐸfunc_out_out_setofᐳ"]]:::plan
-    Object11 & Connection160 --> PgSelect161
+    Object11 & Connection160 & Lambda509 --> PgSelect161
     PgSelect166[["PgSelect[166∈16] ➊<br />ᐸfunc_out_out_setof(aggregate)ᐳ"]]:::plan
-    Object11 & Connection160 --> PgSelect166
+    Object11 & Connection160 & Lambda509 --> PgSelect166
     First167{{"First[167∈16] ➊"}}:::plan
     PgSelect166 --> First167
     PgSelectSingle168{{"PgSelectSingle[168∈16] ➊<br />ᐸfunc_out_out_setofᐳ"}}:::plan
@@ -249,9 +252,9 @@ graph TD
     PgClassExpression175{{"PgClassExpression[175∈19] ➊<br />ᐸ__func_out....”column2”ᐳ"}}:::plan
     PgSelectSingle173 --> PgClassExpression175
     PgSelect184[["PgSelect[184∈20] ➊<br />ᐸfunc_out_setofᐳ"]]:::plan
-    Object11 & Connection183 --> PgSelect184
+    Object11 & Connection183 & Lambda509 --> PgSelect184
     PgSelect188[["PgSelect[188∈20] ➊<br />ᐸfunc_out_setof(aggregate)ᐳ"]]:::plan
-    Object11 & Connection183 --> PgSelect188
+    Object11 & Connection183 & Lambda509 --> PgSelect188
     First189{{"First[189∈20] ➊"}}:::plan
     PgSelect188 --> First189
     PgSelectSingle190{{"PgSelectSingle[190∈20] ➊<br />ᐸfunc_out_setofᐳ"}}:::plan
@@ -271,9 +274,9 @@ graph TD
     Lambda199{{"Lambda[199∈22] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List198 --> Lambda199
     PgSelect208[["PgSelect[208∈23] ➊<br />ᐸfunc_out_table_setofᐳ"]]:::plan
-    Object11 & Connection207 --> PgSelect208
+    Object11 & Connection207 & Lambda509 --> PgSelect208
     PgSelect215[["PgSelect[215∈23] ➊<br />ᐸfunc_out_table_setof(aggregate)ᐳ"]]:::plan
-    Object11 & Connection207 --> PgSelect215
+    Object11 & Connection207 & Lambda509 --> PgSelect215
     First216{{"First[216∈23] ➊"}}:::plan
     PgSelect215 --> First216
     PgSelectSingle217{{"PgSelectSingle[217∈23] ➊<br />ᐸfunc_out_table_setofᐳ"}}:::plan
@@ -297,9 +300,9 @@ graph TD
     PgClassExpression230{{"PgClassExpression[230∈26] ➊<br />ᐸ__func_out...med__.”o2”ᐳ"}}:::plan
     PgSelectSingle227 --> PgClassExpression230
     PgSelect242[["PgSelect[242∈27] ➊<br />ᐸfunc_returns_table_multi_colᐳ"]]:::plan
-    Object11 & Constant563 & Connection241 --> PgSelect242
+    Object11 & Constant995 & Connection241 & Lambda509 --> PgSelect242
     PgSelect247[["PgSelect[247∈27] ➊<br />ᐸfunc_returns_table_multi_col(aggregate)ᐳ"]]:::plan
-    Object11 & Constant563 & Connection241 --> PgSelect247
+    Object11 & Constant995 & Connection241 & Lambda509 --> PgSelect247
     First248{{"First[248∈27] ➊"}}:::plan
     PgSelect247 --> First248
     PgSelectSingle249{{"PgSelectSingle[249∈27] ➊<br />ᐸfunc_returns_table_multi_colᐳ"}}:::plan
@@ -315,9 +318,9 @@ graph TD
     PgClassExpression246{{"PgClassExpression[246∈29]<br />ᐸ__func_ret...l__.”col2”ᐳ"}}:::plan
     PgSelectSingle244 --> PgClassExpression246
     PgSelect260[["PgSelect[260∈30] ➊<br />ᐸfunc_returns_table_one_colᐳ"]]:::plan
-    Object11 & Constant563 & Connection259 --> PgSelect260
+    Object11 & Constant995 & Connection259 & Lambda509 --> PgSelect260
     PgSelect264[["PgSelect[264∈30] ➊<br />ᐸfunc_returns_table_one_col(aggregate)ᐳ"]]:::plan
-    Object11 & Constant563 & Connection259 --> PgSelect264
+    Object11 & Constant995 & Connection259 & Lambda509 --> PgSelect264
     First265{{"First[265∈30] ➊"}}:::plan
     PgSelect264 --> First265
     PgSelectSingle266{{"PgSelectSingle[266∈30] ➊<br />ᐸfunc_returns_table_one_colᐳ"}}:::plan
@@ -339,40 +342,40 @@ graph TD
     PgClassExpression277{{"PgClassExpression[277∈32] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle272 --> PgClassExpression277
     PgSelectSingle286{{"PgSelectSingle[286∈32] ➊<br />ᐸperson_computed_complexᐳ"}}:::plan
-    RemapKeys519{{"RemapKeys[519∈32] ➊<br />ᐸ272:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7,”6”:8,”7”:9,”8”:10}ᐳ"}}:::plan
-    RemapKeys519 --> PgSelectSingle286
+    RemapKeys783{{"RemapKeys[783∈32] ➊<br />ᐸ272:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7,”6”:8,”7”:9,”8”:10}ᐳ"}}:::plan
+    RemapKeys783 --> PgSelectSingle286
     PgSelectSingle332{{"PgSelectSingle[332∈32] ➊<br />ᐸperson_computed_first_arg_inoutᐳ"}}:::plan
-    RemapKeys521{{"RemapKeys[521∈32] ➊<br />ᐸ272:{”0”:11,”1”:12}ᐳ"}}:::plan
-    RemapKeys521 --> PgSelectSingle332
+    RemapKeys793{{"RemapKeys[793∈32] ➊<br />ᐸ272:{”0”:11,”1”:12}ᐳ"}}:::plan
+    RemapKeys793 --> PgSelectSingle332
     PgSelectSingle339{{"PgSelectSingle[339∈32] ➊<br />ᐸperson_computed_first_arg_inout_outᐳ"}}:::plan
-    RemapKeys525{{"RemapKeys[525∈32] ➊<br />ᐸ272:{”0”:13,”1”:14,”2”:15,”3”:16}ᐳ"}}:::plan
-    RemapKeys525 --> PgSelectSingle339
+    RemapKeys813{{"RemapKeys[813∈32] ➊<br />ᐸ272:{”0”:13,”1”:14,”2”:15,”3”:16}ᐳ"}}:::plan
+    RemapKeys813 --> PgSelectSingle339
     PgClassExpression352{{"PgClassExpression[352∈32] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
     PgSelectSingle272 --> PgClassExpression352
     PgSelectSingle358{{"PgSelectSingle[358∈32] ➊<br />ᐸperson_computed_inout_outᐳ"}}:::plan
-    RemapKeys527{{"RemapKeys[527∈32] ➊<br />ᐸ272:{”0”:17,”1”:18,”2”:19}ᐳ"}}:::plan
-    RemapKeys527 --> PgSelectSingle358
+    RemapKeys823{{"RemapKeys[823∈32] ➊<br />ᐸ272:{”0”:17,”1”:18,”2”:19}ᐳ"}}:::plan
+    RemapKeys823 --> PgSelectSingle358
     PgClassExpression362{{"PgClassExpression[362∈32] ➊<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle272 --> PgClassExpression362
     PgSelectSingle367{{"PgSelectSingle[367∈32] ➊<br />ᐸperson_computed_out_outᐳ"}}:::plan
-    RemapKeys529{{"RemapKeys[529∈32] ➊<br />ᐸ272:{”0”:20,”1”:21,”2”:22}ᐳ"}}:::plan
-    RemapKeys529 --> PgSelectSingle367
-    PgSelectSingle272 --> RemapKeys519
-    PgSelectSingle272 --> RemapKeys521
-    PgSelectSingle272 --> RemapKeys525
-    PgSelectSingle272 --> RemapKeys527
-    PgSelectSingle272 --> RemapKeys529
+    RemapKeys833{{"RemapKeys[833∈32] ➊<br />ᐸ272:{”0”:20,”1”:21,”2”:22}ᐳ"}}:::plan
+    RemapKeys833 --> PgSelectSingle367
+    PgSelectSingle272 --> RemapKeys783
+    PgSelectSingle272 --> RemapKeys793
+    PgSelectSingle272 --> RemapKeys813
+    PgSelectSingle272 --> RemapKeys823
+    PgSelectSingle272 --> RemapKeys833
     Connection320{{"Connection[320∈32] ➊<br />ᐸ316ᐳ"}}:::plan
     PgClassExpression287{{"PgClassExpression[287∈33] ➊<br />ᐸ__person_c...plex__.”x”ᐳ"}}:::plan
     PgSelectSingle286 --> PgClassExpression287
     PgSelectSingle294{{"PgSelectSingle[294∈33] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    RemapKeys514{{"RemapKeys[514∈33] ➊<br />ᐸ286:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
-    RemapKeys514 --> PgSelectSingle294
+    RemapKeys754{{"RemapKeys[754∈33] ➊<br />ᐸ286:{”0”:1,”1”:2,”2”:3,”3”:4}ᐳ"}}:::plan
+    RemapKeys754 --> PgSelectSingle294
     PgSelectSingle302{{"PgSelectSingle[302∈33] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys517{{"RemapKeys[517∈33] ➊<br />ᐸ286:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
-    RemapKeys517 --> PgSelectSingle302
-    PgSelectSingle286 --> RemapKeys514
-    PgSelectSingle286 --> RemapKeys517
+    RemapKeys773{{"RemapKeys[773∈33] ➊<br />ᐸ286:{”0”:5,”1”:6,”2”:7}ᐳ"}}:::plan
+    RemapKeys773 --> PgSelectSingle302
+    PgSelectSingle286 --> RemapKeys754
+    PgSelectSingle286 --> RemapKeys773
     PgClassExpression295{{"PgClassExpression[295∈34] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle294 --> PgClassExpression295
     PgClassExpression296{{"PgClassExpression[296∈34] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -387,10 +390,10 @@ graph TD
     List305 --> Lambda306
     PgClassExpression307{{"PgClassExpression[307∈35] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle302 --> PgClassExpression307
-    Access516{{"Access[516∈35] ➊<br />ᐸ517.0ᐳ"}}:::plan
-    RemapKeys517 --> Access516
-    __Item322[/"__Item[322∈36]<br />ᐸ516ᐳ"\]:::itemplan
-    Access516 ==> __Item322
+    Access764{{"Access[764∈35] ➊<br />ᐸ773.0ᐳ"}}:::plan
+    RemapKeys773 --> Access764
+    __Item322[/"__Item[322∈36]<br />ᐸ764ᐳ"\]:::itemplan
+    Access764 ==> __Item322
     PgSelectSingle323{{"PgSelectSingle[323∈36]<br />ᐸpostᐳ"}}:::plan
     __Item322 --> PgSelectSingle323
     List326{{"List[326∈37]<br />ᐸ69,325ᐳ"}}:::plan
@@ -422,11 +425,11 @@ graph TD
     PgSelectSingle383{{"PgSelectSingle[383∈43] ➊<br />ᐸleft_armᐳ"}}:::plan
     PgSelectSingle376 --> PgSelectSingle383
     PgSelectSingle411{{"PgSelectSingle[411∈43] ➊<br />ᐸpostᐳ"}}:::plan
-    RemapKeys541{{"RemapKeys[541∈43] ➊<br />ᐸ376:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
-    RemapKeys541 --> PgSelectSingle411
+    RemapKeys901{{"RemapKeys[901∈43] ➊<br />ᐸ376:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
+    RemapKeys901 --> PgSelectSingle411
     PgClassExpression430{{"PgClassExpression[430∈43] ➊<br />ᐸ__query_ou...ws__.”txt”ᐳ"}}:::plan
     PgSelectSingle376 --> PgClassExpression430
-    PgSelectSingle376 --> RemapKeys541
+    PgSelectSingle376 --> RemapKeys901
     PgClassExpression384{{"PgClassExpression[384∈44] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     PgSelectSingle383 --> PgClassExpression384
     PgClassExpression385{{"PgClassExpression[385∈44] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
@@ -436,15 +439,15 @@ graph TD
     PgClassExpression387{{"PgClassExpression[387∈44] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle383 --> PgClassExpression387
     PgSelectSingle393{{"PgSelectSingle[393∈44] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys533{{"RemapKeys[533∈44] ➊<br />ᐸ383:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
-    RemapKeys533 --> PgSelectSingle393
-    PgSelectSingle383 --> RemapKeys533
+    RemapKeys861{{"RemapKeys[861∈44] ➊<br />ᐸ383:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
+    RemapKeys861 --> PgSelectSingle393
+    PgSelectSingle383 --> RemapKeys861
     PgClassExpression394{{"PgClassExpression[394∈45] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle393 --> PgClassExpression394
     PgSelectSingle401{{"PgSelectSingle[401∈45] ➊<br />ᐸperson_secretᐳ"}}:::plan
-    RemapKeys531{{"RemapKeys[531∈45] ➊<br />ᐸ393:{”0”:1,”1”:2}ᐳ"}}:::plan
-    RemapKeys531 --> PgSelectSingle401
-    PgSelectSingle393 --> RemapKeys531
+    RemapKeys851{{"RemapKeys[851∈45] ➊<br />ᐸ393:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys851 --> PgSelectSingle401
+    PgSelectSingle393 --> RemapKeys851
     PgClassExpression402{{"PgClassExpression[402∈46] ➊<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle401 --> PgClassExpression402
     PgClassExpression412{{"PgClassExpression[412∈47] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
@@ -454,25 +457,25 @@ graph TD
     PgClassExpression414{{"PgClassExpression[414∈47] ➊<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
     PgSelectSingle411 --> PgClassExpression414
     PgSelectSingle420{{"PgSelectSingle[420∈47] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys539{{"RemapKeys[539∈47] ➊<br />ᐸ411:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
-    RemapKeys539 --> PgSelectSingle420
-    PgSelectSingle411 --> RemapKeys539
+    RemapKeys891{{"RemapKeys[891∈47] ➊<br />ᐸ411:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
+    RemapKeys891 --> PgSelectSingle420
+    PgSelectSingle411 --> RemapKeys891
     PgClassExpression421{{"PgClassExpression[421∈48] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle420 --> PgClassExpression421
     PgSelectSingle428{{"PgSelectSingle[428∈48] ➊<br />ᐸperson_secretᐳ"}}:::plan
-    RemapKeys537{{"RemapKeys[537∈48] ➊<br />ᐸ420:{”0”:1,”1”:2}ᐳ"}}:::plan
-    RemapKeys537 --> PgSelectSingle428
-    PgSelectSingle420 --> RemapKeys537
+    RemapKeys881{{"RemapKeys[881∈48] ➊<br />ᐸ420:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys881 --> PgSelectSingle428
+    PgSelectSingle420 --> RemapKeys881
     PgClassExpression429{{"PgClassExpression[429∈49] ➊<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle428 --> PgClassExpression429
     PgSelectSingle444{{"PgSelectSingle[444∈50] ➊<br />ᐸleft_armᐳ"}}:::plan
     PgSelectSingle437 --> PgSelectSingle444
     PgSelectSingle472{{"PgSelectSingle[472∈50] ➊<br />ᐸpostᐳ"}}:::plan
-    RemapKeys553{{"RemapKeys[553∈50] ➊<br />ᐸ437:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
-    RemapKeys553 --> PgSelectSingle472
+    RemapKeys969{{"RemapKeys[969∈50] ➊<br />ᐸ437:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
+    RemapKeys969 --> PgSelectSingle472
     PgClassExpression491{{"PgClassExpression[491∈50] ➊<br />ᐸ__query_ou...ws__.”txt”ᐳ"}}:::plan
     PgSelectSingle437 --> PgClassExpression491
-    PgSelectSingle437 --> RemapKeys553
+    PgSelectSingle437 --> RemapKeys969
     PgClassExpression445{{"PgClassExpression[445∈51] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     PgSelectSingle444 --> PgClassExpression445
     PgClassExpression446{{"PgClassExpression[446∈51] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
@@ -482,15 +485,15 @@ graph TD
     PgClassExpression448{{"PgClassExpression[448∈51] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle444 --> PgClassExpression448
     PgSelectSingle454{{"PgSelectSingle[454∈51] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys545{{"RemapKeys[545∈51] ➊<br />ᐸ444:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
-    RemapKeys545 --> PgSelectSingle454
-    PgSelectSingle444 --> RemapKeys545
+    RemapKeys929{{"RemapKeys[929∈51] ➊<br />ᐸ444:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
+    RemapKeys929 --> PgSelectSingle454
+    PgSelectSingle444 --> RemapKeys929
     PgClassExpression455{{"PgClassExpression[455∈52] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle454 --> PgClassExpression455
     PgSelectSingle462{{"PgSelectSingle[462∈52] ➊<br />ᐸperson_secretᐳ"}}:::plan
-    RemapKeys543{{"RemapKeys[543∈52] ➊<br />ᐸ454:{”0”:1,”1”:2}ᐳ"}}:::plan
-    RemapKeys543 --> PgSelectSingle462
-    PgSelectSingle454 --> RemapKeys543
+    RemapKeys919{{"RemapKeys[919∈52] ➊<br />ᐸ454:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys919 --> PgSelectSingle462
+    PgSelectSingle454 --> RemapKeys919
     PgClassExpression463{{"PgClassExpression[463∈53] ➊<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle462 --> PgClassExpression463
     PgClassExpression473{{"PgClassExpression[473∈54] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
@@ -500,15 +503,15 @@ graph TD
     PgClassExpression475{{"PgClassExpression[475∈54] ➊<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
     PgSelectSingle472 --> PgClassExpression475
     PgSelectSingle481{{"PgSelectSingle[481∈54] ➊<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys551{{"RemapKeys[551∈54] ➊<br />ᐸ472:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
-    RemapKeys551 --> PgSelectSingle481
-    PgSelectSingle472 --> RemapKeys551
+    RemapKeys959{{"RemapKeys[959∈54] ➊<br />ᐸ472:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
+    RemapKeys959 --> PgSelectSingle481
+    PgSelectSingle472 --> RemapKeys959
     PgClassExpression482{{"PgClassExpression[482∈55] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle481 --> PgClassExpression482
     PgSelectSingle489{{"PgSelectSingle[489∈55] ➊<br />ᐸperson_secretᐳ"}}:::plan
-    RemapKeys549{{"RemapKeys[549∈55] ➊<br />ᐸ481:{”0”:1,”1”:2}ᐳ"}}:::plan
-    RemapKeys549 --> PgSelectSingle489
-    PgSelectSingle481 --> RemapKeys549
+    RemapKeys949{{"RemapKeys[949∈55] ➊<br />ᐸ481:{”0”:1,”1”:2}ᐳ"}}:::plan
+    RemapKeys949 --> PgSelectSingle489
+    PgSelectSingle481 --> RemapKeys949
     PgClassExpression490{{"PgClassExpression[490∈56] ➊<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle489 --> PgClassExpression490
     __Item496[/"__Item[496∈57]<br />ᐸ494ᐳ"\]:::itemplan
@@ -523,25 +526,25 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/function-return-types"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 48, 69, 82, 160, 183, 207, 241, 259, 555, 556, 558, 559, 563, 570, 572, 573, 575, 11<br />2: 8, 16, 21, 28, 131, 138, 170, 192, 219, 224, 269, 373, 434, 494<br />ᐳ: 12, 13, 14, 18, 19, 20, 23, 24, 25, 30, 31, 133, 134, 140, 141, 172, 173, 194, 195, 221, 222, 223, 226, 227, 271, 272, 375, 376, 436, 437"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 48, 69, 82, 160, 183, 207, 241, 259, 987, 988, 990, 991, 995, 1002, 1004, 1005, 1007, 1008, 11, 509<br />2: 8, 16, 21, 28, 131, 138, 170, 192, 219, 224, 269, 373, 434, 494<br />ᐳ: 12, 13, 14, 18, 19, 20, 23, 24, 25, 30, 31, 133, 134, 140, 141, 172, 173, 194, 195, 221, 222, 223, 226, 227, 271, 272, 375, 376, 436, 437"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgSelect16,First18,PgSelectSingle19,PgClassExpression20,PgSelect21,First23,PgSelectSingle24,PgClassExpression25,PgSelect28,First30,PgSelectSingle31,Constant48,Constant69,Connection82,PgSelect131,First133,PgSelectSingle134,PgSelect138,First140,PgSelectSingle141,Connection160,PgSelect170,First172,PgSelectSingle173,Connection183,PgSelect192,First194,PgSelectSingle195,Connection207,PgSelect219,First221,PgSelectSingle222,PgClassExpression223,PgSelect224,First226,PgSelectSingle227,Connection241,Connection259,PgSelect269,First271,PgSelectSingle272,PgSelect373,First375,PgSelectSingle376,PgSelect434,First436,PgSelectSingle437,PgSelect494,Constant555,Constant556,Constant558,Constant559,Constant563,Constant570,Constant572,Constant573,Constant575 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgSelect16,First18,PgSelectSingle19,PgClassExpression20,PgSelect21,First23,PgSelectSingle24,PgClassExpression25,PgSelect28,First30,PgSelectSingle31,Constant48,Constant69,Connection82,PgSelect131,First133,PgSelectSingle134,PgSelect138,First140,PgSelectSingle141,Connection160,PgSelect170,First172,PgSelectSingle173,Connection183,PgSelect192,First194,PgSelectSingle195,Connection207,PgSelect219,First221,PgSelectSingle222,PgClassExpression223,PgSelect224,First226,PgSelectSingle227,Connection241,Connection259,PgSelect269,First271,PgSelectSingle272,PgSelect373,First375,PgSelectSingle376,PgSelect434,First436,PgSelectSingle437,PgSelect494,Lambda509,Constant987,Constant988,Constant990,Constant991,Constant995,Constant1002,Constant1004,Constant1005,Constant1007,Constant1008 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 31, 48, 69<br /><br />ROOT PgSelectSingleᐸfunc_out_complexᐳ[31]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression32,PgSelectSingle39,PgSelectSingle47,Connection65,RemapKeys502,RemapKeys505 bucket1
+    class Bucket1,PgClassExpression32,PgSelectSingle39,PgSelectSingle47,Connection65,RemapKeys534,RemapKeys553 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{1}ᐸfrmcdc_compoundTypeᐳ[39]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression40,PgClassExpression41,PgClassExpression42 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 47, 48, 505, 69, 65<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[47]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 47, 48, 553, 69, 65<br /><br />ROOT PgSelectSingle{1}ᐸpersonᐳ[47]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression49,List50,Lambda51,PgClassExpression52,Access504 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 69<br /><br />ROOT __Item{4}ᐸ504ᐳ[67]"):::bucket
+    class Bucket3,PgClassExpression49,List50,Lambda51,PgClassExpression52,Access544 bucket3
+    Bucket4("Bucket 4 (listItem)<br />Deps: 69<br /><br />ROOT __Item{4}ᐸ544ᐳ[67]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item67,PgSelectSingle68 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 68, 69<br /><br />ROOT PgSelectSingle{4}ᐸpostᐳ[68]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression70,List71,Lambda72 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 11, 558, 559, 82, 48, 69<br /><br />ROOT Connectionᐸ80ᐳ[82]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 11, 990, 991, 82, 509, 48, 69<br /><br />ROOT Connectionᐸ80ᐳ[82]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect83,Connection119,PgSelect127,First128,PgSelectSingle129,PgClassExpression130 bucket6
     Bucket7("Bucket 7 (listItem)<br />Deps: 48, 69, 119<br /><br />ROOT __Item{7}ᐸ83ᐳ[84]"):::bucket
@@ -549,14 +552,14 @@ graph TD
     class Bucket7,__Item84,PgSelectSingle85 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 85, 48, 69, 119<br /><br />ROOT PgSelectSingle{7}ᐸfunc_out_complex_setofᐳ[85]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression86,PgSelectSingle93,PgSelectSingle101,RemapKeys507,RemapKeys510 bucket8
+    class Bucket8,PgClassExpression86,PgSelectSingle93,PgSelectSingle101,RemapKeys571,RemapKeys590 bucket8
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 93<br /><br />ROOT PgSelectSingle{8}ᐸfrmcdc_compoundTypeᐳ[93]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgClassExpression94,PgClassExpression95,PgClassExpression96 bucket9
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 101, 48, 510, 69, 119<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[101]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 101, 48, 590, 69, 119<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[101]"):::bucket
     classDef bucket10 stroke:#ffff00
-    class Bucket10,PgClassExpression103,List104,Lambda105,PgClassExpression106,Access509 bucket10
-    Bucket11("Bucket 11 (listItem)<br />Deps: 69<br /><br />ROOT __Item{11}ᐸ509ᐳ[121]"):::bucket
+    class Bucket10,PgClassExpression103,List104,Lambda105,PgClassExpression106,Access581 bucket10
+    Bucket11("Bucket 11 (listItem)<br />Deps: 69<br /><br />ROOT __Item{11}ᐸ581ᐳ[121]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,__Item121,PgSelectSingle122 bucket11
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 122, 69<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[122]"):::bucket
@@ -567,11 +570,11 @@ graph TD
     class Bucket13,PgClassExpression135,PgClassExpression136 bucket13
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 141<br /><br />ROOT PgSelectSingleᐸfunc_out_out_compound_typeᐳ[141]"):::bucket
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,PgClassExpression142,PgSelectSingle149,RemapKeys512 bucket14
+    class Bucket14,PgClassExpression142,PgSelectSingle149,RemapKeys624 bucket14
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 149<br /><br />ROOT PgSelectSingle{14}ᐸfrmcdc_compoundTypeᐳ[149]"):::bucket
     classDef bucket15 stroke:#ff00ff
     class Bucket15,PgClassExpression150,PgClassExpression151,PgClassExpression152 bucket15
-    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 11, 160<br /><br />ROOT Connectionᐸ158ᐳ[160]"):::bucket
+    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 11, 160, 509<br /><br />ROOT Connectionᐸ158ᐳ[160]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,PgSelect161,PgSelect166,First167,PgSelectSingle168,PgClassExpression169 bucket16
     Bucket17("Bucket 17 (listItem)<br /><br />ROOT __Item{17}ᐸ161ᐳ[162]"):::bucket
@@ -583,7 +586,7 @@ graph TD
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 173<br /><br />ROOT PgSelectSingleᐸfunc_out_out_unnamedᐳ[173]"):::bucket
     classDef bucket19 stroke:#7f007f
     class Bucket19,PgClassExpression174,PgClassExpression175 bucket19
-    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 11, 183<br /><br />ROOT Connectionᐸ181ᐳ[183]"):::bucket
+    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 11, 183, 509<br /><br />ROOT Connectionᐸ181ᐳ[183]"):::bucket
     classDef bucket20 stroke:#ffa500
     class Bucket20,PgSelect184,PgSelect188,First189,PgSelectSingle190,PgClassExpression191 bucket20
     Bucket21("Bucket 21 (listItem)<br /><br />ROOT __Item{21}ᐸ184ᐳ[185]"):::bucket
@@ -592,7 +595,7 @@ graph TD
     Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 195, 48<br /><br />ROOT PgSelectSingleᐸfunc_out_tableᐳ[195]"):::bucket
     classDef bucket22 stroke:#7fff00
     class Bucket22,PgClassExpression197,List198,Lambda199 bucket22
-    Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 11, 207, 48<br /><br />ROOT Connectionᐸ205ᐳ[207]"):::bucket
+    Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 11, 207, 509, 48<br /><br />ROOT Connectionᐸ205ᐳ[207]"):::bucket
     classDef bucket23 stroke:#ff1493
     class Bucket23,PgSelect208,PgSelect215,First216,PgSelectSingle217,PgClassExpression218 bucket23
     Bucket24("Bucket 24 (listItem)<br />Deps: 48<br /><br />ROOT __Item{24}ᐸ208ᐳ[209]"):::bucket
@@ -604,7 +607,7 @@ graph TD
     Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 227<br /><br />ROOT PgSelectSingleᐸfunc_out_unnamed_out_out_unnamedᐳ[227]"):::bucket
     classDef bucket26 stroke:#ff0000
     class Bucket26,PgClassExpression228,PgClassExpression229,PgClassExpression230 bucket26
-    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 11, 563, 241<br /><br />ROOT Connectionᐸ239ᐳ[241]"):::bucket
+    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 11, 995, 241, 509<br /><br />ROOT Connectionᐸ239ᐳ[241]"):::bucket
     classDef bucket27 stroke:#ffff00
     class Bucket27,PgSelect242,PgSelect247,First248,PgSelectSingle249,PgClassExpression250 bucket27
     Bucket28("Bucket 28 (listItem)<br /><br />ROOT __Item{28}ᐸ242ᐳ[243]"):::bucket
@@ -613,7 +616,7 @@ graph TD
     Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 244<br /><br />ROOT PgSelectSingle{28}ᐸfunc_returns_table_multi_colᐳ[244]"):::bucket
     classDef bucket29 stroke:#4169e1
     class Bucket29,PgClassExpression245,PgClassExpression246 bucket29
-    Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 11, 563, 259<br /><br />ROOT Connectionᐸ257ᐳ[259]"):::bucket
+    Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 11, 995, 259, 509<br /><br />ROOT Connectionᐸ257ᐳ[259]"):::bucket
     classDef bucket30 stroke:#3cb371
     class Bucket30,PgSelect260,PgSelect264,First265,PgSelectSingle266,PgClassExpression267 bucket30
     Bucket31("Bucket 31 (listItem)<br /><br />ROOT __Item{31}ᐸ260ᐳ[261]"):::bucket
@@ -621,17 +624,17 @@ graph TD
     class Bucket31,__Item261,PgSelectSingle262,PgClassExpression263 bucket31
     Bucket32("Bucket 32 (nullableBoundary)<br />Deps: 272, 48, 69<br /><br />ROOT PgSelectSingleᐸpersonᐳ[272]"):::bucket
     classDef bucket32 stroke:#ff00ff
-    class Bucket32,PgClassExpression274,List275,Lambda276,PgClassExpression277,PgSelectSingle286,Connection320,PgSelectSingle332,PgSelectSingle339,PgClassExpression352,PgSelectSingle358,PgClassExpression362,PgSelectSingle367,RemapKeys519,RemapKeys521,RemapKeys525,RemapKeys527,RemapKeys529 bucket32
+    class Bucket32,PgClassExpression274,List275,Lambda276,PgClassExpression277,PgSelectSingle286,Connection320,PgSelectSingle332,PgSelectSingle339,PgClassExpression352,PgSelectSingle358,PgClassExpression362,PgSelectSingle367,RemapKeys783,RemapKeys793,RemapKeys813,RemapKeys823,RemapKeys833 bucket32
     Bucket33("Bucket 33 (nullableBoundary)<br />Deps: 286, 48, 69, 320<br /><br />ROOT PgSelectSingle{32}ᐸperson_computed_complexᐳ[286]"):::bucket
     classDef bucket33 stroke:#f5deb3
-    class Bucket33,PgClassExpression287,PgSelectSingle294,PgSelectSingle302,RemapKeys514,RemapKeys517 bucket33
+    class Bucket33,PgClassExpression287,PgSelectSingle294,PgSelectSingle302,RemapKeys754,RemapKeys773 bucket33
     Bucket34("Bucket 34 (nullableBoundary)<br />Deps: 294<br /><br />ROOT PgSelectSingle{33}ᐸfrmcdc_compoundTypeᐳ[294]"):::bucket
     classDef bucket34 stroke:#696969
     class Bucket34,PgClassExpression295,PgClassExpression296,PgClassExpression297 bucket34
-    Bucket35("Bucket 35 (nullableBoundary)<br />Deps: 302, 48, 517, 69, 320<br /><br />ROOT PgSelectSingle{33}ᐸpersonᐳ[302]"):::bucket
+    Bucket35("Bucket 35 (nullableBoundary)<br />Deps: 302, 48, 773, 69, 320<br /><br />ROOT PgSelectSingle{33}ᐸpersonᐳ[302]"):::bucket
     classDef bucket35 stroke:#00bfff
-    class Bucket35,PgClassExpression304,List305,Lambda306,PgClassExpression307,Access516 bucket35
-    Bucket36("Bucket 36 (listItem)<br />Deps: 69<br /><br />ROOT __Item{36}ᐸ516ᐳ[322]"):::bucket
+    class Bucket35,PgClassExpression304,List305,Lambda306,PgClassExpression307,Access764 bucket35
+    Bucket36("Bucket 36 (listItem)<br />Deps: 69<br /><br />ROOT __Item{36}ᐸ764ᐳ[322]"):::bucket
     classDef bucket36 stroke:#7f007f
     class Bucket36,__Item322,PgSelectSingle323 bucket36
     Bucket37("Bucket 37 (nullableBoundary)<br />Deps: 323, 69<br /><br />ROOT PgSelectSingle{36}ᐸpostᐳ[323]"):::bucket
@@ -654,43 +657,43 @@ graph TD
     class Bucket42,PgClassExpression368,PgClassExpression369 bucket42
     Bucket43("Bucket 43 (nullableBoundary)<br />Deps: 376<br /><br />ROOT PgSelectSingleᐸquery_output_two_rowsᐳ[376]"):::bucket
     classDef bucket43 stroke:#ff0000
-    class Bucket43,PgSelectSingle383,PgSelectSingle411,PgClassExpression430,RemapKeys541 bucket43
+    class Bucket43,PgSelectSingle383,PgSelectSingle411,PgClassExpression430,RemapKeys901 bucket43
     Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 383<br /><br />ROOT PgSelectSingle{43}ᐸleft_armᐳ[383]"):::bucket
     classDef bucket44 stroke:#ffff00
-    class Bucket44,PgClassExpression384,PgClassExpression385,PgClassExpression386,PgClassExpression387,PgSelectSingle393,RemapKeys533 bucket44
+    class Bucket44,PgClassExpression384,PgClassExpression385,PgClassExpression386,PgClassExpression387,PgSelectSingle393,RemapKeys861 bucket44
     Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 393<br /><br />ROOT PgSelectSingle{44}ᐸpersonᐳ[393]"):::bucket
     classDef bucket45 stroke:#00ffff
-    class Bucket45,PgClassExpression394,PgSelectSingle401,RemapKeys531 bucket45
+    class Bucket45,PgClassExpression394,PgSelectSingle401,RemapKeys851 bucket45
     Bucket46("Bucket 46 (nullableBoundary)<br />Deps: 401<br /><br />ROOT PgSelectSingle{45}ᐸperson_secretᐳ[401]"):::bucket
     classDef bucket46 stroke:#4169e1
     class Bucket46,PgClassExpression402 bucket46
     Bucket47("Bucket 47 (nullableBoundary)<br />Deps: 411<br /><br />ROOT PgSelectSingle{43}ᐸpostᐳ[411]"):::bucket
     classDef bucket47 stroke:#3cb371
-    class Bucket47,PgClassExpression412,PgClassExpression413,PgClassExpression414,PgSelectSingle420,RemapKeys539 bucket47
+    class Bucket47,PgClassExpression412,PgClassExpression413,PgClassExpression414,PgSelectSingle420,RemapKeys891 bucket47
     Bucket48("Bucket 48 (nullableBoundary)<br />Deps: 420<br /><br />ROOT PgSelectSingle{47}ᐸpersonᐳ[420]"):::bucket
     classDef bucket48 stroke:#a52a2a
-    class Bucket48,PgClassExpression421,PgSelectSingle428,RemapKeys537 bucket48
+    class Bucket48,PgClassExpression421,PgSelectSingle428,RemapKeys881 bucket48
     Bucket49("Bucket 49 (nullableBoundary)<br />Deps: 428<br /><br />ROOT PgSelectSingle{48}ᐸperson_secretᐳ[428]"):::bucket
     classDef bucket49 stroke:#ff00ff
     class Bucket49,PgClassExpression429 bucket49
     Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 437<br /><br />ROOT PgSelectSingleᐸquery_output_two_rowsᐳ[437]"):::bucket
     classDef bucket50 stroke:#f5deb3
-    class Bucket50,PgSelectSingle444,PgSelectSingle472,PgClassExpression491,RemapKeys553 bucket50
+    class Bucket50,PgSelectSingle444,PgSelectSingle472,PgClassExpression491,RemapKeys969 bucket50
     Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 444<br /><br />ROOT PgSelectSingle{50}ᐸleft_armᐳ[444]"):::bucket
     classDef bucket51 stroke:#696969
-    class Bucket51,PgClassExpression445,PgClassExpression446,PgClassExpression447,PgClassExpression448,PgSelectSingle454,RemapKeys545 bucket51
+    class Bucket51,PgClassExpression445,PgClassExpression446,PgClassExpression447,PgClassExpression448,PgSelectSingle454,RemapKeys929 bucket51
     Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 454<br /><br />ROOT PgSelectSingle{51}ᐸpersonᐳ[454]"):::bucket
     classDef bucket52 stroke:#00bfff
-    class Bucket52,PgClassExpression455,PgSelectSingle462,RemapKeys543 bucket52
+    class Bucket52,PgClassExpression455,PgSelectSingle462,RemapKeys919 bucket52
     Bucket53("Bucket 53 (nullableBoundary)<br />Deps: 462<br /><br />ROOT PgSelectSingle{52}ᐸperson_secretᐳ[462]"):::bucket
     classDef bucket53 stroke:#7f007f
     class Bucket53,PgClassExpression463 bucket53
     Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 472<br /><br />ROOT PgSelectSingle{50}ᐸpostᐳ[472]"):::bucket
     classDef bucket54 stroke:#ffa500
-    class Bucket54,PgClassExpression473,PgClassExpression474,PgClassExpression475,PgSelectSingle481,RemapKeys551 bucket54
+    class Bucket54,PgClassExpression473,PgClassExpression474,PgClassExpression475,PgSelectSingle481,RemapKeys959 bucket54
     Bucket55("Bucket 55 (nullableBoundary)<br />Deps: 481<br /><br />ROOT PgSelectSingle{54}ᐸpersonᐳ[481]"):::bucket
     classDef bucket55 stroke:#0000ff
-    class Bucket55,PgClassExpression482,PgSelectSingle489,RemapKeys549 bucket55
+    class Bucket55,PgClassExpression482,PgSelectSingle489,RemapKeys949 bucket55
     Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 489<br /><br />ROOT PgSelectSingle{55}ᐸperson_secretᐳ[489]"):::bucket
     classDef bucket56 stroke:#7fff00
     class Bucket56,PgClassExpression490 bucket56

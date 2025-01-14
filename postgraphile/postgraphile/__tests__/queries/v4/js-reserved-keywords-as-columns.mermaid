@@ -9,22 +9,25 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect26[["PgSelect[26∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
     Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant112{{"Constant[112∈0] ➊<br />ᐸ'concrete'ᐳ"}}:::plan
+    Lambda71{{"Lambda[71∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object17 & Constant112 & Lambda71 --> PgSelect26
+    PgSelect33[["PgSelect[33∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸ'spongy'ᐳ"}}:::plan
+    Object17 & Constant113 & Lambda71 --> PgSelect33
+    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Constant114{{"Constant[114∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Object17 & Constant114 & Lambda71 --> PgSelect51
+    PgSelect58[["PgSelect[58∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸ'corn'ᐳ"}}:::plan
+    Object17 & Constant115 & Lambda71 --> PgSelect58
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect26[["PgSelect[26∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ'concrete'ᐳ"}}:::plan
-    Object17 & Constant64 --> PgSelect26
-    PgSelect33[["PgSelect[33∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ'spongy'ᐳ"}}:::plan
-    Object17 & Constant65 --> PgSelect33
-    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object17 & Constant66 --> PgSelect51
-    PgSelect58[["PgSelect[58∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ'corn'ᐳ"}}:::plan
-    Object17 & Constant67 --> PgSelect58
+    PgSelect43[["PgSelect[43∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Object17 & Lambda71 --> PgSelect43
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
@@ -36,8 +39,6 @@ graph TD
     PgSelect33 --> First35
     PgSelectSingle36{{"PgSelectSingle[36∈0] ➊<br />ᐸmaterialᐳ"}}:::plan
     First35 --> PgSelectSingle36
-    PgSelect43[["PgSelect[43∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Object17 --> PgSelect43
     First53{{"First[53∈0] ➊"}}:::plan
     PgSelect51 --> First53
     PgSelectSingle54{{"PgSelectSingle[54∈0] ➊<br />ᐸcropᐳ"}}:::plan
@@ -46,10 +47,12 @@ graph TD
     PgSelect58 --> First60
     PgSelectSingle61{{"PgSelectSingle[61∈0] ➊<br />ᐸcropᐳ"}}:::plan
     First60 --> PgSelectSingle61
+    Constant116{{"Constant[116∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
+    Constant116 --> Lambda71
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Object17 & Connection18 --> PgSelect19
+    Object17 & Connection18 & Lambda71 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸmaterialᐳ"}}:::plan
@@ -90,10 +93,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/js-reserved-keywords-as-columns"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 18, 64, 65, 66, 67, 17<br />2: 26, 33, 43, 51, 58<br />ᐳ: 28, 29, 35, 36, 53, 54, 60, 61"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 18, 112, 113, 114, 115, 116, 17, 71<br />2: 26, 33, 43, 51, 58<br />ᐳ: 28, 29, 35, 36, 53, 54, 60, 61"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,PgSelect26,First28,PgSelectSingle29,PgSelect33,First35,PgSelectSingle36,PgSelect43,PgSelect51,First53,PgSelectSingle54,PgSelect58,First60,PgSelectSingle61,Constant64,Constant65,Constant66,Constant67 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,PgSelect26,First28,PgSelectSingle29,PgSelect33,First35,PgSelectSingle36,PgSelect43,PgSelect51,First53,PgSelectSingle54,PgSelect58,First60,PgSelectSingle61,Lambda71,Constant112,Constant113,Constant114,Constant115,Constant116 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 71<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
