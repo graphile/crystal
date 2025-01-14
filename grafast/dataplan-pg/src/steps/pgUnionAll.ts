@@ -1818,50 +1818,43 @@ ${unionHaving}\
       const wrapperAlias = sql.identifier(wrapperSymbol);
       const identifiersSymbol = Symbol("union_identifiers");
       const identifiersAlias = sql.identifier(identifiersSymbol);
-      if (this.placeholders.length > 0) {
-        this.placeholders.forEach((placeholder) => {
-          const { symbol, dependencyIndex, codec, alreadyEncoded } =
-            placeholder;
-          const ev = values[dependencyIndex];
-          if (!ev.isBatch || count === 1) {
-            const value = ev.at(0);
-            placeholderValues.set(
-              symbol,
-              sql`${sql.value(
-                value == null
-                  ? null
-                  : alreadyEncoded
-                  ? value
-                  : codec.toPg(value),
-              )}::${codec.sqlType}`,
+      this.placeholders.forEach((placeholder) => {
+        const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
+        const ev = values[dependencyIndex];
+        if (!ev.isBatch || count === 1) {
+          const value = ev.at(0);
+          placeholderValues.set(
+            symbol,
+            sql`${sql.value(
+              value == null ? null : alreadyEncoded ? value : codec.toPg(value),
+            )}::${codec.sqlType}`,
+          );
+        } else {
+          // Fine a existing match for this dependency of this type
+          const existingIndex = queryValues.findIndex((v) => {
+            return (
+              v.dependencyIndex === placeholder.dependencyIndex &&
+              v.codec === placeholder.codec
             );
-          } else {
-            // Fine a existing match for this dependency of this type
-            const existingIndex = queryValues.findIndex((v) => {
-              return (
-                v.dependencyIndex === placeholder.dependencyIndex &&
-                v.codec === placeholder.codec
-              );
-            });
+          });
 
-            // If none exists, add one to our query values
-            const idx =
-              existingIndex >= 0
-                ? existingIndex
-                : queryValues.push({
-                    dependencyIndex: placeholder.dependencyIndex,
-                    codec: placeholder.codec,
-                    alreadyEncoded: placeholder.alreadyEncoded,
-                  }) - 1;
+          // If none exists, add one to our query values
+          const idx =
+            existingIndex >= 0
+              ? existingIndex
+              : queryValues.push({
+                  dependencyIndex: placeholder.dependencyIndex,
+                  codec: placeholder.codec,
+                  alreadyEncoded: placeholder.alreadyEncoded,
+                }) - 1;
 
-            // Finally alias this symbol to a reference to this placeholder
-            placeholderValues.set(
-              placeholder.symbol,
-              sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-            );
-          }
-        });
-      }
+          // Finally alias this symbol to a reference to this placeholder
+          placeholderValues.set(
+            placeholder.symbol,
+            sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
+          );
+        }
+      });
 
       if (
         queryValues.length > 0 ||
