@@ -16,12 +16,15 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
+    Lambda46{{"Lambda[46∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant54{{"Constant[54∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant54 --> Lambda46
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate_payload(mutation)ᐳ"]]:::sideeffectplan
-    Object14 & Constant43 & Constant44 & Constant45 --> PgSelect11
+    Object14 & Constant51 & Constant52 & Constant53 & Lambda46 --> PgSelect11
     First15{{"First[15∈1] ➊"}}:::plan
     PgSelect11 --> First15
     PgSelectSingle16{{"PgSelectSingle[16∈1] ➊<br />ᐸauthenticate_payloadᐳ"}}:::plan
@@ -30,7 +33,7 @@ graph TD
     PgSelectSingle16 --> Object17
     PgSelect28[["PgSelect[28∈2] ➊<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression34{{"PgClassExpression[34∈2] ➊<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
-    Object14 & PgClassExpression34 --> PgSelect28
+    Object14 & PgClassExpression34 & Lambda46 --> PgSelect28
     First30{{"First[30∈2] ➊"}}:::plan
     PgSelect28 --> First30
     PgSelectSingle31{{"PgSelectSingle[31∈2] ➊<br />ᐸpersonᐳ"}}:::plan
@@ -38,7 +41,7 @@ graph TD
     PgSelectSingle16 --> PgClassExpression34
     PgSelect19[["PgSelect[19∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"]]:::plan
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
-    Object14 & PgClassExpression18 --> PgSelect19
+    Object14 & PgClassExpression18 & Lambda46 --> PgSelect19
     PgSelectSingle16 --> PgClassExpression18
     First23{{"First[23∈3] ➊"}}:::plan
     PgSelect19 --> First23
@@ -62,14 +65,14 @@ graph TD
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-withPayload"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant43,Constant44,Constant45 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 43, 44, 45<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: 15, 16, 17"):::bucket
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Lambda46,Constant51,Constant52,Constant53,Constant54 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 51, 52, 53, 46<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: 15, 16, 17"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectSingle16,Object17 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 16, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]<br />1: <br />ᐳ: PgClassExpression[34]<br />2: PgSelect[28]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 46, 16, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]<br />1: <br />ᐳ: PgClassExpression[34]<br />2: PgSelect[28]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect28,First30,PgSelectSingle31,PgClassExpression34 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 14, 31, 34<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[16]<br />1: <br />ᐳ: 18, 27<br />2: PgSelect[19]<br />ᐳ: 23, 24, 25"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 14, 46, 31, 34<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[16]<br />1: <br />ᐳ: 18, 27<br />2: PgSelect[19]<br />ᐳ: 23, 24, 25"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgSelect19,First23,PgSelectSingle24,PgClassExpression25,PgClassExpression27 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[31]"):::bucket

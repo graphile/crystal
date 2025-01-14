@@ -12,12 +12,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection11{{"Connection[11∈0] ➊<br />ᐸ7ᐳ"}}:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    PgSelect12[["PgSelect[12∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
     Object10{{"Object[10∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda19{{"Lambda[19∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Connection11 & Lambda19 --> PgSelect12
     Access8{{"Access[8∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect12[["PgSelect[12∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
-    Object10 & Connection11 --> PgSelect12
     __Value2 --> Access8
     __Value2 --> Access9
     First13{{"First[13∈1] ➊"}}:::plan
@@ -26,15 +28,16 @@ graph TD
     First13 --> PgSelectSingle14
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression15
+    Constant20 --> Lambda19
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/returns-setof"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection11 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 11<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: <br />ᐳ: Access[8], Access[9], Object[10]<br />2: PgSelect[12]<br />ᐳ: 13, 14, 15"):::bucket
+    class Bucket0,__Value2,__Value4,Connection11,Constant20 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 11, 20<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: <br />ᐳ: 8, 9, 19, 10<br />2: PgSelect[12]<br />ᐳ: 13, 14, 15"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access8,Access9,Object10,PgSelect12,First13,PgSelectSingle14,PgClassExpression15 bucket1
+    class Bucket1,Access8,Access9,Object10,PgSelect12,First13,PgSelectSingle14,PgClassExpression15,Lambda19 bucket1
     Bucket0 --> Bucket1
     end

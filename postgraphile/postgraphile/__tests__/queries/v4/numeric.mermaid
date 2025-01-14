@@ -11,8 +11,9 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrange_testᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ934ᐳ"}}:::plan
-    Object10 & Constant20 --> PgSelect7
+    Constant24{{"Constant[24∈0] ➊<br />ᐸ934ᐳ"}}:::plan
+    Lambda23{{"Lambda[23∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant24 & Lambda23 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -23,6 +24,8 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸrange_testᐳ"}}:::plan
     First11 --> PgSelectSingle12
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant25 --> Lambda23
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__range_test__.”num”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
@@ -34,9 +37,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/numeric"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 20, 10<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 24, 25, 10, 23<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Constant20 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda23,Constant24,Constant25 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸrange_testᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13 bucket1

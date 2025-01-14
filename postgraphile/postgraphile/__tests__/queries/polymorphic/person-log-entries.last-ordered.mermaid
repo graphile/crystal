@@ -10,18 +10,24 @@ graph TD
 
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant32 --> Connection14
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant37 --> Connection14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object13{{"Object[13∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda35{{"Lambda[35∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda39{{"Lambda[39∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Connection14 & Lambda35 & Lambda39 --> PgSelect15
     Access11{{"Access[11∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Connection14 --> PgSelect15
     __Value2 --> Access11
     __Value2 --> Access12
+    Constant40 --> Lambda35
+    Constant41 --> Lambda39
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelect15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈2]<br />ᐸpeopleᐳ"}}:::plan
@@ -30,10 +36,10 @@ graph TD
     PgSelectSingle17 --> PgClassExpression21
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression30
-    Access31{{"Access[31∈3]<br />ᐸ16.0ᐳ"}}:::plan
-    __Item16 --> Access31
-    __Item26[/"__Item[26∈4]<br />ᐸ31ᐳ"\]:::itemplan
-    Access31 ==> __Item26
+    Access36{{"Access[36∈3]<br />ᐸ16.0ᐳ"}}:::plan
+    __Item16 --> Access36
+    __Item26[/"__Item[26∈4]<br />ᐸ36ᐳ"\]:::itemplan
+    Access36 ==> __Item26
     PgSelectSingle27{{"PgSelectSingle[27∈4]<br />ᐸlog_entriesᐳ"}}:::plan
     __Item26 --> PgSelectSingle27
     PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
@@ -46,17 +52,17 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries.last-ordered"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection14,Constant32 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 14<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: <br />ᐳ: Access[11], Access[12], Object[13]<br />2: PgSelect[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection14,Constant37,Constant40,Constant41 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 14, 40, 41<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: <br />ᐳ: 11, 12, 35, 39, 13<br />2: PgSelect[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access11,Access12,Object13,PgSelect15 bucket1
+    class Bucket1,Access11,Access12,Object13,PgSelect15,Lambda35,Lambda39 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 16<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[17]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression30,Access31 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ31ᐳ[26]"):::bucket
+    class Bucket3,PgClassExpression21,PgClassExpression30,Access36 bucket3
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ36ᐳ[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item26,PgSelectSingle27,PgClassExpression28,PgClassExpression29 bucket4
     Bucket0 --> Bucket1

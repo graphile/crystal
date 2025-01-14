@@ -14,14 +14,17 @@ graph TD
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant30{{"Constant[30∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸ'person_secrets'ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Object12{{"Object[12∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda68{{"Lambda[68∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda68 & Lambda68 & Lambda68 & Lambda68 --> PgSelect14
     Access10{{"Access[10∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object12 & Connection13 --> PgSelect14
     __Value2 --> Access10
     __Value2 --> Access11
+    Constant85 --> Lambda68
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸpersonᐳ"}}:::plan
@@ -39,9 +42,9 @@ graph TD
     PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸleft_armᐳ"}}:::plan
     PgSelectSingle16 --> PgSelectSingle29
     PgSelectSingle49{{"PgSelectSingle[49∈3]<br />ᐸperson_secretᐳ"}}:::plan
-    RemapKeys71{{"RemapKeys[71∈3]<br />ᐸ16:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
-    RemapKeys71 --> PgSelectSingle49
-    PgSelectSingle16 --> RemapKeys71
+    RemapKeys81{{"RemapKeys[81∈3]<br />ᐸ16:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
+    RemapKeys81 --> PgSelectSingle49
+    PgSelectSingle16 --> RemapKeys81
     List32{{"List[32∈4]<br />ᐸ30,31ᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant30 & PgClassExpression31 --> List32
@@ -51,11 +54,11 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression34
     PgSelectSingle40{{"PgSelectSingle[40∈4]<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys65{{"RemapKeys[65∈4]<br />ᐸ29:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    RemapKeys65 --> PgSelectSingle40
+    RemapKeys69{{"RemapKeys[69∈4]<br />ᐸ29:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    RemapKeys69 --> PgSelectSingle40
     PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression45
-    PgSelectSingle29 --> RemapKeys65
+    PgSelectSingle29 --> RemapKeys69
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
     PgClassExpression42{{"PgClassExpression[42∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -84,19 +87,19 @@ graph TD
     subgraph "Buckets for queries/v4/one-to-one-backward"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection13,Constant30,Constant50 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 30, 50<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: Access[10], Access[11], Object[12]<br />2: PgSelect[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection13,Constant30,Constant50,Constant85 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 85, 30, 50<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: 10, 11, 68, 12<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,Access11,Object12,PgSelect14 bucket1
+    class Bucket1,Access10,Access11,Object12,PgSelect14,Lambda68 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 30, 50<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 30, 50<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor17,PgClassExpression18,List19,PgClassExpression21,PgClassExpression23,PgSelectSingle29,PgSelectSingle49,RemapKeys71 bucket3
+    class Bucket3,PgCursor17,PgClassExpression18,List19,PgClassExpression21,PgClassExpression23,PgSelectSingle29,PgSelectSingle49,RemapKeys81 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 30<br /><br />ROOT PgSelectSingle{3}ᐸleft_armᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression31,List32,Lambda33,PgClassExpression34,PgSelectSingle40,PgClassExpression45,RemapKeys65 bucket4
+    class Bucket4,PgClassExpression31,List32,Lambda33,PgClassExpression34,PgSelectSingle40,PgClassExpression45,RemapKeys69 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[40]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression41,PgClassExpression42,PgClassExpression44 bucket5

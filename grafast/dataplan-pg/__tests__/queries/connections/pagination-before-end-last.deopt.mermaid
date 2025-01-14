@@ -10,10 +10,10 @@ graph TD
 
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     Lambda15{{"Lambda[15∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
     PgValidateParsedCursor17["PgValidateParsedCursor[17∈0] ➊"]:::plan
-    Constant59 & Lambda15 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 --> Connection14
+    Constant63 & Lambda15 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 & PgValidateParsedCursor17 --> Connection14
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -21,16 +21,21 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTEᐳ"}}:::plan
-    Constant60 --> Lambda15
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTEᐳ"}}:::plan
+    Constant69 --> Lambda15
     Lambda15 --> PgValidateParsedCursor17
+    Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant70 --> Lambda62
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant37{{"Constant[37∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
     Access18{{"Access[18∈1] ➊<br />ᐸ15.1ᐳ"}}:::plan
-    Object13 & Connection14 & Lambda15 & Access18 --> PgSelect16
+    Lambda66{{"Lambda[66∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Connection14 & Lambda15 & Access18 & Lambda66 --> PgSelect16
     PgSelect55[["PgSelect[55∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object13 & Connection14 --> PgSelect55
+    Object13 & Connection14 & Lambda62 --> PgSelect55
     Lambda15 --> Access18
     PgPageInfo36{{"PgPageInfo[36∈1] ➊"}}:::plan
     Connection14 --> PgPageInfo36
@@ -62,13 +67,14 @@ graph TD
     First56 --> PgSelectSingle57
     PgClassExpression58{{"PgClassExpression[58∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle57 --> PgClassExpression58
+    Constant71 --> Lambda66
     __Item19[/"__Item[19∈2]<br />ᐸ16ᐳ"\]:::itemplan
     PgSelect16 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸmessagesᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
     PgSelect26[["PgSelect[26∈3]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object13 & PgClassExpression25 --> PgSelect26
+    Object13 & PgClassExpression25 & Lambda62 --> PgSelect26
     PgCursor21{{"PgCursor[21∈3]"}}:::plan
     List23{{"List[23∈3]<br />ᐸ22ᐳ"}}:::plan
     List23 --> PgCursor21
@@ -90,16 +96,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/connections/pagination-before-end-last"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 37, 59, 60, 13, 15<br />2: PgValidateParsedCursor[17]<br />ᐳ: Connection[14]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 37, 63, 69, 70, 71, 13, 15, 62<br />2: PgValidateParsedCursor[17]<br />ᐳ: Connection[14]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda15,PgValidateParsedCursor17,Constant37,Constant59,Constant60 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 37<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[55]<br />ᐳ: 18, 36, 56, 57, 58<br />2: PgSelect[16]<br />ᐳ: 39, 42, 43, 46, 47, 49, 50, 53, 54, 44, 51"):::bucket
+    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda15,PgValidateParsedCursor17,Constant37,Lambda62,Constant63,Constant69,Constant70,Constant71 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 62, 71, 37<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[55]<br />ᐳ: 18, 36, 66, 56, 57, 58<br />2: PgSelect[16]<br />ᐳ: 39, 42, 43, 46, 47, 49, 50, 53, 54, 44, 51"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect16,Access18,PgPageInfo36,Access39,First42,PgSelectSingle43,PgCursor44,PgClassExpression46,List47,Last49,PgSelectSingle50,PgCursor51,PgClassExpression53,List54,PgSelect55,First56,PgSelectSingle57,PgClassExpression58 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 13<br /><br />ROOT __Item{2}ᐸ16ᐳ[19]"):::bucket
+    class Bucket1,PgSelect16,Access18,PgPageInfo36,Access39,First42,PgSelectSingle43,PgCursor44,PgClassExpression46,List47,Last49,PgSelectSingle50,PgCursor51,PgClassExpression53,List54,PgSelect55,First56,PgSelectSingle57,PgClassExpression58,Lambda66 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 13, 62<br /><br />ROOT __Item{2}ᐸ16ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 13<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[20]<br />1: <br />ᐳ: 22, 24, 25, 23, 21<br />2: PgSelect[26]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 13, 62<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[20]<br />1: <br />ᐳ: 22, 24, 25, 23, 21<br />2: PgSelect[26]<br />ᐳ: First[30], PgSelectSingle[31]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor21,PgClassExpression22,List23,PgClassExpression24,PgClassExpression25,PgSelect26,First30,PgSelectSingle31 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[31]"):::bucket

@@ -12,16 +12,17 @@ graph TD
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Object10 & Constant6 --> PgSelect7
+    Lambda29{{"Lambda[29∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant6 & Lambda29 --> PgSelect7
+    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸtrueᐳ"}}:::plan
+    Object10 & Constant34 & Lambda29 --> PgSelect15
+    PgSelect21[["PgSelect[21∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
+    Constant27{{"Constant[27∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    Object10 & Constant27 & Lambda29 --> PgSelect21
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Object10 & Constant26 --> PgSelect15
-    PgSelect21[["PgSelect[21∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Object10 & Constant27 --> PgSelect21
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -43,12 +44,14 @@ graph TD
     First23 --> PgSelectSingle24
     PgClassExpression25{{"PgClassExpression[25∈0] ➊<br />ᐸ__unique_a..._count__.vᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant35 --> Lambda29
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/functions/custom-query-scalar"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 26, 27, 10<br />2: PgSelect[7], PgSelect[15], PgSelect[21]<br />ᐳ: 11, 12, 13, 17, 18, 19, 23, 24, 25"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 27, 34, 35, 10, 29<br />2: PgSelect[7], PgSelect[15], PgSelect[21]<br />ᐳ: 11, 12, 13, 17, 18, 19, 23, 24, 25"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,PgSelect15,First17,PgSelectSingle18,PgClassExpression19,PgSelect21,First23,PgSelectSingle24,PgClassExpression25,Constant26,Constant27 bucket0
+    class Bucket0,__Value2,__Value4,Constant6,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,PgSelect15,First17,PgSelectSingle18,PgClassExpression19,PgSelect21,First23,PgSelectSingle24,PgClassExpression25,Constant27,Lambda29,Constant34,Constant35 bucket0
     end

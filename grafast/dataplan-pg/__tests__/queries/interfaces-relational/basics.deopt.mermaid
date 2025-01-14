@@ -9,15 +9,18 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda58{{"Lambda[58∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object9 & Lambda58 --> PgSelect6
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object9 --> PgSelect6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant71 --> Lambda58
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item10[/"__Item[10∈1]<br />ᐸ6ᐳ"\]:::itemplan
     PgSelect6 ==> __Item10
@@ -25,7 +28,7 @@ graph TD
     __Item10 --> PgSelectSingle11
     PgSelect14[["PgSelect[14∈2]<br />ᐸrelational_itemsᐳ"]]:::plan
     PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object9 & PgClassExpression13 --> PgSelect14
+    Object9 & PgClassExpression13 & Lambda58 --> PgSelect14
     PgClassExpression12{{"PgClassExpression[12∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle11 --> PgClassExpression12
     PgSelectSingle11 --> PgClassExpression13
@@ -45,15 +48,15 @@ graph TD
     PgSelectSingle22 --> PgClassExpression23
     PgSelect26[["PgSelect[26∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     PgClassExpression25{{"PgClassExpression[25∈5]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression25 --> PgSelect26
+    Object9 & PgClassExpression25 & Lambda58 --> PgSelect26
     PgSelect39[["PgSelect[39∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression25 --> PgSelect39
+    Object9 & PgClassExpression25 & Lambda58 --> PgSelect39
     PgSelect43[["PgSelect[43∈5]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression25 --> PgSelect43
+    Object9 & PgClassExpression25 & Lambda58 --> PgSelect43
     PgSelect47[["PgSelect[47∈5]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression25 --> PgSelect47
+    Object9 & PgClassExpression25 & Lambda58 --> PgSelect47
     PgSelect51[["PgSelect[51∈5]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression25 --> PgSelect51
+    Object9 & PgClassExpression25 & Lambda58 --> PgSelect51
     PgSelectSingle22 --> PgClassExpression25
     First30{{"First[30∈5]"}}:::plan
     PgSelect26 --> First30
@@ -91,22 +94,22 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/interfaces-relational/basics"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 71, 9, 58<br />2: PgSelect[6]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 9<br /><br />ROOT __Item{1}ᐸ6ᐳ[10]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,Lambda58,Constant71 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 9, 58<br /><br />ROOT __Item{1}ᐸ6ᐳ[10]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item10,PgSelectSingle11 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 9<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[11]<br />1: <br />ᐳ: 12, 13<br />2: PgSelect[14]<br />3: __ListTransform[18]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 9, 58<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[11]<br />1: <br />ᐳ: 12, 13<br />2: PgSelect[14]<br />3: __ListTransform[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression12,PgClassExpression13,PgSelect14,__ListTransform18 bucket2
     Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgSelectSingle{3}ᐸrelational_itemsᐳ[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item19,PgSelectSingle20 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 9<br /><br />ROOT __Item{4}ᐸ18ᐳ[21]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />Deps: 9, 58<br /><br />ROOT __Item{4}ᐸ18ᐳ[21]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item21,PgSelectSingle22,PgClassExpression23,PgPolymorphic24 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 22, 9, 24, 23<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 25, 33, 34, 35, 36, 37, 38<br />2: 26, 39, 43, 47, 51<br />ᐳ: 30, 31, 41, 42, 45, 46, 49, 50, 53, 54"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 22, 9, 58, 24, 23<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 25, 33, 34, 35, 36, 37, 38<br />2: 26, 39, 43, 47, 51<br />ᐳ: 30, 31, 41, 42, 45, 46, 49, 50, 53, 54"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression25,PgSelect26,First30,PgSelectSingle31,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgSelect39,First41,PgSelectSingle42,PgSelect43,First45,PgSelectSingle46,PgSelect47,First49,PgSelectSingle50,PgSelect51,First53,PgSelectSingle54 bucket5
     Bucket0 --> Bucket1

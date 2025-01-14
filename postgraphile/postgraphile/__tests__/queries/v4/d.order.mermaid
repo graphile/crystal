@@ -12,14 +12,17 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Object12{{"Object[12∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda29{{"Lambda[29∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda29 --> PgSelect14
     Access10{{"Access[10∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object12 & Connection13 --> PgSelect14
     __Value2 --> Access10
     __Value2 --> Access11
+    Constant30 --> Lambda29
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸpersonᐳ"}}:::plan
@@ -48,10 +51,10 @@ graph TD
     subgraph "Buckets for queries/v4/d.order"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: Access[10], Access[11], Object[12]<br />2: PgSelect[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection13,Constant30 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 30<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: 10, 11, 29, 12<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,Access11,Object12,PgSelect14 bucket1
+    class Bucket1,Access10,Access11,Object12,PgSelect14,Lambda29 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2
