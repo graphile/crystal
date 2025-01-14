@@ -2001,7 +2001,7 @@ ${lateralText};`;
       this.isTrusted = true;
     }
 
-    this.locker.lockAllParameters();
+    this.lock();
     return peers.filter(($p): $p is PgSelectStep<TResource> => {
       if ($p === this) {
         return true;
