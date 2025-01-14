@@ -34,7 +34,8 @@ export type PgStmtDeferredSQL = {
   dependencyIndex: number;
 };
 
-const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgSelect placeholder! */`;
+const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
+const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
 export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   static $$export = {
@@ -64,7 +65,7 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     const symbol = Symbol(`deferred-${$step.id}`);
     const dependencyIndex = this.addUnaryDependency($step);
     this.deferreds.push({ symbol, dependencyIndex });
-    return sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
+    return sql.placeholder(symbol, UNHANDLED_DEFERRED);
   }
 
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
