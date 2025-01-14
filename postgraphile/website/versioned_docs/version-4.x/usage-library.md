@@ -1,12 +1,11 @@
 ---
-layout: page
-path: /postgraphile/usage-library/
-title: PostGraphile as a Library
-fullTitle: Using PostGraphile as a Library
+title: Library Usage
 ---
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
+
+# Using PostGraphile as a Library
 
 Library mode is the most popular way of running PostGraphile; it gives more
 power than using the CLI (see [CLI usage](./usage-cli)), but is much easier to

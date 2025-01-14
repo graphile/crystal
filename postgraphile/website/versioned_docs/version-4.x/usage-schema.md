@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/usage-schema/
-title: Usage - Schema Only
+title: Schema-only Usage
 ---
+
+# Usage - Schema Only
 
 The PostGraphile middleware gives you a lot of excellent features for running
 your own GraphQL server. However, if you want to execute a PostGraphile query in
@@ -313,7 +313,7 @@ async function myResolver(parent, args, context, info) {
 }
 ```
 
-# Server-side TypeScript support
+## Server-side TypeScript support
 
 PostGraphile takes care of building and serving a GraphQL API for various
 clients to use. But it is not only possible to use the API from external
@@ -325,7 +325,7 @@ High-level overview:
 - use the generated types to query/mutate your data
 - optional: use a Visual Studio Code extension to get IntelliSense
 
-## TypeScript code generation
+### TypeScript code generation
 
 We use the [GraphQL code generator](https://graphql-code-generator.com/) tools
 to create the TypeScript types in our backend code.
@@ -377,7 +377,7 @@ Steps to get the backend typing support:
 6. Run `graphql-codegen --config codegen.yml` to generate the types.
 7. The generated types can now be used in your custom business logic code.
 
-### Example
+#### Example
 
 We have a movie table that we want to query from our backend system.
 
@@ -486,7 +486,7 @@ export const BusinessLogicPlugin = makeExtendSchemaPlugin((build: Build) => {
 });
 ```
 
-## GraphQL IntelliSense
+### GraphQL IntelliSense
 
 The above mentioned steps provide strong typing support. If you are developing
 your code with VisualStudio Code you can get IntelliSense support both in
@@ -578,10 +578,13 @@ export const MyPlugin = makeExtendSchemaPlugin((build: Build) => {
 });
 ```
 
-> **Tips and tricks:**  
-> This VS code extension was not super stable as of the time of writing. It
-> would crash sometimes if it thought to find conflicting definitions. This
-> happens often when committing code and comparing it side by side or when
-> having a "bad" graphql file/definition.  
-> If it stops working then reload the VSCode extension host by typing
-> `Developer: Restart Extension Host` in the actions "CTRL+SHIFT+P" field.
+:::tip Tips and tricks
+
+This VS code extension was not super stable as of the time of writing. It
+would crash sometimes if it thought to find conflicting definitions. This
+happens often when committing code and comparing it side by side or when
+having a "bad" graphql file/definition.  
+If it stops working then reload the VSCode extension host by typing
+`Developer: Restart Extension Host` in the actions "CTRL+SHIFT+P" field.
+
+:::

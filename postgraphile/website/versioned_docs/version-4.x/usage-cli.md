@@ -1,11 +1,11 @@
 ---
-layout: page
-path: /postgraphile/usage-cli/
-title: Command Line Interface
+title: CLI Usage
 ---
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
+
+# Command Line Interface
 
 The easiest way to get up and running with PostGraphile is to use the Command
 Line Interface.
