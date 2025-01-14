@@ -303,16 +303,16 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
                   args: [
                     {
                       step: $user.get("id"),
-                      pgCodec: TYPES.text,
+                      pgCodec: TYPES.int,
                       name: "user_id",
                     },
                   ],
-                  from: ($userId) => {
+                  from: (userIdArg) => {
                     const usersTblId = sql.identifier(Symbol());
                     return sql`(select * from ${
                       users!.codec.sqlType
                     } as ${usersTblId} where id != ${
-                      $userId.placeholder
+                      userIdArg.placeholder
                     } order by ${usersTblId}.id limit 1)`;
                   },
                 });
@@ -327,16 +327,16 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
                   args: [
                     {
                       step: $user.get("id"),
-                      pgCodec: TYPES.text,
+                      pgCodec: TYPES.int,
                       name: "user_id",
                     },
                   ],
-                  from: ($userId) => {
+                  from: (userIdArg) => {
                     const usersTblId = sql.identifier(Symbol());
                     return sql`(select * from ${
                       users!.codec.sqlType
                     } as ${usersTblId} where id != ${
-                      $userId.placeholder
+                      userIdArg.placeholder
                     } order by ${usersTblId}.id limit 1 offset 1)`;
                   },
                 });
