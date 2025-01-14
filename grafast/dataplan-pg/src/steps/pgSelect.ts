@@ -1885,6 +1885,16 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     // Handle placeholders
     this.placeholders.forEach(handlePlaceholder);
 
+    // Handle deferreds
+    this.deferreds.forEach((placeholder) => {
+      const { symbol, dependencyIndex } = placeholder;
+      const fragment = values[dependencyIndex].unaryValue();
+      if (!sql.isSQL(fragment)) {
+        throw new Error(`Deferred SQL must be a valid SQL fragment`);
+      }
+      placeholderValues.set(symbol, fragment);
+    });
+
     const makeQuery = ({
       limit,
       offset,

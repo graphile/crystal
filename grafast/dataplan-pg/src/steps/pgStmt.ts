@@ -45,6 +45,21 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
 
   public scopedSQL = makeScopedSQL(this);
 
+  /**
+   * If we can't figure out the SQL until runtime, we can pass a step that
+   * resolves to an SQL fragment.
+   *
+   * IMPORTANT: this step must be a "unary" step; i.e. it can only depend on
+   * request-global dependencies such as variableValues, context, and input
+   * arguments.
+   */
+  public deferredSQL($step: ExecutableStep<SQL>): SQL {
+    const symbol = Symbol(`deferred-${$step.id}`);
+    const dependencyIndex = this.addUnaryDependency($step);
+    this.deferreds.push({ symbol, dependencyIndex });
+    return sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
+  }
+
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
   public placeholder(
     $step: ExecutableStep,
@@ -78,19 +93,16 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     }
 
     const $evalledStep = applyTransforms($step);
-
     const dependencyIndex = this.addDependency($evalledStep);
-    const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
-    const p: PgStmtDeferredPlaceholder = {
+    const symbol = Symbol(`placeholder-${$step.id}`);
+    this.placeholders.push({
       symbol,
       dependencyIndex,
       codec,
       alreadyEncoded,
-    };
-    this.placeholders.push(p);
+    });
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
-    return sqlPlaceholder;
+    return sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
   }
 }
