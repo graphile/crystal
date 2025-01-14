@@ -2887,57 +2887,6 @@ export function getFragmentAndCodecFromOrder(
     return [order.fragment, order.codec, order.nullable];
   }
 }
-
-/**
- * When using cursor-base pagination with 'natural' cursors, we are actually
- * applying limit/offset under the hood (presumably because we're paginating
- * something that has no explicit order, like a function).
- *
- * If you have:
- * - first: 3
- * - after: ['natural', 4]
- *
- * Then we want `limit 3 offset 4`.
- * With `fetchOneExtra` it'd be `limit 4 offset 4`.
- *
- * For:
- * - last: 2
- * - before: ['natural', 6]
- *
- * We want `limit 2 offset 4`
- * With `fetchOneExtra` it'd be `limit 3 offset 3`.
- *
- * For:
- * - last: 2
- * - before: ['natural', 3]
- *
- * We want `limit 2`
- * With `fetchOneExtra` it'd still be `limit 2`.
- *
- * For:
- * - last: 2
- * - before: ['natural', 4]
- *
- * We want `limit 2 offset 1`
- * With `fetchOneExtra` it'd be `limit 3`.
- *
- * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
- *
- * For:
- * - after: ['natural', 2]
- * - before: ['natural', 6]
- *
- * We want `limit 4 offset 2`
- * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
- *
- * For:
- * - first: 2
- * - after: ['natural', 2]
- * - before: ['natural', 6]
- *
- * We want `limit 2 offset 2`
- * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
- */
 function calculateLimitAndOffsetSQL(params: {
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
@@ -2948,57 +2897,121 @@ function calculateLimitAndOffsetSQL(params: {
 }) {
   const { cursorLower, cursorUpper, first, last, offset, fetchOneExtra } =
     params;
-  /** lower bound - exclusive (1-indexed) */
-  let lower = 0;
-  /** upper bound - exclusive (1-indexed) */
-  let upper = Infinity;
+  let limitValue: Maybe<number>;
+  let offsetValue: Maybe<number>;
+  if (cursorLower != null || cursorUpper != null) {
+    /*
+     * When using cursor-base pagination with 'natural' cursors, we are actually
+     * applying limit/offset under the hood (presumably because we're paginating
+     * something that has no explicit order, like a function).
+     *
+     * If you have:
+     * - first: 3
+     * - after: ['natural', 4]
+     *
+     * Then we want `limit 3 offset 4`.
+     * With `fetchOneExtra` it'd be `limit 4 offset 4`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 6]
+     *
+     * We want `limit 2 offset 4`
+     * With `fetchOneExtra` it'd be `limit 3 offset 3`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 3]
+     *
+     * We want `limit 2`
+     * With `fetchOneExtra` it'd still be `limit 2`.
+     *
+     * For:
+     * - last: 2
+     * - before: ['natural', 4]
+     *
+     * We want `limit 2 offset 1`
+     * With `fetchOneExtra` it'd be `limit 3`.
+     *
+     * Using `offset` with `after`/`before` is forbidden, so we do not need to
+     * consider that.
+     *
+     * For:
+     * - after: ['natural', 2]
+     * - before: ['natural', 6]
+     *
+     * We want `limit 4 offset 2`
+     * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
+     *
+     * For:
+     * - first: 2
+     * - after: ['natural', 2]
+     * - before: ['natural', 6]
+     *
+     * We want `limit 2 offset 2`
+     * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
+     */
 
-  // Apply 'after', if present
-  if (cursorLower != null) {
-    lower = Math.max(0, cursorLower);
-  }
+    /** lower bound - exclusive (1-indexed) */
+    let lower = 0;
+    /** upper bound - exclusive (1-indexed) */
+    let upper = Infinity;
 
-  // Apply 'before', if present
-  if (cursorUpper != null) {
-    upper = cursorUpper;
-  }
-
-  // Cannot go beyond these bounds
-  const maxUpper = upper;
-
-  // Apply 'first', if present
-  if (first != null) {
-    upper = Math.min(upper, lower + first + 1);
-  }
-
-  // Apply 'last', if present
-  if (last != null) {
-    lower = Math.max(0, lower, upper - last - 1);
-  }
-
-  // Apply 'offset', if present
-  if (offset != null && offset > 0) {
-    lower = Math.min(lower + offset, maxUpper);
-    upper = Math.min(upper + offset, maxUpper);
-  }
-
-  // If 'fetch one extra', adjust:
-  if (fetchOneExtra) {
-    if (first != null) {
-      upper = upper + 1;
-    } else if (last != null) {
-      lower = Math.max(0, lower - 1);
+    // Apply 'after', if present
+    if (cursorLower != null) {
+      lower = Math.max(0, cursorLower);
     }
+
+    // Apply 'before', if present
+    if (cursorUpper != null) {
+      upper = cursorUpper;
+    }
+
+    // Cannot go beyond these bounds
+    const maxUpper = upper;
+
+    // Apply 'first', if present
+    if (first != null) {
+      upper = Math.min(upper, lower + first + 1);
+    }
+
+    // Apply 'last', if present
+    if (last != null) {
+      lower = Math.max(0, lower, upper - last - 1);
+    }
+
+    // Apply 'offset', if present
+    if (offset != null && offset > 0) {
+      lower = Math.min(lower + offset, maxUpper);
+      upper = Math.min(upper + offset, maxUpper);
+    }
+
+    // If 'fetch one extra', adjust:
+    if (fetchOneExtra) {
+      if (first != null) {
+        upper = upper + 1;
+      } else if (last != null) {
+        lower = Math.max(0, lower - 1);
+      }
+    }
+
+    /** lower, but 0-indexed and inclusive */
+    const lower0 = lower - 1 + 1;
+    /** upper, but 0-indexed and inclusive */
+    const upper0 = upper - 1 - 1;
+
+    // Calculate the final limit/offset
+    limitValue = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
+    offsetValue = lower0;
+  } else {
+    limitValue =
+      first != null
+        ? first + (fetchOneExtra ? 1 : 0)
+        : last != null
+        ? last + (fetchOneExtra ? 1 : 0)
+        : null;
+    offsetValue = offset;
   }
-
-  /** lower, but 0-indexed and inclusive */
-  const lower0 = lower - 1 + 1;
-  /** upper, but 0-indexed and inclusive */
-  const upper0 = upper - 1 - 1;
-
-  // Calculate the final limit/offset
-  const limitValue = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
-  const offsetValue = lower0;
   const limitSql =
     limitValue == null ? sql.blank : sql`\nlimit ${sql.literal(limitValue)}`;
   const offsetSql =
