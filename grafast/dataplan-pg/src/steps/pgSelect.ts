@@ -3015,6 +3015,9 @@ function calculateLimitAndOffsetSQL(params: {
         : null;
     offsetValue = offset;
   }
+  // PERF: consider changing from `${sql.literal(v)}` to
+  // `${sql.value(v)}::"int4"`. (The advantage being that fewer SQL queries are
+  // generated, and thus chances of reusing a query are greater.)
   const limitSql =
     limitValue == null ? sql.blank : sql`\nlimit ${sql.literal(limitValue)}`;
   const offsetSql =
