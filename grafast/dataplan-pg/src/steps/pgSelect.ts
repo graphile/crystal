@@ -1606,31 +1606,33 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private limitAndOffsetSQL: SQL | null = null;
   private planLimitAndOffset() {
-    const $cursorLower = this.getDepOrConstant<Maybe<number>>(
-      this.lowerIndexStepId,
-      null,
-    );
-    const $cursorUpper = this.getDepOrConstant<Maybe<number>>(
-      this.upperIndexStepId,
-      null,
-    );
-    const $first = constant(this.first);
-    const $last = constant(this.last);
-    const $offset = constant(this.offset);
-    const $fetchOneExtra = constant(this.fetchOneExtra);
+    return this.operationPlan.withRootLayerPlan(() => {
+      const $cursorLower = this.getDepOrConstant<Maybe<number>>(
+        this.lowerIndexStepId,
+        null,
+      );
+      const $cursorUpper = this.getDepOrConstant<Maybe<number>>(
+        this.upperIndexStepId,
+        null,
+      );
+      const $first = constant(this.first);
+      const $last = constant(this.last);
+      const $offset = constant(this.offset);
+      const $fetchOneExtra = constant(this.fetchOneExtra);
 
-    return lambda(
-      {
-        cursorLower: $cursorLower,
-        cursorUpper: $cursorUpper,
-        first: $first,
-        last: $last,
-        offset: $offset,
-        fetchOneExtra: $fetchOneExtra,
-      },
-      calculateLimitAndOffsetSQL,
-      true,
-    );
+      return lambda(
+        {
+          cursorLower: $cursorLower,
+          cursorUpper: $cursorUpper,
+          first: $first,
+          last: $last,
+          offset: $offset,
+          fetchOneExtra: $fetchOneExtra,
+        },
+        calculateLimitAndOffsetSQL,
+        true,
+      );
+    });
   }
 
   private buildLimitAndOffset() {
