@@ -1554,7 +1554,7 @@ and ${condition(i + 1)}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count, values } = executionDetails;
+    const { count } = executionDetails;
     const { typeIdx, reverse } = this;
 
     const memberCodecs = this.memberDigests.map(
