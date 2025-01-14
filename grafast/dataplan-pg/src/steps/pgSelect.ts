@@ -3002,6 +3002,8 @@ function calculateLimitAndOffsetSQL(params: {
   const limitSql =
     limitValue == null ? sql.blank : sql`\nlimit ${sql.literal(limitValue)}`;
   const offsetSql =
-    offsetValue == null ? sql.blank : sql`\noffset ${sql.literal(offsetValue)}`;
+    offsetValue == null || offsetValue === 0
+      ? sql.blank
+      : sql`\noffset ${sql.literal(offsetValue)}`;
   return sql`${limitSql}${offsetSql}`;
 }
