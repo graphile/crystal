@@ -23,6 +23,7 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  constant,
   exportAs,
   first,
   isAsyncIterable,
@@ -41,7 +42,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
-import { listOfCodec, TYPES } from "../codecs.js";
+import { listOfCodec } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutorInput } from "../executor.js";
 import type {
@@ -369,8 +370,6 @@ export class PgSelectStep<
   private lowerIndexStepId: number | null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
   private upperIndexStepId: number | null;
-  /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
-  private limitAndOffsetId: number | null;
 
   // OFFSET
 
@@ -640,7 +639,6 @@ export class PgSelectStep<
     this.afterStepId = cloneFromMatchingMode?.afterStepId ?? null;
     this.lowerIndexStepId = cloneFromMatchingMode?.lowerIndexStepId ?? null;
     this.upperIndexStepId = cloneFromMatchingMode?.upperIndexStepId ?? null;
-    this.limitAndOffsetId = cloneFromMatchingMode?.limitAndOffsetId ?? null;
 
     this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
@@ -1608,152 +1606,31 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private limitAndOffsetSQL: SQL | null = null;
   private planLimitAndOffset() {
-    if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
-      /*
-       * When using cursor-base pagination with 'natural' cursors, we are actually
-       * applying limit/offset under the hood (presumably because we're paginating
-       * something that has no explicit order, like a function).
-       *
-       * If you have:
-       * - first: 3
-       * - after: ['natural', 4]
-       *
-       * Then we want `limit 3 offset 4`.
-       * With `fetchOneExtra` it'd be `limit 4 offset 4`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 4`
-       * With `fetchOneExtra` it'd be `limit 3 offset 3`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 3]
-       *
-       * We want `limit 2`
-       * With `fetchOneExtra` it'd still be `limit 2`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 4]
-       *
-       * We want `limit 2 offset 1`
-       * With `fetchOneExtra` it'd be `limit 3`.
-       *
-       * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
-       *
-       * For:
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 4 offset 2`
-       * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
-       *
-       * For:
-       * - first: 2
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 2`
-       * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
-       */
+    const $cursorLower = this.getDepOrConstant<Maybe<number>>(
+      this.lowerIndexStepId,
+      null,
+    );
+    const $cursorUpper = this.getDepOrConstant<Maybe<number>>(
+      this.upperIndexStepId,
+      null,
+    );
+    const $first = constant(this.first);
+    const $last = constant(this.last);
+    const $offset = constant(this.offset);
+    const $fetchOneExtra = constant(this.fetchOneExtra);
 
-      const $lower = this.getDepOrConstant<Maybe<number>>(
-        this.lowerIndexStepId,
-        null,
-      );
-      const $upper = this.getDepOrConstant<Maybe<number>>(
-        this.upperIndexStepId,
-        null,
-      );
-
-      const limitAndOffsetLambda = lambda(
-        [$lower, $upper],
-        ([cursorLower, cursorUpper]) => {
-          /** lower bound - exclusive (1-indexed) */
-          let lower = 0;
-          /** upper bound - exclusive (1-indexed) */
-          let upper = Infinity;
-
-          // Apply 'after', if present
-          if (cursorLower != null) {
-            lower = Math.max(0, cursorLower);
-          }
-
-          // Apply 'before', if present
-          if (cursorUpper != null) {
-            upper = cursorUpper;
-          }
-
-          // Cannot go beyond these bounds
-          const maxUpper = upper;
-
-          // Apply 'first', if present
-          if (this.first != null) {
-            upper = Math.min(upper, lower + this.first + 1);
-          }
-
-          // Apply 'last', if present
-          if (this.last != null) {
-            lower = Math.max(0, lower, upper - this.last - 1);
-          }
-
-          // Apply 'offset', if present
-          if (this.offset != null && this.offset > 0) {
-            lower = Math.min(lower + this.offset, maxUpper);
-            upper = Math.min(upper + this.offset, maxUpper);
-          }
-
-          // If 'fetch one extra', adjust:
-          if (this.fetchOneExtra) {
-            if (this.first != null) {
-              upper = upper + 1;
-            } else if (this.last != null) {
-              lower = Math.max(0, lower - 1);
-            }
-          }
-
-          /** lower, but 0-indexed and inclusive */
-          const lower0 = lower - 1 + 1;
-          /** upper, but 0-indexed and inclusive */
-          const upper0 = upper - 1 - 1;
-
-          // Calculate the final limit/offset
-          const limit = isFinite(upper0)
-            ? Math.max(0, upper0 - lower0 + 1)
-            : null;
-          const offset = lower0;
-
-          return [limit, offset];
-        },
-        true,
-      );
-      this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
-      const limitLambda = access(limitAndOffsetLambda, [0]);
-      const offsetLambda = access(limitAndOffsetLambda, [1]);
-      return sql`\nlimit ${this.placeholder(
-        limitLambda,
-        TYPES.int,
-      )}\noffset ${this.placeholder(offsetLambda, TYPES.int)}`;
-    } else {
-      const limit =
-        this.first != null
-          ? sql`\nlimit ${sql.literal(
-              this.first + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : this.last != null
-          ? sql`\nlimit ${sql.literal(
-              this.last + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-      const offset =
-        this.offset != null
-          ? sql`\noffset ${sql.literal(this.offset)}`
-          : sql.blank;
-      return sql`${limit}${offset}`;
-    }
+    return lambda(
+      {
+        cursorLower: $cursorLower,
+        cursorUpper: $cursorUpper,
+        first: $first,
+        last: $last,
+        offset: $offset,
+        fetchOneExtra: $fetchOneExtra,
+      },
+      calculateLimitAndOffsetSQL,
+      true,
+    );
   }
 
   private buildLimitAndOffset() {
@@ -2407,8 +2284,8 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    // TODO: should this be in 'beforeLock'?
-    this.limitAndOffsetSQL = this.planLimitAndOffset();
+    // TODO: should this be in 'beforeLock'? Or 'deduplicate'?
+    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
 
     // In case we have any lock actions in future:
     this.lock();
@@ -2991,4 +2868,122 @@ export function getFragmentAndCodecFromOrder(
   } else {
     return [order.fragment, order.codec, order.nullable];
   }
+}
+
+/**
+ * When using cursor-base pagination with 'natural' cursors, we are actually
+ * applying limit/offset under the hood (presumably because we're paginating
+ * something that has no explicit order, like a function).
+ *
+ * If you have:
+ * - first: 3
+ * - after: ['natural', 4]
+ *
+ * Then we want `limit 3 offset 4`.
+ * With `fetchOneExtra` it'd be `limit 4 offset 4`.
+ *
+ * For:
+ * - last: 2
+ * - before: ['natural', 6]
+ *
+ * We want `limit 2 offset 4`
+ * With `fetchOneExtra` it'd be `limit 3 offset 3`.
+ *
+ * For:
+ * - last: 2
+ * - before: ['natural', 3]
+ *
+ * We want `limit 2`
+ * With `fetchOneExtra` it'd still be `limit 2`.
+ *
+ * For:
+ * - last: 2
+ * - before: ['natural', 4]
+ *
+ * We want `limit 2 offset 1`
+ * With `fetchOneExtra` it'd be `limit 3`.
+ *
+ * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
+ *
+ * For:
+ * - after: ['natural', 2]
+ * - before: ['natural', 6]
+ *
+ * We want `limit 4 offset 2`
+ * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
+ *
+ * For:
+ * - first: 2
+ * - after: ['natural', 2]
+ * - before: ['natural', 6]
+ *
+ * We want `limit 2 offset 2`
+ * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
+ */
+function calculateLimitAndOffsetSQL(params: {
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+  first: Maybe<number>;
+  last: Maybe<number>;
+  offset: Maybe<number>;
+  fetchOneExtra: boolean;
+}) {
+  const { cursorLower, cursorUpper, first, last, offset, fetchOneExtra } =
+    params;
+  /** lower bound - exclusive (1-indexed) */
+  let lower = 0;
+  /** upper bound - exclusive (1-indexed) */
+  let upper = Infinity;
+
+  // Apply 'after', if present
+  if (cursorLower != null) {
+    lower = Math.max(0, cursorLower);
+  }
+
+  // Apply 'before', if present
+  if (cursorUpper != null) {
+    upper = cursorUpper;
+  }
+
+  // Cannot go beyond these bounds
+  const maxUpper = upper;
+
+  // Apply 'first', if present
+  if (first != null) {
+    upper = Math.min(upper, lower + first + 1);
+  }
+
+  // Apply 'last', if present
+  if (last != null) {
+    lower = Math.max(0, lower, upper - last - 1);
+  }
+
+  // Apply 'offset', if present
+  if (offset != null && offset > 0) {
+    lower = Math.min(lower + offset, maxUpper);
+    upper = Math.min(upper + offset, maxUpper);
+  }
+
+  // If 'fetch one extra', adjust:
+  if (fetchOneExtra) {
+    if (first != null) {
+      upper = upper + 1;
+    } else if (last != null) {
+      lower = Math.max(0, lower - 1);
+    }
+  }
+
+  /** lower, but 0-indexed and inclusive */
+  const lower0 = lower - 1 + 1;
+  /** upper, but 0-indexed and inclusive */
+  const upper0 = upper - 1 - 1;
+
+  // Calculate the final limit/offset
+  const limitValue = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
+  const offsetValue = lower0;
+  const limitSql =
+    limitValue == null ? sql.blank : sql`\nlimit ${sql.literal(limitValue)}`;
+  const offsetSql =
+    offsetValue == null ? sql.blank : sql`\noffset ${sql.literal(offsetValue)}`;
+  return sql`${limitSql}${offsetSql}`;
 }
