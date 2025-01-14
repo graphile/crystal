@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/tables/
-title: PostgreSQL Tables
+title: Tables
 ---
+
+# PostgreSQL Tables
 
 PostGraphile automatically adds a number of elements to the generated GraphQL
 schema based on the tables and columns found in the inspected schema.
@@ -94,6 +94,8 @@ this user can become within the database, and uses the union of all these
 permissions. Using this flag is recommended, as it results in a much leaner
 schema that doesn't contain functionality that you can't actually use.
 
-\* **_NOTE: We strongly [advise against](./requirements) using column-based
-`SELECT` grants with PostGraphile. Instead, split your permission concerns into
-separate tables and join them with one-to-one relations._**
+:::note
+
+We strongly [advise against](./requirements) using column-based
+`SELECT` grants with PostGraphile. Instead, split your permission concerns into separate tables and join them with one-to-one relations.
+:::

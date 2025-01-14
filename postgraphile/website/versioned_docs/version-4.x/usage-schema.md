@@ -583,7 +583,8 @@ export const MyPlugin = makeExtendSchemaPlugin((build: Build) => {
 This VS code extension was not super stable as of the time of writing. It
 would crash sometimes if it thought to find conflicting definitions. This
 happens often when committing code and comparing it side by side or when
-having a "bad" graphql file/definition.  
+having a "bad" graphql file/definition.
+
 If it stops working then reload the VSCode extension host by typing
 `Developer: Restart Extension Host` in the actions "CTRL+SHIFT+P" field.
 

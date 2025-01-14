@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/computed-columns/
 title: Computed Columns
 ---
 
@@ -9,12 +7,15 @@ table type, but, unlike an actual column, the value for this field is the result
 of calling a function defined in the PostgreSQL schema. This function will
 automatically be exposed to the resultant GraphQL schema as a field on the type;
 it can accept arguments that influence its result, and may return either a
-scalar, record, [enum](./enums/#functions-returning-table-enums),
+scalar, record, [enum](./enums),
 list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections).
 
-_Performance note: we inline these function calls into the original `SELECT`
-statement, so there's no N+1 issues - it's very efficient._
+:::note Performance Note
+
+We inline these function calls into the original `SELECT`
+statement, so there's no N+1 issues - it's very efficient.
+:::
 
 To create a function that PostGraphile will recognise as a computed column, it
 must obey the following rules:

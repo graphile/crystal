@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/aggregates/
 title: Aggregates
 ---
 
@@ -29,4 +27,4 @@ information then you could calculate these on the client).
 
 If you're using `simpleCollections: "only"` you can override it on a
 per-collection basis with the
-[`@simpleCollections` smart comment](./smart-comments/#simple-collections).
+[`@simpleCollections` smart tag](./smart-tags#simplecollections).

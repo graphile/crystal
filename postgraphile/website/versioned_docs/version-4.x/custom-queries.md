@@ -1,18 +1,16 @@
 ---
-layout: page
-path: /postgraphile/custom-queries/
 title: Custom Queries
 ---
 
 You can add root-level `Query` fields to your GraphQL schema using "Custom
 Queries". These are PostgreSQL functions, similar to
-[computed columns](./computed-columns), that can return scalars, records, [enums](./computed-columns), lists
+[computed columns](./computed-columns), that can return scalars, records, [enums](./enums), lists
 or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
 [connections](./connections). The arguments to these functions will be exposed
 via GraphQL - named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
-To create a function that PostGraphile will recognise as a custom query, it must
+To create a function that PostGraphile will recognize as a custom query, it must
 obey the following rules:
 
 - adhere to
@@ -102,7 +100,9 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-**NOTE**: this function will have poor performance because `ILIKE`
+:::note
+
+This function will have poor performance because `ILIKE`
 specifications of this form (beginning and ending with `%`) do not utilise
 indexes. If you're doing this in a real application then it's highly recommended
 that you look into
@@ -110,6 +110,7 @@ that you look into
 capabilities which can be exposed by a similar function. You may want to
 [check out `websearch_to_tsquery` in PG11](https://www.postgresql.org/docs/11/static/functions-textsearch.html)
 as part of this.
+:::
 
 <!--
 ### Graphile Plugins
@@ -147,8 +148,11 @@ filters which can be exposed as GraphQL field arguments - if you reduce the
 amount of data that the function can produce (e.g. to 100 rows) then it reduces
 the potential cost of having this function in your schema.
 
-**Disclaimer**: the information in this advice section is not 100% true, for
+:::caution Disclaimer
+
+The information in this advice section is not 100% true, for
 example PostgreSQL can "see through" some `SQL` functions and has a highly
 intelligent query planner. If you're an expert on PostgreSQL then you should
 ignore this advice and go with your own understanding, it's only intended to
 help beginners from shooting themselves in the foot performance-wise.
+:::

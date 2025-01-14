@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/quick-start-guide/
 title: Quick Start Guide
 ---
 
@@ -127,11 +125,15 @@ It is easy to install PostGraphile with
 $ npm install -g postgraphile
 ```
 
-> **NOTE**: _we do not recommend installing PostGraphile globally (with the `-g`
-> flag to `npm` used here) - local installs are preferred. However, if you're
-> just getting started with Node.js then using the global install method is much
-> simpler. Once you start wanting to use plugins with PostGraphile we recommend
-> you move to using a local install._
+:::note
+
+We do not recommend installing PostGraphile globally (with the `-g`
+flag to `npm` used here) - local installs are preferred. However, if you're
+just getting started with Node.js then using the global install method is much
+simpler. Once you start wanting to use plugins with PostGraphile we recommend
+you move to using a local install.
+
+:::
 
 To run PostGraphile, you’ll use the same URL that you used for `psql` with the
 database name added:

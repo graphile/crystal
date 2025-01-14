@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/requirements/
 title: Requirements
 ---
 
@@ -40,7 +38,7 @@ experience.
   instead split your tables on permission boundaries and use one-to-one
   relations to join them together again - this also makes writing your RBAC/RLS
   policies simpler. If you want to omit a column entirely then you can use the
-  [`@omit` smart comment](./smart-comments/#omitting).
+  [`@omit` smart tag](.smart-tags#omit).
 - **Function restrictions**: we have pretty good support for PostgreSQL
   functions, but there's some
   [common function restrictions](./function-restrictions) you should check out.
