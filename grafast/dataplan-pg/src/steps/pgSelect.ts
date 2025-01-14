@@ -157,6 +157,7 @@ export interface PgSelectArgumentDigest {
 interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
+  alreadyEncoded: boolean;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -1514,6 +1515,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             const { symbol } = this.placeholders[i];
             placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
           }
+          for (let i = 0; i < this.deferreds.length; i++) {
+            const { symbol } = this.deferreds[i];
+            placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+          }
           return sql.compile(frag, { placeholderValues }).text;
         }),
       ),
@@ -1810,80 +1815,32 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count, values } = executionDetails;
-    const identifiersSymbol = Symbol(this.name + "_identifiers");
-    const identifiersAlias = sql.identifier(identifiersSymbol);
+    const { count } = executionDetails;
 
-    /**
-     * Since this is effectively like a DataLoader it processes the data for many
-     * different resolvers at once. This list of (hopefully scalar) plans is used
-     * to represent queryValues the query will need such as identifiers for which
-     * records in the result set should be returned to which GraphQL resolvers,
-     * parameters for conditions or orders, etc.
-     */
-    const queryValues: Array<QueryValue> = [];
     const extraWheres: SQL[] = [];
 
-    const placeholderValues = new Map<symbol, SQL>(this.fixedPlaceholderValues);
+    const {
+      queryValues,
+      placeholderValues,
+      handlePlaceholder,
+      identifiersSymbol,
+      identifiersAlias,
+    } = this.makeValues(executionDetails, this.name);
 
-    const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
-      // NOTE: we're NOT adding to `this.identifierMatches`.
-
-      const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
-      const ev = values[dependencyIndex];
-      if (!ev.isBatch || count === 1) {
-        const value = ev.at(0);
-        placeholderValues.set(
-          symbol,
-          sql`${sql.value(
-            value == null ? null : alreadyEncoded ? value : codec.toPg(value),
-          )}::${codec.sqlType}`,
-        );
-      } else {
-        // Fine a existing match for this dependency of this type
-        const existingIndex = queryValues.findIndex((v) => {
-          return v.dependencyIndex === dependencyIndex && v.codec === codec;
-        });
-
-        // If none exists, add one to our query values
-        const idx =
-          existingIndex >= 0
-            ? existingIndex
-            : queryValues.push({ dependencyIndex, codec }) - 1;
-
-        // Finally alias this symbol to a reference to this placeholder
-        placeholderValues.set(
-          symbol,
-          sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-        );
-      }
-    };
+    // Handle fixed placeholder values
+    for (const [key, value] of this.fixedPlaceholderValues.entries()) {
+      placeholderValues.set(key, value);
+    }
 
     // Handle identifiers
     for (const identifierMatch of this.identifierMatches) {
       const { expression, dependencyIndex } = identifierMatch;
       const symbol = Symbol(`dep-${dependencyIndex}`);
       extraWheres.push(sql`${expression} = ${sql.placeholder(symbol)}`);
+      const alreadyEncoded = false;
       // Now it's essentially a placeholder:
-      handlePlaceholder({
-        ...identifierMatch,
-        symbol,
-        alreadyEncoded: false,
-      });
+      handlePlaceholder({ ...identifierMatch, symbol, alreadyEncoded });
     }
-
-    // Handle placeholders
-    this.placeholders.forEach(handlePlaceholder);
-
-    // Handle deferreds
-    this.deferreds.forEach((placeholder) => {
-      const { symbol, dependencyIndex } = placeholder;
-      const fragment = values[dependencyIndex].unaryValue();
-      if (!sql.isSQL(fragment)) {
-        throw new Error(`Deferred SQL must be a valid SQL fragment`);
-      }
-      placeholderValues.set(symbol, fragment);
-    });
 
     const makeQuery = ({
       limit,
