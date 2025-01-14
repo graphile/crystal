@@ -3791,6 +3791,10 @@ export class OperationPlan {
   public resetCache() {
     this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
   }
+
+  public withRootLayerPlan<T>(cb: () => T): T {
+    return withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, cb);
+  }
 }
 
 function makeDefaultPlan(fieldName: string) {
