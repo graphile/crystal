@@ -137,7 +137,7 @@ export class PgLocker<TStep extends PgStmtBaseStep<any>> {
     }
   }
 
-  public lockAllParameters() {
+  private lockAllParameters() {
     // // We must execute everything after `from` so we have the alias to reference
     // this.lockParameter("from");
     // this.lockParameter("join");
