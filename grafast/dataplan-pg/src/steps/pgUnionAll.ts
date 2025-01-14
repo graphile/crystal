@@ -59,7 +59,11 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
+import type {
+  PgStmtDeferredPlaceholder,
+  PgStmtDeferredSQL,
+  QueryValue,
+} from "./pgStmt.js";
 import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
@@ -189,12 +193,6 @@ export interface PgUnionAllStepCondition<TAttributes extends string> {
 export interface PgUnionAllStepOrder<TAttributes extends string> {
   attribute: TAttributes;
   direction: "ASC" | "DESC";
-}
-
-interface QueryValue {
-  dependencyIndex: number;
-  codec: PgCodec;
-  alreadyEncoded: boolean;
 }
 
 export class PgUnionAllSingleStep
@@ -1493,6 +1491,10 @@ and ${condition(i + 1)}`}
             const { symbol } = this.placeholders[i];
             placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
           }
+          for (let i = 0; i < this.deferreds.length; i++) {
+            const { symbol } = this.deferreds[i];
+            placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+          }
           return sql.compile(frag, { placeholderValues }).text;
         }),
       ),
@@ -1823,43 +1825,15 @@ ${unionHaving}\
       identifierIndex: number | null;
       queryValues: Array<QueryValue>;
     } => {
-      const queryValues: Array<QueryValue> = [];
-      const placeholderValues = new Map<symbol, SQL>();
-
       const wrapperSymbol = Symbol("union_result");
       const wrapperAlias = sql.identifier(wrapperSymbol);
-      const identifiersSymbol = Symbol("union_identifiers");
-      const identifiersAlias = sql.identifier(identifiersSymbol);
-      this.placeholders.forEach((placeholder) => {
-        const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
-        const ev = values[dependencyIndex];
-        if (!ev.isBatch || count === 1) {
-          const value = ev.at(0);
-          const encodedValue =
-            value == null ? null : alreadyEncoded ? value : codec.toPg(value);
-          placeholderValues.set(
-            symbol,
-            sql`${sql.value(encodedValue)}::${codec.sqlType}`,
-          );
-        } else {
-          // Fine a existing match for this dependency of this type
-          const existingIndex = queryValues.findIndex(
-            (v) => v.dependencyIndex === dependencyIndex && v.codec === codec,
-          );
 
-          // If none exists, add one to our query values
-          const idx =
-            existingIndex >= 0
-              ? existingIndex
-              : queryValues.push(placeholder) - 1;
-
-          // Finally alias this symbol to a reference to this placeholder
-          placeholderValues.set(
-            placeholder.symbol,
-            sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-          );
-        }
-      });
+      const {
+        queryValues,
+        placeholderValues,
+        identifiersAlias,
+        identifiersSymbol,
+      } = this.makeValues(executionDetails, "union");
 
       if (
         queryValues.length > 0 ||

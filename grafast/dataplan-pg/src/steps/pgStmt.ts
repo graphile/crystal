@@ -1,9 +1,16 @@
+import type { ExecutionDetails } from "grafast";
 import { applyTransforms, ExecutableStep } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type { PgCodec, PgTypedExecutableStep } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
+
+export interface QueryValue {
+  dependencyIndex: number;
+  codec: PgCodec;
+  alreadyEncoded: boolean;
+}
 
 /**
  * Sometimes we want to refer to something that might change later - e.g. we
@@ -104,5 +111,69 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
     return sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
+  }
+
+  protected makeValues(executionDetails: ExecutionDetails, name: string) {
+    const { values, count } = executionDetails;
+    const identifiersSymbol = Symbol(name + "_identifiers");
+    const identifiersAlias = sql.identifier(identifiersSymbol);
+    /**
+     * Since this is effectively like a DataLoader it processes the data for many
+     * different resolvers at once. This list of (hopefully scalar) plans is used
+     * to represent queryValues the query will need such as identifiers for which
+     * records in the result set should be returned to which GraphQL resolvers,
+     * parameters for conditions or orders, etc.
+     */
+    const queryValues: Array<QueryValue> = [];
+    const placeholderValues = new Map<symbol, SQL>();
+    const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
+      const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
+      const ev = values[dependencyIndex];
+      if (!ev.isBatch || count === 1) {
+        const value = ev.at(0);
+        const encodedValue =
+          value == null ? null : alreadyEncoded ? value : codec.toPg(value);
+        placeholderValues.set(
+          symbol,
+          sql`${sql.value(encodedValue)}::${codec.sqlType}`,
+        );
+      } else {
+        // Fine a existing match for this dependency of this type
+        const existingIndex = queryValues.findIndex(
+          (v) => v.dependencyIndex === dependencyIndex && v.codec === codec,
+        );
+
+        // If none exists, add one to our query values
+        const idx =
+          existingIndex >= 0
+            ? existingIndex
+            : queryValues.push(placeholder) - 1;
+
+        // Finally alias this symbol to a reference to this placeholder
+        placeholderValues.set(
+          placeholder.symbol,
+          sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
+        );
+      }
+    };
+    this.placeholders.forEach(handlePlaceholder);
+
+    // Handle deferreds
+    this.deferreds.forEach((placeholder) => {
+      const { symbol, dependencyIndex } = placeholder;
+      const fragment = values[dependencyIndex].unaryValue();
+      if (!sql.isSQL(fragment)) {
+        throw new Error(`Deferred SQL must be a valid SQL fragment`);
+      }
+      placeholderValues.set(symbol, fragment);
+    });
+
+    return {
+      queryValues,
+      placeholderValues,
+      identifiersSymbol,
+      identifiersAlias,
+      handlePlaceholder,
+    };
   }
 }
