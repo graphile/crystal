@@ -2013,7 +2013,7 @@ ${lateralText};`;
       this.isTrusted = true;
     }
 
-    this.lock();
+    this.locker.lockAllParameters();
     return peers.filter(($p): $p is PgSelectStep<TResource> => {
       if ($p === this) {
         return true;
@@ -2316,15 +2316,14 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    // This cannot be done in deduplicate because setting fetchOneExtra comes later.
-    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
-
     // In case we have any lock actions in future:
     this.lock();
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
     this.locker.locked = false;
+    // This cannot be done in deduplicate because setting fetchOneExtra comes later.
+    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
     this.streamOptions = stream;
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
