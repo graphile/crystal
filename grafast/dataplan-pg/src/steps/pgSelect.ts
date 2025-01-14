@@ -2256,6 +2256,36 @@ ${lateralText};`;
         );
       }
     }
+    for (const deferred of this.deferreds) {
+      const { dependencyIndex, symbol } = deferred;
+      const dep = this.getDep(dependencyIndex);
+      /*
+       * We have dependency `dep`. We're attempting to merge ourself into
+       * `otherPlan`. We have two situations we need to handle:
+       *
+       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
+       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
+       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
+       *    result of selecting an expression in the `otherPlan`), in which
+       *    case we should turn it into an SQL expression and inline that.
+       */
+
+      // PERF: we know dep can't depend on otherPlan if
+      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
+      // `otherPlan`'s layerPlan.
+      if (stepAMayDependOnStepB(otherPlan, dep)) {
+        // Either dep is a static input plan (which isn't dependent on anything
+        // else) or otherPlan is deeper than dep; either way we can use the dep
+        // directly within otherPlan.
+        const newPlanIndex = otherPlan.addDependency(dep);
+        otherPlan.deferreds.push({
+          symbol,
+          dependencyIndex: newPlanIndex,
+        });
+      } else {
+        throw new Error(`Could not merge deferred: ${dep}`);
+      }
+    }
     for (const [
       sqlPlaceholder,
       placeholderValue,
