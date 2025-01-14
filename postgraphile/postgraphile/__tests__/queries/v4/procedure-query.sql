@@ -206,32 +206,31 @@ select
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
+limit 1
+offset 3;
 
 select
   (row_number() over (partition by 1))::text as "0",
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
+limit 3
+offset 1;
 
 select
   (row_number() over (partition by 1))::text as "0",
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
+limit 3;
 
 select
   (row_number() over (partition by 1))::text as "0",
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
+limit 3
+offset 3;
 
 select
   (row_number() over (partition by 1))::text as "0",
@@ -254,32 +253,14 @@ select
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit 3
-offset 0;
+limit 7;
 
 select
   (row_number() over (partition by 1))::text as "0",
   __table_set_query__."person_full_name" as "1",
   __table_set_query__."id"::text as "2"
 from "c"."table_set_query"() as __table_set_query__
-limit 7
-offset 0;
-
-select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
-from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
-
-select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
-from "c"."table_set_query"() as __table_set_query__
-limit $1::"int4"
-offset $2::"int4";
+limit 0;
 
 select
   (row_number() over (partition by 1))::text as "0",
@@ -293,8 +274,8 @@ select
   __table_set_query_plpgsql__."person_full_name" as "1",
   __table_set_query_plpgsql__."id"::text as "2"
 from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
-limit $1::"int4"
-offset $2::"int4";
+limit 3
+offset 2;
 
 select
   __int_set_query__.v::text as "0",
