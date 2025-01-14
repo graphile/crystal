@@ -1998,7 +1998,6 @@ ${lateralText};`;
   }
 
   deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TResource>[] {
-    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
     if (!this.isTrusted) {
       this.resource.applyAuthorizationChecksToPlan(this);
       this.isTrusted = true;
@@ -2307,6 +2306,9 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
+    // This cannot be done in deduplicate because setting fetchOneExtra comes later.
+    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
+
     // In case we have any lock actions in future:
     this.lock();
 
