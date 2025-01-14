@@ -1823,30 +1823,23 @@ ${unionHaving}\
         const ev = values[dependencyIndex];
         if (!ev.isBatch || count === 1) {
           const value = ev.at(0);
+          const encodedValue =
+            value == null ? null : alreadyEncoded ? value : codec.toPg(value);
           placeholderValues.set(
             symbol,
-            sql`${sql.value(
-              value == null ? null : alreadyEncoded ? value : codec.toPg(value),
-            )}::${codec.sqlType}`,
+            sql`${sql.value(encodedValue)}::${codec.sqlType}`,
           );
         } else {
           // Fine a existing match for this dependency of this type
-          const existingIndex = queryValues.findIndex((v) => {
-            return (
-              v.dependencyIndex === placeholder.dependencyIndex &&
-              v.codec === placeholder.codec
-            );
-          });
+          const existingIndex = queryValues.findIndex(
+            (v) => v.dependencyIndex === dependencyIndex && v.codec === codec,
+          );
 
           // If none exists, add one to our query values
           const idx =
             existingIndex >= 0
               ? existingIndex
-              : queryValues.push({
-                  dependencyIndex: placeholder.dependencyIndex,
-                  codec: placeholder.codec,
-                  alreadyEncoded: placeholder.alreadyEncoded,
-                }) - 1;
+              : queryValues.push(placeholder) - 1;
 
           // Finally alias this symbol to a reference to this placeholder
           placeholderValues.set(
