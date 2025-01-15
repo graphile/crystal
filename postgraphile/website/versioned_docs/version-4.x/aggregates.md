@@ -12,8 +12,7 @@ need aggregates good starting points are:
   match the criteria (ignoring pagination info)
 - The [@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates)
   module which adds `sum` aggregates to the schema (more to come)
-- The [Discord chat](http://discord.gg/graphile) (feel free to @benjie in
-  \#help-and-support)
+- The [Discord chat](http://discord.gg/graphile) (feel free to post in the help-forum)
 
 ### Aggregates ignore pagination info
 

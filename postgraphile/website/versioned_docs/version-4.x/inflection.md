@@ -48,7 +48,7 @@ module.exports = makeAddInflectorsPlugin(
 );
 ```
 
-See there also for
+See also:
 [which inflectors to overwrite](./make-add-inflectors-plugin#where-are-the-default-inflectors-defined).
 
 ### Advice
