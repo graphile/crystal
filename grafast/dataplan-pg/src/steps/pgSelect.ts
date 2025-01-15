@@ -1218,7 +1218,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
-    const { first, last, offset } = this.getExecutionCommon(executionDetails);
+    const { first, last } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
       count,
@@ -1305,7 +1305,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       values,
       extra: { eventEmitter },
     } = executionDetails;
-    const { first, last, offset } = this.getExecutionCommon(executionDetails);
+    const { first, last } = this.getExecutionCommon(executionDetails);
     if (first === 0 || last === 0) {
       return arrayOfLength(count, Object.freeze([]));
     }
