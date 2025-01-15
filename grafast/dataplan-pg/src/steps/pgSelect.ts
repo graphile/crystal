@@ -1192,7 +1192,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     return operationPlan().withRootLayerPlan(() =>
       lambda(
         {
-          isStream: constant(this.streamOptions != null),
+          isStream: constant(this.streamOptions != null, false),
           first: this.getDepOrConstant(this.firstStepId, null),
           last: this.getDepOrConstant(this.lastStepId, null),
           cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
@@ -1630,10 +1630,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     return operationPlan().withRootLayerPlan(() =>
       lambda(
         {
-          reverse: $shouldReverseOrder ?? constant(false),
-          orders: constant(this.orders),
-          alias: constant(this.alias),
-          codec: constant(this.resource.codec),
+          reverse: $shouldReverseOrder ?? constant(false, false),
+          orders: constant(this.orders, false),
+          alias: constant(this.alias, false),
+          codec: constant(this.resource.codec, false),
         },
         calculateOrderBySQL,
         true,
@@ -1655,7 +1655,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           first: numberDep(this.firstStepId),
           last: numberDep(this.lastStepId),
           offset: numberDep(this.offsetStepId),
-          fetchOneExtra: constant(this.fetchOneExtra),
+          fetchOneExtra: constant(this.fetchOneExtra, false),
         },
         calculateLimitAndOffsetSQL,
         true,
@@ -2623,7 +2623,7 @@ ${lateralText};`;
               first: $first,
               last: $last,
               shouldReverseOrder: $shouldReverseOrder,
-              fetchOneExtra: constant(this.fetchOneExtra),
+              fetchOneExtra: constant(this.fetchOneExtra, false),
             },
             reverseIfNecessary,
             true,
