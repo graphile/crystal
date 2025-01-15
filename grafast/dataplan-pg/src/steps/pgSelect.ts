@@ -2605,7 +2605,7 @@ ${lateralText};`;
             parent2,
           );
           const $first = this.getDepOrConstant(this.firstStepId, null);
-          const $last = this.getDepOrConstant(this.firstStepId, null);
+          const $last = this.getDepOrConstant(this.lastStepId, null);
           const rowsPlan = access<any[]>(parent2, [selfIndex], []);
           return lambda(
             {
