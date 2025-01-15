@@ -34,7 +34,6 @@ import {
   list,
   operationPlan,
   remapKeys,
-  reverse,
   reverseArray,
   SafeError,
   stepAMayDependOnStepB,
