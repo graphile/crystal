@@ -143,9 +143,7 @@ export class ConnectionStep<
   }
 
   public getFirst(): InputStep | null {
-    return this._firstDepId != null
-      ? (this.getDep(this._firstDepId) as InputStep)
-      : null;
+    return this.maybeGetDep<InputStep>(this._firstDepId);
   }
   public setFirst($firstPlan: InputStep) {
     if (this._firstDepId != null) {
@@ -154,9 +152,7 @@ export class ConnectionStep<
     this._firstDepId = this.addDependency($firstPlan);
   }
   public getLast(): InputStep | null {
-    return this._lastDepId != null
-      ? (this.getDep(this._lastDepId) as InputStep)
-      : null;
+    return this.maybeGetDep<InputStep>(this._lastDepId);
   }
   public setLast($lastPlan: InputStep) {
     if (this._lastDepId != null) {
@@ -165,9 +161,7 @@ export class ConnectionStep<
     this._lastDepId = this.addDependency($lastPlan);
   }
   public getOffset(): InputStep | null {
-    return this._offsetDepId != null
-      ? (this.getDep(this._offsetDepId) as InputStep)
-      : null;
+    return this.maybeGetDep<InputStep>(this._offsetDepId);
   }
   public setOffset($offsetPlan: InputStep) {
     if (this._offsetDepId != null) {
@@ -176,9 +170,7 @@ export class ConnectionStep<
     this._offsetDepId = this.addDependency($offsetPlan);
   }
   public getBefore(): TCursorStep | null {
-    return this._beforeDepId != null
-      ? (this.getDep(this._beforeDepId) as TCursorStep)
-      : null;
+    return this.maybeGetDep<TCursorStep>(this._beforeDepId);
   }
   public setBefore($beforePlan: InputStep) {
     if (this._beforeDepId !== undefined) {
@@ -190,9 +182,7 @@ export class ConnectionStep<
       : null;
   }
   public getAfter(): TCursorStep | null {
-    return this._afterDepId != null
-      ? (this.getDep(this._afterDepId) as TCursorStep)
-      : null;
+    return this.maybeGetDep<TCursorStep>(this._afterDepId);
   }
   public setAfter($afterPlan: InputStep) {
     if (this._afterDepId !== undefined) {
@@ -458,11 +448,11 @@ export class EdgeStep<
     TStep,
     TNodeStep
   > {
-    return this.getDep(this.connectionDepId) as any;
+    return this.getDep<any>(this.connectionDepId);
   }
 
   private getItemStep(): TItemStep {
-    return this.getDep(0) as any;
+    return this.getDep<any>(0);
   }
 
   public data(): TEdgeDataStep {

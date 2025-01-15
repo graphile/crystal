@@ -397,8 +397,26 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return { step, acceptFlags, onReject };
   }
 
-  protected getDep(_depId: number): ExecutableStep {
+  protected getDep<T extends ExecutableStep = ExecutableStep>(
+    _depId: number,
+  ): T {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
+  }
+
+  protected maybeGetDep<T extends ExecutableStep = ExecutableStep>(
+    depId: number | null | undefined,
+  ): T | null {
+    return depId == null ? null : this.getDep<T>(depId);
+  }
+
+  protected getDepOrConstant<TData = any>(
+    _depId: number | null,
+    _fallback: TData,
+  ): ExecutableStep<TData> {
+    // This gets replaced when `constant` is loaded. Were we on ESM we could
     // just put the code here, but since we're not we have to avoid the
     // circular dependency.
     throw new Error(`Grafast failed to load correctly`);

@@ -167,7 +167,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep(this.listStepDepId) as TListStep;
+    return this.getDep<TListStep>(this.listStepDepId);
   }
 
   [$$deepDepSkip]() {
