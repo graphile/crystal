@@ -1,6 +1,6 @@
 import { inspect } from "../inspect.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 /**
@@ -136,3 +136,12 @@ export function constant<TData>(
   }
   return new ConstantStep<TData>(data, isSecret);
 }
+
+// Have to overwrite the getDepOrConstant method due to circular dependency
+(ExecutableStep.prototype as any).getDepOrConstant = function <TData>(
+  this: ExecutableStep,
+  depId: number | null,
+  fallback: TData,
+): ExecutableStep<TData> {
+  return this.maybeGetDep(depId) ?? constant(fallback);
+};
