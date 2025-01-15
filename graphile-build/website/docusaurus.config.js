@@ -109,11 +109,23 @@ const config = {
             label: "Graphile Build",
           },
           {
+            type: "docsVersionDropdown",
+            position: "left",
+            //docsPluginId: "docs",
+            dropdownActiveClassDisabled: true,
+          },
+          {
             type: "doc",
             docId: "index",
             docsPluginId: "graphile-build-pg",
             position: "left",
             label: "Graphile Build pg",
+          },
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            docsPluginId: "graphile-build-pg",
+            dropdownActiveClassDisabled: true,
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
