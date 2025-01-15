@@ -11,8 +11,16 @@ graph TD
     %% plan dependencies
     PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_user_array_setᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda28{{"Lambda[28∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object9 & Lambda28 --> PgSelect6
+    Lambda23{{"Lambda[23∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda26{{"Lambda[26∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda36{{"Lambda[36∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object9 & Lambda23 & Lambda26 & Lambda31 & Lambda36 --> PgSelect6
+    Object30{{"Object[30∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant27{{"Constant[27∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸ{ s: Symbol(random_user_array_set), n: 'random_user_array_seᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: 'app_public.users', [Symbol(pᐳ"}}:::plan
+    Lambda23 & Constant27 & Constant28 & Constant29 --> Object30
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
@@ -21,8 +29,13 @@ graph TD
     __Value2 --> Access8
     __ListTransform10[["__ListTransform[10∈0] ➊<br />ᐸpartitionByIndex1:6ᐳ"]]:::plan
     PgSelect6 --> __ListTransform10
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
-    Constant29 --> Lambda28
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant37 --> Lambda23
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant38 --> Lambda26
+    Object30 --> Lambda31
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(random_useᐳ"}}:::plan
+    Constant39 --> Lambda36
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item11[/"__Item[11∈1]<br />ᐸ6ᐳ"\]:::itemplan
     PgSelect6 -.-> __Item11
@@ -44,9 +57,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 29, 9, 28<br />2: PgSelect[6]<br />3: __ListTransform[10]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 27, 28, 29, 37, 38, 39, 9, 23, 26, 30, 31, 36<br />2: PgSelect[6]<br />3: __ListTransform[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,__ListTransform10,Lambda28,Constant29 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,__ListTransform10,Lambda23,Lambda26,Constant27,Constant28,Constant29,Object30,Lambda31,Lambda36,Constant37,Constant38,Constant39 bucket0
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgClassExpression{1}ᐸ__random_u..._set_idx__ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1

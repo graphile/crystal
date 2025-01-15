@@ -1,47 +1,41 @@
 select
-  ("c"."person_optional_missing_middle_4"(
+  ("c"."person_optional_missing_middle_1"(
     __person__,
     $1::"int4",
-    $2::"int4",
-    $3::"int4"
+    "c" := $2::"int4"
   ))::text as "0",
-  __person__."id"::text as "1",
-  ("c"."person_optional_missing_middle_5"(
-    __person_2,
+  ("c"."person_optional_missing_middle_1"(
+    __person__,
+    $3::"int4",
     $4::"int4",
-    $5::"int4",
-    $6::"int4"
-  ))::text as "2",
-  __person_2."id"::text as "3",
-  ("c"."person_optional_missing_middle_1"(
-    __person_3,
-    $7::"int4",
-    "c" := $8::"int4"
-  ))::text as "4",
-  ("c"."person_optional_missing_middle_1"(
-    __person_3,
-    $9::"int4",
-    $10::"int4",
-    $11::"int4"
-  ))::text as "5",
+    $5::"int4"
+  ))::text as "1",
   ("c"."person_optional_missing_middle_2"(
-    __person_3,
-    $12::"int4",
-    "c" := $13::"int4"
-  ))::text as "6",
+    __person__,
+    $6::"int4",
+    "c" := $7::"int4"
+  ))::text as "2",
   ("c"."person_optional_missing_middle_3"(
-    __person_3,
+    __person__,
+    $8::"int4",
+    "c" := $9::"int4"
+  ))::text as "3",
+  ("c"."person_optional_missing_middle_4"(
+    __person__,
+    $10::"int4",
+    $11::"int4",
+    $12::"int4"
+  ))::text as "4",
+  ("c"."person_optional_missing_middle_5"(
+    __person__,
+    $13::"int4",
     $14::"int4",
-    "c" := $15::"int4"
-  ))::text as "7",
-  __person_3."id"::text as "8"
-from "c"."person" as __person_3
-left outer join lateral (select (__person_3).*) as __person__
-on TRUE
-left outer join lateral (select (__person_3).*) as __person_2
-on TRUE
+    $15::"int4"
+  ))::text as "5",
+  __person__."id"::text as "6"
+from "c"."person" as __person__
 where (
-  __person_3."id" = $16::"int4"
+  __person__."id" = $16::"int4"
 );
 
 select
@@ -93,12 +87,6 @@ order by __types__."id" asc;
 
 select
   __post__."headline" as "0",
-  "a"."post_headline_trimmed_no_defaults"(
-    __post_2,
-    $1::"int4",
-    $2::"text"
-  ) as "1",
-  __post_2."id"::text as "2",
   (select json_agg(s) from (
     select
       __post_computed_compound_type_array__."a"::text as "0",
@@ -111,50 +99,53 @@ select
       __post_computed_compound_type_array__."foo_bar"::text as "7",
       (not (__post_computed_compound_type_array__ is null))::text as "8"
     from unnest("a"."post_computed_compound_type_array"(
-      __post_3,
-      $3::"c"."compound_type"
+      __post_2,
+      $1::"c"."compound_type"
     )) as __post_computed_compound_type_array__
-  ) s) as "3",
+  ) s) as "1",
   (select json_agg(s) from (
     select
       to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
       (row_number() over (partition by 1))::text as "1"
     from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  ) s) as "4",
-  "a"."post_headline_trimmed"(__post__) as "5",
+  ) s) as "2",
+  "a"."post_headline_trimmed"(__post__) as "3",
   "a"."post_headline_trimmed"(
     __post__,
-    $4::"int4"
-  ) as "6",
+    $2::"int4"
+  ) as "4",
   "a"."post_headline_trimmed"(
     __post__,
-    $5::"int4",
-    $6::"text"
+    $3::"int4",
+    $4::"text"
+  ) as "5",
+  "a"."post_headline_trimmed_strict"(__post__) as "6",
+  "a"."post_headline_trimmed_strict"(
+    __post__,
+    $5::"int4"
   ) as "7",
-  "a"."post_headline_trimmed_strict"(__post__) as "8",
   "a"."post_headline_trimmed_strict"(
     __post__,
-    $7::"int4"
-  ) as "9",
-  "a"."post_headline_trimmed_strict"(
+    $6::"int4",
+    $7::"text"
+  ) as "8",
+  "a"."post_headline_trimmed_no_defaults"(
     __post__,
     $8::"int4",
     $9::"text"
-  ) as "10",
+  ) as "9",
   "a"."post_headline_trimmed_no_defaults"(
     __post__,
     $10::"int4",
     $11::"text"
-  ) as "11",
-  ("a"."post_computed_text_array"(__post__))::text as "12",
+  ) as "10",
+  ("a"."post_computed_text_array"(__post__))::text as "11",
   (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
     select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-  )::text end) as "13"
+  )::text end) as "12"
 from "a"."post" as __post__
 left outer join lateral (select (__post__).*) as __post_2
-on TRUE
-left outer join lateral (select (__post__).*) as __post_3
 on TRUE
 order by __post__."id" asc;
 

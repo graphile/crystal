@@ -9,117 +9,176 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect26[["PgSelect[26∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ'concrete'ᐳ"}}:::plan
-    Lambda71{{"Lambda[71∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object17 & Constant112 & Lambda71 --> PgSelect26
-    PgSelect33[["PgSelect[33∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ'spongy'ᐳ"}}:::plan
-    Object17 & Constant113 & Lambda71 --> PgSelect33
-    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object17 & Constant114 & Lambda71 --> PgSelect51
-    PgSelect58[["PgSelect[58∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ'corn'ᐳ"}}:::plan
-    Object17 & Constant115 & Lambda71 --> PgSelect58
-    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access15 & Access16 --> Object17
-    PgSelect43[["PgSelect[43∈0] ➊<br />ᐸcropᐳ"]]:::plan
-    Object17 & Lambda71 --> PgSelect43
+    PgSelect21[["PgSelect[21∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant141{{"Constant[141∈0] ➊<br />ᐸ'concrete'ᐳ"}}:::plan
+    Lambda57{{"Lambda[57∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda60{{"Lambda[60∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda79{{"Lambda[79∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Constant141 & Lambda57 & Lambda60 & Lambda79 & Lambda84 --> PgSelect21
+    PgSelect28[["PgSelect[28∈0] ➊<br />ᐸmaterialᐳ"]]:::plan
+    Constant142{{"Constant[142∈0] ➊<br />ᐸ'spongy'ᐳ"}}:::plan
+    Lambda93{{"Lambda[93∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda98{{"Lambda[98∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Constant142 & Lambda57 & Lambda60 & Lambda93 & Lambda98 --> PgSelect28
+    PgSelect42[["PgSelect[42∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Constant143{{"Constant[143∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Lambda121{{"Lambda[121∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda126{{"Lambda[126∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Constant143 & Lambda57 & Lambda60 & Lambda121 & Lambda126 --> PgSelect42
+    PgSelect49[["PgSelect[49∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Constant144{{"Constant[144∈0] ➊<br />ᐸ'corn'ᐳ"}}:::plan
+    Lambda135{{"Lambda[135∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda140{{"Lambda[140∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Constant144 & Lambda57 & Lambda60 & Lambda135 & Lambda140 --> PgSelect49
+    PgSelect34[["PgSelect[34∈0] ➊<br />ᐸcropᐳ"]]:::plan
+    Lambda107{{"Lambda[107∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda112{{"Lambda[112∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Lambda57 & Lambda60 & Lambda107 & Lambda112 --> PgSelect34
+    Object78{{"Object[78∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ{ s: Symbol(material), n: 'material', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ{ name: 'material', sqlType: { t: '”js_reserved”.”material”'ᐳ"}}:::plan
+    Lambda57 & Constant75 & Constant76 & Constant63 --> Object78
+    Object92{{"Object[92∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ{ s: Symbol(material), n: 'material', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Lambda57 & Constant89 & Constant90 & Constant63 --> Object92
+    Object106{{"Object[106∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant103{{"Constant[103∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant104{{"Constant[104∈0] ➊<br />ᐸ{ s: Symbol(crop), n: 'crop', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Constant105{{"Constant[105∈0] ➊<br />ᐸ{ name: 'crop', sqlType: { t: '”js_reserved”.”crop”', [Symboᐳ"}}:::plan
+    Lambda57 & Constant103 & Constant104 & Constant105 --> Object106
+    Object120{{"Object[120∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant117{{"Constant[117∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant118{{"Constant[118∈0] ➊<br />ᐸ{ s: Symbol(crop), n: 'crop', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Lambda57 & Constant117 & Constant118 & Constant105 --> Object120
+    Object134{{"Object[134∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant131{{"Constant[131∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant132{{"Constant[132∈0] ➊<br />ᐸ{ s: Symbol(crop), n: 'crop', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Lambda57 & Constant131 & Constant132 & Constant105 --> Object134
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access15
-    __Value2 --> Access16
-    First28{{"First[28∈0] ➊"}}:::plan
-    PgSelect26 --> First28
-    PgSelectSingle29{{"PgSelectSingle[29∈0] ➊<br />ᐸmaterialᐳ"}}:::plan
-    First28 --> PgSelectSingle29
-    First35{{"First[35∈0] ➊"}}:::plan
-    PgSelect33 --> First35
-    PgSelectSingle36{{"PgSelectSingle[36∈0] ➊<br />ᐸmaterialᐳ"}}:::plan
-    First35 --> PgSelectSingle36
-    First53{{"First[53∈0] ➊"}}:::plan
-    PgSelect51 --> First53
-    PgSelectSingle54{{"PgSelectSingle[54∈0] ➊<br />ᐸcropᐳ"}}:::plan
-    First53 --> PgSelectSingle54
-    First60{{"First[60∈0] ➊"}}:::plan
-    PgSelect58 --> First60
-    PgSelectSingle61{{"PgSelectSingle[61∈0] ➊<br />ᐸcropᐳ"}}:::plan
-    First60 --> PgSelectSingle61
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ[Object: null prototype] {   cursorLower: null,   cursorUppeᐳ"}}:::plan
-    Constant116 --> Lambda71
+    __Value2 --> Access10
+    __Value2 --> Access11
+    First23{{"First[23∈0] ➊"}}:::plan
+    PgSelect21 --> First23
+    PgSelectSingle24{{"PgSelectSingle[24∈0] ➊<br />ᐸmaterialᐳ"}}:::plan
+    First23 --> PgSelectSingle24
+    First30{{"First[30∈0] ➊"}}:::plan
+    PgSelect28 --> First30
+    PgSelectSingle31{{"PgSelectSingle[31∈0] ➊<br />ᐸmaterialᐳ"}}:::plan
+    First30 --> PgSelectSingle31
+    First44{{"First[44∈0] ➊"}}:::plan
+    PgSelect42 --> First44
+    PgSelectSingle45{{"PgSelectSingle[45∈0] ➊<br />ᐸcropᐳ"}}:::plan
+    First44 --> PgSelectSingle45
+    First51{{"First[51∈0] ➊"}}:::plan
+    PgSelect49 --> First51
+    PgSelectSingle52{{"PgSelectSingle[52∈0] ➊<br />ᐸcropᐳ"}}:::plan
+    First51 --> PgSelectSingle52
+    Constant145{{"Constant[145∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant145 --> Lambda57
+    Constant146{{"Constant[146∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant146 --> Lambda60
+    Object78 --> Lambda79
+    Constant148{{"Constant[148∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(material),ᐳ"}}:::plan
+    Constant148 --> Lambda84
+    Object92 --> Lambda93
+    Constant149{{"Constant[149∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(material),ᐳ"}}:::plan
+    Constant149 --> Lambda98
+    Object106 --> Lambda107
+    Constant150{{"Constant[150∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant150 --> Lambda112
+    Object120 --> Lambda121
+    Constant151{{"Constant[151∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(crop), n: ᐳ"}}:::plan
+    Constant151 --> Lambda126
+    Object134 --> Lambda135
+    Constant152{{"Constant[152∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(crop), n: ᐳ"}}:::plan
+    Constant152 --> Lambda140
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmaterialᐳ"]]:::plan
-    Object17 & Connection18 & Lambda71 --> PgSelect19
-    __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
-    PgSelect19 ==> __Item20
-    PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸmaterialᐳ"}}:::plan
-    __Item20 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__material__.”valueOf”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__material__.”class”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression24
-    PgClassExpression30{{"PgClassExpression[30∈4] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈4] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression31
-    PgClassExpression37{{"PgClassExpression[37∈5] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈5] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression38
-    __Item45[/"__Item[45∈6]<br />ᐸ43ᐳ"\]:::itemplan
-    PgSelect43 ==> __Item45
-    PgSelectSingle46{{"PgSelectSingle[46∈6]<br />ᐸcropᐳ"}}:::plan
-    __Item45 --> PgSelectSingle46
-    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__crop__.”id”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression47
-    PgClassExpression48{{"PgClassExpression[48∈6]<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈6]<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression49
-    PgClassExpression55{{"PgClassExpression[55∈7] ➊<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression55
-    PgClassExpression56{{"PgClassExpression[56∈7] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression56
-    PgClassExpression62{{"PgClassExpression[62∈8] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    PgSelectSingle61 --> PgClassExpression62
-    PgClassExpression63{{"PgClassExpression[63∈8] ➊<br />ᐸ__crop__.”id”ᐳ"}}:::plan
-    PgSelectSingle61 --> PgClassExpression63
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸ{ s: Symbol(material), n: 'material', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Constant147{{"Constant[147∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸmaterialᐳ"]]:::plan
+    Lambda65{{"Lambda[65∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda70{{"Lambda[70∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda57 & Lambda60 & Lambda65 & Lambda70 --> PgSelect14
+    Object64{{"Object[64∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda57 & Constant61 & Constant62 & Constant63 --> Object64
+    Object64 --> Lambda65
+    Constant147 --> Lambda70
+    __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
+    PgSelect14 ==> __Item15
+    PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸmaterialᐳ"}}:::plan
+    __Item15 --> PgSelectSingle16
+    PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__material__.”valueOf”ᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression17
+    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression18
+    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__material__.”id”ᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression19
+    PgClassExpression25{{"PgClassExpression[25∈4] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈4] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression26
+    PgClassExpression32{{"PgClassExpression[32∈5] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression32
+    PgClassExpression33{{"PgClassExpression[33∈5] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression33
+    __Item36[/"__Item[36∈6]<br />ᐸ34ᐳ"\]:::itemplan
+    PgSelect34 ==> __Item36
+    PgSelectSingle37{{"PgSelectSingle[37∈6]<br />ᐸcropᐳ"}}:::plan
+    __Item36 --> PgSelectSingle37
+    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__crop__.”id”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression38
+    PgClassExpression39{{"PgClassExpression[39∈6]<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression39
+    PgClassExpression40{{"PgClassExpression[40∈6]<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression40
+    PgClassExpression46{{"PgClassExpression[46∈7] ➊<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈7] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression47
+    PgClassExpression53{{"PgClassExpression[53∈8] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
+    PgSelectSingle52 --> PgClassExpression53
+    PgClassExpression54{{"PgClassExpression[54∈8] ➊<br />ᐸ__crop__.”id”ᐳ"}}:::plan
+    PgSelectSingle52 --> PgClassExpression54
 
     %% define steps
 
     subgraph "Buckets for queries/v4/js-reserved-keywords-as-columns"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 18, 112, 113, 114, 115, 116, 17, 71<br />2: 26, 33, 43, 51, 58<br />ᐳ: 28, 29, 35, 36, 53, 54, 60, 61"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 11, 13, 61, 62, 63, 75, 76, 89, 90, 103, 104, 105, 117, 118, 131, 132, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 12, 57, 60, 78, 79, 84, 92, 93, 98, 106, 107, 112, 120, 121, 126, 134, 135, 140<br />2: 21, 28, 34, 42, 49<br />ᐳ: 23, 24, 30, 31, 44, 45, 51, 52"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,PgSelect26,First28,PgSelectSingle29,PgSelect33,First35,PgSelectSingle36,PgSelect43,PgSelect51,First53,PgSelectSingle54,PgSelect58,First60,PgSelectSingle61,Lambda71,Constant112,Constant113,Constant114,Constant115,Constant116 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 71<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,PgSelect21,First23,PgSelectSingle24,PgSelect28,First30,PgSelectSingle31,PgSelect34,PgSelect42,First44,PgSelectSingle45,PgSelect49,First51,PgSelectSingle52,Lambda57,Lambda60,Constant61,Constant62,Constant63,Constant75,Constant76,Object78,Lambda79,Lambda84,Constant89,Constant90,Object92,Lambda93,Lambda98,Constant103,Constant104,Constant105,Object106,Lambda107,Lambda112,Constant117,Constant118,Object120,Lambda121,Lambda126,Constant131,Constant132,Object134,Lambda135,Lambda140,Constant141,Constant142,Constant143,Constant144,Constant145,Constant146,Constant147,Constant148,Constant149,Constant150,Constant151,Constant152 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 57, 60, 61, 62, 63, 147<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: Object[64], Lambda[70], Lambda[65]<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect19 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
+    class Bucket1,PgSelect14,Object64,Lambda65,Lambda70 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item20,PgSelectSingle21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸmaterialᐳ[21]"):::bucket
+    class Bucket2,__Item15,PgSelectSingle16 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgSelectSingle{2}ᐸmaterialᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[29]"):::bucket
+    class Bucket3,PgClassExpression17,PgClassExpression18,PgClassExpression19 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 24<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[24]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression30,PgClassExpression31 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[36]"):::bucket
+    class Bucket4,PgClassExpression25,PgClassExpression26 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingleᐸmaterialᐳ[31]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression37,PgClassExpression38 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ43ᐳ[45]"):::bucket
+    class Bucket5,PgClassExpression32,PgClassExpression33 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ34ᐳ[36]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item45,PgSelectSingle46,PgClassExpression47,PgClassExpression48,PgClassExpression49 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingleᐸcropᐳ[54]"):::bucket
+    class Bucket6,__Item36,PgSelectSingle37,PgClassExpression38,PgClassExpression39,PgClassExpression40 bucket6
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingleᐸcropᐳ[45]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression55,PgClassExpression56 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgSelectSingleᐸcropᐳ[61]"):::bucket
+    class Bucket7,PgClassExpression46,PgClassExpression47 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 52<br /><br />ROOT PgSelectSingleᐸcropᐳ[52]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression62,PgClassExpression63 bucket8
+    class Bucket8,PgClassExpression53,PgClassExpression54 bucket8
     Bucket0 --> Bucket1 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
