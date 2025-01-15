@@ -10,6 +10,7 @@ import type {
   GrafastValuesList,
   InputStep,
   LambdaStep,
+  Maybe,
   PolymorphicStep,
 } from "grafast";
 import {
@@ -290,7 +291,7 @@ export class PgUnionAllSingleStep
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    return (this.getDep(0) as any).getDep(0);
+    return this.getDep<any>(0).getDep(0);
   }
 
   public node() {
@@ -775,13 +776,13 @@ on (${sql.indent(
         if (this.beforeStepId != null) {
           this.applyConditionFromCursor(
             "before",
-            this.getDep(this.beforeStepId) as any,
+            this.getDep<any>(this.beforeStepId),
           );
         }
         if (this.afterStepId != null) {
           this.applyConditionFromCursor(
             "after",
-            this.getDep(this.afterStepId) as any,
+            this.getDep<any>(this.afterStepId),
           );
         }
       });
@@ -1096,11 +1097,9 @@ on (${sql.indent(
       );
     } else {
       // To make the error be thrown in the right place, we should also add this error to our parent connection
-      const $connection = this.getDep(this.connectionDepId) as ConnectionStep<
-        any,
-        any,
-        any
-      >;
+      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+        this.connectionDepId,
+      );
       $connection.addValidation(() => {
         return pgValidateParsedCursor(
           $parsedCursorPlan,
@@ -1384,18 +1383,14 @@ and ${condition(i + 1)}`}
        * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
        */
 
-      const $lower =
-        this.lowerIndexStepId != null
-          ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
-      const $upper =
-        this.upperIndexStepId != null
-          ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
+      const $lower = this.getDepOrConstant<Maybe<number>>(
+        this.lowerIndexStepId,
+        null,
+      );
+      const $upper = this.getDepOrConstant<Maybe<number>>(
+        this.upperIndexStepId,
+        null,
+      );
 
       const limitAndOffsetLambda = lambda(
         [$lower, $upper],
