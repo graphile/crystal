@@ -150,5 +150,5 @@ export function constant<TData>(
   depId: number | null,
   fallback: TData,
 ): ExecutableStep<TData> {
-  return this.maybeGetDep(depId) ?? constant(fallback);
+  return this.maybeGetDep(depId) ?? constant(fallback, false);
 };
