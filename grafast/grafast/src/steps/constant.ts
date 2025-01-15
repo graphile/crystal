@@ -131,17 +131,36 @@ export function constant<TData>(
   data: TData | (TemplateStringsArray & [TData]),
   isSecret?: boolean,
 ): ConstantStep<TData> {
-  return operationPlan().withRootLayerPlan(() => {
-    if (isTemplateStringsArray(data)) {
-      if (data.length !== 1) {
-        throw new Error(
-          "constant`...` doesn't currently support placeholders; please use 'constant(`...`)' instead",
-        );
-      }
-      return new ConstantStep<TData>(data[0], false);
+  if (isTemplateStringsArray(data)) {
+    if (data.length !== 1) {
+      throw new Error(
+        "constant`...` doesn't currently support placeholders; please use 'constant(`...`)' instead",
+      );
     }
-    return new ConstantStep<TData>(data, isSecret);
-  });
+    return constant(data[0], false);
+  }
+  const opPlan = operationPlan();
+  const makeConst = () =>
+    operationPlan().withRootLayerPlan(
+      () => new ConstantStep<TData>(data, isSecret),
+    );
+  const t = typeof data;
+  if (
+    data == null ||
+    t === "boolean" ||
+    t === "string" ||
+    t === "number" ||
+    t === "symbol"
+  ) {
+    return opPlan.cacheStep(
+      opPlan.contextStep,
+      isSecret ? `constant-secret` : `constant`,
+      data as null | undefined | boolean | string | number | symbol,
+      makeConst,
+    );
+  } else {
+    return makeConst();
+  }
 }
 
 // Have to overwrite the getDepOrConstant method due to circular dependency
