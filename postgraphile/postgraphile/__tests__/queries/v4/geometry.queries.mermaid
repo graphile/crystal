@@ -12,17 +12,30 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ{ s: Symbol(geom), n: 'geom', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Constant72{{"Constant[72∈0] ➊<br />ᐸ{ name: 'geom', sqlType: { t: '”geometry”.”geom”', [Symbol(pᐳ"}}:::plan
+    Constant80{{"Constant[80∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant81{{"Constant[81∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸgeomᐳ"]]:::plan
     Object12{{"Object[12∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda67{{"Lambda[67∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object12 & Connection13 & Lambda67 --> PgSelect14
+    Lambda66{{"Lambda[66∈1] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda69{{"Lambda[69∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda74{{"Lambda[74∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda79{{"Lambda[79∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda66 & Lambda69 & Lambda74 & Lambda79 --> PgSelect14
+    Object73{{"Object[73∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda66 & Constant70 & Constant71 & Constant72 --> Object73
     Access10{{"Access[10∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant68 --> Lambda67
+    Constant80 --> Lambda66
+    Constant81 --> Lambda69
+    Object73 --> Lambda74
+    Constant82 --> Lambda79
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸgeomᐳ"}}:::plan
@@ -63,10 +76,10 @@ graph TD
     subgraph "Buckets for queries/v4/geometry.queries"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection13,Constant68 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 68<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: 10, 11, 67, 12<br />2: PgSelect[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection13,Constant70,Constant71,Constant72,Constant80,Constant81,Constant82 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 80, 81, 70, 71, 72, 82<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: 10, 11, 66, 69, 79, 12, 73, 74<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,Access11,Object12,PgSelect14,Lambda67 bucket1
+    class Bucket1,Access10,Access11,Object12,PgSelect14,Lambda66,Lambda69,Object73,Lambda74,Lambda79 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2

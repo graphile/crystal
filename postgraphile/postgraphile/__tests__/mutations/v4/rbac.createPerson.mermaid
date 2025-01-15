@@ -16,22 +16,35 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access18
     __Value2 --> Access19
+    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant60 --> Lambda40
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ§{ url: 'http://example.com' }ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ{ s: Symbol(frmcdc_wrappedUrl), n: 'frmcdc_wrapped_url', [Syᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ{ name: 'wrappedUrl', sqlType: { t: '”b”.”wrapped_url”', [Syᐳ"}}:::plan
+    Constant54{{"Constant[54∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(frmcdc_wraᐳ"}}:::plan
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ§{ url: 'http://example.com' }ᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
-    Object20 & Constant42 & Constant49 & Constant45 & Constant46 & Constant50 --> PgInsertSingle17
+    Object20 & Constant54 & Constant63 & Constant57 & Constant58 & Constant64 --> PgInsertSingle17
     Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle17 --> Object21
-    Lambda41{{"Lambda[41∈2] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant48 --> Lambda41
+    Object47{{"Object[47∈2] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda40 & Constant44 & Constant45 & Constant46 --> Object47
+    Lambda43{{"Lambda[43∈2] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant61 --> Lambda43
+    Lambda48{{"Lambda[48∈2] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object47 --> Lambda48
+    Lambda53{{"Lambda[53∈2] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant62 --> Lambda53
     PgSelect31[["PgSelect[31∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
-    Object20 & PgClassExpression30 & Lambda41 --> PgSelect31
+    Object20 & PgClassExpression30 & Lambda40 & Lambda43 & Lambda48 & Lambda53 --> PgSelect31
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -57,14 +70,14 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access18,Access19,Object20,Constant42,Constant45,Constant46,Constant48,Constant49,Constant50 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 42, 49, 45, 46, 50, 48<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Access18,Access19,Object20,Lambda40,Constant44,Constant45,Constant46,Constant54,Constant57,Constant58,Constant60,Constant61,Constant62,Constant63,Constant64 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 54, 63, 57, 58, 64, 61, 40, 44, 45, 46, 62<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 48, 21, 17, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 61, 40, 44, 45, 46, 62, 21, 17, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Lambda41 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20, 41<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[17]<br />1: <br />ᐳ: 24, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />ᐳ: First[35], PgSelectSingle[36]"):::bucket
+    class Bucket2,Lambda43,Object47,Lambda48,Lambda53 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20, 40, 43, 48, 53<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[17]<br />1: <br />ᐳ: 24, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />ᐳ: First[35], PgSelectSingle[36]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectSingle36 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ26ᐳ[27]"):::bucket

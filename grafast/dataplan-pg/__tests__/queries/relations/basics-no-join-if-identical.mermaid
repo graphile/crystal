@@ -11,9 +11,24 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸmessagesᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
-    Lambda26{{"Lambda[26∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object10 & Constant31 & Lambda26 & Lambda26 --> PgSelect7
+    Constant55{{"Constant[55∈0] ➊<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
+    Lambda28{{"Lambda[28∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda25{{"Lambda[25∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda49{{"Lambda[49∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda54{{"Lambda[54∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object10 & Constant55 & Lambda28 & Lambda33 & Lambda38 & Lambda25 & Lambda28 & Lambda49 & Lambda54 --> PgSelect7
+    Object32{{"Object[32∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Lambda25 & Constant29 & Constant30 & Constant31 --> Object32
+    Object48{{"Object[48∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Lambda25 & Constant45 & Constant46 & Constant47 --> Object48
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -24,29 +39,37 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant32 --> Lambda26
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant56 --> Lambda25
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant57 --> Lambda28
+    Object32 --> Lambda33
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
+    Constant58 --> Lambda38
+    Object48 --> Lambda49
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(messages),ᐳ"}}:::plan
+    Constant59 --> Lambda54
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression14
     PgSelectSingle21{{"PgSelectSingle[21∈1] ➊<br />ᐸforumsᐳ"}}:::plan
-    RemapKeys27{{"RemapKeys[27∈1] ➊<br />ᐸ12:{”0”:2}ᐳ"}}:::plan
-    RemapKeys27 --> PgSelectSingle21
-    PgSelectSingle12 --> RemapKeys27
+    RemapKeys39{{"RemapKeys[39∈1] ➊<br />ᐸ12:{”0”:2}ᐳ"}}:::plan
+    RemapKeys39 --> PgSelectSingle21
+    PgSelectSingle12 --> RemapKeys39
     PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression15
 
     %% define steps
 
     subgraph "Buckets for queries/relations/basics-no-join-if-identical"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 31, 32, 10, 26<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 29, 30, 31, 45, 46, 47, 55, 56, 57, 58, 59, 10, 25, 28, 32, 33, 38, 48, 49, 54<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda26,Constant31,Constant32 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda25,Lambda28,Constant29,Constant30,Constant31,Object32,Lambda33,Lambda38,Constant45,Constant46,Constant47,Object48,Lambda49,Lambda54,Constant55,Constant56,Constant57,Constant58,Constant59 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression13,PgClassExpression14,PgSelectSingle21,RemapKeys27 bucket1
+    class Bucket1,PgClassExpression13,PgClassExpression14,PgSelectSingle21,RemapKeys39 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 21<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression15 bucket2

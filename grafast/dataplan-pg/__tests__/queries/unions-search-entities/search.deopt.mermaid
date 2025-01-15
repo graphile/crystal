@@ -11,9 +11,44 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸentity_searchᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant76{{"Constant[76∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
-    Lambda63{{"Lambda[63∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object10 & Constant76 & Lambda63 --> PgSelect7
+    Constant160{{"Constant[160∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
+    Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda65{{"Lambda[65∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda154{{"Lambda[154∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda159{{"Lambda[159∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object10 & Constant160 & Lambda62 & Lambda65 & Lambda154 & Lambda159 --> PgSelect7
+    Object69{{"Object[69∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant66{{"Constant[66∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Lambda62 & Constant66 & Constant67 & Constant68 --> Object69
+    Object83{{"Object[83∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant80{{"Constant[80∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant81{{"Constant[81∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Lambda62 & Constant80 & Constant81 & Constant68 --> Object83
+    Object97{{"Object[97∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant94{{"Constant[94∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant95{{"Constant[95∈0] ➊<br />ᐸ{ s: Symbol(posts), n: 'posts', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸ{ name: 'posts', sqlType: { t: 'interfaces_and_unions.posts'ᐳ"}}:::plan
+    Lambda62 & Constant94 & Constant95 & Constant96 --> Object97
+    Object111{{"Object[111∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant108{{"Constant[108∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant109{{"Constant[109∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Lambda62 & Constant108 & Constant109 & Constant68 --> Object111
+    Object125{{"Object[125∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant122{{"Constant[122∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant123{{"Constant[123∈0] ➊<br />ᐸ{ s: Symbol(posts), n: 'posts', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Lambda62 & Constant122 & Constant123 & Constant96 --> Object125
+    Object139{{"Object[139∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant136{{"Constant[136∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant137{{"Constant[137∈0] ➊<br />ᐸ{ s: Symbol(comments), n: 'comments', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Constant138{{"Constant[138∈0] ➊<br />ᐸ{ name: 'comments', sqlType: { t: 'interfaces_and_unions.comᐳ"}}:::plan
+    Lambda62 & Constant136 & Constant137 & Constant138 --> Object139
+    Object153{{"Object[153∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant150{{"Constant[150∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant151{{"Constant[151∈0] ➊<br />ᐸ{ s: Symbol(entity_search), n: 'entity_search', [Symbol(pg-sᐳ"}}:::plan
+    Constant152{{"Constant[152∈0] ➊<br />ᐸ{ name: 'union__entity', sqlType: { t: 'interfaces_and_unionᐳ"}}:::plan
+    Lambda62 & Constant150 & Constant151 & Constant152 --> Object153
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -22,8 +57,43 @@ graph TD
     __Value2 --> Access9
     __ListTransform11[["__ListTransform[11∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
     PgSelect7 --> __ListTransform11
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant77 --> Lambda63
+    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant161 --> Lambda62
+    Constant162{{"Constant[162∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant162 --> Lambda65
+    Lambda70{{"Lambda[70∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object69 --> Lambda70
+    Lambda75{{"Lambda[75∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant163{{"Constant[163∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant163 --> Lambda75
+    Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object83 --> Lambda84
+    Lambda89{{"Lambda[89∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant164{{"Constant[164∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant164 --> Lambda89
+    Lambda98{{"Lambda[98∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object97 --> Lambda98
+    Lambda103{{"Lambda[103∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant165{{"Constant[165∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(posts), n:ᐳ"}}:::plan
+    Constant165 --> Lambda103
+    Lambda112{{"Lambda[112∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object111 --> Lambda112
+    Lambda117{{"Lambda[117∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant166{{"Constant[166∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant166 --> Lambda117
+    Lambda126{{"Lambda[126∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object125 --> Lambda126
+    Lambda131{{"Lambda[131∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant167{{"Constant[167∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(posts), n:ᐳ"}}:::plan
+    Constant167 --> Lambda131
+    Lambda140{{"Lambda[140∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object139 --> Lambda140
+    Lambda145{{"Lambda[145∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant168{{"Constant[168∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(comments),ᐳ"}}:::plan
+    Constant168 --> Lambda145
+    Object153 --> Lambda154
+    Constant169{{"Constant[169∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(entity_seaᐳ"}}:::plan
+    Constant169 --> Lambda159
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ7ᐳ"\]:::itemplan
     PgSelect7 -.-> __Item12
@@ -44,20 +114,20 @@ graph TD
     PgSelectSingle15 --> PgClassExpression17
     PgSelectSingle15 --> PgClassExpression18
     PgSelect21[["PgSelect[21∈3]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
-    Object10 & PgClassExpression16 & Lambda63 --> PgSelect21
+    Object10 & PgClassExpression16 & Lambda62 & Lambda65 & Lambda70 & Lambda75 --> PgSelect21
     PgSelect29[["PgSelect[29∈3]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
-    Object10 & PgClassExpression17 & Lambda63 --> PgSelect29
+    Object10 & PgClassExpression17 & Lambda62 & Lambda65 & Lambda98 & Lambda103 --> PgSelect29
     PgSelect35[["PgSelect[35∈3]<br />ᐸpeopleᐳ<br />ᐳPost"]]:::plan
     PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression34 & Lambda63 --> PgSelect35
+    Object10 & PgClassExpression34 & Lambda62 & Lambda65 & Lambda84 & Lambda89 --> PgSelect35
     PgSelect41[["PgSelect[41∈3]<br />ᐸcommentsᐳ<br />ᐳComment"]]:::plan
-    Object10 & PgClassExpression18 & Lambda63 --> PgSelect41
+    Object10 & PgClassExpression18 & Lambda62 & Lambda65 & Lambda140 & Lambda145 --> PgSelect41
     PgSelect47[["PgSelect[47∈3]<br />ᐸpeopleᐳ<br />ᐳComment"]]:::plan
     PgClassExpression46{{"PgClassExpression[46∈3]<br />ᐸ__comments...author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression46 & Lambda63 --> PgSelect47
+    Object10 & PgClassExpression46 & Lambda62 & Lambda65 & Lambda112 & Lambda117 --> PgSelect47
     PgSelect53[["PgSelect[53∈3]<br />ᐸpostsᐳ<br />ᐳComment"]]:::plan
     PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression52 & Lambda63 --> PgSelect53
+    Object10 & PgClassExpression52 & Lambda62 & Lambda65 & Lambda126 & Lambda131 --> PgSelect53
     First25{{"First[25∈3]"}}:::plan
     PgSelect21 --> First25
     PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸpeopleᐳ"}}:::plan
@@ -109,16 +179,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/unions-search-entities/search"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 76, 77, 10, 63<br />2: PgSelect[7]<br />3: __ListTransform[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 66, 67, 68, 80, 81, 94, 95, 96, 108, 109, 122, 123, 136, 137, 138, 150, 151, 152, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 10, 62, 65, 69, 70, 75, 83, 84, 89, 97, 98, 103, 111, 112, 117, 125, 126, 131, 139, 140, 145, 153, 154, 159<br />2: PgSelect[7]<br />3: __ListTransform[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,Lambda63,Constant76,Constant77 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,Lambda62,Lambda65,Constant66,Constant67,Constant68,Object69,Lambda70,Lambda75,Constant80,Constant81,Object83,Lambda84,Lambda89,Constant94,Constant95,Constant96,Object97,Lambda98,Lambda103,Constant108,Constant109,Object111,Lambda112,Lambda117,Constant122,Constant123,Object125,Lambda126,Lambda131,Constant136,Constant137,Constant138,Object139,Lambda140,Lambda145,Constant150,Constant151,Constant152,Object153,Lambda154,Lambda159,Constant160,Constant161,Constant162,Constant163,Constant164,Constant165,Constant166,Constant167,Constant168,Constant169 bucket0
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 10, 63<br /><br />ROOT __Item{2}ᐸ11ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 10, 62, 65, 70, 75, 98, 103, 84, 89, 140, 145, 112, 117, 126, 131<br /><br />ROOT __Item{2}ᐸ11ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item14,PgSelectSingle15,PgClassExpression16,PgClassExpression17,PgClassExpression18,List19,PgPolymorphic20 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 10, 16, 63, 17, 18, 20<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br /><br />1: 21, 29, 41<br />ᐳ: 25, 26, 27, 28, 31, 32, 33, 34, 40, 43, 44, 45, 46, 52, 59<br />2: 35, 47, 53<br />ᐳ: 37, 38, 49, 50, 55, 56"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 10, 16, 62, 65, 70, 75, 17, 98, 103, 84, 89, 18, 140, 145, 112, 117, 126, 131, 20<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br /><br />1: 21, 29, 41<br />ᐳ: 25, 26, 27, 28, 31, 32, 33, 34, 40, 43, 44, 45, 46, 52, 59<br />2: 35, 47, 53<br />ᐳ: 37, 38, 49, 50, 55, 56"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect21,First25,PgSelectSingle26,PgClassExpression27,PgClassExpression28,PgSelect29,First31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgSelect35,First37,PgSelectSingle38,PgClassExpression40,PgSelect41,First43,PgSelectSingle44,PgClassExpression45,PgClassExpression46,PgSelect47,First49,PgSelectSingle50,PgClassExpression52,PgSelect53,First55,PgSelectSingle56,PgClassExpression59 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[38]"):::bucket

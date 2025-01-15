@@ -11,9 +11,24 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_topicsᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object10 & Constant60 & Lambda55 & Lambda55 --> PgSelect7
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ10ᐳ"}}:::plan
+    Lambda57{{"Lambda[57∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda54{{"Lambda[54∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda78{{"Lambda[78∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda83{{"Lambda[83∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object10 & Constant84 & Lambda57 & Lambda62 & Lambda67 & Lambda54 & Lambda57 & Lambda78 & Lambda83 --> PgSelect7
+    Object61{{"Object[61∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ{ s: Symbol(relational_items), n: 'relational_items', [Symboᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ{ name: 'relational_items', sqlType: { t: 'interfaces_and_unᐳ"}}:::plan
+    Lambda54 & Constant58 & Constant59 & Constant60 --> Object61
+    Object77{{"Object[77∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ{ s: Symbol(relational_topics), n: 'relational_topics', [Symᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ{ name: 'relational_topics', sqlType: { t: 'interfaces_and_uᐳ"}}:::plan
+    Lambda54 & Constant74 & Constant75 & Constant76 --> Object77
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -24,8 +39,16 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸrelational_topicsᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant61 --> Lambda55
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant85 --> Lambda54
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant86 --> Lambda57
+    Object61 --> Lambda62
+    Constant87{{"Constant[87∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
+    Constant87 --> Lambda67
+    Object77 --> Lambda78
+    Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
+    Constant88 --> Lambda83
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__relation...ics__.”id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
@@ -51,9 +74,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/interfaces-relational/single-topic"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 60, 61, 10, 55<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 58, 59, 60, 74, 75, 76, 84, 85, 86, 87, 88, 10, 54, 57, 61, 62, 67, 77, 78, 83<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda55,Constant60,Constant61 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda54,Lambda57,Constant58,Constant59,Constant60,Object61,Lambda62,Lambda67,Constant74,Constant75,Constant76,Object77,Lambda78,Lambda83,Constant84,Constant85,Constant86,Constant87,Constant88 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,PgSelectSingle19,PgClassExpression20,PgClassExpression25,PgClassExpression30,PgClassExpression35,PgClassExpression40,PgClassExpression45,PgClassExpression50,PgClassExpression51 bucket1

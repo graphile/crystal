@@ -11,28 +11,65 @@ graph TD
     %% plan dependencies
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object11 & Lambda38 --> PgSelect8
+    Lambda37{{"Lambda[37∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda73{{"Lambda[73∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda78{{"Lambda[78∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object11 & Lambda37 & Lambda40 & Lambda73 & Lambda78 --> PgSelect8
+    Object72{{"Object[72∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Lambda37 & Constant69 & Constant70 & Constant71 --> Object72
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant44 --> Lambda38
+    Constant80{{"Constant[80∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant80 --> Lambda37
+    Constant81{{"Constant[81∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant81 --> Lambda40
+    Lambda52{{"Lambda[52∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
+    Constant85 --> Lambda52
+    Object72 --> Lambda73
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant84 --> Lambda78
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: 'app_public.users', [Symbol(pᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
+    Constant83{{"Constant[83∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
+    Object44{{"Object[44∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda37 & Constant41 & Constant42 & Constant43 --> Object44
+    Object58{{"Object[58∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda52 & Constant55 & Constant56 & Constant57 --> Object58
     __Item12[/"__Item[12∈1]<br />ᐸ8ᐳ"\]:::itemplan
     PgSelect8 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item12 --> PgSelectSingle13
-    Lambda41{{"Lambda[41∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant45 --> Lambda41
+    Lambda45{{"Lambda[45∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object44 --> Lambda45
+    Lambda50{{"Lambda[50∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant82 --> Lambda50
+    Lambda54{{"Lambda[54∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant86 --> Lambda54
+    Lambda59{{"Lambda[59∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object58 --> Lambda59
+    Lambda64{{"Lambda[64∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant83 --> Lambda64
     PgSelect18[["PgSelect[18∈2]<br />ᐸmessagesᐳ"]]:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    Object11 & PgClassExpression17 & PgClassExpression22 & Lambda41 --> PgSelect18
+    Object11 & PgClassExpression17 & Constant79 & PgClassExpression22 & Lambda52 & Lambda54 & Lambda59 & Lambda64 --> PgSelect18
     PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression17
@@ -43,7 +80,7 @@ graph TD
     __Item23 --> PgSelectSingle24
     PgSelect27[["PgSelect[27∈4]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression26{{"PgClassExpression[26∈4]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression26 & Lambda38 --> PgSelect27
+    Object11 & PgClassExpression26 & Lambda37 & Lambda40 & Lambda45 & Lambda50 --> PgSelect27
     PgClassExpression25{{"PgClassExpression[25∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
     PgSelectSingle24 --> PgClassExpression26
@@ -59,19 +96,19 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/conditions/basics-with-author"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 44, 45, 11, 38<br />2: PgSelect[8]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 41, 42, 43, 55, 56, 57, 69, 70, 71, 79, 80, 81, 82, 83, 84, 85, 86, 11, 37, 40, 52, 72, 73, 78<br />2: PgSelect[8]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda38,Constant44,Constant45 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 45, 11, 38<br /><br />ROOT __Item{1}ᐸ8ᐳ[12]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda37,Lambda40,Constant41,Constant42,Constant43,Lambda52,Constant55,Constant56,Constant57,Constant69,Constant70,Constant71,Object72,Lambda73,Lambda78,Constant79,Constant80,Constant81,Constant82,Constant83,Constant84,Constant85,Constant86 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 37, 41, 42, 43, 82, 86, 52, 55, 56, 57, 83, 11, 79, 40<br /><br />ROOT __Item{1}ᐸ8ᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item12,PgSelectSingle13,Lambda41 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 11, 41, 38<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 17, 22<br />2: PgSelect[18]"):::bucket
+    class Bucket1,__Item12,PgSelectSingle13,Object44,Lambda45,Lambda50,Lambda54,Object58,Lambda59,Lambda64 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 11, 79, 52, 54, 59, 64, 37, 40, 45, 50<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 17, 22<br />2: PgSelect[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgClassExpression17,PgSelect18,PgClassExpression22 bucket2
-    Bucket3("Bucket 3 (listItem)<br />Deps: 11, 38<br /><br />ROOT __Item{3}ᐸ18ᐳ[23]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 11, 37, 40, 45, 50<br /><br />ROOT __Item{3}ᐸ18ᐳ[23]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item23,PgSelectSingle24 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 24, 11, 38<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[24]<br />1: <br />ᐳ: 25, 26<br />2: PgSelect[27]<br />ᐳ: First[31], PgSelectSingle[32]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 24, 11, 37, 40, 45, 50<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[24]<br />1: <br />ᐳ: 25, 26<br />2: PgSelect[27]<br />ᐳ: First[31], PgSelectSingle[32]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression25,PgClassExpression26,PgSelect27,First31,PgSelectSingle32 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[32]"):::bucket

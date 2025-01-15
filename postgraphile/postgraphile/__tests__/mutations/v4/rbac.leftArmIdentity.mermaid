@@ -9,6 +9,12 @@ graph TD
 
 
     %% plan dependencies
+    Object37{{"Object[37∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda30{{"Lambda[30∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ{ s: Symbol(left_arm_identity), n: 'left_arm_identity', [Symᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ{ name: 'leftArm', sqlType: { t: '”c”.”left_arm”', [Symbol(pᐳ"}}:::plan
+    Lambda30 & Constant34 & Constant35 & Constant36 --> Object37
     Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,14 +22,21 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    Lambda31{{"Lambda[31∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant36 --> Lambda31
+    Constant48{{"Constant[48∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant48 --> Lambda30
+    Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant49 --> Lambda33
+    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object37 --> Lambda38
+    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(left_arm_iᐳ"}}:::plan
+    Constant50 --> Lambda43
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant21{{"Constant[21∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ§{ id: 9001, person_id: 99, length_in_metres: 77, mood: 'jubᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸ§{ id: 9001, person_id: 99, length_in_metres: 77, mood: 'jubᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
-    Object17 & Constant37 & Lambda31 --> PgSelect14
+    Object17 & Constant51 & Lambda30 & Lambda33 & Lambda38 & Lambda43 --> PgSelect14
     First18{{"First[18∈1] ➊"}}:::plan
     PgSelect14 --> First18
     PgSelectSingle19{{"PgSelectSingle[19∈1] ➊<br />ᐸleft_arm_identityᐳ"}}:::plan
@@ -48,8 +61,8 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.leftArmIdentity"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Constant21,Lambda31,Constant36,Constant37 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 37, 31, 21<br /><br />1: PgSelect[14]<br />2: <br />ᐳ: 18, 19, 20"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Constant21,Lambda30,Lambda33,Constant34,Constant35,Constant36,Object37,Lambda38,Lambda43,Constant48,Constant49,Constant50,Constant51 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 51, 30, 33, 38, 43, 21<br /><br />1: PgSelect[14]<br />2: <br />ᐳ: 18, 19, 20"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,First18,PgSelectSingle19,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 19, 21<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
