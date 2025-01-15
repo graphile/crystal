@@ -1,19 +1,15 @@
 ---
-layout: page
-path: /postgraphile/live-queries/
 title: Live Queries
 ---
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
 
-<p class='intro'>
 A “live query” monitors the query a user provides and gives the client an updated version whenever the query would return a different result.
-</p>
 
 _This feature requires PostGraphile v4.4.0 or higher._
 
-### What are live queries?
+## What are live queries?
 
 You can think of live queries as akin to extremely frequent polling of a regular
 query, but without the bandwidth costs. Live queries are not yet an official
@@ -24,15 +20,8 @@ the standard GraphQL subscriptions interface — simply change your `query` to a
 ([available on GitHub](https://github.com/graphile/livesotope)) showing
 real-time points rankings of fictional players:
 
-<div class="tc">
-<img alt="Changing a query to a live query" src="/images/query2subscription.png" style={{maxHeight: '230px'}} />
-</div>
-
-<p></p>
-
-<div class="tc">
-<img alt="Demo of live query" src="/images/live_demo_rankings.gif" />
-</div>
+![Changing a query to a live query](./query2subscription.png)
+![Demo of live query](./live_demo_rankings.gif)
 
 Live queries are an incredibly powerful tool for frontend developers, as it
 means they don’t need to worry about monitoring for changes in the data — they
@@ -44,7 +33,7 @@ One way to achieve 100% accurate live queries is to run the users query over and
 over on the server side, and send an update whenever the results change. This,
 however, is not very efficient and puts an excessive load on the server.
 
-### Live queries via logical decoding
+## Live queries via logical decoding
 
 PostGraphile supports "realtime provider plugins" to source information about
 when data changes. Our initial official realtime provider plugin,
@@ -60,7 +49,7 @@ Therefore, it’s best to keep live queries small and simple: the more complex t
 query, the more sources of change it has (so updates may happen more
 frequently), and the longer it will take to execute.
 
-### When (not) to use live queries
+## When (not) to use live queries
 
 PostGraphile has worked hard to decrease the costs associated with live queries,
 but there’s still more to be done. Currently we feel PostGraphile live queries
@@ -76,14 +65,14 @@ thousands of SQL queries will be issued against the database at the same time.
 This issue can be lessened by ensuring that live queries only apply to a subset
 of users at a time.
 
-### Enabling live queries
+## Enabling live queries
 
 To enable live queries support in PostGraphile, you will need:
 
 - to pass `--live` (or `live: true`)
 - to provide a plugin that can inform PostGraphile of realtime changes
 
-### Realtime provider plugins
+## Realtime provider plugins
 
 You may track changes to your database data in many ways, for example using
 database triggers and LISTEN/NOTIFY, using logical decoding, or even by
@@ -92,7 +81,7 @@ streaming from an external source such as Kafka.
 Currently we have one first-party realtime provider plugin,
 `@graphile/subscriptions-lds`:
 
-#### @graphile/subscriptions-lds
+### @graphile/subscriptions-lds
 
 This plugin uses the Logical Decoding features of PostgreSQL to get a stream of
 data changes very efficiently from the database (using its replication
@@ -191,19 +180,19 @@ subscription {
 More detailed instructions are available in the
 [@graphile/subscriptions-lds README](https://www.npmjs.com/package/@graphile/subscriptions-lds).
 
-### Configuration
+## Configuration
 
 You can configure the live query support with the following environmental
 variables:
 
-#### `LD_WAIT` (default 125)
+### `LD_WAIT` (default 125)
 
 This environmental variable controls how often in milliseconds we check for
 changes from the database. Setting it smaller leads to more timely updates but
 increases overhead. Setting it larger increases efficiency but means each batch
 takes longer to process which may slow the Node.js event loop.
 
-#### `LIVE_THROTTLE` (default 500)
+### `LIVE_THROTTLE` (default 500)
 
 This environmental variable is the minimum duration in milliseconds between live
 updates to the same subscription.
@@ -217,14 +206,14 @@ closer to real-time updates.
 (Throttle fires on both the leading and trailing edge, so decreasing this only
 affects successive updates, not the initial update.)
 
-#### `LD_TABLE_PATTERN` (default "\*.\*")
+### `LD_TABLE_PATTERN` (default "\*.\*")
 
 Set this envvar to e.g. `app_public.*` to only monitor tables in the
 `app_public` schema. See
 [`filter-tables` in the wal2json documentation](https://github.com/eulerto/wal2json#parameters).
 This should increase performance by ignoring irrelevant data.
 
-### Performance
+## Performance
 
 Live queries are a lot more expensive than regular subscriptions — the server
 must monitor a lot more sources to detect a change (monitoring each individual
@@ -270,7 +259,7 @@ We do not currently recommend live queries for very large deployments - if
 you're expecting tens of thousands of concurrent users it's going to be
 significantly more efficient to use regular [subscriptions](./subscriptions).
 
-### Scaling
+## Scaling
 
 Once you reach beyond a few PostGraphile instances you'll want to make your live
 decoding usage more efficient. We support this by allowing you to run a
@@ -281,13 +270,13 @@ this shared server. To set up the server, follow the instructions in the
 project. When running LDS standalone like this, there are more options for
 configuring it.
 
-### Inflection
+## Inflection
 
 By default, live fields use the same names as fields in the `Query` type;
 however these field names are sent through the `live` inflector so you may
 customise these if you wish using [the inflection system](./inflection).
 
-### Limitations
+## Limitations
 
 Note that each live provider plugin has its own limitations, and may not be able
 to detect all changes. For example `@graphile/subscriptions-lds` can detect
@@ -302,7 +291,7 @@ number (which is allowed by the JSON spec), but JavaScript's JSON.parse will not
 maintain precision when parsing them, leading to potential divergence. We
 recommend the key to be either a regular `int` or a `uuid`.
 
-### Amazon RDS
+## Amazon RDS
 
 Configuring Live Queries on Amazon RDS is slightly different, as it's a managed
 service. (Also note that RDS runs a slightly out-of-date `wal2json`.)
