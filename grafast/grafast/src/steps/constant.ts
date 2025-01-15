@@ -2,6 +2,7 @@ import { inspect } from "../inspect.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
+import { operationPlan } from "./index.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
@@ -126,15 +127,17 @@ export function constant<TData>(
   data: TData | (TemplateStringsArray & [TData]),
   isSecret?: boolean,
 ): ConstantStep<TData> {
-  if (isTemplateStringsArray(data)) {
-    if (data.length !== 1) {
-      throw new Error(
-        "constant`...` doesn't currently support placeholders; please use 'constant(`...`)' instead",
-      );
+  return operationPlan().withRootLayerPlan(() => {
+    if (isTemplateStringsArray(data)) {
+      if (data.length !== 1) {
+        throw new Error(
+          "constant`...` doesn't currently support placeholders; please use 'constant(`...`)' instead",
+        );
+      }
+      return new ConstantStep<TData>(data[0], false);
     }
-    return new ConstantStep<TData>(data[0], false);
-  }
-  return new ConstantStep<TData>(data, isSecret);
+    return new ConstantStep<TData>(data, isSecret);
+  });
 }
 
 // Have to overwrite the getDepOrConstant method due to circular dependency
