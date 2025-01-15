@@ -32,6 +32,7 @@ import {
   isPromiseLike,
   lambda,
   list,
+  operationPlan,
   remapKeys,
   reverse,
   reverseArray,
@@ -1165,20 +1166,41 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new SafeError("Cannot use 'offset' with 'last'");
     }
 
-    const cursorLower = getUnary<Maybe<number>>(values, this.lowerIndexStepId);
-    const cursorUpper = getUnary<Maybe<number>>(values, this.upperIndexStepId);
+    if (!this.shouldReverseOrderId) {
+      throw new Error(
+        `Cannot call getExecutionCommon before shouldReverseOrderId has been set`,
+      );
+    }
+
+    const shouldReverseOrder = getUnary<boolean>(
+      values,
+      this.shouldReverseOrderId,
+    );
 
     /**
      * If `last` is in use then we reverse the order from the database and then
      * re-reverse it in JS-land.
      */
-    const shouldReverseOrder =
-      !this.streamOptions &&
-      first == null &&
-      last != null &&
-      cursorLower == null &&
-      cursorUpper == null;
-    return { first, last, offset, shouldReverseOrder };
+    return {
+      first,
+      last,
+      offset,
+      shouldReverseOrder,
+    };
+  }
+
+  shouldReverseOrder() {
+    return lambda(
+      {
+        isStream: constant(this.streamOptions != null),
+        first: this.getDepOrConstant(this.firstStepId, null),
+        last: this.getDepOrConstant(this.lastStepId, null),
+        cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
+        cursorUpper: this.getDepOrConstant(this.upperIndexStepId, null),
+      },
+      calculateShouldReverseOrder,
+      true,
+    );
   }
 
   /**
@@ -1574,44 +1596,52 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     };
   }
 
-  private buildOrderBy({ reverse }: { reverse: boolean }) {
+  /**
+   * This is the `ORDER BY` SQL to be used in the SQL statement; it may be
+   * reversed (see this.shouldReverseOrderId) compared to what the user
+   * requested.
+   */
+  private orderBySQL: SQL | null = null;
+  /**
+   * This is the "true" order (non-reversed) `ORDER BY` SQL to be used in
+   * things like `row_number() over (order by ...)`.
+   */
+  private trueOrderBySQL: SQL | null = null;
+
+  private buildOrderBy(forceTrueOrder = false) {
+    if (forceTrueOrder) {
+      if (!this.trueOrderBySQL) {
+        throw new Error(
+          "trueOrderBySQL was not built - did we not get optimized?",
+        );
+      }
+      return { sql: this.trueOrderBySQL };
+    } else {
+      if (!this.orderBySQL) {
+        throw new Error("orderBySQL was not built - did we not get optimized?");
+      }
+      return { sql: this.orderBySQL };
+    }
+  }
+
+  private planOrderBy($shouldReverseOrder: ExecutableStep<boolean>) {
     this.locker.lockParameter("orderBy");
-    const orders = reverse
-      ? this.orders.map(
-          (o) =>
-            ({
-              ...o,
-              direction: o.direction === "ASC" ? "DESC" : "ASC",
-            }) as PgOrderSpec,
-        )
-      : this.orders;
-    return {
-      sql:
-        orders.length > 0
-          ? sql`\norder by ${sql.join(
-              orders.map((o) => {
-                const [frag] = getFragmentAndCodecFromOrder(
-                  this.alias,
-                  o,
-                  this.resource.codec,
-                );
-                return sql`${frag} ${
-                  o.direction === "ASC" ? sql`asc` : sql`desc`
-                }${
-                  o.nulls === "LAST"
-                    ? sql` nulls last`
-                    : o.nulls === "FIRST"
-                    ? sql` nulls first`
-                    : sql.blank
-                }`;
-              }),
-              ", ",
-            )}`
-          : sql.blank,
-    };
+    return operationPlan().withRootLayerPlan(() =>
+      lambda(
+        {
+          reverse: $shouldReverseOrder,
+          orders: constant(this.orders),
+          alias: constant(this.alias),
+          codec: constant(this.resource.codec),
+        },
+        calculateOrderBySQL,
+        true,
+      ),
+    );
   }
 
   private limitAndOffsetSQL: SQL | null = null;
+  private shouldReverseOrderId: number | null = null;
   private planLimitAndOffset() {
     return this.operationPlan.withRootLayerPlan(() => {
       const numberDep = (stepId: number | null) =>
@@ -1660,8 +1690,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     sql: SQL;
     extraSelectIndexes: number[];
   } {
-    const reverse = this.shouldReverseOrder();
-
     const { sql: select, extraSelectIndexes } = this.buildSelect(options);
     const { sql: from } = this.buildFrom();
     const { sql: join } = this.buildJoin();
@@ -1675,7 +1703,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       sql`having`,
       this.havingConditions,
     );
-    const { sql: orderBy } = this.buildOrderBy({ reverse });
+    const { sql: orderBy } = this.buildOrderBy();
     const { sql: limitAndOffset } = this.buildLimitAndOffset();
 
     const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
@@ -1702,6 +1730,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
     const { count } = executionDetails;
+    const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
 
     const extraWheres: SQL[] = [];
 
@@ -1741,7 +1770,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       rawSqlValues: SQLRawValue[];
       identifierIndex: number | null;
     } => {
-      const forceOrder = this.streamOptions && this.shouldReverseOrder();
+      const forceOrder = this.streamOptions && shouldReverseOrder;
       if (
         queryValues.length > 0 ||
         (count !== 1 && (this.forceIdentity || this.hasSideEffects))
@@ -1754,7 +1783,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
           forceOrder || limit != null || offset != null
             ? extraSelects.push(
                 sql`row_number() over (${sql.indent(
-                  this.buildOrderBy({ reverse: false }).sql,
+                  this.buildOrderBy(true).sql,
                 )})`,
               ) - 1
             : -1;
@@ -1775,7 +1804,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
          * This wrapper around the inner query is for @stream:
          *
          * - stream must be in the correct order, so if we have
-         *   `this.shouldReverseOrder()` then we must reverse the order
+         *   `shouldReverseOrder` then we must reverse the order
          *   ourselves here;
          * - stream can have an `initialCount` - we want to satisfy all
          *   `initialCount` records from _each identifier group_ before we then
@@ -1855,7 +1884,7 @@ ${lateralText};`;
           forceOrder || limit != null || offset != null
             ? extraSelects.push(
                 sql`row_number() over (${sql.indent(
-                  this.buildOrderBy({ reverse: false }).sql,
+                  this.buildOrderBy(true).sql,
                 )})`,
               ) - 1
             : -1;
@@ -1873,7 +1902,7 @@ ${lateralText};`;
          * This wrapper around the inner query is for @stream:
          *
          * - stream must be in the correct order, so if we have
-         *   `this.shouldReverseOrder()` then we must reverse the order
+         *   `shouldReverseOrder` then we must reverse the order
          *   ourselves here;
          * - stream can have an `initialCount` - we want to satisfy all
          *   `initialCount` records from _each identifier group_ before we then
@@ -1904,7 +1933,9 @@ ${lateralText};`;
         );
         return { text, rawSqlValues, identifierIndex: null };
       } else {
-        const { sql: query } = this.buildQuery({ extraWheres });
+        const { sql: query } = this.buildQuery({
+          extraWheres,
+        });
         const { text, values: rawSqlValues } = sql.compile(
           sql`${query};`,
           options,
@@ -1997,7 +2028,7 @@ ${lateralText};`;
         text,
         rawSqlValues,
         identifierIndex,
-        shouldReverseOrder: this.shouldReverseOrder(),
+        shouldReverseOrder,
         name: hash(text),
         queryValues,
       };
@@ -2313,15 +2344,20 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
+    this.streamOptions = stream;
+
     // In case we have any lock actions in future:
     this.lock();
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
     this.locker.locked = false;
+    const $shouldReverseOrder = this.shouldReverseOrder();
+    this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
     // This cannot be done in deduplicate because setting fetchOneExtra comes later.
     this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
-    this.streamOptions = stream;
+    this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
+    this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(constant(false)));
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
@@ -2463,9 +2499,11 @@ ${lateralText};`;
 
         if (
           this.isUnique &&
-          this.first == null &&
-          this.last == null &&
-          this.offset == null &&
+          // TODO: this was previously first==null,last==null,offset==null which isn't the same thing.
+          this.firstStepId == null &&
+          this.lastStepId == null &&
+          this.offsetStepId == null &&
+          // End TODO
           this.mode !== "aggregate" &&
           table.mode !== "aggregate" &&
           // For uniques these should all pass anyway, but pays to be cautious..
@@ -2575,38 +2613,20 @@ ${lateralText};`;
             table,
             parent2,
           );
-          const limit = this.first ?? this.last;
-          const firstAndLast =
-            this.first != null && this.last != null && this.last < this.first;
+          const $first = this.getDepOrConstant(this.firstStepId, null);
+          const $last = this.getDepOrConstant(this.firstStepId, null);
           const rowsPlan = access<any[]>(parent2, [selfIndex], []);
-          const shouldReverse = this.shouldReverseOrder();
-          if ((this.fetchOneExtra || firstAndLast) && limit != null) {
-            return lambda(
-              rowsPlan,
-              (rows) => {
-                if (!rows) {
-                  return rows;
-                }
-                const hasMore = rows.length > limit;
-                const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-                const slicedRows =
-                  firstAndLast && this.last != null
-                    ? limitedRows.slice(-this.last)
-                    : limitedRows;
-                const orderedRows = shouldReverse
-                  ? reverseArray(slicedRows)
-                  : slicedRows;
-                if (hasMore) {
-                  (orderedRows as any).hasMore = true;
-                }
-                return orderedRows;
-              },
-              true,
-            );
-          } else {
-            const orderedPlan = shouldReverse ? reverse(rowsPlan) : rowsPlan;
-            return orderedPlan;
-          }
+          return lambda(
+            {
+              rows: rowsPlan,
+              first: $first,
+              last: $last,
+              shouldReverseOrder: $shouldReverseOrder,
+              fetchOneExtra: constant(this.fetchOneExtra),
+            },
+            reverseIfNecessary,
+            true,
+          );
         }
 
         table.locker.locked = tableWasLocked;
@@ -3034,6 +3054,11 @@ function calculateLimitAndOffsetSQL(params: {
   return sql`${limitSql}${offsetSql}`;
 }
 
+function getUnary<T>(values: ExecutionDetails["values"], stepId: number): T;
+function getUnary<T>(
+  values: ExecutionDetails["values"],
+  stepId: number | null,
+): T | undefined;
 function getUnary<T>(
   values: ExecutionDetails["values"],
   stepId: number | null,
@@ -3041,4 +3066,89 @@ function getUnary<T>(
   return stepId == null
     ? undefined
     : (values[stepId] as UnaryExecutionValue<T>).value;
+}
+
+function calculateShouldReverseOrder(params: {
+  isStream: boolean;
+  first: Maybe<number>;
+  last: Maybe<number>;
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+}) {
+  const { isStream, first, last, cursorLower, cursorUpper } = params;
+  return (
+    !isStream &&
+    first == null &&
+    last != null &&
+    cursorLower == null &&
+    cursorUpper == null
+  );
+}
+
+function reverseIfNecessary(params: {
+  rows: any[];
+  shouldReverseOrder: boolean;
+  first: Maybe<number>;
+  last: Maybe<number>;
+  fetchOneExtra: boolean;
+}) {
+  const { rows, shouldReverseOrder, first, last, fetchOneExtra } = params;
+  const limit = first ?? last;
+  const firstAndLast = first != null && last != null && last < first;
+  if ((fetchOneExtra || firstAndLast) && limit != null) {
+    if (!rows) {
+      return rows;
+    }
+    const hasMore = rows.length > limit;
+    const limitedRows = hasMore ? rows.slice(0, limit) : rows;
+    const slicedRows =
+      firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+    const orderedRows = shouldReverseOrder
+      ? reverseArray(slicedRows)
+      : slicedRows;
+    if (hasMore) {
+      (orderedRows as any).hasMore = true;
+    }
+    return orderedRows;
+  } else {
+    return shouldReverseOrder ? [...rows].reverse() : rows;
+  }
+}
+
+function calculateOrderBySQL(params: {
+  reverse: boolean;
+  orders: PgOrderSpec[];
+  alias: SQL;
+  codec: PgCodec;
+}) {
+  const { reverse, orders: rawOrders, alias, codec } = params;
+  const orders = reverse
+    ? rawOrders.map(
+        (o): PgOrderSpec => ({
+          ...o,
+          direction: o.direction === "ASC" ? "DESC" : "ASC",
+          nulls:
+            o.nulls === "LAST"
+              ? "FIRST"
+              : o.nulls === "FIRST"
+              ? "LAST"
+              : o.nulls,
+        }),
+      )
+    : rawOrders;
+  return orders.length > 0
+    ? sql`\norder by ${sql.join(
+        orders.map((o) => {
+          const [frag] = getFragmentAndCodecFromOrder(alias, o, codec);
+          return sql`${frag} ${o.direction === "ASC" ? sql`asc` : sql`desc`}${
+            o.nulls === "LAST"
+              ? sql` nulls last`
+              : o.nulls === "FIRST"
+              ? sql` nulls first`
+              : sql.blank
+          }`;
+        }),
+        ", ",
+      )}`
+    : sql.blank;
 }
