@@ -1189,16 +1189,18 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   shouldReverseOrder() {
-    return lambda(
-      {
-        isStream: constant(this.streamOptions != null),
-        first: this.getDepOrConstant(this.firstStepId, null),
-        last: this.getDepOrConstant(this.lastStepId, null),
-        cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
-        cursorUpper: this.getDepOrConstant(this.upperIndexStepId, null),
-      },
-      calculateShouldReverseOrder,
-      true,
+    return operationPlan().withRootLayerPlan(() =>
+      lambda(
+        {
+          isStream: constant(this.streamOptions != null),
+          first: this.getDepOrConstant(this.firstStepId, null),
+          last: this.getDepOrConstant(this.lastStepId, null),
+          cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
+          cursorUpper: this.getDepOrConstant(this.upperIndexStepId, null),
+        },
+        calculateShouldReverseOrder,
+        true,
+      ),
     );
   }
 
