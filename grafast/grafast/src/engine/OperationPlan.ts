@@ -2698,6 +2698,10 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return step;
     }
+    if (step instanceof ConstantStep && step.layerPlan === this.rootLayerPlan) {
+      // Don't push constants down
+      return step;
+    }
     switch (step.layerPlan.reason.type) {
       case "root":
       case "subscription":
