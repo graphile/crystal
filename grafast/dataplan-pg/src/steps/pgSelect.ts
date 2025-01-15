@@ -1615,12 +1615,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     }
   }
 
-  private planOrderBy($shouldReverseOrder: ExecutableStep<boolean>) {
+  private planOrderBy($shouldReverseOrder: ExecutableStep<boolean> | null) {
     this.locker.lockParameter("orderBy");
     return operationPlan().withRootLayerPlan(() =>
       lambda(
         {
-          reverse: $shouldReverseOrder,
+          reverse: $shouldReverseOrder ?? constant(false),
           orders: constant(this.orders),
           alias: constant(this.alias),
           codec: constant(this.resource.codec),
@@ -2348,7 +2348,7 @@ ${lateralText};`;
     // This cannot be done in deduplicate because setting fetchOneExtra comes later.
     this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
     this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
-    this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(constant(false)));
+    this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(null));
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
