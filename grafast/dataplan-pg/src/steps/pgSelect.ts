@@ -1182,7 +1182,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     return operationPlan().withRootLayerPlan(() =>
       lambda(
         {
-          isStream: constant(this.streamOptions != null, false),
           first: this.getDepOrConstant(this.firstStepId, null),
           last: this.getDepOrConstant(this.lastStepId, null),
           cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
@@ -1209,8 +1208,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
-    const { first, last, offset, shouldReverseOrder } =
-      this.getExecutionCommon(executionDetails);
+    const { first, last, offset } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
       count,
@@ -1220,8 +1218,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     if (first === 0 || last === 0) {
       return arrayOfLength(count, Object.freeze([]));
     }
-    const { text, rawSqlValues, identifierIndex, name, queryValues } =
-      this.buildTheQuery(executionDetails);
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      queryValues,
+      shouldReverseOrder,
+    } = this.buildTheQuery(executionDetails);
     const contextDep = values[this.contextId];
 
     const specs = indexMap<PgExecutorInput<any>>((i) => {
@@ -1291,8 +1295,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       values,
       extra: { eventEmitter },
     } = executionDetails;
-    const { first, last, offset, shouldReverseOrder } =
-      this.getExecutionCommon(executionDetails);
+    const { first, last, offset } = this.getExecutionCommon(executionDetails);
     if (first === 0 || last === 0) {
       return arrayOfLength(count, Object.freeze([]));
     }
@@ -1304,6 +1307,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       identifierIndex,
       streamInitialCount,
       queryValues,
+      shouldReverseOrder,
     } = this.buildTheQuery(executionDetails);
 
     if (shouldReverseOrder !== false) {
@@ -1676,6 +1680,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       withIdentifiers?: boolean;
       extraSelects?: SQL[];
       extraWheres?: SQL[];
+      forceOrder?: boolean;
     } = Object.create(null),
   ): {
     sql: SQL;
@@ -1694,7 +1699,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       sql`having`,
       this.havingConditions,
     );
-    const { sql: orderBy } = this.buildOrderBy();
+    const { sql: orderBy } = this.buildOrderBy(options.forceOrder);
     const { sql: limitAndOffset } = this.buildLimitAndOffset();
 
     const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
@@ -1761,7 +1766,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       rawSqlValues: SQLRawValue[];
       identifierIndex: number | null;
     } => {
-      const forceOrder = this.streamOptions && shouldReverseOrder;
+      const forceOrder = (this.streamOptions && shouldReverseOrder) || false;
       if (
         queryValues.length > 0 ||
         (count !== 1 && (this.forceIdentity || this.hasSideEffects))
@@ -1782,6 +1787,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
           extraSelects,
           extraWheres,
+          forceOrder,
         });
         const identifierIndex = extraSelectIndexes[identifierIndexOffset];
 
@@ -3060,19 +3066,14 @@ function getUnary<T>(
 }
 
 function calculateShouldReverseOrder(params: {
-  isStream: boolean;
   first: Maybe<number>;
   last: Maybe<number>;
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
 }) {
-  const { isStream, first, last, cursorLower, cursorUpper } = params;
+  const { first, last, cursorLower, cursorUpper } = params;
   return (
-    !isStream &&
-    first == null &&
-    last != null &&
-    cursorLower == null &&
-    cursorUpper == null
+    first == null && last != null && cursorLower == null && cursorUpper == null
   );
 }
 
