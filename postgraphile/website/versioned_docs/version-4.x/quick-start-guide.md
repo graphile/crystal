@@ -2,15 +2,16 @@
 title: Quick Start Guide
 ---
 
+import TOCInline from '@theme/TOCInline';
+
+# Quick Start Guide
+
 This quick start guide will walk you through spinning up your first PostGraphile
 server, including installing the prerequisites such as Node and PostgreSQL.
 
-### Table of Contents
+# Table of Contents
 
-- [Install Node](#install-node)
-- [Install PostgreSQL](#install-postgresql)
-- [Create a Database](#create-a-database)
-- [Install PostGraphile](#install-postgraphile)
+<TOCInline toc={toc} />
 
 ### Install Node
 

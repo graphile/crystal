@@ -4,6 +4,8 @@ path: /postgraphile/postgresql-schema-design/
 title: PostgreSQL schema design
 ---
 
+import TOCInline from '@theme/TOCInline';
+
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
 leverage the features in Postgres to completely express their application
@@ -30,26 +32,9 @@ should be useful for anyone designing a Postgres schema.
 If you haven't installed PostGraphile already, you can follow our
 [Quick Start Guide](./quick-start-guide) to get PostGraphile up and running.
 
-### Table of Contents
+# Table of Contents
 
-- [The Basics](#the-basics)
-  - [Setting Up Your Schemas](#setting-up-your-schemas)
-  - [The Person Table](#the-person-table)
-  - [Table Documentation](#table-documentation)
-  - [The Post Table](#the-post-table)
-- [Database Functions](#database-functions)
-  - [Set Returning Functions](#set-returning-functions)
-  - [Triggers](#triggers)
-- [Authentication and Authorization](#authentication-and-authorization)
-  - [Storing Emails and Passwords](#storing-emails-and-passwords)
-  - [Registering Users](#registering-users)
-  - [Postgres Roles](#postgres-roles)
-  - [JSON Web Tokens](#json-web-tokens)
-  - [Logging In](#logging-in)
-  - [Using the Authorized User](#using-the-authorized-user)
-  - [Grants](#grants)
-  - [Row Level Security](#row-level-security)
-- [Conclusion](#conclusion)
+<TOCInline toc={toc} />
 
 ### The Basics
 

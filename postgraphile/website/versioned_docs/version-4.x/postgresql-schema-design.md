@@ -1,8 +1,10 @@
 ---
-layout: page
-path: /postgraphile/postgresql-schema-design/
 title: PostgreSQL Schema Design
 ---
+
+import TOCInline from '@theme/TOCInline';
+
+# PostgreSQL Schema Design
 
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
@@ -30,30 +32,13 @@ should be useful for anyone designing a Postgres schema.
 If you haven't installed PostGraphile already, you can follow our
 [Quick Start Guide](./quick-start-guide) to get PostGraphile up and running.
 
-### Table of Contents
+# Table of Contents
 
-- [The Basics](#the-basics)
-  - [Setting Up Your Schemas](#setting-up-your-schemas)
-  - [The Person Table](#the-person-table)
-  - [Table Documentation](#table-documentation)
-  - [The Post Table](#the-post-table)
-- [Database Functions](#database-functions)
-  - [Set Returning Functions](#set-returning-functions)
-  - [Triggers](#triggers)
-- [Authentication and Authorization](#authentication-and-authorization)
-  - [Storing Emails and Passwords](#storing-emails-and-passwords)
-  - [Registering Users](#registering-users)
-  - [Postgres Roles](#postgres-roles)
-  - [JSON Web Tokens](#json-web-tokens)
-  - [Logging In](#logging-in)
-  - [Using the Authorized User](#using-the-authorized-user)
-  - [Grants](#grants)
-  - [Row Level Security](#row-level-security)
-- [Conclusion](#conclusion)
+<TOCInline toc={toc} />
 
-### The Basics
+## The Basics
 
-#### Setting Up Your Schemas
+### Setting Up Your Schemas
 
 All of our database objects will go into one or two custom Postgres schemas. A
 schema is essentially a namespace, it allows you to create tables with the same
@@ -92,7 +77,7 @@ permissions than that which you explicitly grant.
 > flag, with watch mode enabled PostGraphile will update your API as we add
 > tables and types throughout this tutorial.
 
-#### The Person Table
+### The Person Table
 
 Now we are going to create the tables in our database which will correspond to
 our users. We will do this by running the Postgres
@@ -182,7 +167,7 @@ but also the most fundamental part of your schema design.
 > There are pros and cons to both approaches, choose what works best for your
 > application!
 
-#### Table Documentation
+### Table Documentation
 
 Now that we have created our table, we want to document it within the Postgres
 database. By adding comments to our table and its columns using the Postgres
@@ -210,7 +195,7 @@ Incredibly simple, yet also incredibly powerful.
 With this we have completed our person table, now let’s create a table for our
 forum posts.
 
-#### The Post Table
+### The Post Table
 
 The users of our forum will want to be able to create posts. That’s the entire
 reason we have a forum after all. To create the post table we go through a very
@@ -302,7 +287,7 @@ write `integer` as the column type. We also made sure to include comments.
 Now that we have gone over the basics, let’s explore Postgres functions and see
 how we can use them to extend the functionality of our database.
 
-### Database Functions
+## Database Functions
 
 The Postgres
 [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/sql-createfunction.html)
@@ -409,7 +394,7 @@ command, just like we add comments to our tables.
 > }
 > ```
 
-#### Set Returning Functions
+### Set Returning Functions
 
 Sometimes it is useful to not just return single values from your function, but
 perhaps entire tables. What returning a table from a function could mean is you
@@ -462,7 +447,7 @@ all of the posts that match our search condition and not just one.
 > you return a set it is like returning a table. Users can paginate through a
 > set using `limit` and `offset`, but not an array.
 
-#### Triggers
+### Triggers
 
 You can also use Postgres functions to define triggers. Triggers in Postgres
 allow you to hook into events that are happening on your tables such as inserts,
@@ -546,7 +531,7 @@ your reference are as follows:
 
 Next up, we are going to learn about auth in Postgres and PostGraphile!
 
-### Authentication and Authorization
+## Authentication and Authorization
 
 Authentication and authorization is incredibly important whenever you build an
 application. You want your users to be able to login and out of your service,
@@ -560,7 +545,7 @@ some pretty important data in our schema. How are users supposed to even login?
 Not by guessing their first and last name one would hope, so we will define
 another table which will store user emails and passwords.
 
-#### Storing Emails and Passwords
+### Storing Emails and Passwords
 
 To store user emails and passwords we will create another table in the
 `forum_example_private` schema.
@@ -610,7 +595,7 @@ could easily allow you to go in that direction.
 > [Membership.db](https://github.com/membership/membership.db/tree/master/postgres)
 > as a reference.
 
-#### Registering Users
+### Registering Users
 
 Before a user can log in, they need to have an account in our database. To
 register a user we are going to implement a Postgres function in PL/pgSQL which
@@ -712,7 +697,7 @@ PostGraphile agnostic, the next two sections will be specific to PostGraphile,
 but useful to anyone wanting to learn just a little bit more about Postgres and
 JSON Web Tokens (JWTs).
 
-#### Postgres Roles
+### Postgres Roles
 
 When a user logs in, we want them to make their queries using a specific
 PostGraphile role. Using that role we can define rules that restrict what data
@@ -795,7 +780,7 @@ Ok, so now we have three roles. `forum_example_postgraphile`,
 we know when a user is logged in and should be using `forum_example_person`? The
 answer is JSON Web Tokens.
 
-#### JSON Web Tokens
+### JSON Web Tokens
 
 PostGraphile uses [JSON Web Tokens (JWTs)](https://jwt.io/) for authorization. A
 JWT is just a JSON object that has been hashed and cryptographically signed to
@@ -877,7 +862,7 @@ they execute their query.
 We now know how PostGraphile uses JWTs to authorize the user, but how does
 PostGraphile create a JWT? Stay tuned.
 
-#### Logging In
+### Logging In
 
 You can pass an option to PostGraphile, called
 `--jwt-token-identifier <identifier>` in the CLI, which takes a composite type
@@ -993,7 +978,7 @@ this JWT will have a `role` of `forum_example_person`, a `person_id` of
 
 Now that we know how to get JWTs for our users, let’s use the JWTs.
 
-#### Using the Authorized User
+### Using the Authorized User
 
 Before we define permissions for our user, let’s utilize the fact that they are
 logged in by defining a quick Postgres function.
@@ -1021,7 +1006,7 @@ that data type.
 
 Now, let’s use the JWT to define permissions.
 
-#### Grants
+### Grants
 
 The highest level of permission that can be given to roles using the Postgres
 are access privileges assigned using the
@@ -1100,7 +1085,7 @@ This provides basic permissions for all of our Postgres objects, but as we
 mentioned before users can update and delete all and any persons or posts. For
 obvious reasons we don’t want this, so let’s define row level security next.
 
-#### Row Level Security
+### Row Level Security
 
 In Postgres 9.5 (released January 2016)
 [Row Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
@@ -1193,7 +1178,7 @@ postgraphile \
 
 ---
 
-### Conclusion
+## Conclusion
 
 You should now be equipped with the knowledge to go out and design your own
 Postgres schema. If you have any questions, encounter a bug, or just want to say
