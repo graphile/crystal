@@ -138,7 +138,7 @@ allUsers {
 
 There's lots of techniques for protecting your server from these kinds of
 queries; a great introduction to this subject is
-[this blog post](https://dev-blog.apollodata.com/securing-your-graphql-api-from-malicious-queries-16130a324a6b)
+[this blog post](https://www.apollographql.com/blog/securing-your-graphql-api-from-malicious-queries)
 from Apollo.
 
 These techniques should be used in conjunction with common HTTP protection

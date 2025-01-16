@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/best-practices/
-title: PostGraphile best practices
+title: Best Practices
 ---
+
+# PostGraphile best practices
 
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or
@@ -48,9 +48,9 @@ GRANT UPDATE ON users TO graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](./requirements/#dont-use-column-based-select-grants):
+[cause a lot of issues](./requirements/#your-postgresql-database):
 
-- Reduces the number of optimisations we can do
+- Reduces the number of optimizations we can do
 - Cannot `SELECT * FROM`
 - Cannot use `RETURNING *` (e.g. what we do in CRUD operations currently)
 - Cannot pass a row type into a function (like we do for computed columns)
