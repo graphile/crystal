@@ -1,17 +1,19 @@
 ---
-layout: page
-path: /postgraphile/plugins/
 title: Server Plugins
 ---
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
 
-Stability: experimental, may change in **semver minor** versions.
+:::warning Stability
+Experimental, may change in **semver minor** versions.
+:::
 
-_NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
+:::note
+This page relates to changing how the PostGraphile HTTP server and CLI
 work. If you're instead looking to change the generated GraphQL schema (e.g. to
-add fields or types), see [Schema Plugins](./extending)._
+add fields or types), see [Schema Plugins](./extending).
+:::
 
 In addition to the [Graphile Engine plugin system](./extending) which builds
 the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
@@ -151,16 +153,20 @@ app.use(postGraphileMiddleware);
 
 ### Writing your own plugins
 
-**IMPORTANT**: here be dragons. This interface is experimental, and
+:::caution important
+
+Here be dragons. This interface is experimental, and
 documentation on it is far from complete. To use this interface you are expected
 to have deep knowledge of the PostGraphile internals, since that is what you
 will be augmenting/overriding. Note that **many things you might think you need
 a server plugin for are better served with standard HTTP middleware**, e.g. by
 using Express/Koa/Fastify/etc middleware you can implement CORS, sessions,
 custom authentication flows, rate limiting, logging, routing,
-liveness/readiness/health endpoints, statistics collection and much more - you
+liveness/readiness/health endpoints, statistics collection and much more — you
 probably do not need to write PostGraphile server plugins for this kind of
 functionality.
+
+:::
 
 The hook methods available can be viewed
 [in pluginHook.ts](https://github.com/graphile/postgraphile/blob/v4/src/postgraphile/pluginHook.ts).
@@ -238,8 +244,8 @@ const postGraphileMiddleware = postgraphile(databaseUrl, "app_public", {
 #### Origin specific CORS
 
 You can enable _generous_ CORS by
-[adding the `-o,--cors` flag to the CLI](./usage-cli/#cli-options) or by
-[adding a `enableCors: true` option when using PostGraphile as a library](./usage-library/#api-postgraphilepgconfig-schemaname-options).
+[adding the `-o,--cors` flag to the CLI](./usage-cli#cli-options) or by
+[adding a `enableCors: true` option when using PostGraphile as a library](./usage-library#api-postgraphilepgconfig-schemaname-options).
 
 However, by being _generous_, you allow **any** origin to communicate with you
 PostGraphile instance. If you want to allow just one specific origin, and using

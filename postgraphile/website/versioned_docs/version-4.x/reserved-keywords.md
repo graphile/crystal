@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/reserved-keywords/
-title: Reserved Keywords / Table Names
+title: Reserved Keywords
 ---
+
+# Reserved Keywords / Table Names
 
 Some table, column, function and argument names can cause issues with
 PostGraphile due to conflicts with auto-generated type and field names. In these
@@ -38,5 +38,5 @@ identifiers. On the CLI you'd do this like:
 `postgraphile --skip-plugins graphile-build-pg:PgNodeAliasPostGraphile`.
 
 To support non-unique table names you should implement an
-[inflection override](./inflection/#overriding-inflection---general) that will
+[inflection override](./inflection#overriding-inflection---general) that will
 change how the GraphQL type names are generated from the raw table name.

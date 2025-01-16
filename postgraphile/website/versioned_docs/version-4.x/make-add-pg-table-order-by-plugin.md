@@ -1,12 +1,14 @@
 ---
-layout: page
-path: /postgraphile/make-add-pg-table-order-by-plugin/
-title: makeAddPgTableOrderByPlugin (graphile-utils v4.4.5+)
+title: makeAddPgTableOrderByPlugin
 ---
 
-**WARNING**: _this plugin generator doesn't currently have any tests, so it's
+# makeAddPgTableOrderByPlugin (graphile-utils v4.4.5+)
+
+:::warning warning
+This plugin generator doesn't currently have any tests, so it's
 status is **experimental**. If you can spare the time to write some tests (or
-sponsor me to do so) then we can promote it to stable._
+[sponsor me to do so](https://graphile.org/sponsor)) then we can promote it to stable.
+:::
 
 PostGraphile adds `orderBy` arguments to various of the table collection fields
 it builds so that you can control the order in which you receive the results. By
@@ -60,8 +62,10 @@ module.exports = makeAddPgTableOrderByPlugin(
 );
 ```
 
-(Note: we used the `orderByAscDesc` helper to easily create the `_ASC` and
-`_DESC` variants without needing redundant code.)
+:::note
+We used the `orderByAscDesc` helper to easily create the `_ASC` and
+`_DESC` variants without needing redundant code.
+:::
 
 The above plugin adds the `LAST_POST_CREATED_AT_ASC` and
 `LAST_POST_CREATED_AT_DESC` enum values to the `ForumOrderBy` enum, so you can

@@ -1,17 +1,17 @@
 ---
-layout: page
-path: /postgraphile/smart-comments/
-title: Smart Comments
+title: Database Smart Comments
 ---
+
+# Smart Comments
 
 _Ensure you've read the [Smart Tags](./smart-tags) page before referring here._
 
-You can customise your PostGraphile GraphQL schema without making breaking
+You can customize your PostGraphile GraphQL schema without making breaking
 changes to your database schema by adding specially formatted comments to
 tables, columns, functions, relations, etc. within your PostgreSQL database. We
 call these "smart comments".
 
-### Smart comment spec
+## Smart comment spec
 
 Comments can be added to various entities within PostgreSQL using
 [the `COMMENT` statement](https://www.postgresql.org/docs/current/sql-comment.html);
@@ -57,7 +57,7 @@ Note that the parser is deliberately very strict currently, we might make it
 more flexible in future; you might want to check out the
 [test suite](https://github.com/graphile/graphile-engine/blob/master/packages/graphile-build-pg/__tests__/tags.test.js).
 
-### Adding newlines
+## Adding newlines
 
 To put newlines in smart comments we recommend the use of the
 [`E` "escape" string constants](https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS),
@@ -73,58 +73,58 @@ You can use newlines verbatim but this can cause issues with some tooling,
 particularly if you have developers on both Windows and Unix-based operating
 systems.
 
-### Applying smart tags to database entities
+## Applying smart tags to database entities
 
-#### Tables
+### Tables
 
 ```sql
 comment on table my_schema.my_table is
   E'@name my_new_table_name\n@omit update,delete\nThis is the documentation.';
 ```
 
-#### Views
+### Views
 
 ```sql
 comment on view my_schema.mv_view is
   E'@name my_new_view_name\n@omit update,delete\nThis is the documentation.';
 ```
 
-#### Materialized Views
+### Materialized Views
 
 ```sql
 comment on materialized view my_schema.mv_view is
   E'@name my_new_view_name\n@omit update,delete\nThis is the documentation.';
 ```
 
-#### Types
+### Types
 
 ```sql
 comment on type my_schema.my_type is
   E'@name my_new_type_name\nThis is the documentation.';
 ```
 
-#### Columns
+### Columns
 
 ```sql
 comment on column my_schema.my_table.my_column is
   E'@name my_new_column\n@omit create,update\nThis is the documentation.';
 ```
 
-#### Constraints
+### Constraints
 
 ```sql
 comment on constraint my_constraint on my_schema.my_table is
   E'@foreignFieldName foos\n@fieldName bar\nDocumentation here.';
 ```
 
-#### Functions
+### Functions
 
 ```sql
 comment on function my_function(arg_type_1, arg_type_2) is
   E'@name my_new_function_name\nDocumentation here.';
 ```
 
-### Adding smart tags to fake constraints
+## Adding smart tags to fake constraints
 
 If you need to apply any smart comments to a fake constraint, you cannot use
 newlines (`\n`) because they will be interpreted as separate smart comments on

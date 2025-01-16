@@ -1,7 +1,6 @@
 ---
-layout: page
-path: /postgraphile/smart-tags/
 title: Smart Tags
+toc_max_heading_level: 4
 ---
 
 You can customise your PostGraphile GraphQL schema by tagging tables, columns,
@@ -16,7 +15,7 @@ PostGraphile's GraphiQL client that the related types and fields will reflect
 the change almost immediately. If you're not using `--watch` then you may need
 to restart the server for smart tag changes to take effect.
 
-### The @ character
+## The @ character
 
 We often refer to things like the `@omit` smart tag or the `@name` smart tag;
 really these tags are just `omit` and `name` respectively; but in the
@@ -25,13 +24,13 @@ PostGraphile) the `@` is required to denote a smart tag, and this pattern has
 stuck when referring to smart tags.
 
 You will also often see the
-[smart comment syntax](./smart-comments/#smart-comment-spec) used to refer to
+[smart comment syntax](./smart-comments#smart-comment-spec) used to refer to
 smart tags in general, it's because the syntax is a little easier to write
-quickly. Read the [Smart Comments Spec](./smart-comments/#smart-comment-spec)
+quickly. Read the [Smart Comments Spec](./smart-comments#smart-comment-spec)
 and you'll soon learn to translate `@omit update,delete` to
 `omit: "update,delete"` (and vice-versa) in your head.
 
-### Valid values
+## Valid values
 
 Tags have a limited set of valid values:
 
@@ -41,7 +40,7 @@ Tags have a limited set of valid values:
 
 Some tags only support one or two of these types of values.
 
-### Ways of adding tags
+## Ways of adding tags
 
 There's multiple ways of adding tags to entities:
 
@@ -50,7 +49,7 @@ There's multiple ways of adding tags to entities:
 - A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin) instance
 - Your own custom [Graphile Engine plugin](./extending-raw)
 
-### Example
+## Example
 
 _In this example we're going to use Smart Comments for brevity, but this works
 with all the ways of adding smart tags._
@@ -111,12 +110,12 @@ So now the query needs to use the new name for the table:
 
 </div>
 
-### Built-in smart tags
+## Built-in smart tags
 
 Any plugin may implement support for smart tags, so refer to those plugins'
 documentation. The following are smart tags built into PostGraphile.
 
-#### @deprecated
+### @deprecated
 
 You can deprecate a database column using the `deprecated` tag. If you need
 multiple lines, you can specify the tag multiple times, one per line of output
@@ -141,7 +140,7 @@ comment on column my_schema.my_table.my_column is
   E'@deprecated Use myOtherColumn instead.';
 ```
 
-#### @hasDefault
+### @hasDefault
 
 You can indicate that a column has a default - be that implemented via a
 trigger, or maybe as an instead of insert rule - so the field will be nullable
@@ -151,7 +150,7 @@ in create\* mutations.
 comment on column my_schema.my_table.my_column is E'@hasDefault';
 ```
 
-#### @name
+### @name
 
 You can add a smart tag to an entity to rename that entity. For tables, columns,
 custom types and many functions you can use the `name` tag. For more complex
@@ -193,7 +192,7 @@ comment on function search_posts(text) is
   E'@name returnPostsMatching';
 ```
 
-#### @fieldName
+### @fieldName
 
 Applies to:
 
@@ -202,7 +201,7 @@ Applies to:
 - unique constraints: the root finder field name
 - computed column functions: the field name this function creates
 
-#### @foreignFieldName
+### @foreignFieldName
 
 `foreignFieldName` applies to
 
@@ -216,7 +215,7 @@ fieldName: "author"
 
 See also: `@fieldName`
 
-#### @resultFieldName
+### @resultFieldName
 
 Applies to:
 
@@ -239,7 +238,7 @@ comment on function authenticate(text, text) is
   E'@resultFieldName token\n@name login';
 ```
 
-#### @omit
+### @omit
 
 To remove an entity from your API, you can use the 'omit' smart tag. If you only
 want to omit the entity from certain operations you can list them. For example,
@@ -268,9 +267,12 @@ table!):
 
 </div>
 
-> **Warning:** This functionality is not intended for implementing permissions,
-> it's for removing things from your API that you don't need. You should back
-> these up with database permissions if needed.
+:::warning warning
+
+This functionality is not intended for implementing permissions,
+it's for removing things from your API that you don't need. You should back
+these up with database permissions if needed.
+:::
 
 Multiple actions can be listed using commas (no spaces!), as in the following
 example which disables mutations on a table:
@@ -302,7 +304,7 @@ Applies to:
 - Unique constraints
 - Foreign key constraints
 
-###### Example
+##### Example
 
 On a simple table called `book` we have added a smart comment omitting the
 `update` and `delete` operations:
@@ -328,10 +330,10 @@ can see the reduced fields and types once the `create` operation is omitted.
 
 ![GraphiQL displaying an omit smart comment example](./smart-comments-omit-example.png)
 
-#### @sortable
+### @sortable
 
-Since version
-[v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1)
+**Since version
+[v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1)**
 
 Applies to:
 
@@ -366,10 +368,10 @@ comment on function users_foo(users) is E'@sortable';
 }
 ```
 
-#### @filterable
+### @filterable
 
-Since version
-[v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1).
+**Since version
+[v4.3.1](https://github.com/graphile/postgraphile/releases/tag/v4.3.1).**
 
 Applies to:
 
@@ -401,7 +403,7 @@ comment on function users_foo(users) is E'@filterable';
 }
 ```
 
-##### Sorting and filtering non-scalar computed columns
+#### Sorting and filtering non-scalar computed columns
 
 If your computed column is returning a composite type, the recommended approach
 is to wrap it with a computed column that returns the scalar field you want to
@@ -455,7 +457,7 @@ Now you can use the array as a _filter by_, for example:
 }
 ```
 
-#### @simpleCollections
+### @simpleCollections
 
 You can control whether simple collections are enabled by default using
 `--simple-collections omit|both|only` (or
@@ -490,7 +492,7 @@ comment on function search_people(query text) is
   E'@simpleCollections both';
 ```
 
-#### @arg0variant, @arg1variant, ...
+### @arg0variant, @arg1variant, ...
 
 When building a custom mutation, you probably want to use the composite type
 that is generated when creating a table in PostgreSQL as a function argument,
@@ -541,14 +543,14 @@ Applies to:
 - Custom Mutation functions
 - Computed Column functions
 
-#### Tags to add virtual constraint
+### Tags to add virtual constraint
 
 You can add "virtual" (fake) constraints to types in PostgreSQL using smart
 comments. The primary use case for this is to make views act more table-like -
 allowing you to express the connections between tables and views. It's also
 useful on composite types.
 
-##### @notNull
+#### @notNull
 
 Allows marking the column as non-nullable.
 
@@ -570,7 +572,7 @@ attribute: {
 comment on column my_view.my_column is E'@notNull`;
 ```
 
-##### @primaryKey
+#### @primaryKey
 
 Primary key columns will automatically be marked as `@notNull`, as they would in
 PostgreSQL.
@@ -597,7 +599,7 @@ comment on view my_view is E'@primaryKey id';
 comment on view my_view is E'@primaryKey type,identifier';
 ```
 
-##### @foreignKey
+#### @foreignKey
 
 The foreign key adds virtual constraints pretending to be foreign keys. It has
 the following syntax which mirrors the PostgreSQL foreign key constraint:
@@ -650,9 +652,9 @@ comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2
 comment on materialized view my_materialized_view is E'@foreignKey (key_1, key_2) references other_table (key_1, key_2)\n@foreignKey (key_3, key_4) references some_other_table (key_3, key_4)';
 ```
 
-##### @unique
+#### @unique
 
-_From PostGraphile 4.9.1_
+**From PostGraphile 4.9.1**
 
 Introduces a "fake" unique constraint, so `@unique col1,col2` is somewhat
 equivalent to the following, except it can also be applied to entities that
@@ -685,7 +687,7 @@ class: {
 comment on view my_view is E'@unique id\n@unique org,slug';
 ```
 
-##### Smart Tags on virtual constraints
+#### Smart Tags on virtual constraints
 
 You can also add smart tags on virtual constraints, for example adding the
 `fieldName` smart tag to a virtual foreign key constraint, by appending the pipe

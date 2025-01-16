@@ -1,10 +1,10 @@
 ---
-layout: page
-path: /postgraphile/make-add-inflectors-plugin/
-title: makeAddInflectorsPlugin (graphile-utils)
+title: makeAddInflectorsPlugin
 ---
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
+# makeAddInflectorsPlugin (graphile-utils)
+
+**This documentation applies to PostGraphile v4.1.0+**
 
 If you're not happy with the default naming conventions in PostGraphile (or if
 you want to extend PostGraphile's functionality and use the inflection system to
