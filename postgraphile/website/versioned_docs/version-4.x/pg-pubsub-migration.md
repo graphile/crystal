@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/pg-pubsub-migration/
-title: Migrating from the Supporter Plugin to @graphile/pg-pubsub
+title: "@graphile/pg-pubsub Migration Guide"
 ---
+
+# Migrating from the Supporter Plugin to @graphile/pg-pubsub
 
 Before April 2019, PostGraphile had rudimentary support for GraphQL
 subscriptions available only to
@@ -15,7 +15,7 @@ With v4.4.0, PostGraphile's subscriptions support was extended and open-sourced.
 Users of `@graphile/supporter` are encouraged to move to using the open source
 subscriptions plugin, which should only take a few minutes.
 
-### Step 1: uninstall the outdated module
+## Step 1: uninstall the outdated module
 
 For the npm module:
 
@@ -26,15 +26,15 @@ yarn remove @graphile/supporter
 For the `git` module, edit your `package.json` and remove the relevant line and
 then run `yarn` or `npm install`
 
-### Step 2: install the new module
+## Step 2: install the new module
 
 ```
 yarn add @graphile/pg-pubsub
 ```
 
-### Step 3: switch to using the new module
+## Step 3: switch to using the new module
 
-#### Library
+### Library
 
 - Your `makePluginHook` line should now reference the `@graphile/pg-pubsub`
   plugin rather than the supporter plugin
@@ -43,17 +43,17 @@ yarn add @graphile/pg-pubsub
   it from the supporter plugin, now import it from `postgraphile` directly. The
   call signature is now
   `enhanceHttpServerWithSubscriptions(httpServer, postgraphileMiddleware)` - see
-  [Subscriptions Advanced Setup](./subscriptions/#advanced-setup).
+  [Subscriptions Advanced Setup](./subscriptions#advanced-setup).
 - **If** you were passing `middleware` to `enhanceHttpServerWithSubscriptions`;
   you should instead pass these middleware as `websocketMiddlewares` via the
   `postgraphile` options.
 
-#### CLI
+### CLI
 
 Change `--plugins @graphile/supporter` to `--plugins @graphile/pg-pubsub` and
 add the `--subscriptions` flag.
 
-### Additional information
+## Additional information
 
 Now PostGraphile natively supports subscriptions, our built in GraphiQL
 (http://localhost:5000/graphiql by default) now supports subscriptions too, so
