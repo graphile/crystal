@@ -3745,7 +3745,7 @@ export class OperationPlan {
 
   private _cacheStepStoreByLayerPlanAndActionKey: Record<
     string,
-    Record<symbol | string | number, any> | undefined
+    Map<any, any> | undefined
   > = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
@@ -3757,13 +3757,13 @@ export class OperationPlan {
   cacheStep<T extends ExecutableStep>(
     ownerStep: ExecutableStep,
     actionKey: string,
-    cacheKey: symbol | string | number,
+    cacheKey: symbol | string | number | boolean | null | undefined,
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
       `${actionKey}|${layerPlan.id}|${ownerStep.id}`
-    ] ??= Object.create(null));
+    ] ??= new Map());
 
     const cacheIt = () => {
       const stepToCache = cb();
@@ -3774,15 +3774,15 @@ export class OperationPlan {
           )}`,
         );
       }
-      cache[cacheKey] = stepToCache.id;
+      cache.set(cacheKey, stepToCache.id);
       return stepToCache;
     };
 
-    if (!(cacheKey in cache)) {
+    if (!cache.has(cacheKey)) {
       return cacheIt();
     }
 
-    const cachedStepId = cache[cacheKey];
+    const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
     return cachedStep ?? cacheIt();
   }
