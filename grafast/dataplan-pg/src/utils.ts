@@ -1,5 +1,5 @@
 import { ExecutableStep } from "grafast";
-import type { PgSQL, SQL, Transformer } from "pg-sql2";
+import type { SQL, Transformer } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgResource } from "./datasource.js";
