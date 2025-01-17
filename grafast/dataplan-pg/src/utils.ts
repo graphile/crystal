@@ -6,6 +6,8 @@ import type { PgResource } from "./datasource.js";
 import type {
   PgClassSingleStep,
   PgCodec,
+  PgSQLCallback,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "./interfaces.js";
 import { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
@@ -32,9 +34,9 @@ export function assertPgClassSingleStep<
   }
 }
 
-export function makeScopedSQL<T extends { placeholder(value: any): SQL }>(
-  that: T,
-) {
+export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
+  that: TThis,
+): <T>(cb: PgSQLCallbackOrDirect<T>) => T {
   const sqlTransformer: Transformer<PgTypedExecutableStep<PgCodec>> = (
     sql,
     value,
@@ -49,6 +51,8 @@ export function makeScopedSQL<T extends { placeholder(value: any): SQL }>(
       return value;
     }
   };
-  return <T>(cb: (sql: PgSQL<PgTypedExecutableStep<PgCodec>>) => T): T =>
-    sql.withTransformer<PgTypedExecutableStep<PgCodec>, T>(sqlTransformer, cb);
+  return <T>(cb: PgSQLCallbackOrDirect<T>) =>
+    typeof cb === "function"
+      ? sql.withTransformer(sqlTransformer, cb as PgSQLCallback<T>)
+      : cb;
 }

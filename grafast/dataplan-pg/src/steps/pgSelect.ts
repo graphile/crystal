@@ -52,6 +52,7 @@ import type {
   PgCodecRelation,
   PgGroupSpec,
   PgOrderSpec,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -124,6 +125,8 @@ type PgSelectPlanJoin =
       conditions: SQL[];
       lateral?: boolean;
     };
+
+type PgSelectScopedPlanJoin = PgSQLCallbackOrDirect<PgSelectPlanJoin>;
 
 export type PgSelectIdentifierSpec =
   | {
@@ -800,8 +803,8 @@ export class PgSelectStep<
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
    */
-  public join(spec: PgSelectPlanJoin) {
-    this.joins.push(spec);
+  public join(spec: PgSelectScopedPlanJoin) {
+    this.joins.push(this.scopedSQL(spec));
   }
 
   /**
@@ -809,7 +812,10 @@ export class PgSelectStep<
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
+  public selectAndReturnIndex(
+    fragmentOrCb: PgSQLCallbackOrDirect<SQL>,
+  ): number {
+    const fragment = this.scopedSQL(fragmentOrCb);
     if (!this.isArgumentsFinalized) {
       throw new Error("Select added before arguments were finalized");
     }
@@ -872,8 +878,8 @@ export class PgSelectStep<
   }
 
   where(
-    condition: PgWhereConditionSpec<
-      keyof GetPgResourceAttributes<TResource> & string
+    rawCondition: PgSQLCallbackOrDirect<
+      PgWhereConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
     >,
   ): void {
     if (this.locker.locked) {
@@ -881,14 +887,17 @@ export class PgSelectStep<
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
+    const condition = this.scopedSQL(rawCondition);
     if (sql.isSQL(condition)) {
       this.conditions.push(condition);
     } else {
       switch (condition.type) {
         case "attribute": {
           this.conditions.push(
-            condition.callback(
-              sql`${this.alias}.${sql.identifier(condition.attribute)}`,
+            this.scopedSQL((sql) =>
+              condition.callback(
+                sql`${this.alias}.${sql.identifier(condition.attribute)}`,
+              ),
             ),
           );
           break;
@@ -911,12 +920,12 @@ export class PgSelectStep<
     return new PgConditionStep(this);
   }
 
-  groupBy(group: PgGroupSpec): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
-    this.groups.push(group);
+    this.groups.push(this.scopedSQL(group));
   }
 
   getGroups(): readonly PgGroupSpec[] {
@@ -937,8 +946,8 @@ export class PgSelectStep<
   }
 
   having(
-    condition: PgHavingConditionSpec<
-      keyof GetPgResourceAttributes<TResource> & string
+    rawCondition: PgSQLCallbackOrDirect<
+      PgHavingConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
     >,
   ): void {
     if (this.locker.locked) {
@@ -949,6 +958,7 @@ export class PgSelectStep<
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
+    const condition = this.scopedSQL(rawCondition);
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
     } else {
@@ -958,9 +968,9 @@ export class PgSelectStep<
     }
   }
 
-  orderBy(order: PgOrderSpec): void {
+  orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec>): void {
     this.locker.assertParameterUnlocked("orderBy");
-    this.orders.push(order);
+    this.orders.push(this.scopedSQL(order));
   }
 
   orderIsUnique(): boolean {

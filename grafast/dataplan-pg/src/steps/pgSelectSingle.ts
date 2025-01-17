@@ -26,6 +26,7 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgRegistry,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { makeScopedSQL } from "../utils.js";
@@ -290,7 +291,7 @@ export class PgSelectSingleStep<
    * Returns a plan representing the result of an expression.
    */
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -299,7 +300,7 @@ export class PgSelectSingleStep<
       codec,
       guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   /**
@@ -308,8 +309,8 @@ export class PgSelectSingleStep<
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
-    return this.getClassStep().selectAndReturnIndex(fragment);
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+    return this.getClassStep().selectAndReturnIndex(this.scopedSQL(fragment));
   }
 
   public scopedSQL = makeScopedSQL(this);

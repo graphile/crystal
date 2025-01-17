@@ -41,6 +41,7 @@ import type {
   PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -312,12 +313,12 @@ export class PgUnionAllSingleStep
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -326,7 +327,7 @@ export class PgUnionAllSingleStep
       codec,
       codec.notNull || guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   execute({
@@ -820,7 +821,8 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(fragment: SQL): number {
+  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
+    const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
@@ -846,7 +848,11 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression(expression: SQL, codec: PgCodec): number {
+  selectExpression(
+    rawExpression: PgSQLCallbackOrDirect<SQL>,
+    codec: PgCodec,
+  ): number {
+    const expression = this.scopedSQL(rawExpression);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "expression" && sql.isEquivalent(s.expression, expression),
@@ -910,12 +916,15 @@ on (${sql.indent(
     return pgPageInfo($connectionPlan);
   }
 
-  where(whereSpec: PgWhereConditionSpec<TAttributes>): void {
+  where(
+    rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
+    const whereSpec = this.scopedSQL(rawWhereSpec);
     for (const digest of this.memberDigests) {
       const { alias: tableAlias, symbol } = digest;
       if (sql.isSQL(whereSpec)) {
@@ -942,12 +951,12 @@ on (${sql.indent(
     return new PgConditionStep(this);
   }
 
-  groupBy(group: PgGroupSpec): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
-    this.groups.push(group);
+    this.groups.push(this.scopedSQL(group));
   }
 
   havingPlan(): PgConditionStep<this> {
@@ -962,7 +971,9 @@ on (${sql.indent(
     return new PgConditionStep(this, true);
   }
 
-  having(condition: PgHavingConditionSpec<string>): void {
+  having(
+    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
@@ -971,6 +982,7 @@ on (${sql.indent(
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
+    const condition = this.scopedSQL(rawCondition);
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
     } else {
