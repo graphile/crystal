@@ -331,9 +331,19 @@ function isSQLable(value: any): value is SQLable {
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
 function enforceValidNode(node: SQLNode, where?: string): SQLNode;
 function enforceValidNode(node: SQL | SQLable, where?: string): SQL;
+function enforceValidNode(node: unknown, where?: string): SQL;
 function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
+  }
+  for (let i = _userTransformers.length - 1; i >= 0; i--) {
+    const transformer = _userTransformers[i];
+    const transformed = transformer(sql, node, where);
+    if (transformed !== node) {
+      return enforceValidNode(transformed);
+    } else {
+      // Continue onward; `node` is unchanged
+    }
   }
   if (isSQLable(node)) {
     return enforceValidNode(node[$$toSQL](), where);
@@ -343,7 +353,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
       where ? ` at ${where}` : ""
     } but received '${inspect(
       node,
-    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
+    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal. Alternatively, perhaps you forgot to call sql.withTransformer() when building your SQL?`,
   );
 }
 
@@ -521,7 +531,10 @@ export function compile(
               "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
             );
           }
-          sqlFragments.push(print(resolvedPlaceholder, indent));
+          const resolved = print(resolvedPlaceholder, indent);
+          if (resolved !== "") {
+            sqlFragments.push(resolved);
+          }
           break;
         }
         default: {
@@ -1213,6 +1226,26 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
+export type Transformer<TNewEmbed> = <TValue>(
+  sql: PgSQL,
+  value: TNewEmbed | TValue,
+  where?: string,
+) => SQL | TValue;
+
+const _userTransformers: Transformer<any>[] = [];
+
+export function withTransformer<TNewEmbed, TResult = SQL>(
+  transformer: Transformer<TNewEmbed>,
+  callback: (sql: PgSQL<TNewEmbed>) => TResult,
+): TResult {
+  _userTransformers.push(transformer);
+  try {
+    return callback(sql as PgSQL<TNewEmbed>);
+  } finally {
+    _userTransformers.pop();
+  }
+}
+
 export const sql = sqlBase as PgSQL;
 export default sql;
 
@@ -1225,12 +1258,15 @@ export {
   trueNode as true,
 };
 
-export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL | SQLable>): SQL;
+export interface PgSQL<TEmbed = never> {
+  (
+    strings: TemplateStringsArray,
+    ...values: Array<SQL | SQLable | TEmbed>
+  ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
-  query: PgSQL;
+  query: PgSQL<TEmbed>;
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
@@ -1242,13 +1278,17 @@ export interface PgSQL {
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
-  fragment: PgSQL;
+  fragment: PgSQL<TEmbed>;
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
-  sql: PgSQL;
+  sql: PgSQL<TEmbed>;
+  withTransformer<TNewEmbed, TResult = SQL>(
+    transformer: Transformer<TNewEmbed>,
+    callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
+  ): TResult;
 }
 
 const attributes = {
@@ -1274,6 +1314,7 @@ const attributes = {
   null: nullNode,
   replaceSymbol,
   isSQL,
+  withTransformer,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
