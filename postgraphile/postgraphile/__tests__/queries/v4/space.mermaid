@@ -11,57 +11,57 @@ graph TD
     %% plan dependencies
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸspacecraftᐳ"]]:::plan
-    Object17{{"Object[17∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant47{{"Constant[47∈1] ➊<br />ᐸ§{ id: '1', type: 'MOBILE' }ᐳ"}}:::plan
-    Object17 & Connection18 & Constant47 --> PgSelect19
-    Access15{{"Access[15∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access15 & Access16 --> Object17
-    __Value2 --> Access15
-    __Value2 --> Access16
-    __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
-    PgSelect19 ==> __Item20
-    PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸspacecraftᐳ"}}:::plan
-    __Item20 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__spacecraft__.”id”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__spacecraft__.”name”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
-    PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸspacecraftᐳ"}}:::plan
-    RemapKeys43{{"RemapKeys[43∈3]<br />ᐸ21:{”0”:2,”1”:3}ᐳ"}}:::plan
-    RemapKeys43 --> PgSelectSingle34
-    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ”space”.”s...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression36
-    PgSelectSingle21 --> RemapKeys43
-    Access37{{"Access[37∈4]<br />ᐸ36.startᐳ"}}:::plan
-    PgClassExpression36 --> Access37
-    Access40{{"Access[40∈4]<br />ᐸ36.endᐳ"}}:::plan
-    PgClassExpression36 --> Access40
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ§{ id: '1', type: 'MOBILE' }ᐳ"}}:::plan
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸspacecraftᐳ"]]:::plan
+    Object12{{"Object[12∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object12 & Connection13 & Constant42 --> PgSelect14
+    Access10{{"Access[10∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
+    __Value2 --> Access10
+    __Value2 --> Access11
+    __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
+    PgSelect14 ==> __Item15
+    PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸspacecraftᐳ"}}:::plan
+    __Item15 --> PgSelectSingle16
+    PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__spacecraft__.”id”ᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression17
+    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__spacecraft__.”name”ᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression18
+    PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸspacecraftᐳ"}}:::plan
+    RemapKeys38{{"RemapKeys[38∈3]<br />ᐸ16:{”0”:2,”1”:3}ᐳ"}}:::plan
+    RemapKeys38 --> PgSelectSingle29
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ”space”.”s...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression31
+    PgSelectSingle16 --> RemapKeys38
+    Access32{{"Access[32∈4]<br />ᐸ31.startᐳ"}}:::plan
+    PgClassExpression31 --> Access32
+    Access35{{"Access[35∈4]<br />ᐸ31.endᐳ"}}:::plan
+    PgClassExpression31 --> Access35
 
     %% define steps
 
     subgraph "Buckets for queries/v4/space"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection18 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]<br />1: <br />ᐳ: 15, 16, 47, 17<br />2: PgSelect[19]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection13,Constant42 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 13, 42<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: Access[10], Access[11], Object[12]<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access15,Access16,Object17,PgSelect19,Constant47 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
+    class Bucket1,Access10,Access11,Object12,PgSelect14 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item20,PgSelectSingle21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸspacecraftᐳ[21]"):::bucket
+    class Bucket2,__Item15,PgSelectSingle16 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgSelectSingle{2}ᐸspacecraftᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23,PgSelectSingle34,PgClassExpression36,RemapKeys43 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgClassExpression{3}ᐸ”space”.”s...lder! */<br />)ᐳ[36]"):::bucket
+    class Bucket3,PgClassExpression17,PgClassExpression18,PgSelectSingle29,PgClassExpression31,RemapKeys38 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgClassExpression{3}ᐸ”space”.”s...lder! */<br />)ᐳ[31]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,Access37,Access40 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 36<br /><br />ROOT Access{4}ᐸ36.startᐳ[37]"):::bucket
+    class Bucket4,Access32,Access35 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 32, 31<br /><br />ROOT Access{4}ᐸ31.startᐳ[32]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 40, 36<br /><br />ROOT Access{4}ᐸ36.endᐳ[40]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 35, 31<br /><br />ROOT Access{4}ᐸ31.endᐳ[35]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
     Bucket0 --> Bucket1
