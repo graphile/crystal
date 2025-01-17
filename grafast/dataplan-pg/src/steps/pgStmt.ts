@@ -3,7 +3,7 @@ import { type SQL, sql } from "pg-sql2";
 
 import type { PgCodec, PgTypedExecutableStep } from "..";
 import type { PgLocker } from "../pgLocker";
-import { makeScopedSQL } from "../utils";
+import { makeScopedSQL } from "../utils.js";
 
 /**
  * Sometimes we want to refer to something that might change later - e.g. we
