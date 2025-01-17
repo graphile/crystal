@@ -7,8 +7,8 @@ title: "sql.withTransformer()"
 
 Sometimes you may want to embed non-SQL values into your SQL fragments and have
 them work automatically. By default we'll throw an error when we see non-SQL
-values, however by using "transformers" you can have dictate how (and if)
-unknown values should be coerced to SQL.
+values, however by using "transformers" you can dictate how (and if) unknown
+values should be coerced to SQL.
 
 In this example, we tell the system that if it sees a `number` value then it
 can automatically embed it using `sql.value(n)`. Note that it also updates the
