@@ -21,6 +21,9 @@ graph TD
     Constant7{{"Constant[7∈0] ➊<br />ᐸ'Computed post ꖛ1'ᐳ"}}:::plan
     Constant13{{"Constant[13∈0] ➊<br />ᐸ'Computed post ꖛ2'ᐳ"}}:::plan
     Constant19{{"Constant[19∈0] ➊<br />ᐸ'Computed post ꖛ3'ᐳ"}}:::plan
+    Constant128{{"Constant[128∈0] ➊<br />ᐸ1000000ᐳ"}}:::plan
+    Constant129{{"Constant[129∈0] ➊<br />ᐸ1000001ᐳ"}}:::plan
+    Constant130{{"Constant[130∈0] ➊<br />ᐸ1000002ᐳ"}}:::plan
     PgSelect8[["PgSelect[8∈1] ➊<br />ᐸrelational_posts(mutation)ᐳ"]]:::sideeffectplan
     Object11 & Constant6 & Constant7 --> PgSelect8
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸrelational_posts(mutation)ᐳ"]]:::sideeffectplan
@@ -34,13 +37,10 @@ graph TD
     PgClassExpression26{{"PgClassExpression[26∈1] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression26
     PgSelect28[["PgSelect[28∈2] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Constant128{{"Constant[128∈2] ➊<br />ᐸ1000000ᐳ"}}:::plan
     Object11 & Constant128 --> PgSelect28
     PgSelect63[["PgSelect[63∈2] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Constant129{{"Constant[129∈2] ➊<br />ᐸ1000001ᐳ"}}:::plan
     Object11 & Constant129 --> PgSelect63
     PgSelect96[["PgSelect[96∈2] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Constant130{{"Constant[130∈2] ➊<br />ᐸ1000002ᐳ"}}:::plan
     Object11 & Constant130 --> PgSelect96
     First32{{"First[32∈2] ➊"}}:::plan
     PgSelect28 --> First32
@@ -190,13 +190,13 @@ graph TD
     subgraph "Buckets for mutations/basics/create-three-relational-posts-computed"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Constant7,Access9,Access10,Object11,Constant13,Constant19 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 6, 7, 13, 19, 4<br /><br />1: PgSelect[8]<br />2: PgSelect[14]<br />3: PgSelect[20]<br />4: <br />ᐳ: 24, 25, 26"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Constant7,Access9,Access10,Object11,Constant13,Constant19,Constant128,Constant129,Constant130 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 6, 7, 13, 19, 128, 129, 130, 4<br /><br />1: PgSelect[8]<br />2: PgSelect[14]<br />3: PgSelect[20]<br />4: <br />ᐳ: 24, 25, 26"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect8,PgSelect14,PgSelect20,First24,PgSelectSingle25,PgClassExpression26 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 26, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[26]<br />1: <br />ᐳ: 128, 129, 130<br />2: 28, 63, 96<br />ᐳ: 32, 33, 65, 66, 98, 99"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 128, 129, 130, 26, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[26]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect28,First32,PgSelectSingle33,PgSelect63,First65,PgSelectSingle66,PgSelect96,First98,PgSelectSingle99,Constant128,Constant129,Constant130 bucket2
+    class Bucket2,PgSelect28,First32,PgSelectSingle33,PgSelect63,First65,PgSelectSingle66,PgSelect96,First98,PgSelectSingle99 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 33, 66, 99, 4, 11<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression34,PgPolymorphic35,PgClassExpression67,PgPolymorphic68,PgClassExpression100,PgPolymorphic101 bucket3
