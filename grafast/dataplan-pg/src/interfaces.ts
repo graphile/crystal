@@ -1,5 +1,5 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
@@ -728,3 +728,8 @@ export type GetPgResourceRelations<
 export type GetPgResourceUniques<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["uniques"];
+
+export type PgSQLCallback<TResult> = (
+  sql: PgSQL<PgTypedExecutableStep<PgCodec>>,
+) => TResult;
+export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;

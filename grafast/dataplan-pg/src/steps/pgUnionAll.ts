@@ -41,9 +41,11 @@ import type {
   PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
+import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
@@ -57,10 +59,10 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
+import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
-
-const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgUnionAll placeholder! */`;
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
@@ -189,23 +191,6 @@ interface QueryValue {
   alreadyEncoded: boolean;
 }
 
-/**
- * Sometimes we want to refer to something that might change later - e.g. we
- * might have SQL that specifies a list of explicit values, or it might later
- * want to be replaced with a reference to an existing table value (e.g. when a
- * query is being inlined). PgSelectPlaceholder allows for this kind of
- * flexibility. It's really important to keep in mind that the same placeholder
- * might be used in multiple different SQL queries, and in the different
- * queries it might end up with different values - this is particularly
- * relevant when using `@stream`/`@defer`, for example.
- */
-type PgUnionAllPlaceholder = {
-  dependencyIndex: number;
-  codec: PgCodec;
-  symbol: symbol;
-  alreadyEncoded: boolean;
-};
-
 export class PgUnionAllSingleStep
   extends ExecutableStep
   implements PolymorphicStep, EdgeCapableStep<any>
@@ -298,6 +283,19 @@ export class PgUnionAllSingleStep
     return this;
   }
 
+  public scopedSQL = makeScopedSQL(this);
+
+  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
+  ): SQL {
+    return overrideCodec
+      ? this.getClassStep().placeholder($step, overrideCodec)
+      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+  }
+
   /**
    * Returns a plan representing the result of an expression.
    */
@@ -315,12 +313,12 @@ export class PgUnionAllSingleStep
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -329,7 +327,7 @@ export class PgUnionAllSingleStep
       codec,
       codec.notNull || guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   execute({
@@ -404,7 +402,7 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >
-  extends ExecutableStep
+  extends PgStmtBaseStep<unknown>
   implements
     ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
@@ -456,7 +454,8 @@ export class PgUnionAllStep<
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<PgUnionAllPlaceholder>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder>;
+  protected deferreds: Array<PgStmtDeferredSQL>;
   private placeholderValues: Map<symbol, SQL>;
 
   // GROUP BY
@@ -528,7 +527,7 @@ export class PgUnionAllStep<
 
   public readonly mode: PgUnionAllMode;
 
-  private locker: PgLocker<this> = new PgLocker(this);
+  protected locker: PgLocker<this> = new PgLocker(this);
 
   private memberDigests: MemberDigest<TTypeNames>[];
   private _limitToTypes: string[] | undefined;
@@ -574,6 +573,7 @@ export class PgUnionAllStep<
         ? [...cloneFromMatchingMode.selects]
         : [];
       this.placeholders = [...cloneFrom.placeholders];
+      this.deferreds = [...cloneFrom.deferreds];
       this.queryValues = [...cloneFrom.queryValues];
       this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.groups = cloneFromMatchingMode
@@ -657,6 +657,7 @@ export class PgUnionAllStep<
 
       this.selects = [];
       this.placeholders = [];
+      this.deferreds = [];
       this.queryValues = [];
       this.placeholderValues = new Map();
       this.groups = [];
@@ -820,7 +821,8 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(fragment: SQL): number {
+  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
+    const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
@@ -846,7 +848,11 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression(expression: SQL, codec: PgCodec): number {
+  selectExpression(
+    rawExpression: PgSQLCallbackOrDirect<SQL>,
+    codec: PgCodec,
+  ): number {
+    const expression = this.scopedSQL(rawExpression);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "expression" && sql.isEquivalent(s.expression, expression),
@@ -910,12 +916,15 @@ on (${sql.indent(
     return pgPageInfo($connectionPlan);
   }
 
-  where(whereSpec: PgWhereConditionSpec<TAttributes>): void {
+  where(
+    rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
+    const whereSpec = this.scopedSQL(rawWhereSpec);
     for (const digest of this.memberDigests) {
       const { alias: tableAlias, symbol } = digest;
       if (sql.isSQL(whereSpec)) {
@@ -942,12 +951,12 @@ on (${sql.indent(
     return new PgConditionStep(this);
   }
 
-  groupBy(group: PgGroupSpec): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
-    this.groups.push(group);
+    this.groups.push(this.scopedSQL(group));
   }
 
   havingPlan(): PgConditionStep<this> {
@@ -962,7 +971,9 @@ on (${sql.indent(
     return new PgConditionStep(this, true);
   }
 
-  having(condition: PgHavingConditionSpec<string>): void {
+  having(
+    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
@@ -971,6 +982,7 @@ on (${sql.indent(
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
+    const condition = this.scopedSQL(rawCondition);
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
     } else {
@@ -1031,49 +1043,6 @@ on (${sql.indent(
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
-  }
-
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder(
-    $step: ExecutableStep,
-    codec: PgCodec,
-    alreadyEncoded?: boolean,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec,
-    alreadyEncoded = false,
-  ): SQL {
-    if (this.locker.locked) {
-      throw new Error(`${this}: cannot add placeholders once plan is locked`);
-    }
-    if (this.placeholders.length >= 100000) {
-      throw new Error(
-        `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
-      );
-    }
-
-    const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
-    if (!codec) {
-      throw new Error(
-        `Step ${$step} does not contain pgCodec information, please wrap ` +
-          `it in \`pgCast\`. E.g. \`pgCast($step, TYPES.boolean)\``,
-      );
-    }
-
-    const dependencyIndex = this.addDependency($step);
-    const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
-    const p: PgUnionAllPlaceholder = {
-      dependencyIndex,
-      codec,
-      symbol,
-      alreadyEncoded,
-    };
-    this.placeholders.push(p);
-    // This allows us to replace the SQL that will be compiled, for example
-    // when we're inlining this into a parent query.
-    return sqlPlaceholder;
   }
 
   private applyConditionFromCursor(
