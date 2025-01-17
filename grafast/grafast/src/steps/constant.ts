@@ -32,8 +32,12 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     // ENHANCE: use nicer simplification
     return this.isSensitive
       ? `[HIDDEN]`
-      : inspect(this.data)
+      : inspect(this.data, {
+          compact: Infinity,
+          breakLength: Infinity,
+        })
           .replace(/[\r\n]/g, " ")
+          .replaceAll("[Object: null prototype] ", "§")
           .slice(0, 60);
   }
 
