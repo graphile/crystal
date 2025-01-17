@@ -4,6 +4,9 @@ lateral (
   select
     __relational_posts_identifiers__.idx as "0"
   from interfaces_and_unions.insert_post(__relational_posts_identifiers__."id0", __relational_posts_identifiers__."id1") as __relational_posts__
+  where (
+    true /* authorization checks */
+  )
   order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
@@ -13,6 +16,9 @@ lateral (
   select
     __relational_posts_identifiers__.idx as "0"
   from interfaces_and_unions.insert_post(__relational_posts_identifiers__."id0", __relational_posts_identifiers__."id1") as __relational_posts__
+  where (
+    true /* authorization checks */
+  )
   order by __relational_posts__."id" asc
 ) as __relational_posts_result__;
 
@@ -24,6 +30,9 @@ lateral (
     __relational_posts__."id"::text as "1",
     __relational_posts_identifiers__.idx as "2"
   from interfaces_and_unions.insert_post(__relational_posts_identifiers__."id0", __relational_posts_identifiers__."id1") as __relational_posts__
+  where (
+    true /* authorization checks */
+  )
 ) as __relational_posts_result__;
 
 select __relational_items_result__.*

@@ -2308,6 +2308,17 @@ export class OperationPlan {
    */
   private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
     if (step.hasSideEffects) {
+      // Plans with side effects have no peers.
+      return EMPTY_ARRAY;
+    }
+
+    if (step._stepOptions.stream) {
+      // Streams have no peers - we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      //
+      // HOWEVER! There may be lifecycle parts that need to be called... So
+      // call the function with an empty array; ignore the result.
       return EMPTY_ARRAY;
     }
 
@@ -2846,27 +2857,13 @@ export class OperationPlan {
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
-    if (step.hasSideEffects) {
-      // Never deduplicate plans with side effects.
-      return null;
-    }
-
     if (step instanceof __ItemStep) {
       // __ItemStep cannot be deduplicated
       return null;
     }
 
-    // OPTIMIZE: Past Benjie thought we might want to revisit this under the
-    // new Grafast system. No idea what he had in mind there though...
-    if (step._stepOptions.stream) {
-      // Never deduplicate streaming plans, we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      return null;
-    }
-
     const peers = this.getPeers(step);
-    // Even if there is just one peer, we must still deduplicate because
+    // Even if there are no peers, we must still deduplicate because
     // `deduplicate` is called to indicate that the field is done being
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
