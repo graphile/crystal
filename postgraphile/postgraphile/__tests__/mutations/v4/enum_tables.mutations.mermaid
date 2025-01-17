@@ -49,7 +49,7 @@ graph TD
     PgInsertSingle24 --> PgClassExpression32
     PgSelect42[["PgSelect[42∈7] ➊<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object45{{"Object[45∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant58{{"Constant[58∈7] ➊<br />ᐸ[Object: null prototype] {   enum_1: 'a1',   enum_2: 'b2',  ᐳ"}}:::plan
+    Constant58{{"Constant[58∈7] ➊<br />ᐸ§{ enum_1: 'a1', enum_2: 'b2', enum_3: 'c4', simple_enum: 'Qᐳ"}}:::plan
     Object45 & Constant58 --> PgSelect42
     Access43{{"Access[43∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access44{{"Access[44∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
