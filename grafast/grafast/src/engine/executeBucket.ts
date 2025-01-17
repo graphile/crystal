@@ -1246,6 +1246,12 @@ export function bucketToString(this: Bucket) {
   return `Bucket<${this.layerPlan}>`;
 }
 
+function throwNotUnary(): never {
+  throw new Error(
+    `This is not a unary value so we cannot get the single value - there may be more than one!`,
+  );
+}
+
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
@@ -1256,6 +1262,7 @@ export function batchExecutionValue<TData>(
     at: batchEntriesAt,
     isBatch: true,
     entries,
+    unaryValue: throwNotUnary,
     _flags,
     _flagsAt: batchFlagsAt,
     _getStateUnion() {
@@ -1313,6 +1320,7 @@ export function unaryExecutionValue<TData>(
     at: unaryAt,
     isBatch: false,
     value,
+    unaryValue: () => value,
     _entryFlags,
     _flagsAt: unaryFlagsAt,
     _getStateUnion: unaryGetStateUnion,

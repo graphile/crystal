@@ -231,7 +231,7 @@ export class __ListTransformStep<
     const listStepValue = values[this.listStepDepId];
 
     if (itemStep._isUnary) {
-      const list = listStepValue.at(0);
+      const list = listStepValue.unaryValue();
       store.set(
         itemStepId,
         unaryExecutionValue(Array.isArray(list) ? list[0] : list),

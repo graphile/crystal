@@ -105,7 +105,7 @@ export class ApplyTransformsStep extends ExecutableStep {
       );
     }
     if (itemStep._isUnary) {
-      store.set(itemStepId, unaryExecutionValue(values0.at(0)));
+      store.set(itemStepId, unaryExecutionValue(values0.unaryValue()));
     } else {
       store.set(itemStepId, batchExecutionValue([]));
     }
