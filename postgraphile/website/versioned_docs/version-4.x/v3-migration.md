@@ -1,15 +1,15 @@
 ---
-layout: page
-path: /postgraphile/v3-migration/
-title: Migrating from PostGraphQL v3
+title: v3 → v4 Migration Guide
 ---
+
+# Migrating from PostGraphQL v3
 
 Despite the fact that PostGraphile v4 has rewritten the _entire_ GraphQL schema
 generation from scratch it is still broadly compatible with version 3. This
 document aims to outline solutions to issues you might face whilst upgrading. If
 you face issues that you cannot solve, please do reach out!
 
-### Short list of breaking changes
+## Short list of breaking changes
 
 These are things that can't be easily solved by just adding a command-line
 switch or configuration parameter - if these are a problem for you then please
@@ -27,17 +27,16 @@ the below first though!)
 - If you have any tables ending with `_input`, `_patch`, `Input` or `Patch` they
   will be renamed (see bottom of this article)
 
-### Aside: project financial status
+## Aside: project financial status
 
-**If your business uses PostGraphile, please invest in
-[our Patreon](https://www.patreon.com/benjie)** - you'll benefit from faster
+**If your business uses PostGraphile, please invest in [sponsoring us](https://graphile.org/sponsor)** - you'll benefit from faster
 fixes, more features, and better performance. If you need a more commercially
-justifiable way of funding the project then please
-[get in touch](mailto:team@graphile.org?subject=Giving%20back).
+justifiable way of funding the project we also offer
+[development support](https://graphile.org/support).
 
-### Deprecations
+## Deprecations
 
-#### One-to-one backward relations
+### One-to-one backward relations
 
 These are now supported, so the previous one-to-many approximation for them has
 been deprecated. If you can do so we encourage you to remove the old API via
@@ -82,9 +81,9 @@ create table bar (
 }
 ```
 
-### Breakdown of issues you might face
+## Breakdown of issues you might face
 
-#### New minimum requirements
+### New minimum requirements
 
 **Problem**: the system fails to start (or even install) because the
 requirements are not met.
@@ -101,7 +100,7 @@ and supporting 8.6+ as the base level gives us longevity whilst also allowing us
 to leverage native support for some of the powerful features of ES2017 and
 ES2018.
 
-#### Type 'Json' or 'Uuid' is not recognized
+### Type 'Json' or 'Uuid' is not recognized
 
 **Problem**: `Json` and `Uuid` have been renamed to `JSON` and `UUID`
 respectively
@@ -112,7 +111,7 @@ option) to change back to the old naming.
 
 **Reasoning**: purely correctness/aesthetic. Sorry. 😅
 
-#### Connection `orderBy` is now an array
+### Connection `orderBy` is now an array
 
 **Problem**: `orderBy` in connection fields now allows an array of order
 specifications, so you can order by multiple things (like in SQL). However
@@ -131,7 +130,7 @@ So any spec-compliant client should **not** have an issue with this.
 **Reasoning**: people want to sort by multiple columns and since we could do it
 with a non-breaking change (according to the above) we did!
 
-#### Expected 'UUID' but received 'String'
+### Expected 'UUID' but received 'String'
 
 **Problem**: 'UUID' is enabled by default
 
@@ -139,19 +138,18 @@ with a non-breaking change (according to the above) we did!
 
 **Reasoning**: named types are helpful
 
-#### JWTs now have audience 'postgraphile' / issuer 'postgraphile'
+### JWTs now have audience 'postgraphile' / issuer 'postgraphile'
 
 **Problem**: we changed the audience with the rename of the library
 
 **Solution**: if you can't update your config you can make sure your token
 objects returned in the DB have `aud: 'postgraphql', iss: 'postgraphql'`
-(solution untested - if you used this please let
-[me](https://twitter.com/benjie) know whether it worked or not)
+(solution untested - if you need support with this, please consider our [development support offering](https://graphile.org/support))
 
 **Reasoning**: we renamed the library, it'd be confusing for new users to
 reference the old name.
 
-#### Functions now use table connections where possible (again!)
+### Functions now use table connections where possible (again!)
 
 **Problem**: functions that return setof a table type now use the same
 connection class as the tables themselves do (just like PostGraphQL v2 did)
@@ -165,7 +163,7 @@ type is much more complex if the connection types differ.
 **Potential future solution**: have the connections implement a shared
 interface.
 
-#### Issues with nullables
+### Issues with nullables
 
 **Problem**: some things are nullable that weren't, some things aren't nullable
 that were.
@@ -199,14 +197,14 @@ If you don't like the nulls everywhere, I encourage you to use the `-N` /
 non-breaking change, but disabling it **is** a breaking change - hence why it is
 not the default behaviour.
 
-#### Fields in create mutations now respect defaults
+### Fields in create mutations now respect defaults
 
 In v3, omitting a field from a create mutation would cause it to be set to
 `NULL`, ignoring the column default. We fixed this in v4, now if you want to set
 the column null you must specify NULL in the mutation (rather than omitting the
 key).
 
-#### Query procedures that `returns setof <scalar>` no longer have `pageInfo` nor `totalCount`
+### Query procedures that `returns setof <scalar>` no longer have `pageInfo` nor `totalCount`
 
 **Problem**: as heading.
 
@@ -216,7 +214,7 @@ if you need this
 **Reasoning**: I did not feel it was particularly necessary and I've only got
 limited time to work on the project...
 
-#### Watch schema has changed
+### Watch schema has changed
 
 _Note that changes to the watch schema are NOT deemed to be breaking changes._
 
@@ -233,22 +231,22 @@ in the same way
 adding tables, columns, functions, etc. to your schema was fine, but removing
 them did not result in a refresh.
 
-### Other changes that may affect you
+## Other changes which may affect you
 
 These are things that I doubt affect many people (if any) but I want to raise so
 you can check your own applications.
 
-#### Introspection query has changed
+### Introspection query has changed
 
 And will probably continue to change. Changes to the introspection query are not
-deemed to be breaking changes. The introspection query is now programatically
+deemed to be breaking changes. The introspection query is now programmatically
 generated so that we can support PG10 and PG11 features.
 
-#### Field descriptions have changed a little
+### Field descriptions have changed a little
 
 Field description changes are not deemed to be breaking changes.
 
-#### Case changing library has changed
+### Case changing library has changed
 
 We replaced the library but this doesn't affect any of the tests. If this causes
 you pain please submit an issue so we can add your fields/table names/etc to the
@@ -257,7 +255,7 @@ tests to ensure this doesn't happen again.
 Workaround: you can change the inflection engine back to the old one with a
 plugin - [see `makeAddInflectorsPlugin`](./make-add-inflectors-plugin).
 
-#### Procedures that only supported `orderBy: NATURAL` now **do not have `orderBy` at all**.
+### Procedures that only supported `orderBy: NATURAL` now **do not have `orderBy` at all**.
 
 Though technically a breaking change, I'm not deeming it as such because I don't
 understand why you'd explicitly set the orderBy for a field that only has one
@@ -266,7 +264,7 @@ value and that value is enabled by default.
 If this is a problem for you please get in touch and we can add support back via
 a simple plugin.
 
-#### Using a return type PostGraphile user can't access
+### Using a return type PostGraphile user can't access
 
 `security definer` mutations that return a type from a schema that the
 requesting PostgreSQL user is not allowed to view may now result in
@@ -274,7 +272,7 @@ requesting PostgreSQL user is not allowed to view may now result in
 
 **Solution**: don't do that 😉
 
-#### Conflicting tables names - `*_input`, `*_patch`
+### Conflicting tables names - `*_input`, `*_patch`
 
 Tables that end in `_input` or `_patch` such as `foo_input` will no longer be
 exported as `FooInput` but as `FooInputRecord` - this prevents collisions with
@@ -292,7 +290,7 @@ You can rename tables directly, or if you prefer not to change your database
 layout you can use [smart comments](./smart-comments) or write a custom
 [inflector](./inflection).
 
-#### Very large numbers
+### Very large numbers
 
 Large integers (over 4 bytes) are still referred to as `BigInt`, large floats
 (those beyond IEEE754) are now called `BigFloat`. The specific boundaries in
