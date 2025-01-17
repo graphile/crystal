@@ -87,7 +87,7 @@ postgraphile \
 ### CLI options
 
 There are more CLI options available to customise the GraphQL server (these are
-from <tt>`postgraphile@4.12.3`</tt>):
+from <tt>postgraphile@<span></span>4.12.3</tt>):
 
 - `-V`, `--version`  
   output the version number

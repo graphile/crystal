@@ -2,7 +2,7 @@
 title: Community Plugins
 ---
 
-# PostGraphile community plugins
+# PostGraphile Community Plugins
 
 Community members can write plugins for PostGraphile that extends its
 functionality; this page lists some of them. Issues with these plugins should be

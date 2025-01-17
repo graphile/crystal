@@ -1,5 +1,5 @@
 ---
-title: Community chat
+title: Community Chat
 ---
 
 import styles from "@site/src/css/common.module.css";

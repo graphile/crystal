@@ -1,6 +1,5 @@
 ---
 title: Connections
-hide_table_of_contents: true
 ---
 
 When a GraphQL field is expected to return a large list of database records, we

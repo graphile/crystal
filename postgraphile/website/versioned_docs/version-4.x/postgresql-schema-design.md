@@ -969,7 +969,7 @@ PostGraphile.
 
 There are two main parts to our function body. The first is:
 
-```sql
+```plsql
 select a.* into account
 from forum_example_private.person_account as a
 where a.email = $1;
@@ -985,7 +985,7 @@ successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
 
-```sql
+```plsql
 if account.password_hash = crypt(password, account.password_hash) then
   return ('forum_example_person', account.person_id)::forum_example.jwt_token;
 else

@@ -319,7 +319,7 @@ const postgraphileOptions = {
 
 The `postgraphile` middleware factory function takes three arguments, all of
 which are optional. The below options are valid
-for <tt>`postgraphile@4.12.3`</tt>.
+for <tt>postgraphile@<span></span>4.12.3</tt>.
 
 - **`pgConfig`**: Specifies the PostgreSQL database you wish to connect to. You
   may pass a PostgreSQL connection string, a configuration object to pass to the

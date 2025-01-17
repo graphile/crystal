@@ -1,5 +1,5 @@
 ---
-title: Community contributions
+title: Community Contributions
 ---
 
 The community contributes to PostGraphile development in many ways.

@@ -149,11 +149,6 @@ tt {
   font-size: 1rem;
 }
 
-tt code {
-  background-color: rgba(255, 255, 255, 0);
-  border: none;
-}
-
 .graphileHeart {
   width: 33%;
   margin: auto;

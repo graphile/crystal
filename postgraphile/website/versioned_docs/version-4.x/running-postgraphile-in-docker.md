@@ -113,7 +113,7 @@ environment variables. In particular:
 - `POSTGRES_USER`: default admin user created upon database initialization.
 - `POSTGRES_PASSWORD`: password of the default admin user.
 
-```
+```ini
 # DB
 # Parameters used by db container
 POSTGRES_DB=forum_example

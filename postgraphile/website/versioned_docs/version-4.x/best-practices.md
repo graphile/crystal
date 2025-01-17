@@ -48,7 +48,7 @@ GRANT UPDATE ON users TO graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](./requirements/#your-postgresql-database):
+[cause a lot of issues](./requirements#your-postgresql-database):
 
 - Reduces the number of optimizations we can do
 - Cannot `SELECT * FROM`
