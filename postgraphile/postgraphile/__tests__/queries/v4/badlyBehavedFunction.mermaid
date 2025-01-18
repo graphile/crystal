@@ -13,16 +13,19 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection11{{"Connection[11∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     Constant15{{"Constant[15∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    PgSelect12[["PgSelect[12∈1] ➊<br />ᐸbadly_behaved_functionᐳ"]]:::plan
     Object10{{"Object[10∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda40{{"Lambda[40∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Connection11 & Lambda40 --> PgSelect12
     Access8{{"Access[8∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect12[["PgSelect[12∈1] ➊<br />ᐸbadly_behaved_functionᐳ"]]:::plan
-    Object10 & Connection11 --> PgSelect12
     __Value2 --> Access8
     __Value2 --> Access9
     __ListTransform22[["__ListTransform[22∈1] ➊<br />ᐸeach:21ᐳ"]]:::plan
     PgSelect12 --> __ListTransform22
+    Constant41 --> Lambda40
     __Item13[/"__Item[13∈2]<br />ᐸ12ᐳ"\]:::itemplan
     PgSelect12 ==> __Item13
     PgSelectSingle14{{"PgSelectSingle[14∈2]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
@@ -65,10 +68,10 @@ graph TD
     subgraph "Buckets for queries/v4/badlyBehavedFunction"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Connection11,Constant15 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 11, 15<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: <br />ᐳ: Access[8], Access[9], Object[10]<br />2: PgSelect[12]<br />3: __ListTransform[22]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection11,Constant15,Constant41 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 11, 41, 15<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: <br />ᐳ: 8, 9, 40, 10<br />2: PgSelect[12]<br />3: __ListTransform[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access8,Access9,Object10,PgSelect12,__ListTransform22 bucket1
+    class Bucket1,Access8,Access9,Object10,PgSelect12,__ListTransform22,Lambda40 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 15<br /><br />ROOT __Item{2}ᐸ12ᐳ[13]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item13,PgSelectSingle14 bucket2

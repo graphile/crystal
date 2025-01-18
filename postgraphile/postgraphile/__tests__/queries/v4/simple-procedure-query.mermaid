@@ -11,28 +11,40 @@ graph TD
     %% plan dependencies
     PgSelect39[["PgSelect[39∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     Constant38{{"Constant[38∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Object11 & Constant77 & Constant38 & Constant78 --> PgSelect39
+    Constant98{{"Constant[98∈0] ➊<br />ᐸ6ᐳ"}}:::plan
+    Lambda82{{"Lambda[82∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Constant77 & Constant38 & Constant98 & Lambda82 --> PgSelect39
+    PgSelect61[["PgSelect[61∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Lambda97{{"Lambda[97∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Lambda82 & Lambda97 --> PgSelect61
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_type_set_queryᐳ"]]:::plan
+    Lambda80{{"Lambda[80∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Lambda80 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_type_set_queryᐳ"]]:::plan
-    Object11 --> PgSelect8
+    PgSelect24[["PgSelect[24∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
+    Object11 & Lambda82 --> PgSelect24
+    PgSelect31[["PgSelect[31∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
+    Lambda85{{"Lambda[85∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Lambda85 --> PgSelect31
+    PgSelect44[["PgSelect[44∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
+    Object11 & Lambda82 --> PgSelect44
+    PgSelect49[["PgSelect[49∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
+    Object11 & Lambda82 --> PgSelect49
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    PgSelect24[["PgSelect[24∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
-    Object11 --> PgSelect24
-    PgSelect31[["PgSelect[31∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
-    Object11 --> PgSelect31
-    PgSelect44[["PgSelect[44∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
-    Object11 --> PgSelect44
-    PgSelect49[["PgSelect[49∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
-    Object11 --> PgSelect49
-    PgSelect61[["PgSelect[61∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object11 --> PgSelect61
+    Constant99{{"Constant[99∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant99 --> Lambda80
+    Constant100{{"Constant[100∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant100 --> Lambda82
+    Constant101{{"Constant[101∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant101 --> Lambda85
+    Constant102{{"Constant[102∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant102 --> Lambda97
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ8ᐳ"\]:::itemplan
     PgSelect8 ==> __Item12
@@ -88,10 +100,10 @@ graph TD
     __Item63 --> PgSelectSingle64
     PgClassExpression65{{"PgClassExpression[65∈12]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression65
-    Access76{{"Access[76∈12]<br />ᐸ63.1ᐳ"}}:::plan
-    __Item63 --> Access76
-    __Item71[/"__Item[71∈13]<br />ᐸ76ᐳ"\]:::itemplan
-    Access76 ==> __Item71
+    Access94{{"Access[94∈12]<br />ᐸ63.1ᐳ"}}:::plan
+    __Item63 --> Access94
+    __Item71[/"__Item[71∈13]<br />ᐸ94ᐳ"\]:::itemplan
+    Access94 ==> __Item71
     PgSelectSingle72{{"PgSelectSingle[72∈13]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
     __Item71 --> PgSelectSingle72
     PgClassExpression73{{"PgClassExpression[73∈13]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
@@ -100,9 +112,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 38, 77, 78, 11<br />2: 8, 24, 31, 39, 44, 49, 61"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 38, 77, 98, 99, 100, 101, 102, 11, 80, 82, 85, 97<br />2: 8, 24, 31, 39, 44, 49, 61"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelect24,PgSelect31,Constant38,PgSelect39,PgSelect44,PgSelect49,PgSelect61,Constant77,Constant78 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelect24,PgSelect31,Constant38,PgSelect39,PgSelect44,PgSelect49,PgSelect61,Constant77,Lambda80,Lambda82,Lambda85,Lambda97,Constant98,Constant99,Constant100,Constant101,Constant102 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ8ᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
@@ -138,8 +150,8 @@ graph TD
     class Bucket11 bucket11
     Bucket12("Bucket 12 (listItem)<br /><br />ROOT __Item{12}ᐸ61ᐳ[63]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,__Item63,PgSelectSingle64,PgClassExpression65,Access76 bucket12
-    Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ76ᐳ[71]"):::bucket
+    class Bucket12,__Item63,PgSelectSingle64,PgClassExpression65,Access94 bucket12
+    Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ94ᐳ[71]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item71,PgSelectSingle72,PgClassExpression73 bucket13
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 73<br /><br />ROOT PgClassExpression{13}ᐸ__post_com...al_set__.vᐳ[73]"):::bucket

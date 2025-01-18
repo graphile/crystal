@@ -11,8 +11,9 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Object10 & Constant46 --> PgSelect7
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Lambda47{{"Lambda[47∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object10 & Constant58 & Lambda47 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -23,11 +24,13 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle12
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant59 --> Lambda47
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant29{{"Constant[29∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸforums_random_userᐳ"]]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
-    Object10 & PgClassExpression13 --> PgSelect14
+    Object10 & PgClassExpression13 & Lambda47 --> PgSelect14
     PgSelectSingle12 --> PgClassExpression13
     First18{{"First[18∈1] ➊"}}:::plan
     PgSelect14 --> First18
@@ -35,7 +38,7 @@ graph TD
     First18 --> PgSelectSingle19
     PgSelect23[["PgSelect[23∈2] ➊<br />ᐸusers_most_recent_forumᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈2] ➊<br />ᐸ__forums_random_user__ᐳ"}}:::plan
-    Object10 & PgClassExpression22 & Constant29 --> PgSelect23
+    Object10 & PgClassExpression22 & Constant29 & Lambda47 & Lambda47 --> PgSelect23
     PgClassExpression20{{"PgClassExpression[20∈2] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression20
     PgClassExpression21{{"PgClassExpression[21∈2] ➊<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
@@ -47,7 +50,7 @@ graph TD
     First27 --> PgSelectSingle28
     PgSelect39[["PgSelect[39∈3] ➊<br />ᐸforums_featured_messagesᐳ"]]:::plan
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__users_mo...nt_forum__ᐳ"}}:::plan
-    Object10 & PgClassExpression30 --> PgSelect39
+    Object10 & PgClassExpression30 & Lambda47 --> PgSelect39
     PgSelectSingle28 --> PgClassExpression30
     PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgSelectSingle28 --> PgSelectSingle36
@@ -63,16 +66,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-combined"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 29, 46, 10<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 29, 58, 59, 10, 47<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Constant29,Constant46 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 10, 29<br /><br />ROOT PgSelectSingleᐸforumsᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13]<br />2: PgSelect[14]<br />ᐳ: First[18], PgSelectSingle[19]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Constant29,Lambda47,Constant58,Constant59 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 10, 47, 29<br /><br />ROOT PgSelectSingleᐸforumsᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13]<br />2: PgSelect[14]<br />ᐳ: First[18], PgSelectSingle[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,PgSelect14,First18,PgSelectSingle19 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 10, 29<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[19]<br />1: <br />ᐳ: 20, 21, 22<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 10, 29, 47<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[19]<br />1: <br />ᐳ: 20, 21, 22<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgSelect23,First27,PgSelectSingle28 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28, 10<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[28]<br />1: <br />ᐳ: 30, 36, 37<br />2: PgSelect[39]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28, 10, 47<br /><br />ROOT PgSelectSingle{2}ᐸusers_most_recent_forumᐳ[28]<br />1: <br />ᐳ: 30, 36, 37<br />2: PgSelect[39]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression30,PgSelectSingle36,PgClassExpression37,PgSelect39 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ39ᐳ[41]"):::bucket

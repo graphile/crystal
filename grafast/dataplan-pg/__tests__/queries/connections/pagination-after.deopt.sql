@@ -8,26 +8,21 @@ where
     true /* authorization checks */
   );
 
-select __messages_result__.*
-from (select 0 as idx, $1::"uuid" as "id0") as __messages_identifiers__,
-lateral (
-  select
-    __messages__."id" as "0",
-    __messages__."body" as "1",
-    __messages__."author_id" as "2",
-    __messages_identifiers__.idx as "3"
-  from app_public.messages as __messages__
-  where
-    (
-      __messages__.archived_at is null
-    ) and (
-      true /* authorization checks */
-    ) and (
-      __messages__."id" > __messages_identifiers__."id0"
-    )
-  order by __messages__."id" asc
-  limit 4
-) as __messages_result__;
+select
+  __messages__."id" as "0",
+  __messages__."body" as "1",
+  __messages__."author_id" as "2"
+from app_public.messages as __messages__
+where
+  (
+    __messages__.archived_at is null
+  ) and (
+    true /* authorization checks */
+  ) and (
+    __messages__."id" > $1::"uuid"
+  )
+order by __messages__."id" asc
+limit 4;
 
 select __users_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,

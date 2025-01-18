@@ -17,14 +17,19 @@ graph TD
     __Value2 --> Access10
     __Value2 --> Access11
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant51 --> Connection13
+    Constant55{{"Constant[55∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant55 --> Connection13
+    Lambda54{{"Lambda[54∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant61 --> Lambda54
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant34{{"Constant[34∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object12 & Connection13 --> PgSelect14
+    Lambda58{{"Lambda[58∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda58 --> PgSelect14
     PgSelect47[["PgSelect[47∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object12 & Connection13 --> PgSelect47
+    Object12 & Connection13 & Lambda54 --> PgSelect47
     PgPageInfo31{{"PgPageInfo[31∈1] ➊"}}:::plan
     Connection13 --> PgPageInfo31
     Access33{{"Access[33∈1] ➊<br />ᐸ14.hasMoreᐳ"}}:::plan
@@ -55,13 +60,14 @@ graph TD
     First48 --> PgSelectSingle49
     PgClassExpression50{{"PgClassExpression[50∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
+    Constant62 --> Lambda58
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸmessagesᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
     PgSelect22[["PgSelect[22∈3]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression21 --> PgSelect22
+    Object12 & PgClassExpression21 & Lambda54 --> PgSelect22
     PgCursor17{{"PgCursor[17∈3]"}}:::plan
     List19{{"List[19∈3]<br />ᐸ18ᐳ"}}:::plan
     List19 --> PgCursor17
@@ -85,14 +91,14 @@ graph TD
     subgraph "Buckets for queries/connections/basics-limit3"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant34,Constant51 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 34<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant34,Lambda54,Constant55,Constant61,Constant62 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 54, 62, 34<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[47]<br />ᐳ: 31, 58, 48, 49, 50<br />2: PgSelect[14]<br />ᐳ: 33, 36, 37, 39, 40, 42, 43, 45, 46, 38, 44"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14,PgPageInfo31,Access33,First36,PgSelectSingle37,PgCursor38,PgClassExpression39,List40,Last42,PgSelectSingle43,PgCursor44,PgClassExpression45,List46,PgSelect47,First48,PgSelectSingle49,PgClassExpression50 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 12<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
+    class Bucket1,PgSelect14,PgPageInfo31,Access33,First36,PgSelectSingle37,PgCursor38,PgClassExpression39,List40,Last42,PgSelectSingle43,PgCursor44,PgClassExpression45,List46,PgSelect47,First48,PgSelectSingle49,PgClassExpression50,Lambda58 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 54<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 12<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[16]<br />1: <br />ᐳ: 18, 20, 21, 19, 17<br />2: PgSelect[22]<br />ᐳ: First[26], PgSelectSingle[27]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 12, 54<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[16]<br />1: <br />ᐳ: 18, 20, 21, 19, 17<br />2: PgSelect[22]<br />ᐳ: First[26], PgSelectSingle[27]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor17,PgClassExpression18,List19,PgClassExpression20,PgClassExpression21,PgSelect22,First26,PgSelectSingle27 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[27]"):::bucket

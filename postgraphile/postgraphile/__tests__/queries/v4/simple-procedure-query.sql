@@ -20,18 +20,13 @@ from "c"."table_set_query"() as __table_set_query__
 limit 2
 offset 2;
 
-select __int_set_query_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_query_identifiers__,
-lateral (
-  select
-    __int_set_query__.v::text as "0",
-    __int_set_query_identifiers__.idx as "1"
-  from "c"."int_set_query"(
-    __int_set_query_identifiers__."id0",
-    __int_set_query_identifiers__."id1",
-    __int_set_query_identifiers__."id2"
-  ) as __int_set_query__(v)
-) as __int_set_query_result__;
+select
+  __int_set_query__.v::text as "0"
+from "c"."int_set_query"(
+  $1::"int4",
+  $2::"int4",
+  $3::"int4"
+) as __int_set_query__(v);
 
 select
   __static_big_integer__.v::text as "0"

@@ -9,15 +9,18 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object11 & Lambda43 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object11 --> PgSelect8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant46 --> Lambda43
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ8ᐳ"\]:::itemplan
     PgSelect8 ==> __Item12
@@ -30,7 +33,7 @@ graph TD
     __ListTransform19[["__ListTransform[19∈3]<br />ᐸfilter:15ᐳ"]]:::plan
     PgSelect15[["PgSelect[15∈3] ➊<br />ᐸmessagesᐳ"]]:::plan
     PgSelect15 & PgSelectSingle13 & PgClassExpression23 --> __ListTransform19
-    Object11 --> PgSelect15
+    Object11 & Lambda43 --> PgSelect15
     __ListTransform26[["__ListTransform[26∈3]<br />ᐸgroupBy:19ᐳ"]]:::plan
     __ListTransform19 --> __ListTransform26
     Lambda30{{"Lambda[30∈3]"}}:::plan
@@ -65,16 +68,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms.defer"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 46, 11, 43<br />2: PgSelect[8]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 11<br /><br />ROOT __Item{1}ᐸ8ᐳ[12]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda43,Constant46 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 11, 43<br /><br />ROOT __Item{1}ᐸ8ᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 11<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[13]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 11, 43<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[13]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgClassExpression23 bucket2
-    Bucket3("Bucket 3 (defer)<br />Deps: 11, 13, 23<br /><br />1: PgSelect[15]<br />2: __ListTransform[19]<br />3: __ListTransform[26]<br />ᐳ: Lambda[30]"):::bucket
+    Bucket3("Bucket 3 (defer)<br />Deps: 11, 43, 13, 23<br /><br />1: PgSelect[15]<br />2: __ListTransform[19]<br />3: __ListTransform[26]<br />ᐳ: Lambda[30]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect15,__ListTransform19,__ListTransform26,Lambda30 bucket3
     Bucket4("Bucket 4 (subroutine)<br />Deps: 23<br /><br />ROOT Lambda{4}[25]"):::bucket

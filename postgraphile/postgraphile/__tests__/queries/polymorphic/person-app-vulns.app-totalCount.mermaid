@@ -17,11 +17,14 @@ graph TD
     __Value2 --> Access11
     __Value2 --> Access12
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant29 --> Connection14
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant30 --> Connection14
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Connection14 --> PgSelect15
+    Lambda33{{"Lambda[33∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Object13 & Connection14 & Lambda33 --> PgSelect15
+    Constant34 --> Lambda33
     Connection24{{"Connection[24∈1] ➊<br />ᐸ20ᐳ"}}:::plan
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelect15 ==> __Item16
@@ -45,10 +48,10 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-totalCount"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Constant29 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Constant30,Constant34 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 34<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: <br />ᐳ: Connection[24], Lambda[33]<br />2: PgSelect[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect15,Connection24 bucket1
+    class Bucket1,PgSelect15,Connection24,Lambda33 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 13, 24<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2

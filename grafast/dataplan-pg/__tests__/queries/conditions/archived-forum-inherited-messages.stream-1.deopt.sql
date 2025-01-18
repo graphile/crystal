@@ -14,29 +14,17 @@ order by __forums__."id" asc;
 begin; /*fake*/
 
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
-select __messages_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids) as __messages_identifiers__,
-lateral (
-  select *
-  from (
-    select
-      __messages__."body" as "0",
-      __messages__."author_id" as "1",
-      __messages_identifiers__.idx as "2",
-      row_number() over (
-        order by __messages__."id" asc
-      ) as "3"
-    from app_public.messages as __messages__
-    where
-      (
-        (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
-      ) and (
-        __messages__."forum_id" = __messages_identifiers__."id0"
-      )
-    order by __messages__."id" asc
-  ) __stream_wrapped__
-  order by __stream_wrapped__."3"
-) as __messages_result__;
+select
+  __messages__."body" as "0",
+  __messages__."author_id" as "1"
+from app_public.messages as __messages__
+where
+  (
+    (__messages__.archived_at is null) = ($1::"timestamptz" is null)
+  ) and (
+    __messages__."forum_id" = $2::"uuid"
+  )
+order by __messages__."id" asc;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
 

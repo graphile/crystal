@@ -16,12 +16,15 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
+    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant41 --> Lambda38
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant17{{"Constant[17∈0] ➊<br />ᐸ'similar_table_1S'ᐳ"}}:::plan
     Connection26{{"Connection[26∈0] ➊<br />ᐸ24ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object12 & Connection13 --> PgSelect14
+    Object12 & Connection13 & Lambda38 --> PgSelect14
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸsimilar_table_1ᐳ"}}:::plan
@@ -35,7 +38,7 @@ graph TD
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression21
     PgSelect27[["PgSelect[27∈4] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object12 & Connection26 --> PgSelect27
+    Object12 & Connection26 & Lambda38 --> PgSelect27
     __Item28[/"__Item[28∈5]<br />ᐸ27ᐳ"\]:::itemplan
     PgSelect27 ==> __Item28
     PgSelectSingle29{{"PgSelectSingle[29∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
@@ -54,8 +57,8 @@ graph TD
     subgraph "Buckets for queries/v4/orderByNullsLast"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant17,Connection26 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 17<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant17,Connection26,Lambda38,Constant41 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 38, 17<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
@@ -64,7 +67,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 17<br /><br />ROOT PgSelectSingle{2}ᐸsimilar_table_1ᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,List19,Lambda20,PgClassExpression21 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 26, 17<br /><br />ROOT Connectionᐸ24ᐳ[26]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 26, 38, 17<br /><br />ROOT Connectionᐸ24ᐳ[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect27 bucket4
     Bucket5("Bucket 5 (listItem)<br />Deps: 17<br /><br />ROOT __Item{5}ᐸ27ᐳ[28]"):::bucket

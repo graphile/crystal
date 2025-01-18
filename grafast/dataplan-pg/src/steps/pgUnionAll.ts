@@ -59,7 +59,11 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
+import type {
+  PgStmtDeferredPlaceholder,
+  PgStmtDeferredSQL,
+  QueryValue,
+} from "./pgStmt.js";
 import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
@@ -173,6 +177,12 @@ export interface PgUnionAllStepConfig<
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
   name?: string;
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  forceIdentity?: boolean;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -183,12 +193,6 @@ export interface PgUnionAllStepCondition<TAttributes extends string> {
 export interface PgUnionAllStepOrder<TAttributes extends string> {
   attribute: TAttributes;
   direction: "ASC" | "DESC";
-}
-
-interface QueryValue {
-  dependencyIndex: number;
-  codec: PgCodec;
-  alreadyEncoded: boolean;
 }
 
 export class PgUnionAllSingleStep
@@ -395,6 +399,38 @@ function cloneDigests<TTypeNames extends string = string>(
 }
 
 /**
+ * When finalized, we build the SQL query, queryValues, and note where to feed in
+ * the relevant queryValues. This saves repeating this work at execution time.
+ */
+interface QueryBuildResult {
+  // The SQL query text
+  text: string;
+
+  // The values to feed into the query
+  rawSqlValues: SQLRawValue[];
+
+  // The `DECLARE ... CURSOR` query for @stream
+  textForDeclare?: string;
+
+  // The values to feed into the `DECLARE ... CURSOR` query
+  rawSqlValuesForDeclare?: SQLRawValue[];
+
+  // If streaming, what's the initialCount
+  streamInitialCount?: number;
+
+  // The attribute on the result that indicates which group the result belongs to
+  identifierIndex: number | null;
+
+  // If last but not first, reverse order.
+  shouldReverseOrder: boolean;
+
+  // For prepared queries
+  name?: string;
+
+  queryValues: Array<QueryValue>;
+}
+
+/**
  * Represents a `UNION ALL` statement, which can have multiple table-like
  * resources, but must return a consistent data shape.
  */
@@ -443,20 +479,10 @@ export class PgUnionAllStep<
   private ordersForCursor: Array<PgOrderFragmentSpec>;
 
   /**
-   * Since this is effectively like a DataLoader it processes the data for many
-   * different resolvers at once. This list of (hopefully scalar) plans is used
-   * to represent queryValues the query will need such as identifiers for which
-   * records in the result set should be returned to which GraphQL resolvers,
-   * parameters for conditions or orders, etc.
-   */
-  private queryValues: Array<QueryValue>;
-
-  /**
    * Values used in this plan.
    */
   protected placeholders: Array<PgStmtDeferredPlaceholder>;
   protected deferreds: Array<PgStmtDeferredSQL>;
-  private placeholderValues: Map<symbol, SQL>;
 
   // GROUP BY
 
@@ -490,38 +516,6 @@ export class PgUnionAllStep<
   // Connection
   private connectionDepId: number | null = null;
 
-  /**
-   * When finalized, we build the SQL query, queryValues, and note where to feed in
-   * the relevant queryValues. This saves repeating this work at execution time.
-   */
-  private finalizeResults: {
-    // The SQL query text
-    text: string;
-    textForSingle?: string;
-
-    // The values to feed into the query
-    rawSqlValues: SQLRawValue[];
-
-    // The `DECLARE ... CURSOR` query for @stream
-    textForDeclare?: string;
-
-    // The values to feed into the `DECLARE ... CURSOR` query
-    rawSqlValuesForDeclare?: SQLRawValue[];
-
-    // If streaming, what's the initialCount
-    streamInitialCount?: number;
-
-    // The attribute on the result that indicates which group the result belongs to
-    identifierIndex: number | null;
-
-    // If last but not first, reverse order.
-    shouldReverseOrder: boolean;
-
-    // For prepared queries
-    name?: string;
-    nameForSingle?: string;
-  } | null = null;
-
   private limitAndOffsetSQL: SQL | null = null;
   private innerLimitSQL: SQL | null = null;
 
@@ -531,6 +525,13 @@ export class PgUnionAllStep<
 
   private memberDigests: MemberDigest<TTypeNames>[];
   private _limitToTypes: string[] | undefined;
+
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  public forceIdentity: boolean;
 
   constructor(
     cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
@@ -556,6 +557,7 @@ export class PgUnionAllStep<
       this._limitToTypes = cloneFrom._limitToTypes
         ? [...cloneFrom._limitToTypes]
         : undefined;
+      this.forceIdentity = cloneFrom.forceIdentity;
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency({
@@ -574,8 +576,6 @@ export class PgUnionAllStep<
         : [];
       this.placeholders = [...cloneFrom.placeholders];
       this.deferreds = [...cloneFrom.deferreds];
-      this.queryValues = [...cloneFrom.queryValues];
-      this.placeholderValues = new Map(cloneFrom.placeholderValues);
       this.groups = cloneFromMatchingMode
         ? [...cloneFromMatchingMode.groups]
         : [];
@@ -629,12 +629,14 @@ export class PgUnionAllStep<
     } else {
       const spec = specOrCloneFrom;
       this.mode = overrideMode ?? spec.mode ?? "normal";
+
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
         );
       }
       this.spec = spec;
+      this.forceIdentity = false;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -658,8 +660,6 @@ export class PgUnionAllStep<
       this.selects = [];
       this.placeholders = [];
       this.deferreds = [];
-      this.queryValues = [];
-      this.placeholderValues = new Map();
       this.groups = [];
       this.havingConditions = [];
       this.orders = [];
@@ -1486,9 +1486,16 @@ and ${condition(i + 1)}`}
             o,
             memberCodecs,
           );
-          return sql.compile(frag, {
-            placeholderValues: this.placeholderValues,
-          }).text;
+          const placeholderValues = new Map<symbol, SQL>();
+          for (let i = 0; i < this.placeholders.length; i++) {
+            const { symbol } = this.placeholders[i];
+            placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+          }
+          for (let i = 0; i < this.deferreds.length; i++) {
+            const { symbol } = this.deferreds[i];
+            placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+          }
+          return sql.compile(frag, { placeholderValues }).text;
         }),
       ),
     );
@@ -1534,16 +1541,25 @@ and ${condition(i + 1)}`}
     return this;
   }
 
+  private typeIdx: number | null = null;
+  private reverse: boolean | null = null;
   finalize() {
     this.locker.lock();
+
     const normalMode = this.mode === "normal";
-    const typeIdx = normalMode ? this.selectType() : null;
-    const reverse = normalMode ? this.shouldReverseOrder() : null;
+    this.typeIdx = normalMode ? this.selectType() : null;
+    this.reverse = normalMode ? this.shouldReverseOrder() : null;
+
+    super.finalize();
+  }
+
+  private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
+    const { count } = executionDetails;
+    const { typeIdx, reverse } = this;
 
     const memberCodecs = this.memberDigests.map(
       (digest) => digest.finalResource.codec,
     );
-
     const makeQuery = () => {
       const tables: SQL[] = [];
 
@@ -1632,7 +1648,7 @@ and ${condition(i + 1)}`}
           .filter(isNotNullish);
         midSelects.push(rowNumberIdent);
 
-        const ascOrDesc = this.shouldReverseOrder() ? sql`desc` : sql`asc`;
+        const ascOrDesc = reverse ? sql`desc` : sql`asc`;
         const pkOrder = sql.join(
           pk.attributes.map(
             (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
@@ -1803,45 +1819,26 @@ ${unionHaving}\
       return innerQuery;
     };
 
-    const { text, rawSqlValues, identifierIndex } = ((): {
+    const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
       text: string;
       rawSqlValues: SQLRawValue[];
-      textForSingle?: string;
       identifierIndex: number | null;
+      queryValues: Array<QueryValue>;
     } => {
-      if (this.queryValues.length > 0 || this.placeholders.length > 0) {
-        const wrapperSymbol = Symbol("union_result");
-        const wrapperAlias = sql.identifier(wrapperSymbol);
-        const identifiersSymbol = Symbol("union_identifiers");
-        const identifiersAlias = sql.identifier(identifiersSymbol);
-        this.placeholders.forEach((placeholder) => {
-          // NOTE: we're NOT adding to `this.identifierMatches`.
+      const wrapperSymbol = Symbol("union_result");
+      const wrapperAlias = sql.identifier(wrapperSymbol);
 
-          // Fine a existing match for this dependency of this type
-          const existingIndex = this.queryValues.findIndex((v) => {
-            return (
-              v.dependencyIndex === placeholder.dependencyIndex &&
-              v.codec === placeholder.codec
-            );
-          });
+      const {
+        queryValues,
+        placeholderValues,
+        identifiersAlias,
+        identifiersSymbol,
+      } = this.makeValues(executionDetails, "union");
 
-          // If none exists, add one to our query values
-          const idx =
-            existingIndex >= 0
-              ? existingIndex
-              : this.queryValues.push({
-                  dependencyIndex: placeholder.dependencyIndex,
-                  codec: placeholder.codec,
-                  alreadyEncoded: placeholder.alreadyEncoded,
-                }) - 1;
-
-          // Finally alias this symbol to a reference to this placeholder
-          this.placeholderValues.set(
-            placeholder.symbol,
-            sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-          );
-        });
-
+      if (
+        queryValues.length > 0 ||
+        (count !== 1 && (this.forceIdentity || this.hasSideEffects))
+      ) {
         const identifierIndex = this.selectAndReturnIndex(
           sql`${identifiersAlias}.idx`,
         );
@@ -1855,14 +1852,11 @@ ${unionHaving}\
           [$$symbolToIdentifier]: symbolToIdentifier,
         } = sql.compile(
           sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
-          {
-            placeholderValues: this.placeholderValues,
-          },
+          { placeholderValues },
         );
         const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
         const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
 
-        let lastPlaceholder = rawSqlValues.length;
         /*
          * IMPORTANT: these wrapper queries are necessary so that queries
          * that have a limit/offset get the limit/offset applied _per
@@ -1871,41 +1865,33 @@ ${unionHaving}\
          */
         const text = `\
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx, ${this.queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(
-            ", ",
-          )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+from (select ids.ordinality - 1 as idx${
+          queryValues.length > 0
+            ? `, ${queryValues
+                .map(({ codec }, idx) => {
+                  return `(ids.value->>${idx})::${
+                    sql.compile(codec.sqlType).text
+                  } as "id${idx}"`;
+                })
+                .join(", ")}`
+            : ""
+        } from json_array_elements($${
+          rawSqlValues.length + 1
+        }::json) with ordinality as ids) as ${identifiersAliasText},
 ${lateralText};`;
 
-        lastPlaceholder = rawSqlValues.length;
-        /**
-         * This is an optimized query to use when there's only one value to
-         * feed in, PostgreSQL seems to be able to execute queries using this
-         * _significantly_ faster (up to 3x or 200ms faster).
-         */
-        const textForSingle = `\
-select ${wrapperAliasText}.*
-from (select 0 as idx, ${this.queryValues
-          .map(({ codec }, idx) => {
-            return `$${++lastPlaceholder}::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}) as ${identifiersAliasText},
-${lateralText};`;
-
-        return { text, textForSingle, rawSqlValues, identifierIndex };
+        return {
+          text,
+          rawSqlValues,
+          identifierIndex,
+          queryValues,
+        };
       } else {
         const query = makeQuery();
         const { text, values: rawSqlValues } = sql.compile(query, {
-          placeholderValues: this.placeholderValues,
+          placeholderValues,
         });
-        return { text, rawSqlValues, identifierIndex: null };
+        return { text, rawSqlValues, identifierIndex: null, queryValues };
       }
     })();
 
@@ -1913,29 +1899,33 @@ ${lateralText};`;
 
     // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
 
-    const textForSingle = undefined;
-
-    this.finalizeResults = {
+    return {
       text,
-      textForSingle,
       rawSqlValues,
       identifierIndex,
       shouldReverseOrder,
       name: hash(text),
-      nameForSingle: textForSingle ? hash(textForSingle) : undefined,
+      queryValues,
     };
-
-    super.finalize();
   }
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
-  async execute({
-    indexMap,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastValuesList<any>> {
-    const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
-      this.finalizeResults!;
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastValuesList<any>> {
+    const {
+      indexMap,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      shouldReverseOrder,
+      name,
+      queryValues,
+    } = this.buildTheQuery(executionDetails)!;
 
     const contextDep = values[this.contextId];
     if (contextDep === undefined) {
@@ -1949,16 +1939,14 @@ ${lateralText};`;
         context,
         queryValues:
           identifierIndex != null
-            ? this.queryValues.map(
-                ({ dependencyIndex, codec, alreadyEncoded }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null
-                    ? null
-                    : alreadyEncoded
-                    ? val
-                    : codec.toPg(val);
-                },
-              )
+            ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
+                const val = values[dependencyIndex].at(i);
+                return val == null
+                  ? null
+                  : alreadyEncoded
+                  ? val
+                  : codec.toPg(val);
+              })
             : EMPTY_ARRAY,
       };
     });
