@@ -2698,8 +2698,9 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return step;
     }
-    if (step instanceof ConstantStep && step.layerPlan === this.rootLayerPlan) {
-      // Don't push constants down
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+      // Don't push unary steps down
       return step;
     }
     switch (step.layerPlan.reason.type) {
