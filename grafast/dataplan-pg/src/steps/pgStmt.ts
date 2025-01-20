@@ -223,11 +223,11 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   }
 
   setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.afterStepId = this.addDependency($parsedCursorPlan);
+    this.afterStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
   setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.beforeStepId = this.addDependency($parsedCursorPlan);
+    this.beforeStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
   parseCursor(
