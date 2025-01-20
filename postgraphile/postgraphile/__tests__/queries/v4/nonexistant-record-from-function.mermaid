@@ -11,17 +11,17 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸtable_queryᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ13373475ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ13373475ᐳ"}}:::plan
     Lambda17{{"Lambda[17∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Lambda20{{"Lambda[20∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Lambda25{{"Lambda[25∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda30{{"Lambda[30∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object10 & Constant31 & Lambda17 & Lambda20 & Lambda25 & Lambda30 --> PgSelect7
-    Object24{{"Object[24∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸsql.identifier(”table_query”)ᐳ"}}:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
-    Lambda17 & Constant21 & Constant22 & Constant23 --> Object24
+    Access21{{"Access[21∈0] ➊<br />ᐸ20.0ᐳ"}}:::plan
+    Lambda26{{"Lambda[26∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object10 & Constant32 & Lambda17 & Access21 & Lambda26 & Lambda31 --> PgSelect7
+    Object25{{"Object[25∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant22{{"Constant[22∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸsql.identifier(”table_query”)ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
+    Lambda17 & Constant22 & Constant23 & Constant24 --> Object25
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -32,13 +32,15 @@ graph TD
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸtable_queryᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant32 --> Lambda17
     Constant33{{"Constant[33∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant33 --> Lambda20
-    Object24 --> Lambda25
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
-    Constant34 --> Lambda30
+    Constant33 --> Lambda17
+    Lambda20{{"Lambda[20∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant34 --> Lambda20
+    Lambda20 --> Access21
+    Object25 --> Lambda26
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant35 --> Lambda31
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__table_query__.”id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
@@ -48,9 +50,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/nonexistant-record-from-function"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 21, 22, 23, 31, 32, 33, 34, 10, 17, 20, 24, 25, 30<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 22, 23, 24, 32, 33, 34, 35, 10, 17, 20, 21, 25, 26, 31<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda17,Lambda20,Constant21,Constant22,Constant23,Object24,Lambda25,Lambda30,Constant31,Constant32,Constant33,Constant34 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Lambda17,Lambda20,Access21,Constant22,Constant23,Constant24,Object25,Lambda26,Lambda31,Constant32,Constant33,Constant34,Constant35 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸtable_queryᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,PgClassExpression14 bucket1
