@@ -15,7 +15,6 @@ import type {
   StepOptimizeOptions,
   StepStreamOptions,
   StreamableStep,
-  UnaryExecutionValue,
 } from "grafast";
 import {
   __InputListStep,

@@ -76,9 +76,11 @@ export interface ConnectionCapableStep<
   setLast(last: ExecutableStep<number | null | undefined> | number): void;
   setOffset(offset: ExecutableStep<number | null | undefined> | number): void;
 
-  parseCursor(cursor: ExecutableStep<string>): TCursorStep | null | undefined;
-  setBefore(before: TCursorStep): void;
-  setAfter(after: TCursorStep): void;
+  parseCursor(
+    $cursor: ExecutableStep<string | null | undefined>,
+  ): TCursorStep | null | undefined;
+  setBefore($before: TCursorStep): void;
+  setAfter($after: TCursorStep): void;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -143,8 +145,10 @@ export class ConnectionStep<
     return String(this.subplanId);
   }
 
-  public getFirst(): ExecutableStep | null {
-    return this.maybeGetDep<InputStep>(this._firstDepId);
+  public getFirst(): ExecutableStep<number | null | undefined> | null {
+    return this.maybeGetDep<ExecutableStep<number | null | undefined>>(
+      this._firstDepId,
+    );
   }
   public setFirst(first: ExecutableStep<number | null | undefined> | number) {
     if (this._firstDepId != null) {
@@ -157,8 +161,10 @@ export class ConnectionStep<
         `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
     });
   }
-  public getLast(): ExecutableStep | null {
-    return this.maybeGetDep<InputStep>(this._lastDepId);
+  public getLast(): ExecutableStep<number | null | undefined> | null {
+    return this.maybeGetDep<ExecutableStep<number | null | undefined>>(
+      this._lastDepId,
+    );
   }
   public setLast(last: ExecutableStep<number | null | undefined> | number) {
     if (this._lastDepId != null) {
@@ -171,8 +177,10 @@ export class ConnectionStep<
         `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
     });
   }
-  public getOffset(): ExecutableStep | null {
-    return this.maybeGetDep<InputStep>(this._offsetDepId);
+  public getOffset(): ExecutableStep<number | null | undefined> | null {
+    return this.maybeGetDep<ExecutableStep<number | null | undefined>>(
+      this._offsetDepId,
+    );
   }
   public setOffset(offset: ExecutableStep<number | null | undefined> | number) {
     if (this._offsetDepId != null) {
@@ -188,7 +196,7 @@ export class ConnectionStep<
   public getBefore(): TCursorStep | null {
     return this.maybeGetDep<TCursorStep>(this._beforeDepId);
   }
-  public setBefore($beforePlan: ExecutableStep) {
+  public setBefore($beforePlan: ExecutableStep<string | null | undefined>) {
     if (this._beforeDepId !== undefined) {
       throw new Error(`${this}->setBefore already called`);
     }
@@ -204,7 +212,7 @@ export class ConnectionStep<
   public getAfter(): TCursorStep | null {
     return this.maybeGetDep<TCursorStep>(this._afterDepId);
   }
-  public setAfter($afterPlan: ExecutableStep) {
+  public setAfter($afterPlan: ExecutableStep<string | null | undefined>) {
     if (this._afterDepId !== undefined) {
       throw new Error(`${this}->setAfter already called`);
     }
