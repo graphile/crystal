@@ -77,31 +77,6 @@ export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
 
-function parseCursor(cursor: string | null) {
-  if (cursor == null) {
-    // This throw should never happen, so we can still be isSyncAndSafe.
-    // If it does throw, the entire lambda will throw, which is allowed.
-    throw new Error(
-      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-    );
-  }
-  try {
-    if (typeof cursor !== "string") {
-      throw new Error("Invalid cursor");
-    }
-    const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-    if (!Array.isArray(decoded)) {
-      throw new Error("Expected array");
-    }
-    return decoded;
-  } catch (e) {
-    throw new SafeError(
-      "Invalid cursor, please enter a cursor from a previous request, or null.",
-    );
-  }
-}
-parseCursor.isSyncAndSafe = true; // Optimization
-
 const debugPlan = debugFactory("@dataplan/pg:PgSelectStep:plan");
 // const debugExecute = debugFactory("@dataplan/pg:PgSelectStep:execute");
 const debugPlanVerbose = debugPlan.extend("verbose");
@@ -362,22 +337,22 @@ export class PgSelectStep<
 
   // LIMIT
 
-  private firstStepId: number | null;
-  private lastStepId: number | null;
-  private fetchOneExtra: boolean;
+  protected firstStepId: number | null;
+  protected lastStepId: number | null;
+  protected fetchOneExtra: boolean;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  private lowerIndexStepId: number | null;
+  protected lowerIndexStepId: number | null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  private upperIndexStepId: number | null;
+  protected upperIndexStepId: number | null;
 
   // OFFSET
 
-  private offsetStepId: number | null;
+  protected offsetStepId: number | null;
 
   // CURSORS
 
-  private beforeStepId: number | null;
-  private afterStepId: number | null;
+  protected beforeStepId: number | null;
+  protected afterStepId: number | null;
 
   // Connection
   private connectionDepId: number | null = null;
@@ -706,30 +681,6 @@ export class PgSelectStep<
     return this.isTrusted;
   }
 
-  public setFirst(first: ExecutableStep<Maybe<number>>): this {
-    this.locker.assertParameterUnlocked("first");
-    // PERF: don't eval
-    this.firstStepId = this.addUnaryDependency(first);
-    this.locker.lockParameter("first");
-    return this;
-  }
-
-  public setLast(last: ExecutableStep<Maybe<number>>): this {
-    this.assertCursorPaginationAllowed();
-    this.locker.assertParameterUnlocked("orderBy");
-    this.locker.assertParameterUnlocked("last");
-    this.lastStepId = this.addUnaryDependency(last);
-    this.locker.lockParameter("last");
-    return this;
-  }
-
-  public setOffset(offset: ExecutableStep<Maybe<number>>): this {
-    this.locker.assertParameterUnlocked("offset");
-    this.offsetStepId = this.addUnaryDependency(offset);
-    this.locker.lockParameter("offset");
-    return this;
-  }
-
   /**
    * Set this true ONLY if there can be at most one match for each of the
    * identifiers. If you set this true when this is not the case then you may
@@ -742,15 +693,6 @@ export class PgSelectStep<
     }
     this.isUnique = newUnique;
     return this;
-  }
-
-  /**
-   * Someone (probably pageInfo) wants to know if there's more records. To
-   * determine this we fetch one extra record and then throw it away.
-   */
-  public hasMore(): ExecutableStep<boolean> {
-    this.fetchOneExtra = true;
-    return access(this, "hasMore", false);
   }
 
   public unique(): boolean {
@@ -993,7 +935,7 @@ export class PgSelectStep<
     this.isOrderUnique = true;
   }
 
-  private assertCursorPaginationAllowed(): void {
+  protected assertCursorPaginationAllowed(): void {
     if (this.mode === "aggregate") {
       throw new SafeError(
         "Cannot use cursor pagination on an aggregate PgSelectStep",
@@ -1122,80 +1064,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  parseCursor(
-    $cursorPlan: __InputStaticLeafStep<string>,
-  ): PgSelectParsedCursorStep | null {
-    this.assertCursorPaginationAllowed();
-    if ($cursorPlan.evalIs(null)) {
-      return null;
-    } else if ($cursorPlan.evalIs(undefined)) {
-      return null;
-    }
-
-    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
-    return $parsedCursorPlan;
-  }
-
-  setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.afterStepId = this.addDependency($parsedCursorPlan);
-  }
-
-  setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.beforeStepId = this.addDependency($parsedCursorPlan);
-  }
-
   public pageInfo(
     $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
   ): PgPageInfoStep<this> {
     this.assertCursorPaginationAllowed();
     this.lock();
     return pgPageInfo($connectionPlan);
-  }
-
-  private getExecutionCommon(executionDetails: ExecutionDetails) {
-    const { values } = executionDetails;
-
-    const first = getUnary<Maybe<number>>(values, this.firstStepId);
-    const last = getUnary<Maybe<number>>(values, this.lastStepId);
-    const offset = getUnary<Maybe<number>>(values, this.offsetStepId);
-
-    if (offset != null && last != null) {
-      throw new SafeError("Cannot use 'offset' with 'last'");
-    }
-
-    if (!this.shouldReverseOrderId) {
-      throw new Error(
-        `Cannot call getExecutionCommon before shouldReverseOrderId has been set`,
-      );
-    }
-
-    /**
-     * If `last` is in use then we reverse the order from the database and then
-     * re-reverse it in JS-land.
-     */
-    const shouldReverseOrder = getUnary<boolean>(
-      values,
-      this.shouldReverseOrderId,
-    );
-
-    return { first, last, offset, shouldReverseOrder };
-  }
-
-  shouldReverseOrder() {
-    return operationPlan().withRootLayerPlan(() => {
-      const numberDep = (stepId: number | null) =>
-        this.getDepOrConstant<Maybe<number>>(stepId, null);
-      return lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-        },
-        calculateShouldReverseOrder,
-        true,
-      );
-    });
   }
 
   /**
@@ -1640,28 +1514,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     );
   }
 
-  private limitAndOffsetSQL: SQL | null = null;
-  private shouldReverseOrderId: number | null = null;
-  private planLimitAndOffset() {
-    return this.operationPlan.withRootLayerPlan(() => {
-      const numberDep = (stepId: number | null) =>
-        this.getDepOrConstant<Maybe<number>>(stepId, null);
-
-      return lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-          offset: numberDep(this.offsetStepId),
-          fetchOneExtra: constant(this.fetchOneExtra, false),
-        },
-        calculateLimitAndOffsetSQL,
-        true,
-      );
-    });
-  }
-
+  protected shouldReverseOrderId: number | null = null;
+  protected limitAndOffsetSQL: SQL | null = null;
   private buildLimitAndOffset() {
     // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
     // Connections Specification first is applied first, then last is applied.
@@ -2357,7 +2211,8 @@ ${lateralText};`;
     const $shouldReverseOrder = this.shouldReverseOrder();
     this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
     // This cannot be done in deduplicate because setting fetchOneExtra comes later.
-    this.limitAndOffsetSQL = this.deferredSQL(this.planLimitAndOffset());
+    const $limitAndOffsets = this.planLimitAndOffsets();
+    this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
     this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
     this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(null));
 
@@ -2917,167 +2772,6 @@ export function getFragmentAndCodecFromOrder(
   } else {
     return [order.fragment, order.codec, order.nullable];
   }
-}
-
-function calculateLimitAndOffsetSQL(params: {
-  cursorLower: Maybe<number>;
-  cursorUpper: Maybe<number>;
-  first: Maybe<number>;
-  last: Maybe<number>;
-  offset: Maybe<number>;
-  fetchOneExtra: boolean;
-}) {
-  const { cursorLower, cursorUpper, first, last, offset, fetchOneExtra } =
-    params;
-  let limitValue: Maybe<number>;
-  let offsetValue: Maybe<number>;
-  if (cursorLower != null || cursorUpper != null) {
-    /*
-     * When using cursor-base pagination with 'natural' cursors, we are actually
-     * applying limit/offset under the hood (presumably because we're paginating
-     * something that has no explicit order, like a function).
-     *
-     * If you have:
-     * - first: 3
-     * - after: ['natural', 4]
-     *
-     * Then we want `limit 3 offset 4`.
-     * With `fetchOneExtra` it'd be `limit 4 offset 4`.
-     *
-     * For:
-     * - last: 2
-     * - before: ['natural', 6]
-     *
-     * We want `limit 2 offset 4`
-     * With `fetchOneExtra` it'd be `limit 3 offset 3`.
-     *
-     * For:
-     * - last: 2
-     * - before: ['natural', 3]
-     *
-     * We want `limit 2`
-     * With `fetchOneExtra` it'd still be `limit 2`.
-     *
-     * For:
-     * - last: 2
-     * - before: ['natural', 4]
-     *
-     * We want `limit 2 offset 1`
-     * With `fetchOneExtra` it'd be `limit 3`.
-     *
-     * Using `offset` with `after`/`before` is forbidden, so we do not need to
-     * consider that.
-     *
-     * For:
-     * - after: ['natural', 2]
-     * - before: ['natural', 6]
-     *
-     * We want `limit 4 offset 2`
-     * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
-     *
-     * For:
-     * - first: 2
-     * - after: ['natural', 2]
-     * - before: ['natural', 6]
-     *
-     * We want `limit 2 offset 2`
-     * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
-     */
-
-    /** lower bound - exclusive (1-indexed) */
-    let lower = 0;
-    /** upper bound - exclusive (1-indexed) */
-    let upper = Infinity;
-
-    // Apply 'after', if present
-    if (cursorLower != null) {
-      lower = Math.max(0, cursorLower);
-    }
-
-    // Apply 'before', if present
-    if (cursorUpper != null) {
-      upper = cursorUpper;
-    }
-
-    // Cannot go beyond these bounds
-    const maxUpper = upper;
-
-    // Apply 'first', if present
-    if (first != null) {
-      upper = Math.min(upper, lower + first + 1);
-    }
-
-    // Apply 'last', if present
-    if (last != null) {
-      lower = Math.max(0, lower, upper - last - 1);
-    }
-
-    // Apply 'offset', if present
-    if (offset != null && offset > 0) {
-      lower = Math.min(lower + offset, maxUpper);
-      upper = Math.min(upper + offset, maxUpper);
-    }
-
-    // If 'fetch one extra', adjust:
-    if (fetchOneExtra) {
-      if (first != null) {
-        upper = upper + 1;
-      } else if (last != null) {
-        lower = Math.max(0, lower - 1);
-      }
-    }
-
-    /** lower, but 0-indexed and inclusive */
-    const lower0 = lower - 1 + 1;
-    /** upper, but 0-indexed and inclusive */
-    const upper0 = upper - 1 - 1;
-
-    // Calculate the final limit/offset
-    limitValue = isFinite(upper0) ? Math.max(0, upper0 - lower0 + 1) : null;
-    offsetValue = lower0;
-  } else {
-    limitValue =
-      first != null
-        ? first + (fetchOneExtra ? 1 : 0)
-        : last != null
-        ? last + (fetchOneExtra ? 1 : 0)
-        : null;
-    offsetValue = offset;
-  }
-  // PERF: consider changing from `${sql.literal(v)}` to
-  // `${sql.value(v)}::"int4"`. (The advantage being that fewer SQL queries are
-  // generated, and thus chances of reusing a query are greater.)
-  const limitSql =
-    limitValue == null ? sql.blank : sql`\nlimit ${sql.literal(limitValue)}`;
-  const offsetSql =
-    offsetValue == null || offsetValue === 0
-      ? sql.blank
-      : sql`\noffset ${sql.literal(offsetValue)}`;
-  return sql`${limitSql}${offsetSql}`;
-}
-
-function getUnary<T>(values: ExecutionDetails["values"], stepId: number): T;
-function getUnary<T>(
-  values: ExecutionDetails["values"],
-  stepId: number | null,
-): T | undefined;
-function getUnary<T>(
-  values: ExecutionDetails["values"],
-  stepId: number | null,
-): T | undefined {
-  return stepId == null ? undefined : (values[stepId].unaryValue() as T);
-}
-
-function calculateShouldReverseOrder(params: {
-  first: Maybe<number>;
-  last: Maybe<number>;
-  cursorLower: Maybe<number>;
-  cursorUpper: Maybe<number>;
-}) {
-  const { first, last, cursorLower, cursorUpper } = params;
-  return (
-    first == null && last != null && cursorLower == null && cursorUpper == null
-  );
 }
 
 function reverseIfNecessary(params: {

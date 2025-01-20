@@ -2,6 +2,7 @@ import * as assert from "../assert.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -71,13 +72,11 @@ export interface ConnectionCapableStep<
       any
     >,
   ): PageInfoCapableStep;
-  setFirst(first: ExecutableStep<number | null | undefined> | number): void;
-  setLast(last: ExecutableStep<number | null | undefined> | number): void;
-  setOffset(offset: ExecutableStep<number | null | undefined> | number): void;
+  setFirst($first: ExecutableStep<Maybe<number>>): void;
+  setLast($last: ExecutableStep<Maybe<number>>): void;
+  setOffset($offset: ExecutableStep<Maybe<number>>): void;
 
-  parseCursor(
-    $cursor: ExecutableStep<string | null | undefined>,
-  ): TCursorStep | null | undefined;
+  parseCursor($cursor: ExecutableStep<Maybe<string>>): Maybe<TCursorStep>;
   setBefore($before: TCursorStep): void;
   setAfter($after: TCursorStep): void;
 }

@@ -8,9 +8,7 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
-  InputStep,
   LambdaStep,
-  Maybe,
   PolymorphicStep,
 } from "grafast";
 import {
@@ -22,7 +20,6 @@ import {
   exportAs,
   first,
   isPromiseLike,
-  lambda,
   list,
   polymorphicWrap,
   reverseArray,
@@ -87,31 +84,6 @@ const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
-
-function parseCursor(cursor: string | null) {
-  if (cursor == null) {
-    // This throw should never happen, so we can still be isSyncAndSafe.
-    // If it does throw, the entire lambda will throw, which is allowed.
-    throw new Error(
-      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-    );
-  }
-  try {
-    if (typeof cursor !== "string") {
-      throw new Error("Invalid cursor");
-    }
-    const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-    if (!Array.isArray(decoded)) {
-      throw new Error("Expected array");
-    }
-    return decoded;
-  } catch (e) {
-    throw new SafeError(
-      "Invalid cursor, please enter a cursor from a previous request, or null.",
-    );
-  }
-}
-parseCursor.isSyncAndSafe = true; // Optimization
 
 function add([a, b]: readonly [a: number, b: number]): number {
   return a + b;
@@ -494,30 +466,32 @@ export class PgUnionAllStep<
 
   // LIMIT
 
-  private first: number | null = null;
-  private last: number | null = null;
-  private fetchOneExtra = false;
+  protected firstStepId: number | null;
+  protected lastStepId: number | null;
+  protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  private lowerIndexStepId: number | null = null;
+  protected lowerIndexStepId: number | null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  private upperIndexStepId: number | null = null;
+  protected upperIndexStepId: number | null;
   /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
-  private limitAndOffsetId: number | null = null;
+  private limitAndOffsetId: number | null;
 
   // OFFSET
 
-  private offset: number | null = null;
+  protected offsetStepId: number | null;
 
   // CURSORS
 
-  private beforeStepId: number | null = null;
-  private afterStepId: number | null = null;
+  protected beforeStepId: number | null;
+  protected afterStepId: number | null;
+
+  protected shouldReverseOrderId: number | null;
 
   // Connection
   private connectionDepId: number | null = null;
 
-  private limitAndOffsetSQL: SQL | null = null;
-  private innerLimitSQL: SQL | null = null;
+  protected limitAndOffsetSQL: SQL | null;
+  private innerLimitSQL: SQL | null;
 
   public readonly mode: PgUnionAllMode;
 
@@ -594,12 +568,18 @@ export class PgUnionAllStep<
       this.isSyncAndSafe = cloneFrom.isSyncAndSafe;
       this.alias = cloneFrom.alias;
 
-      this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
-      this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
+      this.firstStepId = cloneFromMatchingMode
+        ? cloneFromMatchingMode.firstStepId
+        : null;
+      this.lastStepId = cloneFromMatchingMode
+        ? cloneFromMatchingMode.lastStepId
+        : null;
       this.fetchOneExtra = cloneFromMatchingMode
         ? cloneFromMatchingMode.fetchOneExtra
         : false;
-      this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
+      this.offsetStepId = cloneFromMatchingMode
+        ? cloneFromMatchingMode.offsetStepId
+        : null;
       this.limitAndOffsetSQL = cloneFromMatchingMode
         ? cloneFromMatchingMode.limitAndOffsetSQL
         : null;
@@ -614,6 +594,11 @@ export class PgUnionAllStep<
         cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
           ? cloneFromMatchingMode.afterStepId
           : null;
+      this.shouldReverseOrderId =
+        cloneFromMatchingMode &&
+        cloneFromMatchingMode.shouldReverseOrderId != null
+          ? cloneFromMatchingMode.shouldReverseOrderId
+          : null;
       this.lowerIndexStepId =
         cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
           ? cloneFromMatchingMode.lowerIndexStepId
@@ -627,6 +612,18 @@ export class PgUnionAllStep<
           ? cloneFromMatchingMode.limitAndOffsetId
           : null;
     } else {
+      this.firstStepId = null;
+      this.lastStepId = null;
+      this.offsetStepId = null;
+      this.lowerIndexStepId = null;
+      this.upperIndexStepId = null;
+      this.limitAndOffsetId = null;
+      this.beforeStepId = null;
+      this.afterStepId = null;
+      this.shouldReverseOrderId = null;
+      this.limitAndOffsetSQL = null;
+      this.innerLimitSQL = null;
+
       const spec = specOrCloneFrom;
       this.mode = overrideMode ?? spec.mode ?? "normal";
 
@@ -1028,21 +1025,12 @@ on (${sql.indent(
     // TODO: should we do something here to match pgSelect?
   }
 
-  private assertCursorPaginationAllowed(): void {
+  protected assertCursorPaginationAllowed(): void {
     if (this.mode === "aggregate") {
       throw new Error(
         "Cannot use cursor pagination on an aggregate PgSelectStep",
       );
     }
-  }
-
-  /**
-   * Someone (probably pageInfo) wants to know if there's more records. To
-   * determine this we fetch one extra record and then throw it away.
-   */
-  public hasMore(): ExecutableStep<boolean> {
-    this.fetchOneExtra = true;
-    return access(this, "hasMore", false);
   }
 
   private applyConditionFromCursor(
@@ -1083,9 +1071,9 @@ on (${sql.indent(
       // Natural pagination `['natural', N]`
       const $n = access($parsedCursorPlan, [1]);
       if (beforeOrAfter === "before") {
-        this.upperIndexStepId = this.addDependency($n);
+        this.upperIndexStepId = this.addUnaryDependency($n);
       } else {
-        this.lowerIndexStepId = this.addDependency($n);
+        this.lowerIndexStepId = this.addUnaryDependency($n);
       }
       return;
     }
@@ -1233,234 +1221,6 @@ and ${condition(i + 1)}`}
     }
   }
 
-  parseCursor(
-    $cursorPlan: __InputStaticLeafStep<string>,
-  ): PgSelectParsedCursorStep | null {
-    if ($cursorPlan.evalIs(null)) {
-      return null;
-    } else if ($cursorPlan.evalIs(undefined)) {
-      return null;
-    }
-
-    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
-    return $parsedCursorPlan;
-  }
-
-  setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.afterStepId = this.addDependency($parsedCursorPlan);
-  }
-
-  setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.beforeStepId = this.addDependency($parsedCursorPlan);
-  }
-
-  /**
-   * If `last` is in use then we reverse the order from the database and then
-   * re-reverse it in JS-land.
-   */
-  private shouldReverseOrder() {
-    this.locker.lockParameter("first");
-    this.locker.lockParameter("last");
-    return (
-      this.first == null &&
-      this.last != null &&
-      this.lowerIndexStepId == null &&
-      this.upperIndexStepId == null
-    );
-  }
-
-  public setFirst(first: InputStep | number): this {
-    this.locker.assertParameterUnlocked("first");
-    // PERF: don't eval
-    this.first = typeof first === "number" ? first : first.eval() ?? null;
-    this.locker.lockParameter("first");
-    return this;
-  }
-
-  public setLast(last: InputStep | number): this {
-    this.assertCursorPaginationAllowed();
-    this.locker.assertParameterUnlocked("orderBy");
-    this.locker.assertParameterUnlocked("last");
-    this.last = typeof last === "number" ? last : last.eval() ?? null;
-    this.locker.lockParameter("last");
-    return this;
-  }
-
-  public setOffset(offset: InputStep | number): this {
-    this.locker.assertParameterUnlocked("offset");
-    this.offset = typeof offset === "number" ? offset : offset.eval() ?? null;
-    if (this.offset !== null) {
-      this.locker.lockParameter("last");
-      if (this.last != null) {
-        throw new SafeError("Cannot use 'offset' with 'last'");
-      }
-    }
-    this.locker.lockParameter("offset");
-    return this;
-  }
-
-  private planLimitAndOffset() {
-    if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
-      /*
-       * When using cursor-base pagination with 'natural' cursors, we are actually
-       * applying limit/offset under the hood (presumably because we're paginating
-       * something that has no explicit order, like a function).
-       *
-       * If you have:
-       * - first: 3
-       * - after: ['natural', 4]
-       *
-       * Then we want `limit 3 offset 4`.
-       * With `fetchOneExtra` it'd be `limit 4 offset 4`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 4`
-       * With `fetchOneExtra` it'd be `limit 3 offset 3`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 3]
-       *
-       * We want `limit 2`
-       * With `fetchOneExtra` it'd still be `limit 2`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 4]
-       *
-       * We want `limit 2 offset 1`
-       * With `fetchOneExtra` it'd be `limit 3`.
-       *
-       * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
-       *
-       * For:
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 4 offset 2`
-       * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
-       *
-       * For:
-       * - first: 2
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 2`
-       * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
-       */
-
-      const $lower = this.getDepOrConstant<Maybe<number>>(
-        this.lowerIndexStepId,
-        null,
-      );
-      const $upper = this.getDepOrConstant<Maybe<number>>(
-        this.upperIndexStepId,
-        null,
-      );
-
-      const limitAndOffsetLambda = lambda(
-        [$lower, $upper],
-        ([cursorLower, cursorUpper]) => {
-          /** lower bound - exclusive (1-indexed) */
-          let lower = 0;
-          /** upper bound - exclusive (1-indexed) */
-          let upper = Infinity;
-
-          // Apply 'after', if present
-          if (cursorLower != null) {
-            lower = Math.max(0, cursorLower);
-          }
-
-          // Apply 'before', if present
-          if (cursorUpper != null) {
-            upper = cursorUpper;
-          }
-
-          // Cannot go beyond these bounds
-          const maxUpper = upper;
-
-          // Apply 'first', if present
-          if (this.first != null) {
-            upper = Math.min(upper, lower + this.first + 1);
-          }
-
-          // Apply 'last', if present
-          if (this.last != null) {
-            lower = Math.max(0, lower, upper - this.last - 1);
-          }
-
-          // Apply 'offset', if present
-          if (this.offset != null && this.offset > 0) {
-            lower = Math.min(lower + this.offset, maxUpper);
-            upper = Math.min(upper + this.offset, maxUpper);
-          }
-
-          // If 'fetch one extra', adjust:
-          if (this.fetchOneExtra) {
-            if (this.first != null) {
-              upper = upper + 1;
-            } else if (this.last != null) {
-              lower = Math.max(0, lower - 1);
-            }
-          }
-
-          /** lower, but 0-indexed and inclusive */
-          const lower0 = lower - 1 + 1;
-          /** upper, but 0-indexed and inclusive */
-          const upper0 = upper - 1 - 1;
-
-          // Calculate the final limit/offset
-          const limit = isFinite(upper0)
-            ? Math.max(0, upper0 - lower0 + 1)
-            : null;
-          const offset = lower0;
-
-          return [limit, offset];
-        },
-        true,
-      );
-      this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
-      const $limitLambda = access<number>(limitAndOffsetLambda, [0]);
-      const $offsetLambda = access<number>(limitAndOffsetLambda, [1]);
-      const limitPlusOffsetLambda = lambda([$limitLambda, $offsetLambda], add);
-      this.limitAndOffsetSQL = sql`\nlimit ${this.placeholder(
-        $limitLambda,
-        TYPES.int,
-      )}\noffset ${this.placeholder($offsetLambda, TYPES.int)}`;
-      this.innerLimitSQL = sql`\nlimit ${this.placeholder(
-        limitPlusOffsetLambda,
-        TYPES.int,
-      )}`;
-    } else {
-      const limit =
-        this.first != null
-          ? sql`\nlimit ${sql.literal(
-              this.first + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : this.last != null
-          ? sql`\nlimit ${sql.literal(
-              this.last + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-      const offset =
-        this.offset != null
-          ? sql`\noffset ${sql.literal(this.offset)}`
-          : sql.blank;
-      this.limitAndOffsetSQL = sql`${limit}${offset}`;
-      this.innerLimitSQL =
-        this.first != null || this.last != null
-          ? sql`\nlimit ${sql.literal(
-              (this.first ?? this.last ?? 0) +
-                (this.offset ?? 0) +
-                (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-    }
-  }
-
   /**
    * So we can quickly detect if cursors are invalid we use this digest,
    * passing this check does not mean that the cursor is valid but it at least
@@ -1532,30 +1292,36 @@ and ${condition(i + 1)}`}
       return constant([], false);
     }
 
-    this.planLimitAndOffset();
-
     // We must lock here otherwise we might try and create cursor validation
     // plans during `finalize`
     this.locker.lock();
+
+    const $shouldReverseOrder = this.shouldReverseOrder();
+    this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
+    const $limitAndOffsets = this.planLimitAndOffsets();
+    this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
+    this.innerLimitSQL = this.deferredSQL(access($limitAndOffsets, 1));
 
     return this;
   }
 
   private typeIdx: number | null = null;
-  private reverse: boolean | null = null;
+  // private reverse: boolean | null = null;
   finalize() {
     this.locker.lock();
 
     const normalMode = this.mode === "normal";
     this.typeIdx = normalMode ? this.selectType() : null;
-    this.reverse = normalMode ? this.shouldReverseOrder() : null;
+    // this.reverse = normalMode ? this.shouldReverseOrder() : null;
 
     super.finalize();
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
     const { count } = executionDetails;
-    const { typeIdx, reverse } = this;
+    const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
+    const reverse = this.mode === "normal" ? shouldReverseOrder : null;
+    const { typeIdx /* reverse */ } = this;
 
     const memberCodecs = this.memberDigests.map(
       (digest) => digest.finalResource.codec,
@@ -1895,7 +1661,7 @@ ${lateralText};`;
       }
     })();
 
-    const shouldReverseOrder = this.shouldReverseOrder();
+    // const shouldReverseOrder = this.shouldReverseOrder();
 
     // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
 
@@ -1913,6 +1679,7 @@ ${lateralText};`;
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastValuesList<any>> {
+    const { first, last } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
       values,
@@ -1968,22 +1735,19 @@ ${lateralText};`;
       if (allVals == null || isPromiseLike(allVals)) {
         return allVals;
       }
-      const limit = this.first ?? this.last;
-      const firstAndLast =
-        this.first != null && this.last != null && this.last < this.first;
+      const limit = first ?? last;
+      const firstAndLast = first != null && last != null && last < first;
       const hasMore =
         this.fetchOneExtra && limit != null && allVals.length > limit;
       const trimFromStart =
-        !shouldReverseOrder && this.last != null && this.first == null;
+        !shouldReverseOrder && last != null && first == null;
       const limitedRows = hasMore
         ? trimFromStart
           ? allVals.slice(Math.max(0, allVals.length - limit!))
           : allVals.slice(0, limit!)
         : allVals;
       const slicedRows =
-        firstAndLast && this.last != null
-          ? limitedRows.slice(-this.last)
-          : limitedRows;
+        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
