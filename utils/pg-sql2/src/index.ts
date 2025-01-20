@@ -42,7 +42,7 @@ export interface SQLRawNode {
   readonly t: string;
 
   /** @internal */
-  [inspect.custom]: CustomInspectFunction;
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface SQLIdentifierNode {
   readonly n: string;
 
   /** @internal */
-  [inspect.custom]: CustomInspectFunction;
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -82,7 +82,7 @@ export interface SQLValueNode {
   readonly v: SQLRawValue;
 
   /** @internal */
-  [inspect.custom]: CustomInspectFunction;
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -198,6 +198,10 @@ export function escapeSqlIdentifier(str: string): string {
   return `"${str.replace(/["\0]/g, '""')}"`;
 }
 
+const rawNodeInspect: CustomInspectFunction = function (this: SQLRawNode) {
+  return `sql\`${this.t}\``;
+};
+
 function makeRawNode(text: string, exportName?: string): SQLRawNode {
   const n = CACHE_RAW_NODES.get(text);
   if (n) {
@@ -213,9 +217,7 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   const newNode: SQLRawNode = {
     [$$type]: "RAW" as const,
     t: text,
-    [inspect.custom]() {
-      return `sql\`${text}\``;
-    },
+    [inspect.custom]: rawNodeInspect,
   };
   if (exportName) {
     exportAs(newNode, exportName);
@@ -226,6 +228,12 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   return newNode;
 }
 
+const identifierNodeInspect: CustomInspectFunction = function (
+  this: SQLIdentifierNode,
+) {
+  return `sql.identifier(${JSON.stringify(this.n)})`;
+};
+
 // Simple function to help V8 optimize it.
 function makeIdentifierNode(
   s: symbol,
@@ -235,26 +243,30 @@ function makeIdentifierNode(
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
-    [inspect.custom]() {
-      return `sql.identifier(${JSON.stringify(n)})`;
-    },
+    [inspect.custom]: identifierNodeInspect,
   });
 }
+
+const valueNodeInspect: CustomInspectFunction = function (
+  this: SQLValueNode,
+  depth,
+  options,
+) {
+  if (depth < 0) {
+    return `sql.value(...)`;
+  }
+  return `sql.value(${inspect(this.v, {
+    ...options,
+    depth: options.depth == null ? null : options.depth - 1,
+  })})`;
+};
 
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
     [$$type]: "VALUE",
     v: rawValue,
-    [inspect.custom](depth, options) {
-      if (depth < 0) {
-        return `sql.value(...)`;
-      }
-      return `sql.value(${inspect(rawValue, {
-        ...options,
-        depth: options.depth == null ? null : options.depth - 1,
-      })})`;
-    },
+    [inspect.custom]: valueNodeInspect,
   } as SQLValueNode);
 }
 
