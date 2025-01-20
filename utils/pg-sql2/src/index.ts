@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
+import type { CustomInspectFunction } from "util";
 import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
@@ -39,6 +40,9 @@ export interface SQLRawNode {
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
+
+  /** @internal */
+  [inspect.custom]: CustomInspectFunction;
 }
 
 /**
@@ -52,6 +56,9 @@ export interface SQLIdentifierNode {
   readonly s: symbol;
   /** name @internal */
   readonly n: string;
+
+  /** @internal */
+  [inspect.custom]: CustomInspectFunction;
 }
 
 /**
@@ -73,6 +80,9 @@ export interface SQLValueNode {
   readonly [$$type]: "VALUE";
   /** value @internal */
   readonly v: SQLRawValue;
+
+  /** @internal */
+  [inspect.custom]: CustomInspectFunction;
 }
 
 /**
@@ -203,6 +213,9 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   const newNode: SQLRawNode = {
     [$$type]: "RAW" as const,
     t: text,
+    [inspect.custom]() {
+      return `sql\`${text}\``;
+    },
   };
   if (exportName) {
     exportAs(newNode, exportName);
@@ -222,15 +235,27 @@ function makeIdentifierNode(
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
+    [inspect.custom]() {
+      return `sql.identifier(${JSON.stringify(n)})`;
+    },
   });
 }
 
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
-    [$$type]: "VALUE" as const,
+    [$$type]: "VALUE",
     v: rawValue,
-  });
+    [inspect.custom](depth, options) {
+      if (depth < 0) {
+        return `sql.value(...)`;
+      }
+      return `sql.value(${inspect(rawValue, {
+        ...options,
+        depth: options.depth == null ? null : options.depth - 1,
+      })})`;
+    },
+  } as SQLValueNode);
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {

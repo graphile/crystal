@@ -26,6 +26,6 @@ try {
         ? JSON.stringify(obj)
         : String(obj);
     },
-    { custom: Symbol("util.inspect.custom") },
+    { custom: Symbol.for("nodejs.util.inspect.custom") },
   );
 }
