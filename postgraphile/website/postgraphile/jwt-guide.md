@@ -4,10 +4,16 @@ path: /postgraphile/jwt-guide/
 title: PostGraphile JWT guide
 ---
 
-> This specification was authored by
-> [Caleb Meredith](https://twitter.com/calebmer) for use in the PostGraphQL
-> project. The language of the specification is meant to be generally applicable
-> and adoptable by any who might want to use it.
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
+This specification was authored by
+[Caleb Meredith](https://twitter.com/calebmer) for use in the PostGraphQL
+project. The language of the specification is meant to be generally applicable
+and adoptable by any who might want to use it.
+
+</p>
 
 :::info
 

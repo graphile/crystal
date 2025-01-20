@@ -3,11 +3,14 @@ title: Quick Start Guide
 ---
 
 import TOCInline from '@theme/TOCInline';
+import styles from "@site/src/css/common.module.css";
 
-# Quick Start Guide
+<p className={styles.intro}>
 
 This quick start guide will walk you through spinning up your first PostGraphile
 server, including installing the prerequisites such as Node and PostgreSQL.
+
+</p>
 
 # Table of Contents
 

@@ -4,10 +4,19 @@ title: Live Queries
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
 
 A “live query” monitors the query a user provides and gives the client an updated version whenever the query would return a different result.
 
-_This feature requires PostGraphile v4.4.0 or higher._
+</p>
+
+:::info Version 4.4.0+ required
+
+This feature requires PostGraphile v4.4.0 or higher.
+
+:::
 
 ## What are live queries?
 

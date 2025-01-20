@@ -5,6 +5,9 @@ title: PostgreSQL schema design
 ---
 
 import TOCInline from '@theme/TOCInline';
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
 
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
@@ -31,6 +34,8 @@ should be useful for anyone designing a Postgres schema.
 
 If you haven't installed PostGraphile already, you can follow our
 [Quick Start Guide](./quick-start-guide) to get PostGraphile up and running.
+
+</p>
 
 # Table of Contents
 

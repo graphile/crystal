@@ -4,11 +4,17 @@ path: /postgraphile/subscriptions/
 title: GraphQL Subscriptions
 ---
 
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
 Subscriptions notify you when an event occurs on the server side. PostGraphile
 supports subscriptions out of the box (assuming you are using it with a
 supported webserver), but you are responsible for adding subscription fields to
 your schema - without any subscription fields, the `subscription` operation is
 not possible.
+
+</p>
 
 ## Websockets
 

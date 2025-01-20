@@ -2,12 +2,19 @@
 title: PostGraphile JWT Guide
 ---
 
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
 This specification was authored by
 [Caleb Meredith](https://twitter.com/calebmer) for use in the PostGraphQL
 project. The language of the specification is meant to be generally applicable
 and adoptable by any who might want to use it.
 
-:::note
+</p>
+
+:::info
+
 What follows is a specification of how you can use JWTs to
 authenticate a user with PostgreSQL such that PostgreSQL may perform your
 authorization checks. This is not the only way of achieving this goal with
@@ -18,6 +25,7 @@ Express/Koa/Fastify middleware and PostGraphile's
 leverage powerful pre-built authentication stacks such as
 [passport.js](http://www.passportjs.org/) which has OAuth integration with most
 major "social login" providers.
+
 :::
 
 ## PostgreSQL JSON Web Token Serialization Specification

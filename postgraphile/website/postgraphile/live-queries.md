@@ -7,6 +7,7 @@ draft: true
 
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
+import styles from "@site/src/css/common.module.css";
 
 :::caution
 
@@ -15,11 +16,17 @@ This documentation is copied from Version 4 and has not been updated to Version
 
 :::
 
-<p class='intro'>
+<p className={styles.intro}>
+
 A “live query” monitors the query a user provides and gives the client an updated version whenever the query would return a different result.
+
 </p>
 
-_This feature requires PostGraphile v4.4.0 or higher._
+:::info Version 4.4.0+ required
+
+This feature requires PostGraphile v4.4.0 or higher.
+
+:::
 
 ### What are live queries?
 

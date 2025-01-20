@@ -2,11 +2,19 @@
 title: Subscriptions
 ---
 
+import styles from "@site/src/css/common.module.css";
+
 # GraphQL Subscriptions
+
+<p className={styles.intro}>
 
 Subscriptions notify you when an event occurs on the server side.
 
-_This feature requires PostGraphile v4.4.0 or higher._
+</p>
+
+:::note
+This feature requires PostGraphile v4.4.0 or higher.
+:::
 
 ## Introduction
 
