@@ -360,7 +360,8 @@ export async function runTestQuery(
             stringifyPayload(result as any, outputDataAsString),
           );
           if (!checkErrorSnapshots && errors) {
-            console.error(errors[0].originalError || errors[0]);
+            const originalError = result.errors?.[0]?.originalError;
+            console.error(originalError || errors[0]);
           }
           if (options.callback) {
             throw new Error(
