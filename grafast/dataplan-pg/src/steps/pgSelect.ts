@@ -707,7 +707,7 @@ export class PgSelectStep<
     return this.isTrusted;
   }
 
-  public setFirst(first: InputStep): this {
+  public setFirst(first: ExecutableStep<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("first");
     // PERF: don't eval
     this.firstStepId = this.addUnaryDependency(first);
@@ -715,7 +715,7 @@ export class PgSelectStep<
     return this;
   }
 
-  public setLast(last: InputStep): this {
+  public setLast(last: ExecutableStep<Maybe<number>>): this {
     this.assertCursorPaginationAllowed();
     this.locker.assertParameterUnlocked("orderBy");
     this.locker.assertParameterUnlocked("last");
@@ -724,7 +724,7 @@ export class PgSelectStep<
     return this;
   }
 
-  public setOffset(offset: InputStep): this {
+  public setOffset(offset: ExecutableStep<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("offset");
     this.offsetStepId = this.addUnaryDependency(offset);
     this.locker.lockParameter("offset");
@@ -848,7 +848,7 @@ export class PgSelectStep<
     return this.selects.push(fragment) - 1;
   }
 
-  private nullCheckIndex: number | null | undefined = undefined;
+  private nullCheckIndex: Maybe<number> = undefined;
   /** @internal */
   public getNullCheckIndex(): number | null {
     // PERF: if this isn't coming from a function _and_ it's not being inlined
@@ -2375,7 +2375,7 @@ ${lateralText};`;
       !this.joins.some((j) => j.type !== "left")
     ) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectStep<PgResource> | null | undefined = undefined;
+      let t: Maybe<PgSelectStep<PgResource>> = undefined;
       let p: ExecutableStep | undefined = undefined;
       // Scan through the dependencies to find a suitable ancestor step to merge with
       for (

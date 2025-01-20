@@ -2,6 +2,7 @@ import type {
   ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   PageInfoCapableStep,
 } from "grafast";
 import {
@@ -158,8 +159,8 @@ export function pgPageInfo<
 }
 
 function hasNextPageCb(parts: {
-  first: number | null | undefined;
-  last: number | null | undefined;
+  first: Maybe<number>;
+  last: Maybe<number>;
   hasMore: boolean;
 }) {
   const { first, last, hasMore } = parts;
@@ -167,9 +168,9 @@ function hasNextPageCb(parts: {
 }
 
 function hasPreviousPageCb(parts: {
-  first: number | null | undefined;
-  last: number | null | undefined;
-  offset: number | null | undefined;
+  first: Maybe<number>;
+  last: Maybe<number>;
+  offset: Maybe<number>;
   hasMore: boolean;
 }) {
   const { first, last, offset, hasMore } = parts;

@@ -2,7 +2,6 @@ import * as assert from "../assert.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  InputStep,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";

@@ -25,11 +25,11 @@ methods, specifically:
     >,
   ): PageInfoCapableStep;
 
-  setFirst($step: ExecutableStep | number): void;
-  setLast($step: ExecutableStep | number): void;
-  setOffset($step: ExecutableStep | number): void;
+  setFirst($step: ExecutableStep<Maybe<number>> | number): void;
+  setLast($step: ExecutableStep<Maybe<number>> | number): void;
+  setOffset($step: ExecutableStep<Maybe<number>> | number): void;
 
-  parseCursor($step: ExecutableStep): TCursorStep | null | undefined;
+  parseCursor($step: ExecutableStep<Maybe<string>>): TCursorStep | null | undefined;
   setBefore($step: TCursorStep): void;
   setAfter($step: TCursorStep): void;
 ```
