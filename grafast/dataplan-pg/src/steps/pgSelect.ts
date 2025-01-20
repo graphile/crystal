@@ -1184,18 +1184,20 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   shouldReverseOrder() {
-    return operationPlan().withRootLayerPlan(() =>
-      lambda(
+    return operationPlan().withRootLayerPlan(() => {
+      const numberDep = (stepId: number | null) =>
+        this.getDepOrConstant<Maybe<number>>(stepId, null);
+      return lambda(
         {
-          first: this.getDepOrConstant(this.firstStepId, null),
-          last: this.getDepOrConstant(this.lastStepId, null),
-          cursorLower: this.getDepOrConstant(this.lowerIndexStepId, null),
-          cursorUpper: this.getDepOrConstant(this.upperIndexStepId, null),
+          first: numberDep(this.firstStepId),
+          last: numberDep(this.lastStepId),
+          cursorLower: numberDep(this.lowerIndexStepId),
+          cursorUpper: numberDep(this.upperIndexStepId),
         },
         calculateShouldReverseOrder,
         true,
-      ),
-    );
+      );
+    });
   }
 
   /**
@@ -1649,10 +1651,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
       return lambda(
         {
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
           first: numberDep(this.firstStepId),
           last: numberDep(this.lastStepId),
+          cursorLower: numberDep(this.lowerIndexStepId),
+          cursorUpper: numberDep(this.upperIndexStepId),
           offset: numberDep(this.offsetStepId),
           fetchOneExtra: constant(this.fetchOneExtra, false),
         },
