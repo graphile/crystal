@@ -1,5 +1,6 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import type { CustomInspectFunction, inspect } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
@@ -261,6 +262,9 @@ export interface PgCodec<
    * type of an attribute itself.
    */
   executor: PgExecutor | null;
+
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 export type PgCodecWithAttributes<
