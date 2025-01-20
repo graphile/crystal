@@ -22,13 +22,13 @@ graph TD
     Object11 & Lambda42 & Lambda45 & Lambda64 & Lambda69 --> PgSelect15
     Object49{{"Object[49∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda42 & Constant46 & Constant47 & Constant48 --> Object49
     Object63{{"Object[63∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant60{{"Constant[60∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
-    Constant62{{"Constant[62∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸsql.identifier(”messages”)ᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Lambda42 & Constant60 & Constant61 & Constant62 --> Object63
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -38,13 +38,13 @@ graph TD
     __Value2 --> Access10
     Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant70 --> Lambda42
-    Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant71 --> Lambda45
     Object49 --> Lambda50
-    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant72 --> Lambda55
     Object63 --> Lambda64
-    Constant73{{"Constant[73∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant73{{"Constant[73∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant73 --> Lambda69
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ8ᐳ"\]:::itemplan

@@ -20,31 +20,31 @@ graph TD
     Constant156{{"Constant[156∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant156 --> Lambda64
     Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant157 --> Lambda67
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Connection40{{"Connection[40∈0] ➊<br />ᐸ38ᐳ"}}:::plan
     Constant68{{"Constant[68∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Constant84{{"Constant[84∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant100{{"Constant[100∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant101{{"Constant[101∈0] ➊<br />ᐸ{ s: Symbol(compound_key), n: 'compound_key', [Symbol(pg-sqlᐳ"}}:::plan
-    Constant102{{"Constant[102∈0] ➊<br />ᐸ{ name: 'compoundKey', sqlType: { t: '”c”.”compound_key”', [ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant100{{"Constant[100∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 116ᐳ"}}:::plan
+    Constant101{{"Constant[101∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
+    Constant102{{"Constant[102∈0] ➊<br />ᐸRecordCodec(compoundKey)ᐳ"}}:::plan
     Constant114{{"Constant[114∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
     Constant130{{"Constant[130∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant131{{"Constant[131∈0] ➊<br />ᐸ{ s: Symbol(compound_key), n: 'compound_key', [Symbol(pg-sqlᐳ"}}:::plan
+    Constant131{{"Constant[131∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
     Constant146{{"Constant[146∈0] ➊<br />ᐸ[ { attribute: 'person_id', direction: 'ASC' }, { attribute:ᐳ"}}:::plan
-    Constant147{{"Constant[147∈0] ➊<br />ᐸ{ s: Symbol(foreign_key), n: 'foreign_key', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant148{{"Constant[148∈0] ➊<br />ᐸ{ name: 'foreignKey', sqlType: { t: '”a”.”foreign_key”', [Syᐳ"}}:::plan
-    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
-    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
-    Constant160{{"Constant[160∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
-    Constant162{{"Constant[162∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(compound_kᐳ"}}:::plan
+    Constant147{{"Constant[147∈0] ➊<br />ᐸsql.identifier(”foreign_key”)ᐳ"}}:::plan
+    Constant148{{"Constant[148∈0] ➊<br />ᐸRecordCodec(foreignKey)ᐳ"}}:::plan
+    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
+    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
+    Constant160{{"Constant[160∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
+    Constant162{{"Constant[162∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
     Constant163{{"Constant[163∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'person_id', direcᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Lambda72{{"Lambda[72∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

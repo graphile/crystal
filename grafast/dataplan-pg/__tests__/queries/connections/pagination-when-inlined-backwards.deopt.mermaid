@@ -19,8 +19,8 @@ graph TD
     Object12 & Constant152 & Lambda139 & Lambda141 & Lambda146 & Lambda151 --> PgSelect9
     Object145{{"Object[145∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant142{{"Constant[142∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant143{{"Constant[143∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant144{{"Constant[144∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant143{{"Constant[143∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant144{{"Constant[144∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda139 & Constant142 & Constant143 & Constant144 --> Object145
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -34,34 +34,34 @@ graph TD
     Constant153{{"Constant[153∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant153 --> Lambda81
     Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant154{{"Constant[154∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant154{{"Constant[154∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant154 --> Lambda84
     Lambda110{{"Lambda[110∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant160{{"Constant[160∈0] ➊<br />ᐸ§{ first: null, last: 2, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant160 --> Lambda110
     Constant162{{"Constant[162∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant162 --> Lambda139
-    Constant163{{"Constant[163∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
+    Constant163{{"Constant[163∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant163 --> Lambda141
     Object145 --> Lambda146
-    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant159 --> Lambda151
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant8{{"Constant[8∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant85{{"Constant[85∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: 'app_public.users', [Symbol(pᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
     Constant99{{"Constant[99∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant100{{"Constant[100∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Constant100{{"Constant[100∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
     Constant114{{"Constant[114∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸsql.identifier(”messages”)ᐳ"}}:::plan
+    Constant116{{"Constant[116∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Constant128{{"Constant[128∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant155{{"Constant[155∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
-    Constant156{{"Constant[156∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
-    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
-    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(messages),ᐳ"}}:::plan
-    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant155{{"Constant[155∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
+    Constant156{{"Constant[156∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
+    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
+    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”messagᐳ"}}:::plan
+    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ first: null, last: 2, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Object88{{"Object[88∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda81 & Constant85 & Constant86 & Constant87 --> Object88
     Object102{{"Object[102∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan

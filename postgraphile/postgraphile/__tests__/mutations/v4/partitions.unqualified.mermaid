@@ -20,21 +20,21 @@ graph TD
     Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant88 --> Lambda55
     Lambda58{{"Lambda[58∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant89 --> Lambda58
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant59{{"Constant[59∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: '”users”', [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
     Constant73{{"Constant[73∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant74{{"Constant[74∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
     Constant83{{"Constant[83∈0] ➊<br />ᐸ'2023-05-24T07:43:00Z'ᐳ"}}:::plan
     Constant84{{"Constant[84∈0] ➊<br />ᐸ'temp'ᐳ"}}:::plan
     Constant85{{"Constant[85∈0] ➊<br />ᐸ12.7ᐳ"}}:::plan
     Constant86{{"Constant[86∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant87{{"Constant[87∈0] ➊<br />ᐸ13ᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
     PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸmeasurements(timestamp,key,value,user_id)ᐳ"]]:::sideeffectplan
     Object16 & Constant83 & Constant84 & Constant85 & Constant86 --> PgInsertSingle13
     Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan

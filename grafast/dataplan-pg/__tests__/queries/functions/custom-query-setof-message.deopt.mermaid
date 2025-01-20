@@ -18,8 +18,8 @@ graph TD
     Object9 & Lambda15 & Lambda18 & Lambda23 & Lambda28 --> PgSelect6
     Object22{{"Object[22∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant19{{"Constant[19∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ{ s: Symbol(featured_messages), n: 'featured_messages', [Symᐳ"}}:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸsql.identifier(”featured_messages”)ᐳ"}}:::plan
+    Constant21{{"Constant[21∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Lambda15 & Constant19 & Constant20 & Constant21 --> Object22
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -29,10 +29,10 @@ graph TD
     __Value2 --> Access8
     Constant29{{"Constant[29∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant29 --> Lambda15
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant30 --> Lambda18
     Object22 --> Lambda23
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(featured_mᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”featurᐳ"}}:::plan
     Constant31 --> Lambda28
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item10[/"__Item[10∈1]<br />ᐸ6ᐳ"\]:::itemplan

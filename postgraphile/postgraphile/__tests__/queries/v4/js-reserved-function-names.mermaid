@@ -37,21 +37,21 @@ graph TD
     Object13 & Constant110 & Constant107 & Constant105 & Constant111 & Lambda49 & Lambda52 & Lambda85 & Lambda90 --> PgSelect30
     Object56{{"Object[56∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant53{{"Constant[53∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant54{{"Constant[54∈0] ➊<br />ᐸ{ s: Symbol(await), n: 'await', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ{ name: 'int4', sqlType: { t: '”int4”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant54{{"Constant[54∈0] ➊<br />ᐸsql.identifier(”await”)ᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
     Lambda49 & Constant53 & Constant54 & Constant55 --> Object56
     Object70{{"Object[70∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant67{{"Constant[67∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ s: Symbol(case), n: 'case', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸsql.identifier(”case”)ᐳ"}}:::plan
     Lambda49 & Constant67 & Constant68 & Constant55 --> Object70
     Object84{{"Object[84∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant81{{"Constant[81∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ{ s: Symbol(valueOf), n: 'value_of', [Symbol(pg-sql2-type-1)ᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸsql.identifier(”value_of”)ᐳ"}}:::plan
     Lambda49 & Constant81 & Constant82 & Constant55 --> Object84
     Object98{{"Object[98∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant95{{"Constant[95∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ{ s: Symbol(null), n: 'null', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ{ name: 'null', sqlType: { t: '”js_reserved”.”null”', [Symboᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸsql.identifier(”null”)ᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸRecordCodec(null)ᐳ"}}:::plan
     Lambda49 & Constant95 & Constant96 & Constant97 --> Object98
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -83,19 +83,19 @@ graph TD
     First38 --> PgSelectSingle39
     Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant112 --> Lambda49
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant113 --> Lambda52
     Object56 --> Lambda57
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(await), n:ᐳ"}}:::plan
+    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”await”ᐳ"}}:::plan
     Constant114 --> Lambda62
     Object70 --> Lambda71
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(case), n: ᐳ"}}:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”case”)ᐳ"}}:::plan
     Constant115 --> Lambda76
     Object84 --> Lambda85
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(valueOf), ᐳ"}}:::plan
+    Constant116{{"Constant[116∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”value_ᐳ"}}:::plan
     Constant116 --> Lambda90
     Object98 --> Lambda99
-    Constant117{{"Constant[117∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(null), n: ᐳ"}}:::plan
+    Constant117{{"Constant[117∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”null”)ᐳ"}}:::plan
     Constant117 --> Lambda104
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression45{{"PgClassExpression[45∈1] ➊<br />ᐸ”js_reserv...lder! */<br />)ᐳ"}}:::plan

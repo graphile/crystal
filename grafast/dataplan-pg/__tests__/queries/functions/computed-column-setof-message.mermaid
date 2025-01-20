@@ -21,13 +21,13 @@ graph TD
     Object10 & Constant56 & Lambda26 & Lambda31 & Lambda36 & Lambda23 & Lambda26 & Lambda50 & Lambda55 --> PgSelect7
     Object30{{"Object[30∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant27{{"Constant[27∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸ{ s: Symbol(forums_featured_messages), n: 'forums_featured_mᐳ"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸsql.identifier(”forums_featured_messages”)ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Lambda23 & Constant27 & Constant28 & Constant29 --> Object30
     Object49{{"Object[49∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda23 & Constant46 & Constant47 & Constant48 --> Object49
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -41,13 +41,13 @@ graph TD
     First11 --> PgSelectSingle12
     Constant57{{"Constant[57∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant57 --> Lambda23
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant58 --> Lambda26
     Object30 --> Lambda31
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_feaᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant59 --> Lambda36
     Object49 --> Lambda50
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant60 --> Lambda55
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant21{{"Constant[21∈0] ➊<br />ᐸnullᐳ"}}:::plan

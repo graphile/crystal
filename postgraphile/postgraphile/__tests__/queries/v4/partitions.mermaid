@@ -14,18 +14,18 @@ graph TD
     Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant68{{"Constant[68∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: '”partitions”.”users”', [Symbᐳ"}}:::plan
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ[ { codec: { name: 'timestamptz', sqlType: [Object], fromPg:ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ{ s: Symbol(measurements), n: 'measurements', [Symbol(pg-sqlᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ{ name: 'measurements', sqlType: { t: '”partitions”.”measureᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ[ { codec: Codec(timestamptz), fragment: { n: [Array], f: 0,ᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸsql.identifier(”measurements”)ᐳ"}}:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸRecordCodec(measurements)ᐳ"}}:::plan
     Constant99{{"Constant[99∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant109{{"Constant[109∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(measuremenᐳ"}}:::plan
+    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(timestamptz), frᐳ"}}:::plan
+    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”measurᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸmeasurements+1ᐳ"]]:::plan
     Object12{{"Object[12∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Lambda67{{"Lambda[67∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan

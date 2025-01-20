@@ -18,21 +18,21 @@ graph TD
     Object9 & Lambda216 & Lambda219 & Lambda280 & Lambda285 --> PgSelect6
     Object223{{"Object[223∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant220{{"Constant[220∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant221{{"Constant[221∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant222{{"Constant[222∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Constant221{{"Constant[221∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant222{{"Constant[222∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Lambda216 & Constant220 & Constant221 & Constant222 --> Object223
     Object237{{"Object[237∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant234{{"Constant[234∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant235{{"Constant[235∈0] ➊<br />ᐸ{ s: Symbol(single_table_items), n: 'single_table_items', [Sᐳ"}}:::plan
-    Constant236{{"Constant[236∈0] ➊<br />ᐸ{ name: 'single_table_items', sqlType: { t: 'interfaces_and_ᐳ"}}:::plan
+    Constant235{{"Constant[235∈0] ➊<br />ᐸsql.identifier(”single_table_items”)ᐳ"}}:::plan
+    Constant236{{"Constant[236∈0] ➊<br />ᐸRecordCodec(single_table_items)ᐳ"}}:::plan
     Lambda216 & Constant234 & Constant235 & Constant236 --> Object237
     Object251{{"Object[251∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant248{{"Constant[248∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant249{{"Constant[249∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant249{{"Constant[249∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
     Lambda216 & Constant248 & Constant249 & Constant222 --> Object251
     Object279{{"Object[279∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant276{{"Constant[276∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1024, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant277{{"Constant[277∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant277{{"Constant[277∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
     Lambda216 & Constant276 & Constant277 & Constant222 --> Object279
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -42,30 +42,30 @@ graph TD
     __Value2 --> Access8
     Constant286{{"Constant[286∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant286 --> Lambda216
-    Constant287{{"Constant[287∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant287{{"Constant[287∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant287 --> Lambda219
     Lambda224{{"Lambda[224∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object223 --> Lambda224
     Lambda229{{"Lambda[229∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant288{{"Constant[288∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant288{{"Constant[288∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant288 --> Lambda229
     Lambda238{{"Lambda[238∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object237 --> Lambda238
     Lambda243{{"Lambda[243∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant289{{"Constant[289∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(single_tabᐳ"}}:::plan
+    Constant289{{"Constant[289∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”singleᐳ"}}:::plan
     Constant289 --> Lambda243
     Lambda252{{"Lambda[252∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object251 --> Lambda252
     Lambda257{{"Lambda[257∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant290{{"Constant[290∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant290{{"Constant[290∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant290 --> Lambda257
     Object279 --> Lambda280
-    Constant292{{"Constant[292∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant292{{"Constant[292∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant292 --> Lambda285
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant262{{"Constant[262∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant263{{"Constant[263∈0] ➊<br />ᐸ{ s: Symbol(single_table_items), n: 'single_table_items', [Sᐳ"}}:::plan
-    Constant291{{"Constant[291∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant263{{"Constant[263∈0] ➊<br />ᐸsql.identifier(”single_table_items”)ᐳ"}}:::plan
+    Constant291{{"Constant[291∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Object265{{"Object[265∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda216 & Constant262 & Constant263 & Constant236 --> Object265
     __Item10[/"__Item[10∈1]<br />ᐸ6ᐳ"\]:::itemplan

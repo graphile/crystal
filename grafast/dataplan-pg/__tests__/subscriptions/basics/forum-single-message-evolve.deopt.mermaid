@@ -27,21 +27,21 @@ graph TD
     Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant88 --> Lambda45
     Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant89 --> Lambda48
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(users), n: 'users', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: 'app_public.users', [Symbol(pᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
     Constant77{{"Constant[77∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
-    Constant79{{"Constant[79∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users), n:ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(messages),ᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸsql.identifier(”messages”)ᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
+    Constant92{{"Constant[92∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”messagᐳ"}}:::plan
     Object52{{"Object[52∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda45 & Constant49 & Constant50 & Constant51 --> Object52
     Object66{{"Object[66∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan

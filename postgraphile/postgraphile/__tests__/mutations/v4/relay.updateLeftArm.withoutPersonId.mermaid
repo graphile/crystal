@@ -28,11 +28,11 @@ graph TD
     Constant19{{"Constant[19∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     Constant30{{"Constant[30∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     Constant42{{"Constant[42∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Constant53{{"Constant[53∈0] ➊<br />ᐸ0.71ᐳ"}}:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant56{{"Constant[56∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
     PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸleft_arm(id;length_in_metres)ᐳ"]]:::sideeffectplan
     Object17 -->|rejectNull| PgUpdateSingle14
     Access12 & Constant53 --> PgUpdateSingle14

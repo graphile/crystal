@@ -20,13 +20,13 @@ graph TD
     Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
     Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant39{{"Constant[39∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ{ s: Symbol(relational_posts), n: 'relational_posts', [Symboᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ{ name: 'relational_posts', sqlType: { t: 'interfaces_and_unᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸRecordCodec(relational_posts)ᐳ"}}:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
     Constant51{{"Constant[51∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,note)ᐳ"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object15 & PgClassExpression16 & Constant49 & Constant50 --> PgInsertSingle17

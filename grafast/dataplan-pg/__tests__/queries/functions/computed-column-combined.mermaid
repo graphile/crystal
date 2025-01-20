@@ -28,27 +28,27 @@ graph TD
     Object10 & Constant127 & Constant29 & Lambda49 & Lambda54 & Lambda59 & Lambda70 & Lambda75 & Lambda89 & Lambda94 & Lambda49 & Lambda105 & Lambda110 & Lambda46 & Lambda49 & Lambda121 & Lambda126 --> PgSelect7
     Object53{{"Object[53∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ s: Symbol(forums_unique_author_count), n: 'forums_unique_aᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ{ name: 'int4', sqlType: { t: '”int4”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸsql.identifier(”forums_unique_author_count”)ᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
     Lambda46 & Constant50 & Constant51 & Constant52 --> Object53
     Object69{{"Object[69∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant66{{"Constant[66∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ s: Symbol(forums_featured_messages), n: 'forums_featured_mᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸsql.identifier(”forums_featured_messages”)ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Lambda46 & Constant66 & Constant67 & Constant68 --> Object69
     Object88{{"Object[88∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant85{{"Constant[85∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ{ s: Symbol(users_most_recent_forum), n: 'users_most_recent_ᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸsql.identifier(”users_most_recent_forum”)ᐳ"}}:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda46 & Constant85 & Constant86 & Constant87 --> Object88
     Object104{{"Object[104∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant101{{"Constant[101∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant102{{"Constant[102∈0] ➊<br />ᐸ{ s: Symbol(forums_random_user), n: 'forums_random_user', [Sᐳ"}}:::plan
-    Constant103{{"Constant[103∈0] ➊<br />ᐸ{ name: 'users', sqlType: { t: 'app_public.users', [Symbol(pᐳ"}}:::plan
+    Constant102{{"Constant[102∈0] ➊<br />ᐸsql.identifier(”forums_random_user”)ᐳ"}}:::plan
+    Constant103{{"Constant[103∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
     Lambda46 & Constant101 & Constant102 & Constant103 --> Object104
     Object120{{"Object[120∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant117{{"Constant[117∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant118{{"Constant[118∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant118{{"Constant[118∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
     Lambda46 & Constant117 & Constant118 & Constant87 --> Object120
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -62,22 +62,22 @@ graph TD
     First11 --> PgSelectSingle12
     Constant128{{"Constant[128∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant128 --> Lambda46
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant129{{"Constant[129∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant129 --> Lambda49
     Object53 --> Lambda54
-    Constant130{{"Constant[130∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_uniᐳ"}}:::plan
+    Constant130{{"Constant[130∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant130 --> Lambda59
     Object69 --> Lambda70
-    Constant131{{"Constant[131∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_feaᐳ"}}:::plan
+    Constant131{{"Constant[131∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant131 --> Lambda75
     Object88 --> Lambda89
-    Constant132{{"Constant[132∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(users_mostᐳ"}}:::plan
+    Constant132{{"Constant[132∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users_ᐳ"}}:::plan
     Constant132 --> Lambda94
     Object104 --> Lambda105
-    Constant133{{"Constant[133∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_ranᐳ"}}:::plan
+    Constant133{{"Constant[133∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant133 --> Lambda110
     Object120 --> Lambda121
-    Constant134{{"Constant[134∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
+    Constant134{{"Constant[134∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant134 --> Lambda126
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant44{{"Constant[44∈0] ➊<br />ᐸnullᐳ"}}:::plan

@@ -20,7 +20,7 @@ graph TD
     Constant106{{"Constant[106∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant106 --> Lambda45
     Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant107{{"Constant[107∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant107{{"Constant[107∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant107 --> Lambda48
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
@@ -29,17 +29,17 @@ graph TD
     Constant43{{"Constant[43∈0] ➊<br />ᐸnullᐳ"}}:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸfalseᐳ"}}:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(person_friends), n: 'person_friends', [Symbol(pgᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”person_friends”)ᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
     Constant96{{"Constant[96∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ{ s: Symbol(table_set_query), n: 'table_set_query', [Symbol(ᐳ"}}:::plan
-    Constant108{{"Constant[108∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
-    Constant109{{"Constant[109∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person_friᐳ"}}:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
+    Constant108{{"Constant[108∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
+    Constant109{{"Constant[109∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
+    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
     Lambda53{{"Lambda[53∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda58{{"Lambda[58∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

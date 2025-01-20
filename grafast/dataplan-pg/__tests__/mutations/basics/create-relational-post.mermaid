@@ -20,26 +20,26 @@ graph TD
     Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
     Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Constant79{{"Constant[79∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant80{{"Constant[80∈0] ➊<br />ᐸ{ s: Symbol(relational_items), n: 'relational_items', [Symboᐳ"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ{ name: 'relational_items', sqlType: { t: 'interfaces_and_unᐳ"}}:::plan
+    Constant80{{"Constant[80∈0] ➊<br />ᐸsql.identifier(”relational_items”)ᐳ"}}:::plan
+    Constant81{{"Constant[81∈0] ➊<br />ᐸRecordCodec(relational_items)ᐳ"}}:::plan
     Constant95{{"Constant[95∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ{ s: Symbol(relational_posts_title_lower), n: 'relational_poᐳ"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ{ name: 'text', sqlType: { t: '”text”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸsql.identifier(”relational_posts_title_lower”)ᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸCodec(text)ᐳ"}}:::plan
     Constant111{{"Constant[111∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ{ s: Symbol(relational_posts), n: 'relational_posts', [Symboᐳ"}}:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ{ name: 'relational_posts', sqlType: { t: 'interfaces_and_unᐳ"}}:::plan
+    Constant112{{"Constant[112∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸRecordCodec(relational_posts)ᐳ"}}:::plan
     Constant121{{"Constant[121∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
     Constant122{{"Constant[122∈0] ➊<br />ᐸ'A post, innit?'ᐳ"}}:::plan
     Constant123{{"Constant[123∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
     Constant124{{"Constant[124∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(relationalᐳ"}}:::plan
+    Constant125{{"Constant[125∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant126{{"Constant[126∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
+    Constant127{{"Constant[127∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
+    Constant128{{"Constant[128∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
+    Constant129{{"Constant[129∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object15 & PgClassExpression16 & Constant121 & Constant122 & Constant123 --> PgInsertSingle17

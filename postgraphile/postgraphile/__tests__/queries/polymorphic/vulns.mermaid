@@ -17,21 +17,21 @@ graph TD
     Object129{{"Object[129∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda122{{"Lambda[122∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant126{{"Constant[126∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ{ s: Symbol(first_party_vulnerabilities), n: 'first_party_vuᐳ"}}:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ{ name: 'firstPartyVulnerabilities', sqlType: { t: '”polymorᐳ"}}:::plan
+    Constant127{{"Constant[127∈0] ➊<br />ᐸsql.identifier(”first_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant128{{"Constant[128∈0] ➊<br />ᐸRecordCodec(firstPartyVulnerabilities)ᐳ"}}:::plan
     Lambda122 & Constant126 & Constant127 & Constant128 --> Object129
     Object143{{"Object[143∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant140{{"Constant[140∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant141{{"Constant[141∈0] ➊<br />ᐸ{ s: Symbol(third_party_vulnerabilities), n: 'third_party_vuᐳ"}}:::plan
-    Constant142{{"Constant[142∈0] ➊<br />ᐸ{ name: 'thirdPartyVulnerabilities', sqlType: { t: '”polymorᐳ"}}:::plan
+    Constant141{{"Constant[141∈0] ➊<br />ᐸsql.identifier(”third_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant142{{"Constant[142∈0] ➊<br />ᐸRecordCodec(thirdPartyVulnerabilities)ᐳ"}}:::plan
     Lambda122 & Constant140 & Constant141 & Constant142 --> Object143
     Object166{{"Object[166∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant163{{"Constant[163∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant164{{"Constant[164∈0] ➊<br />ᐸ{ s: Symbol(first_party_vulnerabilities), n: 'first_party_vuᐳ"}}:::plan
+    Constant164{{"Constant[164∈0] ➊<br />ᐸsql.identifier(”first_party_vulnerabilities”)ᐳ"}}:::plan
     Lambda122 & Constant163 & Constant164 & Constant128 --> Object166
     Object180{{"Object[180∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant177{{"Constant[177∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant178{{"Constant[178∈0] ➊<br />ᐸ{ s: Symbol(third_party_vulnerabilities), n: 'third_party_vuᐳ"}}:::plan
+    Constant178{{"Constant[178∈0] ➊<br />ᐸsql.identifier(”third_party_vulnerabilities”)ᐳ"}}:::plan
     Lambda122 & Constant177 & Constant178 & Constant142 --> Object180
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -48,27 +48,27 @@ graph TD
     Constant189{{"Constant[189∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant189 --> Lambda122
     Lambda125{{"Lambda[125∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant190{{"Constant[190∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant190{{"Constant[190∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant190 --> Lambda125
     Lambda130{{"Lambda[130∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object129 --> Lambda130
     Lambda135{{"Lambda[135∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant191{{"Constant[191∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(first_partᐳ"}}:::plan
+    Constant191{{"Constant[191∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
     Constant191 --> Lambda135
     Lambda144{{"Lambda[144∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object143 --> Lambda144
     Lambda149{{"Lambda[149∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant192{{"Constant[192∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(third_partᐳ"}}:::plan
+    Constant192{{"Constant[192∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
     Constant192 --> Lambda149
     Lambda167{{"Lambda[167∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object166 --> Lambda167
     Lambda172{{"Lambda[172∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant193{{"Constant[193∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(first_partᐳ"}}:::plan
+    Constant193{{"Constant[193∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
     Constant193 --> Lambda172
     Lambda181{{"Lambda[181∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object180 --> Lambda181
     Lambda186{{"Lambda[186∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant194{{"Constant[194∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(third_partᐳ"}}:::plan
+    Constant194{{"Constant[194∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
     Constant194 --> Lambda186
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan

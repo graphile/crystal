@@ -19,35 +19,35 @@ graph TD
     Object10 & Constant166 & Lambda62 & Lambda65 & Lambda160 & Lambda165 --> PgSelect7
     Object69{{"Object[69∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant66{{"Constant[66∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Lambda62 & Constant66 & Constant67 & Constant68 --> Object69
     Object83{{"Object[83∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant80{{"Constant[80∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant81{{"Constant[81∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
     Lambda62 & Constant80 & Constant81 & Constant68 --> Object83
     Object99{{"Object[99∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant96{{"Constant[96∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ{ s: Symbol(posts), n: 'posts', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant98{{"Constant[98∈0] ➊<br />ᐸ{ name: 'posts', sqlType: { t: 'interfaces_and_unions.posts'ᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸsql.identifier(”posts”)ᐳ"}}:::plan
+    Constant98{{"Constant[98∈0] ➊<br />ᐸRecordCodec(posts)ᐳ"}}:::plan
     Lambda62 & Constant96 & Constant97 & Constant98 --> Object99
     Object113{{"Object[113∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant110{{"Constant[110∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant111{{"Constant[111∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
     Lambda62 & Constant110 & Constant111 & Constant68 --> Object113
     Object129{{"Object[129∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant126{{"Constant[126∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ{ s: Symbol(posts), n: 'posts', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
+    Constant127{{"Constant[127∈0] ➊<br />ᐸsql.identifier(”posts”)ᐳ"}}:::plan
     Lambda62 & Constant126 & Constant127 & Constant98 --> Object129
     Object145{{"Object[145∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant142{{"Constant[142∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant143{{"Constant[143∈0] ➊<br />ᐸ{ s: Symbol(comments), n: 'comments', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
-    Constant144{{"Constant[144∈0] ➊<br />ᐸ{ name: 'comments', sqlType: { t: 'interfaces_and_unions.comᐳ"}}:::plan
+    Constant143{{"Constant[143∈0] ➊<br />ᐸsql.identifier(”comments”)ᐳ"}}:::plan
+    Constant144{{"Constant[144∈0] ➊<br />ᐸRecordCodec(comments)ᐳ"}}:::plan
     Lambda62 & Constant142 & Constant143 & Constant144 --> Object145
     Object159{{"Object[159∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant156{{"Constant[156∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant157{{"Constant[157∈0] ➊<br />ᐸ{ s: Symbol(entity_search), n: 'entity_search', [Symbol(pg-sᐳ"}}:::plan
-    Constant158{{"Constant[158∈0] ➊<br />ᐸ{ name: 'union__entity', sqlType: { t: 'interfaces_and_unionᐳ"}}:::plan
+    Constant157{{"Constant[157∈0] ➊<br />ᐸsql.identifier(”entity_search”)ᐳ"}}:::plan
+    Constant158{{"Constant[158∈0] ➊<br />ᐸRecordCodec(union__entity)ᐳ"}}:::plan
     Lambda62 & Constant156 & Constant157 & Constant158 --> Object159
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -59,40 +59,40 @@ graph TD
     PgSelect7 --> __ListTransform11
     Constant167{{"Constant[167∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant167 --> Lambda62
-    Constant168{{"Constant[168∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant168{{"Constant[168∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant168 --> Lambda65
     Lambda70{{"Lambda[70∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object69 --> Lambda70
     Lambda75{{"Lambda[75∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant169{{"Constant[169∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant169{{"Constant[169∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant169 --> Lambda75
     Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object83 --> Lambda84
     Lambda89{{"Lambda[89∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant170{{"Constant[170∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant170{{"Constant[170∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant170 --> Lambda89
     Lambda100{{"Lambda[100∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object99 --> Lambda100
     Lambda105{{"Lambda[105∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant171{{"Constant[171∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(posts), n:ᐳ"}}:::plan
+    Constant171{{"Constant[171∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”posts”ᐳ"}}:::plan
     Constant171 --> Lambda105
     Lambda114{{"Lambda[114∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object113 --> Lambda114
     Lambda119{{"Lambda[119∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant172{{"Constant[172∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant172{{"Constant[172∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant172 --> Lambda119
     Lambda130{{"Lambda[130∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object129 --> Lambda130
     Lambda135{{"Lambda[135∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant173{{"Constant[173∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(posts), n:ᐳ"}}:::plan
+    Constant173{{"Constant[173∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”posts”ᐳ"}}:::plan
     Constant173 --> Lambda135
     Lambda146{{"Lambda[146∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object145 --> Lambda146
     Lambda151{{"Lambda[151∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant174{{"Constant[174∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(comments),ᐳ"}}:::plan
+    Constant174{{"Constant[174∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”commenᐳ"}}:::plan
     Constant174 --> Lambda151
     Object159 --> Lambda160
-    Constant175{{"Constant[175∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(entity_seaᐳ"}}:::plan
+    Constant175{{"Constant[175∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”entityᐳ"}}:::plan
     Constant175 --> Lambda165
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ7ᐳ"\]:::itemplan

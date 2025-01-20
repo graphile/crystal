@@ -12,8 +12,8 @@ graph TD
     Object80{{"Object[80∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda45{{"Lambda[45∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant77{{"Constant[77∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ{ s: Symbol(authenticate_payload), n: 'authenticate_payload'ᐳ"}}:::plan
-    Constant79{{"Constant[79∈0] ➊<br />ᐸ{ name: 'authPayload', sqlType: { t: '”b”.”auth_payload”', [ᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸsql.identifier(”authenticate_payload”)ᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸRecordCodec(authPayload)ᐳ"}}:::plan
     Lambda45 & Constant77 & Constant78 & Constant79 --> Object80
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -25,25 +25,25 @@ graph TD
     Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant90 --> Lambda45
     Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant91 --> Lambda48
     Lambda81{{"Lambda[81∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object80 --> Lambda81
     Lambda86{{"Lambda[86∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(authenticaᐳ"}}:::plan
+    Constant94{{"Constant[94∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”authenᐳ"}}:::plan
     Constant94 --> Lambda86
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ{ s: Symbol(frmcdc_jwtToken), n: 'frmcdc_jwt_token', [Symbolᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ name: 'jwtToken', sqlType: { t: '”b”.”jwt_token”', [Symbolᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸsql.identifier(”frmcdc_jwt_token”)ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸRecordCodec(jwtToken)ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Constant87{{"Constant[87∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant88{{"Constant[88∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
     Constant89{{"Constant[89∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(frmcdc_jwtᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
+    Constant92{{"Constant[92∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
+    Constant93{{"Constant[93∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate_payload(mutation)ᐳ"]]:::sideeffectplan
     Object14 & Constant87 & Constant88 & Constant89 & Lambda45 & Lambda48 & Lambda81 & Lambda86 --> PgSelect11
     First15{{"First[15∈1] ➊"}}:::plan

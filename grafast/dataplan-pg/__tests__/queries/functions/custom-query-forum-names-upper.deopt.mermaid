@@ -18,8 +18,8 @@ graph TD
     Object9 & Lambda20 & Lambda23 & Lambda28 & Lambda33 --> PgSelect6
     Object27{{"Object[27∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant24{{"Constant[24∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ{ s: Symbol(forum_names), n: 'forum_names', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ{ name: 'text', sqlType: { t: '”text”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸsql.identifier(”forum_names”)ᐳ"}}:::plan
+    Constant26{{"Constant[26∈0] ➊<br />ᐸCodec(text)ᐳ"}}:::plan
     Lambda20 & Constant24 & Constant25 & Constant26 --> Object27
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -31,10 +31,10 @@ graph TD
     PgSelect6 --> __ListTransform10
     Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant34 --> Lambda20
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant35 --> Lambda23
     Object27 --> Lambda28
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forum_nameᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forum_ᐳ"}}:::plan
     Constant36 --> Lambda33
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item11[/"__Item[11∈1]<br />ᐸ6ᐳ"\]:::itemplan

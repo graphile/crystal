@@ -20,13 +20,13 @@ graph TD
     Object9 & Lambda43 & Lambda48 & Lambda53 & Lambda40 & Lambda43 & Lambda67 & Lambda72 --> PgSelect6
     Object47{{"Object[47∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant44{{"Constant[44∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ{ s: Symbol(single_table_items), n: 'single_table_items', [Sᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ{ name: 'single_table_items', sqlType: { t: 'interfaces_and_ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸsql.identifier(”single_table_items”)ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸRecordCodec(single_table_items)ᐳ"}}:::plan
     Lambda40 & Constant44 & Constant45 & Constant46 --> Object47
     Object66{{"Object[66∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1024, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Lambda40 & Constant63 & Constant64 & Constant65 --> Object66
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -36,13 +36,13 @@ graph TD
     __Value2 --> Access8
     Constant73{{"Constant[73∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant73 --> Lambda40
-    Constant74{{"Constant[74∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant74 --> Lambda43
     Object47 --> Lambda48
-    Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant75 --> Lambda53
     Object66 --> Lambda67
-    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant76 --> Lambda72
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant38{{"Constant[38∈0] ➊<br />ᐸnullᐳ"}}:::plan

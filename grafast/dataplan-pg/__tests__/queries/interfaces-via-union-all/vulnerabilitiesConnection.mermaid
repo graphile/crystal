@@ -12,13 +12,13 @@ graph TD
     Object54{{"Object[54∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda47{{"Lambda[47∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant51{{"Constant[51∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ{ s: Symbol(first_party_vulnerabilities), n: 'first_party_vuᐳ"}}:::plan
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ{ name: 'first_party_vulnerabilities', sqlType: { t: 'interfᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸsql.identifier(”first_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸRecordCodec(first_party_vulnerabilities)ᐳ"}}:::plan
     Lambda47 & Constant51 & Constant52 & Constant53 --> Object54
     Object68{{"Object[68∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant65{{"Constant[65∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ{ s: Symbol(third_party_vulnerabilities), n: 'third_party_vuᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ name: 'third_party_vulnerabilities', sqlType: { t: 'interfᐳ"}}:::plan
+    Constant66{{"Constant[66∈0] ➊<br />ᐸsql.identifier(”third_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸRecordCodec(third_party_vulnerabilities)ᐳ"}}:::plan
     Lambda47 & Constant65 & Constant66 & Constant67 --> Object68
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -30,17 +30,17 @@ graph TD
     Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant75 --> Lambda47
     Lambda50{{"Lambda[50∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant76 --> Lambda50
     Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object54 --> Lambda55
     Lambda60{{"Lambda[60∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(first_partᐳ"}}:::plan
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
     Constant77 --> Lambda60
     Lambda69{{"Lambda[69∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object68 --> Lambda69
     Lambda74{{"Lambda[74∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(third_partᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
     Constant78 --> Lambda74
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan

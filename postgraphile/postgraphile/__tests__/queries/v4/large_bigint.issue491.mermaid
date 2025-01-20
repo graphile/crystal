@@ -26,12 +26,12 @@ graph TD
     Access37 & Lambda50 & Lambda53 & Lambda86 & Lambda91 --> PgSelect39
     Object71{{"Object[71∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant68{{"Constant[68∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ{ s: Symbol(large_node_id), n: 'large_node_id', [Symbol(pg-sᐳ"}}:::plan
-    Constant56{{"Constant[56∈0] ➊<br />ᐸ{ name: 'largeNodeId', sqlType: { t: '”large_bigint”.”large_ᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸsql.identifier(”large_node_id”)ᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸRecordCodec(largeNodeId)ᐳ"}}:::plan
     Lambda50 & Constant68 & Constant69 & Constant56 --> Object71
     Object85{{"Object[85∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant82{{"Constant[82∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant83{{"Constant[83∈0] ➊<br />ᐸ{ s: Symbol(large_node_id), n: 'large_node_id', [Symbol(pg-sᐳ"}}:::plan
+    Constant83{{"Constant[83∈0] ➊<br />ᐸsql.identifier(”large_node_id”)ᐳ"}}:::plan
     Lambda50 & Constant82 & Constant83 & Constant56 --> Object85
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -57,20 +57,20 @@ graph TD
     First41 --> PgSelectSingle42
     Constant94{{"Constant[94∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant94 --> Lambda50
-    Constant95{{"Constant[95∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant95{{"Constant[95∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant95 --> Lambda53
     Object71 --> Lambda72
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(large_nodeᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”large_ᐳ"}}:::plan
     Constant97 --> Lambda77
     Object85 --> Lambda86
-    Constant98{{"Constant[98∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(large_nodeᐳ"}}:::plan
+    Constant98{{"Constant[98∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”large_ᐳ"}}:::plan
     Constant98 --> Lambda91
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant17{{"Constant[17∈0] ➊<br />ᐸ'large_node_ids'ᐳ"}}:::plan
-    Constant54{{"Constant[54∈0] ➊<br />ᐸ[ { codec: { name: 'int8', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ{ s: Symbol(large_node_id), n: 'large_node_id', [Symbol(pg-sᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    Constant54{{"Constant[54∈0] ➊<br />ᐸ[ { codec: Codec(int8), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸsql.identifier(”large_node_id”)ᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int8), fragment:ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸlarge_node_idᐳ"]]:::plan
     Lambda58{{"Lambda[58∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda63{{"Lambda[63∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

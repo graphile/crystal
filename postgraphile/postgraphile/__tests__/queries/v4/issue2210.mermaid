@@ -25,17 +25,17 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant8{{"Constant[8∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ s: Symbol(test_user), n: 'test_user', [Symbol(pg-sql2-typeᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ{ name: 'testUser', sqlType: { t: '”issue_2210”.”test_user”'ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸsql.identifier(”test_user”)ᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸRecordCodec(testUser)ᐳ"}}:::plan
     Constant65{{"Constant[65∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ{ s: Symbol(some_messages), n: 'some_messages', [Symbol(pg-sᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ name: 'testMessage', sqlType: { t: '”issue_2210”.”test_mesᐳ"}}:::plan
+    Constant66{{"Constant[66∈0] ➊<br />ᐸsql.identifier(”some_messages”)ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸRecordCodec(testMessage)ᐳ"}}:::plan
     Constant75{{"Constant[75∈0] ➊<br />ᐸ'0d126c0c-9710-478c-9aee-0be34b250573'ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant79{{"Constant[79∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(test_user)ᐳ"}}:::plan
-    Constant80{{"Constant[80∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(some_messaᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”test_uᐳ"}}:::plan
+    Constant80{{"Constant[80∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”some_mᐳ"}}:::plan
     Constant81{{"Constant[81∈0] ➊<br />ᐸ§{ first: 50, last: null, cursorLower: null, cursorUpper: nuᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 50, last: nuᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ first: 50, last: null, cursorLower: null, cursorUpper: nuᐳ"}}:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸsome_messages+1ᐳ"]]:::plan
     Lambda61{{"Lambda[61∈1] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Lambda64{{"Lambda[64∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan

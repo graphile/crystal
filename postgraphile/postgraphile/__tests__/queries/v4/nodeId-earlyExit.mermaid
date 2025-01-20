@@ -26,12 +26,12 @@ graph TD
     Access54 & Lambda63 & Lambda66 & Lambda113 & Lambda118 --> PgSelect56
     Object84{{"Object[84∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant81{{"Constant[81∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Lambda63 & Constant81 & Constant82 & Constant69 --> Object84
     Object112{{"Object[112∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant109{{"Constant[109∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant110{{"Constant[110∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
     Lambda63 & Constant109 & Constant110 & Constant69 --> Object112
     Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -57,28 +57,28 @@ graph TD
     First58 --> PgSelectSingle59
     Constant123{{"Constant[123∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant123 --> Lambda63
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant124{{"Constant[124∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant124 --> Lambda66
     Object84 --> Lambda85
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
+    Constant126{{"Constant[126∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
     Constant126 --> Lambda90
     Object112 --> Lambda113
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(person), nᐳ"}}:::plan
+    Constant128{{"Constant[128∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
     Constant128 --> Lambda118
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0] ➊<br />ᐸ15ᐳ"}}:::plan
     Constant23{{"Constant[23∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     Connection43{{"Connection[43∈0] ➊<br />ᐸ41ᐳ"}}:::plan
     Constant47{{"Constant[47∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant95{{"Constant[95∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ{ s: Symbol(post), n: 'post', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ{ name: 'post', sqlType: { t: '”a”.”post”', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant95{{"Constant[95∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
+    Constant97{{"Constant[97∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
     Constant119{{"Constant[119∈0] ➊<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
     Constant121{{"Constant[121∈0] ➊<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    Constant125{{"Constant[125∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant127{{"Constant[127∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Lambda71{{"Lambda[71∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda76{{"Lambda[76∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

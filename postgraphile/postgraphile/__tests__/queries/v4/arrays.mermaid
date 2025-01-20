@@ -22,17 +22,17 @@ graph TD
     Object10 & Lambda65 & Lambda70 & Lambda75 & Lambda65 & Lambda89 & Lambda94 & Lambda62 & Lambda65 & Lambda106 & Lambda111 --> PgSelect7
     Object69{{"Object[69∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant66{{"Constant[66∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ s: Symbol(frmcdc_compoundType), n: 'frmcdc_compound_type',ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ name: 'compoundType', sqlType: { t: '”c”.”compound_type”',ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸsql.identifier(”frmcdc_compound_type”)ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸRecordCodec(compoundType)ᐳ"}}:::plan
     Lambda62 & Constant66 & Constant67 & Constant68 --> Object69
     Object88{{"Object[88∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant85{{"Constant[85∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ{ s: Symbol(frmcdc_compoundType), n: 'frmcdc_compound_type',ᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸsql.identifier(”frmcdc_compound_type”)ᐳ"}}:::plan
     Lambda62 & Constant85 & Constant86 & Constant68 --> Object88
     Object105{{"Object[105∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant102{{"Constant[102∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant103{{"Constant[103∈0] ➊<br />ᐸ{ s: Symbol(lists), n: 'lists', [Symbol(pg-sql2-type-1)]: 'Iᐳ"}}:::plan
-    Constant104{{"Constant[104∈0] ➊<br />ᐸ{ name: 'lists', sqlType: { t: '”b”.”lists”', [Symbol(pg-sqlᐳ"}}:::plan
+    Constant103{{"Constant[103∈0] ➊<br />ᐸsql.identifier(”lists”)ᐳ"}}:::plan
+    Constant104{{"Constant[104∈0] ➊<br />ᐸRecordCodec(lists)ᐳ"}}:::plan
     Lambda62 & Constant102 & Constant103 & Constant104 --> Object105
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -42,16 +42,16 @@ graph TD
     __Value2 --> Access9
     Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant112 --> Lambda62
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant113 --> Lambda65
     Object69 --> Lambda70
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(frmcdc_comᐳ"}}:::plan
+    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
     Constant114 --> Lambda75
     Object88 --> Lambda89
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(frmcdc_comᐳ"}}:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
     Constant115 --> Lambda94
     Object105 --> Lambda106
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant116{{"Constant[116∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant116 --> Lambda111
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant60{{"Constant[60∈0] ➊<br />ᐸnullᐳ"}}:::plan

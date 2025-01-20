@@ -12,13 +12,13 @@ graph TD
     Object52{{"Object[52∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda45{{"Lambda[45∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ{ s: Symbol(organizations), n: 'organizations', [Symbol(pg-sᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ name: 'organizations', sqlType: { t: '”polymorphic”.”organᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸsql.identifier(”organizations”)ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸRecordCodec(organizations)ᐳ"}}:::plan
     Lambda45 & Constant49 & Constant50 & Constant51 --> Object52
     Object66{{"Object[66∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: '”polymorphic”.”people”', [Sᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Lambda45 & Constant63 & Constant64 & Constant65 --> Object66
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -30,24 +30,24 @@ graph TD
     Constant87{{"Constant[87∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant87 --> Lambda45
     Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant88 --> Lambda48
     Lambda53{{"Lambda[53∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object52 --> Lambda53
     Lambda58{{"Lambda[58∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(organizatiᐳ"}}:::plan
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”organiᐳ"}}:::plan
     Constant89 --> Lambda58
     Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object66 --> Lambda67
     Lambda72{{"Lambda[72∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant90 --> Lambda72
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ{ s: Symbol(log_entries), n: 'log_entries', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant79{{"Constant[79∈0] ➊<br />ᐸ{ name: 'logEntries', sqlType: { t: '”polymorphic”.”log_entrᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸsql.identifier(”log_entries”)ᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸRecordCodec(logEntries)ᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸlog_entriesᐳ"]]:::plan
     Lambda81{{"Lambda[81∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda86{{"Lambda[86∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

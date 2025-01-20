@@ -12,8 +12,8 @@ graph TD
     Object37{{"Object[37∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda30{{"Lambda[30∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant34{{"Constant[34∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ{ s: Symbol(left_arm_identity), n: 'left_arm_identity', [Symᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ{ name: 'leftArm', sqlType: { t: '”c”.”left_arm”', [Symbol(pᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸsql.identifier(”left_arm_identity”)ᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸRecordCodec(leftArm)ᐳ"}}:::plan
     Lambda30 & Constant34 & Constant35 & Constant36 --> Object37
     Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -25,12 +25,12 @@ graph TD
     Constant48{{"Constant[48∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant48 --> Lambda30
     Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant49 --> Lambda33
     Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object37 --> Lambda38
     Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(left_arm_iᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”left_aᐳ"}}:::plan
     Constant50 --> Lambda43
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant21{{"Constant[21∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan

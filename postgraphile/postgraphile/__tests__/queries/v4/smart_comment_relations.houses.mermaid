@@ -28,12 +28,12 @@ graph TD
     Access249 & Lambda265 & Lambda268 & Lambda591 & Lambda596 --> PgSelect251
     Object576{{"Object[576∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant573{{"Constant[573∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant574{{"Constant[574∈0] ➊<br />ᐸ{ s: Symbol(houses), n: 'houses', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant561{{"Constant[561∈0] ➊<br />ᐸ{ name: 'houses', sqlType: { t: '”smart_comment_relations”.”ᐳ"}}:::plan
+    Constant574{{"Constant[574∈0] ➊<br />ᐸsql.identifier(”houses”)ᐳ"}}:::plan
+    Constant561{{"Constant[561∈0] ➊<br />ᐸRecordCodec(houses)ᐳ"}}:::plan
     Lambda265 & Constant573 & Constant574 & Constant561 --> Object576
     Object590{{"Object[590∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant587{{"Constant[587∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant588{{"Constant[588∈0] ➊<br />ᐸ{ s: Symbol(houses), n: 'houses', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
+    Constant588{{"Constant[588∈0] ➊<br />ᐸsql.identifier(”houses”)ᐳ"}}:::plan
     Lambda265 & Constant587 & Constant588 & Constant561 --> Object590
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -56,13 +56,13 @@ graph TD
     First253 --> PgSelectSingle254
     Constant600{{"Constant[600∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant600 --> Lambda265
-    Constant601{{"Constant[601∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant601{{"Constant[601∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant601 --> Lambda268
     Object576 --> Lambda577
-    Constant620{{"Constant[620∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(houses), nᐳ"}}:::plan
+    Constant620{{"Constant[620∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”housesᐳ"}}:::plan
     Constant620 --> Lambda582
     Object590 --> Lambda591
-    Constant621{{"Constant[621∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(houses), nᐳ"}}:::plan
+    Constant621{{"Constant[621∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”housesᐳ"}}:::plan
     Constant621 --> Lambda596
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
@@ -72,64 +72,64 @@ graph TD
     Constant94{{"Constant[94∈0] ➊<br />ᐸ'properties'ᐳ"}}:::plan
     Constant263{{"Constant[263∈0] ➊<br />ᐸnullᐳ"}}:::plan
     Constant266{{"Constant[266∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Constant269{{"Constant[269∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant270{{"Constant[270∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
-    Constant271{{"Constant[271∈0] ➊<br />ᐸ{ name: 'buildings', sqlType: { t: '”smart_comment_relationsᐳ"}}:::plan
+    Constant269{{"Constant[269∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant270{{"Constant[270∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
+    Constant271{{"Constant[271∈0] ➊<br />ᐸRecordCodec(buildings)ᐳ"}}:::plan
     Constant288{{"Constant[288∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant289{{"Constant[289∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
-    Constant290{{"Constant[290∈0] ➊<br />ᐸ{ name: 'streets', sqlType: { t: '”smart_comment_relations”.ᐳ"}}:::plan
-    Constant304{{"Constant[304∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant305{{"Constant[305∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant289{{"Constant[289∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
+    Constant290{{"Constant[290∈0] ➊<br />ᐸRecordCodec(streets)ᐳ"}}:::plan
+    Constant304{{"Constant[304∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant305{{"Constant[305∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
     Constant323{{"Constant[323∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant324{{"Constant[324∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
-    Constant339{{"Constant[339∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant340{{"Constant[340∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant324{{"Constant[324∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
+    Constant339{{"Constant[339∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant340{{"Constant[340∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
     Constant358{{"Constant[358∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant359{{"Constant[359∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
+    Constant359{{"Constant[359∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
     Constant374{{"Constant[374∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant375{{"Constant[375∈0] ➊<br />ᐸ{ s: Symbol(properties), n: 'properties', [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant376{{"Constant[376∈0] ➊<br />ᐸ{ name: 'properties', sqlType: { t: '”smart_comment_relationᐳ"}}:::plan
+    Constant375{{"Constant[375∈0] ➊<br />ᐸsql.identifier(”properties”)ᐳ"}}:::plan
+    Constant376{{"Constant[376∈0] ➊<br />ᐸRecordCodec(properties)ᐳ"}}:::plan
     Constant390{{"Constant[390∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant391{{"Constant[391∈0] ➊<br />ᐸ{ s: Symbol(street_property), n: 'street_property', [Symbol(ᐳ"}}:::plan
-    Constant392{{"Constant[392∈0] ➊<br />ᐸ{ name: 'streetProperty', sqlType: { t: '”smart_comment_relaᐳ"}}:::plan
-    Constant406{{"Constant[406∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant407{{"Constant[407∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant391{{"Constant[391∈0] ➊<br />ᐸsql.identifier(”street_property”)ᐳ"}}:::plan
+    Constant392{{"Constant[392∈0] ➊<br />ᐸRecordCodec(streetProperty)ᐳ"}}:::plan
+    Constant406{{"Constant[406∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant407{{"Constant[407∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
     Constant425{{"Constant[425∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant426{{"Constant[426∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
+    Constant426{{"Constant[426∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
     Constant441{{"Constant[441∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant442{{"Constant[442∈0] ➊<br />ᐸ{ s: Symbol(properties), n: 'properties', [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant457{{"Constant[457∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant458{{"Constant[458∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant442{{"Constant[442∈0] ➊<br />ᐸsql.identifier(”properties”)ᐳ"}}:::plan
+    Constant457{{"Constant[457∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant458{{"Constant[458∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
     Constant476{{"Constant[476∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant477{{"Constant[477∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
-    Constant492{{"Constant[492∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant493{{"Constant[493∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant477{{"Constant[477∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
+    Constant492{{"Constant[492∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
+    Constant493{{"Constant[493∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
     Constant511{{"Constant[511∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant512{{"Constant[512∈0] ➊<br />ᐸ{ s: Symbol(streets), n: 'streets', [Symbol(pg-sql2-type-1)]ᐳ"}}:::plan
+    Constant512{{"Constant[512∈0] ➊<br />ᐸsql.identifier(”streets”)ᐳ"}}:::plan
     Constant527{{"Constant[527∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant528{{"Constant[528∈0] ➊<br />ᐸ{ s: Symbol(properties), n: 'properties', [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant528{{"Constant[528∈0] ➊<br />ᐸsql.identifier(”properties”)ᐳ"}}:::plan
     Constant543{{"Constant[543∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant544{{"Constant[544∈0] ➊<br />ᐸ{ s: Symbol(buildings), n: 'buildings', [Symbol(pg-sql2-typeᐳ"}}:::plan
-    Constant559{{"Constant[559∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant560{{"Constant[560∈0] ➊<br />ᐸ{ s: Symbol(houses), n: 'houses', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant602{{"Constant[602∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant603{{"Constant[603∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant604{{"Constant[604∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant605{{"Constant[605∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant606{{"Constant[606∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant607{{"Constant[607∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant608{{"Constant[608∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(propertiesᐳ"}}:::plan
-    Constant609{{"Constant[609∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(street_proᐳ"}}:::plan
-    Constant610{{"Constant[610∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant611{{"Constant[611∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant612{{"Constant[612∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(propertiesᐳ"}}:::plan
-    Constant613{{"Constant[613∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant614{{"Constant[614∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant615{{"Constant[615∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
-    Constant616{{"Constant[616∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(streets), ᐳ"}}:::plan
-    Constant617{{"Constant[617∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(propertiesᐳ"}}:::plan
-    Constant618{{"Constant[618∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(buildings)ᐳ"}}:::plan
-    Constant619{{"Constant[619∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    Constant544{{"Constant[544∈0] ➊<br />ᐸsql.identifier(”buildings”)ᐳ"}}:::plan
+    Constant559{{"Constant[559∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 102ᐳ"}}:::plan
+    Constant560{{"Constant[560∈0] ➊<br />ᐸsql.identifier(”houses”)ᐳ"}}:::plan
+    Constant602{{"Constant[602∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant603{{"Constant[603∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant604{{"Constant[604∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant605{{"Constant[605∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant606{{"Constant[606∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant607{{"Constant[607∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant608{{"Constant[608∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”properᐳ"}}:::plan
+    Constant609{{"Constant[609∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant610{{"Constant[610∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant611{{"Constant[611∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant612{{"Constant[612∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”properᐳ"}}:::plan
+    Constant613{{"Constant[613∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant614{{"Constant[614∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant615{{"Constant[615∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant616{{"Constant[616∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”streetᐳ"}}:::plan
+    Constant617{{"Constant[617∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”properᐳ"}}:::plan
+    Constant618{{"Constant[618∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”buildiᐳ"}}:::plan
+    Constant619{{"Constant[619∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸhousesᐳ"]]:::plan
     Lambda273{{"Lambda[273∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda278{{"Lambda[278∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan

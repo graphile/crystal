@@ -33,30 +33,30 @@ graph TD
     Object59{{"Object[59∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda52{{"Lambda[52∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant56{{"Constant[56∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant57{{"Constant[57∈0] ➊<br />ᐸ{ s: Symbol(post), n: 'post', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ{ name: 'post', sqlType: { t: '”a”.”post”', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
     Lambda52 & Constant56 & Constant57 & Constant58 --> Object59
     Object78{{"Object[78∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant75{{"Constant[75∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant76{{"Constant[76∈0] ➊<br />ᐸ{ s: Symbol(post), n: 'post', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
     Lambda72 & Constant75 & Constant76 & Constant58 --> Object78
     Object95{{"Object[95∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant92{{"Constant[92∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1168, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ{ s: Symbol(compound_key), n: 'compound_key', [Symbol(pg-sqlᐳ"}}:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ{ name: 'compoundKey', sqlType: { t: '”c”.”compound_key”', [ᐳ"}}:::plan
+    Constant93{{"Constant[93∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
+    Constant94{{"Constant[94∈0] ➊<br />ᐸRecordCodec(compoundKey)ᐳ"}}:::plan
     Lambda72 & Constant92 & Constant93 & Constant94 --> Object95
     Object112{{"Object[112∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant109{{"Constant[109∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1168, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ{ s: Symbol(compound_key), n: 'compound_key', [Symbol(pg-sqlᐳ"}}:::plan
+    Constant110{{"Constant[110∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
     Lambda72 & Constant109 & Constant110 & Constant94 --> Object112
     Object129{{"Object[129∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant126{{"Constant[126∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ{ s: Symbol(person), n: 'person', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant127{{"Constant[127∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
+    Constant128{{"Constant[128∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Lambda72 & Constant126 & Constant127 & Constant128 --> Object129
     Object143{{"Object[143∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant140{{"Constant[140∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1168, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant141{{"Constant[141∈0] ➊<br />ᐸ{ s: Symbol(compound_key), n: 'compound_key', [Symbol(pg-sqlᐳ"}}:::plan
+    Constant141{{"Constant[141∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
     Lambda72 & Constant140 & Constant141 & Constant94 --> Object143
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -66,29 +66,29 @@ graph TD
     __Value2 --> Access9
     Constant160{{"Constant[160∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant160 --> Lambda52
-    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
+    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant161 --> Lambda55
     Object59 --> Lambda60
-    Constant154{{"Constant[154∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant154{{"Constant[154∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant154 --> Lambda65
     Constant152{{"Constant[152∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant152 --> Lambda72
-    Constant153{{"Constant[153∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant153{{"Constant[153∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant153 --> Lambda74
     Object78 --> Lambda79
-    Constant155{{"Constant[155∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant155{{"Constant[155∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant155 --> Lambda84
     Object95 --> Lambda96
-    Constant156{{"Constant[156∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant156{{"Constant[156∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant156 --> Lambda101
     Object112 --> Lambda113
-    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant157{{"Constant[157∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant157 --> Lambda118
     Object129 --> Lambda130
-    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant158{{"Constant[158∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant158 --> Lambda135
     Object143 --> Lambda144
-    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: [Oᐳ"}}:::plan
+    Constant159{{"Constant[159∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
     Constant159 --> Lambda149
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸnullᐳ"}}:::plan

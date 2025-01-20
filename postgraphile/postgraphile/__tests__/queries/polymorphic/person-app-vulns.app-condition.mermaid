@@ -12,13 +12,13 @@ graph TD
     Object69{{"Object[69∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant66{{"Constant[66∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ{ s: Symbol(aws_applications), n: 'aws_applications', [Symboᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ{ name: 'awsApplications', sqlType: { t: '”polymorphic”.”awsᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸsql.identifier(”aws_applications”)ᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸRecordCodec(awsApplications)ᐳ"}}:::plan
     Lambda62 & Constant66 & Constant67 & Constant68 --> Object69
     Object83{{"Object[83∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant80{{"Constant[80∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ{ s: Symbol(gcp_applications), n: 'gcp_applications', [Symboᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ{ name: 'gcpApplications', sqlType: { t: '”polymorphic”.”gcpᐳ"}}:::plan
+    Constant81{{"Constant[81∈0] ➊<br />ᐸsql.identifier(”gcp_applications”)ᐳ"}}:::plan
+    Constant82{{"Constant[82∈0] ➊<br />ᐸRecordCodec(gcpApplications)ᐳ"}}:::plan
     Lambda62 & Constant80 & Constant81 & Constant82 --> Object83
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -36,27 +36,27 @@ graph TD
     Constant108{{"Constant[108∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant108 --> Lambda62
     Lambda65{{"Lambda[65∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant109{{"Constant[109∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant109{{"Constant[109∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant109 --> Lambda65
     Lambda70{{"Lambda[70∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object69 --> Lambda70
     Lambda75{{"Lambda[75∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(aws_applicᐳ"}}:::plan
+    Constant110{{"Constant[110∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”aws_apᐳ"}}:::plan
     Constant110 --> Lambda75
     Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object83 --> Lambda84
     Lambda89{{"Lambda[89∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(gcp_applicᐳ"}}:::plan
+    Constant111{{"Constant[111∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”gcp_apᐳ"}}:::plan
     Constant111 --> Lambda89
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ[ { codec: { name: 'int4', sqlType: [Object], fromPg: [Functᐳ"}}:::plan
-    Constant95{{"Constant[95∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: '”polymorphic”.”people”', [Sᐳ"}}:::plan
+    Constant94{{"Constant[94∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 102ᐳ"}}:::plan
+    Constant95{{"Constant[95∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Constant105{{"Constant[105∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant107{{"Constant[107∈0] ➊<br />ᐸ'AWfulS'ᐳ"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: [Object], fragment: [Oᐳ"}}:::plan
+    Constant112{{"Constant[112∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
     Constant113{{"Constant[113∈0] ➊<br />ᐸ§{ first: 4, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 4, last: nulᐳ"}}:::plan
+    Constant114{{"Constant[114∈0] ➊<br />ᐸ§{ first: 4, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
     Lambda91{{"Lambda[91∈1] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Lambda93{{"Lambda[93∈1] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan

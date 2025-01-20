@@ -29,16 +29,16 @@ graph TD
     Object10 & Constant29 & Lambda28 & Lambda31 & Lambda64 & Lambda69 --> PgSelect21
     Object35{{"Object[35∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant32{{"Constant[32∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ{ s: Symbol(unique_author_count), n: 'unique_author_count', ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ{ name: 'int4', sqlType: { t: '”int4”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant33{{"Constant[33∈0] ➊<br />ᐸsql.identifier(”unique_author_count”)ᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
     Lambda28 & Constant32 & Constant33 & Constant34 --> Object35
     Object49{{"Object[49∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ{ s: Symbol(unique_author_count), n: 'unique_author_count', ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸsql.identifier(”unique_author_count”)ᐳ"}}:::plan
     Lambda28 & Constant46 & Constant47 & Constant34 --> Object49
     Object63{{"Object[63∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant60{{"Constant[60∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ{ s: Symbol(unique_author_count), n: 'unique_author_count', ᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸsql.identifier(”unique_author_count”)ᐳ"}}:::plan
     Lambda28 & Constant60 & Constant61 & Constant34 --> Object63
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -66,16 +66,16 @@ graph TD
     PgSelectSingle24 --> PgClassExpression25
     Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant71 --> Lambda28
-    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant72 --> Lambda31
     Object35 --> Lambda36
-    Constant73{{"Constant[73∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(unique_autᐳ"}}:::plan
+    Constant73{{"Constant[73∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”uniqueᐳ"}}:::plan
     Constant73 --> Lambda41
     Object49 --> Lambda50
-    Constant74{{"Constant[74∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(unique_autᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”uniqueᐳ"}}:::plan
     Constant74 --> Lambda55
     Object63 --> Lambda64
-    Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(unique_autᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”uniqueᐳ"}}:::plan
     Constant75 --> Lambda69
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 

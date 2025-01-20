@@ -22,13 +22,13 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant16{{"Constant[16∈0] ➊<br />ᐸ'users'ᐳ"}}:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ{ s: Symbol(user), n: 'user', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ{ name: 'user', sqlType: { t: '”inheritence”.”user”', [Symboᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸsql.identifier(”user”)ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸRecordCodec(user)ᐳ"}}:::plan
     Constant59{{"Constant[59∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant60{{"Constant[60∈0] ➊<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
     Constant61{{"Constant[61∈0] ➊<br />ᐸ'foo.txt'ᐳ"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(user), n: ᐳ"}}:::plan
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”user”)ᐳ"}}:::plan
     PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸuser(id,name)ᐳ"]]:::sideeffectplan
     Object14 & Constant59 & Constant60 --> PgInsertSingle11
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan

@@ -19,17 +19,17 @@ graph TD
     Object10 & Constant204 & Lambda162 & Lambda165 & Lambda198 & Lambda203 --> PgSelect7
     Object169{{"Object[169∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant166{{"Constant[166∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant167{{"Constant[167∈0] ➊<br />ᐸ{ s: Symbol(people), n: 'people', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant168{{"Constant[168∈0] ➊<br />ᐸ{ name: 'people', sqlType: { t: 'interfaces_and_unions.peoplᐳ"}}:::plan
+    Constant167{{"Constant[167∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant168{{"Constant[168∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
     Lambda162 & Constant166 & Constant167 & Constant168 --> Object169
     Object183{{"Object[183∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant180{{"Constant[180∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant181{{"Constant[181∈0] ➊<br />ᐸ{ s: Symbol(single_table_items), n: 'single_table_items', [Sᐳ"}}:::plan
-    Constant182{{"Constant[182∈0] ➊<br />ᐸ{ name: 'single_table_items', sqlType: { t: 'interfaces_and_ᐳ"}}:::plan
+    Constant181{{"Constant[181∈0] ➊<br />ᐸsql.identifier(”single_table_items”)ᐳ"}}:::plan
+    Constant182{{"Constant[182∈0] ➊<br />ᐸRecordCodec(single_table_items)ᐳ"}}:::plan
     Lambda162 & Constant180 & Constant181 & Constant182 --> Object183
     Object197{{"Object[197∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant194{{"Constant[194∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant195{{"Constant[195∈0] ➊<br />ᐸ{ s: Symbol(single_table_items), n: 'single_table_items', [Sᐳ"}}:::plan
+    Constant195{{"Constant[195∈0] ➊<br />ᐸsql.identifier(”single_table_items”)ᐳ"}}:::plan
     Lambda162 & Constant194 & Constant195 & Constant182 --> Object197
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -49,20 +49,20 @@ graph TD
     PgClassExpression13 --> Lambda14
     Constant205{{"Constant[205∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant205 --> Lambda162
-    Constant206{{"Constant[206∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant206{{"Constant[206∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant206 --> Lambda165
     Lambda170{{"Lambda[170∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object169 --> Lambda170
     Lambda175{{"Lambda[175∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant207{{"Constant[207∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(people), nᐳ"}}:::plan
+    Constant207{{"Constant[207∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”peopleᐳ"}}:::plan
     Constant207 --> Lambda175
     Lambda184{{"Lambda[184∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object183 --> Lambda184
     Lambda189{{"Lambda[189∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant208{{"Constant[208∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(single_tabᐳ"}}:::plan
+    Constant208{{"Constant[208∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”singleᐳ"}}:::plan
     Constant208 --> Lambda189
     Object197 --> Lambda198
-    Constant209{{"Constant[209∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(single_tabᐳ"}}:::plan
+    Constant209{{"Constant[209∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”singleᐳ"}}:::plan
     Constant209 --> Lambda203
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan

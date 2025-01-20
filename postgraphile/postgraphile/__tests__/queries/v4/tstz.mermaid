@@ -19,8 +19,8 @@ graph TD
     Object10 & Constant33 & Lambda19 & Lambda22 & Lambda27 & Lambda32 --> PgSelect7
     Object26{{"Object[26∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant23{{"Constant[23∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ{ s: Symbol(range_test), n: 'range_test', [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ{ name: 'rangeTest', sqlType: { t: '”ranges”.”range_test”', ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸsql.identifier(”range_test”)ᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸRecordCodec(rangeTest)ᐳ"}}:::plan
     Lambda19 & Constant23 & Constant24 & Constant25 --> Object26
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -34,10 +34,10 @@ graph TD
     First11 --> PgSelectSingle12
     Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant34 --> Lambda19
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant35 --> Lambda22
     Object26 --> Lambda27
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(range_testᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”range_ᐳ"}}:::plan
     Constant36 --> Lambda32
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__range_test__.”tstz”ᐳ"}}:::plan

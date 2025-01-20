@@ -24,17 +24,17 @@ graph TD
     Object10 & Constant80 & Constant81 & Lambda34 & Lambda39 & Lambda44 & Lambda34 & Lambda58 & Lambda63 & Lambda31 & Lambda34 & Lambda74 & Lambda79 --> PgSelect7
     Object38{{"Object[38∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant35{{"Constant[35∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ{ s: Symbol(post_computed_compound_type_array), n: 'post_comᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ{ name: 'compoundType', sqlType: { t: '”c”.”compound_type”',ᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸsql.identifier(”post_computed_compound_type_array”)ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0] ➊<br />ᐸRecordCodec(compoundType)ᐳ"}}:::plan
     Lambda31 & Constant35 & Constant36 & Constant37 --> Object38
     Object57{{"Object[57∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant54{{"Constant[54∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ{ s: Symbol(post), n: 'post', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
-    Constant56{{"Constant[56∈0] ➊<br />ᐸ{ name: 'post', sqlType: { t: '”a”.”post”', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
     Lambda31 & Constant54 & Constant55 & Constant56 --> Object57
     Object73{{"Object[73∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant70{{"Constant[70∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant71{{"Constant[71∈0] ➊<br />ᐸ{ s: Symbol(post), n: 'post', [Symbol(pg-sql2-type-1)]: 'IDEᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
     Lambda31 & Constant70 & Constant71 & Constant56 --> Object73
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -48,16 +48,16 @@ graph TD
     First11 --> PgSelectSingle12
     Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant82 --> Lambda31
-    Constant83{{"Constant[83∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant83{{"Constant[83∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant83 --> Lambda34
     Object38 --> Lambda39
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(post_compuᐳ"}}:::plan
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”post_cᐳ"}}:::plan
     Constant84 --> Lambda44
     Object57 --> Lambda58
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(post), n: ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”post”)ᐳ"}}:::plan
     Constant85 --> Lambda63
     Object73 --> Lambda74
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(post), n: ᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”post”)ᐳ"}}:::plan
     Constant86 --> Lambda79
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant29{{"Constant[29∈0] ➊<br />ᐸnullᐳ"}}:::plan

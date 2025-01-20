@@ -28,21 +28,21 @@ graph TD
     Object10 & Constant100 & Constant13 & Lambda41 & Lambda46 & Lambda51 & Constant101 & Lambda41 & Lambda62 & Lambda67 & Constant39 & Lambda41 & Lambda78 & Lambda83 & Lambda38 & Lambda41 & Lambda94 & Lambda99 --> PgSelect7
     Object45{{"Object[45∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant42{{"Constant[42∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ{ s: Symbol(forums_unique_author_count), n: 'forums_unique_aᐳ"}}:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ{ name: 'int4', sqlType: { t: '”int4”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸsql.identifier(”forums_unique_author_count”)ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
     Lambda38 & Constant42 & Constant43 & Constant44 --> Object45
     Object61{{"Object[61∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant58{{"Constant[58∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ{ s: Symbol(forums_unique_author_count), n: 'forums_unique_aᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸsql.identifier(”forums_unique_author_count”)ᐳ"}}:::plan
     Lambda38 & Constant58 & Constant59 & Constant44 --> Object61
     Object77{{"Object[77∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant74{{"Constant[74∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant75{{"Constant[75∈0] ➊<br />ᐸ{ s: Symbol(forums_unique_author_count), n: 'forums_unique_aᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸsql.identifier(”forums_unique_author_count”)ᐳ"}}:::plan
     Lambda38 & Constant74 & Constant75 & Constant44 --> Object77
     Object93{{"Object[93∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant90{{"Constant[90∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant92{{"Constant[92∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda38 & Constant90 & Constant91 & Constant92 --> Object93
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -56,19 +56,19 @@ graph TD
     First11 --> PgSelectSingle12
     Constant102{{"Constant[102∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant102 --> Lambda38
-    Constant103{{"Constant[103∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant103{{"Constant[103∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant103 --> Lambda41
     Object45 --> Lambda46
-    Constant104{{"Constant[104∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_uniᐳ"}}:::plan
+    Constant104{{"Constant[104∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant104 --> Lambda51
     Object61 --> Lambda62
-    Constant105{{"Constant[105∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_uniᐳ"}}:::plan
+    Constant105{{"Constant[105∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant105 --> Lambda67
     Object77 --> Lambda78
-    Constant106{{"Constant[106∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums_uniᐳ"}}:::plan
+    Constant106{{"Constant[106∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant106 --> Lambda83
     Object93 --> Lambda94
-    Constant107{{"Constant[107∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
+    Constant107{{"Constant[107∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant107 --> Lambda99
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelectSingle20{{"PgSelectSingle[20∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan

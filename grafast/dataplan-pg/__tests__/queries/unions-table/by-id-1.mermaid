@@ -19,33 +19,33 @@ graph TD
     Object10 & Constant138 & Lambda54 & Lambda57 & Lambda132 & Lambda137 --> PgSelect7
     Object61{{"Object[61∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant58{{"Constant[58∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ{ s: Symbol(union_topics), n: 'union_topics', [Symbol(pg-sqlᐳ"}}:::plan
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ{ name: 'union_topics', sqlType: { t: 'interfaces_and_unionsᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸsql.identifier(”union_topics”)ᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸRecordCodec(union_topics)ᐳ"}}:::plan
     Lambda54 & Constant58 & Constant59 & Constant60 --> Object61
     Object75{{"Object[75∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant72{{"Constant[72∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant73{{"Constant[73∈0] ➊<br />ᐸ{ s: Symbol(union_posts), n: 'union_posts', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant74{{"Constant[74∈0] ➊<br />ᐸ{ name: 'union_posts', sqlType: { t: 'interfaces_and_unions.ᐳ"}}:::plan
+    Constant73{{"Constant[73∈0] ➊<br />ᐸsql.identifier(”union_posts”)ᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸRecordCodec(union_posts)ᐳ"}}:::plan
     Lambda54 & Constant72 & Constant73 & Constant74 --> Object75
     Object89{{"Object[89∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant86{{"Constant[86∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ{ s: Symbol(union_dividers), n: 'union_dividers', [Symbol(pgᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ{ name: 'union_dividers', sqlType: { t: 'interfaces_and_unioᐳ"}}:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸsql.identifier(”union_dividers”)ᐳ"}}:::plan
+    Constant88{{"Constant[88∈0] ➊<br />ᐸRecordCodec(union_dividers)ᐳ"}}:::plan
     Lambda54 & Constant86 & Constant87 & Constant88 --> Object89
     Object103{{"Object[103∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant100{{"Constant[100∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant101{{"Constant[101∈0] ➊<br />ᐸ{ s: Symbol(union_checklists), n: 'union_checklists', [Symboᐳ"}}:::plan
-    Constant102{{"Constant[102∈0] ➊<br />ᐸ{ name: 'union_checklists', sqlType: { t: 'interfaces_and_unᐳ"}}:::plan
+    Constant101{{"Constant[101∈0] ➊<br />ᐸsql.identifier(”union_checklists”)ᐳ"}}:::plan
+    Constant102{{"Constant[102∈0] ➊<br />ᐸRecordCodec(union_checklists)ᐳ"}}:::plan
     Lambda54 & Constant100 & Constant101 & Constant102 --> Object103
     Object117{{"Object[117∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant114{{"Constant[114∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ{ s: Symbol(union_checklist_items), n: 'union_checklist_itemᐳ"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ{ name: 'union_checklist_items', sqlType: { t: 'interfaces_aᐳ"}}:::plan
+    Constant115{{"Constant[115∈0] ➊<br />ᐸsql.identifier(”union_checklist_items”)ᐳ"}}:::plan
+    Constant116{{"Constant[116∈0] ➊<br />ᐸRecordCodec(union_checklist_items)ᐳ"}}:::plan
     Lambda54 & Constant114 & Constant115 & Constant116 --> Object117
     Object131{{"Object[131∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant128{{"Constant[128∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ{ s: Symbol(union_items), n: 'union_items', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant130{{"Constant[130∈0] ➊<br />ᐸ{ name: 'union_items', sqlType: { t: 'interfaces_and_unions.ᐳ"}}:::plan
+    Constant129{{"Constant[129∈0] ➊<br />ᐸsql.identifier(”union_items”)ᐳ"}}:::plan
+    Constant130{{"Constant[130∈0] ➊<br />ᐸRecordCodec(union_items)ᐳ"}}:::plan
     Lambda54 & Constant128 & Constant129 & Constant130 --> Object131
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -63,35 +63,35 @@ graph TD
     PgSelectSingle12 --> PgClassExpression13
     Constant139{{"Constant[139∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant139 --> Lambda54
-    Constant140{{"Constant[140∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant140{{"Constant[140∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant140 --> Lambda57
     Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object61 --> Lambda62
     Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant141{{"Constant[141∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_topiᐳ"}}:::plan
+    Constant141{{"Constant[141∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant141 --> Lambda67
     Lambda76{{"Lambda[76∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object75 --> Lambda76
     Lambda81{{"Lambda[81∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant142{{"Constant[142∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_postᐳ"}}:::plan
+    Constant142{{"Constant[142∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant142 --> Lambda81
     Lambda90{{"Lambda[90∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object89 --> Lambda90
     Lambda95{{"Lambda[95∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant143{{"Constant[143∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_diviᐳ"}}:::plan
+    Constant143{{"Constant[143∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant143 --> Lambda95
     Lambda104{{"Lambda[104∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object103 --> Lambda104
     Lambda109{{"Lambda[109∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant144{{"Constant[144∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_checᐳ"}}:::plan
+    Constant144{{"Constant[144∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant144 --> Lambda109
     Lambda118{{"Lambda[118∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object117 --> Lambda118
     Lambda123{{"Lambda[123∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant145{{"Constant[145∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_checᐳ"}}:::plan
+    Constant145{{"Constant[145∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant145 --> Lambda123
     Object131 --> Lambda132
-    Constant146{{"Constant[146∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(union_itemᐳ"}}:::plan
+    Constant146{{"Constant[146∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”union_ᐳ"}}:::plan
     Constant146 --> Lambda137
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic"]]:::plan

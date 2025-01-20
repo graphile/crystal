@@ -145,11 +145,11 @@ graph TD
     Lambda1667{{"Lambda[1667∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1672{{"Lambda[1672∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Constant1826 & Lambda1083 & Lambda1086 & Lambda1667 & Lambda1672 --> PgSelect1016
-    Object1408{{"Object[1408∈0] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
+    Object1408{{"Object[1408∈0] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
     Access387{{"Access[387∈0] ➊<br />ᐸ379.1ᐳ"}}:::plan
     Access385{{"Access[385∈0] ➊<br />ᐸ378.1ᐳ"}}:::plan
     Constant1323{{"Constant[1323∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Access387 & Access385 & Constant48 & Constant48 & Constant48 & Constant1323 --> Object1408
+    Constant48 & Constant48 & Access387 & Access385 & Constant48 & Constant1323 --> Object1408
     PgSelect981[["PgSelect[981∈0] ➊<br />ᐸno_args_queryᐳ"]]:::plan
     Lambda1624{{"Lambda[1624∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1629{{"Lambda[1629∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
@@ -164,105 +164,105 @@ graph TD
     Object10 & Lambda1083 & Lambda1086 & Lambda1695 & Lambda1700 --> PgSelect1037
     Object1090{{"Object[1090∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1087{{"Constant[1087∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1088{{"Constant[1088∈0] ➊<br />ᐸ{ s: Symbol(json_identity), n: 'json_identity', [Symbol(pg-sᐳ"}}:::plan
-    Constant1089{{"Constant[1089∈0] ➊<br />ᐸ{ name: 'json', sqlType: { t: '”json”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant1088{{"Constant[1088∈0] ➊<br />ᐸsql.identifier(”json_identity”)ᐳ"}}:::plan
+    Constant1089{{"Constant[1089∈0] ➊<br />ᐸCodec(json)ᐳ"}}:::plan
     Lambda1083 & Constant1087 & Constant1088 & Constant1089 --> Object1090
     Object1104{{"Object[1104∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1101{{"Constant[1101∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1102{{"Constant[1102∈0] ➊<br />ᐸ{ s: Symbol(jsonb_identity), n: 'jsonb_identity', [Symbol(pgᐳ"}}:::plan
-    Constant1103{{"Constant[1103∈0] ➊<br />ᐸ{ name: 'jsonb', sqlType: { t: '”jsonb”', [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant1102{{"Constant[1102∈0] ➊<br />ᐸsql.identifier(”jsonb_identity”)ᐳ"}}:::plan
+    Constant1103{{"Constant[1103∈0] ➊<br />ᐸCodec(jsonb)ᐳ"}}:::plan
     Lambda1083 & Constant1101 & Constant1102 & Constant1103 --> Object1104
     Object1118{{"Object[1118∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1115{{"Constant[1115∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1116{{"Constant[1116∈0] ➊<br />ᐸ{ s: Symbol(json_identity), n: 'json_identity', [Symbol(pg-sᐳ"}}:::plan
+    Constant1116{{"Constant[1116∈0] ➊<br />ᐸsql.identifier(”json_identity”)ᐳ"}}:::plan
     Lambda1083 & Constant1115 & Constant1116 & Constant1089 --> Object1118
     Object1132{{"Object[1132∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1129{{"Constant[1129∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1130{{"Constant[1130∈0] ➊<br />ᐸ{ s: Symbol(jsonb_identity), n: 'jsonb_identity', [Symbol(pgᐳ"}}:::plan
+    Constant1130{{"Constant[1130∈0] ➊<br />ᐸsql.identifier(”jsonb_identity”)ᐳ"}}:::plan
     Lambda1083 & Constant1129 & Constant1130 & Constant1103 --> Object1132
     Object1146{{"Object[1146∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1143{{"Constant[1143∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1144{{"Constant[1144∈0] ➊<br />ᐸ{ s: Symbol(add_1_query), n: 'add_1_query', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant1145{{"Constant[1145∈0] ➊<br />ᐸ{ name: 'int4', sqlType: { t: '”int4”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant1144{{"Constant[1144∈0] ➊<br />ᐸsql.identifier(”add_1_query”)ᐳ"}}:::plan
+    Constant1145{{"Constant[1145∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
     Lambda1083 & Constant1143 & Constant1144 & Constant1145 --> Object1146
     Object1160{{"Object[1160∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1157{{"Constant[1157∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1158{{"Constant[1158∈0] ➊<br />ᐸ{ s: Symbol(add_2_query), n: 'add_2_query', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant1158{{"Constant[1158∈0] ➊<br />ᐸsql.identifier(”add_2_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1157 & Constant1158 & Constant1145 --> Object1160
     Object1174{{"Object[1174∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1171{{"Constant[1171∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1172{{"Constant[1172∈0] ➊<br />ᐸ{ s: Symbol(add_3_query), n: 'add_3_query', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant1172{{"Constant[1172∈0] ➊<br />ᐸsql.identifier(”add_3_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1171 & Constant1172 & Constant1145 --> Object1174
     Object1188{{"Object[1188∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1185{{"Constant[1185∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1186{{"Constant[1186∈0] ➊<br />ᐸ{ s: Symbol(add_4_query), n: 'add_4_query', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant1186{{"Constant[1186∈0] ➊<br />ᐸsql.identifier(”add_4_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1185 & Constant1186 & Constant1145 --> Object1188
     Object1202{{"Object[1202∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1199{{"Constant[1199∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1200{{"Constant[1200∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_1), n: 'optional_missingᐳ"}}:::plan
+    Constant1200{{"Constant[1200∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_1”)ᐳ"}}:::plan
     Lambda1083 & Constant1199 & Constant1200 & Constant1145 --> Object1202
     Object1216{{"Object[1216∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1213{{"Constant[1213∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1214{{"Constant[1214∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_1), n: 'optional_missingᐳ"}}:::plan
+    Constant1214{{"Constant[1214∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_1”)ᐳ"}}:::plan
     Lambda1083 & Constant1213 & Constant1214 & Constant1145 --> Object1216
     Object1230{{"Object[1230∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1227{{"Constant[1227∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1228{{"Constant[1228∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_2), n: 'optional_missingᐳ"}}:::plan
+    Constant1228{{"Constant[1228∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_2”)ᐳ"}}:::plan
     Lambda1083 & Constant1227 & Constant1228 & Constant1145 --> Object1230
     Object1244{{"Object[1244∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1241{{"Constant[1241∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1242{{"Constant[1242∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_3), n: 'optional_missingᐳ"}}:::plan
+    Constant1242{{"Constant[1242∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_3”)ᐳ"}}:::plan
     Lambda1083 & Constant1241 & Constant1242 & Constant1145 --> Object1244
     Object1258{{"Object[1258∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1255{{"Constant[1255∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1256{{"Constant[1256∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_4), n: 'optional_missingᐳ"}}:::plan
+    Constant1256{{"Constant[1256∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_4”)ᐳ"}}:::plan
     Lambda1083 & Constant1255 & Constant1256 & Constant1145 --> Object1258
     Object1272{{"Object[1272∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1269{{"Constant[1269∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1270{{"Constant[1270∈0] ➊<br />ᐸ{ s: Symbol(optional_missing_middle_5), n: 'optional_missingᐳ"}}:::plan
+    Constant1270{{"Constant[1270∈0] ➊<br />ᐸsql.identifier(”optional_missing_middle_5”)ᐳ"}}:::plan
     Lambda1083 & Constant1269 & Constant1270 & Constant1145 --> Object1272
     Object1286{{"Object[1286∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1283{{"Constant[1283∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1284{{"Constant[1284∈0] ➊<br />ᐸ{ s: Symbol(types_query), n: 'types_query', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant1285{{"Constant[1285∈0] ➊<br />ᐸ{ name: 'bool', sqlType: { t: '”bool”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant1284{{"Constant[1284∈0] ➊<br />ᐸsql.identifier(”types_query”)ᐳ"}}:::plan
+    Constant1285{{"Constant[1285∈0] ➊<br />ᐸCodec(bool)ᐳ"}}:::plan
     Lambda1083 & Constant1283 & Constant1284 & Constant1285 --> Object1286
     Object1300{{"Object[1300∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1297{{"Constant[1297∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1298{{"Constant[1298∈0] ➊<br />ᐸ{ s: Symbol(types_query), n: 'types_query', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant1298{{"Constant[1298∈0] ➊<br />ᐸsql.identifier(”types_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1297 & Constant1298 & Constant1285 --> Object1300
     Object1314{{"Object[1314∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1311{{"Constant[1311∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1312{{"Constant[1312∈0] ➊<br />ᐸ{ s: Symbol(compound_type_query), n: 'compound_type_query', ᐳ"}}:::plan
-    Constant1313{{"Constant[1313∈0] ➊<br />ᐸ{ name: 'compoundType', sqlType: { t: '”c”.”compound_type”',ᐳ"}}:::plan
+    Constant1312{{"Constant[1312∈0] ➊<br />ᐸsql.identifier(”compound_type_query”)ᐳ"}}:::plan
+    Constant1313{{"Constant[1313∈0] ➊<br />ᐸRecordCodec(compoundType)ᐳ"}}:::plan
     Lambda1083 & Constant1311 & Constant1312 & Constant1313 --> Object1314
     Object1343{{"Object[1343∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1340{{"Constant[1340∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1341{{"Constant[1341∈0] ➊<br />ᐸ{ s: Symbol(compound_type_array_query), n: 'compound_type_arᐳ"}}:::plan
+    Constant1341{{"Constant[1341∈0] ➊<br />ᐸsql.identifier(”compound_type_array_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1340 & Constant1341 & Constant1313 --> Object1343
     Object1357{{"Object[1357∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1354{{"Constant[1354∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1355{{"Constant[1355∈0] ➊<br />ᐸ{ s: Symbol(table_query), n: 'table_query', [Symbol(pg-sql2-ᐳ"}}:::plan
-    Constant1356{{"Constant[1356∈0] ➊<br />ᐸ{ name: 'post', sqlType: { t: '”a”.”post”', [Symbol(pg-sql2-ᐳ"}}:::plan
+    Constant1355{{"Constant[1355∈0] ➊<br />ᐸsql.identifier(”table_query”)ᐳ"}}:::plan
+    Constant1356{{"Constant[1356∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
     Lambda1083 & Constant1354 & Constant1355 & Constant1356 --> Object1357
     Object1406{{"Object[1406∈0] ➊<br />ᐸ{first,last,cursorLower,cursorUpper}ᐳ"}}:::plan
     Constant48 & Constant48 & Access387 & Access385 --> Object1406
     Object1623{{"Object[1623∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1620{{"Constant[1620∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1621{{"Constant[1621∈0] ➊<br />ᐸ{ s: Symbol(no_args_query), n: 'no_args_query', [Symbol(pg-sᐳ"}}:::plan
+    Constant1621{{"Constant[1621∈0] ➊<br />ᐸsql.identifier(”no_args_query”)ᐳ"}}:::plan
     Lambda1083 & Constant1620 & Constant1621 & Constant1145 --> Object1623
     Object1666{{"Object[1666∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1663{{"Constant[1663∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1664{{"Constant[1664∈0] ➊<br />ᐸ{ s: Symbol(query_compound_type_array), n: 'query_compound_tᐳ"}}:::plan
+    Constant1664{{"Constant[1664∈0] ➊<br />ᐸsql.identifier(”query_compound_type_array”)ᐳ"}}:::plan
     Lambda1083 & Constant1663 & Constant1664 & Constant1313 --> Object1666
     Object1680{{"Object[1680∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1677{{"Constant[1677∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1678{{"Constant[1678∈0] ➊<br />ᐸ{ s: Symbol(query_text_array), n: 'query_text_array', [Symboᐳ"}}:::plan
-    Constant1679{{"Constant[1679∈0] ➊<br />ᐸ{ name: 'textArray', sqlType: { t: '”text”[]', [Symbol(pg-sqᐳ"}}:::plan
+    Constant1678{{"Constant[1678∈0] ➊<br />ᐸsql.identifier(”query_text_array”)ᐳ"}}:::plan
+    Constant1679{{"Constant[1679∈0] ➊<br />ᐸListCodecᐸtext[]ᐳ(textArray)ᐳ"}}:::plan
     Lambda1083 & Constant1677 & Constant1678 & Constant1679 --> Object1680
     Object1694{{"Object[1694∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant1691{{"Constant[1691∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1692{{"Constant[1692∈0] ➊<br />ᐸ{ s: Symbol(query_interval_array), n: 'query_interval_array'ᐳ"}}:::plan
-    Constant1693{{"Constant[1693∈0] ➊<br />ᐸ{ name: 'intervalArray', sqlType: { t: '”interval”[]', [Symbᐳ"}}:::plan
+    Constant1692{{"Constant[1692∈0] ➊<br />ᐸsql.identifier(”query_interval_array”)ᐳ"}}:::plan
+    Constant1693{{"Constant[1693∈0] ➊<br />ᐸListCodecᐸinterval[]ᐳ(intervalArray)ᐳ"}}:::plan
     Lambda1083 & Constant1691 & Constant1692 & Constant1693 --> Object1694
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -431,67 +431,67 @@ graph TD
     PgSelectSingle1040 --> PgClassExpression1041
     Constant1737{{"Constant[1737∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant1737 --> Lambda1083
-    Constant1738{{"Constant[1738∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant1738{{"Constant[1738∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant1738 --> Lambda1086
     Object1090 --> Lambda1091
-    Constant1762{{"Constant[1762∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(json_identᐳ"}}:::plan
+    Constant1762{{"Constant[1762∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”json_iᐳ"}}:::plan
     Constant1762 --> Lambda1096
     Object1104 --> Lambda1105
-    Constant1763{{"Constant[1763∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(jsonb_idenᐳ"}}:::plan
+    Constant1763{{"Constant[1763∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”jsonb_ᐳ"}}:::plan
     Constant1763 --> Lambda1110
     Object1118 --> Lambda1119
-    Constant1764{{"Constant[1764∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(json_identᐳ"}}:::plan
+    Constant1764{{"Constant[1764∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”json_iᐳ"}}:::plan
     Constant1764 --> Lambda1124
     Object1132 --> Lambda1133
-    Constant1765{{"Constant[1765∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(jsonb_idenᐳ"}}:::plan
+    Constant1765{{"Constant[1765∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”jsonb_ᐳ"}}:::plan
     Constant1765 --> Lambda1138
     Object1146 --> Lambda1147
-    Constant1766{{"Constant[1766∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(add_1_querᐳ"}}:::plan
+    Constant1766{{"Constant[1766∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”add_1_ᐳ"}}:::plan
     Constant1766 --> Lambda1152
     Object1160 --> Lambda1161
-    Constant1767{{"Constant[1767∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(add_2_querᐳ"}}:::plan
+    Constant1767{{"Constant[1767∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”add_2_ᐳ"}}:::plan
     Constant1767 --> Lambda1166
     Object1174 --> Lambda1175
-    Constant1768{{"Constant[1768∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(add_3_querᐳ"}}:::plan
+    Constant1768{{"Constant[1768∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”add_3_ᐳ"}}:::plan
     Constant1768 --> Lambda1180
     Object1188 --> Lambda1189
-    Constant1769{{"Constant[1769∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(add_4_querᐳ"}}:::plan
+    Constant1769{{"Constant[1769∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”add_4_ᐳ"}}:::plan
     Constant1769 --> Lambda1194
     Object1202 --> Lambda1203
-    Constant1770{{"Constant[1770∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1770{{"Constant[1770∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1770 --> Lambda1208
     Object1216 --> Lambda1217
-    Constant1771{{"Constant[1771∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1771{{"Constant[1771∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1771 --> Lambda1222
     Object1230 --> Lambda1231
-    Constant1772{{"Constant[1772∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1772{{"Constant[1772∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1772 --> Lambda1236
     Object1244 --> Lambda1245
-    Constant1773{{"Constant[1773∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1773{{"Constant[1773∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1773 --> Lambda1250
     Object1258 --> Lambda1259
-    Constant1774{{"Constant[1774∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1774{{"Constant[1774∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1774 --> Lambda1264
     Object1272 --> Lambda1273
-    Constant1775{{"Constant[1775∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(optional_mᐳ"}}:::plan
+    Constant1775{{"Constant[1775∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”optionᐳ"}}:::plan
     Constant1775 --> Lambda1278
     Object1286 --> Lambda1287
-    Constant1776{{"Constant[1776∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(types_querᐳ"}}:::plan
+    Constant1776{{"Constant[1776∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”types_ᐳ"}}:::plan
     Constant1776 --> Lambda1292
     Object1300 --> Lambda1301
-    Constant1777{{"Constant[1777∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(types_querᐳ"}}:::plan
+    Constant1777{{"Constant[1777∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”types_ᐳ"}}:::plan
     Constant1777 --> Lambda1306
     Object1314 --> Lambda1315
-    Constant1778{{"Constant[1778∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(compound_tᐳ"}}:::plan
+    Constant1778{{"Constant[1778∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
     Constant1778 --> Lambda1320
     Object1343 --> Lambda1344
-    Constant1780{{"Constant[1780∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(compound_tᐳ"}}:::plan
+    Constant1780{{"Constant[1780∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
     Constant1780 --> Lambda1349
     Object1357 --> Lambda1358
-    Constant1781{{"Constant[1781∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_querᐳ"}}:::plan
+    Constant1781{{"Constant[1781∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
     Constant1781 --> Lambda1363
     Lambda1367{{"Lambda[1367∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant1739{{"Constant[1739∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant1739{{"Constant[1739∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant1739 --> Lambda1367
     Lambda1407{{"Lambda[1407∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Object1406 --> Lambda1407
@@ -501,16 +501,16 @@ graph TD
     Constant1812{{"Constant[1812∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant1812 --> Lambda1477
     Object1623 --> Lambda1624
-    Constant1800{{"Constant[1800∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(no_args_quᐳ"}}:::plan
+    Constant1800{{"Constant[1800∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”no_argᐳ"}}:::plan
     Constant1800 --> Lambda1629
     Object1666 --> Lambda1667
-    Constant1803{{"Constant[1803∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(query_compᐳ"}}:::plan
+    Constant1803{{"Constant[1803∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
     Constant1803 --> Lambda1672
     Object1680 --> Lambda1681
-    Constant1804{{"Constant[1804∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(query_textᐳ"}}:::plan
+    Constant1804{{"Constant[1804∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
     Constant1804 --> Lambda1686
     Object1694 --> Lambda1695
-    Constant1805{{"Constant[1805∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(query_inteᐳ"}}:::plan
+    Constant1805{{"Constant[1805∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
     Constant1805 --> Lambda1700
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
@@ -522,14 +522,14 @@ graph TD
     Connection988{{"Connection[988∈0] ➊<br />ᐸ986ᐳ"}}:::plan
     Connection1051{{"Connection[1051∈0] ➊<br />ᐸ1049ᐳ"}}:::plan
     Constant1326{{"Constant[1326∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1327{{"Constant[1327∈0] ➊<br />ᐸ{ s: Symbol(compound_type_set_query), n: 'compound_type_set_ᐳ"}}:::plan
+    Constant1327{{"Constant[1327∈0] ➊<br />ᐸsql.identifier(”compound_type_set_query”)ᐳ"}}:::plan
     Constant1368{{"Constant[1368∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1369{{"Constant[1369∈0] ➊<br />ᐸ{ s: Symbol(table_set_query), n: 'table_set_query', [Symbol(ᐳ"}}:::plan
-    Constant1370{{"Constant[1370∈0] ➊<br />ᐸ{ name: 'person', sqlType: { t: '”c”.”person”', [Symbol(pg-sᐳ"}}:::plan
+    Constant1369{{"Constant[1369∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
+    Constant1370{{"Constant[1370∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
     Constant1382{{"Constant[1382∈0] ➊<br />ᐸ[ { attribute: 'person_full_name', direction: 'ASC' } ]ᐳ"}}:::plan
-    Constant1383{{"Constant[1383∈0] ➊<br />ᐸ{ s: Symbol(table_set_query), n: 'table_set_query', [Symbol(ᐳ"}}:::plan
+    Constant1383{{"Constant[1383∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
     Constant1396{{"Constant[1396∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1397{{"Constant[1397∈0] ➊<br />ᐸ{ s: Symbol(table_set_query), n: 'table_set_query', [Symbol(ᐳ"}}:::plan
+    Constant1397{{"Constant[1397∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
     Constant1410{{"Constant[1410∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1424{{"Constant[1424∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1438{{"Constant[1438∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
@@ -542,51 +542,51 @@ graph TD
     Constant1536{{"Constant[1536∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1550{{"Constant[1550∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1564{{"Constant[1564∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1565{{"Constant[1565∈0] ➊<br />ᐸ{ s: Symbol(table_set_query_plpgsql), n: 'table_set_query_plᐳ"}}:::plan
+    Constant1565{{"Constant[1565∈0] ➊<br />ᐸsql.identifier(”table_set_query_plpgsql”)ᐳ"}}:::plan
     Constant1578{{"Constant[1578∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1592{{"Constant[1592∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1593{{"Constant[1593∈0] ➊<br />ᐸ{ s: Symbol(int_set_query), n: 'int_set_query', [Symbol(pg-sᐳ"}}:::plan
+    Constant1593{{"Constant[1593∈0] ➊<br />ᐸsql.identifier(”int_set_query”)ᐳ"}}:::plan
     Constant1606{{"Constant[1606∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1635{{"Constant[1635∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1636{{"Constant[1636∈0] ➊<br />ᐸ{ s: Symbol(static_big_integer), n: 'static_big_integer', [Sᐳ"}}:::plan
-    Constant1637{{"Constant[1637∈0] ➊<br />ᐸ{ name: 'int8', sqlType: { t: '”int8”', [Symbol(pg-sql2-typeᐳ"}}:::plan
+    Constant1636{{"Constant[1636∈0] ➊<br />ᐸsql.identifier(”static_big_integer”)ᐳ"}}:::plan
+    Constant1637{{"Constant[1637∈0] ➊<br />ᐸCodec(int8)ᐳ"}}:::plan
     Constant1649{{"Constant[1649∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1705{{"Constant[1705∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant1706{{"Constant[1706∈0] ➊<br />ᐸ{ s: Symbol(query_interval_set), n: 'query_interval_set', [Sᐳ"}}:::plan
-    Constant1707{{"Constant[1707∈0] ➊<br />ᐸ{ name: 'interval', sqlType: { t: '”interval”', [Symbol(pg-sᐳ"}}:::plan
+    Constant1706{{"Constant[1706∈0] ➊<br />ᐸsql.identifier(”query_interval_set”)ᐳ"}}:::plan
+    Constant1707{{"Constant[1707∈0] ➊<br />ᐸCodec(interval)ᐳ"}}:::plan
     Constant1719{{"Constant[1719∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     Constant1754{{"Constant[1754∈0] ➊<br />ᐸ'Budd Deey'ᐳ"}}:::plan
-    Constant1779{{"Constant[1779∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(compound_tᐳ"}}:::plan
-    Constant1782{{"Constant[1782∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
+    Constant1779{{"Constant[1779∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
+    Constant1782{{"Constant[1782∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
     Constant1783{{"Constant[1783∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'person_full_name'ᐳ"}}:::plan
-    Constant1784{{"Constant[1784∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1785{{"Constant[1785∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1786{{"Constant[1786∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1787{{"Constant[1787∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1788{{"Constant[1788∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1789{{"Constant[1789∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1790{{"Constant[1790∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1791{{"Constant[1791∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1792{{"Constant[1792∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1793{{"Constant[1793∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1794{{"Constant[1794∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1795{{"Constant[1795∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1796{{"Constant[1796∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1797{{"Constant[1797∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(table_set_ᐳ"}}:::plan
-    Constant1798{{"Constant[1798∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(int_set_quᐳ"}}:::plan
-    Constant1799{{"Constant[1799∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(int_set_quᐳ"}}:::plan
-    Constant1801{{"Constant[1801∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(static_bigᐳ"}}:::plan
-    Constant1802{{"Constant[1802∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(static_bigᐳ"}}:::plan
-    Constant1806{{"Constant[1806∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(query_inteᐳ"}}:::plan
-    Constant1807{{"Constant[1807∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(query_inteᐳ"}}:::plan
+    Constant1784{{"Constant[1784∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1785{{"Constant[1785∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1786{{"Constant[1786∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1787{{"Constant[1787∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1788{{"Constant[1788∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1789{{"Constant[1789∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1790{{"Constant[1790∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1791{{"Constant[1791∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1792{{"Constant[1792∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1793{{"Constant[1793∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1794{{"Constant[1794∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1795{{"Constant[1795∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1796{{"Constant[1796∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1797{{"Constant[1797∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
+    Constant1798{{"Constant[1798∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”int_seᐳ"}}:::plan
+    Constant1799{{"Constant[1799∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”int_seᐳ"}}:::plan
+    Constant1801{{"Constant[1801∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”staticᐳ"}}:::plan
+    Constant1802{{"Constant[1802∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”staticᐳ"}}:::plan
+    Constant1806{{"Constant[1806∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
+    Constant1807{{"Constant[1807∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
     Constant1810{{"Constant[1810∈0] ➊<br />ᐸ§{ first: 5, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant1811{{"Constant[1811∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 5, last: nulᐳ"}}:::plan
-    Constant1813{{"Constant[1813∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
-    Constant1814{{"Constant[1814∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
-    Constant1815{{"Constant[1815∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
+    Constant1811{{"Constant[1811∈0] ➊<br />ᐸ§{ first: 5, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
+    Constant1813{{"Constant[1813∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
+    Constant1814{{"Constant[1814∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
+    Constant1815{{"Constant[1815∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     Constant1816{{"Constant[1816∈0] ➊<br />ᐸ§{ first: 6, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant1817{{"Constant[1817∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 6, last: nulᐳ"}}:::plan
-    Constant1818{{"Constant[1818∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: 2, last: nulᐳ"}}:::plan
+    Constant1817{{"Constant[1817∈0] ➊<br />ᐸ§{ first: 6, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
+    Constant1818{{"Constant[1818∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
     PgClassExpression160{{"PgClassExpression[160∈1] ➊<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
     PgSelectSingle159 --> PgClassExpression160
     PgClassExpression161{{"PgClassExpression[161∈1] ➊<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
@@ -1015,8 +1015,8 @@ graph TD
     Lambda1442{{"Lambda[1442∈38] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1447{{"Lambda[1447∈38] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection487 & Lambda378 & Constant1734 & Access385 & Lambda1435 & Lambda1437 & Lambda1442 & Lambda1447 --> PgSelect489
-    Object1436{{"Object[1436∈38] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Constant48 & Access385 & Constant48 & Constant1734 & Constant48 & Constant1323 --> Object1436
+    Object1436{{"Object[1436∈38] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant48 & Constant1734 & Constant48 & Access385 & Constant48 & Constant1323 --> Object1436
     Object527{{"Object[527∈38] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access521{{"Access[521∈38] ➊<br />ᐸ489.hasMoreᐳ"}}:::plan
     Constant46 & Constant1734 & Constant46 & Access521 --> Object527
@@ -1083,8 +1083,8 @@ graph TD
     Lambda1456{{"Lambda[1456∈43] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1461{{"Lambda[1461∈43] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection534 & Lambda378 & Constant1734 & Access385 & Lambda1449 & Lambda1451 & Lambda1456 & Lambda1461 --> PgSelect536
-    Object1450{{"Object[1450∈43] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Constant48 & Access385 & Constant1734 & Constant48 & Constant48 & Constant1323 --> Object1450
+    Object1450{{"Object[1450∈43] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant1734 & Constant48 & Constant48 & Access385 & Constant48 & Constant1323 --> Object1450
     Object574{{"Object[574∈43] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access568{{"Access[568∈43] ➊<br />ᐸ536.hasMoreᐳ"}}:::plan
     Constant1734 & Constant46 & Constant46 & Access568 --> Object574
@@ -1151,8 +1151,8 @@ graph TD
     Lambda1470{{"Lambda[1470∈48] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1475{{"Lambda[1475∈48] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection581 & Lambda379 & Constant1734 & Access387 & Lambda1463 & Lambda1465 & Lambda1470 & Lambda1475 --> PgSelect583
-    Object1464{{"Object[1464∈48] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Access387 & Constant48 & Constant1734 & Constant48 & Constant48 & Constant1323 --> Object1464
+    Object1464{{"Object[1464∈48] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant1734 & Constant48 & Access387 & Constant48 & Constant48 & Constant1323 --> Object1464
     Object621{{"Object[621∈48] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access615{{"Access[615∈48] ➊<br />ᐸ583.hasMoreᐳ"}}:::plan
     Constant1734 & Constant46 & Constant46 & Access615 --> Object621
@@ -1469,8 +1469,8 @@ graph TD
     Lambda1540{{"Lambda[1540∈73] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1545{{"Lambda[1545∈73] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection784 & Lambda785 & Constant1734 & Access791 & Lambda1533 & Lambda1535 & Lambda1540 & Lambda1545 --> PgSelect786
-    Object1534{{"Object[1534∈73] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Constant48 & Access791 & Constant48 & Constant1734 & Constant48 & Constant1323 --> Object1534
+    Object1534{{"Object[1534∈73] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant48 & Constant1734 & Constant48 & Access791 & Constant48 & Constant1323 --> Object1534
     Object824{{"Object[824∈73] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access818{{"Access[818∈73] ➊<br />ᐸ786.hasMoreᐳ"}}:::plan
     Constant46 & Constant1734 & Constant46 & Access818 --> Object824
@@ -1537,8 +1537,8 @@ graph TD
     Lambda1554{{"Lambda[1554∈78] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1559{{"Lambda[1559∈78] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection832 & Lambda785 & Constant1734 & Constant1733 & Access791 & Lambda1547 & Lambda1549 & Lambda1554 & Lambda1559 --> PgSelect834
-    Object1548{{"Object[1548∈78] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Access791 & Constant48 & Constant1734 & Constant48 & Constant1733 & Constant1323 --> Object1548
+    Object1548{{"Object[1548∈78] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant1734 & Constant48 & Access791 & Constant48 & Constant1733 & Constant1323 --> Object1548
     Object872{{"Object[872∈78] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access866{{"Access[866∈78] ➊<br />ᐸ834.hasMoreᐳ"}}:::plan
     Constant1734 & Constant46 & Constant1733 & Access866 --> Object872
@@ -1668,8 +1668,8 @@ graph TD
     Lambda1582{{"Lambda[1582∈88] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Lambda1587{{"Lambda[1587∈88] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object10 & Connection917 & Lambda918 & Constant1734 & Access924 & Lambda1575 & Lambda1577 & Lambda1582 & Lambda1587 --> PgSelect919
-    Object1576{{"Object[1576∈88] ➊<br />ᐸ{cursorLower,cursorUpper,first,last,offset,fetchOneExtra}ᐳ"}}:::plan
-    Access924 & Constant48 & Constant1734 & Constant48 & Constant48 & Constant1323 --> Object1576
+    Object1576{{"Object[1576∈88] ➊<br />ᐸ{first,last,cursorLower,cursorUpper,offset,fetchOneExtra}ᐳ"}}:::plan
+    Constant1734 & Constant48 & Access924 & Constant48 & Constant48 & Constant1323 --> Object1576
     Object957{{"Object[957∈88] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access951{{"Access[951∈88] ➊<br />ᐸ919.hasMoreᐳ"}}:::plan
     Constant1734 & Constant46 & Constant46 & Access951 --> Object957

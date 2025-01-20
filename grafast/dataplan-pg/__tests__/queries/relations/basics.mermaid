@@ -21,13 +21,13 @@ graph TD
     Object10 & Constant56 & Lambda29 & Lambda34 & Lambda39 & Lambda26 & Lambda29 & Lambda50 & Lambda55 --> PgSelect7
     Object33{{"Object[33∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant30{{"Constant[30∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ{ s: Symbol(forums), n: 'forums', [Symbol(pg-sql2-type-1)]: ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ{ name: 'forums', sqlType: { t: 'app_public.forums', [Symbolᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸsql.identifier(”forums”)ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸRecordCodec(forums)ᐳ"}}:::plan
     Lambda26 & Constant30 & Constant31 & Constant32 --> Object33
     Object49{{"Object[49∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Constant46{{"Constant[46∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ{ s: Symbol(messages), n: 'messages', [Symbol(pg-sql2-type-1ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ{ name: 'messages', sqlType: { t: 'app_public.messages', [Syᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸsql.identifier(”messages”)ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0] ➊<br />ᐸRecordCodec(messages)ᐳ"}}:::plan
     Lambda26 & Constant46 & Constant47 & Constant48 --> Object49
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -41,13 +41,13 @@ graph TD
     First11 --> PgSelectSingle12
     Constant57{{"Constant[57∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant57 --> Lambda26
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
     Constant58 --> Lambda29
     Object33 --> Lambda34
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(forums), nᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forumsᐳ"}}:::plan
     Constant59 --> Lambda39
     Object49 --> Lambda50
-    Constant60{{"Constant[60∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: { s: Symbol(messages),ᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”messagᐳ"}}:::plan
     Constant60 --> Lambda55
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
