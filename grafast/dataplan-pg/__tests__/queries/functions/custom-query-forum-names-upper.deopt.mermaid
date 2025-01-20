@@ -11,8 +11,16 @@ graph TD
     %% plan dependencies
     PgSelect6[["PgSelect[6∈0] ➊<br />ᐸforum_namesᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda21{{"Lambda[21∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Object9 & Lambda21 --> PgSelect6
+    Lambda20{{"Lambda[20∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Lambda23{{"Lambda[23∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Lambda28{{"Lambda[28∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object9 & Lambda20 & Lambda23 & Lambda28 & Lambda33 --> PgSelect6
+    Object27{{"Object[27∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸsql.identifier(”forum_names”)ᐳ"}}:::plan
+    Constant26{{"Constant[26∈0] ➊<br />ᐸCodec(text)ᐳ"}}:::plan
+    Lambda20 & Constant24 & Constant25 & Constant26 --> Object27
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
@@ -21,8 +29,13 @@ graph TD
     __Value2 --> Access8
     __ListTransform10[["__ListTransform[10∈0] ➊<br />ᐸeach:6ᐳ"]]:::plan
     PgSelect6 --> __ListTransform10
-    Constant22{{"Constant[22∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant22 --> Lambda21
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant34 --> Lambda20
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant35 --> Lambda23
+    Object27 --> Lambda28
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forum_ᐳ"}}:::plan
+    Constant36 --> Lambda33
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item11[/"__Item[11∈1]<br />ᐸ6ᐳ"\]:::itemplan
     PgSelect6 -.-> __Item11
@@ -42,9 +55,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 22, 9, 21<br />2: PgSelect[6]<br />3: __ListTransform[10]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 24, 25, 26, 34, 35, 36, 9, 20, 23, 27, 28, 33<br />2: PgSelect[6]<br />3: __ListTransform[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,__ListTransform10,Lambda21,Constant22 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,__ListTransform10,Lambda20,Lambda23,Constant24,Constant25,Constant26,Object27,Lambda28,Lambda33,Constant34,Constant35,Constant36 bucket0
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgClassExpression{1}ᐸ__forum_names__.vᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1

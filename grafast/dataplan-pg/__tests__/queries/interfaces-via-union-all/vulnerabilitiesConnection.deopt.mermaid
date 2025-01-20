@@ -9,6 +9,17 @@ graph TD
 
 
     %% plan dependencies
+    Object54{{"Object[54∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda47{{"Lambda[47∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸsql.identifier(”first_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸRecordCodec(first_party_vulnerabilities)ᐳ"}}:::plan
+    Lambda47 & Constant51 & Constant52 & Constant53 --> Object54
+    Object68{{"Object[68∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant66{{"Constant[66∈0] ➊<br />ᐸsql.identifier(”third_party_vulnerabilities”)ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸRecordCodec(third_party_vulnerabilities)ᐳ"}}:::plan
+    Lambda47 & Constant65 & Constant66 & Constant67 --> Object68
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,9 +27,21 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant51 --> Lambda48
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant75 --> Lambda47
+    Lambda50{{"Lambda[50∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant76 --> Lambda50
+    Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object54 --> Lambda55
+    Lambda60{{"Lambda[60∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
+    Constant77 --> Lambda60
+    Lambda69{{"Lambda[69∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object68 --> Lambda69
+    Lambda74{{"Lambda[74∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
+    Constant78 --> Lambda74
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     PgUnionAll14[["PgUnionAll[14∈1] ➊"]]:::plan
@@ -39,10 +62,10 @@ graph TD
     PgUnionAllSingle16 --> Access20
     PgSelect25[["PgSelect[25∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access24{{"Access[24∈4]<br />ᐸ23.0ᐳ"}}:::plan
-    Object12 & Access24 & Lambda48 --> PgSelect25
+    Object12 & Access24 & Lambda47 & Lambda50 & Lambda55 & Lambda60 --> PgSelect25
     PgSelect37[["PgSelect[37∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Access36{{"Access[36∈4]<br />ᐸ35.0ᐳ"}}:::plan
-    Object12 & Access36 & Lambda48 --> PgSelect37
+    Object12 & Access36 & Lambda47 & Lambda50 & Lambda69 & Lambda74 --> PgSelect37
     JSONParse23[["JSONParse[23∈4]<br />ᐸ20ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access20 --> JSONParse23
     JSONParse23 --> Access24
@@ -79,17 +102,17 @@ graph TD
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Lambda48,Constant51 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 48<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Lambda47,Lambda50,Constant51,Constant52,Constant53,Object54,Lambda55,Lambda60,Constant65,Constant66,Constant67,Object68,Lambda69,Lambda74,Constant75,Constant76,Constant77,Constant78 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 47, 50, 55, 60, 69, 74<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 48<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 47, 50, 55, 60, 69, 74<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgUnionAllSingle16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 12, 48<br /><br />ROOT PgUnionAllSingle{2}[16]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 12, 47, 50, 55, 60, 69, 74<br /><br />ROOT PgUnionAllSingle{2}[16]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor17,Access18,Access19,Access20,List21 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 20, 12, 48, 16<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[23], JSONParse[35]<br />ᐳ: Access[24], Access[36]<br />2: PgSelect[25], PgSelect[37]<br />ᐳ: 29, 30, 31, 32, 33, 34, 39, 40, 41, 42, 43, 44"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 20, 12, 47, 50, 55, 60, 69, 74, 16<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[23], JSONParse[35]<br />ᐳ: Access[24], Access[36]<br />2: PgSelect[25], PgSelect[37]<br />ᐳ: 29, 30, 31, 32, 33, 34, 39, 40, 41, 42, 43, 44"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,JSONParse23,Access24,PgSelect25,First29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,JSONParse35,Access36,PgSelect37,First39,PgSelectSingle40,PgClassExpression41,PgClassExpression42,PgClassExpression43,PgClassExpression44 bucket4
     Bucket0 --> Bucket1

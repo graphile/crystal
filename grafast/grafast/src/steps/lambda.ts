@@ -20,13 +20,13 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   isSyncAndSafe = false;
   allowMultipleOptimizations = true;
 
-  private planDep: number | null;
+  private depId: number | null;
   constructor(
     $plan: ExecutableStep<TIn> | null | undefined,
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
-    this.planDep = $plan != null ? this.addDependency($plan) : null;
+    this.depId = $plan != null ? this.addDependency($plan) : null;
     if ((fn as any).hasSideEffects) {
       this.hasSideEffects = true;
     } else if ((fn as any).isSyncAndSafe) {

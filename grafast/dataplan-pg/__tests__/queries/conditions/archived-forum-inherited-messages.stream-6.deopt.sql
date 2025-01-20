@@ -54,6 +54,16 @@ close __SNAPSHOT_CURSOR_1__
 
 commit; /*fake*/
 
+select /* NOTHING?! */
+from app_public.messages as __messages__
+where
+  (
+    (__messages__.archived_at is null) = ($1::"timestamptz" is null)
+  ) and (
+    __messages__."forum_id" = $2::"uuid"
+  )
+order by __messages__."id" asc;
+
 select
   (count(*))::text as "0"
 from app_public.messages as __messages__

@@ -372,9 +372,8 @@ export class StepTracker {
   ): number {
     const $dependency = options.step;
     if (!$dependency._isUnary) {
-      throw new Error(
-        `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
-      );
+      const { nonUnaryMessage = defaultNonUnaryMessage } = options;
+      throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
     return this.addStepDependency($dependent, options);
@@ -748,4 +747,11 @@ export class StepTracker {
     }
     this.lockedStepCount = this.stepCount;
   }
+}
+
+function defaultNonUnaryMessage(
+  $dependent: ExecutableStep,
+  $dependency: ExecutableStep,
+) {
+  return `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. See https://err.red/gud`;
 }

@@ -9,6 +9,12 @@ graph TD
 
 
     %% plan dependencies
+    Object28{{"Object[28∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda21{{"Lambda[21∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant26{{"Constant[26∈0] ➊<br />ᐸsql.identifier(”authenticate”)ᐳ"}}:::plan
+    Constant27{{"Constant[27∈0] ➊<br />ᐸRecordCodec(jwtToken)ᐳ"}}:::plan
+    Lambda21 & Constant25 & Constant26 & Constant27 --> Object28
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,15 +22,22 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Lambda22{{"Lambda[22∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant26 --> Lambda22
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant38 --> Lambda21
+    Lambda24{{"Lambda[24∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant39 --> Lambda24
+    Lambda29{{"Lambda[29∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object28 --> Lambda29
+    Lambda34{{"Lambda[34∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”authenᐳ"}}:::plan
+    Constant40 --> Lambda34
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    Object14 & Constant23 & Constant24 & Constant25 & Lambda22 --> PgSelect11
+    Object14 & Constant35 & Constant36 & Constant37 & Lambda21 & Lambda24 & Lambda29 & Lambda34 --> PgSelect11
     First15{{"First[15∈1] ➊"}}:::plan
     PgSelect11 --> First15
     PgSelectSingle16{{"PgSelectSingle[16∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
@@ -39,8 +52,8 @@ graph TD
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-bigNumbers"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Lambda22,Constant23,Constant24,Constant25,Constant26 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 23, 24, 25, 22<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: 15, 16, 17"):::bucket
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Lambda21,Lambda24,Constant25,Constant26,Constant27,Object28,Lambda29,Lambda34,Constant35,Constant36,Constant37,Constant38,Constant39,Constant40 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 35, 36, 37, 21, 24, 29, 34<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: 15, 16, 17"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectSingle16,Object17 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket

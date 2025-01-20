@@ -16,14 +16,30 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ§{ cursorLower: null, cursorUpper: null, first: null, last: ᐳ"}}:::plan
-    Constant43 --> Lambda40
+    Lambda39{{"Lambda[39∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant67 --> Lambda39
+    Lambda42{{"Lambda[42∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant68{{"Constant[68∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant68 --> Lambda42
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Connection27{{"Connection[27∈0] ➊<br />ᐸ25ᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸsql.identifier(”testview”)ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸRecordCodec(testview)ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ[ { attribute: 'col1', direction: 'DESC' } ]ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸsql.identifier(”testview”)ᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”testviᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col1', direction:ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object12 & Connection13 & Lambda40 --> PgSelect14
+    Lambda47{{"Lambda[47∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda52{{"Lambda[52∈1] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Connection13 & Lambda39 & Lambda42 & Lambda47 & Lambda52 --> PgSelect14
+    Object46{{"Object[46∈1] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda39 & Constant43 & Constant44 & Constant45 --> Object46
+    Object46 --> Lambda47
+    Constant69 --> Lambda52
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸtestviewᐳ"}}:::plan
@@ -41,7 +57,13 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression22
     PgSelect28[["PgSelect[28∈4] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object12 & Connection27 & Lambda40 --> PgSelect28
+    Lambda61{{"Lambda[61∈4] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Lambda66{{"Lambda[66∈4] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object12 & Connection27 & Lambda39 & Lambda42 & Lambda61 & Lambda66 --> PgSelect28
+    Object60{{"Object[60∈4] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda39 & Constant57 & Constant58 & Constant45 --> Object60
+    Object60 --> Lambda61
+    Constant70 --> Lambda66
     __Item29[/"__Item[29∈5]<br />ᐸ28ᐳ"\]:::itemplan
     PgSelect28 ==> __Item29
     PgSelectSingle30{{"PgSelectSingle[30∈5]<br />ᐸtestviewᐳ"}}:::plan
@@ -62,19 +84,19 @@ graph TD
     subgraph "Buckets for queries/v4/view"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection27,Lambda40,Constant43 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 40<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection27,Lambda39,Lambda42,Constant43,Constant44,Constant45,Constant57,Constant58,Constant67,Constant68,Constant69,Constant70 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 39, 42, 43, 44, 45, 69<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: <br />ᐳ: Object[46], Lambda[52], Lambda[47]<br />2: PgSelect[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14 bucket1
+    class Bucket1,PgSelect14,Object46,Lambda47,Lambda52 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgSelectSingle{2}ᐸtestviewᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor17,PgClassExpression18,List19,PgClassExpression20,PgClassExpression21,PgClassExpression22 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 27, 40<br /><br />ROOT Connectionᐸ25ᐳ[27]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 27, 39, 42, 57, 58, 45, 70<br /><br />ROOT Connectionᐸ25ᐳ[27]<br />1: <br />ᐳ: Object[60], Lambda[66], Lambda[61]<br />2: PgSelect[28]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect28 bucket4
+    class Bucket4,PgSelect28,Object60,Lambda61,Lambda66 bucket4
     Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ28ᐳ[29]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item29,PgSelectSingle30 bucket5

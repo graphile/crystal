@@ -4,6 +4,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
+import type { CustomInspectFunction } from "util";
 
 import type {
   PgBox,
@@ -180,6 +181,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       listCastFromPg,
       executor: null,
       isBinary,
+      [inspect.custom]: codecInspect,
     };
   };
 }
@@ -404,6 +406,19 @@ export type PgRecordTypeCodecSpec<
   isAnonymous?: boolean;
 };
 
+const codecInspect: CustomInspectFunction = function (this: PgCodec) {
+  const type = this.domainOfCodec
+    ? `DomainCodec<${this.domainOfCodec.name}>`
+    : this.arrayOfCodec
+    ? `ListCodec<${this.arrayOfCodec.name}[]>`
+    : this.rangeOfCodec
+    ? `RangeCodec<${this.rangeOfCodec.name}>`
+    : this.attributes
+    ? `RecordCodec`
+    : "Codec";
+  return `${type}(${this.name})`;
+};
+
 /**
  * Returns a PgCodec that represents a composite type (a type with
  * attributes).
@@ -448,6 +463,7 @@ export function recordCodec<
     description,
     extensions,
     executor,
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
@@ -709,6 +725,7 @@ export function listOfCodec<
         }
       : null),
     executor: innerCodec.executor,
+    [inspect.custom]: codecInspect,
   };
 
   if (!config) {
@@ -760,6 +777,7 @@ export function domainOfCodec<
     extensions,
     domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
     notNull: Boolean(notNull),
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
@@ -914,6 +932,7 @@ export function rangeOfCodec<
     },
     attributes: undefined,
     executor: innerCodec.executor,
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");

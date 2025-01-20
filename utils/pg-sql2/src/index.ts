@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
+import type { CustomInspectFunction } from "util";
 import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
@@ -32,10 +33,42 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const nodeInspect: CustomInspectFunction = function (
+  this: SQLNode,
+  depth,
+  options,
+) {
+  if (this[$$type] === "VALUE") {
+    if (depth < 0) {
+      return `sql.value(...)`;
+    }
+    return `sql.value(${inspect(this.v, {
+      ...options,
+      depth: options.depth == null ? null : options.depth - 1,
+    })})`;
+  } else if (this[$$type] === "RAW") {
+    return `sql\`${this.t}\``;
+  } else if (this[$$type] === "IDENTIFIER") {
+    return `sql.identifier(${JSON.stringify(this.n)})`;
+  } else {
+    return `sql{${this[$$type]}}`;
+  }
+};
+
+interface PgSQL2Proto {
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
+}
+
+const pgSQL2Proto: PgSQL2Proto = Object.assign(Object.create(null), {
+  [inspect.custom]: nodeInspect,
+});
+
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
@@ -47,6 +80,7 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "IDENTIFIER";
   /** symbol @internal */
   readonly s: symbol;
@@ -70,6 +104,7 @@ export type SQLRawValue =
  * compiled SQL statement.
  */
 export interface SQLValueNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "VALUE";
   /** value @internal */
   readonly v: SQLRawValue;
@@ -201,6 +236,7 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
     );
   }
   const newNode: SQLRawNode = {
+    __proto__: pgSQL2Proto,
     [$$type]: "RAW" as const,
     t: text,
   };
@@ -219,6 +255,7 @@ function makeIdentifierNode(
   n = getSymbolName(s),
 ): SQLIdentifierNode {
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
@@ -228,9 +265,10 @@ function makeIdentifierNode(
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
-    [$$type]: "VALUE" as const,
+    __proto__: pgSQL2Proto,
+    [$$type]: "VALUE",
     v: rawValue,
-  });
+  } as SQLValueNode);
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
