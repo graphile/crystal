@@ -1171,21 +1171,16 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       );
     }
 
+    /**
+     * If `last` is in use then we reverse the order from the database and then
+     * re-reverse it in JS-land.
+     */
     const shouldReverseOrder = getUnary<boolean>(
       values,
       this.shouldReverseOrderId,
     );
 
-    /**
-     * If `last` is in use then we reverse the order from the database and then
-     * re-reverse it in JS-land.
-     */
-    return {
-      first,
-      last,
-      offset,
-      shouldReverseOrder,
-    };
+    return { first, last, offset, shouldReverseOrder };
   }
 
   shouldReverseOrder() {
@@ -3070,9 +3065,7 @@ function getUnary<T>(
   values: ExecutionDetails["values"],
   stepId: number | null,
 ): T | undefined {
-  return stepId == null
-    ? undefined
-    : (values[stepId] as UnaryExecutionValue<T>).value;
+  return stepId == null ? undefined : (values[stepId].unaryValue() as T);
 }
 
 function calculateShouldReverseOrder(params: {
@@ -3113,7 +3106,7 @@ function reverseIfNecessary(params: {
     }
     return orderedRows;
   } else {
-    return shouldReverseOrder ? [...rows].reverse() : rows;
+    return shouldReverseOrder ? reverseArray(rows) : rows;
   }
 }
 
