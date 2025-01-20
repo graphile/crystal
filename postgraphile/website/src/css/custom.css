@@ -44,6 +44,7 @@ figure {
 
 figure p {
   margin: 0;
+  text-align: center;
 }
 
 figure figcaption {

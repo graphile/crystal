@@ -20,8 +20,16 @@ the standard GraphQL subscriptions interface — simply change your `query` to a
 ([available on GitHub](https://github.com/graphile/livesotope)) showing
 real-time points rankings of fictional players:
 
+<figure>
+
 ![Changing a query to a live query](./query2subscription.png)
+
+</figure>
+<figure>
+
 ![Demo of live query](./live_demo_rankings.gif)
+
+</figure>
 
 Live queries are an incredibly powerful tool for frontend developers, as it
 means they don’t need to worry about monitoring for changes in the data — they
