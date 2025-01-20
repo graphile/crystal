@@ -8,7 +8,6 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   GrafastResultStreamList,
-  InputStep,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
