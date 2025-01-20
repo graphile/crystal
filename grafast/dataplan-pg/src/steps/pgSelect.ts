@@ -2211,10 +2211,12 @@ ${lateralText};`;
     const $shouldReverseOrder = this.shouldReverseOrder();
     this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
     // This cannot be done in deduplicate because setting fetchOneExtra comes later.
-    const $limitAndOffsets = this.planLimitAndOffsets();
-    this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
-    this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
-    this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(null));
+    operationPlan().withRootLayerPlan(() => {
+      const $limitAndOffsets = this.planLimitAndOffsets();
+      this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
+      this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
+      this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(null));
+    });
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the

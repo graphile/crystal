@@ -21,6 +21,7 @@ import {
   first,
   isPromiseLike,
   list,
+  operationPlan,
   polymorphicWrap,
   reverseArray,
   SafeError,
@@ -1298,9 +1299,11 @@ and ${condition(i + 1)}`}
 
     const $shouldReverseOrder = this.shouldReverseOrder();
     this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
-    const $limitAndOffsets = this.planLimitAndOffsets();
-    this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
-    this.innerLimitSQL = this.deferredSQL(access($limitAndOffsets, 1));
+    operationPlan().withRootLayerPlan(() => {
+      const $limitAndOffsets = this.planLimitAndOffsets();
+      this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
+      this.innerLimitSQL = this.deferredSQL(access($limitAndOffsets, 1));
+    });
 
     return this;
   }
