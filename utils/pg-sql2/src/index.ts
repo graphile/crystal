@@ -460,7 +460,7 @@ export function compile(
     const sqlFragments: string[] = [];
 
     const trustedInput =
-      untrustedInput[$$type] !== undefined
+      untrustedInput?.[$$type] !== undefined
         ? untrustedInput
         : enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
@@ -472,7 +472,7 @@ export function compile(
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
       const itemAtIndex = items[itemIndex];
       const item =
-        itemAtIndex[$$type] !== undefined
+        itemAtIndex?.[$$type] !== undefined
           ? itemAtIndex
           : enforceValidNode(itemAtIndex as SQLNode, `item ${itemIndex}`);
       switch (item[$$type]) {
@@ -640,7 +640,7 @@ const sqlBase = function sql(
     if (i < l - 1) {
       const rawVal = values[i];
       const valid: SQL =
-        rawVal[$$type] !== undefined
+        rawVal?.[$$type] !== undefined
           ? (rawVal as SQL)
           : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
@@ -828,7 +828,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
   } else if (items.length === 1) {
     const rawNode = items[0];
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${0}`);
     return node;
@@ -841,7 +841,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
