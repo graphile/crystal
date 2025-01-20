@@ -33,16 +33,45 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const nodeInspect: CustomInspectFunction = function (
+  this: SQLNode,
+  depth,
+  options,
+) {
+  if (this[$$type] === "VALUE") {
+    if (depth < 0) {
+      return `sql.value(...)`;
+    }
+    return `sql.value(${inspect(this.v, {
+      ...options,
+      depth: options.depth == null ? null : options.depth - 1,
+    })})`;
+  } else if (this[$$type] === "RAW") {
+    return `sql\`${this.t}\``;
+  } else if (this[$$type] === "IDENTIFIER") {
+    return `sql.identifier(${JSON.stringify(this.n)})`;
+  } else {
+    return `sql{${this[$$type]}}`;
+  }
+};
+
+interface PgSQL2Proto {
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
+}
+
+const pgSQL2Proto: PgSQL2Proto = Object.assign(Object.create(null), {
+  [inspect.custom]: nodeInspect,
+});
+
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
-
-  /** @internal */
-  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -51,14 +80,12 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "IDENTIFIER";
   /** symbol @internal */
   readonly s: symbol;
   /** name @internal */
   readonly n: string;
-
-  /** @internal */
-  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -77,12 +104,10 @@ export type SQLRawValue =
  * compiled SQL statement.
  */
 export interface SQLValueNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "VALUE";
   /** value @internal */
   readonly v: SQLRawValue;
-
-  /** @internal */
-  [inspect.custom]?: CustomInspectFunction;
 }
 
 /**
@@ -198,10 +223,6 @@ export function escapeSqlIdentifier(str: string): string {
   return `"${str.replace(/["\0]/g, '""')}"`;
 }
 
-const rawNodeInspect: CustomInspectFunction = function (this: SQLRawNode) {
-  return `sql\`${this.t}\``;
-};
-
 function makeRawNode(text: string, exportName?: string): SQLRawNode {
   const n = CACHE_RAW_NODES.get(text);
   if (n) {
@@ -215,9 +236,9 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
     );
   }
   const newNode: SQLRawNode = {
+    __proto__: pgSQL2Proto,
     [$$type]: "RAW" as const,
     t: text,
-    [inspect.custom]: rawNodeInspect,
   };
   if (exportName) {
     exportAs(newNode, exportName);
@@ -228,45 +249,25 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   return newNode;
 }
 
-const identifierNodeInspect: CustomInspectFunction = function (
-  this: SQLIdentifierNode,
-) {
-  return `sql.identifier(${JSON.stringify(this.n)})`;
-};
-
 // Simple function to help V8 optimize it.
 function makeIdentifierNode(
   s: symbol,
   n = getSymbolName(s),
 ): SQLIdentifierNode {
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
-    [inspect.custom]: identifierNodeInspect,
   });
 }
-
-const valueNodeInspect: CustomInspectFunction = function (
-  this: SQLValueNode,
-  depth,
-  options,
-) {
-  if (depth < 0) {
-    return `sql.value(...)`;
-  }
-  return `sql.value(${inspect(this.v, {
-    ...options,
-    depth: options.depth == null ? null : options.depth - 1,
-  })})`;
-};
 
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "VALUE",
     v: rawValue,
-    [inspect.custom]: valueNodeInspect,
   } as SQLValueNode);
 }
 
