@@ -1,8 +1,10 @@
 ---
 layout: page
 path: /postgraphile/function-restrictions/
-title: Database Function Restrictions
+title: Function Restrictions
 ---
+
+# Database Function Restrictions
 
 PostGraphile supports a wide range of PostgreSQL functions; however we do not
 support:

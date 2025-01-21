@@ -1,8 +1,10 @@
 ---
 layout: page
 path: /postgraphile/node-id/
-title: Globally Unique Object Identification ("id" / "nodeId")
+title: nodeID / id
 ---
+
+# Globally Unique Object Identification ("id" / "nodeId")
 
 The [GraphQL Global Object Identification
 Specification](https://facebook.github.io/relay/graphql/objectidentification.htm)

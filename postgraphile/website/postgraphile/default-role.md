@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/default-role/
-title: Default role
+title: The Default Role
 ---
 
 PostGraphile V5 doesn't have a "default role" any more, but you can indicate a

@@ -1,8 +1,8 @@
 ---
-title: Database Smart Comments
+title: Smart Comments
 ---
 
-# Smart Comments
+# Database Smart Comments
 
 _Ensure you've read the [Smart Tags](./smart-tags) page before referring here._
 

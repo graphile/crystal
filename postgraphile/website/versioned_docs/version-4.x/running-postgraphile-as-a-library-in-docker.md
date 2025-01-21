@@ -1,5 +1,5 @@
 ---
-title: Running PostGraphile as a library in Docker
+title: Running PostGraphile as a Library in Docker
 ---
 
 The following guide describes how to run a network of Docker containers on a
@@ -38,7 +38,7 @@ by PostGraphile to connect to the PostgreSQL database. Note the `DATABASE_URL`
 follows the syntax `postgres://<user>:<password>@db:5432/<db_name>`.
 
 ```
-[...]
+[...]ini
 # GRAPHQL
 # Parameters used by graphql container
 DATABASE_URL=postgres://postgres:change_me@db:5432/forum_example

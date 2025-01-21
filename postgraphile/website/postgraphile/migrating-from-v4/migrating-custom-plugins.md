@@ -1,10 +1,10 @@
 ---
-title: "Custom plugins"
+title: "Custom Plugins"
 toc_min_heading_level: 2
 toc_max_heading_level: 4
 ---
 
-# Migrating custom plugins
+# Migrating Custom Plugins
 
 If you've written some PostGraphile V4 plugins by hand (not using one of the
 `make...Plugin` helpers) then this migration guide is for you. We'll step you

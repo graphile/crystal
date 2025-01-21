@@ -1,10 +1,12 @@
 ---
 layout: page
 path: /postgraphile/subscriptions/
-title: GraphQL Subscriptions
+title: Subscriptions
 ---
 
 import styles from "@site/src/css/common.module.css";
+
+# GraphQL Subscriptions
 
 <p className={styles.intro}>
 

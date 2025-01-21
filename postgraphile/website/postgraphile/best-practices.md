@@ -1,8 +1,10 @@
 ---
 layout: page
 path: /postgraphile/best-practices/
-title: PostGraphile best practices
+title: Best Practices
 ---
+
+# PostGraphile Best Practices
 
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or

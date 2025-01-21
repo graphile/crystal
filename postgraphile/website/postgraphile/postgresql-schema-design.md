@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/postgresql-schema-design/
-title: PostgreSQL schema design
+title: PostgreSQL Schema Design
 ---
 
 import TOCInline from '@theme/TOCInline';
