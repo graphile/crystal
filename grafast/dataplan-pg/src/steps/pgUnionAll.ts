@@ -55,6 +55,7 @@ import { PgConditionStep } from "./pgCondition.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
+import { PgQueryBuilderStep } from "./pgQueryBuilder.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
@@ -91,24 +92,6 @@ function add([a, b]: readonly [a: number, b: number]): number {
   return a + b;
 }
 add.isSyncAndSafe = true;
-
-type PgUnionAllStepSelect<TAttributes extends string> =
-  | { type: "pk" }
-  | { type: "type" }
-  | { type: "order"; orderIndex: number }
-  | {
-      type: "attribute";
-      attribute: TAttributes;
-    }
-  | {
-      type: "expression";
-      expression: SQL;
-      codec: PgCodec;
-    }
-  | {
-      type: "outerExpression";
-      expression: SQL;
-    };
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
@@ -425,10 +408,12 @@ export class PgUnionAllStep<
 
   public isSyncAndSafe = false;
 
+  /**
+   * Aids in debugging.
+   */
+  private readonly name: string | undefined;
   public symbol: symbol;
   public alias: SQL;
-
-  private selects: PgUnionAllStepSelect<TAttributes>[];
 
   private executor!: PgExecutor;
   private contextId!: number;
@@ -511,6 +496,8 @@ export class PgUnionAllStep<
    */
   public forceIdentity: boolean;
 
+  protected queryBuilderDepId: number;
+
   constructor(
     cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
     mode?: PgUnionAllMode,
@@ -523,13 +510,24 @@ export class PgUnionAllStep<
     overrideMode?: PgUnionAllMode,
   ) {
     super();
-    if (specOrCloneFrom instanceof PgUnionAllStep) {
-      const cloneFrom = specOrCloneFrom;
-      this.symbol = cloneFrom.symbol;
-      this.alias = cloneFrom.alias;
-      this.mode = overrideMode ?? cloneFrom.mode ?? "normal";
-      const cloneFromMatchingMode =
-        cloneFrom.mode === this.mode ? cloneFrom : null;
+    const [cloneFrom, spec] =
+      specOrCloneFrom instanceof PgUnionAllStep
+        ? [specOrCloneFrom, null]
+        : [null, specOrCloneFrom];
+    this.name = cloneFrom?.name ?? spec?.name;
+    this.symbol = cloneFrom?.symbol ?? Symbol(spec?.name ?? "union");
+    this.alias = cloneFrom?.alias ?? sql.identifier(this.symbol);
+    this.mode = overrideMode ?? cloneFrom?.mode ?? "normal";
+
+    const $queryBuilder = cloneFrom
+      ? PgQueryBuilderStep.clone(cloneFrom.getQueryBuilder(), this.mode)
+      : new PgQueryBuilderStep(this.alias, this.mode);
+    this.queryBuilderDepId = this.addDependency($queryBuilder);
+
+    const cloneFromMatchingMode =
+      cloneFrom?.mode === this.mode ? cloneFrom : null;
+
+    if (cloneFrom) {
       this.spec = cloneFrom.spec;
       this.memberDigests = cloneDigests(cloneFrom.memberDigests);
       this._limitToTypes = cloneFrom._limitToTypes
@@ -655,8 +653,6 @@ export class PgUnionAllStep<
             resource,
           }),
         );
-      this.symbol = Symbol(spec.name ?? "union");
-      this.alias = sql.identifier(this.symbol);
 
       this.selects = [];
       this.placeholders = [];
@@ -791,6 +787,10 @@ on (${sql.indent(
     });
   }
 
+  public getQueryBuilder(): PgQueryBuilderStep {
+    return this.getDep(this.queryBuilderDepId) as PgQueryBuilderStep;
+  }
+
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
@@ -808,73 +808,43 @@ on (${sql.indent(
     ) {
       throw new Error(`Attribute '${key}' unknown`);
     }
-    const existingIndex = this.selects.findIndex(
-      (s) => s.type === "attribute" && s.attribute === key,
-    );
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index =
-      this.selects.push({
-        type: "attribute",
-        attribute: key,
-      }) - 1;
-    return index;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "attribute",
+      attribute: key,
+    });
   }
 
   selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
-    const fragment = this.scopedSQL(rawFragment);
-    const existingIndex = this.selects.findIndex(
-      (s) =>
-        s.type === "outerExpression" &&
-        sql.isEquivalent(s.expression, fragment),
-    );
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index =
-      this.selects.push({
-        type: "outerExpression",
-        expression: fragment,
-      }) - 1;
-    return index;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "outerExpression",
+      expression: this.scopedSQL(rawFragment),
+    });
   }
 
   selectPk(): number {
-    const existingIndex = this.selects.findIndex((s) => s.type === "pk");
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index = this.selects.push({ type: "pk" }) - 1;
-    return index;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "pk",
+    });
   }
 
   selectExpression(
     rawExpression: PgSQLCallbackOrDirect<SQL>,
     codec: PgCodec,
   ): number {
-    const expression = this.scopedSQL(rawExpression);
-    const existingIndex = this.selects.findIndex(
-      (s) =>
-        s.type === "expression" && sql.isEquivalent(s.expression, expression),
-    );
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index =
-      this.selects.push({ type: "expression", expression, codec }) - 1;
-    return index;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "expression",
+      expression: this.scopedSQL(rawExpression),
+      codec,
+    });
   }
 
   selectType(): number {
-    const existingIndex = this.selects.findIndex((s) => s.type === "type");
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index = this.selects.push({ type: "type" }) - 1;
-    return index;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "type",
+    });
   }
 
+  /*
   selectOrderValue(orderIndex: number): number {
     const orders = this.getOrderByWithoutType();
     const order = orders[orderIndex];
@@ -884,6 +854,7 @@ on (${sql.indent(
     // Order is already selected
     return this.orderSelectIndex[orderIndex];
   }
+  */
 
   /**
    * If this plan may only return one record, you can use `.singleAsRecord()`

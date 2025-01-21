@@ -64,6 +64,8 @@ import type {
 import { PgConditionStep } from "./pgCondition.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
+import type { QueryBuilder, QueryBuilderSelect } from "./pgQueryBuilder.js";
+import { PgQueryBuilderStep } from "./pgQueryBuilder.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
@@ -302,6 +304,8 @@ export class PgSelectStep<
    * map are the symbols of PgSelects that don't exist any more, the values are
    * symbols of the PgSelects that they were replaced with (which might also not
    * exist in future, but we follow the chain so it's fine).
+   *
+   * This is a pointer to this.queryBuilder.getSymbolSubstitutes()
    */
   private readonly _symbolSubstitutes: Map<symbol, symbol>;
 
@@ -422,11 +426,6 @@ export class PgSelectStep<
   private joinAsLateral: boolean;
 
   /**
-   * The list of things we're selecting.
-   */
-  private selects: Array<SQL>;
-
-  /**
    * The id for the PostgreSQL context plan.
    */
   private contextId: number;
@@ -443,6 +442,8 @@ export class PgSelectStep<
   public readonly mode: PgSelectMode;
 
   protected locker: PgLocker<this> = new PgLocker(this);
+
+  protected queryBuilderDepId: number;
 
   constructor(options: PgSelectOptions<TResource>);
   constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
@@ -482,7 +483,16 @@ export class PgSelectStep<
           ]
         : [null, optionsOrCloneFrom];
 
+    this.name = customName ?? resource.name;
+    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
+    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.mode = overrideMode ?? inMode ?? "normal";
+
+    const $queryBuilder = cloneFrom
+      ? PgQueryBuilderStep.clone(cloneFrom.getQueryBuilder(), this.mode)
+      : new PgQueryBuilderStep(this.alias, this.mode);
+    this.queryBuilderDepId = this.addDependency($queryBuilder);
+
     const cloneFromMatchingMode =
       cloneFrom?.mode === this.mode ? cloneFrom : null;
 
@@ -524,12 +534,7 @@ export class PgSelectStep<
       ? cloneFrom.contextId
       : this.addDependency(this.resource.executor.context());
 
-    this.name = customName ?? resource.name;
-    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
-    this._symbolSubstitutes = cloneFrom
-      ? new Map(cloneFrom._symbolSubstitutes)
-      : new Map();
-    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this._symbolSubstitutes = $queryBuilder.getSymbolSubstitutes();
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
@@ -580,9 +585,6 @@ export class PgSelectStep<
       ? new Map(cloneFrom.relationJoins)
       : new Map();
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
-    this.selects = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.selects]
-      : [];
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
     this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
     this.isInliningForbidden = cloneFrom
@@ -654,6 +656,10 @@ export class PgSelectStep<
       (this.fetchOneExtra ? "+1" : "") +
       (this.mode === "normal" ? "" : `(${this.mode})`)
     );
+  }
+
+  public getQueryBuilder(): PgQueryBuilderStep {
+    return this.getDep(this.queryBuilderDepId) as PgQueryBuilderStep;
   }
 
   public lock(): void {
@@ -766,27 +772,10 @@ export class PgSelectStep<
   public selectAndReturnIndex(
     fragmentOrCb: PgSQLCallbackOrDirect<SQL>,
   ): number {
-    const fragment = this.scopedSQL(fragmentOrCb);
-    if (!this.isArgumentsFinalized) {
-      throw new Error("Select added before arguments were finalized");
-    }
-    // NOTE: it's okay to add selections after the plan is "locked" - lock only
-    // applies to which rows are being selected, not what is being queried
-    // about the rows.
-
-    // Optimisation: if we're already selecting this fragment, return the existing one.
-    const options = {
-      symbolSubstitutes: this._symbolSubstitutes,
-    };
-    // PERF: performance of this sucks at planning time
-    const index = this.selects.findIndex((frag) =>
-      sql.isEquivalent(frag, fragment, options),
-    );
-    if (index >= 0) {
-      return index;
-    }
-
-    return this.selects.push(fragment) - 1;
+    return this.getQueryBuilder().selectAndReturnIndex({
+      type: "rawExpression",
+      expression: this.scopedSQL(fragmentOrCb),
+    });
   }
 
   private nullCheckIndex: Maybe<number> = undefined;
@@ -1305,13 +1294,24 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildSelect(
+    queryBuilder: QueryBuilder,
     options: {
       extraSelects?: readonly SQL[];
     } = Object.create(null),
   ) {
     const { extraSelects = EMPTY_ARRAY } = options;
-    const selects = [...this.selects, ...extraSelects];
-    const l = this.selects.length;
+    const convertToFragment = (s: QueryBuilderSelect<string>) => {
+      if (s.type === "rawExpression") {
+        return s.expression;
+      } else {
+        throw new Error(`PgSelectStep doesn't handle select type '${s.type}'?`);
+      }
+    };
+    const selects = [
+      ...queryBuilder.getSelects().map(convertToFragment),
+      ...extraSelects,
+    ];
+    const l = queryBuilder.getSelects().length;
     const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
     const fragmentsWithAliases = selects.map(
@@ -1533,7 +1533,27 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     };
   }
 
+  private planQueryForEmbed(
+    table: PgSelectStep,
+    options: {
+      asJsonAgg: true;
+    },
+  ): { sql: SQL } {
+    const $queryBuilder = this.getQueryBuilder();
+    return {
+      sql: table.deferredSQL(
+        /** this is NOT a pure function!! */
+        lambda(
+          $queryBuilder,
+          (queryBuilder) => this.buildQuery(queryBuilder, options).sql,
+          true,
+        ),
+      ),
+    };
+  }
+
   private buildQuery(
+    queryBuilder: QueryBuilder,
     options: {
       asJsonAgg?: boolean;
       withIdentifiers?: boolean;
@@ -1545,7 +1565,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     sql: SQL;
     extraSelectIndexes: number[];
   } {
-    const { sql: select, extraSelectIndexes } = this.buildSelect(options);
+    const { sql: select, extraSelectIndexes } = this.buildSelect(
+      queryBuilder,
+      options,
+    );
     const { sql: from } = this.buildFrom();
     const { sql: join } = this.buildJoin();
     const { sql: where } = this.buildWhereOrHaving(
@@ -1584,7 +1607,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count } = executionDetails;
+    const { count, values } = executionDetails;
+    const queryBuilder = values[
+      this.queryBuilderDepId
+    ].unaryValue() as QueryBuilder;
     const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
 
     const extraWheres: SQL[] = [];
@@ -1643,11 +1669,14 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               ) - 1
             : -1;
 
-        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
-          extraSelects,
-          extraWheres,
-          forceOrder,
-        });
+        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery(
+          queryBuilder,
+          {
+            extraSelects,
+            extraWheres,
+            forceOrder,
+          },
+        );
         const identifierIndex = extraSelectIndexes[identifierIndexOffset];
 
         const rowNumberIndex =
@@ -1745,10 +1774,13 @@ ${lateralText};`;
               ) - 1
             : -1;
 
-        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
-          extraSelects,
-          extraWheres,
-        });
+        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery(
+          queryBuilder,
+          {
+            extraSelects,
+            extraWheres,
+          },
+        );
         const rowNumberIndex =
           rowNumberIndexOffset >= 0
             ? extraSelectIndexes[rowNumberIndexOffset]
@@ -1789,7 +1821,7 @@ ${lateralText};`;
         );
         return { text, rawSqlValues, identifierIndex: null };
       } else {
-        const { sql: query } = this.buildQuery({
+        const { sql: query } = this.buildQuery(queryBuilder, {
           extraWheres,
         });
         const { text, values: rawSqlValues } = sql.compile(
@@ -1975,7 +2007,16 @@ ${lateralText};`;
       }
 
       // Check SELECT matches
-      if (!arraysMatch(this.selects, p.selects, sqlIsEquivalent)) {
+      if (
+        !arraysMatch(
+          this.getQueryBuilder().getSelects(),
+          p.getQueryBuilder().getSelects(),
+          (a, b) =>
+            a.type === "rawExpression" &&
+            b.type === "rawExpression" &&
+            sqlIsEquivalent(a.expression, b.expression),
+        )
+      ) {
         return false;
       }
 
@@ -2103,9 +2144,13 @@ ${lateralText};`;
     //console.dir(otherPlan.selects, { depth: 8 });
     //console.log(`My ${this} selects:`);
     //console.dir(this.selects, { depth: 8 });
-    this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
-    });
+    this.getQueryBuilder()
+      .getSelects()
+      .forEach((sel, idx) => {
+        actualKeyByDesiredKey[idx] = otherPlan
+          .getQueryBuilder()
+          .selectAndReturnIndex(sel);
+      });
     //console.dir(actualKeyByDesiredKey);
     //console.log(`Other ${otherPlan} selects now:`);
     //console.dir(otherPlan.selects, { depth: 8 });
@@ -2359,6 +2404,10 @@ ${lateralText};`;
         if (
           this.isUnique &&
           // TODO: this was previously first==null,last==null,offset==null which isn't the same thing.
+          // TODO: these assertions no longer hold since some of these values
+          // can come at runtime now. Consider: `(SELECT * FROM table WHERE
+          // conditions ORDER BY stuff LIMIT 1)`... Is it still okay to
+          // inline this? I think so. Maybe we can remove some of these assertins?
           this.firstStepId == null &&
           this.lastStepId == null &&
           this.offsetStepId == null &&
@@ -2371,7 +2420,15 @@ ${lateralText};`;
           this.orders.length === 0 &&
           !this.fetchOneExtra
         ) {
-          if (this.selects.length > 0) {
+          // TODO: is this safe? Just because the query builder doesn't have
+          // plans _yet_ doesn't mean it won't ultimately. What if we selected
+          // a cursor - in that case, dynamic orders passed via an argument
+          // would produce additional SELECTs at runtime so we could produce a
+          // cursor. Maybe all we need is the cursor, and the node itself isn't
+          // requested. Suggest we choose the truthy arm of this if and drop
+          // the falsy block (unless we can assert, via the above, that no
+          // dynamic ordering is happening).
+          if (this.getQueryBuilder().getSelects().length > 0) {
             debugPlanVerbose(
               "Merging %c into %c (via %c)",
               this,
@@ -2459,7 +2516,7 @@ ${lateralText};`;
             }
           });
           this.mergePlaceholdersInto(table);
-          const { sql: query } = this.buildQuery({
+          const { sql: query } = this.planQueryForEmbed(table, {
             // No need to do arrays; the json_agg handles this for us - we can
             // return objects with numeric keys just fine and JS will be fine
             // with it.
