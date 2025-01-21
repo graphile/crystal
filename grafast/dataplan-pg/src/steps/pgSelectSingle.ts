@@ -4,7 +4,9 @@ import type {
   UnbatchedExecutionExtra,
 } from "grafast";
 import {
+  constant,
   exportAs,
+  lambda,
   list,
   polymorphicWrap,
   UnbatchedExecutableStep,
@@ -431,7 +433,9 @@ export class PgSelectSingleStep<
    * @internal
    * For use by PgCursorStep
    */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
+  public getCursorDigestAndValues(): ExecutableStep<
+    readonly [string, readonly any[]]
+  > {
     const classPlan = this.getClassStep();
     const digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderBy();
@@ -454,7 +458,7 @@ export class PgSelectSingleStep<
             ),
           ],
     );
-    return [digest, step];
+    return list([constant(digest), step]);
   }
 
   /**

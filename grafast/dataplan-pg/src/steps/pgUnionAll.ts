@@ -20,6 +20,7 @@ import {
   exportAs,
   first,
   isPromiseLike,
+  lambda,
   list,
   operationPlan,
   polymorphicWrap,
@@ -225,7 +226,9 @@ export class PgUnionAllSingleStep
    * @internal
    * For use by PgCursorStep
    */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
+  public getCursorDigestAndValues(): ExecutableStep<
+    readonly [string, readonly any[]]
+  > {
     if (this.typeKey === null) {
       throw new Error("Forbidden since parent isn't in normal mode");
     }
@@ -239,7 +242,7 @@ export class PgUnionAllSingleStep
     // Add the pk to the cursor
     orders.push(access(this, [classPlan.selectPk()]));
     const step = list(orders);
-    return [digest, step];
+    return list([constant(digest), step]);
   }
 
   /**

@@ -18,16 +18,13 @@ export class PgCursorStep<
   };
   isSyncAndSafe = true;
 
-  private cursorValuesDepId: number;
   private classSingleStepId: number;
-  private digest: string;
 
   constructor(itemPlan: TStep) {
     super();
     this.classSingleStepId = itemPlan.id;
-    const [digest, step] = itemPlan.getCursorDigestAndStep();
-    this.digest = digest;
-    this.cursorValuesDepId = this.addDependency(step);
+    const $dandv = itemPlan.getCursorDigestAndValues();
+    this.addDependency($dandv);
   }
 
   public getClassSingleStep(): TStep {
@@ -42,11 +39,13 @@ export class PgCursorStep<
 
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
-    v: any[] | null,
+    deets: [digest: string, values: any[] | null] | null,
   ): string | null {
-    return v == null || v!.every((v) => v == null)
+    if (!deets) return null;
+    const [digest, values] = deets;
+    return values == null || values!.every((v: any) => v == null)
       ? null
-      : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(
+      : Buffer.from(JSON.stringify([digest, ...values]), "utf8").toString(
           "base64",
         );
   }
