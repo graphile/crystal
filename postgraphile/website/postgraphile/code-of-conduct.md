@@ -4,6 +4,8 @@ path: /postgraphile/code-of-conduct/
 title: Code of Conduct
 ---
 
+import styles from "@site/src/css/common.module.css";
+
 The Graphile project is governed by the Contributor Covenant code of conduct.
 Please be careful to ensure your language always contributes to creating a
 positive environment.
@@ -20,7 +22,11 @@ This covers:
 - Our official social media accounts
 - Anywhere you're representing the Graphile project
 
-<div class='graphile-logo-bg'></div>
+<figure className={styles.graphileHeart}>
+
+![The Graphile logo - a stylized red heart](@site/static/img/graphile.optimized.centered.svg)
+
+</figure>
 
 ## Contributor Covenant Code of Conduct
 

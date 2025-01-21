@@ -1,8 +1,10 @@
 ---
 layout: page
 path: /postgraphile/community-plugins/
-title: PostGraphile community plugins
+title: Community Plugins
 ---
+
+# PostGraphile Community Plugins
 
 Community members can write plugins for PostGraphile that extends its
 functionality; this page lists some of them. Issues with these plugins should be
@@ -10,7 +12,7 @@ directed to the plugin authors, not to this project. This page is maintained by
 the community and is not an endorsement by the project.
 
 If you have written a PostGraphile plugin (or have found one that is not listed
-here), then please feel free to add it, you can use the "edit this page" link
+here), then please feel free to add it, you can use the ["edit this page"](https://github.com/graphile/crystal/tree/main/postgraphile/website/postgraphile/community-plugins.md) link
 to do so.
 
 See [the configuration docs](./config) for how to load

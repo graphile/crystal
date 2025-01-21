@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/community-contributions/
-title: Community contributions
+title: Community Contributions
 ---
 
 The community contributes to PostGraphile development in many ways.
