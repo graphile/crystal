@@ -9,6 +9,12 @@ graph TD
 
 
     %% plan dependencies
+    Object43{{"Object[43∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda35{{"Lambda[35∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸRecordCodec(relational_posts)ᐳ"}}:::plan
+    Lambda35 & Constant40 & Constant41 & Constant42 --> Object43
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,21 +22,27 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access13
     __Value2 --> Access14
+    Constant52{{"Constant[52∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant52 --> Lambda35
+    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant53 --> Lambda38
+    Access39{{"Access[39∈0] ➊<br />ᐸ38.0ᐳ"}}:::plan
+    Lambda38 --> Access39
+    Lambda44{{"Lambda[44∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object43 --> Lambda44
+    Lambda49{{"Lambda[49∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant54{{"Constant[54∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
+    Constant54 --> Lambda49
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
     Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant33{{"Constant[33∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸRecordCodec(relational_posts)ᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression16 & Constant49 & Constant33 & Constant50 --> PgInsertSingle17
+    Object15 & PgClassExpression16 & Constant50 & Constant33 & Constant51 --> PgInsertSingle17
     PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object15 & Constant10 & Constant11 --> PgInsertSingle12
     PgInsertSingle12 --> PgClassExpression16
@@ -38,22 +50,12 @@ graph TD
     PgInsertSingle17 --> PgClassExpression21
     PgSelect23[["PgSelect[23∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈2] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Lambda35{{"Lambda[35∈2] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Lambda38{{"Lambda[38∈2] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Lambda43{{"Lambda[43∈2] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda48{{"Lambda[48∈2] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object15 & PgClassExpression22 & Lambda35 & Lambda38 & Lambda43 & Lambda48 --> PgSelect23
-    Object42{{"Object[42∈2] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda35 & Constant39 & Constant40 & Constant41 --> Object42
+    Object15 & PgClassExpression22 & Lambda35 & Access39 & Lambda44 & Lambda49 --> PgSelect23
     PgInsertSingle17 --> PgClassExpression22
     First27{{"First[27∈2] ➊"}}:::plan
     PgSelect23 --> First27
     PgSelectSingle28{{"PgSelectSingle[28∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
     First27 --> PgSelectSingle28
-    Constant51 --> Lambda35
-    Constant52 --> Lambda38
-    Object42 --> Lambda43
-    Constant53 --> Lambda48
     PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression29
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
@@ -68,13 +70,13 @@ graph TD
     subgraph "Buckets for mutations/basics/create-relational-post-null-description"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant33,Constant39,Constant40,Constant41,Constant49,Constant50,Constant51,Constant52,Constant53 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 49, 33, 50, 51, 52, 39, 40, 41, 53<br /><br />1: PgInsertSingle[12]<br />2: PgClassExpression[16]<br />3: PgInsertSingle[17]<br />4: <br />ᐳ: PgClassExpression[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant33,Lambda35,Lambda38,Access39,Constant40,Constant41,Constant42,Object43,Lambda44,Lambda49,Constant50,Constant51,Constant52,Constant53,Constant54 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 50, 33, 51, 35, 39, 44, 49<br /><br />1: PgInsertSingle[12]<br />2: PgClassExpression[16]<br />3: PgInsertSingle[17]<br />4: <br />ᐳ: PgClassExpression[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,PgClassExpression16,PgInsertSingle17,PgClassExpression21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 51, 52, 39, 40, 41, 53, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: 22, 35, 38, 48, 42, 43<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 35, 39, 44, 49, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: PgClassExpression[22]<br />2: PgSelect[23]<br />ᐳ: First[27], PgSelectSingle[28]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression22,PgSelect23,First27,PgSelectSingle28,Lambda35,Lambda38,Object42,Lambda43,Lambda48 bucket2
+    class Bucket2,PgClassExpression22,PgSelect23,First27,PgSelectSingle28 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32 bucket3
