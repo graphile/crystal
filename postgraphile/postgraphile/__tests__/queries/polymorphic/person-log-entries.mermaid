@@ -9,17 +9,17 @@ graph TD
 
 
     %% plan dependencies
-    Object40{{"Object[40∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda32{{"Lambda[32∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸsql.identifier(”log_entries”)ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸRecordCodec(logEntries)ᐳ"}}:::plan
-    Lambda32 & Constant37 & Constant38 & Constant39 --> Object40
-    Object60{{"Object[60∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant57{{"Constant[57∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 102ᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
-    Lambda32 & Constant57 & Constant58 & Constant59 --> Object60
+    Object42{{"Object[42∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda34{{"Lambda[34∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸsql.identifier(”log_entries”)ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸRecordCodec(logEntries)ᐳ"}}:::plan
+    Lambda34 & Constant39 & Constant40 & Constant41 --> Object42
+    Object62{{"Object[62∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 102ᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
+    Constant61{{"Constant[61∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
+    Lambda34 & Constant59 & Constant60 & Constant61 --> Object62
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -27,49 +27,52 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant67 --> Lambda32
-    Lambda35{{"Lambda[35∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant68 --> Lambda35
-    Access36{{"Access[36∈0] ➊<br />ᐸ35.0ᐳ"}}:::plan
-    Lambda35 --> Access36
-    Lambda41{{"Lambda[41∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object40 --> Lambda41
-    Lambda46{{"Lambda[46∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
-    Constant69 --> Lambda46
-    Lambda61{{"Lambda[61∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object60 --> Lambda61
-    Lambda66{{"Lambda[66∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
-    Constant70 --> Lambda66
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant69 --> Lambda34
+    Lambda37{{"Lambda[37∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant70 --> Lambda37
+    Access38{{"Access[38∈0] ➊<br />ᐸ37.0ᐳ"}}:::plan
+    Lambda37 --> Access38
+    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object42 --> Lambda43
+    Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
+    Constant71 --> Lambda48
+    Lambda63{{"Lambda[63∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object62 --> Lambda63
+    Lambda68{{"Lambda[68∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
+    Constant72 --> Lambda68
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸfalseᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object12 & Connection13 & Access36 & Lambda41 & Lambda46 & Lambda32 & Access36 & Lambda61 & Lambda66 --> PgSelect14
+    Object12 & Connection13 & Access38 & Lambda43 & Lambda48 & Lambda34 & Access38 & Lambda63 & Lambda68 --> PgSelect14
     __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelect14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    Object50{{"Object[50∈3]<br />ᐸ{rows,first,last,shouldReverseOrder,fetchOneExtra}ᐳ"}}:::plan
-    Access48{{"Access[48∈3]<br />ᐸ15.0ᐳ"}}:::plan
-    Access48 & Constant30 & Constant30 & Lambda32 & Constant33 --> Object50
+    Object52{{"Object[52∈3]<br />ᐸ{rows,first,last,shouldReverseOrder,fetchOneExtra}ᐳ"}}:::plan
+    Access50{{"Access[50∈3]<br />ᐸ15.0ᐳ"}}:::plan
+    Access50 & Constant32 & Constant32 & Lambda34 & Constant35 --> Object52
+    List31{{"List[31∈3]<br />ᐸ30,29ᐳ"}}:::plan
+    List29{{"List[29∈3]<br />ᐸ17ᐳ"}}:::plan
+    Constant30 & List29 --> List31
     PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression26
     PgCursor27{{"PgCursor[27∈3]"}}:::plan
-    List29{{"List[29∈3]<br />ᐸ17ᐳ"}}:::plan
-    List29 --> PgCursor27
+    List31 --> PgCursor27
     PgClassExpression17 --> List29
-    __Item15 --> Access48
-    Lambda51{{"Lambda[51∈3]<br />ᐸreverseIfNecessaryᐳ"}}:::plan
-    Object50 --> Lambda51
-    __Item22[/"__Item[22∈4]<br />ᐸ51ᐳ"\]:::itemplan
-    Lambda51 ==> __Item22
+    __Item15 --> Access50
+    Lambda53{{"Lambda[53∈3]<br />ᐸreverseIfNecessaryᐳ"}}:::plan
+    Object52 --> Lambda53
+    __Item22[/"__Item[22∈4]<br />ᐸ53ᐳ"\]:::itemplan
+    Lambda53 ==> __Item22
     PgSelectSingle23{{"PgSelectSingle[23∈4]<br />ᐸlog_entriesᐳ"}}:::plan
     __Item22 --> PgSelectSingle23
     PgClassExpression24{{"PgClassExpression[24∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
@@ -82,17 +85,17 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant30,Lambda32,Constant33,Lambda35,Access36,Constant37,Constant38,Constant39,Object40,Lambda41,Lambda46,Constant57,Constant58,Constant59,Object60,Lambda61,Lambda66,Constant67,Constant68,Constant69,Constant70 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 36, 41, 46, 32, 61, 66, 30, 33<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant30,Constant32,Lambda34,Constant35,Lambda37,Access38,Constant39,Constant40,Constant41,Object42,Lambda43,Lambda48,Constant59,Constant60,Constant61,Object62,Lambda63,Lambda68,Constant69,Constant70,Constant71,Constant72 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 38, 43, 48, 34, 63, 68, 30, 32, 35<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 30, 32, 33<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 30, 32, 34, 35<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 15, 30, 32, 33<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 30, 15, 32, 34, 35<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression17,PgClassExpression26,PgCursor27,List29,Access48,Object50,Lambda51 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ51ᐳ[22]"):::bucket
+    class Bucket3,PgClassExpression17,PgClassExpression26,PgCursor27,List29,List31,Access50,Object52,Lambda53 bucket3
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ53ᐳ[22]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item22,PgSelectSingle23,PgClassExpression24,PgClassExpression25 bucket4
     Bucket0 --> Bucket1
