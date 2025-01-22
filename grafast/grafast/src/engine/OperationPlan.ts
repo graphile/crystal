@@ -48,6 +48,7 @@ import type {
   GrafastPlanBucketReasonJSONv1,
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
+  ItemsStreamDetails,
   LocationDetails,
   StepOptions,
   TrackedArguments,
@@ -82,6 +83,7 @@ import {
   assertNotAsync,
   assertNotPromise,
   defaultValueToValueNode,
+  directiveArgument,
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
@@ -1257,6 +1259,42 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
+          let streamDetails: ItemsStreamDetails | null = null;
+          if (isListType(getNullableType(fieldType))) {
+            // read the @stream directive, if present
+            for (const n of fieldNodes) {
+              const streamDirective = n.directives?.find(
+                (d) => d.name.value === "stream",
+              );
+              if (streamDirective === undefined) {
+                // Undo any previous stream details; the non-@stream wins.
+                streamDetails = null;
+                break;
+              } else if (streamDetails !== null) {
+                // Validation promises the values are the same
+                continue;
+              } else {
+                // Create streamDetails
+                streamDetails = {
+                  // initialCount: $initialCount,
+                  initialCount: directiveArgument(
+                    this,
+                    streamDirective,
+                    "initialCount",
+                    graphql.Kind.INT,
+                    0,
+                  ),
+                  if: directiveArgument(
+                    this,
+                    streamDirective,
+                    "if",
+                    graphql.Kind.BOOLEAN,
+                    true,
+                  ),
+                };
+              }
+            }
+          }
           this.planIntoOutputPlan(
             outputPlan,
             fieldLayerPlan,
@@ -1273,6 +1311,8 @@ export class OperationPlan {
             step,
             locationDetails,
             resolverEmulation,
+            0,
+            streamDetails,
           );
         }
       } finally {
@@ -1393,7 +1433,8 @@ export class OperationPlan {
     $step: ExecutableStep,
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
-    listDepth = 0,
+    listDepth: number,
+    streamDetails: ItemsStreamDetails | null = null,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
@@ -1405,6 +1446,7 @@ export class OperationPlan {
         itemsOrStep,
         null,
         $step,
+        streamDetails,
       );
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,

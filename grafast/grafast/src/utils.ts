@@ -36,6 +36,7 @@ import type {
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep, ModifierStep } from "./step.js";
+import { constant } from "./steps/constant.js";
 
 const {
   GraphQLBoolean,
@@ -1155,4 +1156,33 @@ export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
     }
   }
   return str;
+}
+
+export function directiveArgument<T>(
+  operationPlan: OperationPlan,
+  directive: DirectiveNode,
+  argName: string,
+  expectedKind: graphql.Kind.INT | graphql.Kind.FLOAT | graphql.Kind.BOOLEAN,
+  fallback: T,
+): ExecutableStep<T> {
+  const initialCountArg = directive.arguments?.find(
+    (n) => n.name.value === argName,
+  );
+  const val = initialCountArg?.value;
+  return operationPlan.withRootLayerPlan(() =>
+    val == null
+      ? constant(fallback)
+      : val.kind === graphql.Kind.VARIABLE
+      ? operationPlan.variableValuesStep.get(val.name.value)
+      : val.kind === expectedKind
+      ? constant(
+          val.kind === Kind.INT
+            ? (parseInt(val.value, 10) as T)
+            : val.kind === Kind.FLOAT
+            ? (parseFloat(val.value) as T)
+            : (val.value as T),
+        )
+      : // For `null` and other unexpected values
+        constant(fallback),
+  );
 }
