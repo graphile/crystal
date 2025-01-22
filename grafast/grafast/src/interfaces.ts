@@ -1003,3 +1003,9 @@ export interface StreamStepEvent {
   step: StreamableStep<unknown>;
   streamDetails: StreamDetails;
 }
+
+/** The details passed to a `$step.items(...)` call */
+export interface ItemsStreamDetails {
+  initialCount: ExecutableStep<number>;
+  if: ExecutableStep<boolean>;
+}
