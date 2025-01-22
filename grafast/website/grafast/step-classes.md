@@ -438,6 +438,38 @@ from steps which don't adhere to these expectations.
 
 :::
 
+### items
+
+Implement `.items()` if your step represents a collection and you want to give
+users an easy way of accessing the items of your collection (as opposed to
+metadata you may also wish to make available, such as pagination info). It
+should accept a no arguments (later we might support options related to
+streaming, so do not implement arguments!).
+
+```ts
+import { access } from "grafast";
+
+class MyCollectionStep extends ExecutableStep /* implements ConnectionCapableStep */ {
+  // ...
+
+  items() {
+    // Update this to access the correct property needed for the items in your
+    // collection; you may also choose to track that this was requested and
+    // thus ensure that fetches only go ahead when necessary.
+    return access(this, "items");
+  }
+}
+```
+
+:::caution
+
+If your step implements `.items()`, make sure it meets the expectations:
+i.e. it does not require any arguments.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come

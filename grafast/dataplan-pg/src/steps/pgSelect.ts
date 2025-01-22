@@ -2286,30 +2286,6 @@ ${lateralText};`;
     return new PgSelectSingleStep(this, $row, options);
   }
 
-  [$$toSQL]() {
-    return this.alias;
-  }
-}
-
-export class PgSelectRowsStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends ExecutableStep {
-  static $$export = {
-    moduleName: "@dataplan/pg",
-    exportName: "PgSelectRowsStep",
-  };
-
-  private resource: TResource;
-
-  constructor($pgSelect: PgSelectStep<TResource>) {
-    super();
-    this.addDependency($pgSelect);
-    this.resource = $pgSelect.resource;
-  }
-  public getClassStep(): PgSelectStep<TResource> {
-    return this.getDep<PgSelectStep<TResource>>(0);
-  }
-
   /**
    * When you return a plan in a situation where GraphQL is expecting a
    * GraphQLList, it must implement the `.listItem()` method to return a plan
@@ -2339,9 +2315,35 @@ export class PgSelectRowsStep<
           TResource
         >
     : never {
-    const $single = new PgSelectSingleStep(this.getClassStep(), itemPlan);
+    const $single = new PgSelectSingleStep(this, itemPlan);
     const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
+  }
+
+  [$$toSQL]() {
+    return this.alias;
+  }
+}
+
+export class PgSelectRowsStep<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectRowsStep",
+  };
+
+  constructor($pgSelect: PgSelectStep<TResource>) {
+    super();
+    this.addDependency($pgSelect);
+  }
+
+  public getClassStep(): PgSelectStep<TResource> {
+    return this.getDep<PgSelectStep<TResource>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    return this.getClassStep().listItem(itemPlan);
   }
 
   optimize() {

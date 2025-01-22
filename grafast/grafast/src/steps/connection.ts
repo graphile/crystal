@@ -575,3 +575,15 @@ export function connection<
   }
   return new ConnectionStep(step, config);
 }
+
+export type ItemsStep<
+  T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
+> = T extends ConnectionCapableStep<any, any> ? ReturnType<T["items"]> : T;
+
+export function itemsOrStep<
+  T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
+>($step: T): ExecutableStep<readonly any[]> {
+  return "items" in $step && typeof $step.items === "function"
+    ? $step.items()
+    : $step;
+}
