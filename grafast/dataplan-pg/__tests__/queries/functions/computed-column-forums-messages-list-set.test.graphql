@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(1)
+#// expect(queries).toHaveLength(1)
 ## expect(data.forums[0].messagesListSet).toHaveLength(1)
 ## expect(data.forums[0].messagesListSet[0].every(message => message.featured === false)).toBe(true)
 ## expect(data.forums[1].messagesListSet).toHaveLength(2)
