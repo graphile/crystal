@@ -73,6 +73,7 @@ import {
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { access } from "../steps/access.js";
+import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
@@ -1398,9 +1399,10 @@ export class OperationPlan {
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
+      const $list = itemsOrStep($step);
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
-        $step,
+        $list,
         OUTPUT_PLAN_TYPE_ARRAY,
         locationDetails,
       );
@@ -1413,17 +1415,17 @@ export class OperationPlan {
 
       const $__item = this.itemStepForListStep(
         parentLayerPlan,
-        $step,
+        $list,
         listDepth,
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
-        const $item = isListCapableStep($step)
+        const $item = isListCapableStep($list)
           ? withGlobalLayerPlan(
               $__item.layerPlan,
               $__item.polymorphicPaths,
-              ($step as ListCapableStep<any>).listItem,
-              $step,
+              $list.listItem,
+              $list,
               $__item,
             )
           : $__item;
