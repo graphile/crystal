@@ -1,32 +1,6 @@
 select
-  (select json_agg(s) from (
-    select /* NOTHING?! */
-    from app_public.messages as __messages__
-    where
-      (
-        __messages__.featured = $1::"bool"
-      ) and (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-      ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
-      )
-    order by __messages__."id" asc
-    limit 6
-  ) s) as "0",
-  (select json_agg(s) from (
-    select
-      (count(*))::text as "0"
-    from app_public.messages as __messages__
-    where
-      (
-        __messages__.featured = $1::"bool"
-      ) and (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-      ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
-      )
-  ) s) as "1",
-  __forums__."id" as "2"
+  __forums__."id" as "0",
+  to_char(__forums__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "1"
 from app_public.forums as __forums__
 where
   (
@@ -35,3 +9,38 @@ where
     true /* authorization checks */
   )
 order by __forums__."id" asc;
+
+select __messages_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"timestamptz" as "id0", (ids.value->>1)::"uuid" as "id1" from json_array_elements($2::json) with ordinality as ids) as __messages_identifiers__,
+lateral (
+  select
+    __messages_identifiers__.idx as "0"
+  from app_public.messages as __messages__
+  where
+    (
+      __messages__.featured = $1::"bool"
+    ) and (
+      (__messages__.archived_at is null) = (__messages_identifiers__."id0" is null)
+    ) and (
+      __messages__."forum_id" = __messages_identifiers__."id1"
+    )
+  order by __messages__."id" asc
+  limit 6
+) as __messages_result__;
+
+select __messages_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"timestamptz" as "id0", (ids.value->>1)::"uuid" as "id1" from json_array_elements($2::json) with ordinality as ids) as __messages_identifiers__,
+lateral (
+  select
+    (count(*))::text as "0",
+    __messages_identifiers__.idx as "1"
+  from app_public.messages as __messages__
+  where
+    (
+      __messages__.featured = $1::"bool"
+    ) and (
+      (__messages__.archived_at is null) = (__messages_identifiers__."id0" is null)
+    ) and (
+      __messages__."forum_id" = __messages_identifiers__."id1"
+    )
+) as __messages_result__;

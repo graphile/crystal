@@ -54,6 +54,13 @@ select
 from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
+  case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
+  case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
+  __frmcdc_nested_compound_type__."baz_buz"::text as "2",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "3"
+from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__;
+
+select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
   __frmcdc_compound_type__."c"::text as "2",
@@ -61,22 +68,19 @@ select
   __frmcdc_compound_type__."e"::text as "4",
   __frmcdc_compound_type__."f"::text as "5",
   __frmcdc_compound_type__."foo_bar"::text as "6",
-  (not (__frmcdc_compound_type__ is null))::text as "7",
-  __frmcdc_compound_type_2."a"::text as "8",
-  __frmcdc_compound_type_2."b" as "9",
-  __frmcdc_compound_type_2."c"::text as "10",
-  __frmcdc_compound_type_2."d" as "11",
-  __frmcdc_compound_type_2."e"::text as "12",
-  __frmcdc_compound_type_2."f"::text as "13",
-  __frmcdc_compound_type_2."foo_bar"::text as "14",
-  (not (__frmcdc_compound_type_2 is null))::text as "15",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "16",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "17"
-from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
-on TRUE;
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."person_full_name" as "0",
@@ -410,17 +414,12 @@ where (
 select
   __post__."id"::text as "0",
   __post__."headline" as "1",
-  (select json_agg(s) from (
-    select
-      to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
-      __frmcdc_comptype__."is_optimised"::text as "1",
-      (not (__frmcdc_comptype__ is null))::text as "2"
-    from unnest(__post__."comptypes") as __frmcdc_comptype__
-  ) s) as "2",
-  __person__."person_full_name" as "3"
+  (case when (__post__."comptypes") is not distinct from null then null::text else array(
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
+    from unnest(__post__."comptypes") __comptype__
+  )::text end) as "2",
+  __post__."author_id"::text as "3"
 from "a"."post" as __post__
-left outer join "c"."person" as __person__
-on (__post__."author_id"::"int4" = __person__."id")
 where (
   __post__."id" = $1::"int4"
 )
@@ -431,3 +430,16 @@ select
   __frmcdc_comptype__."is_optimised"::text as "1",
   (not (__frmcdc_comptype__ is null))::text as "2"
 from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
+
+select
+  to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+  __frmcdc_comptype__."is_optimised"::text as "1",
+  (not (__frmcdc_comptype__ is null))::text as "2"
+from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
+
+select
+  __person__."person_full_name" as "0"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
