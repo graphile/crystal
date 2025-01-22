@@ -1399,7 +1399,13 @@ export class OperationPlan {
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
-      const $list = itemsOrStep($step);
+      const $list = withGlobalLayerPlan(
+        parentLayerPlan,
+        polymorphicPaths,
+        itemsOrStep,
+        null,
+        $step,
+      );
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
         $list,
