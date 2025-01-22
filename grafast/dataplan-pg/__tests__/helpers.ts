@@ -549,10 +549,13 @@ export const assertSnapshotsMatch = async (
     const planOp = extensions?.explain?.operations?.find(
       (op) => op.type === "plan",
     );
+    if (!planOp) {
+      throw new Error("No plan was emitted for this test!");
+    }
     const graphString = planToMermaid(planOp.plan);
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
-      throw new Error("No plan was emitted for this test!");
+      throw new Error("Was unable to generate plan diagram for this test!");
     }
     const lines = graphString.split("\n");
     const relativePath = relative(__dirname, basePath);
