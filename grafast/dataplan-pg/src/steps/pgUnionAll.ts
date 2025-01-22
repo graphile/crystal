@@ -1794,8 +1794,7 @@ export class PgUnionAllRowsStep<
   }
 
   listItem(itemPlan: ExecutableStep) {
-    const $single = new PgUnionAllSingleStep(this.getClassStep(), itemPlan);
-    return $single as any;
+    return this.getClassStep().listItem(itemPlan);
   }
 
   optimize() {
