@@ -403,6 +403,12 @@ interface QueryBuildResult {
   queryValues: Array<QueryValue>;
 }
 
+interface PgUnionAllStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]>;
+}
+
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
  * resources, but must return a consistent data shape.
@@ -411,7 +417,7 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >
-  extends PgStmtBaseStep<unknown>
+  extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
     ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
@@ -901,6 +907,10 @@ on (${sql.indent(
 
   row($row: ExecutableStep) {
     return new PgUnionAllSingleStep(this, $row);
+  }
+
+  public items() {
+    return new PgUnionAllRowsStep(this);
   }
 
   listItem(itemPlan: ExecutableStep) {
@@ -1763,6 +1773,38 @@ ${lateralText};`;
 
   [$$toSQL]() {
     return this.alias;
+  }
+}
+
+export class PgUnionAllRowsStep<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgUnionAllRowsStep",
+  };
+
+  constructor($pgSelect: PgUnionAllStep<TAttributes, TTypeNames>) {
+    super();
+    this.addDependency($pgSelect);
+  }
+  public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
+    return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    const $single = new PgUnionAllSingleStep(this.getClassStep(), itemPlan);
+    return $single as any;
+  }
+
+  optimize() {
+    return access(this.getClassStep(), "items");
+  }
+
+  execute(executionDetails: ExecutionDetails) {
+    const pgSelect = executionDetails.values[0];
+    return executionDetails.indexMap((i) => pgSelect.at(i).items);
   }
 }
 
