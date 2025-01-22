@@ -1,10 +1,8 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
-  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -13,16 +11,17 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
-  StreamableStep,
 } from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
+  __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
   access,
   arrayOfLength,
   constant,
+  ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
@@ -36,6 +35,7 @@ import {
   SafeError,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
+  StreamableStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
@@ -252,6 +252,12 @@ interface QueryBuildResult {
   queryValues: Array<QueryValue>;
 }
 
+interface PgSelectStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]>;
+}
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <attributes>, <cursor?> FROM <table>`. You can also add
@@ -264,11 +270,8 @@ interface QueryBuildResult {
 export class PgSelectStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends PgStmtBaseStep<
-    ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
-  >
+  extends PgStmtBaseStep<PgSelectStepResult>
   implements
-    StreamableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -1064,6 +1067,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
+  public items() {
+    return new PgSelectRowsStep(this);
+  }
+
   public pageInfo(
     $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
   ): PgPageInfoStep<this> {
@@ -1086,7 +1093,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    */
   async execute(
     executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  ): Promise<GrafastResultsList<PgSelectStepResult>> {
     const { first, last } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
@@ -1135,9 +1142,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     });
     // debugExecute("%s; result: %c", this, executionResult);
 
-    return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
-        return allVals;
+    return (await Promise.all(executionResult.values)).map((allVals) => {
+      if (allVals == null) {
+        return {
+          items: allVals,
+        };
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;
@@ -1155,10 +1164,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
+      return {
+        items: orderedRows,
+        hasMore,
+      };
     });
   }
 
@@ -2277,6 +2286,30 @@ ${lateralText};`;
     return new PgSelectSingleStep(this, $row, options);
   }
 
+  [$$toSQL]() {
+    return this.alias;
+  }
+}
+
+export class PgSelectRowsStep<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectRowsStep",
+  };
+
+  private resource: TResource;
+
+  constructor($pgSelect: PgSelectStep<TResource>) {
+    super();
+    this.addDependency($pgSelect);
+    this.resource = $pgSelect.resource;
+  }
+  public getClassStep(): PgSelectStep<TResource> {
+    return this.getDep<PgSelectStep<TResource>>(0);
+  }
+
   /**
    * When you return a plan in a situation where GraphQL is expecting a
    * GraphQLList, it must implement the `.listItem()` method to return a plan
@@ -2306,16 +2339,19 @@ ${lateralText};`;
           TResource
         >
     : never {
-    const $single = new PgSelectSingleStep(this, itemPlan);
+    const $single = new PgSelectSingleStep(this.getClassStep(), itemPlan);
     const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
-  [$$toSQL]() {
-    return this.alias;
+  optimize() {
+    return access(this.getClassStep(), "items");
   }
 
-  // --------------------
+  execute(executionDetails: ExecutionDetails) {
+    const pgSelect = executionDetails.values[0];
+    return executionDetails.indexMap((i) => pgSelect.at(i).items);
+  }
 }
 
 function joinMatches(
