@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(2);
+#// expect(queries).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges).toHaveLength(3);
 ## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Cecilia");

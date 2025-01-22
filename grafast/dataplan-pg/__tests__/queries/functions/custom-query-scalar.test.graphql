@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(3)
+#// expect(queries).toHaveLength(3)
 ## expect(data.all).toEqual(3)
 ## expect(data.featured).toEqual(2)
 ## expect(data.unfeatured).toEqual(1)

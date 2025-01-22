@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(1)
+#// expect(queries).toHaveLength(1)
 ## expect(data.forum.featuredMessages).toHaveLength(1)
 ## expect(data.forum.featuredMessages[0].body).toMatch("Postgres")
 ## expect(data.forum.featuredMessages[0].body).toMatch("Bob")

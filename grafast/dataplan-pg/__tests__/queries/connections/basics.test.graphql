@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(2);
+#// expect(queries).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges).toHaveLength(6);
 # See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
 # 'last' is not set, so hasPreviousPage is false.

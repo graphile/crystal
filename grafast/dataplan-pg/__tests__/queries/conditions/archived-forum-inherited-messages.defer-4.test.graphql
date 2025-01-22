@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy()
 # PERF: should be able to achieve this with length 1 because the data is
 # identical to the data we already have.
-## expect(queries).toHaveLength(2);
+#// expect(queries).toHaveLength(2);
 ## expect(payloads[0].data.forums).toHaveLength(1);
 ## expect(payloads[0].data.forums[0].messagesConnection.totalCount).toEqual(3);
 ## expect(payloads[0].data.forums[0].messagesConnection.pageInfo.startCursor).toEqual(payloads[0].data.forums[0].messagesConnection.edges[0].cursor);

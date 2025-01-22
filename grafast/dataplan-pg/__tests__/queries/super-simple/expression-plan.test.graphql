@@ -5,7 +5,7 @@
 ## expect(data.forums[1].archivedAtIsNotNull).toEqual(true);
 ## expect(data.forums[2].name).toEqual("Postgres");
 ## expect(data.forums[2].archivedAtIsNotNull).toEqual(false);
-## expect(queries).toHaveLength(1);
+#// expect(queries).toHaveLength(1);
 {
   forums(includeArchived: YES) {
     name

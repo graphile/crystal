@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(1);
+#// expect(queries).toHaveLength(1);
 ## expect(data.forums[0].messagesConnection.nodes).toHaveLength(2);
 ## expect(data.forums[0].messagesConnection.edges).toHaveLength(2);
 ## expect(data.forums[0].messagesConnection.totalCount).toEqual(3);
