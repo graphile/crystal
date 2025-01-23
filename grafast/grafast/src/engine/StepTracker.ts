@@ -46,6 +46,8 @@ export class StepTracker {
   >();
 
   /** @internal */
+  public internalDependencies = new Set<ExecutableStep>();
+  /** @internal */
   public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
   /** @internal */
   public layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
@@ -580,6 +582,9 @@ export class StepTracker {
   private isNotNeeded($step: ExecutableStep): boolean {
     if ($step.dependents.length !== 0) return false;
     if ($step.hasSideEffects) return false;
+    if (this.internalDependencies.has($step)) {
+      return false;
+    }
     const s1 = this.outputPlansByRootStep.get($step);
     if (s1 && s1.size !== 0) return false;
     const s2 = this.layerPlansByRootStep.get($step);

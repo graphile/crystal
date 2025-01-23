@@ -1427,6 +1427,11 @@ export class OperationPlan {
     if (this.loc !== null) this.loc.pop();
   }
 
+  private internalDependency($step: ExecutableStep): number {
+    this.stepTracker.internalDependencies.add($step);
+    return $step.id;
+  }
+
   // Similar to the old 'planFieldReturnType'
   private planIntoOutputPlan(
     parentOutputPlan: OutputPlan,
@@ -1473,9 +1478,11 @@ export class OperationPlan {
 
       const stream: LayerPlanReasonListItemStream | undefined = streamDetails
         ? {
-            initialCountStepId: streamDetails.initialCount.id,
-            ifStepId: streamDetails.if.id,
-            labelStepId: streamDetails.label.id,
+            initialCountStepId: this.internalDependency(
+              streamDetails.initialCount,
+            ),
+            ifStepId: this.internalDependency(streamDetails.if),
+            labelStepId: this.internalDependency(streamDetails.label),
           }
         : undefined;
       const $__item = this.itemStepForListStep(
@@ -3599,6 +3606,17 @@ export class OperationPlan {
       if (layerPlan.reason.type === "listItem") {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+        const stream = layerPlan.reason.stream;
+        if (stream) {
+          const $initialCount = this.stepTracker.getStepById(
+            stream.initialCountStepId,
+          );
+          const $if = this.stepTracker.getStepById(stream.ifStepId);
+          const $label = this.stepTracker.getStepById(stream.labelStepId);
+          ensurePlanAvailableInLayer($initialCount, layerPlan.parentLayerPlan!);
+          ensurePlanAvailableInLayer($if, layerPlan.parentLayerPlan!);
+          ensurePlanAvailableInLayer($label, layerPlan.parentLayerPlan!);
+        }
       }
     }
 
