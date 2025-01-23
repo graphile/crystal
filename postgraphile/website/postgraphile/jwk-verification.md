@@ -95,8 +95,7 @@ Remember that a JWT has
 [three _period-separated_ sections](https://jwt.io/introduction/): header,
 payload, and signature. On successful verification, the payload will be
 available for us to save inside the PostGraphile request via the
-[`pgSettings`](./usage-library/#exposing-http-request-data-to-postgresql)
-function.
+[`pgSettings`](./config#pgsettings) function.
 
 Let's look at an example payload:
 
@@ -162,7 +161,7 @@ app.use(
 ```
 
 PostGraphile applies everything returned by
-[pgSettings](./usage-library/#pgsettings-function) to the
+[`pgSettings`](./config#pgsettings) to the
 [current session](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET)
 with `set_config($key, $value, true)`. So inside Postgres we can read the
 current value of `user.permissions` by

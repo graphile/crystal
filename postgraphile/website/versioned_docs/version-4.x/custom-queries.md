@@ -100,10 +100,10 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-:::note
+:::tip Performance Note
 
 This function will have poor performance because `ILIKE`
-specifications of this form (beginning and ending with `%`) do not utilise
+specifications of this form (beginning and ending with `%`) do not utilize
 indexes. If you're doing this in a real application then it's highly recommended
 that you look into
 [PostgreSQL's Full Text Search](http://rachbelaid.com/postgres-full-text-search-is-good-enough/)

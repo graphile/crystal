@@ -10,7 +10,7 @@ it can accept arguments that influence its result, and may return either a
 scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections) or lists, depending on the behavior configuration.
 
-:::tip
+:::tip Performance Note
 
 We inline these function calls into the original `SELECT` statement for
 efficiency, so no additional SQL queries need to be issued to the database.

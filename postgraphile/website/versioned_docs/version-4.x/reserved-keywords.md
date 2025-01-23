@@ -38,5 +38,5 @@ identifiers. On the CLI you'd do this like:
 `postgraphile --skip-plugins graphile-build-pg:PgNodeAliasPostGraphile`.
 
 To support non-unique table names you should implement an
-[inflection override](./inflection#overriding-inflection---general) that will
+[inflection override](./inflection/#overriding-inflection) that will
 change how the GraphQL type names are generated from the raw table name.

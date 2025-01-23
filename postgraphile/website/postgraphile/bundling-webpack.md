@@ -105,7 +105,7 @@ module.exports = {
 };
 ```
 
-A more invasive and optimised config can be found in our
+A more invasive and optimized config can be found in our
 [Lambda example](https://github.com/graphile/postgraphile-lambda-example); note
 that it cannot be used with watch mode and does not support subscriptions.
 Here's a simplified and commented version of it:

@@ -9,7 +9,7 @@ This documentation is copied from Version 4 and has not been updated to Version
 
 :::
 
-On a Digital Ocean compute-optimised droplet with 8GB of RAM, running
+On a Digital Ocean compute-optimized droplet with 8GB of RAM, running
 PostGraphile, PostgreSQL _and_ the benchmarking software all through Docker,
 PostGraphile running in cluster mode over 4 vCPUs can handle 3250 requests per
 second for the following simple query:
@@ -81,7 +81,7 @@ on Medium.
 ### How is it so fast?
 
 We leverage graphile-build's
-[look-ahead](https://graphile.org/graphile-build/look-ahead/) features when
+[look-ahead](https://build.graphile.org/graphile-build/look-ahead/) features when
 resolving a GraphQL request so that a single root level query, no matter how
 nested, is compiled into just one SQL query. PostgreSQL has an excellent query
 planner which optimises and executes this query for us, avoiding the need for

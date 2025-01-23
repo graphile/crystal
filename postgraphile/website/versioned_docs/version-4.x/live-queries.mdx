@@ -110,7 +110,7 @@ always respected, and that no caching issues occur.
 To enable this plugin, you must alter your PostgreSQL configuration
 `postgresql.conf` and ensure that the following settings are enabled:
 
-```
+```ini
 wal_level = logical
 max_wal_senders = 10
 max_replication_slots = 10
@@ -119,7 +119,7 @@ max_replication_slots = 10
 You must also install the `wal2json` extension into PostgreSQL if you don't
 already have it (normally takes under 10 seconds):
 
-```
+```shell
 git clone https://github.com/eulerto/wal2json.git
 cd wal2json
 USE_PGXS=1 make
@@ -129,7 +129,7 @@ USE_PGXS=1 make install
 Now PostgreSQL is ready, you can enable live queries support in PostGraphile.
 First, install the plugin:
 
-```
+```shell
 yarn add @graphile/subscriptions-lds
 ```
 

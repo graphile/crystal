@@ -62,9 +62,11 @@ module.exports = makeAddPgTableOrderByPlugin(
 );
 ```
 
-:::note
+:::tip
+
 We used the `orderByAscDesc` helper to easily create the `_ASC` and
 `_DESC` variants without needing redundant code.
+
 :::
 
 The above plugin adds the `LAST_POST_CREATED_AT_ASC` and

@@ -11,10 +11,11 @@ scalar, record, [enum](./enums),
 list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections).
 
-:::note Performance Note
+:::tip Performance Note
 
 We inline these function calls into the original `SELECT`
 statement, so there's no N+1 issues - it's very efficient.
+
 :::
 
 To create a function that PostGraphile will recognise as a computed column, it

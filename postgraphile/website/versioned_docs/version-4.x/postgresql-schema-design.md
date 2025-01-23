@@ -156,7 +156,7 @@ default in your table creation. Like so:
 create extension if not exists "uuid-ossp";
 
 create table forum_example.person (
- id uuid primary key default uuid_generate_v1mc(),
+  id uuid primary key default uuid_generate_v1mc(),
   ...
 );
 ```

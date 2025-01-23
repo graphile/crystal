@@ -2,7 +2,7 @@
 title: Smart Tags
 ---
 
-You can customise your PostGraphile GraphQL schema by tagging tables, columns,
+You can customize your PostGraphile GraphQL schema by tagging tables, columns,
 functions, relations, etc. These changes could be renaming something, omitting
 things from your GraphQL schema, or anything else a plugin supports!
 

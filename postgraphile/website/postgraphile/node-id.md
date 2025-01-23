@@ -111,9 +111,13 @@ export default {
 Ensure that you have a good way of generating cache identifiers for your GraphQL
 client though!
 
-(Note: the GraphQL Global Object Identification Specification was previously
+:::note
+
+The GraphQL Global Object Identification Specification was previously
 known as the Relay Global Object Identification Specification, but it is not
-specific to Relay and is a general best practice for GraphQL APIs.)
+specific to Relay and is a general best practice for GraphQL APIs.
+
+:::
 
 ### More On the Relay Preset
 

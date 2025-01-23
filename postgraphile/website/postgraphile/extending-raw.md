@@ -1,5 +1,5 @@
 ---
-title: Schema Plugins - Graphile Build
+title: Schema Plugins — Graphile Build
 ---
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile

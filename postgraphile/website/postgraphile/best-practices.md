@@ -7,7 +7,7 @@ title: Best Practices
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or
 discuss them in #documentation on
-[the PostGraphile Discord chat](http://discord.gg/graphile).
+[the Graphile Discord chat](http://discord.gg/graphile).
 
 ### Foreign Key Indexes
 
@@ -66,7 +66,7 @@ GRANT UPDATE ON users TO graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](./requirements/#dont-use-column-based-select-grants)
+[cause a lot of issues](./requirements#your-postgresql-database)
 not just for PostGraphile:
 
 - Cannot `SELECT * FROM`

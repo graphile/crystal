@@ -32,6 +32,6 @@ please consider using the "Edit this page" link to suggest some changes!
 If there exists multiple schemas with the same table name inside of them, it
 can cause naming conflicts as the same name will be generated for each. To
 support non-unique table names you should either apply an `@name` [smart
-tag](./smart-tags) to one or both tables, or implement an [inflection
-override](./inflection/#overriding-inflection---general) that will change how
+tag](./smart-tags#name) to one or both tables, or implement an [inflection
+override](./inflection/#overriding-inflection) that will change how
 the GraphQL type names are generated from the raw table name.
