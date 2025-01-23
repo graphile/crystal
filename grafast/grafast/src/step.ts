@@ -817,16 +817,6 @@ export function isListLikeStep<
   return "at" in plan && typeof (plan as any).at === "function";
 }
 
-// TODO: DELETE
-export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {};
-
-// TODO: DELETE
-export function isStreamableStep<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
-): plan is StreamableStep<TData> {
-  return true;
-}
-
 export type PolymorphicStep = ExecutableStep & {
   planForType(objectType: GraphQLObjectType): ExecutableStep;
 };

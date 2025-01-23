@@ -3125,9 +3125,6 @@ export class OperationPlan {
       (lp) => lp.reason.type === "stream",
     );
 
-    // PERF: if step isn't streamable, don't create a streamLayerPlan because
-    // there's no point (and then we can leverage better optimisations).
-
     return {
       stream:
         streamLayerPlan && isStreamableStep(step)
