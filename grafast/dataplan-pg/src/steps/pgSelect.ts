@@ -2309,6 +2309,8 @@ export class PgSelectRowsStep<
     exportName: "PgSelectRowsStep",
   };
 
+  public isSyncAndSafe = false;
+
   constructor($pgSelect: PgSelectStep<TResource>) {
     super();
     this.addDependency($pgSelect);
@@ -2322,9 +2324,11 @@ export class PgSelectRowsStep<
     return this.getClassStep().listItem(itemPlan);
   }
 
-  optimize() {
-    return access(this.getClassStep(), "items");
-  }
+  // optimize() {
+  //   const $access = access(this.getClassStep(), "items");
+  //   $access.isSyncAndSafe = false;
+  //   return $access;
+  // }
 
   execute(executionDetails: ExecutionDetails) {
     const pgSelect = executionDetails.values[0];
