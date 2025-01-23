@@ -200,17 +200,23 @@ export type GrafastResultStreamList<TStreamItem> = ReadonlyArray<
     >
   | PromiseLike<never>
 >;
-export type ExecutionResults<TData> = ReadonlyArray<
-  | PromiseOrDirect<
-      | ExecutionResultValue<TData>
-      | (TData extends ReadonlyArray<infer UStreamItem>
-          ? AsyncIterable<
-              PromiseOrDirect<ExecutionResultValue<UStreamItem>>
-            > /* | null */
-          : never)
-    >
-  | PromiseLike<never>
+export type AwaitedExecutionResults<TData> = ReadonlyArray<
+  PromiseOrDirect<
+    | ExecutionResultValue<TData>
+    | AsyncIterable<
+        PromiseOrDirect<
+          ExecutionResultValue<any /*
+                TData extends ReadonlyArray<infer UStreamItem>
+                  ? UStreamItem
+                  : never
+                  */>
+        >
+      > /* | null */
+  >
 >;
+export type ExecutionResults<TData> =
+  | PromiseOrDirect<AwaitedExecutionResults<TData>>
+  | PromiseLike<never>;
 
 /** @internal */
 export type ForcedValues = {
@@ -225,7 +231,7 @@ export type ForcedValues = {
 /** @internal */
 export type GrafastInternalResultsOrStream<T> = {
   flags: ReadonlyArray<ExecutionEntryFlags>;
-  results: GrafastResultsList<T> | GrafastResultStreamList<T>;
+  results: AwaitedExecutionResults<T>;
 };
 
 export type BaseGraphQLRootValue = any;
