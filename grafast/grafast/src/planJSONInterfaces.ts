@@ -52,8 +52,9 @@ export interface GrafastPlanBucketReasonListItemJSONv1 {
 
   /** If this listItem is to be streamed, the configuration for that streaming */
   stream?: {
-    initialCount: number;
-    label?: string;
+    initialCountStepId: number;
+    ifStepId: number;
+    labelStepId: number;
   };
 }
 /** Non-branching, deferred */

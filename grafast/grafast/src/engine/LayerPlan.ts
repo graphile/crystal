@@ -52,6 +52,11 @@ export interface LayerPlanReasonNullableField {
    */
   parentStep: ExecutableStep;
 }
+export interface LayerPlanReasonListItemStream {
+  initialCountStepId: number;
+  ifStepId: number;
+  labelStepId: number;
+}
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
   type: "listItem";
@@ -64,11 +69,10 @@ export interface LayerPlanReasonListItem {
    */
   parentStep: ExecutableStep;
 
-  /** If this listItem is to be streamed, the configuration for that streaming */
-  stream?: {
-    initialCount: number;
-    label?: string;
-  };
+  /**
+   * If this listItem is to be streamed, the configuration for that streaming.
+   */
+  stream?: LayerPlanReasonListItemStream;
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
