@@ -86,6 +86,8 @@ export interface LayerPlanReasonMutationField {
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
+  // TODO: change to labelStepId, also add ifStepId. See listItem.stream for
+  // examples.
   label?: string;
 }
 /** Branching, non-deferred */
@@ -226,7 +228,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * - root: the `operationPlan.rootValue`
    * - listItem: the `__ItemStep`
-   * - stream: also the `__ItemStep`
    * - subscription: also the `__ItemStep`
    * - mutationField: the result plan of the mutation field
    * - defer: the parent layer's rootStep (defer always results in an object, unless an error occurs)
