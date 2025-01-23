@@ -106,19 +106,19 @@ export interface LayerPlanReasonSubroutine {
   parentStep: ExecutableStep;
 }
 
-export function isBranchingLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
   return layerPlan.reason.type === "polymorphic";
 }
-export function isDeferredLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return (
-    t === "stream" ||
+    (t === "listItem" && layerPlan.reason.stream != null) ||
     t === "subscription" ||
     t === "mutationField" ||
     t === "defer"
   );
 }
-export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isPolymorphicLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return t === "polymorphic";
 }
