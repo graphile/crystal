@@ -1160,7 +1160,11 @@ export function directiveArgument<T>(
   operationPlan: OperationPlan,
   directive: DirectiveNode,
   argName: string,
-  expectedKind: graphql.Kind.INT | graphql.Kind.FLOAT | graphql.Kind.BOOLEAN,
+  expectedKind:
+    | graphql.Kind.INT
+    | graphql.Kind.FLOAT
+    | graphql.Kind.BOOLEAN
+    | graphql.Kind.STRING,
   fallback: T,
 ): ExecutableStep<T> {
   const initialCountArg = directive.arguments?.find(
@@ -1178,7 +1182,8 @@ export function directiveArgument<T>(
             ? (parseInt(val.value, 10) as T)
             : val.kind === Kind.FLOAT
             ? (parseFloat(val.value) as T)
-            : (val.value as T),
+            : // boolean, string
+              (val.value as T),
         )
       : // For `null` and other unexpected values
         constant(fallback),

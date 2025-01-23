@@ -1022,4 +1022,5 @@ export interface ExecuteStepEvent {
 export interface ItemsStreamDetails {
   initialCount: ExecutableStep<number>;
   if: ExecutableStep<boolean>;
+  label: ExecutableStep<Maybe<string>>;
 }

@@ -50,6 +50,7 @@ import type {
   GrafastPlanStepJSONv1,
   ItemsStreamDetails,
   LocationDetails,
+  Maybe,
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
@@ -94,6 +95,7 @@ import {
 import type {
   LayerPlanPhase,
   LayerPlanReason,
+  LayerPlanReasonListItemStream,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
@@ -970,7 +972,8 @@ export class OperationPlan {
   private itemStepForListStep<TData>(
     parentLayerPlan: LayerPlan,
     listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
-    depth = 0,
+    depth: number,
+    stream: LayerPlanReasonListItemStream | undefined,
   ): __ItemStep<TData> {
     const itemStepId = this.itemStepIdByListStepId[listStep.id];
     if (itemStepId !== undefined) {
@@ -980,7 +983,7 @@ export class OperationPlan {
     const layerPlan = new LayerPlan(this, parentLayerPlan, {
       type: "listItem",
       parentStep: listStep,
-      stream: listStep._stepOptions.stream ?? undefined,
+      stream,
     });
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
@@ -1277,19 +1280,26 @@ export class OperationPlan {
                 // Create streamDetails
                 streamDetails = {
                   // initialCount: $initialCount,
-                  initialCount: directiveArgument(
+                  initialCount: directiveArgument<number>(
                     this,
                     streamDirective,
                     "initialCount",
                     graphql.Kind.INT,
                     0,
                   ),
-                  if: directiveArgument(
+                  if: directiveArgument<boolean>(
                     this,
                     streamDirective,
                     "if",
                     graphql.Kind.BOOLEAN,
                     true,
+                  ),
+                  label: directiveArgument<Maybe<string>>(
+                    this,
+                    streamDirective,
+                    "label",
+                    graphql.Kind.STRING,
+                    undefined,
                   ),
                 };
               }
@@ -1434,7 +1444,7 @@ export class OperationPlan {
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
     listDepth: number,
-    streamDetails: ItemsStreamDetails | null = null,
+    streamDetails: ItemsStreamDetails | null,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
@@ -1461,10 +1471,18 @@ export class OperationPlan {
         locationDetails,
       });
 
+      const stream: LayerPlanReasonListItemStream | undefined = streamDetails
+        ? {
+            initialCountStepId: streamDetails.initialCount.id,
+            ifStepId: streamDetails.if.id,
+            labelStepId: streamDetails.label.id,
+          }
+        : undefined;
       const $__item = this.itemStepForListStep(
         parentLayerPlan,
         $list,
         listDepth,
+        stream,
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
@@ -1491,6 +1509,7 @@ export class OperationPlan {
           locationDetails,
           resolverEmulation,
           listDepth + 1,
+          null,
         );
       } finally {
         $__item.layerPlan.latestSideEffectStep = $sideEffect;
