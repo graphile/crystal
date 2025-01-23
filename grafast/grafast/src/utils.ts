@@ -288,8 +288,8 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
  * Is "thenable".
  */
 export function isPromiseLike<T>(
-  t: T | Promise<T> | PromiseLike<T>,
-): t is PromiseLike<T> | Promise<T> {
+  t: unknown | PromiseLike<T>,
+): t is PromiseLike<T> {
   return t != null && typeof (t as any).then === "function";
 }
 

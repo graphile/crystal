@@ -22,6 +22,7 @@ import type {
   AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
+  ExecutionResults,
   GrafastResultsList,
   GrafastResultStreamList,
   JSONValue,
@@ -597,11 +598,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   /* abstract */
-  execute(
-    details: ExecutionDetails,
-  ): PromiseOrDirect<
-    GrafastResultsList<TData> | GrafastResultStreamList<TData>
-  > {
+  execute(details: ExecutionDetails): ExecutionResults<TData> {
     // ESLint/TS: ignore not used.
     details;
     throw new Error(`${this} has not implemented an 'execute' method`);

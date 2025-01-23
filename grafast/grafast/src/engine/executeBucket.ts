@@ -11,6 +11,7 @@ import type {
   ExecutionDetails,
   ExecutionEntryFlags,
   ExecutionExtra,
+  ExecutionResults,
   ExecutionValue,
   ForcedValues,
   GrafastInternalResultsOrStream,
@@ -103,7 +104,10 @@ export function executeBucket(
     const results = executeOrStream(size, step, dependencies, extra);
     const flags = arrayOfLength(size, NO_FLAGS);
     if (isPromiseLike(results)) {
-      return results.then((results) => ({ flags, results }));
+      return results.then((results) => ({
+        flags,
+        results,
+      }));
     } else {
       return { flags, results };
     }
@@ -699,7 +703,7 @@ export function executeBucket(
     step: ExecutableStep,
     values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+  ): ExecutionResults<any> {
     if (isDev && step._isUnary && count !== 1) {
       throw new Error(
         `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
@@ -1358,7 +1362,6 @@ function makeIndexForEach(count: number) {
   }
   return result;
 }
-
 function executeStepFromEvent(event: ExecuteStepEvent) {
   return event.step.execute(event.executeDetails);
 }
