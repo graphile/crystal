@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/background-tasks/
 title: Background Tasks
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/realtime/
 title: PostGraphile Realtime
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/smart-comments/
 title: Smart Comments
 ---
 

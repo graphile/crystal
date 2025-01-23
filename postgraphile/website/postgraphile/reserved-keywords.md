@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/reserved-keywords/
 title: Reserved Keywords
 ---
 

@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/customization-overview/
-title: Customization overview
+title: Customization Overview
 ---
 
 PostGraphile offers a variety of options, in both JavaScript and SQL, for

@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/namespaces/
-title: Database schemas
+title: Database Schemas
 ---
 
 In PostgreSQL, each database consists of a number of "schemas" (also known as

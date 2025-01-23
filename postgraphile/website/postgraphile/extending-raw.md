@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/extending-raw/
 title: Schema Plugins - Graphile Build
 ---
 

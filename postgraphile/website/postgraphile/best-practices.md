@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/best-practices/
 title: Best Practices
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/running-postgraphile-as-a-library-in-docker/
 title: Running PostGraphile as a Library in Docker
 ---
 

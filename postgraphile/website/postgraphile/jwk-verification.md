@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/jwk-verification/
 title: JWK Verification (e.g. Auth0)
 ---
 

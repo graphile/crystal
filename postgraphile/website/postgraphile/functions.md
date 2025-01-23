@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/functions/
 title: Database Functions
 ---
 

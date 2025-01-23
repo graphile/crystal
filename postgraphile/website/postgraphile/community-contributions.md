@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/community-contributions/
 title: Community Contributions
 ---
 

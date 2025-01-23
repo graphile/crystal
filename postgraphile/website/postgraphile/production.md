@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/production/
 title: Production Considerations
 ---
 
@@ -61,7 +59,7 @@ seconds, no matter how fast your queries actually are.
 Run PostGraphile in the same city as your database, preferably in the same data
 centre.
 
-## Grafast Considerations
+## Gra*fast* Considerations
 
 Since PostGraphile uses Gra*fast* under the hood, you should also familiarize
 yourself with [Gra*fast*'s production

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/running-postgraphile-in-docker/
 title: Running PostGraphile in Docker
 ---
 

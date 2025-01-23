@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/community-plugins/
 title: Community Plugins
 ---
 

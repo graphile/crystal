@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/multiple-schemas/
 title: Multiple GraphQL Schemas
 ---
 

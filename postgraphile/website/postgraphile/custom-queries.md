@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/custom-queries/
 title: Custom Queries
 ---
 

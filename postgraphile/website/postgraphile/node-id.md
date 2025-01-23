@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/node-id/
 title: nodeID / id
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/bundling-webpack/
 title: Bundling with Webpack
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-pg-smart-tags-plugin/
 title: makePgSmartTagsPlugin
 ---
 

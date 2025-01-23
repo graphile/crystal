@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/default-role/
 title: The Default Role
 ---
 

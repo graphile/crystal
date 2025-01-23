@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/function-restrictions/
 title: Function Restrictions
 ---
 

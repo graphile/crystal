@@ -1,8 +1,5 @@
 ---
-layout: page
-path: /postgraphile/plugin-gallery/
 title: Plugin Gallery
-showExamples: plugins
 ---
 
 # PostGraphile Plugin Gallery
