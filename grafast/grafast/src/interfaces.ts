@@ -194,9 +194,7 @@ export type GrafastResultsList<TData> = ReadonlyArray<
 >;
 export type GrafastResultStreamList<TStreamItem> = ReadonlyArray<
   | PromiseOrDirect<
-      AsyncIterable<
-        PromiseOrDirect<ExecutionResultValue<TStreamItem>>
-      > /* | null */
+      AsyncIterable<PromiseOrDirect<ExecutionResultValue<TStreamItem>>>
     >
   | PromiseLike<never>
 >;
@@ -205,13 +203,11 @@ export type AwaitedExecutionResults<TData> = ReadonlyArray<
     | ExecutionResultValue<TData>
     | AsyncIterable<
         PromiseOrDirect<
-          ExecutionResultValue<any /*
-                TData extends ReadonlyArray<infer UStreamItem>
-                  ? UStreamItem
-                  : never
-                  */>
+          ExecutionResultValue<
+            TData extends ReadonlyArray<infer UStreamItem> ? UStreamItem : never
+          >
         >
-      > /* | null */
+      >
   >
 >;
 export type ExecutionResults<TData> =
