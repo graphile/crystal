@@ -104,10 +104,7 @@ export function executeBucket(
     const results = executeOrStream(size, step, dependencies, extra);
     const flags = arrayOfLength(size, NO_FLAGS);
     if (isPromiseLike(results)) {
-      return results.then((results) => ({
-        flags,
-        results,
-      }));
+      return results.then((results) => ({ flags, results }));
     } else {
       return { flags, results };
     }
@@ -710,6 +707,11 @@ export function executeBucket(
       );
     }
     const stream = step._stepOptions.stream;
+    if (step.execute.length > 1) {
+      throw new Error(
+        `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
+      );
+    }
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
