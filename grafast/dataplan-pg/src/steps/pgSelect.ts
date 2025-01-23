@@ -5,7 +5,6 @@ import type {
   ConnectionStep,
   ExecutionDetails,
   GrafastResultsList,
-  GrafastResultStreamList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
@@ -26,16 +25,11 @@ import {
   first,
   isAsyncIterable,
   isDev,
-  isPromiseLike,
   lambda,
-  list,
   operationPlan,
-  remapKeys,
   reverseArray,
   SafeError,
   stepAMayDependOnStepB,
-  stepsAreInSamePhase,
-  StreamableStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
