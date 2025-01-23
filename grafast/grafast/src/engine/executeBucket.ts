@@ -294,13 +294,8 @@ export function executeBucket(
           return;
         }
 
-        let valueIsAsyncIterable;
-        if (
-          // Are we streaming this? If so, we need an iterable or async
-          // iterable.
-          finishedStep._stepOptions.stream &&
-          ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
-        ) {
+        const valueIsAsyncIterable = isAsyncIterable(value);
+        if (valueIsAsyncIterable || isIterable(value)) {
           const streamOptions = finishedStep._stepOptions.stream;
           const initialCount: number = streamOptions
             ? streamOptions.initialCount
