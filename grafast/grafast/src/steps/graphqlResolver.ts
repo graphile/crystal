@@ -137,88 +137,63 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
+    extra: UnbatchedExecutionExtra,
     source: any,
     args: any,
     context: any,
     variableValues: any,
     rootValue: any,
   ): any {
-    if (this.isNotRoot && source == null) {
-      return source;
-    }
-    const resolveInfo: GraphQLResolveInfo = Object.assign(
-      Object.create(this.resolveInfoBase),
-      {
-        variableValues,
-        rootValue,
-        path: {
-          typename: this.resolveInfoBase.parentType.name,
-          key: this.resolveInfoBase.fieldName,
-          // ENHANCE: add full support for path (requires runtime indexes)
-          prev: undefined,
+    if (!extra.stream) {
+      if (this.isNotRoot && source == null) {
+        return source;
+      }
+      const resolveInfo: GraphQLResolveInfo = Object.assign(
+        Object.create(this.resolveInfoBase),
+        {
+          variableValues,
+          rootValue,
+          path: {
+            typename: this.resolveInfoBase.parentType.name,
+            key: this.resolveInfoBase.fieldName,
+            // ENHANCE: add full support for path (requires runtime indexes)
+            prev: undefined,
+          },
         },
-      },
-    );
-    const data = this.resolver?.(source, args, context, resolveInfo);
-    if (this.returnContextAndResolveInfo) {
-      return dcr(data, context, resolveInfo);
+      );
+      const data = this.resolver?.(source, args, context, resolveInfo);
+      if (this.returnContextAndResolveInfo) {
+        return dcr(data, context, resolveInfo);
+      } else {
+        return flagErrorIfErrorAsync(data);
+      }
     } else {
+      if (this.isNotRoot) {
+        return Promise.reject(new Error(`Invalid non-root subscribe`));
+      }
+      if (this.subscriber == null) {
+        return Promise.reject(new Error(`Cannot subscribe to field`));
+      }
+      if (this.returnContextAndResolveInfo) {
+        return Promise.reject(
+          new Error(
+            `Subscription with returnContextAndResolveInfo is not supported`,
+          ),
+        );
+      }
+      const resolveInfo: GraphQLResolveInfo = Object.assign(
+        Object.create(this.resolveInfoBase),
+        {
+          // ENHANCE: add support for path
+          variableValues,
+          rootValue,
+        },
+      );
+      // TODO: we also need to call the resolver on each result?
+      const data = this.subscriber(source, args, context, resolveInfo);
+      // TODO: should apply flagErrorIfError to each value data yields
       return flagErrorIfErrorAsync(data);
     }
-  }
-
-  unbatchedStream(
-    _extra: ExecutionExtra,
-    source: any,
-    args: any,
-    context: any,
-    variableValues: any,
-    rootValue: any,
-  ): any {
-    if (this.isNotRoot) {
-      return Promise.reject(new Error(`Invalid non-root subscribe`));
-    }
-    if (this.subscriber == null) {
-      return Promise.reject(new Error(`Cannot subscribe to field`));
-    }
-    if (this.returnContextAndResolveInfo) {
-      return Promise.reject(
-        new Error(
-          `Subscription with returnContextAndResolveInfo is not supported`,
-        ),
-      );
-    }
-    const resolveInfo: GraphQLResolveInfo = Object.assign(
-      Object.create(this.resolveInfoBase),
-      {
-        // ENHANCE: add support for path
-        variableValues,
-        rootValue,
-      },
-    );
-    const data = this.subscriber(source, args, context, resolveInfo);
-    // TODO: should apply flagErrorIfError to each value data yields
-    return flagErrorIfErrorAsync(data);
-  }
-
-  async stream({
-    indexMap,
-    values,
-    extra,
-  }: ExecutionDetails): Promise<GrafastResultStreamList<any>> {
-    const depCount = this.dependencies.length;
-    return indexMap((i) => {
-      try {
-        const tuple = [];
-        for (let j = 0; j < depCount; j++) {
-          tuple[j] = values[j].at(i);
-        }
-        return (this.unbatchedStream as any)(extra, ...tuple);
-      } catch (e) {
-        return flagError(e);
-      }
-    });
   }
 }
 

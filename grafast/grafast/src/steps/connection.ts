@@ -4,7 +4,6 @@ import type {
   GrafastResultsList,
   ItemsStreamDetails,
   Maybe,
-  StreamDetails,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";

@@ -551,7 +551,7 @@ ${duration}
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    streams: Array<AsyncIterable<TOutput> | PromiseLike<never> | null>;
+    streams: Array<AsyncIterable<TOutput> | PromiseLike<never>>;
   }> {
     const { text, rawSqlValues, identifierIndex } = common;
 
