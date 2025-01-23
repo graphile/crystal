@@ -28,7 +28,6 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
-  StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import {
@@ -600,7 +599,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   /* abstract */
   execute(
     details: ExecutionDetails,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  ): PromiseOrDirect<
+    GrafastResultsList<TData> | GrafastResultStreamList<TData>
+  > {
     // ESLint/TS: ignore not used.
     details;
     throw new Error(`${this} has not implemented an 'execute' method`);
@@ -733,9 +734,13 @@ export abstract class UnbatchedExecutableStep<
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
+    const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {
-        const tuple = values.map((list) => list.at(i));
+        const tuple = [];
+        for (let j = 0; j < depCount; j++) {
+          tuple[j] = values[j].at(i);
+        }
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         return flagError(e);
@@ -812,16 +817,14 @@ export function isListLikeStep<
   return "at" in plan && typeof (plan as any).at === "function";
 }
 
-export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  stream(
-    details: StreamDetails,
-  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
-};
+// TODO: DELETE
+export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {};
 
+// TODO: DELETE
 export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
-  return typeof (plan as StreamableStep<TData>).stream === "function";
+  return true;
 }
 
 export type PolymorphicStep = ExecutableStep & {

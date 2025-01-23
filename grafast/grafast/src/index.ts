@@ -54,7 +54,6 @@ import type {
   ParseAndValidateEvent,
   PrepareArgsEvent,
   ScalarInputPlanResolver,
-  StreamStepEvent,
   UnaryExecutionValue,
   ValidateSchemaEvent,
 } from "./interfaces.js";
@@ -74,9 +73,12 @@ import {
   EventCallback,
   EventMapKey,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -321,9 +323,12 @@ export {
   ExecutableStep,
   execute,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
   ExecutionValue,
   exportAs,
   exportAsMany,
@@ -780,9 +785,6 @@ declare global {
       executeStep(
         event: ExecuteStepEvent,
       ): PromiseOrDirect<GrafastResultsList<any>>;
-      streamStep(
-        event: StreamStepEvent,
-      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {

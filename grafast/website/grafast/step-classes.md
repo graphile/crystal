@@ -195,25 +195,13 @@ execute method then returns the same number of results in the same order: `[3,
 
 ### stream
 
-_This method is optional._
+:::warning REMOVED!
 
-```ts
-stream(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
-```
+`stream` is no longer its own method; it has been merged with `execute`.
 
-```ts
-interface StreamDetails extends ExecutionDetails {
-  streamOptions: {
-    initialCount: number;
-  };
-}
+Use `executionDetails.stream` to determine whether you should stream or not.
 
-type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null>
->;
-```
-
-TODO: document stream. (It's like execute, except it returns a list of async iterators.)
+:::
 
 ### deduplicate
 

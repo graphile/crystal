@@ -255,7 +255,7 @@ interface QueryBuildResult {
 interface PgSelectStepResult {
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
-  items: ReadonlyArray<unknown[]>;
+  items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
 }
 
 /**
@@ -1100,90 +1100,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       count,
       values,
       extra: { eventEmitter },
+      stream,
     } = executionDetails;
-    if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
-    }
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      queryValues,
-      shouldReverseOrder,
-    } = this.buildTheQuery(executionDetails);
-    const contextDep = values[this.contextId];
-
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? null : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.resource[executeMethod](specs, {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      eventEmitter,
-      useTransaction: this.mode === "mutation",
-    });
-    // debugExecute("%s; result: %c", this, executionResult);
-
-    return (await Promise.all(executionResult.values)).map((allVals) => {
-      if (allVals == null) {
-        return {
-          items: allVals,
-        };
-      }
-      const limit = first ?? last;
-      const firstAndLast = first != null && last != null && last < first;
-      const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
-      const trimFromStart =
-        !shouldReverseOrder && last != null && first == null;
-      const limitedRows = hasMore
-        ? trimFromStart
-          ? allVals.slice(Math.max(0, allVals.length - limit!))
-          : allVals.slice(0, limit!)
-        : allVals;
-      const slicedRows =
-        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-      const orderedRows = shouldReverseOrder
-        ? reverseArray(slicedRows)
-        : slicedRows;
-      return {
-        items: orderedRows,
-        hasMore,
-      };
-    });
-  }
-
-  /**
-   * Like `execute`, but stream the results via async iterables.
-   */
-  async stream(
-    executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultStreamList<unknown[]>> {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
-    const { first, last } = this.getExecutionCommon(executionDetails);
     if (first === 0 || last === 0) {
       return arrayOfLength(count, Object.freeze([]));
     }
@@ -1193,22 +1111,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       textForDeclare,
       rawSqlValuesForDeclare,
       identifierIndex,
+      name,
       streamInitialCount,
       queryValues,
       shouldReverseOrder,
     } = this.buildTheQuery(executionDetails);
-
-    if (shouldReverseOrder !== false) {
-      throw new Error("shouldReverseOrder must be false for stream");
-    }
-    if (!rawSqlValuesForDeclare || !textForDeclare) {
-      throw new Error("declare query must exist for stream");
-    }
-
     const contextDep = values[this.contextId];
-    let specs: readonly PgExecutorInput<any>[] | null = null;
-    if (text) {
-      specs = indexMap((i) => {
+
+    if (!stream) {
+      const specs = indexMap<PgExecutorInput<any>>((i) => {
         const context = contextDep.at(i);
         return {
           // The context is how we'd handle different connections with different claims
@@ -1222,50 +1133,120 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               : EMPTY_ARRAY,
         };
       });
-    }
-    const initialFetchResult = specs
-      ? (
-          await this.resource.executeWithoutCache(specs, {
-            text,
-            rawSqlValues,
-            identifierIndex,
-            eventEmitter,
-          })
-        ).values
-      : null;
-
-    const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? val : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const streams = (
-      await this.resource.executeStream(streamSpecs, {
-        text: textForDeclare,
-        rawSqlValues: rawSqlValuesForDeclare,
+      const executeMethod =
+        this.operationPlan.operation.operation === "query"
+          ? "executeWithCache"
+          : "executeWithoutCache";
+      const executionResult = await this.resource[executeMethod](specs, {
+        text,
+        rawSqlValues,
         identifierIndex,
+        name,
         eventEmitter,
-      })
-    ).streams;
+        useTransaction: this.mode === "mutation",
+      });
+      // debugExecute("%s; result: %c", this, executionResult);
 
-    if (initialFetchResult) {
-      // Munge the initialCount records into the streams
+      return (await Promise.all(executionResult.values)).map((allVals) => {
+        if (allVals == null) {
+          return {
+            items: allVals,
+          };
+        }
+        const limit = first ?? last;
+        const firstAndLast = first != null && last != null && last < first;
+        const hasMore =
+          this.fetchOneExtra && limit != null && allVals.length > limit;
+        const trimFromStart =
+          !shouldReverseOrder && last != null && first == null;
+        const limitedRows = hasMore
+          ? trimFromStart
+            ? allVals.slice(Math.max(0, allVals.length - limit!))
+            : allVals.slice(0, limit!)
+          : allVals;
+        const slicedRows =
+          firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+        const orderedRows = shouldReverseOrder
+          ? reverseArray(slicedRows)
+          : slicedRows;
+        return {
+          items: orderedRows,
+          hasMore,
+        };
+      });
+    } else {
+      if (shouldReverseOrder !== false) {
+        throw new Error("shouldReverseOrder must be false for stream");
+      }
+      if (!rawSqlValuesForDeclare || !textForDeclare) {
+        throw new Error("declare query must exist for stream");
+      }
+
+      let specs: readonly PgExecutorInput<any>[] | null = null;
+      if (text) {
+        specs = indexMap((i) => {
+          const context = contextDep.at(i);
+          return {
+            // The context is how we'd handle different connections with different claims
+            context,
+            queryValues:
+              identifierIndex != null
+                ? queryValues.map(({ dependencyIndex, codec }) => {
+                    const val = values[dependencyIndex].at(i);
+                    return val == null ? null : codec.toPg(val);
+                  })
+                : EMPTY_ARRAY,
+          };
+        });
+      }
+      const initialFetchResult = specs
+        ? (
+            await this.resource.executeWithoutCache(specs, {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              eventEmitter,
+            })
+          ).values
+        : null;
+
+      const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
+        const context = contextDep.at(i);
+
+        return {
+          // The context is how we'd handle different connections with different claims
+          context,
+          queryValues:
+            identifierIndex != null
+              ? queryValues.map(({ dependencyIndex, codec }) => {
+                  const val = values[dependencyIndex].at(i);
+                  return val == null ? val : codec.toPg(val);
+                })
+              : EMPTY_ARRAY,
+        };
+      });
+      const streams = (
+        await this.resource.executeStream(streamSpecs, {
+          text: textForDeclare,
+          rawSqlValues: rawSqlValuesForDeclare,
+          identifierIndex,
+          eventEmitter,
+        })
+      ).streams;
 
       return streams.map((stream, idx) => {
         if (!isAsyncIterable(stream)) {
+          // Must be an error
           return stream;
         }
+        if (!initialFetchResult) {
+          return {
+            items: stream,
+            hasMore: false,
+          };
+        }
 
+        // Munge the initialCount records into the streams
         const innerIterator = stream[Symbol.asyncIterator]();
 
         let i = 0;
@@ -1306,10 +1287,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             return this;
           },
         };
-        return mergedGenerator;
+        return {
+          items: mergedGenerator,
+          hasMore: false,
+        };
       });
-    } else {
-      return streams;
     }
   }
 

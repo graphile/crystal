@@ -19,9 +19,7 @@ import type {
   IndexForEach,
   IndexMap,
   PromiseOrDirect,
-  StreamDetails,
   StreamMaybeMoreableArray,
-  StreamStepEvent,
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
@@ -36,7 +34,6 @@ import {
   NO_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
-import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -491,6 +488,7 @@ export function executeBucket(
           stopTime,
           meta,
           eventEmitter,
+          stream: step._stepOptions.stream,
           _bucket: bucket,
           _requestContext: requestContext,
         };
@@ -707,52 +705,23 @@ export function executeBucket(
         `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
       );
     }
-    const streamOptions = step._stepOptions.stream;
-    if (streamOptions && isStreamableStep(step)) {
-      if (step.stream.length > 1) {
-        throw new Error(
-          `${step} is using a legacy form of 'stream' which accepts multiple arguments, please see https://err.red/gev2`,
-        );
-      }
-      const streamDetails: StreamDetails<readonly any[]> = {
-        indexMap: makeIndexMap(count),
-        indexForEach: makeIndexForEach(count),
-        count,
-        values,
-        extra,
-        streamOptions,
-      };
-      if (!step.isSyncAndSafe && middleware != null) {
-        return middleware.run(
-          "streamStep",
-          { args, step, streamDetails },
-          streamStepFromEvent,
-        );
-      } else {
-        return step.stream(streamDetails);
-      }
+    const stream = step._stepOptions.stream;
+    const executeDetails: ExecutionDetails<readonly any[]> = {
+      indexMap: makeIndexMap(count),
+      indexForEach: makeIndexForEach(count),
+      count,
+      values,
+      extra,
+      stream,
+    };
+    if (!step.isSyncAndSafe && middleware != null) {
+      return middleware.run(
+        "executeStep",
+        { args, step, executeDetails },
+        executeStepFromEvent,
+      );
     } else {
-      if (step.execute.length > 1) {
-        throw new Error(
-          `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
-        );
-      }
-      const executeDetails: ExecutionDetails<readonly any[]> = {
-        indexMap: makeIndexMap(count),
-        indexForEach: makeIndexForEach(count),
-        count,
-        values,
-        extra,
-      };
-      if (!step.isSyncAndSafe && middleware != null) {
-        return middleware.run(
-          "executeStep",
-          { args, step, executeDetails },
-          executeStepFromEvent,
-        );
-      } else {
-        return step.execute(executeDetails);
-      }
+      return step.execute(executeDetails);
     }
   }
 
@@ -944,6 +913,7 @@ export function executeBucket(
         stopTime,
         meta,
         eventEmitter,
+        stream: step._stepOptions.stream,
         _bucket: bucket,
         _requestContext: requestContext,
       };
@@ -1387,10 +1357,6 @@ function makeIndexForEach(count: number) {
     indexForEachCache.set(count, result);
   }
   return result;
-}
-
-function streamStepFromEvent(event: StreamStepEvent) {
-  return event.step.stream(event.streamDetails);
 }
 
 function executeStepFromEvent(event: ExecuteStepEvent) {

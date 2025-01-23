@@ -188,15 +188,32 @@ export interface IndexByListItemStepId {
 }
 
 // These values are just to make reading the code a little clearer
-export type GrafastValuesList<T> = ReadonlyArray<T>;
+export type GrafastValuesList<TData> = ReadonlyArray<TData>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type GrafastResultsList<T> = ReadonlyArray<
-  PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+export type ExecutionResultValue<T> =
+  | T
+  | FlaggedValue<Error>
+  | FlaggedValue<null>;
+export type GrafastResultsList<TData> = ReadonlyArray<
+  PromiseOrDirect<ExecutionResultValue<TData>>
 >;
-export type GrafastResultStreamList<T> = ReadonlyArray<
-  | PromiseOrDirect<AsyncIterable<
-      PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
-    > | null>
+export type GrafastResultStreamList<TStreamItem> = ReadonlyArray<
+  | PromiseOrDirect<
+      AsyncIterable<
+        PromiseOrDirect<ExecutionResultValue<TStreamItem>>
+      > /* | null */
+    >
+  | PromiseLike<never>
+>;
+export type ExecutionResults<TData> = ReadonlyArray<
+  | PromiseOrDirect<
+      | ExecutionResultValue<TData>
+      | (TData extends ReadonlyArray<infer UStreamItem>
+          ? AsyncIterable<
+              PromiseOrDirect<ExecutionResultValue<UStreamItem>>
+            > /* | null */
+          : never)
+    >
   | PromiseLike<never>
 >;
 
@@ -799,9 +816,18 @@ export interface ExecutionExtraBase {
   _bucket: Bucket;
   /** @internal */
   _requestContext: RequestTools;
+  /**
+   * @internal
+   *
+   * @remarks We populate it here, but users should only access it from
+   * UnbatchedExecutionExtra or directly from ExecutionDetails.
+   */
+  stream: ExecutionDetailsStream | null;
 }
 export interface ExecutionExtra extends ExecutionExtraBase {}
-export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+export interface UnbatchedExecutionExtra extends ExecutionExtraBase {
+  stream: ExecutionDetailsStream | null;
+}
 
 /**
  * A bitwise number representing a number of flags:
@@ -886,6 +912,11 @@ export interface UnaryExecutionValue<TData = any>
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
 
+export interface ExecutionDetailsStream {
+  // TODO: subscribe: boolean;
+  initialCount: number;
+}
+
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
@@ -899,11 +930,7 @@ export interface ExecutionDetails<
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
   };
   extra: ExecutionExtra;
-}
-export interface StreamDetails<
-  TDeps extends readonly [...any[]] = readonly [...any[]],
-> extends ExecutionDetails<TDeps> {
-  streamOptions: StepStreamOptions;
+  stream: ExecutionDetailsStream | null;
 }
 
 export interface LocationDetails {
@@ -998,12 +1025,6 @@ export interface ExecuteStepEvent {
   step: ExecutableStep;
   executeDetails: ExecutionDetails;
 }
-export interface StreamStepEvent {
-  args: GrafastExecutionArgs;
-  step: StreamableStep<unknown>;
-  streamDetails: StreamDetails;
-}
-
 /** The details passed to a `$step.items(...)` call */
 export interface ItemsStreamDetails {
   initialCount: ExecutableStep<number>;
