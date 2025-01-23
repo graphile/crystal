@@ -7,7 +7,7 @@ Out of the box, PostGraphile supports rudimentary filtering on
 filter using equality with specific values (e.g. `username: "Alice"` or
 `category: ARTICLE`).
 
-[See an example using the `connection` argument.](./examples/#Collections__Relation_condition)
+TODO: See an example using the `connection` argument.
 
 It's important when implementing filters to keep performance in mind. By
 default (unless you're using the V4 preset), PostGraphile will not allow you to
@@ -48,7 +48,7 @@ filters, including filtering on related records from other tables, using greater
 than, less than and ranges for filtering, and even filtering against the output
 of functions. If you need advanced filtering in your GraphQL API (and you can
 use something like
-[persisted queries](./production/#simple-query-whitelist-persisted-queries) to
+[persisted queries](./production#simple-query-allowlist-persisted-queries--persisted-operations) to
 prevent malicious parties issuing complex requests) then I recommend you check
 it out! (But do keep the caveats above in mind.)
 

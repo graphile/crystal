@@ -2,7 +2,7 @@
 title: Direct Schema Usage
 ---
 
-# PostGraphile schema-only usage
+# PostGraphile Schema-Only Usage
 
 The PostGraphile library mode gives you a lot of excellent features for running
 your own GraphQL server. However, if you want to execute a PostGraphile query in

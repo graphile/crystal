@@ -58,14 +58,14 @@ PostGraphile settings you use (and the permissions you've granted), you might
 get the following mutations:
 
 - createUser - Creates a single `User`.
-  [See example](./examples/#Mutations__Create).
+  [See example](#create).
 - updateUser - Updates a single `User` using its globally unique id and a patch.
 - updateUserById - Updates a single `User` using a unique key and a patch.
-  [See example](./examples/#Mutations__Update).
+  [See example](#update).
 - updateUserByUsername - Updates a single `User` using a unique key and a patch.
 - deleteUser - Deletes a single `User` using its globally unique id.
 - deleteUserById - Deletes a single `User` using a unique key.
-  [See example](./examples/#Mutations__Delete).
+  [See example](#delete).
 - deleteUserByUsername - Deletes a single `User` using a unique key.
 
 **The `update` and `delete` mutations are created only if the table contains a
@@ -81,6 +81,8 @@ You also get the following query fields ("Read"):
 
 ### Examples
 
+#### Create
+
 ```graphql
 # Create a User and get back details of the record we created
 mutation {
@@ -95,7 +97,11 @@ mutation {
     }
   }
 }
+```
 
+#### Update
+
+```graphql
 # Update Bilbo using the user.id primary key
 mutation {
   updateUserById(
@@ -110,7 +116,11 @@ mutation {
     }
   }
 }
+```
 
+#### Delete
+
+```graphql
 # Delete Bilbo using the unique user.username column and return the mutation ID
 mutation {
   deleteUserByUsername(input: { username: "bilbo" }) {
