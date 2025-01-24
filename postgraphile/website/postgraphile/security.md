@@ -38,7 +38,7 @@ If you already have a secure database schema that implements these technologies
 to protect your data at the lowest levels then you can leverage `postgraphile`
 to generate a powerful, secure and fast API very rapidly. You just need to
 generate JWT tokens for your users (and we even help you with that), or use
-[pgSettings](./usage-library/#pgsettings-function) to indicate the current user.
+[pgSettings](./config#pgsettings) to indicate the current user.
 
 ### Processing JWTs
 
