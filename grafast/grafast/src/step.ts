@@ -373,7 +373,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
-    this._stepOptions = { stream: null };
+    this._stepOptions = { stream: null, walkIterable: false };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
 
