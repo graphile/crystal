@@ -78,6 +78,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
 
 type PgSelectPlanJoin =
   | {
@@ -1096,7 +1097,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     /** Note: do NOT get this from executionDetails, that would be the wrong position */
     const stream = getUnary(executionDetails.values, this.streamDetailsDepId);
     if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
+      return arrayOfLength(count, NO_ROWS);
     }
     const {
       text,
