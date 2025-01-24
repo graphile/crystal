@@ -824,7 +824,6 @@ export class OperationPlan {
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
-      subscribeStep._stepOptions.stream = {};
       this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(
@@ -909,6 +908,7 @@ export class OperationPlan {
         },
       );
       subscribeStep._stepOptions.stream = {};
+      subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
 
@@ -1198,7 +1198,8 @@ export class OperationPlan {
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
         let streamDetails: StreamDetails | null = null;
-        if (isListType(getNullableType(fieldType))) {
+        const isList = isListType(getNullableType(fieldType));
+        if (isList) {
           // read the @stream directive, if present
           // TODO: Check SameStreamDirective still exists in @stream spec at release.
           /*
@@ -1270,7 +1271,7 @@ export class OperationPlan {
             parentStep,
             objectField,
             trackedArguments,
-            streamDetails,
+            isList ? streamDetails ?? false : null,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
@@ -1493,6 +1494,7 @@ export class OperationPlan {
       if ($list !== $step) {
         $list._stepOptions.stream = $step._stepOptions.stream;
       }
+      $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
         $list,
@@ -1952,7 +1954,10 @@ export class OperationPlan {
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     // If 'true' this is a subscription rather than a stream
-    streamDetails: StreamDetails | true | null,
+    // If 'false' this is a list but it will never stream
+    // If 'null' this is neither subscribe field nor list field
+    // Otherwise, it's a list field that has the `@stream` directive applied
+    streamDetails: StreamDetails | true | false | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
     // The step may have been de-duped whilst sibling steps were planned
@@ -1997,18 +2002,20 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      step._stepOptions.stream =
-        streamDetails === true
-          ? {
-              /* subscription */
-            }
-          : streamDetails != null
-          ? {
-              initialCountStepId: streamDetails.initialCount.id,
-              ifStepId: streamDetails.if.id,
-              labelStepId: streamDetails.label.id,
-            }
-          : null;
+      if (streamDetails === true) {
+        // subscription
+        step._stepOptions.stream = {};
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails === false) {
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails != null) {
+        step._stepOptions.stream = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+        step._stepOptions.walkIterable = true;
+      }
 
       if (deduplicate) {
         // Now that the field has been planned (including arguments, but NOT

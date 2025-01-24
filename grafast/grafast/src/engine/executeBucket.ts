@@ -294,7 +294,11 @@ export function executeBucket(
         }
 
         const valueIsAsyncIterable = isAsyncIterable(value);
-        if (valueIsAsyncIterable || isIterable(value)) {
+        if (
+          finishedStep._stepOptions.walkIterable &&
+          // PERF: do we want to handle arrays differently?
+          (valueIsAsyncIterable || isIterable(value))
+        ) {
           // PERF: we've already calculated this once; can we reference that again here?
           const stream = evaluateStream(bucket, finishedStep);
           const initialCount = stream?.initialCount ?? Infinity;
