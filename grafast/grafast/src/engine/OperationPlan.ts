@@ -804,6 +804,7 @@ export class OperationPlan {
             field,
           )
         : NO_ARGS;
+
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
@@ -816,13 +817,12 @@ export class OperationPlan {
         this.trackedRootValueStep,
         fieldSpec,
         trackedArguments,
+        true,
       );
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
-      const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
-      };
+      const stepOptions: StepOptions = { stream: {} };
       subscribeStep._stepOptions = stepOptions;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
@@ -908,7 +908,7 @@ export class OperationPlan {
         },
       );
       const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
+        stream: {},
       };
       subscribeStep._stepOptions = stepOptions;
 
@@ -1199,6 +1199,65 @@ export class OperationPlan {
               )
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
+        let streamDetails: ItemsStreamDetails | null = null;
+        if (isListType(getNullableType(fieldType))) {
+          // read the @stream directive, if present
+          // TODO: Check SameStreamDirective still exists in @stream spec at release.
+          /*
+           * `SameStreamDirective`
+           * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+           * ensures that every field that has `@stream` must have the same
+           * `@stream` arguments; so we can just check the first node in the
+           * merged set to see our stream options. NOTE: if this changes before
+           * release then we may need to find the stream with the largest
+           * `initialCount` to figure what to do; something like:
+           *
+           *      const streamDirective = firstField.directives?.filter(
+           *        (d) => d.name.value === "stream",
+           *      ).sort(
+           *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+           *      )[0]
+           */
+
+          for (const n of fieldNodes) {
+            const streamDirective = n.directives?.find(
+              (d) => d.name.value === "stream",
+            );
+            if (streamDirective === undefined) {
+              // Undo any previous stream details; the non-@stream wins.
+              streamDetails = null;
+              break;
+            } else if (streamDetails !== null) {
+              // Validation promises the values are the same
+              continue;
+            } else {
+              // Create streamDetails
+              streamDetails = this.withRootLayerPlan(() => ({
+                initialCount:
+                  directiveArgument<number>(
+                    this,
+                    streamDirective,
+                    "initialCount",
+                    graphql.Kind.INT,
+                  ) ?? constant(0),
+                if:
+                  directiveArgument<boolean>(
+                    this,
+                    streamDirective,
+                    "if",
+                    graphql.Kind.BOOLEAN,
+                  ) ?? constant(true),
+                label:
+                  directiveArgument<Maybe<string>>(
+                    this,
+                    streamDirective,
+                    "label",
+                    graphql.Kind.STRING,
+                  ) ?? constant(undefined),
+              }));
+            }
+          }
+        }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
             fieldLayerPlan,
@@ -1210,6 +1269,7 @@ export class OperationPlan {
             parentStep,
             objectField,
             trackedArguments,
+            streamDetails,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
@@ -1262,49 +1322,6 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
-          let streamDetails: ItemsStreamDetails | null = null;
-          if (isListType(getNullableType(fieldType))) {
-            // read the @stream directive, if present
-            for (const n of fieldNodes) {
-              const streamDirective = n.directives?.find(
-                (d) => d.name.value === "stream",
-              );
-              if (streamDirective === undefined) {
-                // Undo any previous stream details; the non-@stream wins.
-                streamDetails = null;
-                break;
-              } else if (streamDetails !== null) {
-                // Validation promises the values are the same
-                continue;
-              } else {
-                // Create streamDetails
-                streamDetails = {
-                  // initialCount: $initialCount,
-                  initialCount: directiveArgument<number>(
-                    this,
-                    streamDirective,
-                    "initialCount",
-                    graphql.Kind.INT,
-                    0,
-                  ),
-                  if: directiveArgument<boolean>(
-                    this,
-                    streamDirective,
-                    "if",
-                    graphql.Kind.BOOLEAN,
-                    true,
-                  ),
-                  label: directiveArgument<Maybe<string>>(
-                    this,
-                    streamDirective,
-                    "label",
-                    graphql.Kind.STRING,
-                    undefined,
-                  ),
-                };
-              }
-            }
-          }
           this.planIntoOutputPlan(
             outputPlan,
             fieldLayerPlan,
@@ -1922,6 +1939,8 @@ export class OperationPlan {
     rawParentStep: ExecutableStep,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
+    // If 'true' this is a subscription rather than a stream
+    streamDetails: ItemsStreamDetails | true | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
     // The step may have been de-duped whilst sibling steps were planned
@@ -1966,40 +1985,17 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      // TODO: Check SameStreamDirective still exists in @stream spec at release.
-      /*
-       * `SameStreamDirective`
-       * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
-       * ensures that every field that has `@stream` must have the same
-       * `@stream` arguments; so we can just check the first node in the
-       * merged set to see our stream options. NOTE: if this changes before
-       * release then we may need to find the stream with the largest
-       * `initialCount` to figure what to do; something like:
-       *
-       *      const streamDirective = firstField.directives?.filter(
-       *        (d) => d.name.value === "stream",
-       *      ).sort(
-       *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
-       *      )[0]
-       */
-      const streamDirective = fieldNodes[0].directives?.find(
-        (d) => d.name.value === "stream",
-      );
-
       const stepOptions: StepOptions = {
         stream:
-          !haltTree && streamDirective
+          streamDetails === true
             ? {
-                initialCount:
-                  Number(
-                    evalDirectiveArg<number | null>(
-                      fieldNodes[0],
-                      "stream",
-                      "initialCount",
-                      this.trackedVariableValuesStep,
-                      null,
-                    ),
-                  ) || 0,
+                /* subscription */
+              }
+            : streamDetails != null
+            ? {
+                initialCountStepId: streamDetails.initialCount.id,
+                ifStepId: streamDetails.if.id,
+                labelStepId: streamDetails.label.id,
               }
             : null,
       };
@@ -2388,7 +2384,7 @@ export class OperationPlan {
       return EMPTY_ARRAY;
     }
 
-    if (step._stepOptions.stream) {
+    if (step._stepOptions.stream != null) {
       // Streams have no peers - we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
       // entries to be garbage collected).
@@ -2407,7 +2403,7 @@ export class OperationPlan {
       constructor: stepConstructor,
       peerKey,
     } = sstep;
-    const streamInitialCount = sstep._stepOptions.stream?.initialCount;
+    // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
@@ -2421,8 +2417,9 @@ export class OperationPlan {
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.peerKey === peerKey &&
-          possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
+          possiblyPeer._stepOptions.stream == null &&
+          possiblyPeer.peerKey === peerKey
+          // && possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2456,10 +2453,10 @@ export class OperationPlan {
           peerDependencyIndex !== 0 ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
-          rawPossiblyPeer.peerKey !== peerKey ||
-          rawPossiblyPeer._stepOptions.stream?.initialCount !==
-            streamInitialCount
+          rawPossiblyPeer.peerKey !== peerKey
+          // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
         ) {
           continue;
         }
@@ -2522,10 +2519,10 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
-              rawPossiblyPeer.peerKey !== peerKey ||
-              rawPossiblyPeer._stepOptions.stream?.initialCount !==
-                streamInitialCount
+              rawPossiblyPeer.peerKey !== peerKey
+              // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
             ) {
               continue;
             }
@@ -3142,25 +3139,6 @@ export class OperationPlan {
     this.processSteps("pushDown", "dependents-first", false, this.pushDown);
   }
 
-  private getStepOptionsForStep(step: ExecutableStep): StepOptions {
-    return step._stepOptions;
-    /*
-    // NOTE: streams can only be merged if their parameters are compatible
-    // (namely they need to have equivalent `initialCount`)
-    const streamLayerPlan = step.childLayerPlans.find(
-      (lp) => lp.reason.type === "stream",
-    );
-
-    return {
-      stream:
-        streamLayerPlan && isStreamableStep(step)
-          ? // && streamLayerPlan.parentStep === step
-            { initialCount: streamLayerPlan.reason.initialCount }
-          : null,
-    };
-    */
-  }
-
   /**
    * Calls the 'optimize' method on a plan, which may cause the plan to
    * communicate with its (deep) dependencies, and even to replace itself with
@@ -3180,7 +3158,7 @@ export class OperationPlan {
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const stepOptions = this.getStepOptionsForStep(step);
+    const stepOptions = step._stepOptions;
     let meta;
     if (step.optimizeMetaKey !== undefined) {
       meta = this.optimizeMeta.get(step.optimizeMetaKey);
@@ -3607,15 +3585,25 @@ export class OperationPlan {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
         const stream = layerPlan.reason.stream;
-        if (stream) {
-          const $initialCount = this.stepTracker.getStepById(
-            stream.initialCountStepId,
-          );
-          const $if = this.stepTracker.getStepById(stream.ifStepId);
-          const $label = this.stepTracker.getStepById(stream.labelStepId);
-          ensurePlanAvailableInLayer($initialCount, layerPlan.parentLayerPlan!);
-          ensurePlanAvailableInLayer($if, layerPlan.parentLayerPlan!);
-          ensurePlanAvailableInLayer($label, layerPlan.parentLayerPlan!);
+        if (stream != null) {
+          if (stream.initialCountStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.initialCountStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
+          if (stream.ifStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.ifStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
+          if (stream.labelStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.labelStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
         }
       }
     }
@@ -3693,7 +3681,7 @@ export class OperationPlan {
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
         stream: step._stepOptions.stream
-          ? { initialCount: step._stepOptions.stream.initialCount }
+          ? { initialCountStepId: step._stepOptions.stream.initialCountStepId }
           : undefined,
         extra: step.planJSONExtra(),
       };

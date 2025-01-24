@@ -53,9 +53,9 @@ export interface LayerPlanReasonNullableField {
   parentStep: ExecutableStep;
 }
 export interface LayerPlanReasonListItemStream {
-  initialCountStepId: number;
-  ifStepId: number;
-  labelStepId: number;
+  initialCountStepId?: number;
+  ifStepId?: number;
+  labelStepId?: number;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {

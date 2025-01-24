@@ -428,13 +428,6 @@ export class PgSelectStep<
    */
   private contextId: number;
 
-  /**
-   * If this plan going to stream, the options for the stream (e.g.
-   * initialCount). Set during the `optimize` call - do not trust it before
-   * then. If null then the plan is not expected to stream.
-   */
-  private streamOptions: StepStreamOptions | null = null;
-
   // --------------------
 
   public readonly mode: PgSelectMode;
@@ -1569,7 +1562,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count } = executionDetails;
+    const { count, stream } = executionDetails;
     const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
 
     const extraWheres: SQL[] = [];
@@ -1610,7 +1603,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       rawSqlValues: SQLRawValue[];
       identifierIndex: number | null;
     } => {
-      const forceOrder = (this.streamOptions && shouldReverseOrder) || false;
+      const forceOrder = (stream && shouldReverseOrder) || false;
       if (
         queryValues.length > 0 ||
         (count !== 1 && (this.forceIdentity || this.hasSideEffects))
@@ -1785,11 +1778,11 @@ ${lateralText};`;
       }
     };
 
-    if (this.streamOptions) {
+    if (stream) {
       // PERF: should use the queryForSingle optimization in here too
 
       // When streaming we can't reverse order in JS - we must do it in the DB.
-      if (this.streamOptions.initialCount > 0) {
+      if (stream.initialCount > 0) {
         /*
          * Here our stream is constructed of two parts - an
          * `initialFetchQuery` to satisfy the `initialCount` and then a
@@ -1801,7 +1794,7 @@ ${lateralText};`;
           rawSqlValues,
           identifierIndex: initialFetchIdentifierIndex,
         } = makeQuery({
-          limit: this.streamOptions.initialCount,
+          limit: stream.initialCount,
           options: { placeholderValues },
         });
         const {
@@ -1809,7 +1802,7 @@ ${lateralText};`;
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex: streamIdentifierIndex,
         } = makeQuery({
-          offset: this.streamOptions.initialCount,
+          offset: stream.initialCount,
           options: { placeholderValues },
         });
         if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
@@ -1825,7 +1818,7 @@ ${lateralText};`;
           rawSqlValuesForDeclare,
           identifierIndex,
           shouldReverseOrder: false,
-          streamInitialCount: this.streamOptions.initialCount,
+          streamInitialCount: stream.initialCount,
           queryValues,
         };
       } else {
@@ -2185,8 +2178,6 @@ ${lateralText};`;
   }
 
   optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    this.streamOptions = stream;
-
     // In case we have any lock actions in future:
     this.lock();
 

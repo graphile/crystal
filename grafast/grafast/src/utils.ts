@@ -1156,6 +1156,14 @@ export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
   return str;
 }
 
+/**
+ * If the directive has the argument `argName`, return a step representing that
+ * arguments value, whether that be a step representing the relevant variable
+ * or a constant step representing the hardcoded value in the document.
+ *
+ * @remarks NOT SUITABLE FOR USAGE WITH LISTS OR OBJECTS! Does not evaluate
+ * internal variable usages e.g. `[1, $b, 3]`
+ */
 export function directiveArgument<T>(
   operationPlan: OperationPlan,
   directive: DirectiveNode,
@@ -1165,27 +1173,20 @@ export function directiveArgument<T>(
     | graphql.Kind.FLOAT
     | graphql.Kind.BOOLEAN
     | graphql.Kind.STRING,
-  fallback: T,
-): ExecutableStep<T> {
-  const initialCountArg = directive.arguments?.find(
-    (n) => n.name.value === argName,
-  );
-  const val = initialCountArg?.value;
-  return operationPlan.withRootLayerPlan(() =>
-    val == null
-      ? constant(fallback)
-      : val.kind === graphql.Kind.VARIABLE
-      ? operationPlan.variableValuesStep.get(val.name.value)
-      : val.kind === expectedKind
-      ? constant(
-          val.kind === Kind.INT
-            ? (parseInt(val.value, 10) as T)
-            : val.kind === Kind.FLOAT
-            ? (parseFloat(val.value) as T)
-            : // boolean, string
-              (val.value as T),
-        )
-      : // For `null` and other unexpected values
-        constant(fallback),
-  );
+): ExecutableStep<T> | undefined {
+  const arg = directive.arguments?.find((n) => n.name.value === argName);
+  if (!arg) return undefined;
+  const val = arg.value;
+  return val.kind === graphql.Kind.VARIABLE
+    ? operationPlan.variableValuesStep.get(val.name.value)
+    : val.kind === expectedKind
+    ? constant(
+        val.kind === Kind.INT
+          ? (parseInt(val.value, 10) as T)
+          : val.kind === Kind.FLOAT
+          ? (parseFloat(val.value) as T)
+          : // boolean, string
+            (val.value as T),
+      )
+    : undefined;
 }
