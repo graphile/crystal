@@ -25,6 +25,7 @@ import {
   first,
   isAsyncIterable,
   isDev,
+  isPromiseLike,
   lambda,
   operationPlan,
   reverseArray,
@@ -1139,11 +1140,13 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       });
       // debugExecute("%s; result: %c", this, executionResult);
 
-      return (await Promise.all(executionResult.values)).map((allVals) => {
+      return executionResult.values.map((allVals) => {
+        if (isPromiseLike(allVals)) {
+          // Must be an error
+          return allVals as never;
+        }
         if (allVals == null) {
-          return {
-            items: allVals,
-          };
+          return allVals;
         }
         const limit = first ?? last;
         const firstAndLast = first != null && last != null && last < first;
