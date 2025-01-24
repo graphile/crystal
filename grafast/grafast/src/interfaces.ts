@@ -202,9 +202,13 @@ export type GrafastResultStreamList<TStreamItem> = ReadonlyArray<
 export type AwaitedExecutionResults<TData> = ReadonlyArray<
   PromiseOrDirect<
     | ExecutionResultValue<TData>
-    | (TData extends ReadonlyArray<infer UStreamItem>
-        ? AsyncIterable<PromiseOrDirect<ExecutionResultValue<UStreamItem>>>
-        : never)
+    | AsyncIterable<
+        PromiseOrDirect<
+          ExecutionResultValue<
+            TData extends ReadonlyArray<infer UStreamItem> ? UStreamItem : never
+          >
+        >
+      >
   >
 >;
 export type ExecutionResults<TData> =
