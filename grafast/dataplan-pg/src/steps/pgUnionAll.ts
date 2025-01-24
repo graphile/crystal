@@ -162,8 +162,6 @@ export interface PgUnionAllStepConfig<
    */
   forceIdentity?: boolean;
 
-  /** @internal @experimental */
-  context?: ExecutableStep<PgExecutorContextPlans<any>>;
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */
@@ -535,32 +533,23 @@ export class PgUnionAllStep<
     TTypeNames extends string = string,
   >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
     const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
-    const context =
-      cloneFrom.contextId != null
-        ? cloneFrom.getDep(cloneFrom.contextId)
-        : undefined;
-    if (context && cloneFrom.contextId !== 0) {
-      throw new Error(`The first dependency must be the context`);
-    }
     const $clone = new PgUnionAllStep({
       ...cloneFrom.spec,
       mode,
       members: [], // This will be overwritten later
       forceIdentity: cloneFrom.forceIdentity,
-      context,
 
       _internalCloneSymbol: cloneFrom.symbol,
       _internalCloneAlias: cloneFrom.alias,
     });
 
-    if ($clone.dependencies.length !== (context ? 1 : 0)) {
+    if ($clone.dependencies.length !== 0) {
       throw new Error(
-        "Should not have any dependencies other than context yet",
+        `Should not have any dependencies yet: ${$clone.dependencies}`,
       );
     }
 
     cloneFrom.dependencies.forEach((planId, idx) => {
-      if (context && idx === 0) return;
       const myIdx = $clone.addDependency({
         ...cloneFrom.getDepOptions(idx),
         skipDeduplication: true,
