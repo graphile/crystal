@@ -217,6 +217,8 @@ export interface PgSelectOptions<
   context?: ExecutableStep<PgExecutorContextPlans<any>>;
   /** @internal */
   _internalCloneSymbol?: symbol | string;
+  /** @internal */
+  _internalCloneAlias?: SQL;
 }
 
 /**
@@ -465,6 +467,7 @@ export class PgSelectStep<
       forceIdentity: cloneFrom.forceIdentity,
 
       _internalCloneSymbol: cloneFrom.symbol,
+      _internalCloneAlias: cloneFrom.alias,
     });
 
     if ($clone.dependencies.length !== 1) {
@@ -561,6 +564,7 @@ export class PgSelectStep<
 
       // Clone only details
       _internalCloneSymbol,
+      _internalCloneAlias,
     } = options;
 
     this.mode = mode ?? "normal";
@@ -588,7 +592,7 @@ export class PgSelectStep<
     this.name = name ?? resource.name;
     this.symbol = _internalCloneSymbol ?? Symbol(this.name);
     this._symbolSubstitutes = new Map();
-    this.alias = sql.identifier(this.symbol);
+    this.alias = _internalCloneAlias ?? sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.placeholders = [];
