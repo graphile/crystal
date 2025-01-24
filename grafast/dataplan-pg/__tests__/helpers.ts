@@ -362,6 +362,7 @@ export async function runTestQuery(
           if (!checkErrorSnapshots && errors) {
             const originalError = result.errors?.[0]?.originalError;
             console.error(originalError || errors[0]);
+            console.error("Occurred at", errors[0].path);
           }
           if (options.callback) {
             throw new Error(
