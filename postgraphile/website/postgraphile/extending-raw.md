@@ -1,6 +1,8 @@
 ---
-title: Schema Plugins — Graphile Build
+title: Graphile Build
 ---
+
+# Schema Plugins — Graphile Build
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Build plugins. The core PG-related plugins can be found here:
@@ -153,7 +155,7 @@ tips above.
 
 However, sometimes the above strategies don't allow you to make the changes you
 desire. To remove something manually, you need to add a hook to the thing that
-owns the thing you wish to remove - for example if you want to remove a field
+owns the thing you wish to remove — for example if you want to remove a field
 `bar` from an object type `Foo` you could hook `GraphQLObjectType_fields` and
 return the set of fields less the one you want removed.
 

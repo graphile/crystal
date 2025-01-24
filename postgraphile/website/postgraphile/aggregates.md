@@ -10,7 +10,7 @@ via plugins. Aggregates are located under connection fields.
 ### Aggregates ignore pagination info
 
 Aggregates are performed over the **entire collection** represented by the
-field and its filters - not just the data that would be returned if you were to
+field and its filters — not just the data that would be returned if you were to
 query the nodes. This means they ignore the `first`, `last`, `before`, `after`
 and `offset` arguments. This is deliberate (if you only need aggregates over
 the data that matches your pagination information then you could calculate

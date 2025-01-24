@@ -471,7 +471,7 @@ would be queryable like so:
 
 :::note
 
-Postgres has awesome text searching capabilities - if you want high
+Postgres has awesome text searching capabilities — if you want high
 quality full text searching you don’t need to look outside Postgres. Instead
 look into the Postgres
 [Full Text Search](https://www.postgresql.org/docs/current/static/textsearch.html)
@@ -1069,7 +1069,7 @@ This code will select a single account from
 here is just another way to write the `email` argument. If we had wrote
 `email = email` or even `a.email = email`, Postgres would not have known which
 email we were referring to, so instead we just used a substitute for the `email`
-argument which depends on its placement in the identifer `$1`. If we
+argument which depends on its placement in the identifier `$1`. If we
 successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:

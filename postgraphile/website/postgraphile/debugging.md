@@ -139,7 +139,7 @@ the internals of your schema that would be useful to an attacker.
 :::
 
 Once enabled, visit Ruru (by default this will be at
-http://localhost:5678/graphiql) and open the `Explain` tab on the left - the
+http://localhost:5678/graphiql) and open the `Explain` tab on the left — the
 icon looks like a magnifying glass 🔍. You should see the query that was
 executed and the associated Gra*fast* operation plan, and from the dropdown you
 can select the various SQL queries and their explain results.
@@ -229,7 +229,7 @@ $env:DEBUG = "graphile-build:warn,@dataplan/pg:*"; postgraphile -c postgres://..
 
 If you're a plugin author, you think you've discovered an issue in PostGraphile,
 or you just like seeing how things work, you can use the Chrome Debug tools to
-debug the node process - add breakpoints, break on exceptions, and step through
+debug the node process — add breakpoints, break on exceptions, and step through
 code execution.
 
 1.  Visit `chrome://inspect` in Google Chrome (we can't hyperlink it for

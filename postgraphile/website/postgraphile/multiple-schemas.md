@@ -4,9 +4,9 @@ title: Multiple GraphQL Schemas
 
 # Multiple GraphQL Schemas with PostGraphile
 
-Each PostGraphile instance only creates a single GraphQL schema ─ you don't get
+Each PostGraphile instance only creates a single GraphQL schema — you don't get
 one schema per user based on permissions, for example. Typically, in GraphQL, a
-single schema is what you want ─ it allows you to use the various GraphQL
+single schema is what you want — it allows you to use the various GraphQL
 tooling for autocomplete, linting, mapping, etc using the same shared schema.
 
 However it sometimes makes sense to provide two or more different schemas; for
@@ -21,10 +21,10 @@ they simply cannot access that endpoint.
 It's possible to run multiple PostGraphile schemas in a single Node.js server,
 either mounting them at different endpoints or on the same URI and use a simple
 middleware to switch between them. The key thing is to not to build more
-PostGraphile instances then the number of services you have - do not build a
+PostGraphile instances then the number of services you have — do not build a
 PostGraphile instance per request! (This is because every time you create a
 PostGraphile instance, it will perform a fresh introspection of your database
-schema and generate the GraphQL API from that - this would cause considerable
+schema and generate the GraphQL API from that — this would cause considerable
 lag, and unnecessary load on your database!)
 
 ### Multiple endpoints

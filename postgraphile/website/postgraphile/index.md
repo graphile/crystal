@@ -61,7 +61,7 @@ techniques to hone the GraphQL API to your needs.
 
 By exporting the executable schema you can see the plan resolvers/types/fields
 that PostGraphile has generated for you and, should you choose to, you can take
-this code and make it your own - either for the entire schema, or for specific
+this code and make it your own — either for the entire schema, or for specific
 portions of it. This can be used to enable you to evolve your database tables
 without breaking your GraphQL schema.
 

@@ -4,7 +4,7 @@ title: GraphQL Schema Plugins
 
 PostGraphile's schema generator is built from a number of
 [graphile-build plugins](https://build.graphile.org/graphile-build/plugins/). You can
-write your own plugins - either using the helpers available in `graphile-utils`,
+write your own plugins — either using the helpers available in `graphile-utils`,
 or using the raw plugin interface available from Graphile Build.
 
 _If you're looking for an easy way to remove/rename things, check out

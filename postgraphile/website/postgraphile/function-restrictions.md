@@ -13,5 +13,5 @@ support:
 - functions that return `record` without any more type information (because we
   don't know what columns that `record` will contain, and thus cannot convert it
   to GraphQL)
-  - to solve this, change `record` to be the name of a composite type that
-    you've defined with `CREATE TYPE` (or similar)
+  — to solve this, change `record` to be the name of a composite type that
+  you've defined with `CREATE TYPE` (or similar)

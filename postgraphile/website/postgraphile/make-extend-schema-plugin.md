@@ -5,11 +5,11 @@ title: makeExtendSchemaPlugin
 `makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It's
 the "bread and butter" of customizing your PostGraphile schema, enabling you to
 add new fields and types to your GraphQL schema in a convenient and concise
-familiar syntax - GraphQL SDL.
+familiar syntax — GraphQL SDL.
 
 :::info
 
-Though the SDL syntax is used, it is not validated - if you define a type but
+Though the SDL syntax is used, it is not validated — if you define a type but
 never use that type, that will likely not cause a schema validation error. If
 you use a directive that does not exist (or pass the wrong arguments to a
 directive), that's also unlikely to error. The SDL is just used as a convenient
@@ -177,7 +177,7 @@ downstream fields may fail to plan because their expectations are broken.
 Object types' `plans` entries may define an `__assertStep` property to indicate
 the type of step the object type's fields' resolvers will be expecting; this is
 equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
-type programatically.
+type programmatically.
 
 The value for `__assertStep` can either be a step class itself (e.g.
 `PgSelectSingleStep`) or
@@ -960,10 +960,10 @@ async function sendEmail(email: string, message: string) {
 
 ## Plugin SQL Privileges
 
-Plugins access the database with the same privileges as everything else - they
+Plugins access the database with the same privileges as everything else — they
 are subject to RLS/RBAC/etc. If your database user does not have privileges to
 perform the action your plugin is attempting to achieve then you may need to
 create a companion database function that is marked as `SECURITY DEFINER` in
 order to perform the action with elevated privileges; alternatively you could
-use this database function directly - see [Custom
+use this database function directly — see [Custom
 Mutations](./custom-mutations) for more details.

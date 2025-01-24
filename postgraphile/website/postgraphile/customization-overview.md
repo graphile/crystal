@@ -5,7 +5,7 @@ title: Customization Overview
 PostGraphile offers a variety of options, in both JavaScript and SQL, for
 customizing your API. Of course the main thing is to ensure that you have
 suitable database objects in place (tables, columns, types, constraints,
-functions, views, indexes, etc.) - PostGraphile should work fine with many
+functions, views, indexes, etc.) — PostGraphile should work fine with many
 different shapes of database, but we do expect you to not shy away from
 leveraging the powerful features your database offers.
 
@@ -27,7 +27,7 @@ well designed database schema. When designing your database schema it's
 critical that you use best practices: primary keys, unique and foreign key
 constraints, indexes, and so on.
 
-When you add new entities to your database, assuming that the revevant
+When you add new entities to your database, assuming that the relevant
 permissions are `GRANT`-ed, PostGraphile will generate related fields and types
 automatically.
 
@@ -109,7 +109,7 @@ which is either the boolean `true`, a string, or a list of these.
 For example, a `@name` "smart tag" can be used to rename any function, table,
 or view; an `@omit` tag can similarly be used to hide any field from the API;
 while a `@resultFieldName` tag can be used to rename the result of a mutation.
-Views (which can't have constraits) can add constraint-like fields by using
+Views (which can't have constraints) can add constraint-like fields by using
 `@foreignKey`, `@primaryKey` or `@unique` smart tags; these enable the views to
 function like more fully-featured tables.
 
@@ -290,8 +290,8 @@ work with certain subsets of these types though.)
 
 ### Adding a field to a function-derived type
 
-We generally recommend against using "anonymous" types in your database - it's better for
-functions to `returns setof named_type` than `returns table(...)` - but should you
+We generally recommend against using "anonymous" types in your database — it's better for
+functions to `returns setof named_type` than `returns table(...)` — but should you
 choose to use anonymous types anyway, adding a field to these can be achieved by:
 
 - alter the function to return additional values
@@ -310,7 +310,7 @@ Options for adding new mutations include:
 ### Renaming a field
 
 To rename any field, you can either rename the database object that it is based
-on, annotate it with a `@name` [smart tag](smart-tags) or similar, or use an
+on, annotate it with a `@name` [smart tag](./smart-tags) or similar, or use an
 [inflection plugin](./inflection).
 
 ### Removing fields

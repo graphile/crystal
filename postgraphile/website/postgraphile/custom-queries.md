@@ -7,7 +7,7 @@ Queries". These are PostgreSQL functions, similar to
 [computed columns](./computed-columns), that can return scalars, records, lists
 or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
 [connections](./connections) or lists (depending on your behavior configuration). The arguments to these functions will be exposed
-via GraphQL - named arguments are preferred, if your arguments are not named we
+via GraphQL — named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
 To create a function that PostGraphile will recognize as a custom query, it must
@@ -144,7 +144,7 @@ record then PostgreSQL will literally have to execute the function until all
 100,000 records have been generated, and this is often expensive.
 
 One way to solve this is to have your function apply its own internal limits and
-filters which can be exposed as GraphQL field arguments - if you reduce the
+filters which can be exposed as GraphQL field arguments — if you reduce the
 amount of data that the function can produce (e.g. to 100 rows) then it reduces
 the potential cost of having this function in your schema.
 

@@ -102,7 +102,7 @@ $$ language sql stable strict;
 
 which can be queried like:
 
-```graphql {5}
+```graphql {3}
 {
   userById(id: …) {
     greet(greeting: "Greetings and salutations")

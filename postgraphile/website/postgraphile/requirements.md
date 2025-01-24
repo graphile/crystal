@@ -3,7 +3,7 @@ title: Requirements
 ---
 
 PostGraphile is packaged as a Node.js module, you can install it with any Node
-package manager such as `npm` or `yarn` (depending on your preference) - users
+package manager such as `npm` or `yarn` (depending on your preference) — users
 tend to have fewer issues with `yarn`, so we recommend it (but if you use yarn
 "berry", we recommend using `nodeLinker: node-modules` in your `.yarnrc.yml`).
 
@@ -36,7 +36,7 @@ experience.
   optimization strategies. Computed columns (where we pass the entire record to
   the function) typically have issues with column-based `SELECT` grants. It's
   recommended that you instead split your tables on permission boundaries and
-  use one-to-one relations to join them together again - this also makes
+  use one-to-one relations to join them together again — this also makes
   writing your RBAC/RLS policies simpler. If you want to omit a column entirely
   then you can give it the
   [`@behavior -*` smart tag](./smart-tags.md#behavior).
@@ -63,13 +63,13 @@ consistent, etc.
 
 We only support LTS versions of Node.js. **Once a Node.js version reaches
 end-of-life we no longer support it**, and any future patch release may be
-incompatible with it. We do not see this as a violation of semver - once a
+incompatible with it. We do not see this as a violation of semver — once a
 Node.js version reaches EOL **no reasonable user should use it**, and as such a
 change to drop support for it is not a breaking change for reasonable users.
 
 ### TypeScript v5.0.0+ (optional)
 
-We recommend that you use TypeScript for the best experience - auto-completion,
+We recommend that you use TypeScript for the best experience — auto-completion,
 inline documentation, etc.
 
 You do not need to use TypeScript to use PostGraphile, but if you do then you
@@ -81,7 +81,7 @@ TypeScript configuration:
     "moduleResolution": "node16", // Or "nodenext"
 ```
 
-Our adherence to semver **does not cover types** - we _may_ make breaking
+Our adherence to semver **does not cover types** — we _may_ make breaking
 changes to TypeScript types in patch-level updates. The reason for this is that
 TypeScript itself is ever-changing, and the libraries we depend on often make
 breaking type changes, forcing us to do so too. Further, improvements to types
@@ -99,7 +99,7 @@ For best results we recommend you use the latest stable release of PostgreSQL
 that we officially support, however it should run well on any earlier version
 of PostgreSQL that have not yet reached end-of life. Once a PostgreSQL version
 reaches end-of-life we no longer support it, and any future patch release may
-be incompatible with it. We do not see this as a violation of semver - once a
+be incompatible with it. We do not see this as a violation of semver — once a
 PostgreSQL version reaches EOL **no reasonable user should use it**, and as
 such a change to drop support for it is not a breaking change for reasonable
 users.
@@ -129,5 +129,5 @@ Works well.
 PostGraphile is developed on \*nix operating systems like GNU/Linux and macOS.
 As far as we know it works on Windows, but since no-one in the core team uses
 Windows for development our Windows support is "best effort" rather than
-"officially supported" - please file an issue if you have problems, but we may
+"officially supported" — please file an issue if you have problems, but we may
 be asking for your help to fix/test them!

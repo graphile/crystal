@@ -15,24 +15,24 @@ API) PostGraphile takes care of it.
 
 This takes a huge maintenance burden off your shoulders. Now you don’t have to
 worry about optimizing the API and the database, instead you can focus on just
-optimizing your database. Scaling a database is well-understood - and you can
-combine techniques - scaling vertically with larger database servers (more RAM,
+optimizing your database. Scaling a database is well-understood — and you can
+combine techniques — scaling vertically with larger database servers (more RAM,
 faster storage), or horizontally with read replicas.
 
 ### No Lock-In
 
-PostGraphile does not lock you into using PostGraphile forever - in fact most of
+PostGraphile does not lock you into using PostGraphile forever — in fact most of
 the work you do implementing a PostGraphile API is in your database, which you
 can take with you if you chose to move to a different system, so no work is
 lost. If you feel comfortable with the cost of building your API, PostGraphile
-is simple to switch with a custom solution - you can even export the GraphQL SDL
+is simple to switch with a custom solution — you can even export the GraphQL SDL
 PostGraphile builds for you so you just need to implement your own resolvers.
 And thanks to `graphile-export`, if your plugins support it, you can export
 your GraphQL schema as executable code including the Gra*fast* plan resolvers.
 
 PostGraphile does not ask you to do anything too divergent with your PostgreSQL
 schema, allowing you to take your schema (and all your data) to whatever
-solution you build next, and being confident that it was well designed - hand
+solution you build next, and being confident that it was well designed — hand
 rolled by you! GraphQL itself provides a simple and clear deprecation path if
 you want to start using different fields. And of course with Graphile Build
 plugins you can extend (or remove) functionality as you wish.
@@ -42,7 +42,7 @@ proxy in front of it and redirecting certain resolvers to your new solution.
 This enables you to move away from PostGraphile with zero downtime.
 
 Ideally PostGraphile will scale with your company (get in touch if you're
-facing scaling issues - we can almost certainly help!), however there is a
+facing scaling issues — we can almost certainly help!), however there is a
 simple exit path even years into the business. We welcome your contributions to
 help PostGraphile scale and meet your needs, and are very open to sponsored
 improvements to the software.
@@ -95,7 +95,7 @@ idea:
     via an ORM or similar abstraction; this performance improvement can
     eliminate the need for caching and the dreaded cache invalidation problem,
     at least for a while. In the database, all the data is _right there_ -
-    there's no need for expensive roundtrips over the network, and the
+    there's no need for expensive round-trips over the network, and the
     serialization/deserialization and data transfer costs are eliminated since
     no data is transferred to remote clients.
 
@@ -107,7 +107,7 @@ we're confident we can convince you otherwise 😉
     badly in the database (just as it is in the application layer) if you use the
     wrong approach. The procedural patterns you may have learned in your
     programming language of choice are likely not the patterns that you should
-    employ in the database - databases (and SQL) use a more declarative approach to
+    employ in the database — databases (and SQL) use a more declarative approach to
     programming, when you use procedural patterns you can introduce huge
     performance issues. For example: looping in the database is expensive, instead
     you should use single statements to process all your data at once in a way that

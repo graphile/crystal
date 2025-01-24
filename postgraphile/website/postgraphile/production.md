@@ -230,7 +230,7 @@ GraphQL clients, but it does have a few caveats:
 - Your API will only accept operations that you've approved, so it's not
   suitable if you want third parties to run arbitrary custom operations.
 - You must be able to generate a unique ID (e.g. a hash) from each operation at
-  build time of your application/web page - your GraphQL operations must be
+  build time of your application/web page — your GraphQL operations must be
   "static". It's important to note this only applies to the operation document
   itself, the variables can of course change at runtime.
 - You must have a way of sharing these static operations from the application

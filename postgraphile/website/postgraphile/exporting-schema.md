@@ -45,7 +45,7 @@ main()
 
 Run this file, and you should see a `exported-schema.mjs` file containing your
 executable schema. You'll notice that this schema does not import
-graphile-build, graphile-build-pg, etc - it just imports what it needs from
+graphile-build, graphile-build-pg, etc — it just imports what it needs from
 `graphql`, `grafast` and similar runtime modules.
 
 :::warning For a schema to be exported, all plugins must support exporting
@@ -67,7 +67,7 @@ handled via the `EXPORTABLE()` function from `graphile-export`. Using
 `eslint-plugin-graphile-export` will help catch most of these kinds of errors,
 but you should be careful to ensure that every function that will be exported
 is either wrapped with `EXPORTABLE` (with the correct args) or is from a
-declared module - see the `graphile-export` documentation.
+declared module — see the `graphile-export` documentation.
 
 TODO: update this warning, since this is less of an issue now that
 graphile-export does its own internal consistency checks.

@@ -24,7 +24,7 @@ permission constraints to the existing table- and column-based permissions.
 
 Now that this functionality is stable and proven (and especially with the
 performance improvements in the latest PostgreSQL releases), we advise that you
-protect your lowest level - the data itself. By doing so you can be sure that no
+protect your lowest level — the data itself. By doing so you can be sure that no
 matter how many services interact with your database they will all be protected
 by the same underlying permissions logic, which you only need to maintain in one
 place. You can add as many microservices as you like, and they can talk to the
@@ -245,7 +245,7 @@ commit;
 
 :::info
 
-To save roundtrips, many adaptors perform just one query to set all configs via:
+To save round-trips, many adaptors perform just one query to set all configs via:
 
 ```sql
 select set_config('role', 'app_user', true), set_config('user_id', '2', true), ...

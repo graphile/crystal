@@ -58,7 +58,7 @@ because it's not nullable, so it would then try and make the parent field
 to make nullable would be the entire query itself. This means that all the
 letters, despite producing no errors, would also be omitted from the result.
 
-One of the key aims of GraphQL is to deal smoothly with temporary errors - i.e.
+One of the key aims of GraphQL is to deal smoothly with temporary errors — i.e.
 when an error occurs it aims to not
 ["throw the baby out with the bathwater"](https://en.wikipedia.org/wiki/Don%27t_throw_the_baby_out_with_the_bathwater).
 This is one of the reasons (the main reason, really) that GraphQL treats all
@@ -121,7 +121,7 @@ create table post (
 ```
 
 From this we know that given a `Post` record exists, then the associated
-`Person` object must also exist - PostgreSQL guarantees this. So why does
+`Person` object must also exist — PostgreSQL guarantees this. So why does
 PostGraphile mark the `Post.personByAuthorId` field as nullable? Well, consider
 this:
 
@@ -139,14 +139,14 @@ exists, that doesn't guarantee that you can see them.
 ### Fields under mutation payloads
 
 For similar reasons to the Relations above, it's possible for you to be able to
-create something but then not see the result of that - it really depends how
+create something but then not see the result of that — it really depends how
 you've defined your security. For example, if you create a truly anonymous
 "feedback" item then there's nothing in it to indicate that you're allowed to
 view it.
 
 ### What about nullable nodes in table connections?
 
-This one at first seems obviously a mistake - of course if I request a list of
+This one at first seems obviously a mistake — of course if I request a list of
 rows from a table or function I'm not going to get some rows and some nulls -
 they'll either all fail or all succeed... Surely? Well, it turns out: no -
 functions which return connections (that is
@@ -176,16 +176,16 @@ leave these as nullable.
 
 I'd be happy to accept a Pull Request that adds functionality marking a function
 as non-nullable via a smart comment (e.g.
-`COMMENT ON FUNCTION foo_func(foo) IS E'@notNull';`) - do raise an issue if this
+`COMMENT ON FUNCTION foo_func(foo) IS E'@notNull';`) — do raise an issue if this
 is of interest to you. Even with this, though, it would be unwise to mark
-root-level functions as non-nullable - what if the PostgreSQL connection is
+root-level functions as non-nullable — what if the PostgreSQL connection is
 terminated when resolving that field, should that make all the other fields null
 too? GraphQL best practices suggest that we should keep errors as localised as
 we can.
 
 ### I've read the above, but I still want this particular thing to be non-nullable!
 
-Sure! PostGraphile is built with extensibility and customisability in mind - you
+Sure! PostGraphile is built with extensibility and customizability in mind — you
 can fix that with a plugin.
 
 Here's a plugin which looks for all forward relation fields (like

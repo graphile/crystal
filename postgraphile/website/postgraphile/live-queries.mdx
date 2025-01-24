@@ -112,7 +112,7 @@ This plugin uses the Logical Decoding features of PostgreSQL to get a stream of
 data changes very efficiently from the database (using its replication
 interface). When a change occurs, if any of the live queries would be affected
 by it, they're informed of the change and PostGraphile re-runs the query and
-sends the results to the client - this ensures that database permissions are
+sends the results to the client — this ensures that database permissions are
 always respected, and that no caching issues occur.
 
 To enable this plugin, you must alter your PostgreSQL configuration
@@ -244,7 +244,7 @@ Live queries are a lot more expensive than regular subscriptions — the server
 must monitor a lot more sources to detect a change (monitoring each individual
 record returned, plus monitoring for additions/removals from any collection
 including filtering constraints), and changes will most likely be more frequent
-as they're coming from multiple sources. Use live queries with care - it's wise
+as they're coming from multiple sources. Use live queries with care — it's wise
 to keep the queries as small as possible since they must be recalculated any
 time anything within the query results changes.
 
@@ -269,7 +269,7 @@ touch!
 Optimization steps you can take currently:
 
 - Whitelist (or otherwise limit) the live queries that your system may perform
-- Only write small non-overlapping live queries - since the entire query must
+- Only write small non-overlapping live queries — since the entire query must
   run again on change it's better to have 20 small queries than one large one
   (quite the opposite to normal queries!)
 - Use `LD_TABLE_PATTERN` to ignore irrelevant data
@@ -280,7 +280,7 @@ Optimization steps you can take currently:
   that they do not trigger live updates for that user (TODO: document this!)
 - Use read replicas <Pro />&nbsp;<Spon />
 
-We do not currently recommend live queries for very large deployments - if
+We do not currently recommend live queries for very large deployments — if
 you're expecting tens of thousands of concurrent users it's going to be
 significantly more efficient to use regular [subscriptions](./subscriptions).
 

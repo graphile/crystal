@@ -34,7 +34,7 @@ because PostgreSQL is finely tuned for data intensive uses.
 
 It's _very easy_ to have very poor performance in the database if
 you try and move your procedural programming language knowledge over without
-making accomodations for the new paradigm you're in. In PostgreSQL, every
+making accommodations for the new paradigm you're in. In PostgreSQL, every
 function call and every statement executed has a performance overhead, so if
 you don't adapt your coding patterns to be optimal for a database, you will
 likely get poor performance. This poor performance from poorly written database
@@ -184,7 +184,7 @@ PL/pgSQL is PostgreSQL’s custom procedural language, it's fairly easy to pick 
 and there are plenty of StackOverflow and other resources for this language.
 You’ll need to learn PL/pgSQL (or one of the other procedural languages) if you
 want to write any triggers, because SQL can’t be used for triggers. Don’t
-worry - you can definitely make awesome applications without a deep knowledge of
+worry — you can definitely make awesome applications without a deep knowledge of
 PL/pgSQL.
 
 A simple function written with `LANGUAGE sql` looks like this:
@@ -376,7 +376,7 @@ If your function depends only on its arguments and does not fetch
 data from other sources, nor is it dependent on configuration variables, then
 you can declare it as `IMMUTABLE` which is a stricter form of `STABLE`.
 
-We advise that you don't use `IMMUTABLE` until you become expert - stick to `STABLE`.
+We advise that you don't use `IMMUTABLE` until you become expert — stick to `STABLE`.
 
 :::
 
@@ -423,7 +423,7 @@ HTTP methods like `GET` and `HEAD`.
 Certain STABLE/IMMUTABLE functions will be exposed by PostGraphile as
 [custom queries](./custom-queries) or [computed columns](./computed-columns).
 
-## SETOF Functions - Connections
+## SETOF Functions — Connections
 
 As well as scalars, compound types, and arrays of these, PostgreSQL functions
 can also return sets. Sets emulate tables, and so it's natural for PostGraphile

@@ -124,7 +124,7 @@ specific to Relay and is a general best practice for GraphQL APIs.
 If having both `id: ID!` and `rowId: Int!` in your schema bothers you (as it
 should!), you should consider using the `postgraphile/presets/relay` preset.
 This preset will hide raw primary keys from most of the schema, and will use
-global object identifiers instead - not just in the query schema but also in
+global object identifiers instead — not just in the query schema but also in
 mutations and filtering (and, with a little guidance, in function inputs).
 
 ```js title="graphile.config.mjs"

@@ -75,7 +75,7 @@ some bug, if we deem that these are likely to affect less than 1% of users then
 we might include them in a minor release (e.g. 5.0.0 -> 5.1.0). Despite this,
 breaking changes to the plugin interface are seen as a major issue and will be
 avoided as much as possible. Interfaces that are documented on the website(s)
-will not be broken without a **very good reason** - so stick to the documented
+will not be broken without a **very good reason** — so stick to the documented
 APIs!
 
 ### Exception: TypeScript types

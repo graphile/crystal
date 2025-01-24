@@ -29,7 +29,7 @@ avoiding naming conflicts. For example:
 But if you don't want this (or it's doing something wrong), then you can fix it
 by overriding inflectors!
 
-### Overriding Naming - One-off
+### Overriding Naming — One-off
 
 If you want to rename just one field or type, your best bet is to use a
 [smart tag](./smart-tags.md); e.g. for a table you might do:
@@ -67,8 +67,8 @@ export default {
 ```
 
 In this example, `previous` is the previous inflector (in case you only want to
-override in certain circumstances) - you would call it using the same
-arguments, just dropping the first two - so in this case: `previous(typeName)`.
+override in certain circumstances) — you would call it using the same
+arguments, just dropping the first two — so in this case: `previous(typeName)`.
 
 :::tip
 
