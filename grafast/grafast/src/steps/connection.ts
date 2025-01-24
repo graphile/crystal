@@ -1,8 +1,8 @@
 import * as assert from "../assert.js";
 import type {
+  ExecutableStepItemsDetails,
   ExecutionDetails,
   GrafastResultsList,
-  ItemsStreamDetails,
   Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
@@ -80,7 +80,7 @@ export interface ConnectionCapableStep<
   setAfter($after: TCursorStep): void;
 
   items(
-    streamDetails?: ItemsStreamDetails | null,
+    streamDetails?: ExecutableStepItemsDetails | null,
   ): ExecutableStep<
     ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
   >;
@@ -587,9 +587,9 @@ export function itemsOrStep<
   T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
 >(
   $step: T,
-  streamDetails?: ItemsStreamDetails | null,
+  itemsDetails: ExecutableStepItemsDetails = {},
 ): ExecutableStep<readonly any[]> {
   return "items" in $step && typeof $step.items === "function"
-    ? $step.items(streamDetails)
+    ? $step.items(itemsDetails)
     : $step;
 }

@@ -19,7 +19,7 @@ import {
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
-import type { ConnectionCapableStep} from "./connection.js";
+import type { ConnectionCapableStep } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 
 /**

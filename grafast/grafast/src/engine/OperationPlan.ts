@@ -34,6 +34,7 @@ import {
   error,
   ExecutableStep,
   isDev,
+  lambda,
   object,
   SafeError,
   stripAnsi,
@@ -42,13 +43,14 @@ import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
+  EvaluatedStreamDetails,
+  ExecutableStepItemsDetails,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
   GrafastPlanBucketReasonJSONv1,
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
-  ItemsStreamDetails,
   LocationDetails,
   Maybe,
   StepOptions,
@@ -1199,7 +1201,7 @@ export class OperationPlan {
               )
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
-        let streamDetails: ItemsStreamDetails | null = null;
+        let streamDetails: StreamDetails | null = null;
         if (isListType(getNullableType(fieldType))) {
           // read the @stream directive, if present
           // TODO: Check SameStreamDirective still exists in @stream spec at release.
@@ -1471,19 +1473,26 @@ export class OperationPlan {
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
     listDepth: number,
-    streamDetails: ItemsStreamDetails | null,
+    streamDetails: StreamDetails | null,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
+      const itemsDetails = streamDetails
+        ? {
+            $stream: this.withRootLayerPlan(() =>
+              evaluatedStreamDetails(streamDetails),
+            ),
+          }
+        : {};
       const $list = withGlobalLayerPlan(
         parentLayerPlan,
         polymorphicPaths,
         itemsOrStep,
         null,
         $step,
-        streamDetails,
+        itemsDetails,
       );
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -1944,7 +1953,7 @@ export class OperationPlan {
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     // If 'true' this is a subscription rather than a stream
-    streamDetails: ItemsStreamDetails | true | null,
+    streamDetails: StreamDetails | true | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
     // The step may have been de-duped whilst sibling steps were planned
@@ -4054,4 +4063,28 @@ function throwNoNewStepsError(
       .map((s) => String(s))
       .join(", ")}`,
   );
+}
+
+type StreamDetails = {
+  if: ExecutableStep<boolean>;
+  initialCount: ExecutableStep<number>;
+  label: ExecutableStep<Maybe<string>>;
+};
+
+function evaluatedStreamDetails(
+  streamDetails: StreamDetails,
+): ExecutableStep<EvaluatedStreamDetails> {
+  return lambda(streamDetails, evaluateStreamDetails, true);
+}
+
+function evaluateStreamDetails(details: {
+  initialCount: number;
+  if: boolean;
+  label: Maybe<string>;
+}): EvaluatedStreamDetails {
+  if (details.if === false) return null;
+  return {
+    initialCount: details.initialCount ?? 0,
+    label: details.label,
+  };
 }

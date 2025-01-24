@@ -3,13 +3,13 @@ import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   ConnectionStep,
+  ExecutableStepItemsDetails,
   ExecutionDetails,
   GrafastResultsList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
   StepOptimizeOptions,
-  StepStreamOptions,
 } from "grafast";
 import {
   __InputListStep,
@@ -61,7 +61,7 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
-import { PgStmtBaseStep } from "./pgStmt.js";
+import { getUnary, PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
@@ -1054,7 +1054,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  public items() {
+  private streamDetailsDepId: number | null = null;
+  public items({ $stream }: ExecutableStepItemsDetails) {
+    if ($stream) {
+      this.streamDetailsDepId = this.addDependency($stream);
+    }
     return new PgSelectRowsStep(this);
   }
 
@@ -1087,8 +1091,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       count,
       values,
       extra: { eventEmitter },
-      stream,
     } = executionDetails;
+    /** Note: do NOT get this from executionDetails, that would be the wrong position */
+    const stream = getUnary(executionDetails.values, this.streamDetailsDepId);
     if (first === 0 || last === 0) {
       return arrayOfLength(count, Object.freeze([]));
     }
@@ -1105,7 +1110,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     } = this.buildTheQuery(executionDetails);
     const contextDep = values[this.contextId];
 
-    if (!stream) {
+    if (stream == null) {
       const specs = indexMap<PgExecutorInput<any>>((i) => {
         const context = contextDep.at(i);
         return {
@@ -1221,20 +1226,20 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         })
       ).streams;
 
-      return streams.map((stream, idx) => {
-        if (!isAsyncIterable(stream)) {
+      return streams.map((iterable, idx) => {
+        if (!isAsyncIterable(iterable)) {
           // Must be an error
-          return stream;
+          return iterable;
         }
         if (!initialFetchResult) {
           return {
-            items: stream,
+            items: iterable,
             hasMore: false,
           };
         }
 
         // Munge the initialCount records into the streams
-        const innerIterator = stream[Symbol.asyncIterator]();
+        const innerIterator = iterable[Symbol.asyncIterator]();
 
         let i = 0;
         let done = false;
