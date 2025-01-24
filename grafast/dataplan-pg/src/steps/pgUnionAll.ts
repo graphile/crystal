@@ -253,7 +253,11 @@ export class PgUnionAllSingleStep
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    return this.getDep<any>(0).getDep(0);
+    // TODO: we should add validation of this!
+    const $item = this.getDep<any>(0);
+    const $rows = $item.getDep(0);
+    const $pgUnionAll = $rows.getDep(0);
+    return $pgUnionAll;
   }
 
   public node() {
