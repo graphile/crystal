@@ -212,6 +212,9 @@ export interface PgSelectOptions<
    * If true and this turns into a join it should be a lateral join.
    */
   joinAsLateral?: boolean;
+
+  /** @internal */
+  _internalCloneSymbol?: symbol | string;
 }
 
 /**
@@ -366,6 +369,7 @@ export class PgSelectStep<
     dependencyIndex: number;
     expression: SQL;
     codec: PgCodec;
+    _matches: PgSelectIdentifierSpec["matches"];
   }[];
 
   /**
@@ -434,73 +438,136 @@ export class PgSelectStep<
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
-  constructor(options: PgSelectOptions<TResource>);
-  constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
-  constructor(
-    optionsOrCloneFrom: PgSelectStep<TResource> | PgSelectOptions<TResource>,
-    overrideMode?: PgSelectMode,
-  ) {
-    super();
-    const [
-      cloneFrom,
-      {
-        resource,
-        identifiers,
-        args: inArgs,
-        from: inFrom = null,
-        hasImplicitOrder: inHasImplicitOrder,
-        name: customName,
-        mode: inMode,
-        joinAsLateral: inJoinAsLateral = false,
-        forceIdentity: inForceIdentity = false,
-      },
-    ] =
-      optionsOrCloneFrom instanceof PgSelectStep
-        ? [
-            optionsOrCloneFrom,
-            {
-              resource: optionsOrCloneFrom.resource,
-              identifiers: null,
-              from: optionsOrCloneFrom.from,
-              hasImplicitOrder: optionsOrCloneFrom.hasImplicitOrder,
-              args: null,
-              name: optionsOrCloneFrom.name,
-              mode: undefined,
-              joinAsLateral: optionsOrCloneFrom.joinAsLateral,
-              forceIdentity: optionsOrCloneFrom.forceIdentity,
-            },
-          ]
-        : [null, optionsOrCloneFrom];
+  static clone<TResource extends PgResource<any, any, any, any, any>>(
+    cloneFrom: PgSelectStep<TResource>,
+    mode: PgSelectMode = cloneFrom.mode,
+  ): PgSelectStep<TResource> {
+    // Prevent any changes to our original to help avoid programming
+    // errors.
+    cloneFrom.lock();
 
-    this.mode = overrideMode ?? inMode ?? "normal";
-    const cloneFromMatchingMode =
-      cloneFrom?.mode === this.mode ? cloneFrom : null;
+    const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
+    const $clone = new PgSelectStep({
+      identifiers: [], //We'll overwrite teh result of this in a moment
+      args: undefined, // We'll overwrite the result of this in a moment
+
+      resource: cloneFrom.resource,
+      from: cloneFrom.from,
+      ...(cloneFrom.hasImplicitOrder === false
+        ? { hasImplicitOrder: cloneFrom.hasImplicitOrder }
+        : {}),
+      name: cloneFrom.name,
+      mode,
+      joinAsLateral: cloneFrom.joinAsLateral,
+      forceIdentity: cloneFrom.forceIdentity,
+
+      _internalCloneSymbol: cloneFrom.symbol,
+    });
+
+    if ($clone.dependencies.length !== 1) {
+      throw new Error(
+        "Should not have any dependencies other than context yet",
+      );
+    }
+
+    cloneFrom.dependencies.forEach((planId, idx) => {
+      if (idx === 0) return;
+      const myIdx = $clone.addDependency({
+        ...cloneFrom.getDepOptions(idx),
+        skipDeduplication: true,
+      });
+      if (myIdx !== idx) {
+        throw new Error(
+          `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+        );
+      }
+    });
+
+    $clone.identifierMatches = [...cloneFrom.identifierMatches];
+    $clone.arguments = [...cloneFrom.arguments];
+    $clone.isTrusted = cloneFrom.isTrusted;
+    // TODO: should `isUnique` only be set if mode matches?
+    $clone.isUnique = cloneFrom.isUnique;
+    $clone.isInliningForbidden = cloneFrom.isInliningForbidden;
+
+    for (const [k, v] of cloneFrom._symbolSubstitutes) {
+      $clone._symbolSubstitutes.set(k, v);
+    }
+
+    for (const v of cloneFrom.placeholders) {
+      $clone.placeholders.push(v);
+    }
+    for (const v of cloneFrom.deferreds) {
+      $clone.deferreds.push(v);
+    }
+    for (const [k, v] of cloneFrom.fixedPlaceholderValues) {
+      $clone.fixedPlaceholderValues.set(k, v);
+    }
+    for (const [k, v] of cloneFrom.relationJoins) {
+      $clone.relationJoins.set(k, v);
+    }
+    for (const v of cloneFrom.joins) {
+      $clone.joins.push(v);
+    }
+    for (const v of cloneFrom.conditions) {
+      $clone.conditions.push(v);
+    }
+    if (cloneFromMatchingMode) {
+      for (const v of cloneFromMatchingMode.selects) {
+        $clone.selects.push(v);
+      }
+      for (const v of cloneFromMatchingMode.groups) {
+        $clone.groups.push(v);
+      }
+      for (const v of cloneFromMatchingMode.havingConditions) {
+        $clone.havingConditions.push(v);
+      }
+      for (const v of cloneFromMatchingMode.orders) {
+        $clone.orders.push(v);
+      }
+
+      $clone.isOrderUnique = cloneFromMatchingMode.isOrderUnique;
+      $clone.firstStepId = cloneFromMatchingMode.firstStepId;
+      $clone.lastStepId = cloneFromMatchingMode.lastStepId;
+      $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
+
+      // dependencies were already added, so we can just copy the dependency references
+      $clone.beforeStepId = cloneFromMatchingMode.beforeStepId;
+      $clone.afterStepId = cloneFromMatchingMode.afterStepId;
+      $clone.lowerIndexStepId = cloneFromMatchingMode.lowerIndexStepId;
+      $clone.upperIndexStepId = cloneFromMatchingMode.upperIndexStepId;
+    }
+
+    return $clone;
+  }
+
+  constructor(options: PgSelectOptions<TResource>) {
+    super();
+    const {
+      resource,
+      identifiers,
+      args: inArgs,
+      from: inFrom = null,
+      hasImplicitOrder: inHasImplicitOrder,
+      name,
+      mode,
+      joinAsLateral: inJoinAsLateral = false,
+      forceIdentity: inForceIdentity = false,
+
+      // Clone only details
+      _internalCloneSymbol,
+    } = options;
+
+    this.mode = mode ?? "normal";
 
     this.hasSideEffects = this.mode === "mutation";
 
     this.resource = resource;
-    if (cloneFrom !== null) {
-      // Prevent any changes to our original to help avoid programming
-      // errors.
-      cloneFrom.lock();
 
-      if (this.dependencies.length !== 0) {
-        throw new Error("Should not have any dependencies yet");
-      }
-      cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency({
-          ...cloneFrom.getDepOptions(idx),
-          skipDeduplication: true,
-        });
-        if (myIdx !== idx) {
-          throw new Error(
-            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
-          );
-        }
-      });
-    } else {
-      // Since we're applying this to the original it doesn't make sense to
-      // also apply it to the clones.
+    // Since we're applying this to the original it doesn't make sense to
+    // also apply it to the clones.
+    if (_internalCloneSymbol === undefined) {
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
@@ -510,29 +577,21 @@ export class PgSelectStep<
       }
     }
 
-    this.contextId = cloneFrom
-      ? cloneFrom.contextId
-      : this.addDependency(this.resource.executor.context());
+    this.contextId = this.addDependency(this.resource.executor.context());
 
-    this.name = customName ?? resource.name;
-    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
-    this._symbolSubstitutes = cloneFrom
-      ? new Map(cloneFrom._symbolSubstitutes)
-      : new Map();
-    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.name = name ?? resource.name;
+    this.symbol = _internalCloneSymbol ?? Symbol(this.name);
+    this._symbolSubstitutes = new Map();
+    this.alias = sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
-    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
-    this.deferreds = cloneFrom ? [...cloneFrom.deferreds] : [];
-    this.fixedPlaceholderValues = cloneFrom
-      ? new Map(cloneFrom.fixedPlaceholderValues)
-      : new Map();
+    this.placeholders = [];
+    this.deferreds = [];
+    this.fixedPlaceholderValues = new Map();
     this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
     this.forceIdentity = inForceIdentity;
-    if (cloneFrom !== null) {
-      this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
-      this.arguments = Object.freeze(cloneFrom.arguments);
-    } else {
+
+    {
       if (!identifiers) {
         throw new Error("Invalid construction of PgSelectStep");
       }
@@ -540,6 +599,7 @@ export class PgSelectStep<
         dependencyIndex: number;
         expression: SQL;
         codec: PgCodec;
+        _matches: PgSelectIdentifierSpec["matches"];
       }[] = [];
       let args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
@@ -555,6 +615,7 @@ export class PgSelectStep<
           expression: matches(this.alias),
           dependencyIndex: this.addDependency(step),
           codec,
+          _matches: matches,
         });
       });
       if (inArgs != null) {
@@ -566,49 +627,28 @@ export class PgSelectStep<
       this.identifierMatches = identifierMatches;
       this.arguments = args;
     }
-    this.relationJoins = cloneFrom
-      ? new Map(cloneFrom.relationJoins)
-      : new Map();
-    this.joins = cloneFrom ? [...cloneFrom.joins] : [];
-    this.selects = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.selects]
-      : [];
-    this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
-    this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
-    this.isInliningForbidden = cloneFrom
-      ? cloneFrom.isInliningForbidden
-      : false;
-    this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
-    this.groups = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.groups]
-      : [];
-    this.havingConditions = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.havingConditions]
-      : [];
-    this.orders = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.orders]
-      : [];
-    this.isOrderUnique = cloneFromMatchingMode
-      ? cloneFromMatchingMode.isOrderUnique
-      : false;
-    this.firstStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.firstStepId
-      : null;
-    this.lastStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.lastStepId
-      : null;
-    this.fetchOneExtra = cloneFromMatchingMode
-      ? cloneFromMatchingMode.fetchOneExtra
-      : false;
-    this.offsetStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.offsetStepId
-      : null;
+
+    this.relationJoins = new Map();
+    this.joins = [];
+    this.selects = [];
+    this.isTrusted = false;
+    this.isUnique = false;
+    this.isInliningForbidden = false;
+    this.conditions = [];
+    this.groups = [];
+    this.havingConditions = [];
+    this.orders = [];
+    this.isOrderUnique = false;
+    this.firstStepId = null;
+    this.lastStepId = null;
+    this.fetchOneExtra = false;
+    this.offsetStepId = null;
 
     // dependencies were already added, so we can just copy the dependency references
-    this.beforeStepId = cloneFromMatchingMode?.beforeStepId ?? null;
-    this.afterStepId = cloneFromMatchingMode?.afterStepId ?? null;
-    this.lowerIndexStepId = cloneFromMatchingMode?.lowerIndexStepId ?? null;
-    this.upperIndexStepId = cloneFromMatchingMode?.upperIndexStepId ?? null;
+    this.beforeStepId = null;
+    this.afterStepId = null;
+    this.lowerIndexStepId = null;
+    this.upperIndexStepId = null;
 
     this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
@@ -627,13 +667,7 @@ export class PgSelectStep<
 
     this.peerKey = this.resource.name;
 
-    debugPlanVerbose(
-      `%s (%s) constructor (%s; %s)`,
-      this,
-      this.name,
-      cloneFrom ? "clone" : "original",
-      this.mode,
-    );
+    debugPlanVerbose(`%s (%s) constructor (%s)`, this, this.name, this.mode);
 
     return this;
   }
@@ -805,7 +839,7 @@ export class PgSelectStep<
    * pagination, or grouping, aggregates, etc)
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
-    return new PgSelectStep(this, mode);
+    return PgSelectStep.clone(this, mode);
   }
 
   connectionClone(
