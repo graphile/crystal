@@ -50,7 +50,7 @@ experience.
 - **Use the defaults** for formatting output; for example we only support the
   default `intervalstyle = 'postgres'` rather than `intervalstyle = 'iso_8601'`.
   Many times this can be solved by returning the relevant default setting value
-  from the [pgSettings function](./usage-library/#pgsettings-function).
+  from the [pgSettings function](./usage-library#pgsettings-function).
 - **Use UTF8 encoding**: GraphQL operates over the UTF8 character set, using
   different encodings may impact your ability to store/retrieve certain values.
 
