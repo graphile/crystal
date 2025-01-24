@@ -1,6 +1,5 @@
 import * as assert from "../assert.js";
 import type {
-  ExecutableStepItemsDetails,
   ExecutionDetails,
   GrafastResultsList,
   Maybe,
@@ -79,9 +78,7 @@ export interface ConnectionCapableStep<
   setBefore($before: TCursorStep): void;
   setAfter($after: TCursorStep): void;
 
-  items(
-    streamDetails?: ExecutableStepItemsDetails | null,
-  ): ExecutableStep<
+  items(): ExecutableStep<
     ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
   >;
 }
@@ -585,11 +582,8 @@ export type ItemsStep<
 
 export function itemsOrStep<
   T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
->(
-  $step: T,
-  itemsDetails: ExecutableStepItemsDetails = {},
-): ExecutableStep<readonly any[]> {
+>($step: T): ExecutableStep<readonly any[]> {
   return "items" in $step && typeof $step.items === "function"
-    ? $step.items(itemsDetails)
+    ? $step.items()
     : $step;
 }

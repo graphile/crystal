@@ -20,7 +20,6 @@ import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
 import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
-  evalDirectiveArg,
   graphqlCollectFields,
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
@@ -34,7 +33,6 @@ import {
   error,
   ExecutableStep,
   isDev,
-  lambda,
   object,
   SafeError,
   stripAnsi,
@@ -43,8 +41,6 @@ import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
-  EvaluatedStreamDetails,
-  ExecutableStepItemsDetails,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -53,7 +49,6 @@ import type {
   GrafastPlanStepJSONv1,
   LocationDetails,
   Maybe,
-  StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
 import {
@@ -66,7 +61,7 @@ import {
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import type { PolymorphicStep } from "../step.js";
 import {
   $$noExec,
   assertExecutableStep,
@@ -1476,20 +1471,12 @@ export class OperationPlan {
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
-      const itemsDetails = streamDetails
-        ? {
-            $stream: this.withRootLayerPlan(() =>
-              evaluatedStreamDetails(streamDetails),
-            ),
-          }
-        : {};
       const $list = withGlobalLayerPlan(
         parentLayerPlan,
         polymorphicPaths,
         itemsOrStep,
         null,
         $step,
-        itemsDetails,
       );
       if ($list !== $step) {
         $list._stepOptions.stream = $step._stepOptions.stream;
@@ -4080,21 +4067,3 @@ type StreamDetails = {
   initialCount: ExecutableStep<number>;
   label: ExecutableStep<Maybe<string>>;
 };
-
-function evaluatedStreamDetails(
-  streamDetails: StreamDetails,
-): ExecutableStep<EvaluatedStreamDetails> {
-  return lambda(streamDetails, evaluateStreamDetails, true);
-}
-
-function evaluateStreamDetails(details: {
-  initialCount: number;
-  if: boolean;
-  label: Maybe<string>;
-}): EvaluatedStreamDetails {
-  if (details.if === false) return null;
-  return {
-    initialCount: details.initialCount ?? 0,
-    label: details.label,
-  };
-}

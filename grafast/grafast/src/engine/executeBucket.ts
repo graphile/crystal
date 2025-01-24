@@ -1364,9 +1364,6 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
   return event.step.execute(event.executeDetails);
 }
 
-// PERF: this is now also calculated to pass to the `.items()` method in
-// OperationPlan - we should re-use that lambda step instead of recalculating
-// here. See `evaluateStreamDetails`.
 function evaluateStream(
   bucket: Bucket,
   step: ExecutableStep,
