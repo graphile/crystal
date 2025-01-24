@@ -824,8 +824,7 @@ export class OperationPlan {
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
-      const stepOptions: StepOptions = { stream: {} };
-      subscribeStep._stepOptions = stepOptions;
+      subscribeStep._stepOptions.stream = {};
       this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(
@@ -909,10 +908,7 @@ export class OperationPlan {
           );
         },
       );
-      const stepOptions: StepOptions = {
-        stream: {},
-      };
-      subscribeStep._stepOptions = stepOptions;
+      subscribeStep._stepOptions.stream = {};
 
       this.rootLayerPlan.setRootStep(subscribeStep);
 
@@ -1494,6 +1490,9 @@ export class OperationPlan {
         $step,
         itemsDetails,
       );
+      if ($list !== $step) {
+        $list._stepOptions.stream = $step._stepOptions.stream;
+      }
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
         $list,
@@ -1998,21 +1997,18 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      const stepOptions: StepOptions = {
-        stream:
-          streamDetails === true
-            ? {
-                /* subscription */
-              }
-            : streamDetails != null
-            ? {
-                initialCountStepId: streamDetails.initialCount.id,
-                ifStepId: streamDetails.if.id,
-                labelStepId: streamDetails.label.id,
-              }
-            : null,
-      };
-      step._stepOptions = stepOptions;
+      step._stepOptions.stream =
+        streamDetails === true
+          ? {
+              /* subscription */
+            }
+          : streamDetails != null
+          ? {
+              initialCountStepId: streamDetails.initialCount.id,
+              ifStepId: streamDetails.if.id,
+              labelStepId: streamDetails.label.id,
+            }
+          : null;
 
       if (deduplicate) {
         // Now that the field has been planned (including arguments, but NOT
