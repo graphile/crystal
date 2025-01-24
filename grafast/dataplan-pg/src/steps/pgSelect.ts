@@ -3,13 +3,11 @@ import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   ConnectionStep,
-  ExecutableStepItemsDetails,
   ExecutionDetails,
   GrafastResultsList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
-  StepOptimizeOptions,
 } from "grafast";
 import {
   __InputListStep,
@@ -1056,11 +1054,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  private streamDetailsDepId: number | null = null;
-  public items({ $stream }: ExecutableStepItemsDetails) {
-    if ($stream) {
-      this.streamDetailsDepId = this.addDependency($stream);
-    }
+  public items() {
     return new PgSelectRowsStep(this);
   }
 
@@ -1093,9 +1087,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       count,
       values,
       extra: { eventEmitter },
+      stream,
     } = executionDetails;
-    /** Note: do NOT get this from executionDetails, that would be the wrong position */
-    const stream = getUnary(executionDetails.values, this.streamDetailsDepId);
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
     }
