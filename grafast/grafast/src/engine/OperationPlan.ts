@@ -2394,12 +2394,19 @@ export class OperationPlan {
     }
 
     if (step._stepOptions.stream != null) {
+      // PERF: re-evaluate this... should be okay to merge streams if we're careful?
+
       // Streams have no peers - we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
       // entries to be garbage collected).
       //
       // HOWEVER! There may be lifecycle parts that need to be called... So
       // call the function with an empty array; ignore the result.
+      return EMPTY_ARRAY;
+    }
+
+    if (this.stepTracker.internalDependencies.has(step)) {
+      // PERF: we need to set up correct tracking, then internal deps can be deduped
       return EMPTY_ARRAY;
     }
 
