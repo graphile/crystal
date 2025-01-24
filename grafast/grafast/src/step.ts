@@ -24,7 +24,6 @@ import type {
   ExecutionEntryFlags,
   ExecutionResults,
   GrafastResultsList,
-  GrafastResultStreamList,
   JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,

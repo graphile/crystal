@@ -60,7 +60,7 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
-import { getUnary, PgStmtBaseStep } from "./pgStmt.js";
+import { PgStmtBaseStep } from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
@@ -2509,36 +2509,6 @@ export function getFragmentAndCodecFromOrder(
       : [colFrag, colCodec, isNullable];
   } else {
     return [order.fragment, order.codec, order.nullable];
-  }
-}
-
-function reverseIfNecessary(params: {
-  rows: any[];
-  shouldReverseOrder: boolean;
-  first: Maybe<number>;
-  last: Maybe<number>;
-  fetchOneExtra: boolean;
-}) {
-  const { rows, shouldReverseOrder, first, last, fetchOneExtra } = params;
-  const limit = first ?? last;
-  const firstAndLast = first != null && last != null && last < first;
-  if ((fetchOneExtra || firstAndLast) && limit != null) {
-    if (!rows) {
-      return rows;
-    }
-    const hasMore = rows.length > limit;
-    const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-    const slicedRows =
-      firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-    const orderedRows = shouldReverseOrder
-      ? reverseArray(slicedRows)
-      : slicedRows;
-    if (hasMore) {
-      (orderedRows as any).hasMore = true;
-    }
-    return orderedRows;
-  } else {
-    return shouldReverseOrder ? reverseArray(rows) : rows;
   }
 }
 

@@ -1,7 +1,8 @@
 import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { ConnectionCapableStep, itemsOrStep } from "./connection.js";
+import type { ConnectionCapableStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
 export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
