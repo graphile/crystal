@@ -9,14 +9,13 @@ import type {
   BatchExecutionValue,
   ExecuteStepEvent,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEntryFlags,
   ExecutionExtra,
   ExecutionResults,
   ExecutionValue,
   ForcedValues,
   GrafastInternalResultsOrStream,
-  GrafastResultsList,
-  GrafastResultStreamList,
   IndexForEach,
   IndexMap,
   PromiseOrDirect,
@@ -296,10 +295,9 @@ export function executeBucket(
 
         const valueIsAsyncIterable = isAsyncIterable(value);
         if (valueIsAsyncIterable || isIterable(value)) {
-          const streamOptions = finishedStep._stepOptions.stream;
-          const initialCount: number = streamOptions
-            ? streamOptions.initialCount
-            : Infinity;
+          // PERF: we've already calculated this once; can we reference that again here?
+          const stream = evaluateStream(bucket, finishedStep);
+          const initialCount = stream?.initialCount ?? Infinity;
 
           const iterator = valueIsAsyncIterable
             ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
@@ -484,7 +482,7 @@ export function executeBucket(
           stopTime,
           meta,
           eventEmitter,
-          stream: step._stepOptions.stream,
+          stream: evaluateStream(bucket, step),
           _bucket: bucket,
           _requestContext: requestContext,
         };
@@ -701,7 +699,6 @@ export function executeBucket(
         `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
       );
     }
-    const stream = step._stepOptions.stream;
     if (step.execute.length > 1) {
       throw new Error(
         `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
@@ -713,7 +710,7 @@ export function executeBucket(
       count,
       values,
       extra,
-      stream,
+      stream: evaluateStream(bucket, step),
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -914,7 +911,7 @@ export function executeBucket(
         stopTime,
         meta,
         eventEmitter,
-        stream: step._stepOptions.stream,
+        stream: evaluateStream(bucket, step),
         _bucket: bucket,
         _requestContext: requestContext,
       };
@@ -1361,4 +1358,25 @@ function makeIndexForEach(count: number) {
 }
 function executeStepFromEvent(event: ExecuteStepEvent) {
   return event.step.execute(event.executeDetails);
+}
+
+function evaluateStream(
+  bucket: Bucket,
+  step: ExecutableStep,
+): ExecutionDetailsStream | null {
+  const stream = step._stepOptions.stream;
+  if (!stream) return null;
+
+  const shouldStream =
+    stream.ifStepId == null
+      ? true
+      : bucket.store.get(stream.ifStepId)?.unaryValue() ?? true;
+  if (!shouldStream) return null;
+
+  const initialCount =
+    stream.initialCountStepId == null
+      ? 0
+      : bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0;
+
+  return { initialCount };
 }

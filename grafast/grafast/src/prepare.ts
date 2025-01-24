@@ -445,6 +445,7 @@ function executePreemptive(
       return payload;
     }
 
+    // NOTE: this is where we determine whether to stream or not
     if (
       bucketRootValue != null &&
       subscriptionLayerPlan != null &&

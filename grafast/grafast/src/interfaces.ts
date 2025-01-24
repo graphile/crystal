@@ -27,6 +27,7 @@ import type {
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
@@ -650,9 +651,7 @@ export type TrackedArguments<
 /**
  * `@stream` directive meta.
  */
-export interface StepStreamOptions {
-  initialCount: number;
-}
+export interface StepStreamOptions extends LayerPlanReasonListItemStream {}
 /**
  * Additional details about the planning for a field; currently only relates to
  * the `@stream` directive.
