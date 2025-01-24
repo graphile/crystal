@@ -1233,27 +1233,30 @@ export class OperationPlan {
             } else {
               // Create streamDetails
               streamDetails = this.withRootLayerPlan(() => ({
-                initialCount:
+                initialCount: this.internalDependency(
                   directiveArgument<number>(
                     this,
                     streamDirective,
                     "initialCount",
                     graphql.Kind.INT,
                   ) ?? constant(0),
-                if:
+                ),
+                if: this.internalDependency(
                   directiveArgument<boolean>(
                     this,
                     streamDirective,
                     "if",
                     graphql.Kind.BOOLEAN,
                   ) ?? constant(true),
-                label:
+                ),
+                label: this.internalDependency(
                   directiveArgument<Maybe<string>>(
                     this,
                     streamDirective,
                     "label",
                     graphql.Kind.STRING,
                   ) ?? constant(undefined),
+                ),
               }));
             }
           }
@@ -1444,9 +1447,11 @@ export class OperationPlan {
     if (this.loc !== null) this.loc.pop();
   }
 
-  private internalDependency($step: ExecutableStep): number {
+  private internalDependency<TStep extends ExecutableStep>(
+    $step: TStep,
+  ): TStep {
     this.stepTracker.internalDependencies.add($step);
-    return $step.id;
+    return $step;
   }
 
   // Similar to the old 'planFieldReturnType'
@@ -1495,11 +1500,10 @@ export class OperationPlan {
 
       const stream: LayerPlanReasonListItemStream | undefined = streamDetails
         ? {
-            initialCountStepId: this.internalDependency(
-              streamDetails.initialCount,
-            ),
-            ifStepId: this.internalDependency(streamDetails.if),
-            labelStepId: this.internalDependency(streamDetails.label),
+            // These are already marked as internal dependencies
+            initialCountStepId: streamDetails.initialCount.id,
+            ifStepId: streamDetails.if.id,
+            labelStepId: streamDetails.label.id,
           }
         : undefined;
       const $__item = this.itemStepForListStep(
