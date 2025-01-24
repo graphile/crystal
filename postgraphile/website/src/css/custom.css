@@ -37,6 +37,10 @@
   --ifm-footer-color: var(--ifm-color-primary-lightest);
 }
 
+.theme-code-block-highlighted-line {
+  border-left: 0.25em solid var(--ifm-color-primary);
+}
+
 figure {
   margin-left: 0;
   margin-right: 0;
