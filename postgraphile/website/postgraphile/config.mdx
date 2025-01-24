@@ -3,31 +3,32 @@ title: Configuration
 ---
 
 import GraphileCLI from "@theme/GraphileCLI";
+import Spon from "@site/src/components/Spon";
 
 # Configuration
 
-No matter whether you're using PostGraphile CLI, library mode or schema only,
+No matter whether you’re using PostGraphile CLI, library mode or schema only,
 PostGraphile (and other elements of the stack including Graphile Build,
 Gra*fast* and Grafserv) are configured via a [`graphile-config`
-"preset."](https://star.graphile.org/graphile-config/preset)
+“preset.”](https://star.graphile.org/graphile-config/preset)
 
 A preset is a simple JS object that contains a combination of: other presets,
 plugins, and options for the various scopes. Your configuration, your preset,
 will almost certainly need to extend an existing preset or presets; which
-preset(s) to extend depends on what you're looking for from PostGraphile.
+preset(s) to extend depends on what you’re looking for from PostGraphile.
 
 The PostGraphile base presets are named after crystals; the first base preset
-available is `postgraphile/presets/amber`, so you'll almost definitely want
+available is `postgraphile/presets/amber`, so you’ll almost definitely want
 that.
 
-:::caution
+:::caution Avoid naming conflicts!
 
-Please don't name your own presets after crystals, or we may end up having
+Please don’t name your own presets after crystals, or we may end up having
 confusion!
 
 :::
 
-**If you're coming from PostGraphile V4** you may then want to add your own
+**If you’re coming from PostGraphile V4** you may then want to add your own
 V4-themed preset with the `makeV4Preset()` factory — see the [V4 migration
 docs](./migrating-from-v4) for more information.
 
@@ -43,10 +44,10 @@ relevant APIs, we recommend that you put your preset into a
 easily be picked up by the PostGraphile CLI and any other utilities (e.g. the
 `graphile` command). You may write your preset in either JS or TS, and you may
 expose it as either CommonJS (`module.exports = ...;`) or ESM (`export default
-...;`). In our examples, we'll typically use `.mjs` since it's modern but
+...;`). In our examples, we’ll typically use `.mjs` since it’s modern but
 without the overhead of requiring TypeScript.
 
-Here's an example preset that just extends the "Amber" preset:
+Here’s an example preset which only extends the “Amber” preset:
 
 ```js title="graphile.config.mjs"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
@@ -75,7 +76,7 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-Similarly you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
+Similarly, you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
 the PostGraphile CLI will pick up all of these automatically assuming that you
 have TypeScript installed locally.
 
@@ -233,7 +234,7 @@ export default preset;
 
 ### Viewing the available options
 
-Once you have a basic configuration file, you can use the `graphile` CLI to
+Once you have a basic configuration file, you can use the <Spon /> `graphile` CLI to
 find out what options are available to you:
 
 ```sh
@@ -243,11 +244,11 @@ graphile config options
 :::info
 
 The `graphile` CLI is a development aid only, and is not needed at runtime or
-in production (or in development really, it's just a handy little helper). This
-utility is sponsors-only source-available software. If you're not a sponsor
-there's a 30 day free trial that starts as soon as you run it for the first
+in production (or in development really, it’s just a handy little helper). This
+utility is sponsors-only source-available software. If you’re not a sponsor
+there’s a 30 day free trial that starts as soon as you run it for the first
 time. You may sponsor at any level for access to this utility. Read the details
-in the [graphile command's
+in the [graphile command’s
 README](https://www.npmjs.com/package/graphile/v/alpha).
 
 :::
@@ -258,14 +259,14 @@ file.
 
 <figure>
 
-[![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
+[![Cropped screenshot of ‘graphile config options’](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
 </figure>
 
 ### Viewing the resolved configuration
 
-You can also use the `graphile` CLI to print out your resolved configuration
+You can also use the <Spon /> `graphile` CLI to print out your resolved configuration
 (once all the presets have been applied). This can help with debugging:
 
 ```sh
@@ -274,7 +275,7 @@ graphile config print
 
 <figure>
 
-[![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
+[![Cropped screenshot of ‘graphile config print’](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
 </figure>
@@ -283,7 +284,7 @@ graphile config print
 
 What follows are some of the more commonly used options to serve as a quick
 reference, but this list can quickly become out of date (feel free to send a
-PR!). You can use TypeScript or the sponsors-only `graphile config options`
+PR!). You can use TypeScript or the sponsors-only <Spon /> `graphile config options`
 command mentioned above to see what options are available to you — different
 presets and plugins make different options available.
 
@@ -298,16 +299,16 @@ _None at this time._
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgServiceConfiguration>`)_
 
 Details the PostgreSQL database(s) for PostGraphile to connect to; this is a
-separate option because it's used in both the `gather` phase (for introspection)
+separate option because it’s used in both the `gather` phase (for introspection)
 and at runtime.
 
-Generally it's best to construct this by using the `makePgService` helper from
+Generally it’s best to construct this by using the `makePgService` helper from
 the adaptor(s) you are using (see below), but if you want to know the
 nitty-gritty: each entry in the list is an object with the following keys (only
 `name` and `adaptor` are required):
 
 - `name: string` - an arbitrary unique name for this config; please keep it
-  alphanumeric! Don't set this unless you have more than one pgService; see
+  alphanumeric! Don’t set this unless you have more than one pgService; see
   warning below.
 - `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
   result of `import("@dataplan/pg/adaptors/pg")` for the `pg` module
@@ -355,14 +356,14 @@ const pgServices = [
 ];
 ```
 
-:::caution Don't set `name` unless you need to!
+:::caution Don’t set `name` unless you need to!
 
-We recommend that you don't set a `name` unless you have more than one
+We recommend that you don’t set a `name` unless you have more than one
 pgService. If you do, the different services may need different properties on
 `context` to detail how to connect, the settings to use, and how to subscribe
 to events. The `withPgClientKey`, `pgSettingsKey` and `pgSubscriberKey` options
 dictate under which keys these properties are stored on the context. By
-default, if the pgService's `name` is left at its default (`"main"`) then it
+default, if the pgService’s `name` is left at its default (`"main"`) then it
 uses `"withPgClient"`, `"pgSettings"` and `"pgSubscriber"` respectively for
 these keys; otherwise it prefixes the keys with the name of the service and an
 underscore, for example a pgService with `name: "otherdb"` would use the
@@ -374,7 +375,7 @@ context keys `otherdb_withPgClient`, `otherdb_pgSettings` and
 ### `makePgService`
 
 When PostGraphile (or, strictly, `@dataplan/pg`) wishes to communicate with
-PostgreSQL, it does so using an "adaptor". The adaptor must expose a common set
+PostgreSQL, it does so using an “adaptor”. The adaptor must expose a common set
 of functionality, but on top of that it can add adaptor-specific features, for
 example you might write an adaptor to add support for using your ORM of choice,
 so that in your custom fields/plan resolvers you can use that ORM to execute
@@ -463,7 +464,7 @@ primarily, it accepts the following options:
 - `pool` - pass your own pre-built `pg.Pool` instance to use, in which case all
   other (non-superuser) options will be ignored. You are responsible for
   releasing this pool!
-- `connectionString` - the database connection string to use, we'll create a
+- `connectionString` - the database connection string to use, we’ll create a
   pool for you automatically (and handle releasing it) using this connection
   string
 - `poolConfig` - additional configuration options (options other than
@@ -487,14 +488,14 @@ be specified. Similarly if `superuserPool` is provided then
 
 _(TypeScript type: `GraphileBuild.GatherOptions`)_
 
-- `pgStrictFunctions: boolean` - if true, we'll treat all PostgreSQL function
-  arguments that don't have defaults as being required (non-nullable)
+- `pgStrictFunctions: boolean` - if true, we’ll treat all PostgreSQL function
+  arguments that don’t have defaults as being required (non-nullable)
 - `pgJwtTypes: string | string[]` - an array of (or comma separated list of)
   the names (including schemas) for the types in the database to convert into a
   JWT (equivalent to giving these type the behavior `"-table +jwt"`); example:
   `pgJwtTypes: "app_public.jwt_token"`
 - `installWatchFixtures: boolean` - if not false and schema is in watch mode
-  then we will attempt to install the "event triggers" into the database so that
+  then we will attempt to install the “event triggers” into the database so that
   PostGraphile can be notified when your database changes
 
 Deprecated options:
@@ -509,7 +510,7 @@ _(TypeScript type: `GraphileBuild.SchemaOptions`)_
 
 :::tip
 
-Plugins may add additional options, please refer to your plugins' documentation
+Plugins may add additional options, please refer to your plugins’ documentation
 to determine the options that they offer.
 
 :::
@@ -521,7 +522,7 @@ to determine the options that they offer.
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
 - `jsonScalarAsString: boolean` - if true, JSON values will be stringified
-  rather than returned as "dynamic" objects.
+  rather than returned as “dynamic” objects.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
   cannot return null, so our list and connection types can be non-nullable in
   more places.
@@ -537,7 +538,7 @@ to determine the options that they offer.
 
 _(TypeScript type: `GraphileConfig.GrafastOptions`)_
 
-- `explain` - a list of 'explain' types that should be exposed to clients via
+- `explain` - a list of ‘explain’ types that should be exposed to clients via
   `extensions.explain` (`plan` for the operation plan, `sql` for the
   SQL), or `true` to expose everything.
 - `context` - an object (or function that returns an object, or promise to an
@@ -553,15 +554,15 @@ _(TypeScript type: `GraphileConfig.GrafastOptions`)_
 _(TypeScript type: `GraphileConfig.GrafservOptions`)_
 
 - `port: number` - Port number to listen on (default: 5678)
-- `host: string` - Host to listen on (default: '127.0.0.1'; consider setting to
-  '0.0.0.0' in Docker and similar environments)
+- `host: string` - Host to listen on (default: ‘127.0.0.1’; consider setting to
+  ‘0.0.0.0’ in Docker and similar environments)
 - `graphqlPath: string` - The path at which GraphQL will be available; usually
   `/graphql`
 - `graphiqlPath: string` - The path at which GraphiQL will be available; usually
   `/`
 - `eventStreamPath: string` - The path at which the GraphQL event stream would
   be made available; usually `/graphql/stream`
-- `graphqlOverGET: boolean` - If true, we'll support GraphQL queries over the
+- `graphqlOverGET: boolean` - If true, we’ll support GraphQL queries over the
   GET method (beware of the security implications, for example cross-site
   timing attacks)
 - `graphiql: boolean`
@@ -570,7 +571,7 @@ _(TypeScript type: `GraphileConfig.GrafservOptions`)_
 - `watch: boolean` - Set true to enable watch mode
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept, only used if the framework of choice
-  doesn't already handle input parsing
+  doesn’t already handle input parsing
 
 ## Making HTTP data available to plan resolvers
 
@@ -621,7 +622,7 @@ context keys with your initials, company name, or similar.
 
 :::tip
 
-It's _not_ a good idea to give direct access to the `req` or `res` objects
+It’s _not_ a good idea to give direct access to the `req` or `res` objects
 via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
 request lifecycle — this will cause you issues if you try and use the GraphQL
 schema in other contexts (e.g. directly from the application, in integration
@@ -642,17 +643,17 @@ or can be used to indicate details of the currently active user (e.g.
 Every `pgService` can indicate its own `pgSettings` callback to dictate which
 settings that specific service should use with its associated database (see
 [`pgServices`](#pgservices) above), and these settings are added to the
-GraphQL context using the key set in that services' `pgSettingsKey`.
+GraphQL context using the key set in that services’ `pgSettingsKey`.
 
 Presets may also add values to `pgSettings`, for example
 `postgraphile/presets/lazy-jwt` parses the `Authorization` header and adds the
 claims from the JWT to `pgSettings`.
 
-For most PostGraphile users there's only one pgService, and the default
+For most PostGraphile users there’s only one pgService, and the default
 `pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
 the adaptor you might opt to configure it via including a `pgSettings` key in
 the object you return from the Grafast context callback mentioned in the
-"Grafast options" section above. The value for this key should be a POJO (plain
+“Grafast options" section above. The value for this key should be a POJO (plain
 old JavaScript object) with string keys and string values, and you should be
 careful to copy across settings from the pgService adaptor and any
 presets/plugins that may have added to it. For example:
@@ -732,9 +733,9 @@ export default {
 };
 ```
 
-If you're using the PostGraphile CLI then you won't have middleware to do the
+If you’re using the PostGraphile CLI then you won’t have middleware to do the
 heavy lifting for you, but you can still process incoming request headers -
-this more complicated example extracts the user's ID from a JWT and sends that
+this more complicated example extracts the user’s ID from a JWT and sends that
 and the value of a specific HTTP header to PostgreSQL:
 
 ```ts title="graphile.config.js"
@@ -814,12 +815,12 @@ $$ language sql stable;
 
 By default, everything in `pgSettings` is applied to the current transaction
 with `set_config($key, $value, true)`; note that `set_config` only supports
-string values so it is best to only feed `pgSettings` string values (we'll
+string values so it is best to only feed `pgSettings` string values (we’ll
 [convert other values using the `String()` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#string_coercion), which may not
 have the effect you intend). All settings are automatically reset when the
 transaction completes.
 
-Here's an example of switching the PostgreSQL client into the 'visitor' role,
+Here’s an example of switching the PostgreSQL client into the ‘visitor’ role,
 and applying the application setting `jwt.claims.user_id` using the `req.user`
 object from an Express server:
 
