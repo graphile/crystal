@@ -36,7 +36,7 @@ import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
-import type { PgExecutorInput } from "../executor.js";
+import type { PgExecutorContextPlans, PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -213,6 +213,8 @@ export interface PgSelectOptions<
    */
   joinAsLateral?: boolean;
 
+  /** @internal @experimental */
+  context?: ExecutableStep<PgExecutorContextPlans<any>>;
   /** @internal */
   _internalCloneSymbol?: symbol | string;
 }
@@ -450,6 +452,7 @@ export class PgSelectStep<
     const $clone = new PgSelectStep({
       identifiers: [], //We'll overwrite teh result of this in a moment
       args: undefined, // We'll overwrite the result of this in a moment
+      context: cloneFrom.getDep(cloneFrom.contextId),
 
       resource: cloneFrom.resource,
       from: cloneFrom.from,
@@ -554,6 +557,7 @@ export class PgSelectStep<
       mode,
       joinAsLateral: inJoinAsLateral = false,
       forceIdentity: inForceIdentity = false,
+      context: inContext,
 
       // Clone only details
       _internalCloneSymbol,
@@ -577,7 +581,9 @@ export class PgSelectStep<
       }
     }
 
-    this.contextId = this.addDependency(this.resource.executor.context());
+    this.contextId = this.addDependency(
+      inContext ?? resource.executor.context(),
+    );
 
     this.name = name ?? resource.name;
     this.symbol = _internalCloneSymbol ?? Symbol(this.name);
