@@ -445,7 +445,7 @@ export class PgUnionAllStep<
   public symbol: symbol;
   public alias: SQL;
 
-  private selects: PgUnionAllStepSelect<TAttributes>[];
+  private selects: PgUnionAllStepSelect<TAttributes>[] = [];
 
   private executor!: PgExecutor;
   private contextId!: number;
@@ -454,9 +454,9 @@ export class PgUnionAllStep<
   public readonly spec: PgUnionAllStepConfig<TAttributes, TTypeNames>;
 
   /** @internal */
-  public orders: Array<PgOrderFragmentSpec>;
+  public orders: Array<PgOrderFragmentSpec> = [];
   /** The select index used to store the order value for the given order */
-  private orderSelectIndex: Array<number>;
+  private orderSelectIndex: Array<number> = [];
   /**
    * `ordersForCursor` is the same as `orders`, but then with the type and
    * primary key added. This ensures unique ordering, as required by cursor
@@ -469,56 +469,56 @@ export class PgUnionAllStep<
    * entries with `pk` higher than the given `pk`, and for all other `type`s we
    * can include all records.
    */
-  private ordersForCursor: Array<PgOrderFragmentSpec>;
+  private ordersForCursor: Array<PgOrderFragmentSpec> = [];
 
   /**
    * Values used in this plan.
    */
-  protected placeholders: Array<PgStmtDeferredPlaceholder>;
-  protected deferreds: Array<PgStmtDeferredSQL>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
+  protected deferreds: Array<PgStmtDeferredSQL> = [];
 
   // GROUP BY
 
-  private groups: Array<PgGroupSpec>;
+  private groups: Array<PgGroupSpec> = [];
 
   // HAVING
 
-  private havingConditions: SQL[];
+  private havingConditions: SQL[] = [];
 
   // LIMIT
 
-  protected firstStepId: number | null;
-  protected lastStepId: number | null;
+  protected firstStepId: number | null = null;
+  protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected lowerIndexStepId: number | null;
+  protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected upperIndexStepId: number | null;
+  protected upperIndexStepId: number | null = null;
   /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
-  private limitAndOffsetId: number | null;
+  private limitAndOffsetId: number | null = null;
 
   // OFFSET
 
-  protected offsetStepId: number | null;
+  protected offsetStepId: number | null = null;
 
   // CURSORS
 
-  protected beforeStepId: number | null;
-  protected afterStepId: number | null;
+  protected beforeStepId: number | null = null;
+  protected afterStepId: number | null = null;
 
-  protected shouldReverseOrderId: number | null;
+  protected shouldReverseOrderId: number | null = null;
 
   // Connection
   private connectionDepId: number | null = null;
 
-  protected limitAndOffsetSQL: SQL | null;
-  private innerLimitSQL: SQL | null;
+  protected limitAndOffsetSQL: SQL | null = null;
+  private innerLimitSQL: SQL | null = null;
 
   public readonly mode: PgUnionAllMode;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
-  private memberDigests: MemberDigest<TTypeNames>[];
+  private memberDigests: MemberDigest<TTypeNames>[] = [];
   private _limitToTypes: string[] | undefined;
 
   /**
@@ -526,7 +526,7 @@ export class PgUnionAllStep<
    * seemingly innocuous things such as `random()`) otherwise we might only
    * call the relevant function once and re-use the result.
    */
-  public forceIdentity: boolean;
+  public forceIdentity = false;
 
   static clone<
     TAttributes extends string = string,
@@ -600,18 +600,6 @@ export class PgUnionAllStep<
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
     {
-      this.firstStepId = null;
-      this.lastStepId = null;
-      this.offsetStepId = null;
-      this.lowerIndexStepId = null;
-      this.upperIndexStepId = null;
-      this.limitAndOffsetId = null;
-      this.beforeStepId = null;
-      this.afterStepId = null;
-      this.shouldReverseOrderId = null;
-      this.limitAndOffsetSQL = null;
-      this.innerLimitSQL = null;
-
       this.mode = spec.mode ?? "normal";
 
       if (this.mode === "aggregate") {
@@ -620,7 +608,6 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
-      this.forceIdentity = false;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -641,16 +628,6 @@ export class PgUnionAllStep<
       this.symbol = Symbol(spec.name ?? "union");
       this.alias = sql.identifier(this.symbol);
 
-      this.selects = [];
-      this.placeholders = [];
-      this.deferreds = [];
-      this.groups = [];
-      this.havingConditions = [];
-      this.orders = [];
-      this.orderSelectIndex = [];
-      this.ordersForCursor = [];
-
-      this.memberDigests = [];
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
