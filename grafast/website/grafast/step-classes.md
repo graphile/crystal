@@ -431,8 +431,10 @@ from steps which don't adhere to these expectations.
 Implement `.items()` if your step represents a collection and you want to give
 users an easy way of accessing the items of your collection (as opposed to
 metadata you may also wish to make available, such as pagination info). It
-should accept a no arguments (later we might support options related to
-streaming, so do not implement arguments!).
+should accept no arguments (later <!-- Benjie: see commit
+8f5ccf8592d80b0addc942951e96659292763c4d --> we might support options related
+to streaming, so do not implement arguments!) and it should expect to be called
+zero or more times.
 
 ```ts
 import { access } from "grafast";
