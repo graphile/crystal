@@ -82,6 +82,7 @@ const digestSpecificExpressionFromAttributeName = (
 };
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
@@ -1304,7 +1305,7 @@ and ${condition(i + 1)}`}
     }
     if (this.memberDigests.length === 0) {
       // We have no implementations, we'll never return anything
-      return constant([], false);
+      return constant(NO_ROWS, false);
     }
 
     // We must lock here otherwise we might try and create cursor validation
@@ -1753,7 +1754,7 @@ ${lateralText};`;
         // Must be an error!
         return allVals;
       } else if (allVals == null) {
-        return allVals;
+        return NO_ROWS;
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;
