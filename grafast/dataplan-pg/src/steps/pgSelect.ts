@@ -307,7 +307,7 @@ export class PgSelectStep<
    * symbols of the PgSelects that they were replaced with (which might also not
    * exist in future, but we follow the chain so it's fine).
    */
-  private readonly _symbolSubstitutes: Map<symbol, symbol>;
+  private readonly _symbolSubstitutes = new Map<symbol, symbol>();
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
@@ -319,44 +319,47 @@ export class PgSelectStep<
 
   // JOIN
 
-  private relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
-  private joins: Array<PgSelectPlanJoin>;
+  private relationJoins = new Map<
+    keyof GetPgResourceRelations<TResource>,
+    SQL
+  >();
+  private joins: Array<PgSelectPlanJoin> = [];
 
   // WHERE
 
-  private conditions: SQL[];
+  private conditions: SQL[] = [];
 
   // GROUP BY
 
-  private groups: Array<PgGroupSpec>;
+  private groups: Array<PgGroupSpec> = [];
 
   // HAVING
 
-  private havingConditions: SQL[];
+  private havingConditions: SQL[] = [];
 
   // ORDER BY
 
-  private orders: Array<PgOrderSpec>;
-  private isOrderUnique: boolean;
+  private orders: Array<PgOrderSpec> = [];
+  private isOrderUnique = false;
 
   // LIMIT
 
-  protected firstStepId: number | null;
-  protected lastStepId: number | null;
-  protected fetchOneExtra: boolean;
+  protected firstStepId: number | null = null;
+  protected lastStepId: number | null = null;
+  protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected lowerIndexStepId: number | null;
+  protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected upperIndexStepId: number | null;
+  protected upperIndexStepId: number | null = null;
 
   // OFFSET
 
-  protected offsetStepId: number | null;
+  protected offsetStepId: number | null = null;
 
   // CURSORS
 
-  protected beforeStepId: number | null;
-  protected afterStepId: number | null;
+  protected beforeStepId: number | null = null;
+  protected afterStepId: number | null = null;
 
   // Connection
   private connectionDepId: number | null = null;
@@ -388,27 +391,27 @@ export class PgSelectStep<
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
-  protected placeholders: Array<PgStmtDeferredPlaceholder>;
-  protected deferreds: Array<PgStmtDeferredSQL>;
-  private fixedPlaceholderValues: Map<symbol, SQL>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
+  protected deferreds: Array<PgStmtDeferredSQL> = [];
+  private fixedPlaceholderValues = new Map<symbol, SQL>();
 
   /**
    * If true, we don't need to add any of the security checks from the
    * resource; otherwise we must do so. Default false.
    */
-  private isTrusted: boolean;
+  private isTrusted = false;
 
   /**
    * If true, we know at most one result can be matched for each identifier, so
    * it's safe to do a `LEFT JOIN` without risk of returning duplicates. Default false.
    */
-  private isUnique: boolean;
+  private isUnique = false;
 
   /**
    * If true, we will not attempt to inline this into the parent query.
    * Default false.
    */
-  private isInliningForbidden: boolean;
+  private isInliningForbidden = false;
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -429,7 +432,7 @@ export class PgSelectStep<
   /**
    * The list of things we're selecting.
    */
-  private selects: Array<SQL>;
+  private selects: Array<SQL> = [];
 
   /**
    * The id for the PostgreSQL context plan.
@@ -591,13 +594,9 @@ export class PgSelectStep<
 
     this.name = name ?? resource.name;
     this.symbol = _internalCloneSymbol ?? Symbol(this.name);
-    this._symbolSubstitutes = new Map();
     this.alias = _internalCloneAlias ?? sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
-    this.placeholders = [];
-    this.deferreds = [];
-    this.fixedPlaceholderValues = new Map();
     this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
     this.forceIdentity = inForceIdentity;
 
@@ -637,28 +636,6 @@ export class PgSelectStep<
       this.identifierMatches = identifierMatches;
       this.arguments = args;
     }
-
-    this.relationJoins = new Map();
-    this.joins = [];
-    this.selects = [];
-    this.isTrusted = false;
-    this.isUnique = false;
-    this.isInliningForbidden = false;
-    this.conditions = [];
-    this.groups = [];
-    this.havingConditions = [];
-    this.orders = [];
-    this.isOrderUnique = false;
-    this.firstStepId = null;
-    this.lastStepId = null;
-    this.fetchOneExtra = false;
-    this.offsetStepId = null;
-
-    // dependencies were already added, so we can just copy the dependency references
-    this.beforeStepId = null;
-    this.afterStepId = null;
-    this.lowerIndexStepId = null;
-    this.upperIndexStepId = null;
 
     this.locker.afterLock("orderBy", () => {
       if (this.beforeStepId != null) {
