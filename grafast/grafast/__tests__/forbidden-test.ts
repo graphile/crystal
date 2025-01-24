@@ -40,7 +40,7 @@ class BadOptimizeStep extends ExecutableStep {
   }
   optimize() {
     const $parent = this.getDep(0);
-    $parent.optimize?.({ meta: {}, stream: null });
+    $parent.optimize?.({ meta: {} });
     return this;
   }
   async execute({ count }: ExecutionDetails) {
