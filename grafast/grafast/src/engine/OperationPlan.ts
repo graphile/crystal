@@ -3174,7 +3174,7 @@ export class OperationPlan {
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const stepOptions = step._stepOptions;
+    // const stepOptions = step._stepOptions;
     let meta;
     if (step.optimizeMetaKey !== undefined) {
       meta = this.optimizeMeta.get(step.optimizeMetaKey);
@@ -3185,7 +3185,7 @@ export class OperationPlan {
     }
     const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
-      ...stepOptions,
+      // ...stepOptions,
       meta,
     });
     if (wasLocked) lock(step);

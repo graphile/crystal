@@ -2182,7 +2182,7 @@ ${lateralText};`;
     }
   }
 
-  optimize({ stream }: StepOptimizeOptions): ExecutableStep {
+  optimize(): ExecutableStep {
     // In case we have any lock actions in future:
     this.lock();
 
