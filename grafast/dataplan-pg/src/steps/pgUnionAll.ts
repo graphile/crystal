@@ -1745,7 +1745,10 @@ ${lateralText};`;
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
+      if (isPromiseLike(allVals)) {
+        // Must be an error!
+        return allVals;
+      } else if (allVals == null) {
         return allVals;
       }
       const limit = first ?? last;
@@ -1764,10 +1767,10 @@ ${lateralText};`;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
+      return {
+        hasMore,
+        items: orderedRows,
+      };
     });
   }
 
