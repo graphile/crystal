@@ -1017,9 +1017,15 @@ export interface ExecuteStepEvent {
   step: ExecutableStep;
   executeDetails: ExecutionDetails;
 }
+export type EvaluatedStreamDetails = null | {
+  initialCount: number;
+  label: Maybe<string>;
+};
 /** The details passed to a `$step.items(...)` call */
-export interface ItemsStreamDetails {
-  initialCount: ExecutableStep<number>;
-  if: ExecutableStep<boolean>;
-  label: ExecutableStep<Maybe<string>>;
+export interface ExecutableStepItemsDetails {
+  /**
+   * If the step _might_ stream, this is a step that will resolve to `null`
+   * (don't stream) or to an object describing the stream parameters.
+   */
+  $stream?: ExecutableStep<EvaluatedStreamDetails>;
 }
