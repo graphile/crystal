@@ -12,9 +12,7 @@ import type { FlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, flagError, SafeError } from "../index.js";
 import type {
-  ExecutionExtra,
   GrafastResultsList,
-  GrafastResultStreamList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";

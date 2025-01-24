@@ -673,7 +673,6 @@ export interface StepOptions {
  * Options passed to the `optimize` method of a plan to give more context.
  */
 export interface StepOptimizeOptions {
-  // stream: StepStreamOptions | null;
   meta: Record<string, unknown> | undefined;
 }
 
