@@ -372,7 +372,7 @@ export function getUnary<T>(
   return stepId == null ? undefined : (values[stepId].unaryValue() as T);
 }
 
-function calculateLimitAndOffsetSQL(params: {
+export function calculateLimitAndOffsetSQL(params: {
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   first: Maybe<number>;
@@ -520,4 +520,121 @@ function calculateLimitAndOffsetSQL(params: {
       ? sql`\nlimit ${sql.literal(innerLimitValue)}`
       : sql.blank;
   return [limitAndOffset, innerLimitSQL];
+}
+
+export interface PgStmtCommonQueryInfo {
+  executionDetails: ExecutionDetails;
+  placeholders: Array<PgStmtDeferredPlaceholder>;
+  deferreds: Array<PgStmtDeferredSQL>;
+  fetchOneExtra: boolean;
+  firstStepId: number | null;
+  lastStepId: number | null;
+  offsetStepId: number | null;
+  lowerIndexStepId: number | null;
+  upperIndexStepId: number | null;
+}
+
+export function calculateLimitAndOffsetSQLFromInfo(
+  info: PgStmtCommonQueryInfo,
+) {
+  const {
+    executionDetails: { values },
+    fetchOneExtra,
+  } = info;
+  return calculateLimitAndOffsetSQL({
+    first: getUnary(values, info.firstStepId),
+    last: getUnary(values, info.lastStepId),
+    cursorLower: getUnary(values, info.lowerIndexStepId),
+    cursorUpper: getUnary(values, info.upperIndexStepId),
+    offset: getUnary(values, info.offsetStepId),
+    fetchOneExtra,
+  });
+}
+
+export function getExecutionCommon(info: PgStmtCommonQueryInfo) {
+  const { executionDetails } = info;
+  const { values } = executionDetails;
+
+  const first = getUnary<Maybe<number>>(values, info.firstStepId);
+  const last = getUnary<Maybe<number>>(values, info.lastStepId);
+  const offset = getUnary<Maybe<number>>(values, info.offsetStepId);
+
+  if (offset != null && last != null) {
+    throw new SafeError("Cannot use 'offset' with 'last'");
+  }
+  /**
+   * If `last` is in use then we reverse the order from the database and then
+   * re-reverse it in JS-land.
+   */
+  const shouldReverseOrder = calculateShouldReverseOrder({
+    first: getUnary(values, info.firstStepId),
+    last: getUnary(values, info.lastStepId),
+    cursorLower: getUnary(values, info.lowerIndexStepId),
+    cursorUpper: getUnary(values, info.upperIndexStepId),
+  });
+
+  return { first, last, offset, shouldReverseOrder };
+}
+
+export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
+  const { executionDetails, placeholders, deferreds } = info;
+  const { values, count } = executionDetails;
+  const identifiersSymbol = Symbol(name + "_identifiers");
+  const identifiersAlias = sql.identifier(identifiersSymbol);
+  /**
+   * Since this is effectively like a DataLoader it processes the data for many
+   * different resolvers at once. This list of (hopefully scalar) plans is used
+   * to represent queryValues the query will need such as identifiers for which
+   * records in the result set should be returned to which GraphQL resolvers,
+   * parameters for conditions or orders, etc.
+   */
+  const queryValues: Array<QueryValue> = [];
+  const placeholderValues = new Map<symbol, SQL>();
+  const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
+    const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
+    const ev = values[dependencyIndex];
+    if (!ev.isBatch || count === 1) {
+      const value = ev.at(0);
+      const encodedValue =
+        value == null ? null : alreadyEncoded ? value : codec.toPg(value);
+      placeholderValues.set(
+        symbol,
+        sql`${sql.value(encodedValue)}::${codec.sqlType}`,
+      );
+    } else {
+      // Fine a existing match for this dependency of this type
+      const existingIndex = queryValues.findIndex(
+        (v) => v.dependencyIndex === dependencyIndex && v.codec === codec,
+      );
+
+      // If none exists, add one to our query values
+      const idx =
+        existingIndex >= 0 ? existingIndex : queryValues.push(placeholder) - 1;
+
+      // Finally alias this symbol to a reference to this placeholder
+      placeholderValues.set(
+        placeholder.symbol,
+        sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
+      );
+    }
+  };
+  placeholders.forEach(handlePlaceholder);
+
+  // Handle deferreds
+  deferreds.forEach((placeholder) => {
+    const { symbol, dependencyIndex } = placeholder;
+    const fragment = values[dependencyIndex].unaryValue();
+    if (!sql.isSQL(fragment)) {
+      throw new Error(`Deferred SQL must be a valid SQL fragment`);
+    }
+    placeholderValues.set(symbol, fragment);
+  });
+
+  return {
+    queryValues,
+    placeholderValues,
+    identifiersSymbol,
+    identifiersAlias,
+    handlePlaceholder,
+  };
 }
