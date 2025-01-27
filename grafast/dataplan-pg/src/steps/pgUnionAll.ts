@@ -22,7 +22,6 @@ import {
   first,
   isPromiseLike,
   list,
-  operationPlan,
   polymorphicWrap,
   reverseArray,
   SafeError,
@@ -67,7 +66,6 @@ import type {
 import {
   calculateLimitAndOffsetSQLFromInfo,
   getExecutionCommon,
-  getUnary,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.js";
@@ -419,6 +417,9 @@ interface QueryBuildResult {
   name?: string;
 
   queryValues: Array<QueryValue>;
+
+  first: Maybe<number>;
+  last: Maybe<number>;
 }
 
 interface PgUnionAllStepResult {
@@ -510,13 +511,8 @@ export class PgUnionAllStep<
   protected beforeStepId: number | null = null;
   protected afterStepId: number | null = null;
 
-  protected shouldReverseOrderId: number | null = null;
-
   // Connection
   private connectionDepId: number | null = null;
-
-  protected limitAndOffsetSQL: SQL | null = null;
-  private innerLimitSQL: SQL | null = null;
 
   public readonly mode: PgUnionAllMode;
 
@@ -588,11 +584,8 @@ export class PgUnionAllStep<
       $clone.lastStepId = cloneFromMatchingMode.lastStepId;
       $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
       $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
-      $clone.limitAndOffsetSQL = cloneFromMatchingMode.limitAndOffsetSQL;
-      $clone.innerLimitSQL = cloneFromMatchingMode.innerLimitSQL;
       $clone.beforeStepId = cloneFromMatchingMode.beforeStepId;
       $clone.afterStepId = cloneFromMatchingMode.afterStepId;
-      $clone.shouldReverseOrderId = cloneFromMatchingMode.shouldReverseOrderId;
       $clone.lowerIndexStepId = cloneFromMatchingMode.lowerIndexStepId;
       $clone.upperIndexStepId = cloneFromMatchingMode.upperIndexStepId;
       $clone.limitAndOffsetId = cloneFromMatchingMode.limitAndOffsetId;
@@ -1268,14 +1261,6 @@ and ${condition(i + 1)}`}
     // plans during `finalize`
     this.locker.lock();
 
-    const $shouldReverseOrder = this.shouldReverseOrder();
-    this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
-    operationPlan().withRootLayerPlan(() => {
-      const $limitAndOffsets = this.planLimitAndOffsets();
-      this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
-      this.innerLimitSQL = this.deferredSQL(access($limitAndOffsets, 1));
-    });
-
     return this;
   }
 
@@ -1295,7 +1280,6 @@ and ${condition(i + 1)}`}
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastValuesList<any>> {
-    const { first, last } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
       values,
@@ -1308,6 +1292,8 @@ and ${condition(i + 1)}`}
       shouldReverseOrder,
       name,
       queryValues,
+      first,
+      last,
     } = buildTheQuery({
       executionDetails,
       placeholders: this.placeholders,
@@ -1400,6 +1386,10 @@ and ${condition(i + 1)}`}
   [$$toSQL]() {
     return this.alias;
   }
+
+  // TODO: Delete these both from here and from pgStmt
+  protected shouldReverseOrderId: number | null = null;
+  protected limitAndOffsetSQL: SQL | null = null;
 }
 
 export class PgUnionAllRowsStep<
@@ -1469,50 +1459,43 @@ function buildTheQuery<
     typeIdx,
     memberDigests,
     step,
-    selects: rawSelects,
     attributes,
-    groups,
-    orders,
-    havingConditions,
     forceIdentity,
+
+    selects: rawSelects,
+    groups: rawGroups,
+    orders: rawOrders,
+    havingConditions: rawHavingConditions,
   } = info;
+
+  // TODO: evaluate runtime orders, conditions, etc here
   const selects = [...rawSelects];
+  const orders = [...rawOrders];
+  const groups = [...rawGroups];
+  const havingConditions = [...rawHavingConditions];
+
   function selectType() {
+    if (typeIdx != null) return typeIdx;
     const existingIndex = selects.findIndex((s) => s.type === "type");
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index = selects.push({ type: "type" }) - 1;
-    return index;
+    if (existingIndex >= 0) return existingIndex;
+    return selects.push({ type: "type" }) - 1;
   }
   function selectPk(): number {
     const existingIndex = selects.findIndex((s) => s.type === "pk");
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index = selects.push({ type: "pk" }) - 1;
-    return index;
+    if (existingIndex >= 0) return existingIndex;
+    return selects.push({ type: "pk" }) - 1;
   }
 
-  function selectAndReturnIndex(
-    fragment: SQL /* PgSQLCallbackOrDirect<SQL> */,
-  ): number {
-    // const fragment = this.scopedSQL(rawFragment);
+  function selectAndReturnIndex(expression: SQL): number {
     const existingIndex = selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
-        sql.isEquivalent(s.expression, fragment),
+        sql.isEquivalent(s.expression, expression),
     );
-    if (existingIndex >= 0) {
-      return existingIndex;
-    }
-    const index =
-      selects.push({
-        type: "outerExpression",
-        expression: fragment,
-      }) - 1;
-    return index;
+    if (existingIndex >= 0) return existingIndex;
+    return selects.push({ type: "outerExpression", expression }) - 1;
   }
+
   const ordersForCursor: PgOrderFragmentSpec[] = [
     ...orders,
     {
@@ -1527,7 +1510,7 @@ function buildTheQuery<
     },
   ];
   const { count } = executionDetails;
-  const { shouldReverseOrder } = getExecutionCommon(info);
+  const { shouldReverseOrder, first, last } = getExecutionCommon(info);
   const reverse = mode === "normal" ? shouldReverseOrder : null;
 
   const memberCodecs = memberDigests.map(
@@ -1881,5 +1864,7 @@ ${lateralText};`;
     shouldReverseOrder,
     name: hash(text),
     queryValues,
+    first,
+    last,
   };
 }
