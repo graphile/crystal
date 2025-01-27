@@ -1072,6 +1072,10 @@ on (${sql.indent(
       fetchOneExtra,
     });
 
+    if (first === 0 || last === 0) {
+      return indexMap(() => NO_ROWS);
+    }
+
     const contextDep = values[this.contextId];
     if (contextDep === undefined) {
       throw new Error("We have no context dependency?");
