@@ -66,10 +66,14 @@ import type {
 import {
   calculateLimitAndOffsetSQLFromInfo,
   getExecutionCommon,
+  getUnary,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.js";
-import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
+import {
+  pgValidateParsedCursor,
+  validateParsedCursor,
+} from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
@@ -362,7 +366,7 @@ interface MemberDigest<TTypeNames extends string> {
   symbol: symbol;
   alias: SQL;
   conditions: SQL[];
-  orders: PgOrderSpec[];
+  orders: Readonly<PgOrderSpec>[];
 }
 
 export type PgUnionAllMode = "normal" | "aggregate";
@@ -1257,6 +1261,25 @@ and ${condition(i + 1)}`}
       return constant(NO_ROWS, false);
     }
 
+    // TODO: validate the parsed cursor and throw error in connection if it
+    // fails. I'm not sure, but perhaps we can add this step itself (or a
+    // derivative thereof) as a dependency of the connection - that way, if
+    // this step throws (e.g. due to invalid cursor) then so does the
+    // connection.
+    /*
+      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+        this.connectionDepId,
+      );
+      $connection.addValidation(() => {
+        return pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        );
+      });
+      */
+
     // We must lock here otherwise we might try and create cursor validation
     // plans during `finalize`
     this.locker.lock();
@@ -1294,15 +1317,15 @@ and ${condition(i + 1)}`}
       queryValues,
       first,
       last,
-    } = buildTheQuery({
+    } = buildTheQuery<TAttributes, TTypeNames>({
       executionDetails,
       placeholders: this.placeholders,
       deferreds: this.deferreds,
       firstStepId: this.firstStepId,
       lastStepId: this.lastStepId,
       offsetStepId: this.offsetStepId,
-      lowerIndexStepId: this.lowerIndexStepId,
-      upperIndexStepId: this.upperIndexStepId,
+      afterStepId: this.afterStepId,
+      beforeStepId: this.beforeStepId,
       forceIdentity: this.forceIdentity,
       havingConditions: this.havingConditions,
       mode: this.mode,
@@ -1439,7 +1462,7 @@ interface PgUnionAllQueryInfo<
 > extends PgStmtCommonQueryInfo {
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
-  readonly memberDigests: readonly MemberDigest<TTypeNames>[];
+  readonly memberDigests: readonly Readonly<MemberDigest<TTypeNames>>[];
   readonly step: PgUnionAllStep<TAttributes, TTypeNames>;
   readonly selects: readonly PgUnionAllStepSelect<TAttributes>[];
   readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
@@ -1457,23 +1480,30 @@ function buildTheQuery<
     executionDetails,
     mode,
     typeIdx,
-    memberDigests,
     step,
     attributes,
     forceIdentity,
 
+    memberDigests: rawMemberDigests,
     selects: rawSelects,
     groups: rawGroups,
     orders: rawOrders,
     havingConditions: rawHavingConditions,
   } = info;
+  const { values } = executionDetails;
 
-  // TODO: evaluate runtime orders, conditions, etc here
+  const memberDigests = rawMemberDigests.map(cloneMemberDigest);
+
   const selects = [...rawSelects];
-  const orders = [...rawOrders];
-  const groups = [...rawGroups];
-  const havingConditions = [...rawHavingConditions];
-
+  function selectAndReturnIndex(expression: SQL): number {
+    const existingIndex = selects.findIndex(
+      (s) =>
+        s.type === "outerExpression" &&
+        sql.isEquivalent(s.expression, expression),
+    );
+    if (existingIndex >= 0) return existingIndex;
+    return selects.push({ type: "outerExpression", expression }) - 1;
+  }
   function selectType() {
     if (typeIdx != null) return typeIdx;
     const existingIndex = selects.findIndex((s) => s.type === "type");
@@ -1486,15 +1516,11 @@ function buildTheQuery<
     return selects.push({ type: "pk" }) - 1;
   }
 
-  function selectAndReturnIndex(expression: SQL): number {
-    const existingIndex = selects.findIndex(
-      (s) =>
-        s.type === "outerExpression" &&
-        sql.isEquivalent(s.expression, expression),
-    );
-    if (existingIndex >= 0) return existingIndex;
-    return selects.push({ type: "outerExpression", expression }) - 1;
-  }
+  const orders = [...rawOrders];
+  const groups = [...rawGroups];
+  const havingConditions = [...rawHavingConditions];
+
+  // TODO: evaluate runtime orders, conditions, etc here
 
   const ordersForCursor: PgOrderFragmentSpec[] = [
     ...orders,
@@ -1509,8 +1535,33 @@ function buildTheQuery<
       direction: "ASC",
     },
   ];
+
+  // afterLock("orderBy"): Now the runtime orders/etc have been performed,
+  // apply conditions from the cursor
+
+  const cursorLower = applyConditionFromCursor(
+    info,
+    memberDigests,
+    orders,
+    ordersForCursor,
+    "after",
+    getUnary<any[] | null>(values, info.afterStepId),
+  );
+  const cursorUpper = applyConditionFromCursor(
+    info,
+    memberDigests,
+    orders,
+    ordersForCursor,
+    "before",
+    getUnary<any[] | null>(values, info.beforeStepId),
+  );
+
   const { count } = executionDetails;
-  const { shouldReverseOrder, first, last } = getExecutionCommon(info);
+  const { shouldReverseOrder, first, last } = getExecutionCommon(
+    info,
+    cursorLower,
+    cursorUpper,
+  );
   const reverse = mode === "normal" ? shouldReverseOrder : null;
 
   const memberCodecs = memberDigests.map(
@@ -1520,21 +1571,21 @@ function buildTheQuery<
     const tables: SQL[] = [];
 
     const [limitAndOffsetSQL, innerLimitSQL] =
-      calculateLimitAndOffsetSQLFromInfo(info);
+      calculateLimitAndOffsetSQLFromInfo(info, cursorLower, cursorUpper);
 
-    for (const digest of memberDigests) {
+    for (const memberDigest of memberDigests) {
       const {
         sqlSource,
         alias: tableAlias,
         conditions,
         orders,
         finalResource,
-      } = digest;
+      } = memberDigest;
 
       const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
       if (!pk) {
         throw new Error(
-          `No PK for ${digest.member.typeName} resource in ${step}`,
+          `No PK for ${memberDigest.member.typeName} resource in ${step}`,
         );
       }
       const midSelects: SQL[] = [];
@@ -1551,14 +1602,14 @@ function buildTheQuery<
                 const attr = attributes[s.attribute];
                 return [
                   sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
-                    digest,
+                    memberDigest,
                     s.attribute,
                   )}`,
                   attr.codec,
                 ];
               }
               case "type": {
-                return [sql.literal(digest.member.typeName), TYPES.text];
+                return [sql.literal(memberDigest.member.typeName), TYPES.text];
               }
               case "pk": {
                 return [
@@ -1583,7 +1634,7 @@ function buildTheQuery<
                 const [frag, codec] = getFragmentAndCodecFromOrder(
                   step.alias,
                   orderSpec,
-                  digest.finalResource.codec,
+                  memberDigest.finalResource.codec,
                 );
                 return [frag, codec];
               }
@@ -1866,5 +1917,234 @@ ${lateralText};`;
     queryValues,
     first,
     last,
+  };
+}
+
+function applyConditionFromCursor<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+>(
+  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
+  mutableMemberDigests: MemberDigest<TTypeNames>[],
+  orders: PgOrderFragmentSpec[],
+  ordersForCursor: PgOrderFragmentSpec[],
+  beforeOrAfter: "before" | "after",
+  parsedCursor: Maybe<any[]>,
+) {
+  const {
+    step: { alias },
+  } = info;
+  if (parsedCursor == null) return;
+  const orderDigest = getOrderByDigest(
+    info,
+    mutableMemberDigests,
+    ordersForCursor,
+  );
+  const orderCount = ordersForCursor.length;
+
+  // Cursor validity check
+  validateParsedCursor(parsedCursor, orderDigest, orderCount, beforeOrAfter);
+
+  if (orderCount === 0) {
+    // Natural pagination `['natural', N]`
+    // This will be used in upperIndex(before)/lowerIndex(after)
+    return parsedCursor[1];
+  }
+
+  const identifierPlaceholders: SQL[] = [];
+  for (let i = 0; i < orderCount; i++) {
+    const order = orders[i];
+    if (i === orderCount - 1) {
+      // PK (within that polymorphic type)
+
+      // TODO: rather than using JSON here and since we now run this at runtime
+      // rather than plan time, lets expand this to be each individual PK
+      // column rather than one JSON encoding of the same.
+
+      // NOTE: this is a JSON-encoded string containing all the PK values. We
+      // don't want to parse it and then re-stringify it, so we'll just feed
+      // it in as text and tell the system it has already been encoded:
+      identifierPlaceholders[i] = sql`${sql.value(parsedCursor[i + 1])}::json`;
+    } else if (i === orderCount - 2) {
+      // Polymorphic type
+      identifierPlaceholders[i] = sql`${sql.value(parsedCursor[i + 1])}::text`;
+    } else if (mutableMemberDigests.length > 0) {
+      const memberCodecs = mutableMemberDigests.map(
+        (d) => d.finalResource.codec,
+      );
+      const [, codec] = getFragmentAndCodecFromOrder(
+        alias,
+        order,
+        memberCodecs,
+      );
+      identifierPlaceholders[i] = sql`${sql.value(
+        codec.toPg(parsedCursor[i + 1]),
+      )}::${codec.sqlType}`;
+    } else {
+      // No implementations?!
+    }
+  }
+
+  for (const mutableMemberDigest of mutableMemberDigests) {
+    const { finalResource } = mutableMemberDigest;
+    const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
+    if (!pk) {
+      throw new Error("No primary key; this should have been caught earlier");
+    }
+    const max = orderCount - 1 + pk.attributes.length;
+    const pkPlaceholder = identifierPlaceholders[orderCount - 1];
+    const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
+    const condition = (i = 0): SQL => {
+      const order = mutableMemberDigest.orders[i];
+      const [
+        orderFragment,
+        sqlValue,
+        direction,
+        nullable = false,
+        nulls = null,
+      ] = (() => {
+        if (i >= orderCount - 1) {
+          // PK
+          const pkIndex = i - (orderCount - 1);
+          const pkCol = pk.attributes[pkIndex];
+          return [
+            sql`${mutableMemberDigest.alias}.${sql.identifier(pkCol)}`,
+            sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
+              pkAttributes[pkCol].codec.sqlType
+            }`,
+            "ASC",
+            false,
+          ];
+        } else if (i === orderCount - 2) {
+          // Type
+          return [
+            sql.literal(mutableMemberDigest.member.typeName),
+            identifierPlaceholders[i],
+            "ASC",
+            false,
+          ];
+        } else {
+          const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
+            alias,
+            order,
+            mutableMemberDigest.finalResource.codec,
+          );
+          return [
+            frag,
+            identifierPlaceholders[i],
+            order.direction,
+            isNullable,
+            order.nulls,
+          ];
+        }
+      })();
+
+      // For the truth-table of this code, have a look at this spreadsheet:
+      // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
+      const gt =
+        (direction === "ASC" && beforeOrAfter === "after") ||
+        (direction === "DESC" && beforeOrAfter === "before");
+
+      const nullsFirst =
+        nulls === "FIRST"
+          ? true
+          : nulls === "LAST"
+          ? false
+          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+            // ASC = NULLS LAST
+            direction === "DESC";
+
+      // Simple less than or greater than
+      let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+
+      // Nullable, so now handle if one is null but the other isn't
+      if (nullable) {
+        const useAIsNullAndBIsNotNull =
+          (nullsFirst && beforeOrAfter === "after") ||
+          (!nullsFirst && beforeOrAfter === "before");
+        const oneIsNull = useAIsNullAndBIsNotNull
+          ? sql`${orderFragment} is null and ${sqlValue} is not null`
+          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+        fragment = sql`((${fragment}) or (${oneIsNull}))`;
+      }
+
+      // Finally handle if they're equal - recurse
+      if (i < max - 1) {
+        const equals = nullable ? sql`is not distinct from` : sql`=`;
+        const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
+        fragment = sql`(${fragment})
+or (
+${sql.indent`${aEqualsB}
+and ${condition(i + 1)}`}
+)`;
+      }
+
+      return sql.parens(sql.indent(fragment));
+    };
+
+    const finalCondition = condition();
+    mutableMemberDigest.conditions.push(finalCondition);
+  }
+}
+
+function getOrderByDigest<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+>(
+  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
+  memberDigests: MemberDigest<TTypeNames>[],
+  ordersForCursor: readonly PgOrderFragmentSpec[],
+) {
+  const {
+    placeholders,
+    deferreds,
+    step: { alias },
+  } = info;
+  if (ordersForCursor.length === 0 || memberDigests.length === 0) {
+    return "natural";
+  }
+  // The security of this hash is unimportant; the main aim is to protect the
+  // user from themself. If they bypass this, that's their problem (it will
+  // not introduce a security issue).
+  const hash = createHash("sha256");
+  const memberCodecs = memberDigests.map(
+    (digest) => digest.finalResource.codec,
+  );
+  hash.update(
+    JSON.stringify(
+      ordersForCursor.map((o) => {
+        const [frag] = getFragmentAndCodecFromOrder(alias, o, memberCodecs);
+        const placeholderValues = new Map<symbol, SQL>();
+        for (let i = 0; i < placeholders.length; i++) {
+          const { symbol } = placeholders[i];
+          placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+        }
+        for (let i = 0; i < deferreds.length; i++) {
+          const { symbol } = deferreds[i];
+          placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+        }
+        return sql.compile(frag, { placeholderValues }).text;
+      }),
+    ),
+  );
+  const digest = hash.digest("hex").slice(0, 10);
+  return digest;
+}
+
+function cloneMemberDigest<TTypeNames extends string = string>(
+  memberDigest: MemberDigest<TTypeNames>,
+): MemberDigest<TTypeNames> {
+  return {
+    // Unchanging parts
+    symbol: memberDigest.symbol,
+    alias: memberDigest.alias,
+    member: memberDigest.member,
+    sqlSource: memberDigest.sqlSource,
+    finalResource: memberDigest.finalResource,
+
+    // Mutable parts
+    orders: [...memberDigest.orders],
+    conditions: [...memberDigest.conditions],
   };
 }
