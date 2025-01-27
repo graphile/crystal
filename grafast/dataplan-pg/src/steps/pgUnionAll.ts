@@ -354,42 +354,28 @@ export class PgUnionAllSingleStep
 }
 
 interface MemberDigest<TTypeNames extends string> {
-  member: PgUnionAllStepMember<TTypeNames>;
-  finalResource: PgResource<
+  readonly member: PgUnionAllStepMember<TTypeNames>;
+  readonly finalResource: PgResource<
     any,
     any,
     ReadonlyArray<PgResourceUnique<any>>,
     any,
     any
   >;
-  sqlSource: SQL;
-  symbol: symbol;
-  alias: SQL;
-  conditions: SQL[];
-  orders: Readonly<PgOrderSpec>[];
+  readonly sqlSource: SQL;
+  readonly symbol: symbol;
+  readonly alias: SQL;
+  readonly conditions: readonly SQL[];
+  readonly orders: readonly PgOrderSpec[];
+}
+
+interface MutableMemberDigest<TTypeNames extends string>
+  extends MemberDigest<TTypeNames> {
+  readonly conditions: SQL[];
+  readonly orders: PgOrderSpec[];
 }
 
 export type PgUnionAllMode = "normal" | "aggregate";
-
-function cloneDigest<TTypeNames extends string = string>(
-  digest: MemberDigest<TTypeNames>,
-): MemberDigest<TTypeNames> {
-  return {
-    member: digest.member,
-    finalResource: digest.finalResource,
-    sqlSource: digest.sqlSource,
-    symbol: digest.symbol,
-    alias: digest.alias,
-    conditions: [...digest.conditions],
-    orders: [...digest.orders],
-  };
-}
-
-function cloneDigests<TTypeNames extends string = string>(
-  digests: ReadonlyArray<MemberDigest<TTypeNames>>,
-): Array<MemberDigest<TTypeNames>> {
-  return digests.map(cloneDigest);
-}
 
 /**
  * When finalized, we build the SQL query, queryValues, and note where to feed in
@@ -522,7 +508,7 @@ export class PgUnionAllStep<
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
-  private memberDigests: MemberDigest<TTypeNames>[] = [];
+  private memberDigests: Readonly<MutableMemberDigest<TTypeNames>>[] = [];
   private _limitToTypes: string[] | undefined;
 
   /**
@@ -566,7 +552,7 @@ export class PgUnionAllStep<
     });
 
     $clone.contextId = cloneFrom.contextId;
-    $clone.memberDigests = cloneDigests(cloneFrom.memberDigests);
+    $clone.memberDigests = cloneFrom.memberDigests.map(cloneMemberDigest);
     if (cloneFrom._limitToTypes) {
       $clone._limitToTypes = [...cloneFrom._limitToTypes];
     }
@@ -715,41 +701,6 @@ on (${sql.indent(
         });
       }
     }
-
-    this.locker.afterLock("orderBy", () => {
-      this.withMyLayerPlan(() => {
-        this.ordersForCursor = [
-          ...this.orders,
-          {
-            fragment: sql`${this.alias}.${sql.identifier(
-              String(this.selectType()),
-            )}`,
-            codec: TYPES.text,
-            direction: "ASC",
-          },
-          {
-            fragment: sql`${this.alias}.${sql.identifier(
-              String(this.selectPk()),
-            )}`,
-            codec: TYPES.json,
-            direction: "ASC",
-          },
-        ];
-
-        if (this.beforeStepId != null) {
-          this.applyConditionFromCursor(
-            "before",
-            this.getDep<any>(this.beforeStepId),
-          );
-        }
-        if (this.afterStepId != null) {
-          this.applyConditionFromCursor(
-            "after",
-            this.getDep<any>(this.afterStepId),
-          );
-        }
-      });
-    });
   }
 
   connectionClone(
@@ -1925,7 +1876,7 @@ function applyConditionFromCursor<
   TTypeNames extends string = string,
 >(
   info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
-  mutableMemberDigests: MemberDigest<TTypeNames>[],
+  mutableMemberDigests: MutableMemberDigest<TTypeNames>[],
   orders: PgOrderFragmentSpec[],
   ordersForCursor: PgOrderFragmentSpec[],
   beforeOrAfter: "before" | "after",
@@ -1964,10 +1915,14 @@ function applyConditionFromCursor<
       // NOTE: this is a JSON-encoded string containing all the PK values. We
       // don't want to parse it and then re-stringify it, so we'll just feed
       // it in as text and tell the system it has already been encoded:
-      identifierPlaceholders[i] = sql`${sql.value(parsedCursor[i + 1])}::json`;
+      identifierPlaceholders[i] = sql`${sql.value(
+        parsedCursor[i + 1],
+      )}::"json"`;
     } else if (i === orderCount - 2) {
       // Polymorphic type
-      identifierPlaceholders[i] = sql`${sql.value(parsedCursor[i + 1])}::text`;
+      identifierPlaceholders[i] = sql`${sql.value(
+        parsedCursor[i + 1],
+      )}::"text"`;
     } else if (mutableMemberDigests.length > 0) {
       const memberCodecs = mutableMemberDigests.map(
         (d) => d.finalResource.codec,
@@ -2134,7 +2089,7 @@ function getOrderByDigest<
 
 function cloneMemberDigest<TTypeNames extends string = string>(
   memberDigest: MemberDigest<TTypeNames>,
-): MemberDigest<TTypeNames> {
+): MutableMemberDigest<TTypeNames> {
   return {
     // Unchanging parts
     symbol: memberDigest.symbol,
