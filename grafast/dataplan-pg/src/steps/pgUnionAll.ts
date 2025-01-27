@@ -92,7 +92,10 @@ const digestSpecificExpressionFromAttributeName = (
 };
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
-const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
+const NO_ROWS = Object.freeze({
+  hasMore: false,
+  items: [],
+} as PgUnionAllStepResult);
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
@@ -953,241 +956,18 @@ on (${sql.indent(
     }
   }
 
-  private applyConditionFromCursor(
-    beforeOrAfter: "before" | "after",
-    $parsedCursorPlan: LambdaStep<any, any[] | null>,
-  ): void {
-    const digest = this.getOrderByDigest();
-    const orders = this.getOrderBy();
-    const orderCount = orders.length;
-
-    // Cursor validity check; if we get inlined then this will be passed up
-    // to the parent so we can trust it.
-    if (this.connectionDepId === null) {
-      this.addDependency(
-        pgValidateParsedCursor(
-          $parsedCursorPlan,
-          digest,
-          orderCount,
-          beforeOrAfter,
-        ),
-      );
-    } else {
-      // To make the error be thrown in the right place, we should also add this error to our parent connection
-      const $connection = this.getDep<ConnectionStep<any, any, any>>(
-        this.connectionDepId,
-      );
-      $connection.addValidation(() => {
-        return pgValidateParsedCursor(
-          $parsedCursorPlan,
-          digest,
-          orderCount,
-          beforeOrAfter,
-        );
-      });
-    }
-
-    if (orderCount === 0) {
-      // Natural pagination `['natural', N]`
-      const $n = access($parsedCursorPlan, [1]);
-      if (beforeOrAfter === "before") {
-        this.upperIndexStepId = this.addUnaryDependency($n);
-      } else {
-        this.lowerIndexStepId = this.addUnaryDependency($n);
-      }
-      return;
-    }
-
-    const identifierPlaceholders: SQL[] = [];
-    for (let i = 0; i < orderCount; i++) {
-      const order = this.orders[i];
-      if (i === orderCount - 1) {
-        // PK (within that polymorphic type)
-
-        identifierPlaceholders[i] = this.placeholder(
-          access($parsedCursorPlan, [i + 1]),
-          TYPES.json,
-          // NOTE: this is a JSON-encoded string containing all the PK values. We
-          // don't want to parse it and then re-stringify it, so we'll just feed
-          // it in as text and tell the system it has already been encoded:
-          true,
-        );
-      } else if (i === orderCount - 2) {
-        // Polymorphic type
-        identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
-          TYPES.text,
-        );
-      } else if (this.memberDigests.length > 0) {
-        const memberCodecs = this.memberDigests.map(
-          (d) => d.finalResource.codec,
-        );
-        const [, codec] = getFragmentAndCodecFromOrder(
-          this.alias,
-          order,
-          memberCodecs,
-        );
-        identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec as PgCodec,
-        );
-      } else {
-        // No implementations?!
-      }
-    }
-
-    for (const digest of this.memberDigests) {
-      const { finalResource } = digest;
-      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
-      if (!pk) {
-        throw new Error("No primary key; this should have been caught earlier");
-      }
-      const max = orderCount - 1 + pk.attributes.length;
-      const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
-      const condition = (i = 0): SQL => {
-        const order = digest.orders[i];
-        const [
-          orderFragment,
-          sqlValue,
-          direction,
-          nullable = false,
-          nulls = null,
-        ] = (() => {
-          if (i >= orderCount - 1) {
-            // PK
-            const pkIndex = i - (orderCount - 1);
-            const pkCol = pk.attributes[pkIndex];
-            return [
-              sql`${digest.alias}.${sql.identifier(pkCol)}`,
-              sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
-                pkAttributes[pkCol].codec.sqlType
-              }`,
-              "ASC",
-              false,
-            ];
-          } else if (i === orderCount - 2) {
-            // Type
-            return [
-              sql.literal(digest.member.typeName),
-              identifierPlaceholders[i],
-              "ASC",
-              false,
-            ];
-          } else {
-            const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
-              this.alias,
-              order,
-              digest.finalResource.codec,
-            );
-            return [
-              frag,
-              identifierPlaceholders[i],
-              order.direction,
-              isNullable,
-              order.nulls,
-            ];
-          }
-        })();
-
-        // For the truth-table of this code, have a look at this spreadsheet:
-        // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
-
-        const gt =
-          (direction === "ASC" && beforeOrAfter === "after") ||
-          (direction === "DESC" && beforeOrAfter === "before");
-
-        const nullsFirst =
-          nulls === "FIRST"
-            ? true
-            : nulls === "LAST"
-            ? false
-            : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-              // ASC = NULLS LAST
-              direction === "DESC";
-
-        // Simple less than or greater than
-        let fragment = sql`${orderFragment} ${
-          gt ? sql`>` : sql`<`
-        } ${sqlValue}`;
-
-        // Nullable, so now handle if one is null but the other isn't
-        if (nullable) {
-          const useAIsNullAndBIsNotNull =
-            (nullsFirst && beforeOrAfter === "after") ||
-            (!nullsFirst && beforeOrAfter === "before");
-          const oneIsNull = useAIsNullAndBIsNotNull
-            ? sql`${orderFragment} is null and ${sqlValue} is not null`
-            : sql`${orderFragment} is not null and ${sqlValue} is null`;
-          fragment = sql`((${fragment}) or (${oneIsNull}))`;
-        }
-
-        // Finally handle if they're equal - recurse
-        if (i < max - 1) {
-          const equals = nullable ? sql`is not distinct from` : sql`=`;
-          const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
-          fragment = sql`(${fragment})
-or (
-${sql.indent`${aEqualsB}
-and ${condition(i + 1)}`}
-)`;
-        }
-
-        return sql.parens(sql.indent(fragment));
-      };
-
-      const finalCondition = condition();
-      digest.conditions.push(finalCondition);
-    }
-  }
-
-  // TODO: this MUST be removed, it gives the wrong result now
-  /**
-   * So we can quickly detect if cursors are invalid we use this digest,
-   * passing this check does not mean that the cursor is valid but it at least
-   * catches common user errors.
-   */
+  // TODO: this MUST be removed, it gives the wrong result now.
+  // Instead, call `orderByDigest` at runtime.
   public getOrderByDigest() {
-    this.locker.lockParameter("orderBy");
-    if (this.ordersForCursor.length === 0 || this.memberDigests.length === 0) {
-      return "natural";
-    }
-    // The security of this hash is unimportant; the main aim is to protect the
-    // user from themself. If they bypass this, that's their problem (it will
-    // not introduce a security issue).
-    const hash = createHash("sha256");
-    const memberCodecs = this.memberDigests.map(
-      (digest) => digest.finalResource.codec,
-    );
-    hash.update(
-      JSON.stringify(
-        this.ordersForCursor.map((o) => {
-          const [frag] = getFragmentAndCodecFromOrder(
-            this.alias,
-            o,
-            memberCodecs,
-          );
-          const placeholderValues = new Map<symbol, SQL>();
-          for (let i = 0; i < this.placeholders.length; i++) {
-            const { symbol } = this.placeholders[i];
-            placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
-          }
-          for (let i = 0; i < this.deferreds.length; i++) {
-            const { symbol } = this.deferreds[i];
-            placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
-          }
-          return sql.compile(frag, { placeholderValues }).text;
-        }),
-      ),
-    );
-    const digest = hash.digest("hex").slice(0, 10);
-    return digest;
+    return "natural";
   }
 
+  // TODO: this MUST be removed, it gives the wrong result now.
   public getOrderBy(): ReadonlyArray<PgOrderFragmentSpec> {
     this.locker.lockParameter("orderBy");
     return this.ordersForCursor;
   }
+  // TODO: this MUST be removed, it gives the wrong result now.
   public getOrderByWithoutType(): ReadonlyArray<PgOrderFragmentSpec> {
     this.locker.lockParameter("orderBy");
     return this.orders;
@@ -1242,7 +1022,7 @@ and ${condition(i + 1)}`}
   private typeIdx: number | null = null;
   // private reverse: boolean | null = null;
   finalize() {
-    this.locker.lock();
+    // this.locker.lock();
 
     const normalMode = this.mode === "normal";
     this.typeIdx = normalMode ? this.selectType() : null;
@@ -1260,6 +1040,7 @@ and ${condition(i + 1)}`}
       values,
       extra: { eventEmitter },
     } = executionDetails;
+    const { fetchOneExtra } = this;
     const {
       text,
       rawSqlValues,
@@ -1288,7 +1069,7 @@ and ${condition(i + 1)}`}
       typeIdx: this.typeIdx,
       attributes: this.spec.attributes,
       memberDigests: this.memberDigests,
-      fetchOneExtra: this.fetchOneExtra,
+      fetchOneExtra,
     });
 
     const contextDep = values[this.contextId];
@@ -1337,8 +1118,7 @@ and ${condition(i + 1)}`}
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;
-      const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
+      const hasMore = fetchOneExtra && limit != null && allVals.length > limit;
       const trimFromStart =
         !shouldReverseOrder && last != null && first == null;
       const limitedRows = hasMore
@@ -2103,4 +1883,46 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     orders: [...memberDigest.orders],
     conditions: [...memberDigest.conditions],
   };
+}
+
+function orderByDigest<TAttributes extends string, TTypeNames extends string>(
+  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
+  ordersForCursor: PgOrderFragmentSpec[],
+  memberDigests: MemberDigest<TTypeNames>[],
+) {
+  const {
+    step: { alias },
+    // TODO: satisfy placeholders and deferreds before we get this far!
+    placeholders,
+    deferreds,
+  } = info;
+  if (ordersForCursor.length === 0 || memberDigests.length === 0) {
+    return "natural";
+  }
+  // The security of this hash is unimportant; the main aim is to protect the
+  // user from themself. If they bypass this, that's their problem (it will
+  // not introduce a security issue).
+  const hash = createHash("sha256");
+  const memberCodecs = memberDigests.map(
+    (digest) => digest.finalResource.codec,
+  );
+  hash.update(
+    JSON.stringify(
+      ordersForCursor.map((o) => {
+        const [frag] = getFragmentAndCodecFromOrder(alias, o, memberCodecs);
+        const placeholderValues = new Map<symbol, SQL>();
+        for (let i = 0; i < placeholders.length; i++) {
+          const { symbol } = placeholders[i];
+          placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+        }
+        for (let i = 0; i < deferreds.length; i++) {
+          const { symbol } = deferreds[i];
+          placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+        }
+        return sql.compile(frag, { placeholderValues }).text;
+      }),
+    ),
+  );
+  const digest = hash.digest("hex").slice(0, 10);
+  return digest;
 }
