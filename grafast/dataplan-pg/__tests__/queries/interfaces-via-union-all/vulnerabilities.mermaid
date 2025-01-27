@@ -12,12 +12,9 @@ graph TD
     PgUnionAll8[["PgUnionAll[8∈0] ➊"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant12{{"Constant[12∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Constant80{{"Constant[80∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Lambda75{{"Lambda[75∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access78{{"Access[78∈0] ➊<br />ᐸ77.0ᐳ"}}:::plan
-    Access79{{"Access[79∈0] ➊<br />ᐸ77.1ᐳ"}}:::plan
-    Object11 & Constant12 & Constant80 & Constant81 & Lambda75 & Access78 & Access79 --> PgUnionAll8
+    Constant74{{"Constant[74∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Object11 & Constant12 & Constant74 & Constant75 --> PgUnionAll8
     Object51{{"Object[51∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
     Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
     Constant48{{"Constant[48∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
@@ -35,32 +32,25 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant82 --> Lambda43
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant76 --> Lambda43
     Lambda46{{"Lambda[46∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant83{{"Constant[83∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant83 --> Lambda46
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant77 --> Lambda46
     Access47{{"Access[47∈0] ➊<br />ᐸ46.0ᐳ"}}:::plan
     Lambda46 --> Access47
     Lambda52{{"Lambda[52∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object51 --> Lambda52
     Lambda57{{"Lambda[57∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
-    Constant84 --> Lambda57
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
+    Constant78 --> Lambda57
     Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
     Object66 --> Lambda67
     Lambda72{{"Lambda[72∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
-    Constant85 --> Lambda72
+    Constant79{{"Constant[79∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
+    Constant79 --> Lambda72
     Access73{{"Access[73∈0] ➊<br />ᐸ8.itemsᐳ"}}:::plan
     PgUnionAll8 --> Access73
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ first: 3, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant86 --> Lambda75
-    Lambda77{{"Lambda[77∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ§{ first: 3, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant87 --> Lambda77
-    Lambda77 --> Access78
-    Lambda77 --> Access79
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ73ᐳ"\]:::itemplan
     Access73 ==> __Item14
@@ -112,9 +102,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilities"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 48, 49, 50, 63, 64, 65, 80, 81, 82, 83, 84, 85, 86, 87, 11, 43, 46, 47, 51, 52, 57, 66, 67, 72, 75, 77, 78, 79<br />2: PgUnionAll[8]<br />ᐳ: Access[73]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 48, 49, 50, 63, 64, 65, 74, 75, 76, 77, 78, 79, 11, 43, 46, 47, 51, 52, 57, 66, 67, 72<br />2: PgUnionAll[8]<br />ᐳ: Access[73]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgUnionAll8,Access9,Access10,Object11,Constant12,Lambda43,Lambda46,Access47,Constant48,Constant49,Constant50,Object51,Lambda52,Lambda57,Constant63,Constant64,Constant65,Object66,Lambda67,Lambda72,Access73,Lambda75,Lambda77,Access78,Access79,Constant80,Constant81,Constant82,Constant83,Constant84,Constant85,Constant86,Constant87 bucket0
+    class Bucket0,__Value2,__Value4,PgUnionAll8,Access9,Access10,Object11,Constant12,Lambda43,Lambda46,Access47,Constant48,Constant49,Constant50,Object51,Lambda52,Lambda57,Constant63,Constant64,Constant65,Object66,Lambda67,Lambda72,Access73,Constant74,Constant75,Constant76,Constant77,Constant78,Constant79 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 43, 47, 52, 57, 67, 72<br /><br />ROOT __Item{1}ᐸ73ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,PgUnionAllSingle15 bucket1
