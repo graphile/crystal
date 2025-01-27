@@ -9,6 +9,7 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
   LambdaStep,
+  Maybe,
   PolymorphicStep,
 } from "grafast";
 import {
@@ -58,11 +59,18 @@ import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
+  PgStmtCommonQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   QueryValue,
 } from "./pgStmt.js";
-import { PgStmtBaseStep } from "./pgStmt.js";
+import {
+  calculateLimitAndOffsetSQLFromInfo,
+  getExecutionCommon,
+  getUnary,
+  makeValues,
+  PgStmtBaseStep,
+} from "./pgStmt.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
 import { toPg } from "./toPg.js";
 
@@ -1283,364 +1291,6 @@ and ${condition(i + 1)}`}
     super.finalize();
   }
 
-  private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count } = executionDetails;
-    const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
-    const reverse = this.mode === "normal" ? shouldReverseOrder : null;
-    const { typeIdx /* reverse */ } = this;
-
-    const memberCodecs = this.memberDigests.map(
-      (digest) => digest.finalResource.codec,
-    );
-    const makeQuery = () => {
-      const tables: SQL[] = [];
-
-      for (const digest of this.memberDigests) {
-        const {
-          sqlSource,
-          alias: tableAlias,
-          conditions,
-          orders,
-          finalResource,
-        } = digest;
-
-        const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
-        if (!pk) {
-          throw new Error(
-            `No PK for ${digest.member.typeName} resource in ${this}`,
-          );
-        }
-        const midSelects: SQL[] = [];
-        const innerSelects = this.selects
-          .map((s, selectIndex) => {
-            const r = ((): [SQL, PgCodec] | null => {
-              switch (s.type) {
-                case "attribute": {
-                  if (!this.spec.attributes) {
-                    throw new Error(
-                      `${this}: cannot select an attribute when there's no shared attributes`,
-                    );
-                  }
-                  const attr = this.spec.attributes[s.attribute];
-                  return [
-                    sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
-                      digest,
-                      s.attribute,
-                    )}`,
-                    attr.codec,
-                  ];
-                }
-                case "type": {
-                  return [sql.literal(digest.member.typeName), TYPES.text];
-                }
-                case "pk": {
-                  return [
-                    sql`json_build_array(${sql.join(
-                      pk.attributes.map(
-                        (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
-                      ),
-                      ",",
-                    )})`,
-                    TYPES.json,
-                  ];
-                }
-                case "expression": {
-                  return [s.expression, s.codec];
-                }
-                case "outerExpression": {
-                  // Only applies on outside
-                  return null;
-                }
-                case "order": {
-                  const orders = this.getOrderByWithoutType();
-                  const orderSpec = orders[s.orderIndex];
-                  const [frag, codec] = getFragmentAndCodecFromOrder(
-                    this.alias,
-                    orderSpec,
-                    digest.finalResource.codec,
-                  );
-                  return [frag, codec];
-                }
-                default: {
-                  const never: never = s;
-                  throw new Error(`Couldn't match ${(never as any).type}`);
-                }
-              }
-            })();
-            if (!r) {
-              return r;
-            }
-            const [frag, _codec] = r;
-            const alias = String(selectIndex);
-            const ident = sql.identifier(alias);
-            const fullIdent = sql`${tableAlias}.${ident}`;
-            midSelects.push(fullIdent);
-            return sql`${frag} as ${ident}`;
-          })
-          .filter(isNotNullish);
-        midSelects.push(rowNumberIdent);
-
-        const ascOrDesc = reverse ? sql`desc` : sql`asc`;
-        const pkOrder = sql.join(
-          pk.attributes.map(
-            (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
-          ),
-          ",\n",
-        );
-        const orderBy = sql`order by
-${sql.indent`${
-  orders.length > 0
-    ? sql`${sql.join(
-        orders.map((orderSpec) => {
-          const [frag] = getFragmentAndCodecFromOrder(
-            tableAlias,
-            orderSpec,
-            finalResource.codec,
-          );
-          return sql`${frag} ${
-            Number(orderSpec.direction === "DESC") ^ Number(reverse)
-              ? sql`desc`
-              : sql`asc`
-          }`;
-        }),
-        `,\n`,
-      )},\n`
-    : sql.blank
-}${pkOrder}`}`;
-
-        innerSelects.push(
-          sql`row_number() over (${sql.indent(orderBy)}) as ${rowNumberIdent}`,
-        );
-
-        // Can't order individual selects in a `union all` so we're using
-        // subqueries to do so.
-        const innerQuery = sql.indent`
-select
-${sql.indent(sql.join(innerSelects, ",\n"))}
-from ${sqlSource}
-${
-  conditions.length > 0
-    ? sql`where ${sql.join(conditions, `\nand `)}\n`
-    : sql.blank
-}\
-${orderBy}\
-${this.innerLimitSQL!}
-`;
-
-        // Relies on Postgres maintaining the order of the subquery
-        const query = sql.indent`\
-select
-${sql.indent(sql.join(midSelects, ",\n"))}
-from (${innerQuery}) as ${tableAlias}\
-`;
-        tables.push(query);
-      }
-
-      const outerSelects = this.selects.map((select, i) => {
-        if (select.type === "outerExpression") {
-          return sql`${select.expression} as ${sql.identifier(String(i))}`;
-        } else if (this.mode === "normal") {
-          const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-          let codec: PgCodec;
-          let guaranteedNotNull: boolean | undefined;
-          switch (select.type) {
-            case "type": {
-              codec = TYPES.text;
-              break;
-            }
-            case "pk": {
-              codec = TYPES.json;
-              guaranteedNotNull = true;
-              break;
-            }
-            case "order": {
-              const order = this.getOrderBy()[select.orderIndex];
-              codec = getFragmentAndCodecFromOrder(
-                this.alias,
-                order,
-                memberCodecs,
-              )[1];
-              guaranteedNotNull = order.nullable === false;
-              break;
-            }
-            case "attribute": {
-              const attr = this.spec.attributes![select.attribute];
-              codec = attr.codec;
-              guaranteedNotNull = attr.notNull;
-              break;
-            }
-            default: {
-              codec = select.codec;
-            }
-          }
-          return sql`${
-            codec.castFromPg?.(sqlSrc, guaranteedNotNull || codec.notNull) ??
-            sql`${sqlSrc}::text`
-          } as ${sql.identifier(String(i))}`;
-        } else {
-          // PERF: eradicate this (aggregate mode) without breaking arrayMode
-          // tuple numbering
-          return sql`null as ${sql.identifier(String(i))}`;
-        }
-      });
-
-      const unionGroupBy =
-        this.mode === "aggregate" && this.groups.length > 0
-          ? sql`group by
-${sql.indent(
-  sql.join(
-    this.groups.map((g) => g.fragment),
-    ",\n",
-  ),
-)}
-`
-          : sql.blank;
-
-      const unionHaving =
-        this.mode === "aggregate" && this.havingConditions.length > 0
-          ? sql`having
-${sql.indent(sql.join(this.havingConditions, ",\n"))}
-`
-          : sql.blank;
-
-      const unionOrderBy =
-        this.mode === "aggregate"
-          ? sql.blank
-          : sql`\
-order by${sql.indent`
-${
-  this.orders.length
-    ? sql`${sql.join(
-        this.orders.map((o) => {
-          return sql`${o.fragment} ${
-            Number(o.direction === "DESC") ^ Number(reverse)
-              ? sql`desc`
-              : sql`asc`
-          }`;
-        }),
-        ",\n",
-      )},\n`
-    : sql.blank
-}\
-${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`},
-${rowNumberIdent} asc\
-`}
-`;
-
-      // Union must be ordered _before_ applying `::text`/etc transforms to
-      // select, so we wrap this with another select.
-      const unionQuery = sql.indent`
-${sql.join(
-  tables,
-  `
-union all
-`,
-)}
-${unionOrderBy}\
-${this.limitAndOffsetSQL!}
-`;
-
-      // Adds all the `::text`/etc casting
-      const innerQuery = sql`\
-select
-${sql.indent(sql.join(outerSelects, ",\n"))}
-from (${unionQuery}) ${this.alias}
-${unionGroupBy}\
-${unionHaving}\
-`;
-      return innerQuery;
-    };
-
-    const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
-      text: string;
-      rawSqlValues: SQLRawValue[];
-      identifierIndex: number | null;
-      queryValues: Array<QueryValue>;
-    } => {
-      const wrapperSymbol = Symbol("union_result");
-      const wrapperAlias = sql.identifier(wrapperSymbol);
-
-      const {
-        queryValues,
-        placeholderValues,
-        identifiersAlias,
-        identifiersSymbol,
-      } = this.makeValues(executionDetails, "union");
-
-      if (
-        queryValues.length > 0 ||
-        (count !== 1 && (this.forceIdentity || this.hasSideEffects))
-      ) {
-        const identifierIndex = this.selectAndReturnIndex(
-          sql`${identifiersAlias}.idx`,
-        );
-
-        // IMPORTANT: this must come after the `selectExpression` call above.
-        const innerQuery = makeQuery();
-
-        const {
-          text: lateralText,
-          values: rawSqlValues,
-          [$$symbolToIdentifier]: symbolToIdentifier,
-        } = sql.compile(
-          sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
-          { placeholderValues },
-        );
-        const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
-        const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
-
-        /*
-         * IMPORTANT: these wrapper queries are necessary so that queries
-         * that have a limit/offset get the limit/offset applied _per
-         * identifier group_; that's why this cannot just be another "from"
-         * clause.
-         */
-        const text = `\
-select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-          queryValues.length > 0
-            ? `, ${queryValues
-                .map(({ codec }, idx) => {
-                  return `(ids.value->>${idx})::${
-                    sql.compile(codec.sqlType).text
-                  } as "id${idx}"`;
-                })
-                .join(", ")}`
-            : ""
-        } from json_array_elements($${
-          rawSqlValues.length + 1
-        }::json) with ordinality as ids) as ${identifiersAliasText},
-${lateralText};`;
-
-        return {
-          text,
-          rawSqlValues,
-          identifierIndex,
-          queryValues,
-        };
-      } else {
-        const query = makeQuery();
-        const { text, values: rawSqlValues } = sql.compile(query, {
-          placeholderValues,
-        });
-        return { text, rawSqlValues, identifierIndex: null, queryValues };
-      }
-    })();
-
-    // const shouldReverseOrder = this.shouldReverseOrder();
-
-    // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
-
-    return {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      shouldReverseOrder,
-      name: hash(text),
-      queryValues,
-    };
-  }
-
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async execute(
     executionDetails: ExecutionDetails,
@@ -1658,7 +1308,27 @@ ${lateralText};`;
       shouldReverseOrder,
       name,
       queryValues,
-    } = this.buildTheQuery(executionDetails)!;
+    } = buildTheQuery({
+      executionDetails,
+      placeholders: this.placeholders,
+      deferreds: this.deferreds,
+      firstStepId: this.firstStepId,
+      lastStepId: this.lastStepId,
+      offsetStepId: this.offsetStepId,
+      lowerIndexStepId: this.lowerIndexStepId,
+      upperIndexStepId: this.upperIndexStepId,
+      forceIdentity: this.forceIdentity,
+      havingConditions: this.havingConditions,
+      mode: this.mode,
+      step: this,
+      groups: this.groups,
+      orders: this.orders,
+      selects: this.selects,
+      typeIdx: this.typeIdx,
+      attributes: this.spec.attributes,
+      memberDigests: this.memberDigests,
+      fetchOneExtra: this.fetchOneExtra,
+    });
 
     const contextDep = values[this.contextId];
     if (contextDep === undefined) {
@@ -1772,3 +1442,444 @@ export function pgUnionAll<
   return new PgUnionAllStep(spec);
 }
 exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");
+
+interface PgUnionAllQueryInfo<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends PgStmtCommonQueryInfo {
+  readonly mode: PgUnionAllMode;
+  readonly typeIdx: number | null;
+  readonly memberDigests: readonly MemberDigest<TTypeNames>[];
+  readonly step: PgUnionAllStep<TAttributes, TTypeNames>;
+  readonly selects: readonly PgUnionAllStepSelect<TAttributes>[];
+  readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
+  readonly orders: ReadonlyArray<PgOrderFragmentSpec>;
+  readonly groups: ReadonlyArray<PgGroupSpec>;
+  readonly havingConditions: readonly SQL[];
+  readonly forceIdentity: boolean;
+}
+
+function buildTheQuery<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+>(info: PgUnionAllQueryInfo<TAttributes, TTypeNames>): QueryBuildResult {
+  const {
+    executionDetails,
+    mode,
+    typeIdx,
+    memberDigests,
+    step,
+    selects: rawSelects,
+    attributes,
+    groups,
+    orders,
+    havingConditions,
+    forceIdentity,
+  } = info;
+  const selects = [...rawSelects];
+  function selectType() {
+    const existingIndex = selects.findIndex((s) => s.type === "type");
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index = selects.push({ type: "type" }) - 1;
+    return index;
+  }
+  function selectPk(): number {
+    const existingIndex = selects.findIndex((s) => s.type === "pk");
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index = selects.push({ type: "pk" }) - 1;
+    return index;
+  }
+
+  function selectAndReturnIndex(
+    fragment: SQL /* PgSQLCallbackOrDirect<SQL> */,
+  ): number {
+    // const fragment = this.scopedSQL(rawFragment);
+    const existingIndex = selects.findIndex(
+      (s) =>
+        s.type === "outerExpression" &&
+        sql.isEquivalent(s.expression, fragment),
+    );
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index =
+      selects.push({
+        type: "outerExpression",
+        expression: fragment,
+      }) - 1;
+    return index;
+  }
+  const ordersForCursor: PgOrderFragmentSpec[] = [
+    ...orders,
+    {
+      fragment: sql`${step.alias}.${sql.identifier(String(selectType()))}`,
+      codec: TYPES.text,
+      direction: "ASC",
+    },
+    {
+      fragment: sql`${step.alias}.${sql.identifier(String(selectPk()))}`,
+      codec: TYPES.json,
+      direction: "ASC",
+    },
+  ];
+  const { count } = executionDetails;
+  const { shouldReverseOrder } = getExecutionCommon(info);
+  const reverse = mode === "normal" ? shouldReverseOrder : null;
+
+  const memberCodecs = memberDigests.map(
+    (digest) => digest.finalResource.codec,
+  );
+  const makeQuery = () => {
+    const tables: SQL[] = [];
+
+    const [limitAndOffsetSQL, innerLimitSQL] =
+      calculateLimitAndOffsetSQLFromInfo(info);
+
+    for (const digest of memberDigests) {
+      const {
+        sqlSource,
+        alias: tableAlias,
+        conditions,
+        orders,
+        finalResource,
+      } = digest;
+
+      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
+      if (!pk) {
+        throw new Error(
+          `No PK for ${digest.member.typeName} resource in ${step}`,
+        );
+      }
+      const midSelects: SQL[] = [];
+      const innerSelects = selects
+        .map((s, selectIndex) => {
+          const r = ((): [SQL, PgCodec] | null => {
+            switch (s.type) {
+              case "attribute": {
+                if (!attributes) {
+                  throw new Error(
+                    `${step}: cannot select an attribute when there's no shared attributes`,
+                  );
+                }
+                const attr = attributes[s.attribute];
+                return [
+                  sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+                    digest,
+                    s.attribute,
+                  )}`,
+                  attr.codec,
+                ];
+              }
+              case "type": {
+                return [sql.literal(digest.member.typeName), TYPES.text];
+              }
+              case "pk": {
+                return [
+                  sql`json_build_array(${sql.join(
+                    pk.attributes.map(
+                      (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
+                    ),
+                    ",",
+                  )})`,
+                  TYPES.json,
+                ];
+              }
+              case "expression": {
+                return [s.expression, s.codec];
+              }
+              case "outerExpression": {
+                // Only applies on outside
+                return null;
+              }
+              case "order": {
+                const orderSpec = orders[s.orderIndex];
+                const [frag, codec] = getFragmentAndCodecFromOrder(
+                  step.alias,
+                  orderSpec,
+                  digest.finalResource.codec,
+                );
+                return [frag, codec];
+              }
+              default: {
+                const never: never = s;
+                throw new Error(`Couldn't match ${(never as any).type}`);
+              }
+            }
+          })();
+          if (!r) {
+            return r;
+          }
+          const [frag, _codec] = r;
+          const alias = String(selectIndex);
+          const ident = sql.identifier(alias);
+          const fullIdent = sql`${tableAlias}.${ident}`;
+          midSelects.push(fullIdent);
+          return sql`${frag} as ${ident}`;
+        })
+        .filter(isNotNullish);
+      midSelects.push(rowNumberIdent);
+
+      const ascOrDesc = reverse ? sql`desc` : sql`asc`;
+      const pkOrder = sql.join(
+        pk.attributes.map(
+          (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
+        ),
+        ",\n",
+      );
+      const orderBy = sql`order by
+${sql.indent`${
+  orders.length > 0
+    ? sql`${sql.join(
+        orders.map((orderSpec) => {
+          const [frag] = getFragmentAndCodecFromOrder(
+            tableAlias,
+            orderSpec,
+            finalResource.codec,
+          );
+          return sql`${frag} ${
+            Number(orderSpec.direction === "DESC") ^ Number(reverse)
+              ? sql`desc`
+              : sql`asc`
+          }`;
+        }),
+        `,\n`,
+      )},\n`
+    : sql.blank
+}${pkOrder}`}`;
+
+      innerSelects.push(
+        sql`row_number() over (${sql.indent(orderBy)}) as ${rowNumberIdent}`,
+      );
+
+      // Can't order individual selects in a `union all` so we're using
+      // subqueries to do so.
+      const innerQuery = sql.indent`
+select
+${sql.indent(sql.join(innerSelects, ",\n"))}
+from ${sqlSource}
+${
+  conditions.length > 0
+    ? sql`where ${sql.join(conditions, `\nand `)}\n`
+    : sql.blank
+}\
+${orderBy}\
+${innerLimitSQL}
+`;
+
+      // Relies on Postgres maintaining the order of the subquery
+      const query = sql.indent`\
+select
+${sql.indent(sql.join(midSelects, ",\n"))}
+from (${innerQuery}) as ${tableAlias}\
+`;
+      tables.push(query);
+    }
+
+    const outerSelects = selects.map((select, i) => {
+      if (select.type === "outerExpression") {
+        return sql`${select.expression} as ${sql.identifier(String(i))}`;
+      } else if (mode === "normal") {
+        const sqlSrc = sql`${step.alias}.${sql.identifier(String(i))}`;
+        let codec: PgCodec;
+        let guaranteedNotNull: boolean | undefined;
+        switch (select.type) {
+          case "type": {
+            codec = TYPES.text;
+            break;
+          }
+          case "pk": {
+            codec = TYPES.json;
+            guaranteedNotNull = true;
+            break;
+          }
+          case "order": {
+            const order = ordersForCursor[select.orderIndex];
+            codec = getFragmentAndCodecFromOrder(
+              step.alias,
+              order,
+              memberCodecs,
+            )[1];
+            guaranteedNotNull = order.nullable === false;
+            break;
+          }
+          case "attribute": {
+            const attr = attributes![select.attribute];
+            codec = attr.codec;
+            guaranteedNotNull = attr.notNull;
+            break;
+          }
+          default: {
+            codec = select.codec;
+          }
+        }
+        return sql`${
+          codec.castFromPg?.(sqlSrc, guaranteedNotNull || codec.notNull) ??
+          sql`${sqlSrc}::text`
+        } as ${sql.identifier(String(i))}`;
+      } else {
+        // PERF: eradicate this (aggregate mode) without breaking arrayMode
+        // tuple numbering
+        return sql`null as ${sql.identifier(String(i))}`;
+      }
+    });
+
+    const unionGroupBy =
+      mode === "aggregate" && groups.length > 0
+        ? sql`group by
+${sql.indent(
+  sql.join(
+    groups.map((g) => g.fragment),
+    ",\n",
+  ),
+)}
+`
+        : sql.blank;
+
+    const unionHaving =
+      mode === "aggregate" && havingConditions.length > 0
+        ? sql`having
+${sql.indent(sql.join(havingConditions, ",\n"))}
+`
+        : sql.blank;
+
+    const unionOrderBy =
+      mode === "aggregate"
+        ? sql.blank
+        : sql`\
+order by${sql.indent`
+${
+  orders.length
+    ? sql`${sql.join(
+        orders.map((o) => {
+          return sql`${o.fragment} ${
+            Number(o.direction === "DESC") ^ Number(reverse)
+              ? sql`desc`
+              : sql`asc`
+          }`;
+        }),
+        ",\n",
+      )},\n`
+    : sql.blank
+}\
+${sql.identifier(String(typeIdx))} ${reverse ? sql`desc` : sql`asc`},
+${rowNumberIdent} asc\
+`}
+`;
+
+    // Union must be ordered _before_ applying `::text`/etc transforms to
+    // select, so we wrap this with another select.
+    const unionQuery = sql.indent`
+${sql.join(
+  tables,
+  `
+union all
+`,
+)}
+${unionOrderBy}\
+${limitAndOffsetSQL}
+`;
+
+    // Adds all the `::text`/etc casting
+    const innerQuery = sql`\
+select
+${sql.indent(sql.join(outerSelects, ",\n"))}
+from (${unionQuery}) ${step.alias}
+${unionGroupBy}\
+${unionHaving}\
+`;
+    return innerQuery;
+  };
+
+  const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
+    text: string;
+    rawSqlValues: SQLRawValue[];
+    identifierIndex: number | null;
+    queryValues: Array<QueryValue>;
+  } => {
+    const wrapperSymbol = Symbol("union_result");
+    const wrapperAlias = sql.identifier(wrapperSymbol);
+
+    const {
+      queryValues,
+      placeholderValues,
+      identifiersAlias,
+      identifiersSymbol,
+    } = makeValues(info, "union");
+
+    if (
+      queryValues.length > 0 ||
+      (count !== 1 && (forceIdentity || step.hasSideEffects))
+    ) {
+      const identifierIndex = selectAndReturnIndex(
+        sql`${identifiersAlias}.idx`,
+      );
+
+      // IMPORTANT: this must come after the `selectExpression` call above.
+      const innerQuery = makeQuery();
+
+      const {
+        text: lateralText,
+        values: rawSqlValues,
+        [$$symbolToIdentifier]: symbolToIdentifier,
+      } = sql.compile(
+        sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
+        { placeholderValues },
+      );
+      const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
+      const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
+
+      /*
+       * IMPORTANT: these wrapper queries are necessary so that queries
+       * that have a limit/offset get the limit/offset applied _per
+       * identifier group_; that's why this cannot just be another "from"
+       * clause.
+       */
+      const text = `\
+select ${wrapperAliasText}.*
+from (select ids.ordinality - 1 as idx${
+        queryValues.length > 0
+          ? `, ${queryValues
+              .map(({ codec }, idx) => {
+                return `(ids.value->>${idx})::${
+                  sql.compile(codec.sqlType).text
+                } as "id${idx}"`;
+              })
+              .join(", ")}`
+          : ""
+      } from json_array_elements($${
+        rawSqlValues.length + 1
+      }::json) with ordinality as ids) as ${identifiersAliasText},
+${lateralText};`;
+
+      return {
+        text,
+        rawSqlValues,
+        identifierIndex,
+        queryValues,
+      };
+    } else {
+      const query = makeQuery();
+      const { text, values: rawSqlValues } = sql.compile(query, {
+        placeholderValues,
+      });
+      return { text, rawSqlValues, identifierIndex: null, queryValues };
+    }
+  })();
+
+  // const shouldReverseOrder = this.shouldReverseOrder();
+
+  // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
+
+  return {
+    text,
+    rawSqlValues,
+    identifierIndex,
+    shouldReverseOrder,
+    name: hash(text),
+    queryValues,
+  };
+}
