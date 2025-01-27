@@ -1141,6 +1141,7 @@ and ${condition(i + 1)}`}
     }
   }
 
+  // TODO: this MUST be removed, it gives the wrong result now
   /**
    * So we can quickly detect if cursors are invalid we use this digest,
    * passing this check does not mean that the cursor is valid but it at least
