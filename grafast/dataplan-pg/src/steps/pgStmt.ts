@@ -530,12 +530,14 @@ export interface PgStmtCommonQueryInfo {
   firstStepId: number | null;
   lastStepId: number | null;
   offsetStepId: number | null;
-  lowerIndexStepId: number | null;
-  upperIndexStepId: number | null;
+  beforeStepId: number | null;
+  afterStepId: number | null;
 }
 
 export function calculateLimitAndOffsetSQLFromInfo(
   info: PgStmtCommonQueryInfo,
+  cursorLower: Maybe<number>,
+  cursorUpper: Maybe<number>,
 ) {
   const {
     executionDetails: { values },
@@ -544,14 +546,18 @@ export function calculateLimitAndOffsetSQLFromInfo(
   return calculateLimitAndOffsetSQL({
     first: getUnary(values, info.firstStepId),
     last: getUnary(values, info.lastStepId),
-    cursorLower: getUnary(values, info.lowerIndexStepId),
-    cursorUpper: getUnary(values, info.upperIndexStepId),
     offset: getUnary(values, info.offsetStepId),
+    cursorLower,
+    cursorUpper,
     fetchOneExtra,
   });
 }
 
-export function getExecutionCommon(info: PgStmtCommonQueryInfo) {
+export function getExecutionCommon(
+  info: PgStmtCommonQueryInfo,
+  cursorLower: Maybe<number>,
+  cursorUpper: Maybe<number>,
+) {
   const { executionDetails } = info;
   const { values } = executionDetails;
 
@@ -569,8 +575,8 @@ export function getExecutionCommon(info: PgStmtCommonQueryInfo) {
   const shouldReverseOrder = calculateShouldReverseOrder({
     first: getUnary(values, info.firstStepId),
     last: getUnary(values, info.lastStepId),
-    cursorLower: getUnary(values, info.lowerIndexStepId),
-    cursorUpper: getUnary(values, info.upperIndexStepId),
+    cursorLower,
+    cursorUpper,
   });
 
   return { first, last, offset, shouldReverseOrder };
