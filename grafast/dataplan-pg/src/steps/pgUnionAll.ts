@@ -1179,8 +1179,6 @@ interface MutablePgUnionAllQueryInfo<
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
-  cursorDigest: string | null;
-  cursorIndicies: ReadonlyArray<number> | null;
   typeIdx: number | null;
 }
 
@@ -1256,6 +1254,8 @@ function buildTheQuery<
   ];
   if (isDev) Object.freeze(info.ordersForCursor);
 
+  // afterLock("orderBy"): Now the runtime orders/etc have been performed,
+
   const after = getUnary<any[] | null>(values, info.afterStepId);
   const before = getUnary<any[] | null>(values, info.beforeStepId);
   if (info.needsCursor || after != null || before != null) {
@@ -1269,7 +1269,6 @@ function buildTheQuery<
     ];
   }
 
-  // afterLock("orderBy"): Now the runtime orders/etc have been performed,
   // apply conditions from the cursor
 
   applyConditionFromCursor(info, "after", after);
