@@ -595,7 +595,6 @@ export class PgSelectStep<
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
         );
-      } else {
       }
     }
 
