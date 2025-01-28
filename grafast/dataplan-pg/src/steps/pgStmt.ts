@@ -480,7 +480,7 @@ export interface MutablePgStmtCommonQueryInfo {
   offset: Maybe<number>;
 
   cursorDigest: string | null;
-  cursorIndicies: ReadonlyArray<number> | null;
+  readonly cursorIndicies: Array<number> | null;
 }
 
 export function calculateLimitAndOffsetSQLFromInfo(

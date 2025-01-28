@@ -1878,7 +1878,7 @@ function buildTheQuery<
     cursorLower: null,
     cursorUpper: null,
     cursorDigest: null,
-    cursorIndicies: null,
+    cursorIndicies: rawInfo.needsCursor ? [] : null,
 
     // Will be populated by applyCommonPaginationStuff
     first: null,
@@ -1910,23 +1910,21 @@ function buildTheQuery<
     info.cursorDigest = getOrderByDigest(info);
   }
   if (info.needsCursor) {
-    info.cursorIndicies = [
-      ...info.orders.map((o) => {
-        const [frag, codec] = getFragmentAndCodecFromOrder(
-          info.alias,
-          o,
-          info.resource.codec,
-        );
-        if (codec.castFromPg) {
-          const guaranteedNotNull = o.nullable === false;
-          return selectAndReturnIndex(
-            codec.castFromPg(frag, guaranteedNotNull),
-          );
-        } else {
-          return selectAndReturnIndex(sql`${sql.parens(frag)}::text`);
-        }
-      }),
-    ];
+    if (!info.cursorIndicies) throw new Error(`Impossible?`);
+    for (const o of info.orders) {
+      const [frag, codec] = getFragmentAndCodecFromOrder(
+        info.alias,
+        o,
+        info.resource.codec,
+      );
+      info.cursorIndicies.push(
+        selectAndReturnIndex(
+          codec.castFromPg
+            ? codec.castFromPg(frag, o.nullable === false)
+            : sql`${sql.parens(frag)}::text`,
+        ),
+      );
+    }
   }
 
   // apply conditions from the cursor
