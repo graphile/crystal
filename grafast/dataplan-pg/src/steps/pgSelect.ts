@@ -15,6 +15,7 @@ import {
   __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
+  access,
   arrayOfLength,
   ExecutableStep,
   exportAs,
@@ -50,6 +51,7 @@ import type {
   PgWhereConditionSpec,
 } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
+import type { PgCursorDetails } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
@@ -82,7 +84,10 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
-const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
+const NO_ROWS = Object.freeze({
+  hasMore: false,
+  items: [],
+} as PgSelectStepResult);
 
 type PgSelectPlanJoin =
   | {
@@ -266,6 +271,7 @@ interface PgSelectStepResult {
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
+  cursorDetails?: PgCursorDetails;
 }
 
 /**
@@ -950,6 +956,11 @@ export class PgSelectStep<
     return pgPageInfo($connectionPlan);
   }
 
+  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+    this.needsCursor = true;
+    return access(this, "cursorDetails");
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -1013,6 +1024,7 @@ export class PgSelectStep<
       from: this.from,
       joins: this.joins,
       arguments: this.arguments,
+      needsCursor: this.needsCursor,
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1196,17 +1208,6 @@ export class PgSelectStep<
         };
       });
     }
-  }
-
-  // TODO: this MUST be removed, it gives the wrong result now.
-  // Instead, call `getOrderByDigest` at runtime.
-  public getOrderByDigest() {
-    return "natural";
-  }
-
-  public getOrderBy(): ReadonlyArray<PgOrderSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.orders;
   }
 
   public finalize(): void {

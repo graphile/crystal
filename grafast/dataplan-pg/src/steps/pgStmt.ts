@@ -2,10 +2,8 @@ import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
 import {
   access,
   applyTransforms,
-  constant,
   ExecutableStep,
   lambda,
-  operationPlan,
   SafeError,
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
@@ -69,6 +67,8 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   protected abstract offsetStepId: number | null;
   protected abstract beforeStepId: number | null;
   protected abstract afterStepId: number | null;
+
+  protected needsCursor = false;
 
   public scopedSQL = makeScopedSQL(this);
 
@@ -457,6 +457,7 @@ export interface PgStmtCommonQueryInfo {
   readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
   readonly fetchOneExtra: boolean;
   readonly forceIdentity: boolean;
+  readonly needsCursor: boolean;
 
   readonly firstStepId: number | null;
   readonly lastStepId: number | null;

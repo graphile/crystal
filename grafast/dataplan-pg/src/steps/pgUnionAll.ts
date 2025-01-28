@@ -19,8 +19,8 @@ import {
   ExecutableStep,
   exportAs,
   first,
+  isDev,
   isPromiseLike,
-  list,
   polymorphicWrap,
   reverseArray,
   SafeError,
@@ -50,6 +50,7 @@ import type {
   PgWhereConditionSpec,
 } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
+import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -237,33 +238,15 @@ export class PgUnionAllSingleStep
   }
 
   /**
-   * @internal
-   * For use by PgCursorStep
-   */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
-    if (this.typeKey === null) {
-      throw new Error("Forbidden since parent isn't in normal mode");
-    }
-    const classPlan = this.getClassStep();
-    const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderByWithoutType().map((o, i) => {
-      return access(this, [classPlan.selectOrderValue(i)]);
-    });
-    // Add the type to the cursor
-    orders.push(access(this, [classPlan.selectType()]));
-    // Add the pk to the cursor
-    orders.push(access(this, [classPlan.selectPk()]));
-    const step = list(orders);
-    return [digest, step];
-  }
-
-  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
   public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(this);
+    const cursorPlan = new PgCursorStep<this>(
+      this,
+      this.getClassStep().getCursorDetails(),
+    );
     return cursorPlan;
   }
 
@@ -409,12 +392,15 @@ interface QueryBuildResult {
 
   first: Maybe<number>;
   last: Maybe<number>;
+
+  cursorDetails: PgCursorDetails | undefined;
 }
 
 interface PgUnionAllStepResult {
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
+  cursorDetails?: PgCursorDetails;
 }
 
 /**
@@ -786,16 +772,6 @@ on (${sql.indent(
     return index;
   }
 
-  selectOrderValue(orderIndex: number): number {
-    const orders = this.getOrderByWithoutType();
-    const order = orders[orderIndex];
-    if (!order) {
-      throw new Error("OOB!");
-    }
-    // Order is already selected
-    return this.orderSelectIndex[orderIndex];
-  }
-
   /**
    * If this plan may only return one record, you can use `.singleAsRecord()`
    * to return a plan that resolves to that record (rather than a list of
@@ -952,23 +928,6 @@ on (${sql.indent(
     }
   }
 
-  // TODO: this MUST be removed, it gives the wrong result now.
-  // Instead, call `getOrderByDigest` at runtime.
-  public getOrderByDigest() {
-    return "natural";
-  }
-
-  // TODO: this MUST be removed, it gives the wrong result now.
-  public getOrderBy(): ReadonlyArray<PgOrderFragmentSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.ordersForCursor;
-  }
-  // TODO: this MUST be removed, it gives the wrong result now.
-  public getOrderByWithoutType(): ReadonlyArray<PgOrderFragmentSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.orders;
-  }
-
   /** @experimental */
   limitToTypes(types: readonly string[]): void {
     if (!this._limitToTypes) {
@@ -1015,6 +974,11 @@ on (${sql.indent(
     return this;
   }
 
+  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+    this.needsCursor = true;
+    return access(this, "cursorDetails");
+  }
+
   private typeIdx: number | null = null;
   // private reverse: boolean | null = null;
   finalize() {
@@ -1046,6 +1010,7 @@ on (${sql.indent(
       queryValues,
       first,
       last,
+      cursorDetails,
     } = buildTheQuery<TAttributes, TTypeNames>({
       executionDetails,
       placeholders: this.placeholders,
@@ -1067,6 +1032,7 @@ on (${sql.indent(
       attributes: this.spec.attributes,
       memberDigests: this.memberDigests,
       fetchOneExtra,
+      needsCursor: this.needsCursor,
     });
 
     if (first === 0 || last === 0) {
@@ -1135,6 +1101,7 @@ on (${sql.indent(
       return {
         hasMore,
         items: orderedRows,
+        cursorDetails,
       };
     });
   }
@@ -1212,6 +1179,8 @@ interface MutablePgUnionAllQueryInfo<
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
+  cursorDigest: string | null;
+  cursorIndicies: ReadonlyArray<number> | null;
   typeIdx: number | null;
 }
 
@@ -1221,12 +1190,18 @@ function buildTheQuery<
 >(rawInfo: PgUnionAllQueryInfo<TAttributes, TTypeNames>): QueryBuildResult {
   const info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames> = {
     ...rawInfo,
+
+    // Copy and make mutable
     selects: [...rawInfo.selects],
     orders: [...rawInfo.orders],
-    ordersForCursor: undefined /* will be replaced shortly */ as never,
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
     memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
+
+    // Will be populated below
+    ordersForCursor: undefined as never,
+    cursorDigest: null,
+    cursorIndicies: null,
 
     // Will be populated by applyConditionFromCursor
     cursorLower: null,
@@ -1264,6 +1239,8 @@ function buildTheQuery<
 
   // TODO: evaluate runtime orders, conditions, etc here
 
+  if (isDev) Object.freeze(info.orders);
+
   info.ordersForCursor = [
     ...info.orders,
     {
@@ -1277,16 +1254,40 @@ function buildTheQuery<
       direction: "ASC",
     },
   ];
+  if (isDev) Object.freeze(info.ordersForCursor);
+
+  const after = getUnary<any[] | null>(values, info.afterStepId);
+  const before = getUnary<any[] | null>(values, info.beforeStepId);
+  if (info.needsCursor || after != null || before != null) {
+    info.cursorDigest = getOrderByDigest(info);
+  }
+  if (info.needsCursor) {
+    info.cursorIndicies = [
+      ...info.orders.map((o) => selectAndReturnIndex(o.fragment)),
+      selectType(),
+      selectPk(),
+    ];
+  }
 
   // afterLock("orderBy"): Now the runtime orders/etc have been performed,
   // apply conditions from the cursor
 
-  const after = getUnary<any[] | null>(values, info.afterStepId);
   applyConditionFromCursor(info, "after", after);
-  const before = getUnary<any[] | null>(values, info.beforeStepId);
   applyConditionFromCursor(info, "before", before);
 
   applyCommonPaginationStuff(info);
+
+  if (isDev) {
+    info.memberDigests.forEach((d) => {
+      Object.freeze(d.conditions);
+      Object.freeze(d.orders);
+      Object.freeze(d);
+    });
+    Object.freeze(info.memberDigests);
+    // Object.freeze(info.selects);
+    Object.freeze(info.groups);
+    Object.freeze(info.havingConditions);
+  }
 
   /****************************************
    *                                      *
@@ -1309,6 +1310,8 @@ function buildTheQuery<
     hasSideEffects,
     ordersForCursor,
     shouldReverseOrder,
+    cursorDigest,
+    cursorIndicies,
   } = info;
 
   const reverse = mode === "normal" ? shouldReverseOrder : null;
@@ -1650,6 +1653,13 @@ ${lateralText};`;
   // const shouldReverseOrder = this.shouldReverseOrder();
 
   // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
+  const cursorDetails: PgCursorDetails | undefined =
+    cursorDigest != null && cursorIndicies != null
+      ? {
+          digest: cursorDigest,
+          indicies: cursorIndicies,
+        }
+      : undefined;
 
   return {
     text,
@@ -1660,6 +1670,7 @@ ${lateralText};`;
     queryValues,
     first: info.first,
     last: info.last,
+    cursorDetails,
   };
 }
 
@@ -1672,12 +1683,14 @@ function applyConditionFromCursor<
   parsedCursor: Maybe<any[]>,
 ): void {
   if (parsedCursor == null) return;
-  const { alias, orders, ordersForCursor, memberDigests } = info;
-  const orderDigest = getOrderByDigest(info);
+  const { alias, orders, ordersForCursor, memberDigests, cursorDigest } = info;
+  if (cursorDigest == null) {
+    throw new Error(`Cursor passed, but could not determine order digest.`);
+  }
   const orderCount = ordersForCursor.length;
 
   // Cursor validity check
-  validateParsedCursor(parsedCursor, orderDigest, orderCount, beforeOrAfter);
+  validateParsedCursor(parsedCursor, cursorDigest, orderCount, beforeOrAfter);
 
   if (orderCount === 0) {
     // Natural pagination `['natural', N]`
