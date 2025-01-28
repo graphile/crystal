@@ -167,23 +167,23 @@ select
 from "a"."query_interval_array"() as __query_interval_array__(v);
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __compound_type_set_query__."a"::text as "1",
-  __compound_type_set_query__."b" as "2",
-  __compound_type_set_query__."c"::text as "3",
-  __compound_type_set_query__."d" as "4",
-  __compound_type_set_query__."e"::text as "5",
-  __compound_type_set_query__."f"::text as "6",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "7",
-  __compound_type_set_query__."foo_bar"::text as "8",
-  (not (__compound_type_set_query__ is null))::text as "9"
+  __compound_type_set_query__."a"::text as "0",
+  __compound_type_set_query__."b" as "1",
+  __compound_type_set_query__."c"::text as "2",
+  __compound_type_set_query__."d" as "3",
+  __compound_type_set_query__."e"::text as "4",
+  __compound_type_set_query__."f"::text as "5",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+  __compound_type_set_query__."foo_bar"::text as "7",
+  (not (__compound_type_set_query__ is null))::text as "8",
+  (row_number() over (partition by 1))::text as "9"
 from "c"."compound_type_set_query"() as __compound_type_set_query__
 limit 6;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__;
 
 select
@@ -193,86 +193,86 @@ from "c"."table_set_query"() as __table_set_query__
 order by __table_set_query__."person_full_name" asc;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 where (
   __table_set_query__."person_full_name" = $1::"varchar"
 );
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 1
 offset 3;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 3
 offset 1;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 3;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 3
 offset 3;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 3
 offset 2;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 3
 offset 4;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 7;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query__."person_full_name" as "1",
-  __table_set_query__."id"::text as "2"
+  __table_set_query__."person_full_name" as "0",
+  __table_set_query__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query"() as __table_set_query__
 limit 0;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query_plpgsql__."person_full_name" as "1",
-  __table_set_query_plpgsql__."id"::text as "2"
+  __table_set_query_plpgsql__."person_full_name" as "0",
+  __table_set_query_plpgsql__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
 limit 3;
 
 select
-  (row_number() over (partition by 1))::text as "0",
-  __table_set_query_plpgsql__."person_full_name" as "1",
-  __table_set_query_plpgsql__."id"::text as "2"
+  __table_set_query_plpgsql__."person_full_name" as "0",
+  __table_set_query_plpgsql__."id"::text as "1",
+  (row_number() over (partition by 1))::text as "2"
 from "c"."table_set_query_plpgsql"() as __table_set_query_plpgsql__
 limit 3
 offset 2;
@@ -295,7 +295,8 @@ from "c"."int_set_query"(
 ) as __int_set_query__(v);
 
 select
-  __static_big_integer__.v::text as "0"
+  __static_big_integer__.v::text as "0",
+  (row_number() over (partition by 1))::text as "1"
 from "a"."static_big_integer"() as __static_big_integer__(v);
 
 select
