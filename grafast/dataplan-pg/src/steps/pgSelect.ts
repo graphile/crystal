@@ -15,20 +15,15 @@ import {
   __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
-  access,
   arrayOfLength,
-  constant,
   ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
   isDev,
   isPromiseLike,
-  lambda,
-  operationPlan,
   reverseArray,
   SafeError,
-  stepAMayDependOnStepB,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
@@ -49,7 +44,7 @@ import type {
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import { PgClassExpressionStep } from "./pgClassExpression.js";
+import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
@@ -72,10 +67,7 @@ import {
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.js";
-import {
-  pgValidateParsedCursor,
-  validateParsedCursor,
-} from "./pgValidateParsedCursor.js";
+import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
 
@@ -466,10 +458,6 @@ export class PgSelectStep<
     cloneFrom: PgSelectStep<TResource>,
     mode: PgSelectMode = cloneFrom.mode,
   ): PgSelectStep<TResource> {
-    // Prevent any changes to our original to help avoid programming
-    // errors.
-    cloneFrom.lock();
-
     const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
     const $clone = new PgSelectStep({
       identifiers: [], //We'll overwrite teh result of this in a moment
@@ -827,6 +815,10 @@ export class PgSelectStep<
    * pagination, or grouping, aggregates, etc)
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
+    // Prevent any changes to our original to help avoid programming
+    // errors.
+    this.lock();
+
     return PgSelectStep.clone(this, mode);
   }
 
@@ -891,11 +883,6 @@ export class PgSelectStep<
     this.groups.push(this.scopedSQL(group));
   }
 
-  getGroups(): readonly PgGroupSpec[] {
-    this.locker.lockParameter("groupBy");
-    return this.groups;
-  }
-
   havingPlan(): PgConditionStep<this> {
     if (this.locker.locked) {
       throw new Error(
@@ -934,10 +921,6 @@ export class PgSelectStep<
   orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec>): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(this.scopedSQL(order));
-  }
-
-  orderIsUnique(): boolean {
-    return this.isOrderUnique;
   }
 
   setOrderIsUnique(): void {
@@ -1433,117 +1416,6 @@ export class PgSelectStep<
 
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
-    }
-  }
-
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgResource>>(
-    otherPlan: TOtherStep,
-  ): {
-    [desiredIndex: string]: string;
-  } {
-    if (otherPlan.mode !== this.mode) {
-      throw new Error(
-        "GrafastInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
-      );
-    }
-    const actualKeyByDesiredKey = Object.create(null);
-    //console.log(`Other ${otherPlan} selects:`);
-    //console.dir(otherPlan.selects, { depth: 8 });
-    //console.log(`My ${this} selects:`);
-    //console.dir(this.selects, { depth: 8 });
-    this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
-    });
-    //console.dir(actualKeyByDesiredKey);
-    //console.log(`Other ${otherPlan} selects now:`);
-    //console.dir(otherPlan.selects, { depth: 8 });
-    return actualKeyByDesiredKey;
-  }
-
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResource>>(
-    otherPlan: TOtherStep,
-  ): void {
-    for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
-      const dep = this.getDep(dependencyIndex);
-      /*
-       * We have dependency `dep`. We're attempting to merge ourself into
-       * `otherPlan`. We have two situations we need to handle:
-       *
-       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
-       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
-       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
-       *    result of selecting an expression in the `otherPlan`), in which
-       *    case we should turn it into an SQL expression and inline that.
-       */
-
-      // PERF: we know dep can't depend on otherPlan if
-      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
-      // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB(otherPlan, dep)) {
-        // Either dep is a static input plan (which isn't dependent on anything
-        // else) or otherPlan is deeper than dep; either way we can use the dep
-        // directly within otherPlan.
-        const newPlanIndex = otherPlan.addDependency(dep);
-        otherPlan.placeholders.push({
-          dependencyIndex: newPlanIndex,
-          codec,
-          symbol,
-          alreadyEncoded,
-        });
-      } else if (dep instanceof PgClassExpressionStep) {
-        // Replace with a reference.
-        otherPlan.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
-      } else {
-        throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
-        );
-      }
-    }
-    for (const deferred of this.deferreds) {
-      const { dependencyIndex, symbol } = deferred;
-      const dep = this.getDep(dependencyIndex);
-      /*
-       * We have dependency `dep`. We're attempting to merge ourself into
-       * `otherPlan`. We have two situations we need to handle:
-       *
-       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
-       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
-       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
-       *    result of selecting an expression in the `otherPlan`), in which
-       *    case we should turn it into an SQL expression and inline that.
-       */
-
-      // PERF: we know dep can't depend on otherPlan if
-      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
-      // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB(otherPlan, dep)) {
-        // Either dep is a static input plan (which isn't dependent on anything
-        // else) or otherPlan is deeper than dep; either way we can use the dep
-        // directly within otherPlan.
-        const newPlanIndex = otherPlan.addDependency(dep);
-        otherPlan.deferreds.push({
-          symbol,
-          dependencyIndex: newPlanIndex,
-        });
-      } else {
-        throw new Error(`Could not merge deferred: ${dep}`);
-      }
-    }
-    for (const [
-      sqlPlaceholder,
-      placeholderValue,
-    ] of this.fixedPlaceholderValues.entries()) {
-      if (
-        otherPlan.fixedPlaceholderValues.has(sqlPlaceholder) &&
-        otherPlan.fixedPlaceholderValues.get(sqlPlaceholder) !==
-          placeholderValue
-      ) {
-        throw new Error(
-          `${otherPlan} already has an identical placeholder with a different value when trying to mergePlaceholdersInto it from ${this}`,
-        );
-      }
-      otherPlan.fixedPlaceholderValues.set(sqlPlaceholder, placeholderValue);
     }
   }
 
