@@ -265,6 +265,7 @@ interface QueryBuildResult {
 
   first: Maybe<number>;
   last: Maybe<number>;
+  cursorDetails: PgCursorDetails | undefined;
 }
 
 interface PgSelectStepResult {
@@ -995,6 +996,7 @@ export class PgSelectStep<
       shouldReverseOrder,
       first,
       last,
+      cursorDetails,
     } = buildTheQuery({
       executionDetails,
       placeholders: this.placeholders,
@@ -1087,6 +1089,7 @@ export class PgSelectStep<
         return {
           items: orderedRows,
           hasMore,
+          cursorDetails,
         };
       });
     } else {
@@ -1158,6 +1161,7 @@ export class PgSelectStep<
           return {
             items: iterable,
             hasMore: false,
+            cursorDetails,
           };
         }
 
@@ -1205,6 +1209,7 @@ export class PgSelectStep<
         return {
           items: mergedGenerator,
           hasMore: false,
+          cursorDetails,
         };
       });
     }
@@ -1869,6 +1874,8 @@ function buildTheQuery<
     // Will be populated by applyConditionFromCursor
     cursorLower: null,
     cursorUpper: null,
+    cursorDigest: null,
+    cursorIndicies: null,
 
     // Will be populated by applyCommonPaginationStuff
     first: null,
@@ -1877,17 +1884,50 @@ function buildTheQuery<
     shouldReverseOrder: false,
   };
 
+  function selectAndReturnIndex(expression: SQL): number {
+    const existingIndex = info.selects.findIndex((s) =>
+      sql.isEquivalent(s, expression),
+    );
+    if (existingIndex >= 0) return existingIndex;
+    return info.selects.push(expression) - 1;
+  }
+
   // TODO: evaluate runtime orders, conditions, etc here
 
   // beforeLock("orderBy"): Now the runtime orders/etc have been added, mutate `orders` to be unique
   makeOrderUniqueIfPossible(info);
 
   // afterLock("orderBy"): Now the runtime orders/etc have been performed,
-  // apply conditions from the cursor
+
   const { count, stream, values } = info.executionDetails;
   const after = getUnary<any[] | null>(values, info.afterStepId);
-  applyConditionFromCursor(info, "after", after);
   const before = getUnary<any[] | null>(values, info.beforeStepId);
+
+  if (info.needsCursor || after != null || before != null) {
+    info.cursorDigest = getOrderByDigest(info);
+  }
+  if (info.needsCursor) {
+    info.cursorIndicies = [
+      ...info.orders.map((o) => {
+        const [frag, codec] = getFragmentAndCodecFromOrder(
+          info.alias,
+          o,
+          info.resource.codec,
+        );
+        if (codec.castFromPg) {
+          const guaranteedNotNull = o.nullable === false;
+          return selectAndReturnIndex(
+            codec.castFromPg(frag, guaranteedNotNull),
+          );
+        } else {
+          return selectAndReturnIndex(sql`${sql.parens(frag)}::text`);
+        }
+      }),
+    ];
+  }
+
+  // apply conditions from the cursor
+  applyConditionFromCursor(info, "after", after);
   applyConditionFromCursor(info, "before", before);
 
   applyCommonPaginationStuff(info);
@@ -1908,6 +1948,8 @@ function buildTheQuery<
     first,
     last,
     shouldReverseOrder,
+    cursorDigest,
+    cursorIndicies,
   } = info;
 
   const { sql: trueOrderBySQL } = buildOrderBy(info, false);
@@ -2121,6 +2163,14 @@ ${lateralText};`;
     }
   };
 
+  const cursorDetails: PgCursorDetails | undefined =
+    cursorDigest != null && cursorIndicies != null
+      ? {
+          digest: cursorDigest,
+          indicies: cursorIndicies,
+        }
+      : undefined;
+
   if (stream) {
     // PERF: should use the queryForSingle optimization in here too
 
@@ -2165,6 +2215,7 @@ ${lateralText};`;
         queryValues,
         first,
         last,
+        cursorDetails,
       };
     } else {
       /*
@@ -2197,6 +2248,7 @@ ${lateralText};`;
         queryValues,
         first,
         last,
+        cursorDetails,
       };
     }
   } else {
@@ -2214,6 +2266,7 @@ ${lateralText};`;
       queryValues,
       first,
       last,
+      cursorDetails,
     };
   }
 }
@@ -2226,12 +2279,14 @@ function applyConditionFromCursor<
   parsedCursor: Maybe<any[]>,
 ): void {
   if (parsedCursor == null) return;
-  const { orders, isOrderUnique, alias, resource } = info;
-  const orderDigest = getOrderByDigest(info, orders);
+  const { orders, isOrderUnique, alias, resource, cursorDigest } = info;
+  if (cursorDigest == null) {
+    throw new Error(`Cursor passed, but could not determine order digest.`);
+  }
   const orderCount = orders.length;
 
   // Cursor validity check
-  validateParsedCursor(parsedCursor, orderDigest, orderCount, beforeOrAfter);
+  validateParsedCursor(parsedCursor, cursorDigest, orderCount, beforeOrAfter);
 
   if (orderCount === 0) {
     // Natural pagination `['natural', N]`
@@ -2329,9 +2384,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
  */
 function getOrderByDigest<
   TResource extends PgResource<any, any, any, any, any>,
->(info: PgSelectQueryInfo<TResource>, orders: readonly PgOrderSpec[]) {
-  const { placeholders, deferreds, alias, resource, fixedPlaceholderValues } =
-    info;
+>(info: MutablePgSelectQueryInfo<TResource>) {
+  const {
+    placeholders,
+    deferreds,
+    alias,
+    resource,
+    fixedPlaceholderValues,
+    orders,
+  } = info;
   if (orders.length === 0) {
     return "natural";
   }
