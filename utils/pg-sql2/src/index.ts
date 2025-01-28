@@ -401,7 +401,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
  */
 export function compile(
   sql: SQL,
-  options?: { placeholderValues?: Map<symbol, SQL> },
+  options?: { placeholderValues?: ReadonlyMap<symbol, SQL> },
 ): {
   text: string;
   values: SQLRawValue[];
@@ -806,7 +806,7 @@ export function literal(val: string | number | boolean | null): SQL {
  * dealing with lists of SQL items, for example a dynamic list of columns or
  * variadic SQL function arguments.
  */
-export function join(items: Array<SQL>, separator = ""): SQL {
+export function join(items: ReadonlyArray<SQL>, separator = ""): SQL {
   if (!Array.isArray(items)) {
     throw new Error(
       `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
@@ -1235,7 +1235,7 @@ export function replaceSymbol(
  */
 function getSubstitute(
   initialSymbol: symbol,
-  symbolSubstitutes?: Map<symbol, symbol>,
+  symbolSubstitutes?: ReadonlyMap<symbol, symbol>,
 ): symbol {
   const path: symbol[] = [];
   let symbol = initialSymbol;
