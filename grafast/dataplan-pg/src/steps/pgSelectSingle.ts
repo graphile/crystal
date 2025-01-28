@@ -3,12 +3,7 @@ import type {
   ExecutableStep,
   UnbatchedExecutionExtra,
 } from "grafast";
-import {
-  exportAs,
-  list,
-  polymorphicWrap,
-  UnbatchedExecutableStep,
-} from "grafast";
+import { exportAs, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -34,7 +29,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
-import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
+import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");
