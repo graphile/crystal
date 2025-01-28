@@ -9,12 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object37{{"Object[37∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda29{{"Lambda[29∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ[ { attribute: 'col_no_create_update', direction: 'DESC' }, ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
-    Lambda29 & Constant34 & Constant35 & Constant36 --> Object37
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,22 +16,10 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant44 --> Lambda29
-    Lambda32{{"Lambda[32∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant45 --> Lambda32
-    Access33{{"Access[33∈0] ➊<br />ᐸ32.0ᐳ"}}:::plan
-    Lambda32 --> Access33
-    Lambda38{{"Lambda[38∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object37 --> Lambda38
-    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col_no_create_updᐳ"}}:::plan
-    Constant46 --> Lambda43
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object12 & Connection13 & Lambda29 & Access33 & Lambda38 & Lambda43 --> PgSelect14
+    Object12 & Connection13 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
@@ -68,8 +50,8 @@ graph TD
     subgraph "Buckets for queries/v4/d.order"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Lambda29,Lambda32,Access33,Constant34,Constant35,Constant36,Object37,Lambda38,Lambda43,Constant44,Constant45,Constant46 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 29, 33, 38, 43<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket

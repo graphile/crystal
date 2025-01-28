@@ -11,22 +11,8 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_topicsᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access66{{"Access[66∈0] ➊<br />ᐸ65.0ᐳ"}}:::plan
-    Lambda86{{"Lambda[86∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda91{{"Lambda[91∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object10 & Constant92 & Lambda62 & Access66 & Lambda86 & Lambda91 --> PgSelect7
-    Object70{{"Object[70∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸsql.identifier(”relational_items”)ᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸRecordCodec(relational_items)ᐳ"}}:::plan
-    Lambda62 & Constant67 & Constant68 & Constant69 --> Object70
-    Object85{{"Object[85∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant83{{"Constant[83∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸRecordCodec(relational_topics)ᐳ"}}:::plan
-    Lambda62 & Constant82 & Constant83 & Constant84 --> Object85
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ12ᐳ"}}:::plan
+    Object10 & Constant60 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -39,24 +25,10 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸrelational_topicsᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant93 --> Lambda62
-    Lambda65{{"Lambda[65∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant94 --> Lambda65
-    Lambda65 --> Access66
-    Lambda71{{"Lambda[71∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object70 --> Lambda71
-    Lambda76{{"Lambda[76∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant95{{"Constant[95∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant95 --> Lambda76
-    Object85 --> Lambda86
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant96 --> Lambda91
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__relation...ics__.”id”ᐳ"}}:::plan
-    Object10 & PgClassExpression14 & Lambda62 & Access66 & Lambda71 & Lambda76 --> PgSelect15
+    Object10 & PgClassExpression14 --> PgSelect15
     PgSelectSingle13 --> PgClassExpression14
     First19{{"First[19∈1] ➊"}}:::plan
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
@@ -120,10 +92,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/interfaces-relational/single-topic-not-topic"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 67, 68, 69, 82, 83, 84, 92, 93, 94, 95, 96, 10, 62, 65, 66, 70, 71, 76, 85, 86, 91<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 60, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Lambda62,Lambda65,Access66,Constant67,Constant68,Constant69,Object70,Lambda71,Lambda76,Constant82,Constant83,Constant84,Object85,Lambda86,Lambda91,Constant92,Constant93,Constant94,Constant95,Constant96 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10, 62, 66, 71, 76<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]<br />1: <br />ᐳ: 14, 59<br />2: PgSelect[15]<br />3: 20, 26, 32, 38, 44, 50, 56<br />ᐳ: 19, 21, 22, 25, 27, 28, 31, 33, 34, 37, 39, 40, 43, 45, 46, 49, 51, 52, 55, 57, 58"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant60 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]<br />1: <br />ᐳ: 14, 59<br />2: PgSelect[15]<br />3: 20, 26, 32, 38, 44, 50, 56<br />ᐳ: 19, 21, 22, 25, 27, 28, 31, 33, 34, 37, 39, 40, 43, 45, 46, 49, 51, 52, 55, 57, 58"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgSelect15,First19,PgSelectRows20,PgSelectSingle21,PgClassExpression22,First25,PgSelectRows26,PgSelectSingle27,PgClassExpression28,First31,PgSelectRows32,PgSelectSingle33,PgClassExpression34,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,First43,PgSelectRows44,PgSelectSingle45,PgClassExpression46,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression52,First55,PgSelectRows56,PgSelectSingle57,PgClassExpression58,PgClassExpression59 bucket1
     Bucket0 --> Bucket1

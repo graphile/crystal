@@ -9,125 +9,93 @@ graph TD
 
 
     %% plan dependencies
-    Object61{{"Object[61∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda53{{"Lambda[53∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸsql.identifier(”first_party_vulnerabilities”)ᐳ"}}:::plan
-    Constant60{{"Constant[60∈0] ➊<br />ᐸRecordCodec(first_party_vulnerabilities)ᐳ"}}:::plan
-    Lambda53 & Constant58 & Constant59 & Constant60 --> Object61
-    Object76{{"Object[76∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant73{{"Constant[73∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant74{{"Constant[74∈0] ➊<br />ᐸsql.identifier(”third_party_vulnerabilities”)ᐳ"}}:::plan
-    Constant75{{"Constant[75∈0] ➊<br />ᐸRecordCodec(third_party_vulnerabilities)ᐳ"}}:::plan
-    Lambda53 & Constant73 & Constant74 & Constant75 --> Object76
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
     Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant84 & Lambda16 --> Connection15
+    Constant49 & Lambda16 --> Connection15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ'WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkᐳ"}}:::plan
-    Constant85 --> Lambda16
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant86 --> Lambda53
-    Lambda56{{"Lambda[56∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant87 --> Lambda56
-    Access57{{"Access[57∈0] ➊<br />ᐸ56.0ᐳ"}}:::plan
-    Lambda56 --> Access57
-    Lambda62{{"Lambda[62∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object61 --> Lambda62
-    Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”first_ᐳ"}}:::plan
-    Constant88 --> Lambda67
-    Lambda77{{"Lambda[77∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object76 --> Lambda77
-    Lambda82{{"Lambda[82∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”third_ᐳ"}}:::plan
-    Constant89 --> Lambda82
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ'WyJkMTg1OWM4N2RhIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkᐳ"}}:::plan
+    Constant50 --> Lambda16
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgUnionAll17[["PgUnionAll[17∈1] ➊"]]:::plan
-    Object14 & Connection15 & Lambda16 & Constant84 --> PgUnionAll17
-    Access83{{"Access[83∈1] ➊<br />ᐸ17.itemsᐳ"}}:::plan
-    PgUnionAll17 --> Access83
-    __Item19[/"__Item[19∈2]<br />ᐸ83ᐳ"\]:::itemplan
-    Access83 ==> __Item19
+    Object14 & Connection15 & Lambda16 & Constant49 --> PgUnionAll17
+    Access21{{"Access[21∈1] ➊<br />ᐸ17.cursorDetailsᐳ"}}:::plan
+    PgUnionAll17 --> Access21
+    Access48{{"Access[48∈1] ➊<br />ᐸ17.itemsᐳ"}}:::plan
+    PgUnionAll17 --> Access48
+    __Item19[/"__Item[19∈2]<br />ᐸ48ᐳ"\]:::itemplan
+    Access48 ==> __Item19
     PgUnionAllSingle20["PgUnionAllSingle[20∈2]"]:::plan
     __Item19 --> PgUnionAllSingle20
-    List25{{"List[25∈3]<br />ᐸ22,23,24ᐳ"}}:::plan
-    Access22{{"Access[22∈3]<br />ᐸ20.0ᐳ"}}:::plan
-    Access23{{"Access[23∈3]<br />ᐸ20.1ᐳ"}}:::plan
-    Access24{{"Access[24∈3]<br />ᐸ20.2ᐳ"}}:::plan
-    Access22 & Access23 & Access24 --> List25
-    PgCursor21{{"PgCursor[21∈3]"}}:::plan
-    List25 --> PgCursor21
-    PgUnionAllSingle20 --> Access22
+    PgCursor22{{"PgCursor[22∈3]"}}:::plan
+    PgUnionAllSingle20 & Access21 --> PgCursor22
+    PgSelect26[["PgSelect[26∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Access25{{"Access[25∈4]<br />ᐸ24.0ᐳ"}}:::plan
+    Object14 & Access25 --> PgSelect26
+    PgSelect39[["PgSelect[39∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access38{{"Access[38∈4]<br />ᐸ37.0ᐳ"}}:::plan
+    Object14 & Access38 --> PgSelect39
+    Access23{{"Access[23∈4]<br />ᐸ20.1ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     PgUnionAllSingle20 --> Access23
-    PgUnionAllSingle20 --> Access24
-    PgSelect29[["PgSelect[29∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access28{{"Access[28∈4]<br />ᐸ27.0ᐳ"}}:::plan
-    Object14 & Access28 & Lambda53 & Access57 & Lambda62 & Lambda67 --> PgSelect29
-    PgSelect42[["PgSelect[42∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access41{{"Access[41∈4]<br />ᐸ40.0ᐳ"}}:::plan
-    Object14 & Access41 & Lambda53 & Access57 & Lambda77 & Lambda82 --> PgSelect42
-    JSONParse27[["JSONParse[27∈4]<br />ᐸ24ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access24 --> JSONParse27
-    JSONParse27 --> Access28
-    First33{{"First[33∈4]"}}:::plan
-    PgSelectRows34[["PgSelectRows[34∈4]"]]:::plan
-    PgSelectRows34 --> First33
-    PgSelect29 --> PgSelectRows34
-    PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
-    First33 --> PgSelectSingle35
-    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression38
-    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression39
-    JSONParse40[["JSONParse[40∈4]<br />ᐸ24ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access24 --> JSONParse40
-    JSONParse40 --> Access41
-    First44{{"First[44∈4]"}}:::plan
-    PgSelectRows45[["PgSelectRows[45∈4]"]]:::plan
-    PgSelectRows45 --> First44
-    PgSelect42 --> PgSelectRows45
-    PgSelectSingle46{{"PgSelectSingle[46∈4]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First44 --> PgSelectSingle46
-    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression47
-    PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈4]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression49
-    PgClassExpression50{{"PgClassExpression[50∈4]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression50
+    JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ"]]:::plan
+    Access23 --> JSONParse24
+    JSONParse24 --> Access25
+    First30{{"First[30∈4]"}}:::plan
+    PgSelectRows31[["PgSelectRows[31∈4]"]]:::plan
+    PgSelectRows31 --> First30
+    PgSelect26 --> PgSelectRows31
+    PgSelectSingle32{{"PgSelectSingle[32∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    First30 --> PgSelectSingle32
+    PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression36
+    JSONParse37[["JSONParse[37∈4]<br />ᐸ23ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access23 --> JSONParse37
+    JSONParse37 --> Access38
+    First41{{"First[41∈4]"}}:::plan
+    PgSelectRows42[["PgSelectRows[42∈4]"]]:::plan
+    PgSelectRows42 --> First41
+    PgSelect39 --> PgSelectRows42
+    PgSelectSingle43{{"PgSelectSingle[43∈4]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First41 --> PgSelectSingle43
+    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression44
+    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression47
 
     %% define steps
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection.after1"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Connection15,Lambda16,Lambda53,Lambda56,Access57,Constant58,Constant59,Constant60,Object61,Lambda62,Lambda67,Constant73,Constant74,Constant75,Object76,Lambda77,Lambda82,Constant84,Constant85,Constant86,Constant87,Constant88,Constant89 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 15, 16, 84, 53, 57, 62, 67, 77, 82<br /><br />ROOT Connectionᐸ11ᐳ[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Connection15,Lambda16,Constant49,Constant50 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 15, 16, 49<br /><br />ROOT Connectionᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUnionAll17,Access83 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 14, 53, 57, 62, 67, 77, 82<br /><br />ROOT __Item{2}ᐸ83ᐳ[19]"):::bucket
+    class Bucket1,PgUnionAll17,Access21,Access48 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 21, 14<br /><br />ROOT __Item{2}ᐸ48ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgUnionAllSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 14, 53, 57, 62, 67, 77, 82<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 14<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor21,Access22,Access23,Access24,List25 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 24, 14, 53, 57, 62, 67, 77, 82, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[27], JSONParse[40]<br />ᐳ: Access[28], Access[41]<br />2: PgSelect[29], PgSelect[42]<br />3: PgSelectRows[34], PgSelectRows[45]<br />ᐳ: 33, 35, 36, 37, 38, 39, 44, 46, 47, 48, 49, 50"):::bucket
+    class Bucket3,PgCursor22 bucket3
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 20, 14<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: <br />ᐳ: Access[23]<br />2: JSONParse[24], JSONParse[37]<br />ᐳ: Access[25], Access[38]<br />3: PgSelect[26], PgSelect[39]<br />4: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,JSONParse27,Access28,PgSelect29,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,JSONParse40,Access41,PgSelect42,First44,PgSelectRows45,PgSelectSingle46,PgClassExpression47,PgClassExpression48,PgClassExpression49,PgClassExpression50 bucket4
+    class Bucket4,Access23,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,JSONParse37,Access38,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
