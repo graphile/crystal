@@ -9,16 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object93{{"Object[93∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda85{{"Lambda[85∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸsql.identifier(”frmcdc_domain_constrained_compound_type”)ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸDomainCodecᐸcompoundTypeᐳ(domainConstrainedCompoundType)ᐳ"}}:::plan
-    Lambda85 & Constant90 & Constant91 & Constant92 --> Object93
-    Object108{{"Object[108∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant105{{"Constant[105∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant106{{"Constant[106∈0] ➊<br />ᐸsql.identifier(”frmcdc_domain_constrained_compound_type”)ᐳ"}}:::plan
-    Lambda85 & Constant105 & Constant106 & Constant92 --> Object108
     Object21{{"Object[21∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access20{{"Access[20∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -26,38 +16,21 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access19
     __Value2 --> Access20
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant124 --> Lambda85
-    Lambda88{{"Lambda[88∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant125 --> Lambda88
-    Access89{{"Access[89∈0] ➊<br />ᐸ88.0ᐳ"}}:::plan
-    Lambda88 --> Access89
-    Lambda94{{"Lambda[94∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object93 --> Lambda94
-    Lambda99{{"Lambda[99∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
-    Constant126 --> Lambda99
-    Lambda109{{"Lambda[109∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object108 --> Lambda109
-    Lambda114{{"Lambda[114∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
-    Constant127 --> Lambda114
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ'postgraphile_test_authenticator'ᐳ"}}:::plan
-    Constant117{{"Constant[117∈0] ➊<br />ᐸ'pg11'ᐳ"}}:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
-    Constant123{{"Constant[123∈0] ➊<br />ᐸ'c'ᐳ"}}:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ§{ a: 1 }ᐳ"}}:::plan
+    Constant83{{"Constant[83∈0] ➊<br />ᐸ12ᐳ"}}:::plan
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ'postgraphile_test_authenticator'ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ'pg11'ᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ'c'ᐳ"}}:::plan
+    Constant92{{"Constant[92∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
+    Constant93{{"Constant[93∈0] ➊<br />ᐸ§{ a: 1 }ᐳ"}}:::plan
     PgUpdateSingle18[["PgUpdateSingle[18∈1] ➊<br />ᐸtypes(id;regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ"]]:::sideeffectplan
-    Object21 & Constant115 & Constant116 & Constant117 & Constant128 & Constant129 --> PgUpdateSingle18
+    Object21 & Constant83 & Constant84 & Constant85 & Constant92 & Constant93 --> PgUpdateSingle18
     Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle18 --> Object22
     PgSelect31[["PgSelect[31∈3] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"]]:::plan
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__types__....ound_type”ᐳ"}}:::plan
-    Object21 & PgClassExpression30 & Lambda85 & Access89 & Lambda94 & Lambda99 --> PgSelect31
+    Object21 & PgClassExpression30 --> PgSelect31
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgUpdateSingle18 --> PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
@@ -91,7 +64,7 @@ graph TD
     PgSelectSingle37 --> PgClassExpression44
     PgInsertSingle56[["PgInsertSingle[56∈6] ➊<br />ᐸtypes(regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ"]]:::sideeffectplan
     Object59{{"Object[59∈6] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object59 & Constant122 & Constant123 & Constant128 & Constant129 --> PgInsertSingle56
+    Object59 & Constant90 & Constant91 & Constant92 & Constant93 --> PgInsertSingle56
     Access57{{"Access[57∈6] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access58{{"Access[58∈6] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access57 & Access58 --> Object59
@@ -101,7 +74,7 @@ graph TD
     PgInsertSingle56 --> Object60
     PgSelect69[["PgSelect[69∈8] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"]]:::plan
     PgClassExpression68{{"PgClassExpression[68∈8] ➊<br />ᐸ__types__....ound_type”ᐳ"}}:::plan
-    Object59 & PgClassExpression68 & Lambda85 & Access89 & Lambda109 & Lambda114 --> PgSelect69
+    Object59 & PgClassExpression68 --> PgSelect69
     PgClassExpression63{{"PgClassExpression[63∈8] ➊<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgInsertSingle56 --> PgClassExpression63
     PgClassExpression64{{"PgClassExpression[64∈8] ➊<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
@@ -139,14 +112,14 @@ graph TD
     subgraph "Buckets for mutations/v4/pg11.types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access19,Access20,Object21,Lambda85,Lambda88,Access89,Constant90,Constant91,Constant92,Object93,Lambda94,Lambda99,Constant105,Constant106,Object108,Lambda109,Lambda114,Constant115,Constant116,Constant117,Constant122,Constant123,Constant124,Constant125,Constant126,Constant127,Constant128,Constant129 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 21, 115, 116, 117, 128, 129, 85, 89, 94, 99<br /><br />1: PgUpdateSingle[18]<br />2: <br />ᐳ: Object[22]"):::bucket
+    class Bucket0,__Value2,__Value4,Access19,Access20,Object21,Constant83,Constant84,Constant85,Constant90,Constant91,Constant92,Constant93 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 21, 83, 84, 85, 92, 93<br /><br />1: PgUpdateSingle[18]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle18,Object22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 18, 21, 85, 89, 94, 99<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 18, 21<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21, 85, 89, 94, 99<br /><br />ROOT PgUpdateSingle{1}ᐸtypes(id;regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[18]<br />1: <br />ᐳ: 25, 26, 27, 28, 30<br />2: PgSelect[31]<br />3: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 21<br /><br />ROOT PgUpdateSingle{1}ᐸtypes(id;regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[18]<br />1: <br />ᐳ: 25, 26, 27, 28, 30<br />2: PgSelect[31]<br />3: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression30,PgSelect31,First35,PgSelectRows36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ28ᐳ[29]"):::bucket
@@ -155,13 +128,13 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_domainConstrainedCompoundTypeᐳ[37]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41,PgClassExpression42,PgClassExpression43,PgClassExpression44 bucket5
-    Bucket6("Bucket 6 (mutationField)<br />Deps: 122, 123, 128, 129, 2, 85, 89, 109, 114<br /><br />1: Access[57]<br />2: Access[58]<br />3: Object[59]<br />4: PgInsertSingle[56]<br />5: <br />ᐳ: Object[60]"):::bucket
+    Bucket6("Bucket 6 (mutationField)<br />Deps: 90, 91, 92, 93, 2<br /><br />1: Access[57]<br />2: Access[58]<br />3: Object[59]<br />4: PgInsertSingle[56]<br />5: <br />ᐳ: Object[60]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgInsertSingle56,Access57,Access58,Object59,Object60 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 60, 56, 59, 85, 89, 109, 114<br /><br />ROOT Object{6}ᐸ{result}ᐳ[60]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 60, 56, 59<br /><br />ROOT Object{6}ᐸ{result}ᐳ[60]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 56, 59, 85, 89, 109, 114<br /><br />ROOT PgInsertSingle{6}ᐸtypes(regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[56]<br />1: <br />ᐳ: 63, 64, 65, 66, 68<br />2: PgSelect[69]<br />3: PgSelectRows[74]<br />ᐳ: First[73], PgSelectSingle[75]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 56, 59<br /><br />ROOT PgInsertSingle{6}ᐸtypes(regrole,regnamespace,bigint_domain_array_domain,domain_constrained_compound_type)ᐳ[56]<br />1: <br />ᐳ: 63, 64, 65, 66, 68<br />2: PgSelect[69]<br />3: PgSelectRows[74]<br />ᐳ: First[73], PgSelectSingle[75]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgClassExpression68,PgSelect69,First73,PgSelectRows74,PgSelectSingle75 bucket8
     Bucket9("Bucket 9 (listItem)<br /><br />ROOT __Item{9}ᐸ66ᐳ[67]"):::bucket

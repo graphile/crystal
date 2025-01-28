@@ -11,154 +11,44 @@ graph TD
     %% plan dependencies
     PgSelect42[["PgSelect[42∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant206{{"Constant[206∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Constant84{{"Constant[84∈0] ➊<br />ᐸ5ᐳ"}}:::plan
     Constant41{{"Constant[41∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant208{{"Constant[208∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Lambda102{{"Lambda[102∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access105{{"Access[105∈0] ➊<br />ᐸ104.0ᐳ"}}:::plan
-    Lambda140{{"Lambda[140∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda145{{"Lambda[145∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Constant206 & Constant41 & Constant208 & Lambda102 & Access105 & Lambda140 & Lambda145 --> PgSelect42
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ6ᐳ"}}:::plan
+    Object11 & Constant84 & Constant41 & Constant86 --> PgSelect42
     PgSelect33[["PgSelect[33∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
-    Constant207{{"Constant[207∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda117{{"Lambda[117∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access120{{"Access[120∈0] ➊<br />ᐸ119.0ᐳ"}}:::plan
-    Lambda125{{"Lambda[125∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda130{{"Lambda[130∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Constant207 & Constant207 & Lambda117 & Access120 & Lambda125 & Lambda130 --> PgSelect33
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Object11 & Constant85 & Constant85 --> PgSelect33
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_type_set_queryᐳ"]]:::plan
-    Lambda86{{"Lambda[86∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access90{{"Access[90∈0] ➊<br />ᐸ89.0ᐳ"}}:::plan
-    Lambda95{{"Lambda[95∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda100{{"Lambda[100∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Constant206 & Lambda86 & Access90 & Lambda95 & Lambda100 --> PgSelect8
-    PgSelect67[["PgSelect[67∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Constant211{{"Constant[211∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Lambda192{{"Lambda[192∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access195{{"Access[195∈0] ➊<br />ᐸ194.0ᐳ"}}:::plan
-    Lambda200{{"Lambda[200∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda205{{"Lambda[205∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Constant211 & Lambda192 & Access195 & Lambda200 & Lambda205 --> PgSelect67
-    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
-    Lambda110{{"Lambda[110∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda115{{"Lambda[115∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Lambda102 & Access105 & Lambda110 & Lambda115 --> PgSelect25
-    PgSelect48[["PgSelect[48∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
-    Lambda155{{"Lambda[155∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda160{{"Lambda[160∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Lambda102 & Access105 & Lambda155 & Lambda160 --> PgSelect48
-    PgSelect54[["PgSelect[54∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
-    Lambda170{{"Lambda[170∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda175{{"Lambda[175∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object11 & Lambda102 & Access105 & Lambda170 & Lambda175 --> PgSelect54
-    Object94{{"Object[94∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant92{{"Constant[92∈0] ➊<br />ᐸsql.identifier(”compound_type_set_query”)ᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸRecordCodec(compoundType)ᐳ"}}:::plan
-    Lambda86 & Constant91 & Constant92 & Constant93 --> Object94
-    Object109{{"Object[109∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant106{{"Constant[106∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant107{{"Constant[107∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
-    Constant108{{"Constant[108∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
-    Lambda102 & Constant106 & Constant107 & Constant108 --> Object109
-    Object124{{"Object[124∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant121{{"Constant[121∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸsql.identifier(”table_set_query”)ᐳ"}}:::plan
-    Lambda117 & Constant121 & Constant122 & Constant108 --> Object124
-    Object139{{"Object[139∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant136{{"Constant[136∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant137{{"Constant[137∈0] ➊<br />ᐸsql.identifier(”int_set_query”)ᐳ"}}:::plan
-    Constant138{{"Constant[138∈0] ➊<br />ᐸCodec(int4)ᐳ"}}:::plan
-    Lambda102 & Constant136 & Constant137 & Constant138 --> Object139
-    Object154{{"Object[154∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant151{{"Constant[151∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant152{{"Constant[152∈0] ➊<br />ᐸsql.identifier(”static_big_integer”)ᐳ"}}:::plan
-    Constant153{{"Constant[153∈0] ➊<br />ᐸCodec(int8)ᐳ"}}:::plan
-    Lambda102 & Constant151 & Constant152 & Constant153 --> Object154
-    Object169{{"Object[169∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant166{{"Constant[166∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant167{{"Constant[167∈0] ➊<br />ᐸsql.identifier(”query_interval_set”)ᐳ"}}:::plan
-    Constant168{{"Constant[168∈0] ➊<br />ᐸCodec(interval)ᐳ"}}:::plan
-    Lambda102 & Constant166 & Constant167 & Constant168 --> Object169
-    Object184{{"Object[184∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant181{{"Constant[181∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant182{{"Constant[182∈0] ➊<br />ᐸsql.identifier(”post_computed_interval_set”)ᐳ"}}:::plan
-    Lambda102 & Constant181 & Constant182 & Constant168 --> Object184
-    Object199{{"Object[199∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant196{{"Constant[196∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant197{{"Constant[197∈0] ➊<br />ᐸsql.identifier(”post”)ᐳ"}}:::plan
-    Constant198{{"Constant[198∈0] ➊<br />ᐸRecordCodec(post)ᐳ"}}:::plan
-    Lambda192 & Constant196 & Constant197 & Constant198 --> Object199
+    Object11 & Constant84 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
+    PgSelect67[["PgSelect[67∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Constant87{{"Constant[87∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Object11 & Constant87 --> PgSelect67
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows12
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
+    Object11 --> PgSelect25
     PgSelectRows27[["PgSelectRows[27∈0] ➊"]]:::plan
     PgSelect25 --> PgSelectRows27
     PgSelectRows35[["PgSelectRows[35∈0] ➊"]]:::plan
     PgSelect33 --> PgSelectRows35
     PgSelectRows44[["PgSelectRows[44∈0] ➊"]]:::plan
     PgSelect42 --> PgSelectRows44
+    PgSelect48[["PgSelect[48∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
+    Object11 --> PgSelect48
     PgSelectRows50[["PgSelectRows[50∈0] ➊"]]:::plan
     PgSelect48 --> PgSelectRows50
+    PgSelect54[["PgSelect[54∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
+    Object11 --> PgSelect54
     PgSelectRows56[["PgSelectRows[56∈0] ➊"]]:::plan
     PgSelect54 --> PgSelectRows56
     PgSelectRows69[["PgSelectRows[69∈0] ➊"]]:::plan
     PgSelect67 --> PgSelectRows69
-    Constant220{{"Constant[220∈0] ➊<br />ᐸ§{ first: 5, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant220 --> Lambda86
-    Lambda89{{"Lambda[89∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant221{{"Constant[221∈0] ➊<br />ᐸ§{ first: 5, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant221 --> Lambda89
-    Lambda89 --> Access90
-    Object94 --> Lambda95
-    Constant212{{"Constant[212∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
-    Constant212 --> Lambda100
-    Constant209{{"Constant[209∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant209 --> Lambda102
-    Lambda104{{"Lambda[104∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant210{{"Constant[210∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant210 --> Lambda104
-    Lambda104 --> Access105
-    Object109 --> Lambda110
-    Constant213{{"Constant[213∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
-    Constant213 --> Lambda115
-    Constant222{{"Constant[222∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant222 --> Lambda117
-    Lambda119{{"Lambda[119∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant223{{"Constant[223∈0] ➊<br />ᐸ§{ first: 2, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant223 --> Lambda119
-    Lambda119 --> Access120
-    Object124 --> Lambda125
-    Constant214{{"Constant[214∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”table_ᐳ"}}:::plan
-    Constant214 --> Lambda130
-    Object139 --> Lambda140
-    Constant215{{"Constant[215∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”int_seᐳ"}}:::plan
-    Constant215 --> Lambda145
-    Object154 --> Lambda155
-    Constant216{{"Constant[216∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”staticᐳ"}}:::plan
-    Constant216 --> Lambda160
-    Object169 --> Lambda170
-    Constant217{{"Constant[217∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”query_ᐳ"}}:::plan
-    Constant217 --> Lambda175
-    Lambda185{{"Lambda[185∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object184 --> Lambda185
-    Lambda190{{"Lambda[190∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant218{{"Constant[218∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”post_cᐳ"}}:::plan
-    Constant218 --> Lambda190
-    Constant224{{"Constant[224∈0] ➊<br />ᐸ§{ first: 1, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant224 --> Lambda192
-    Lambda194{{"Lambda[194∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant225{{"Constant[225∈0] ➊<br />ᐸ§{ first: 1, last: null, cursorLower: null, cursorUpper: nulᐳ"}}:::plan
-    Constant225 --> Lambda194
-    Lambda194 --> Access195
-    Object199 --> Lambda200
-    Constant219{{"Constant[219∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
-    Constant219 --> Lambda205
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item13[/"__Item[13∈1]<br />ᐸ12ᐳ"\]:::itemplan
     PgSelectRows12 ==> __Item13
@@ -210,7 +100,7 @@ graph TD
     PgSelectSingle58 --> PgClassExpression59
     PgSelect74[["PgSelect[74∈12]<br />ᐸpost_computed_interval_setᐳ"]]:::plan
     PgClassExpression73{{"PgClassExpression[73∈12]<br />ᐸ__post__ᐳ"}}:::plan
-    Object11 & PgClassExpression73 & Lambda102 & Access105 & Lambda185 & Lambda190 --> PgSelect74
+    Object11 & PgClassExpression73 --> PgSelect74
     __Item70[/"__Item[70∈12]<br />ᐸ69ᐳ"\]:::itemplan
     PgSelectRows69 ==> __Item70
     PgSelectSingle71{{"PgSelectSingle[71∈12]<br />ᐸpostᐳ"}}:::plan
@@ -230,9 +120,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 41, 91, 92, 93, 106, 107, 108, 121, 122, 136, 137, 138, 151, 152, 153, 166, 167, 168, 181, 182, 196, 197, 198, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 11, 86, 89, 90, 94, 95, 100, 102, 104, 105, 109, 110, 115, 117, 119, 120, 124, 125, 130, 139, 140, 145, 154, 155, 160, 169, 170, 175, 184, 185, 190, 192, 194, 195, 199, 200, 205<br />2: 8, 25, 33, 42, 48, 54, 67<br />3: 12, 27, 35, 44, 50, 56, 69"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 41, 84, 85, 86, 87, 11<br />2: 8, 25, 33, 42, 48, 54, 67<br />3: 12, 27, 35, 44, 50, 56, 69"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,PgSelectRows27,PgSelect33,PgSelectRows35,Constant41,PgSelect42,PgSelectRows44,PgSelect48,PgSelectRows50,PgSelect54,PgSelectRows56,PgSelect67,PgSelectRows69,Lambda86,Lambda89,Access90,Constant91,Constant92,Constant93,Object94,Lambda95,Lambda100,Lambda102,Lambda104,Access105,Constant106,Constant107,Constant108,Object109,Lambda110,Lambda115,Lambda117,Lambda119,Access120,Constant121,Constant122,Object124,Lambda125,Lambda130,Constant136,Constant137,Constant138,Object139,Lambda140,Lambda145,Constant151,Constant152,Constant153,Object154,Lambda155,Lambda160,Constant166,Constant167,Constant168,Object169,Lambda170,Lambda175,Constant181,Constant182,Object184,Lambda185,Lambda190,Lambda192,Lambda194,Access195,Constant196,Constant197,Constant198,Object199,Lambda200,Lambda205,Constant206,Constant207,Constant208,Constant209,Constant210,Constant211,Constant212,Constant213,Constant214,Constant215,Constant216,Constant217,Constant218,Constant219,Constant220,Constant221,Constant222,Constant223,Constant224,Constant225 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,PgSelectRows27,PgSelect33,PgSelectRows35,Constant41,PgSelect42,PgSelectRows44,PgSelect48,PgSelectRows50,PgSelect54,PgSelectRows56,PgSelect67,PgSelectRows69,Constant84,Constant85,Constant86,Constant87 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ12ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
@@ -266,7 +156,7 @@ graph TD
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgClassExpression{10}ᐸ__query_in...al_set__.vᐳ[59]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
-    Bucket12("Bucket 12 (listItem)<br />Deps: 11, 102, 105, 185, 190<br /><br />ROOT __Item{12}ᐸ69ᐳ[70]<br />1: <br />ᐳ: 71, 72, 73<br />2: PgSelect[74]<br />3: PgSelectRows[78]"):::bucket
+    Bucket12("Bucket 12 (listItem)<br />Deps: 11<br /><br />ROOT __Item{12}ᐸ69ᐳ[70]<br />1: <br />ᐳ: 71, 72, 73<br />2: PgSelect[74]<br />3: PgSelectRows[78]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,__Item70,PgSelectSingle71,PgClassExpression72,PgClassExpression73,PgSelect74,PgSelectRows78 bucket12
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ78ᐳ[79]"):::bucket

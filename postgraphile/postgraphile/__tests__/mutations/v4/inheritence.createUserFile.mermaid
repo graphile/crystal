@@ -9,12 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object54{{"Object[54∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda46{{"Lambda[46∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant51{{"Constant[51∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant52{{"Constant[52∈0] ➊<br />ᐸsql.identifier(”user”)ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0] ➊<br />ᐸRecordCodec(user)ᐳ"}}:::plan
-    Lambda46 & Constant51 & Constant52 & Constant53 --> Object54
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,25 +16,13 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant64 --> Lambda46
-    Lambda49{{"Lambda[49∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant65 --> Lambda49
-    Access50{{"Access[50∈0] ➊<br />ᐸ49.0ᐳ"}}:::plan
-    Lambda49 --> Access50
-    Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object54 --> Lambda55
-    Lambda60{{"Lambda[60∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”user”)ᐳ"}}:::plan
-    Constant66 --> Lambda60
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant16{{"Constant[16∈0] ➊<br />ᐸ'users'ᐳ"}}:::plan
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant62{{"Constant[62∈0] ➊<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ'foo.txt'ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ'foo.txt'ᐳ"}}:::plan
     PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸuser(id,name)ᐳ"]]:::sideeffectplan
-    Object14 & Constant61 & Constant62 --> PgInsertSingle11
+    Object14 & Constant44 & Constant45 --> PgInsertSingle11
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object15
     List18{{"List[18∈3] ➊<br />ᐸ16,17ᐳ"}}:::plan
@@ -53,7 +35,7 @@ graph TD
     PgInsertSingle11 --> PgClassExpression21
     PgInsertSingle27[["PgInsertSingle[27∈4] ➊<br />ᐸuser_file(filename,user_id)ᐳ"]]:::sideeffectplan
     Object30{{"Object[30∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object30 & Constant63 & Constant61 --> PgInsertSingle27
+    Object30 & Constant46 & Constant44 --> PgInsertSingle27
     Access28{{"Access[28∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access29{{"Access[29∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access28 & Access29 --> Object30
@@ -63,7 +45,7 @@ graph TD
     PgInsertSingle27 --> Object31
     PgSelect35[["PgSelect[35∈6] ➊<br />ᐸuserᐳ"]]:::plan
     PgClassExpression34{{"PgClassExpression[34∈6] ➊<br />ᐸ__user_file__.”user_id”ᐳ"}}:::plan
-    Object30 & PgClassExpression34 & Lambda46 & Access50 & Lambda55 & Lambda60 --> PgSelect35
+    Object30 & PgClassExpression34 --> PgSelect35
     PgClassExpression32{{"PgClassExpression[32∈6] ➊<br />ᐸ__user_file__.”id”ᐳ"}}:::plan
     PgInsertSingle27 --> PgClassExpression32
     PgClassExpression33{{"PgClassExpression[33∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
@@ -85,8 +67,8 @@ graph TD
     subgraph "Buckets for mutations/v4/inheritence.createUserFile"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant16,Lambda46,Lambda49,Access50,Constant51,Constant52,Constant53,Object54,Lambda55,Lambda60,Constant61,Constant62,Constant63,Constant64,Constant65,Constant66 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 61, 62, 16<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant16,Constant44,Constant45,Constant46 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 44, 45, 16<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object15 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
@@ -95,13 +77,13 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 16<br /><br />ROOT PgInsertSingle{1}ᐸuser(id,name)ᐳ[11]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression17,List18,Lambda19,PgClassExpression21 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 63, 61, 2, 46, 50, 55, 60<br /><br />1: Access[28]<br />2: Access[29]<br />3: Object[30]<br />4: PgInsertSingle[27]<br />5: <br />ᐳ: Object[31]"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 46, 44, 2<br /><br />1: Access[28]<br />2: Access[29]<br />3: Object[30]<br />4: PgInsertSingle[27]<br />5: <br />ᐳ: Object[31]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgInsertSingle27,Access28,Access29,Object30,Object31 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 31, 27, 30, 46, 50, 55, 60<br /><br />ROOT Object{4}ᐸ{result}ᐳ[31]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 31, 27, 30<br /><br />ROOT Object{4}ᐸ{result}ᐳ[31]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 27, 30, 46, 50, 55, 60<br /><br />ROOT PgInsertSingle{4}ᐸuser_file(filename,user_id)ᐳ[27]<br />1: <br />ᐳ: 32, 33, 34<br />2: PgSelect[35]<br />3: PgSelectRows[40]<br />ᐳ: First[39], PgSelectSingle[41]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 27, 30<br /><br />ROOT PgInsertSingle{4}ᐸuser_file(filename,user_id)ᐳ[27]<br />1: <br />ᐳ: 32, 33, 34<br />2: PgSelect[35]<br />3: PgSelectRows[40]<br />ᐳ: First[39], PgSelectSingle[41]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelect35,First39,PgSelectRows40,PgSelectSingle41 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{6}ᐸuserᐳ[41]"):::bucket

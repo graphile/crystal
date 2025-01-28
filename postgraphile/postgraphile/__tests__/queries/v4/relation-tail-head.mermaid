@@ -9,34 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object78{{"Object[78∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda70{{"Lambda[70∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant75{{"Constant[75∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant76{{"Constant[76∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸRecordCodec(person)ᐳ"}}:::plan
-    Lambda70 & Constant75 & Constant76 & Constant77 --> Object78
-    Object93{{"Object[93∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
-    Lambda70 & Constant90 & Constant91 & Constant77 --> Object93
-    Object108{{"Object[108∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant105{{"Constant[105∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 116ᐳ"}}:::plan
-    Constant106{{"Constant[106∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
-    Constant107{{"Constant[107∈0] ➊<br />ᐸRecordCodec(compoundKey)ᐳ"}}:::plan
-    Lambda70 & Constant105 & Constant106 & Constant107 --> Object108
-    Object123{{"Object[123∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant120{{"Constant[120∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant121{{"Constant[121∈0] ➊<br />ᐸsql.identifier(”person”)ᐳ"}}:::plan
-    Lambda70 & Constant120 & Constant121 & Constant77 --> Object123
-    Object138{{"Object[138∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant135{{"Constant[135∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant136{{"Constant[136∈0] ➊<br />ᐸsql.identifier(”compound_key”)ᐳ"}}:::plan
-    Lambda70 & Constant135 & Constant136 & Constant107 --> Object138
-    Object153{{"Object[153∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant150{{"Constant[150∈0] ➊<br />ᐸ[ { attribute: 'person_id', direction: 'ASC' }, { attribute:ᐳ"}}:::plan
-    Constant151{{"Constant[151∈0] ➊<br />ᐸsql.identifier(”foreign_key”)ᐳ"}}:::plan
-    Constant152{{"Constant[152∈0] ➊<br />ᐸRecordCodec(foreignKey)ᐳ"}}:::plan
-    Lambda70 & Constant150 & Constant151 & Constant152 --> Object153
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -44,48 +16,11 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant160{{"Constant[160∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant160 --> Lambda70
-    Lambda73{{"Lambda[73∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant161{{"Constant[161∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant161 --> Lambda73
-    Access74{{"Access[74∈0] ➊<br />ᐸ73.0ᐳ"}}:::plan
-    Lambda73 --> Access74
-    Lambda79{{"Lambda[79∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object78 --> Lambda79
-    Lambda84{{"Lambda[84∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant162{{"Constant[162∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
-    Constant162 --> Lambda84
-    Lambda94{{"Lambda[94∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object93 --> Lambda94
-    Lambda99{{"Lambda[99∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant163{{"Constant[163∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
-    Constant163 --> Lambda99
-    Lambda109{{"Lambda[109∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object108 --> Lambda109
-    Lambda114{{"Lambda[114∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant164{{"Constant[164∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
-    Constant164 --> Lambda114
-    Lambda124{{"Lambda[124∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object123 --> Lambda124
-    Lambda129{{"Lambda[129∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant165{{"Constant[165∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”personᐳ"}}:::plan
-    Constant165 --> Lambda129
-    Lambda139{{"Lambda[139∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object138 --> Lambda139
-    Lambda144{{"Lambda[144∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant166{{"Constant[166∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”compouᐳ"}}:::plan
-    Constant166 --> Lambda144
-    Lambda154{{"Lambda[154∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object153 --> Lambda154
-    Lambda159{{"Lambda[159∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant167{{"Constant[167∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'person_id', direcᐳ"}}:::plan
-    Constant167 --> Lambda159
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Connection43{{"Connection[43∈0] ➊<br />ᐸ41ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Object12 & Connection13 & Lambda70 & Access74 & Lambda109 & Lambda114 --> PgSelect14
+    Object12 & Connection13 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
@@ -94,10 +29,10 @@ graph TD
     __Item16 --> PgSelectSingle17
     PgSelect21[["PgSelect[21∈3]<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    Object12 & PgClassExpression18 & Lambda70 & Access74 & Lambda79 & Lambda84 --> PgSelect21
+    Object12 & PgClassExpression18 --> PgSelect21
     PgSelect30[["PgSelect[30∈3]<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    Object12 & PgClassExpression19 & Lambda70 & Access74 & Lambda94 & Lambda99 --> PgSelect30
+    Object12 & PgClassExpression19 --> PgSelect30
     PgSelectSingle17 --> PgClassExpression18
     PgSelectSingle17 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
@@ -123,7 +58,7 @@ graph TD
     PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression36
     PgSelect44[["PgSelect[44∈6] ➊<br />ᐸforeign_keyᐳ"]]:::plan
-    Object12 & Connection43 & Lambda70 & Access74 & Lambda154 & Lambda159 --> PgSelect44
+    Object12 & Connection43 --> PgSelect44
     PgSelectRows45[["PgSelectRows[45∈6] ➊"]]:::plan
     PgSelect44 --> PgSelectRows45
     __Item46[/"__Item[46∈7]<br />ᐸ45ᐳ"\]:::itemplan
@@ -133,10 +68,10 @@ graph TD
     PgSelect60[["PgSelect[60∈8]<br />ᐸcompound_keyᐳ"]]:::plan
     PgClassExpression49{{"PgClassExpression[49∈8]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
     PgClassExpression50{{"PgClassExpression[50∈8]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
-    Object12 & PgClassExpression49 & PgClassExpression50 & Lambda70 & Access74 & Lambda139 & Lambda144 --> PgSelect60
+    Object12 & PgClassExpression49 & PgClassExpression50 --> PgSelect60
     PgSelect51[["PgSelect[51∈8]<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression48{{"PgClassExpression[48∈8]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression48 & Lambda70 & Access74 & Lambda124 & Lambda129 --> PgSelect51
+    Object12 & PgClassExpression48 --> PgSelect51
     PgSelectSingle47 --> PgClassExpression48
     PgSelectSingle47 --> PgClassExpression49
     PgSelectSingle47 --> PgClassExpression50
@@ -168,14 +103,14 @@ graph TD
     subgraph "Buckets for queries/v4/relation-tail-head"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection43,Lambda70,Lambda73,Access74,Constant75,Constant76,Constant77,Object78,Lambda79,Lambda84,Constant90,Constant91,Object93,Lambda94,Lambda99,Constant105,Constant106,Constant107,Object108,Lambda109,Lambda114,Constant120,Constant121,Object123,Lambda124,Lambda129,Constant135,Constant136,Object138,Lambda139,Lambda144,Constant150,Constant151,Constant152,Object153,Lambda154,Lambda159,Constant160,Constant161,Constant162,Constant163,Constant164,Constant165,Constant166,Constant167 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 70, 74, 109, 114, 79, 84, 94, 99<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection43 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 70, 74, 79, 84, 94, 99<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 12<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 12, 70, 74, 79, 84, 94, 99<br /><br />ROOT PgSelectSingle{2}ᐸcompound_keyᐳ[17]<br />1: <br />ᐳ: 18, 19, 20<br />2: PgSelect[21], PgSelect[30]<br />3: PgSelectRows[26], PgSelectRows[33]<br />ᐳ: 25, 27, 32, 34"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 12<br /><br />ROOT PgSelectSingle{2}ᐸcompound_keyᐳ[17]<br />1: <br />ᐳ: 18, 19, 20<br />2: PgSelect[21], PgSelect[30]<br />3: PgSelectRows[26], PgSelectRows[33]<br />ᐳ: 25, 27, 32, 34"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgSelect21,First25,PgSelectRows26,PgSelectSingle27,PgSelect30,First32,PgSelectRows33,PgSelectSingle34 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[27]"):::bucket
@@ -184,13 +119,13 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[34]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression35,PgClassExpression36 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 12, 43, 70, 74, 154, 159, 124, 129, 139, 144<br /><br />ROOT Connectionᐸ41ᐳ[43]<br />1: PgSelect[44]<br />2: PgSelectRows[45]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 12, 43<br /><br />ROOT Connectionᐸ41ᐳ[43]<br />1: PgSelect[44]<br />2: PgSelectRows[45]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect44,PgSelectRows45 bucket6
-    Bucket7("Bucket 7 (listItem)<br />Deps: 12, 70, 74, 124, 129, 139, 144<br /><br />ROOT __Item{7}ᐸ45ᐳ[46]"):::bucket
+    Bucket7("Bucket 7 (listItem)<br />Deps: 12<br /><br />ROOT __Item{7}ᐸ45ᐳ[46]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item46,PgSelectSingle47 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 47, 12, 70, 74, 124, 129, 139, 144<br /><br />ROOT PgSelectSingle{7}ᐸforeign_keyᐳ[47]<br />1: <br />ᐳ: 48, 49, 50<br />2: PgSelect[51], PgSelect[60]<br />3: PgSelectRows[56], PgSelectRows[63]<br />ᐳ: 55, 57, 62, 64"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 47, 12<br /><br />ROOT PgSelectSingle{7}ᐸforeign_keyᐳ[47]<br />1: <br />ᐳ: 48, 49, 50<br />2: PgSelect[51], PgSelect[60]<br />3: PgSelectRows[56], PgSelectRows[63]<br />ᐳ: 55, 57, 62, 64"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression48,PgClassExpression49,PgClassExpression50,PgSelect51,First55,PgSelectRows56,PgSelectSingle57,PgSelect60,First62,PgSelectRows63,PgSelectSingle64 bucket8
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 57<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[57]"):::bucket
