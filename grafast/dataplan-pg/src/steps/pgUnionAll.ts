@@ -1217,6 +1217,7 @@ interface MutablePgUnionAllQueryInfo<
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
+  typeIdx: number | null;
 }
 
 function buildTheQuery<
@@ -1245,24 +1246,25 @@ function buildTheQuery<
   const { values, count } = info.executionDetails;
 
   function selectAndReturnIndex(expression: SQL): number {
-    const existingIndex = selects.findIndex(
+    const existingIndex = info.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
         sql.isEquivalent(s.expression, expression),
     );
     if (existingIndex >= 0) return existingIndex;
-    return selects.push({ type: "outerExpression", expression }) - 1;
+    return info.selects.push({ type: "outerExpression", expression }) - 1;
   }
   function selectType() {
-    if (typeIdx != null) return typeIdx;
-    const existingIndex = selects.findIndex((s) => s.type === "type");
+    if (info.typeIdx != null) return info.typeIdx;
+    const existingIndex = info.selects.findIndex((s) => s.type === "type");
     if (existingIndex >= 0) return existingIndex;
-    return selects.push({ type: "type" }) - 1;
+    info.typeIdx = info.selects.push({ type: "type" }) - 1;
+    return info.typeIdx;
   }
   function selectPk(): number {
-    const existingIndex = selects.findIndex((s) => s.type === "pk");
+    const existingIndex = info.selects.findIndex((s) => s.type === "pk");
     if (existingIndex >= 0) return existingIndex;
-    return selects.push({ type: "pk" }) - 1;
+    return info.selects.push({ type: "pk" }) - 1;
   }
 
   // TODO: evaluate runtime orders, conditions, etc here
@@ -1296,6 +1298,7 @@ function buildTheQuery<
    *      ALL MUTATION NOW COMPLETE       *
    *                                      *
    ****************************************/
+  // Except we still do selectAndReturnIndex() below, and maybe some other stuff?
 
   const {
     mode,
