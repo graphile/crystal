@@ -8,7 +8,6 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
-  LambdaStep,
   Maybe,
   PolymorphicStep,
 } from "grafast";
@@ -71,11 +70,7 @@ import {
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.js";
-import {
-  pgValidateParsedCursor,
-  validateParsedCursor,
-} from "./pgValidateParsedCursor.js";
-import { toPg } from "./toPg.js";
+import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
