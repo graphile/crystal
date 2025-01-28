@@ -1423,6 +1423,9 @@ export class PgSelectStep<
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
     }
+    if (this.needsCursor) {
+      replacement.needsCursor = true;
+    }
   }
 
   optimize(): ExecutableStep {
