@@ -1239,13 +1239,22 @@ function buildTheQuery<
       codec: info.attributes[orderSpec.attribute].codec,
     });
     if (info.cursorIndicies != null) {
-      info.cursorIndicies.push(selectedIndex);
+      info.cursorIndicies.push({
+        index: selectedIndex,
+        codec: TYPES.text,
+      });
     }
   }
 
   if (info.cursorIndicies != null) {
-    info.cursorIndicies.push(selectType());
-    info.cursorIndicies.push(selectPk());
+    info.cursorIndicies.push({
+      index: selectType(),
+      codec: TYPES.text,
+    });
+    info.cursorIndicies.push({
+      index: selectPk(),
+      codec: TYPES.text,
+    });
   }
 
   if (isDev) Object.freeze(info.orders);

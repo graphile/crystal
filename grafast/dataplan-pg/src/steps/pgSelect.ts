@@ -30,7 +30,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
-import { listOfCodec } from "../codecs.js";
+import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutorContextPlans, PgExecutorInput } from "../executor.js";
 import type {
@@ -1909,21 +1909,34 @@ function buildTheQuery<
   if (info.needsCursor || after != null || before != null) {
     info.cursorDigest = getOrderByDigest(info);
   }
-  if (info.needsCursor) {
-    if (!info.cursorIndicies) throw new Error(`Impossible?`);
-    for (const o of info.orders) {
-      const [frag, codec] = getFragmentAndCodecFromOrder(
-        info.alias,
-        o,
-        info.resource.codec,
-      );
-      info.cursorIndicies.push(
-        selectAndReturnIndex(
-          codec.castFromPg
-            ? codec.castFromPg(frag, o.nullable === false)
-            : sql`${sql.parens(frag)}::text`,
+  // PERF: only calculate this if needed
+  const { sql: trueOrderBySQL } = buildOrderBy(info, false);
+  if (info.cursorIndicies) {
+    // PERF: calculate cursorDigest here instead?
+    if (info.orders.length > 0) {
+      for (const o of info.orders) {
+        const [frag, codec] = getFragmentAndCodecFromOrder(
+          info.alias,
+          o,
+          info.resource.codec,
+        );
+        info.cursorIndicies.push({
+          index: selectAndReturnIndex(
+            codec.castFromPg
+              ? codec.castFromPg(frag, o.nullable === false)
+              : frag,
+          ),
+          codec,
+        });
+      }
+    } else {
+      // No ordering; so use row number
+      info.cursorIndicies.push({
+        index: selectAndReturnIndex(
+          sql`(row_number() over (partition by 1))::text`,
         ),
-      );
+        codec: TYPES.int,
+      });
     }
   }
 
@@ -1952,8 +1965,6 @@ function buildTheQuery<
     cursorDigest,
     cursorIndicies,
   } = info;
-
-  const { sql: trueOrderBySQL } = buildOrderBy(info, false);
 
   const extraWheres: SQL[] = [];
 
@@ -2002,6 +2013,7 @@ function buildTheQuery<
 
       const identifierIndexOffset =
         extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
+      // PERF: try and re-use existing trueOrderBySQL selection?
       const rowNumberIndexOffset =
         forceOrder || limit != null || offset != null
           ? extraSelects.push(

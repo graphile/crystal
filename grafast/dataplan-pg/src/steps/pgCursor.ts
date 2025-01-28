@@ -1,12 +1,16 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
+import type { PgCodec } from "../index.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
 
 export interface PgCursorDetails {
   readonly digest: string;
-  readonly indicies: ReadonlyArray<number>;
+  readonly indicies: ReadonlyArray<{
+    index: number;
+    codec: PgCodec;
+  }>;
 }
 
 /**
@@ -45,11 +49,12 @@ export class PgCursorStep<
     const cursorTuple = [digest];
     let hasNonNull = false;
     for (let i = 0, l = indicies.length; i < l; i++) {
-      const orderVal = itemTuple[indicies[i]];
+      const { index, codec } = indicies[i];
+      const orderVal = itemTuple[index];
       if (!hasNonNull && orderVal != null) {
         hasNonNull = true;
       }
-      cursorTuple.push(orderVal);
+      cursorTuple.push(codec.fromPg(orderVal));
     }
     if (!hasNonNull) return null;
     return Buffer.from(JSON.stringify(cursorTuple), "utf8").toString("base64");
