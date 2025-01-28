@@ -1263,7 +1263,7 @@ function buildTheQuery<
   }
   if (info.needsCursor) {
     info.cursorIndicies = [
-      ...info.orders.map((o) => selectAndReturnIndex(o.fragment)),
+      ...info.orders.map((o) => selectAndReturnIndex(sql`${o.fragment}::text`)),
       selectType(),
       selectPk(),
     ];
