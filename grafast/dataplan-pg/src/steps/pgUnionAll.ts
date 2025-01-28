@@ -58,14 +58,15 @@ import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
+  MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   QueryValue,
 } from "./pgStmt.js";
 import {
+  applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
-  getExecutionCommon,
   getUnary,
   makeValues,
   PgStmtBaseStep,
@@ -957,7 +958,7 @@ on (${sql.indent(
   }
 
   // TODO: this MUST be removed, it gives the wrong result now.
-  // Instead, call `orderByDigest` at runtime.
+  // Instead, call `getOrderByDigest` at runtime.
   public getOrderByDigest() {
     return "natural";
   }
@@ -1062,7 +1063,8 @@ on (${sql.indent(
       forceIdentity: this.forceIdentity,
       havingConditions: this.havingConditions,
       mode: this.mode,
-      step: this,
+      alias: this.alias,
+      hasSideEffects: this.hasSideEffects,
       groups: this.groups,
       orders: this.orders,
       selects: this.selects,
@@ -1198,39 +1200,50 @@ interface PgUnionAllQueryInfo<
 > extends PgStmtCommonQueryInfo {
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
-  readonly memberDigests: readonly Readonly<MemberDigest<TTypeNames>>[];
-  readonly step: PgUnionAllStep<TAttributes, TTypeNames>;
-  readonly selects: readonly PgUnionAllStepSelect<TAttributes>[];
+  readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;
   readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
+
+  readonly selects: ReadonlyArray<PgUnionAllStepSelect<TAttributes>>;
   readonly orders: ReadonlyArray<PgOrderFragmentSpec>;
-  readonly groups: ReadonlyArray<PgGroupSpec>;
-  readonly havingConditions: readonly SQL[];
-  readonly forceIdentity: boolean;
+}
+interface MutablePgUnionAllQueryInfo<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends PgUnionAllQueryInfo<TAttributes, TTypeNames>,
+    MutablePgStmtCommonQueryInfo {
+  readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
+  readonly orders: Array<PgOrderFragmentSpec>;
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+  ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
 }
 
 function buildTheQuery<
   TAttributes extends string = string,
   TTypeNames extends string = string,
->(info: PgUnionAllQueryInfo<TAttributes, TTypeNames>): QueryBuildResult {
-  const {
-    executionDetails,
-    mode,
-    typeIdx,
-    step,
-    attributes,
-    forceIdentity,
+>(rawInfo: PgUnionAllQueryInfo<TAttributes, TTypeNames>): QueryBuildResult {
+  const info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames> = {
+    ...rawInfo,
+    selects: [...rawInfo.selects],
+    orders: [...rawInfo.orders],
+    ordersForCursor: undefined /* will be replaced shortly */ as never,
+    groups: [...rawInfo.groups],
+    havingConditions: [...rawInfo.havingConditions],
+    memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
 
-    memberDigests: rawMemberDigests,
-    selects: rawSelects,
-    groups: rawGroups,
-    orders: rawOrders,
-    havingConditions: rawHavingConditions,
-  } = info;
-  const { values } = executionDetails;
+    // Will be populated by applyConditionFromCursor
+    cursorLower: null,
+    cursorUpper: null,
 
-  const memberDigests = rawMemberDigests.map(cloneMemberDigest);
+    // Will be populated by applyCommonPaginationStuff
+    first: null,
+    last: null,
+    offset: null,
+    shouldReverseOrder: false,
+  };
+  const { values, count } = info.executionDetails;
 
-  const selects = [...rawSelects];
   function selectAndReturnIndex(expression: SQL): number {
     const existingIndex = selects.findIndex(
       (s) =>
@@ -1252,21 +1265,17 @@ function buildTheQuery<
     return selects.push({ type: "pk" }) - 1;
   }
 
-  const orders = [...rawOrders];
-  const groups = [...rawGroups];
-  const havingConditions = [...rawHavingConditions];
-
   // TODO: evaluate runtime orders, conditions, etc here
 
-  const ordersForCursor: PgOrderFragmentSpec[] = [
-    ...orders,
+  info.ordersForCursor = [
+    ...info.orders,
     {
-      fragment: sql`${step.alias}.${sql.identifier(String(selectType()))}`,
+      fragment: sql`${info.alias}.${sql.identifier(String(selectType()))}`,
       codec: TYPES.text,
       direction: "ASC",
     },
     {
-      fragment: sql`${step.alias}.${sql.identifier(String(selectPk()))}`,
+      fragment: sql`${info.alias}.${sql.identifier(String(selectPk()))}`,
       codec: TYPES.json,
       direction: "ASC",
     },
@@ -1275,29 +1284,35 @@ function buildTheQuery<
   // afterLock("orderBy"): Now the runtime orders/etc have been performed,
   // apply conditions from the cursor
 
-  const cursorLower = applyConditionFromCursor(
-    info,
-    memberDigests,
-    orders,
-    ordersForCursor,
-    "after",
-    getUnary<any[] | null>(values, info.afterStepId),
-  );
-  const cursorUpper = applyConditionFromCursor(
-    info,
-    memberDigests,
-    orders,
-    ordersForCursor,
-    "before",
-    getUnary<any[] | null>(values, info.beforeStepId),
-  );
+  const after = getUnary<any[] | null>(values, info.afterStepId);
+  applyConditionFromCursor(info, "after", after);
+  const before = getUnary<any[] | null>(values, info.beforeStepId);
+  applyConditionFromCursor(info, "before", before);
 
-  const { count } = executionDetails;
-  const { shouldReverseOrder, first, last } = getExecutionCommon(
-    info,
-    cursorLower,
-    cursorUpper,
-  );
+  applyCommonPaginationStuff(info);
+
+  /****************************************
+   *                                      *
+   *      ALL MUTATION NOW COMPLETE       *
+   *                                      *
+   ****************************************/
+
+  const {
+    mode,
+    typeIdx,
+    alias,
+    attributes,
+    forceIdentity,
+    memberDigests,
+    selects,
+    orders,
+    groups,
+    havingConditions,
+    hasSideEffects,
+    ordersForCursor,
+    shouldReverseOrder,
+  } = info;
+
   const reverse = mode === "normal" ? shouldReverseOrder : null;
 
   const memberCodecs = memberDigests.map(
@@ -1307,7 +1322,7 @@ function buildTheQuery<
     const tables: SQL[] = [];
 
     const [limitAndOffsetSQL, innerLimitSQL] =
-      calculateLimitAndOffsetSQLFromInfo(info, cursorLower, cursorUpper);
+      calculateLimitAndOffsetSQLFromInfo(info);
 
     for (const memberDigest of memberDigests) {
       const {
@@ -1320,9 +1335,7 @@ function buildTheQuery<
 
       const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
       if (!pk) {
-        throw new Error(
-          `No PK for ${memberDigest.member.typeName} resource in ${step}`,
-        );
+        throw new Error(`No PK for ${memberDigest.member.typeName} resource`);
       }
       const midSelects: SQL[] = [];
       const innerSelects = selects
@@ -1332,7 +1345,7 @@ function buildTheQuery<
               case "attribute": {
                 if (!attributes) {
                   throw new Error(
-                    `${step}: cannot select an attribute when there's no shared attributes`,
+                    `Cannot select an attribute when there's no shared attributes`,
                   );
                 }
                 const attr = attributes[s.attribute];
@@ -1368,7 +1381,7 @@ function buildTheQuery<
               case "order": {
                 const orderSpec = orders[s.orderIndex];
                 const [frag, codec] = getFragmentAndCodecFromOrder(
-                  step.alias,
+                  alias,
                   orderSpec,
                   memberDigest.finalResource.codec,
                 );
@@ -1384,8 +1397,8 @@ function buildTheQuery<
             return r;
           }
           const [frag, _codec] = r;
-          const alias = String(selectIndex);
-          const ident = sql.identifier(alias);
+          const identAlias = String(selectIndex);
+          const ident = sql.identifier(identAlias);
           const fullIdent = sql`${tableAlias}.${ident}`;
           midSelects.push(fullIdent);
           return sql`${frag} as ${ident}`;
@@ -1453,7 +1466,7 @@ from (${innerQuery}) as ${tableAlias}\
       if (select.type === "outerExpression") {
         return sql`${select.expression} as ${sql.identifier(String(i))}`;
       } else if (mode === "normal") {
-        const sqlSrc = sql`${step.alias}.${sql.identifier(String(i))}`;
+        const sqlSrc = sql`${alias}.${sql.identifier(String(i))}`;
         let codec: PgCodec;
         let guaranteedNotNull: boolean | undefined;
         switch (select.type) {
@@ -1468,11 +1481,7 @@ from (${innerQuery}) as ${tableAlias}\
           }
           case "order": {
             const order = ordersForCursor[select.orderIndex];
-            codec = getFragmentAndCodecFromOrder(
-              step.alias,
-              order,
-              memberCodecs,
-            )[1];
+            codec = getFragmentAndCodecFromOrder(alias, order, memberCodecs)[1];
             guaranteedNotNull = order.nullable === false;
             break;
           }
@@ -1557,7 +1566,7 @@ ${limitAndOffsetSQL}
     const innerQuery = sql`\
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
-from (${unionQuery}) ${step.alias}
+from (${unionQuery}) ${alias}
 ${unionGroupBy}\
 ${unionHaving}\
 `;
@@ -1582,7 +1591,7 @@ ${unionHaving}\
 
     if (
       queryValues.length > 0 ||
-      (count !== 1 && (forceIdentity || step.hasSideEffects))
+      (count !== 1 && (forceIdentity || hasSideEffects))
     ) {
       const identifierIndex = selectAndReturnIndex(
         sql`${identifiersAlias}.idx`,
@@ -1648,11 +1657,11 @@ ${lateralText};`;
     text,
     rawSqlValues,
     identifierIndex,
-    shouldReverseOrder,
+    shouldReverseOrder: info.shouldReverseOrder,
     name: hash(text),
     queryValues,
-    first,
-    last,
+    first: info.first,
+    last: info.last,
   };
 }
 
@@ -1660,22 +1669,13 @@ function applyConditionFromCursor<
   TAttributes extends string = string,
   TTypeNames extends string = string,
 >(
-  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
-  mutableMemberDigests: MutableMemberDigest<TTypeNames>[],
-  orders: PgOrderFragmentSpec[],
-  ordersForCursor: PgOrderFragmentSpec[],
+  info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames>,
   beforeOrAfter: "before" | "after",
   parsedCursor: Maybe<any[]>,
-) {
-  const {
-    step: { alias },
-  } = info;
+): void {
   if (parsedCursor == null) return;
-  const orderDigest = getOrderByDigest(
-    info,
-    mutableMemberDigests,
-    ordersForCursor,
-  );
+  const { alias, orders, ordersForCursor, memberDigests } = info;
+  const orderDigest = getOrderByDigest(info);
   const orderCount = ordersForCursor.length;
 
   // Cursor validity check
@@ -1684,7 +1684,13 @@ function applyConditionFromCursor<
   if (orderCount === 0) {
     // Natural pagination `['natural', N]`
     // This will be used in upperIndex(before)/lowerIndex(after)
-    return parsedCursor[1];
+    const n = parsedCursor[1];
+    if (beforeOrAfter === "after") {
+      info.cursorLower = n;
+    } else {
+      info.cursorUpper = n;
+    }
+    return;
   }
 
   const identifierPlaceholders: SQL[] = [];
@@ -1708,10 +1714,8 @@ function applyConditionFromCursor<
       identifierPlaceholders[i] = sql`${sql.value(
         parsedCursor[i + 1],
       )}::"text"`;
-    } else if (mutableMemberDigests.length > 0) {
-      const memberCodecs = mutableMemberDigests.map(
-        (d) => d.finalResource.codec,
-      );
+    } else if (memberDigests.length > 0) {
+      const memberCodecs = memberDigests.map((d) => d.finalResource.codec);
       const [, codec] = getFragmentAndCodecFromOrder(
         alias,
         order,
@@ -1725,7 +1729,7 @@ function applyConditionFromCursor<
     }
   }
 
-  for (const mutableMemberDigest of mutableMemberDigests) {
+  for (const mutableMemberDigest of memberDigests) {
     const { finalResource } = mutableMemberDigest;
     const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
     if (!pk) {
@@ -1831,15 +1835,14 @@ and ${condition(i + 1)}`}
 function getOrderByDigest<
   TAttributes extends string = string,
   TTypeNames extends string = string,
->(
-  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
-  memberDigests: MemberDigest<TTypeNames>[],
-  ordersForCursor: readonly PgOrderFragmentSpec[],
-) {
+>(info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames>) {
   const {
+    memberDigests,
+    ordersForCursor,
+    alias,
+    // TODO: satisfy placeholders and deferreds before we get this far!
     placeholders,
     deferreds,
-    step: { alias },
   } = info;
   if (ordersForCursor.length === 0 || memberDigests.length === 0) {
     return "natural";
@@ -1887,46 +1890,4 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     orders: [...memberDigest.orders],
     conditions: [...memberDigest.conditions],
   };
-}
-
-function orderByDigest<TAttributes extends string, TTypeNames extends string>(
-  info: PgUnionAllQueryInfo<TAttributes, TTypeNames>,
-  ordersForCursor: PgOrderFragmentSpec[],
-  memberDigests: MemberDigest<TTypeNames>[],
-) {
-  const {
-    step: { alias },
-    // TODO: satisfy placeholders and deferreds before we get this far!
-    placeholders,
-    deferreds,
-  } = info;
-  if (ordersForCursor.length === 0 || memberDigests.length === 0) {
-    return "natural";
-  }
-  // The security of this hash is unimportant; the main aim is to protect the
-  // user from themself. If they bypass this, that's their problem (it will
-  // not introduce a security issue).
-  const hash = createHash("sha256");
-  const memberCodecs = memberDigests.map(
-    (digest) => digest.finalResource.codec,
-  );
-  hash.update(
-    JSON.stringify(
-      ordersForCursor.map((o) => {
-        const [frag] = getFragmentAndCodecFromOrder(alias, o, memberCodecs);
-        const placeholderValues = new Map<symbol, SQL>();
-        for (let i = 0; i < placeholders.length; i++) {
-          const { symbol } = placeholders[i];
-          placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
-        }
-        for (let i = 0; i < deferreds.length; i++) {
-          const { symbol } = deferreds[i];
-          placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
-        }
-        return sql.compile(frag, { placeholderValues }).text;
-      }),
-    ),
-  );
-  const digest = hash.digest("hex").slice(0, 10);
-  return digest;
 }

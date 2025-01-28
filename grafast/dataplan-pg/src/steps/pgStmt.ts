@@ -10,7 +10,11 @@ import {
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import type { PgCodec, PgTypedExecutableStep } from "../interfaces.js";
+import type {
+  PgCodec,
+  PgGroupSpec,
+  PgTypedExecutableStep,
+} from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
@@ -65,11 +69,6 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   protected abstract offsetStepId: number | null;
   protected abstract beforeStepId: number | null;
   protected abstract afterStepId: number | null;
-  /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected abstract lowerIndexStepId: number | null;
-  /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected abstract upperIndexStepId: number | null;
-  protected abstract shouldReverseOrderId: number | null;
 
   public scopedSQL = makeScopedSQL(this);
 
@@ -244,21 +243,9 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     return $parsedCursorPlan;
   }
 
+  // TODO: delete this
   shouldReverseOrder() {
-    return operationPlan().withRootLayerPlan(() => {
-      const numberDep = (stepId: number | null) =>
-        this.getDepOrConstant<Maybe<number>>(stepId, null);
-      return lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-        },
-        calculateShouldReverseOrder,
-        true,
-      );
-    });
+    throw new Error("shouldReverseOrder RUNTIME ONLY PLZ");
   }
 
   /**
@@ -268,55 +255,6 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
-  }
-
-  protected getExecutionCommon(executionDetails: ExecutionDetails) {
-    const { values } = executionDetails;
-
-    const first = getUnary<Maybe<number>>(values, this.firstStepId);
-    const last = getUnary<Maybe<number>>(values, this.lastStepId);
-    const offset = getUnary<Maybe<number>>(values, this.offsetStepId);
-
-    if (offset != null && last != null) {
-      throw new SafeError("Cannot use 'offset' with 'last'");
-    }
-
-    if (!this.shouldReverseOrderId) {
-      throw new Error(
-        `Cannot call getExecutionCommon before shouldReverseOrderId has been set`,
-      );
-    }
-
-    /**
-     * If `last` is in use then we reverse the order from the database and then
-     * re-reverse it in JS-land.
-     */
-    const shouldReverseOrder = getUnary<boolean>(
-      values,
-      this.shouldReverseOrderId,
-    );
-
-    return { first, last, offset, shouldReverseOrder };
-  }
-
-  protected abstract limitAndOffsetSQL: SQL | null;
-  protected planLimitAndOffsets() {
-    const numberDep = (stepId: number | null) =>
-      this.getDepOrConstant<Maybe<number>>(stepId, null);
-    return this.operationPlan.withRootLayerPlan(() =>
-      lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-          offset: numberDep(this.offsetStepId),
-          fetchOneExtra: constant(this.fetchOneExtra, false),
-        },
-        calculateLimitAndOffsetSQL,
-        true,
-      ),
-    );
   }
 }
 
@@ -344,18 +282,6 @@ function parseCursor(cursor: string | null) {
   }
 }
 parseCursor.isSyncAndSafe = true; // Optimization
-
-function calculateShouldReverseOrder(params: {
-  first: Maybe<number>;
-  last: Maybe<number>;
-  cursorLower: Maybe<number>;
-  cursorUpper: Maybe<number>;
-}) {
-  const { first, last, cursorLower, cursorUpper } = params;
-  return (
-    first == null && last != null && cursorLower == null && cursorUpper == null
-  );
-}
 
 export function getUnary<T>(
   values: ExecutionDetails["values"],
@@ -523,25 +449,47 @@ export function calculateLimitAndOffsetSQL(params: {
 }
 
 export interface PgStmtCommonQueryInfo {
-  executionDetails: ExecutionDetails;
-  placeholders: Array<PgStmtDeferredPlaceholder>;
-  deferreds: Array<PgStmtDeferredSQL>;
-  fetchOneExtra: boolean;
-  firstStepId: number | null;
-  lastStepId: number | null;
-  offsetStepId: number | null;
-  beforeStepId: number | null;
-  afterStepId: number | null;
+  readonly alias: SQL;
+  readonly hasSideEffects: boolean;
+
+  readonly executionDetails: ExecutionDetails;
+  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
+  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+  readonly fetchOneExtra: boolean;
+  readonly forceIdentity: boolean;
+
+  readonly firstStepId: number | null;
+  readonly lastStepId: number | null;
+  readonly offsetStepId: number | null;
+  readonly beforeStepId: number | null;
+  readonly afterStepId: number | null;
+
+  readonly groups: ReadonlyArray<PgGroupSpec>;
+  readonly havingConditions: ReadonlyArray<SQL>;
+}
+
+export interface MutablePgStmtCommonQueryInfo {
+  // New properties
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+
+  first: Maybe<number>;
+  last: Maybe<number>;
+  shouldReverseOrder: boolean;
+  offset: Maybe<number>;
 }
 
 export function calculateLimitAndOffsetSQLFromInfo(
-  info: PgStmtCommonQueryInfo,
-  cursorLower: Maybe<number>,
-  cursorUpper: Maybe<number>,
+  info: PgStmtCommonQueryInfo & {
+    readonly cursorLower: Maybe<number>;
+    readonly cursorUpper: Maybe<number>;
+  },
 ) {
   const {
     executionDetails: { values },
     fetchOneExtra,
+    cursorUpper,
+    cursorLower,
   } = info;
   return calculateLimitAndOffsetSQL({
     first: getUnary(values, info.firstStepId),
@@ -553,13 +501,14 @@ export function calculateLimitAndOffsetSQLFromInfo(
   });
 }
 
-export function getExecutionCommon(
-  info: PgStmtCommonQueryInfo,
-  cursorLower: Maybe<number>,
-  cursorUpper: Maybe<number>,
-) {
-  const { executionDetails } = info;
-  const { values } = executionDetails;
+export function applyCommonPaginationStuff(
+  info: PgStmtCommonQueryInfo & MutablePgStmtCommonQueryInfo,
+): void {
+  const {
+    cursorUpper,
+    cursorLower,
+    executionDetails: { values },
+  } = info;
 
   const first = getUnary<Maybe<number>>(values, info.firstStepId);
   const last = getUnary<Maybe<number>>(values, info.lastStepId);
@@ -568,18 +517,15 @@ export function getExecutionCommon(
   if (offset != null && last != null) {
     throw new SafeError("Cannot use 'offset' with 'last'");
   }
+  info.first = first;
+  info.last = last;
+  info.offset = offset;
   /**
    * If `last` is in use then we reverse the order from the database and then
    * re-reverse it in JS-land.
    */
-  const shouldReverseOrder = calculateShouldReverseOrder({
-    first: getUnary(values, info.firstStepId),
-    last: getUnary(values, info.lastStepId),
-    cursorLower,
-    cursorUpper,
-  });
-
-  return { first, last, offset, shouldReverseOrder };
+  info.shouldReverseOrder =
+    first == null && last != null && cursorLower == null && cursorUpper == null;
 }
 
 export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
