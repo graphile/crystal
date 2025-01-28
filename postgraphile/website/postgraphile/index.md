@@ -29,26 +29,26 @@ accessible to your frontend application developers (or even API clients).
 PostGraphile uses automation and intelligent defaults to eradicate the time
 consuming and repetitive parts of building a best practices GraphQL API, whilst
 giving you the tools you need to customize and extend your schema to be exactly
-what you need. And because it's powered by [Gra*fast*](https://grafast.org) it's
-extremely unlikely that you'd be able to build a GraphQL API using traditional
-GraphQL/DataLoader patterns that's anywhere near as fast as a PostGraphile API -
+what you need. And because it’s powered by [Gra*fast*](https://grafast.org) it’s
+extremely unlikely that you’d be able to build a GraphQL API using traditional
+GraphQL/DataLoader patterns that’s anywhere near as fast as a PostGraphile API —
 it truly runs rings around traditional API development practices.
 
 Built on a [plugin system](./extending), you can easily pick and choose the
 features that you want in your API (and even develop your own or mix in features
 [from the community](./community-plugins)). Using the
 [smart tags system](./smart-tags) you can easily tweak which entities appear,
-and how they're exposed. If you ultimately decide an auto-generated GraphQL API
-may not be for you, PostGraphile has an ['export' feature](./exporting-schema)
+and how they’re exposed. If you ultimately decide an auto-generated GraphQL API
+may not be for you, PostGraphile has an [‘export’ feature](./exporting-schema)
 so your generated API can be exported as executable JavaScript code which you
 can then maintain yourself ─ there's no lock-in.
 
 :::tip PostGraphile is not always a 1-to-1 map of the database
 
-PostGraphile doesn't have to be (and _generally_ should not be) a "1-to-1 map"
+PostGraphile doesn't have to be (and _generally_ should not be) a “1-to-1 map”
 of your database.
 
-Via schema extensions you can add any types/fields/args that you need to, which
+Via schema extensions, you can add any types/fields/args that you need to, which
 can communicate with any data source that Node itself can communicate with. You
 can also use the plugin interface to wrap _plan resolvers_ with your own logic,
 which gives huge control over authorization, presentation, filtering, and
@@ -59,14 +59,14 @@ database and only expose the tables, columns, functions and mutations that are
 granted to it; but you should use [smart tags](./smart-tags) and similar
 techniques to hone the GraphQL API to your needs.
 
-By exporting the executable schema you can see the plan resolvers/types/fields
+By exporting the executable schema, you can see the plan resolvers/types/fields
 that PostGraphile has generated for you and, should you choose to, you can take
 this code and make it your own — either for the entire schema, or for specific
 portions of it. This can be used to enable you to evolve your database tables
 without breaking your GraphQL schema.
 
 We strongly advise that you start with as small a GraphQL API as you can, and
-then add features to it as you need them, rather than going for a "kitchen sink"
+then add features to it as you need them, rather than going for a “kitchen sink”
 approach!
 
 :::
@@ -108,10 +108,10 @@ Some of the features we offer:
 - Bring your own PostgreSQL driver/adaptor (integrate with almost any Postgres client library)
 - Run as a CLI, as a Node.js middleware, or a standalone GraphQL schema
 - Easy customization via [smart tags](./smart-tags)
-- Explain your operations via [Ruru](https://grafast.org/ruru/) (our Gra*fast*-enhanced Graph*i*QL IDE)
+- Explain your operations via [Ruru](https://grafast.org/ruru/) (our Gra*fast*-enhanced GraphiQL IDE)
 - [Auto-discovered relations](./relations)
 - [Automatic CRUD mutations](./crud-mutations) e.g. `updatePost`
-- Almost all features are optional, and most can be customised on a per-table, per-column or per-constraint basis (as appropriate)
+- Almost all features are optional, and most can be customized on a per-table, per-column or per-constraint basis (as appropriate)
 - Incredible versatility via a wide array of plugins:
   - Aggregates
   - Powerful filtering

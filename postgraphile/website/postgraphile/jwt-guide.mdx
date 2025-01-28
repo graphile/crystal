@@ -13,18 +13,18 @@ and adoptable by any who might want to use it.
 
 </p>
 
-:::info
+:::info There are alternatives to JWTs available
 
 What follows is a specification of how you can use JWTs to
 authenticate a user with PostgreSQL such that PostgreSQL may perform your
 authorization checks. **This is not the only way of achieving this goal with
 PostGraphile**, for example you can do as the PostGraphile maintainer does and use
 standard session-based authentication (i.e. with cookies) via the relevant
-Express/Koa/Fastify middleware and PostGraphile's
+Express/Koa/Fastify middleware and PostGraphile’s
 [`pgSettings` functionality](./config#pgsettings) allowing you to
 leverage powerful pre-built authentication stacks such as
 [passport.js](http://www.passportjs.org/) which has OAuth integration with most
-major "social login" providers.
+major “social login” providers.
 
 :::
 

@@ -2,7 +2,7 @@
 title: The Default Role
 ---
 
-PostGraphile V5 doesn't have a "default role" any more, but you can indicate a
+PostGraphile V5 doesn’t have a “default role” any more, but you can indicate a
 role to use in your [pgSettings](./config#pgsettings), and this can be
 dependent on a role not already having been set.
 

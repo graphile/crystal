@@ -2,17 +2,17 @@
 title: GraphQL Schema Plugins
 ---
 
-PostGraphile's schema generator is built from a number of
+PostGraphile’s schema generator is built from a number of
 [graphile-build plugins](https://build.graphile.org/graphile-build/plugins/). You can
 write your own plugins — either using the helpers available in `graphile-utils`,
 or using the raw plugin interface available from Graphile Build.
 
-_If you're looking for an easy way to remove/rename things, check out
+_If you’re looking for an easy way to remove/rename things, check out
 [smart tags](./smart-tags)._
 
 ### Inflection example
 
-Here's an example of a simple plugin which uses the ["inflection"
+Here’s an example of a simple plugin which uses the [“inflection”
 system](./inflection) to rename all database columns named `full_name` to be
 output as `name` in GraphQL:
 
@@ -36,29 +36,29 @@ const FullNameToNamePlugin = {
 
 ### Writing Plugins
 
-We've created a number of plugin helpers for common tasks:
+We’ve created a number of plugin helpers for common tasks:
 
 - To add new fields and types,
-  [check out `makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+  [see `makeExtendSchemaPlugin`](./make-extend-schema-plugin)
 - To change how fields and types are automatically named,
-  [check out "Overriding inflection"](./inflection#overriding-inflection)
+  [see “Overriding inflection”](./inflection#overriding-inflection)
 - To change how fields are planned,
-  [check out `makeWrapPlansPlugin`](./make-wrap-plans-plugin)
+  [see `makeWrapPlansPlugin`](./make-wrap-plans-plugin)
 - To make certain fields nullable or non-nullable,
-  [check out `makeChangeNullabilityPlugin`](./make-change-nullability-plugin)
+  [see `makeChangeNullabilityPlugin`](./make-change-nullability-plugin)
 - To process the generated schema,
-  [check out `makeProcessSchemaPlugin`](./make-process-schema-plugin)
+  [see `makeProcessSchemaPlugin`](./make-process-schema-plugin)
 
 For everything else, you can
 [write raw Graphile Build plugins](./extending-raw).
 
-Do check out our [plugin gallery](./plugin-gallery) for examples of plugins.
+Do look over our [plugin gallery](./plugin-gallery) for examples of plugins.
 These are generally suitable for copying/pasting into your app and then
-customising to your needs.
+customizing to your needs.
 
 ### Loading Plugins
 
-Once you've written (or installed) a plugin, you can load it via your preset:
+Once you’ve written (or installed) a plugin, you can load it via your preset:
 
 ```js title="graphile.config.mjs"
 import MyPlugin from "./myPlugin.mjs";

@@ -4,17 +4,17 @@ title: makeAddPgTableConditionPlugin
 
 PostGraphile adds `condition` arguments to various of the table collection
 fields it builds so that you can filter the result set down to just the records
-you're interested in. By default we add the table's indexed columns to the
+you’re interested in. By default we add the table’s indexed columns to the
 condition input, where you can specify their value, or `null` if you only want
 the records where that column `IS NULL`.
 
 Many GraphQL experts would opine that GraphQL filters should not be overly
 complicated, and should not reveal too much of the underlying data store. This
-is why we don't have advanced filtering built in by default; however, should you
+is why we don’t have advanced filtering built in by default; however, should you
 desire that, please check out the filter plugin
 [documented on our Filtering page](./filtering).
 
-Here's an example of filtering forums to those created by a particular user:
+Here’s an example of filtering forums to those created by a particular user:
 
 ```graphql
 query ForumsCreatedByUser1 {
@@ -32,7 +32,7 @@ the fields on that table; maybe you want to filter by a field on a related
 table, or by a computation, or something else.
 
 This plugin generator helps you build new `condition` values so that you can
-filter more flexibly. Let's make this clearer with an example:
+filter more flexibly. Let’s make this clearer with an example:
 
 ## Example 1
 
@@ -127,8 +127,8 @@ query ForumsContainingPostsByUser1 {
 :::tip
 
 `$condition.alias` represents the `app_public.forums` table in the example
-above (i.e. the schemaName.tableName table); if you don't use it in your
-implementation then there's a good chance your plugin is incorrect.
+above (i.e. the schemaName.tableName table); if you don’t use it in your
+implementation then there’s a good chance your plugin is incorrect.
 
 :::
 
@@ -204,7 +204,7 @@ representation is specified by the result of `fieldSpecGenerator`.
 
 Also inside `fieldSpecGenerator` should be an `applyPlan`, which indicates how
 this condition should work. It is passed two arguments, the `$condition` (which
-is a `PgConditionStep` wrapping the `PgSelectStep` that we're applying
+is a `PgConditionStep` wrapping the `PgSelectStep` that we’re applying
 conditions to) and the `value` (which is a `FieldArgs` instance representing
 the value of the field). The `applyPlan` should use `$conditon.where(...)` to
 apply a condition to the fetch.

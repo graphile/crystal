@@ -56,7 +56,7 @@ Other important considerations when choosing a task queue would be:
 - Complexity
 - Throughput requirements
 - DevOps complexity
-- Tracability
+- Traceability
 - Privacy
 
 ### Graphile Worker
@@ -94,5 +94,5 @@ on how to set up and use it.
 Despite all the benefits, Graphile Worker stills lacks some features provided by
 other more mature tasks queues
 
-- Currently Graphile Worker doesn't expose a GUI to monitor or manage tasks.
+- Currently Graphile Worker doesn’t expose a GUI to monitor or manage tasks.
 - ??

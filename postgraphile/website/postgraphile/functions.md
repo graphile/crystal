@@ -16,7 +16,7 @@ with PostgreSQL functions. The three main methods are:
   (but not a connection, since you cannot paginate over a mutation)
 
 If you want to leverage database functionality rather than PostGraphile plugins
-to enhance your API then it's very important to understand PostgreSQL
+to enhance your API then it’s very important to understand PostgreSQL
 functions. Functions allow you to define business logic in the database using
 SQL or one of many other scripting languages.
 
@@ -30,13 +30,13 @@ Well written business logic in the database will often be significantly more
 performant then writing the business logic in the application layer. This is
 because PostgreSQL is finely tuned for data intensive uses.
 
-:::info
+:::info Take care to adapt your coding pattern to the new paradigm-shift
 
-It's _very easy_ to have very poor performance in the database if
+It’s _very easy_ to have very poor performance in the database if
 you try and move your procedural programming language knowledge over without
-making accommodations for the new paradigm you're in. In PostgreSQL, every
+making accommodations for the new paradigm you’re in. In PostgreSQL, every
 function call and every statement executed has a performance overhead, so if
-you don't adapt your coding patterns to be optimal for a database, you will
+you don’t adapt your coding patterns to be optimal for a database, you will
 likely get poor performance. This poor performance from poorly written database
 functions is one of the reasons some critics claim that business logic in the
 database should not be used.
@@ -44,7 +44,7 @@ database should not be used.
 :::
 
 JavaScript programmers will likely be tempted to use the `FOR`, `FOREACH` and
-`LOOP` constructs to manipulate rows, since that's what they would do in their
+`LOOP` constructs to manipulate rows, since that’s what they would do in their
 JavaScript code. But doing so might result in PostgreSQL having to perform
 hundreds, thousands, or even millions of SQL queries and function calls under
 the hood of your function.
@@ -110,7 +110,7 @@ function calls in RLS policies. For example:
 create function current_user_is_member_of(target_organization_id int) returns boolean as $$
   select exists(
     select 1
-    from memebrs
+    from members
     where organization_id = target_organization_id
     and user_id = current_user_id()
   );
@@ -127,7 +127,7 @@ create policy select_members
 Here each new value for `members.organization_id` is passed to the
 `current_user_is_member_of` function, meaning that (depending on the other
 filters used in the query) we may be calling the `current_user_is_member_of`
-function for every unique `organization_id` in the database. And that's the best
+function for every unique `organization_id` in the database. And that’s the best
 case, at worst PostgreSQL may call the function for every row. Ouch!
 
 Instead, we should ensure that functions called in RLS policies never accept a
@@ -136,7 +136,7 @@ row value as argument. We can do this by restructuring the logic:
 ```sql title="Much better - only a single function call"
 create function current_user_organization_ids() returns setof int as $$
   select organization_id
-  from memebrs
+  from members
   where user_id = current_user_id();
 $$ language sql stable security definer;
 
@@ -153,7 +153,7 @@ simple index check to select the rows that are visible according to the RLS
 policy. This can be **literally thousands of times faster** than the previous
 example.
 
-You might think that this is likely to be _less performant_ when you're
+You might think that this is likely to be _less performant_ when you’re
 fetching individual rows, but as a general rule of thumb PostgreSQL can read
 millions of rows per second (and even more if it just needs index values), so
 determining the list of `organization_id`s a user is a member of is so trivial
@@ -180,7 +180,7 @@ likely already familiar with it. Because it lacks the looping constructs, it
 also encourages you to write your functions in a performant way. We advise that
 if your function can be written in SQL, it probably should be.
 
-PL/pgSQL is PostgreSQL’s custom procedural language, it's fairly easy to pick up
+PL/pgSQL is PostgreSQL’s custom procedural language, it’s fairly easy to pick up
 and there are plenty of StackOverflow and other resources for this language.
 You’ll need to learn PL/pgSQL (or one of the other procedural languages) if you
 want to write any triggers, because SQL can’t be used for triggers. Don’t
@@ -190,19 +190,19 @@ PL/pgSQL.
 A simple function written with `LANGUAGE sql` looks like this:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   select a + b;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+$$ language sql immutable strict;
 ```
 
 The same function with `LANGUAGE plpgsql` could look like this:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
-BEGIN
-  RETURN a + b;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+create function add(a int, b int) returns int as $$
+begin
+  return a + b;
+end;
+$$ language plpgsql immutable strict;
 ```
 
 If you don’t want to use PL/pgSQL or SQL, many popular scripting languages can
@@ -216,18 +216,18 @@ For example, a function defined using JavaScript could look like:
 
 ```sql
 -- This does look the exact same as the PL/pgSQL example…
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   return a + b;
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$$ language plv8 immutable strict;
 
 -- Here’s a better example from the plv8 repo…
-CREATE FUNCTION plv8_test(keys text[], vals text[]) RETURNS text AS $$
+create function plv8_test(keys text[], vals text[]) returns text as $$
   var object = {}
   for (var i = 0; i < keys.length; i++) {
     object[keys[i]] = vals[i]
   }
   return JSON.stringify(object)
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$$ language plv8 immutable strict;
 ```
 
 [pl/pgsql]: http://www.postgresql.org/docs/current/static/plpgsql.html
@@ -242,17 +242,17 @@ name an argument, PostGraphile will give it a name like `arg1`, `arg2`, `arg3`,
 and so on. An example of a function with unnamed arguments is as follows:
 
 ```sql
-CREATE FUNCTION add(int, int) RETURNS int AS $$
-  SELECT $1 + $2;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+create function add(int, int) returns int as $$
+  select $1 + $2;
+$$ language sql immutable strict;
 ```
 
 Whereas named arguments look like:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   select a + b;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+$$ language sql immutable strict;
 ```
 
 For the sake of your schema and your coworkers, you should always use named
@@ -266,7 +266,7 @@ can solve this in a number of ways.
 
 ### Use function name
 
-You can use the function's name to disambiguate a function argument from a
+You can use the function’s name to disambiguate a function argument from a
 column value:
 
 ```sql {2}
@@ -339,13 +339,17 @@ for
 By default, a function is “volatile”. For example, a function defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql;
 ```
 
-Is equivalent to a function defined as:
+is equivalent to a function defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql VOLATILE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql volatile;
 ```
 
 From the PostgreSQL docs:
@@ -370,33 +374,39 @@ Certain VOLATILE functions will be exposed by PostGraphile as
 If your function does not modify any data or state, you should declare it as
 `STABLE`.
 
-:::info
+:::info When to use `IMMUTABLE`
 
 If your function depends only on its arguments and does not fetch
 data from other sources, nor is it dependent on configuration variables, then
 you can declare it as `IMMUTABLE` which is a stricter form of `STABLE`.
 
-We advise that you don't use `IMMUTABLE` until you become expert — stick to `STABLE`.
+We advise that you don’t use `IMMUTABLE` until you become expert — stick to `STABLE`.
 
 :::
 
 By marking your function as `STABLE` or `IMMUTABLE`, PostgreSQL knows that it
-can apply a number of optimisations, including memoization to avoiding calling
+can apply a number of optimizations, including memoization to avoiding calling
 it multiple times for the same inputs during the same statement. Memoization is
 a possible choice PostgreSQL may make, it is not guaranteed.
 
-Here's examples of defining functions as STABLE/IMMUTABLE:
+Here’s examples of defining functions as STABLE/IMMUTABLE:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql stable;
 
 -- or…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql IMMUTABLE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql immutable;
 
 -- or if you wanted to return a row from a table…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS my_table AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns my_table as $$
+  …
+$$ language sql stable;
 ```
 
 From the PostgreSQL docs:
@@ -426,7 +436,7 @@ Certain STABLE/IMMUTABLE functions will be exposed by PostGraphile as
 ## SETOF Functions — Connections
 
 As well as scalars, compound types, and arrays of these, PostgreSQL functions
-can also return sets. Sets emulate tables, and so it's natural for PostGraphile
+can also return sets. Sets emulate tables, and so it’s natural for PostGraphile
 to expose these to GraphQL using [connections](./connections) (or, if your
 behaviors are configured to prefer lists, as lists).
 
@@ -437,10 +447,12 @@ To create a function that returns a connection, you could use SQL such as this:
 
 ```sql
 -- Assuming we already have a table named `person`…
-CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns setof person as $$
+  …
+$$ language sql stable;
 ```
 
-This function would be recognised as a [custom query](./custom-queries), and
+This function would be recognized as a [custom query](./custom-queries), and
 could be queried like this:
 
 ```graphql {2}

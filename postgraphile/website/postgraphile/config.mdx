@@ -109,7 +109,7 @@ the `graphile config options` command detailed below. It may be necessary to
 add `import "postgraphile"` at the top of the configuration file so that
 TypeScript imports all the available scopes.
 
-:::note
+:::tip The Schema Build Process
 
 The schema build process in PostGraphile is:
 
@@ -241,7 +241,7 @@ find out what options are available to you:
 graphile config options
 ```
 
-:::info
+:::info The graphile CLI is a development aid
 
 The `graphile` CLI is a development aid only, and is not needed at runtime or
 in production (or in development really, it’s just a handy little helper). This
@@ -259,7 +259,7 @@ file.
 
 <figure>
 
-[![Cropped screenshot of ‘graphile config options’](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
+[![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
 </figure>
@@ -275,7 +275,7 @@ graphile config print
 
 <figure>
 
-[![Cropped screenshot of ‘graphile config print’](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
+[![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
 
 <figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
 </figure>
@@ -410,7 +410,7 @@ why every adaptor should support them.
 
 :::
 
-:::caution
+:::caution `name` must be unique!
 
 The `name` option must be unique across all your `pgServices`; therefore if you
 have more than one entry in `pgServices` you must give each additional entry an
@@ -607,7 +607,7 @@ export default {
 };
 ```
 
-:::warning
+:::warning Use prefixes
 
 When adding details to `grafast.context`, you must careful to not add properties that
 will clash with system context keys such as `withPgClient`, `pgSettings`,
@@ -620,7 +620,7 @@ context keys with your initials, company name, or similar.
 
 :::
 
-:::tip
+:::tip Use helpers
 
 It’s _not_ a good idea to give direct access to the `req` or `res` objects
 via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
@@ -653,7 +653,7 @@ For most PostGraphile users there’s only one pgService, and the default
 `pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
 the adaptor you might opt to configure it via including a `pgSettings` key in
 the object you return from the Grafast context callback mentioned in the
-“Grafast options" section above. The value for this key should be a POJO (plain
+“Grafast options” section above. The value for this key should be a POJO (plain
 old JavaScript object) with string keys and string values, and you should be
 careful to copy across settings from the pgService adaptor and any
 presets/plugins that may have added to it. For example:
@@ -679,7 +679,7 @@ export default {
 };
 ```
 
-:::caution
+:::caution Naming conventions
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings.
@@ -788,7 +788,7 @@ export default {
 };
 ```
 
-:::tip
+:::tip Use abstractions
 
 GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
 choose to use your PostGraphile schema you may or may not have access to an

@@ -6,7 +6,7 @@ title: Bundling with Webpack
 
 In V5, we recommend that you export your schema with `graphile-export`
 (assuming all your plugins support it, which they may not) and then bundle the
-result. Here's an example webpack configuration you might use:
+result. Here’s an example webpack configuration you might use:
 
 ```js title="webpack.config.js"
 const webpack = require("webpack");
@@ -108,7 +108,7 @@ module.exports = {
 A more invasive and optimized config can be found in our
 [Lambda example](https://github.com/graphile/postgraphile-lambda-example); note
 that it cannot be used with watch mode and does not support subscriptions.
-Here's a simplified and commented version of it:
+Here’s a simplified and commented version of it:
 
 ```js
 const webpack = require("webpack");

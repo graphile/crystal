@@ -15,6 +15,6 @@ code/projects/tutorials/blog posts. Here are links to some of these (use the
 
 - [Multi roles JWT token example](https://github.com/dijam/graphile-jwt-example)
 
-And of course, we couldn't keep progressing this project like we do if it wasn't
+And of course, we couldn’t keep progressing this project like we do if it wasn’t
 for the financial support of many
 [community members](https://graphile.org/sponsor).

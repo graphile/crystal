@@ -12,17 +12,17 @@ straightforward:
 
 ## Replacing an inflector
 
-Replacing an inflector is slightly easier than adding a new one because there's
+Replacing an inflector is slightly easier than adding a new one because there’s
 no need to define the TypeScript types (you just use the existing types); so
-we'll start there.
+we’ll start there.
 
 Replacement inflectors are added via a plugin, using the
 `inflection.replace.<inflectorName>` property, which should be set to a
 function. This function accepts three or more parameters:
 
-1. The previous version of the inflector, for delegation, or `null` if there wasn't previously an inflector with this name
+1. The previous version of the inflector, for delegation, or `null` if there wasn’t previously an inflector with this name
 2. The resolved `graphile-config` preset that the user is using
-3. All remaining parameters are the inflector's inputs, from which a name should be derived
+3. All remaining parameters are the inflector’s inputs, from which a name should be derived
 
 ### Example 1
 
@@ -60,7 +60,7 @@ export const ReplaceInflectorPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-:::info
+:::info The first two arguments are already supplied
 
 The first two arguments to your replace inflector definition are supplied by the
 Graphile Build system and hidden from calling code, so only arguments from the
@@ -106,7 +106,7 @@ Adding a new inflector is very much like adding a replacement inflector, with
 the following differences:
 
 1. No `previous` inflector existed, so the first argument is omitted
-2. The types won't already exist, so you must declare them yourself, via the `global.GraphileBuild.Inflection` interface
+2. The types won’t already exist, so you must declare them yourself, via the `global.GraphileBuild.Inflection` interface
 
 In JS, adding a new inflector is straightforward:
 
@@ -124,7 +124,7 @@ export const MyNewInflectorPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-In TypeScript, it's somewhat more verbose as we use [declaration merging][] to
+In TypeScript, it’s somewhat more verbose as we use [declaration merging][] to
 make other plugins aware of the new inflector:
 
 ```ts
@@ -158,7 +158,7 @@ export const MyNewInflectorPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-:::info
+:::info The first argument is already supplied
 
 The first argument to your add inflector definition is supplied by the Graphile
 Build system and hidden from calling code, so only arguments from the second

@@ -2,7 +2,7 @@
 title: Aggregates
 ---
 
-PostGraphile's engine has support for powerful aggregates. The
+PostGraphile’s engine has support for powerful aggregates. The
 [@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates) module
 adds various aggregates to the schema, and gives you the ability to add more
 via plugins. Aggregates are located under connection fields.
@@ -19,7 +19,7 @@ these on the client).
 ### Aggregates only work on Relay connection
 
 Thanks to their expansibility, relay [connections](./connections) were the
-perfect place to add aggregates support. If you're using a behavior
+perfect place to add aggregates support. If you’re using a behavior
 configuration that prefers lists over connections (e.g. `-connection +list`)
 then you can override it on a per-collection basis with the [`@behavior
 +connection` smart tag](./smart-tags/#behavior).

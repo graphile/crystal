@@ -37,9 +37,9 @@ Schema extension plugins for PostGraphile:
   associations. (same concept as
   postgraphile-plugin-connection-filter-polymorphic). :question:_(Not yet ported to V5)_
 - [postgraphile-index-to-unique-constraint-plugin](https://github.com/hansololai/postgraphile-index-to-unique-constraint-plugin) -
-  extends PostGraphile's unique constraint detection to unique indexes also. :question:_(Not yet ported to V5)_
+  extends PostGraphile’s unique constraint detection to unique indexes also. :question:_(Not yet ported to V5)_
 - [postgraphile-table-extension-plugin](https://github.com/hansololai/postgraphile-table-extension-plugin) -
-  extend a table's fields (non-association) to another table via unique foreign
+  extend a table’s fields (non-association) to another table via unique foreign
   key constraint. Useful for vertical partitioned tables. :question:_(Not yet ported to V5)_
 - [postgraphile-plugin-custom-filter](https://github.com/RoadRunnerEngineering/postgraphile-plugin-custom-filter) -
   adds a `customFilter:` arg to connections that offers user defined filters on
@@ -83,7 +83,7 @@ Schema extension plugins for PostGraphile:
   Removes all foreign key fields from the GraphQL schema while still allowing
   foreign relationships to be created. :question:_(Not yet ported to V5, but use the "relay" preset instead?)_
 - [postgraphile-plugin-timestamp-format](https://github.com/RedShift1/postgraphile-plugin-timestamp-format) -
-  Format timestamps with PostgreSQL's to*char function. Supports timezones too :question:*(Not yet ported to V5)\_
+  Format timestamps with PostgreSQL’s to*char function. Supports timezones too :question:*(Not yet ported to V5)\_
 
 Examples of using these plugins:
 
