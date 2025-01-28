@@ -1029,6 +1029,7 @@ export class PgSelectStep<
       _symbolSubstitutes: this._symbolSubstitutes,
       from: this.from,
       joins: this.joins,
+      arguments: this.arguments,
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1962,6 +1963,7 @@ interface PgSelectQueryInfo<
 
   readonly selects: ReadonlyArray<SQL>;
   readonly from: SQL | ((...args: Array<PgSelectArgumentDigest>) => SQL);
+  readonly arguments: ReadonlyArray<PgSelectArgumentDigest>;
   readonly joins: ReadonlyArray<PgSelectPlanJoin>;
   readonly conditions: ReadonlyArray<SQL>;
   readonly orders: ReadonlyArray<PgOrderSpec>;
@@ -2529,7 +2531,9 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
 
   function buildFrom() {
     const fromSql =
-      typeof info.from === "function" ? info.from(...arguments) : info.from;
+      typeof info.from === "function"
+        ? info.from(...info.arguments)
+        : info.from;
     return {
       sql: sql`\nfrom ${fromSql} as ${alias}${
         resource.codec.attributes ? sql.blank : sql`(v)`
