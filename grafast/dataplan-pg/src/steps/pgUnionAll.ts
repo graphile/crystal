@@ -157,6 +157,11 @@ export interface PgUnionAllStepConfig<
    * call the relevant function once and re-use the result.
    */
   forceIdentity?: boolean;
+
+  /** @internal */
+  _internalCloneSymbol?: symbol | string;
+  /** @internal */
+  _internalCloneAlias?: SQL;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -436,7 +441,7 @@ export class PgUnionAllStep<
   public symbol: symbol;
   public alias: SQL;
 
-  private selects: PgUnionAllStepSelect<TAttributes>[];
+  private selects: PgUnionAllStepSelect<TAttributes>[] = [];
 
   private executor!: PgExecutor;
   private contextId!: number;
@@ -445,9 +450,9 @@ export class PgUnionAllStep<
   public readonly spec: PgUnionAllStepConfig<TAttributes, TTypeNames>;
 
   /** @internal */
-  public orders: Array<PgOrderFragmentSpec>;
+  public orders: Array<PgOrderFragmentSpec> = [];
   /** The select index used to store the order value for the given order */
-  private orderSelectIndex: Array<number>;
+  private orderSelectIndex: Array<number> = [];
   /**
    * `ordersForCursor` is the same as `orders`, but then with the type and
    * primary key added. This ensures unique ordering, as required by cursor
@@ -460,56 +465,56 @@ export class PgUnionAllStep<
    * entries with `pk` higher than the given `pk`, and for all other `type`s we
    * can include all records.
    */
-  private ordersForCursor: Array<PgOrderFragmentSpec>;
+  private ordersForCursor: Array<PgOrderFragmentSpec> = [];
 
   /**
    * Values used in this plan.
    */
-  protected placeholders: Array<PgStmtDeferredPlaceholder>;
-  protected deferreds: Array<PgStmtDeferredSQL>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
+  protected deferreds: Array<PgStmtDeferredSQL> = [];
 
   // GROUP BY
 
-  private groups: Array<PgGroupSpec>;
+  private groups: Array<PgGroupSpec> = [];
 
   // HAVING
 
-  private havingConditions: SQL[];
+  private havingConditions: SQL[] = [];
 
   // LIMIT
 
-  protected firstStepId: number | null;
-  protected lastStepId: number | null;
+  protected firstStepId: number | null = null;
+  protected lastStepId: number | null = null;
   protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected lowerIndexStepId: number | null;
+  protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected upperIndexStepId: number | null;
+  protected upperIndexStepId: number | null = null;
   /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
-  private limitAndOffsetId: number | null;
+  private limitAndOffsetId: number | null = null;
 
   // OFFSET
 
-  protected offsetStepId: number | null;
+  protected offsetStepId: number | null = null;
 
   // CURSORS
 
-  protected beforeStepId: number | null;
-  protected afterStepId: number | null;
+  protected beforeStepId: number | null = null;
+  protected afterStepId: number | null = null;
 
-  protected shouldReverseOrderId: number | null;
+  protected shouldReverseOrderId: number | null = null;
 
   // Connection
   private connectionDepId: number | null = null;
 
-  protected limitAndOffsetSQL: SQL | null;
-  private innerLimitSQL: SQL | null;
+  protected limitAndOffsetSQL: SQL | null = null;
+  private innerLimitSQL: SQL | null = null;
 
   public readonly mode: PgUnionAllMode;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
-  private memberDigests: MemberDigest<TTypeNames>[];
+  private memberDigests: MemberDigest<TTypeNames>[] = [];
   private _limitToTypes: string[] | undefined;
 
   /**
@@ -517,127 +522,81 @@ export class PgUnionAllStep<
    * seemingly innocuous things such as `random()`) otherwise we might only
    * call the relevant function once and re-use the result.
    */
-  public forceIdentity: boolean;
+  public forceIdentity = false;
 
-  constructor(
-    cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
-    mode?: PgUnionAllMode,
-  );
-  constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>);
-  constructor(
-    specOrCloneFrom:
-      | PgUnionAllStepConfig<TAttributes, TTypeNames>
-      | PgUnionAllStep<TAttributes, TTypeNames>,
-    overrideMode?: PgUnionAllMode,
-  ) {
-    super();
-    if (specOrCloneFrom instanceof PgUnionAllStep) {
-      const cloneFrom = specOrCloneFrom;
-      this.symbol = cloneFrom.symbol;
-      this.alias = cloneFrom.alias;
-      this.mode = overrideMode ?? cloneFrom.mode ?? "normal";
-      const cloneFromMatchingMode =
-        cloneFrom.mode === this.mode ? cloneFrom : null;
-      this.spec = cloneFrom.spec;
-      this.memberDigests = cloneDigests(cloneFrom.memberDigests);
-      this._limitToTypes = cloneFrom._limitToTypes
-        ? [...cloneFrom._limitToTypes]
-        : undefined;
-      this.forceIdentity = cloneFrom.forceIdentity;
+  static clone<
+    TAttributes extends string = string,
+    TTypeNames extends string = string,
+  >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
+    const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
+    const $clone = new PgUnionAllStep({
+      ...cloneFrom.spec,
+      mode,
+      members: [], // This will be overwritten later
+      forceIdentity: cloneFrom.forceIdentity,
 
-      cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency({
-          ...cloneFrom.getDepOptions(idx),
-          skipDeduplication: true,
-        });
-        if (myIdx !== idx) {
-          throw new Error(
-            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
-          );
-        }
+      _internalCloneSymbol: cloneFrom.symbol,
+      _internalCloneAlias: cloneFrom.alias,
+    });
+
+    if ($clone.dependencies.length !== 0) {
+      throw new Error(
+        `Should not have any dependencies yet: ${$clone.dependencies}`,
+      );
+    }
+
+    cloneFrom.dependencies.forEach((planId, idx) => {
+      const myIdx = $clone.addDependency({
+        ...cloneFrom.getDepOptions(idx),
+        skipDeduplication: true,
       });
+      if (myIdx !== idx) {
+        throw new Error(
+          `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+        );
+      }
+    });
 
-      this.selects = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.selects]
-        : [];
-      this.placeholders = [...cloneFrom.placeholders];
-      this.deferreds = [...cloneFrom.deferreds];
-      this.groups = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.groups]
-        : [];
-      this.havingConditions = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.havingConditions]
-        : [];
-      this.orders = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.orders]
-        : [];
-      this.orderSelectIndex = [...cloneFrom.orderSelectIndex];
-      this.ordersForCursor = [...cloneFrom.ordersForCursor];
+    $clone.contextId = cloneFrom.contextId;
+    $clone.memberDigests = cloneDigests(cloneFrom.memberDigests);
+    if (cloneFrom._limitToTypes) {
+      $clone._limitToTypes = [...cloneFrom._limitToTypes];
+    }
+    $clone.placeholders = [...cloneFrom.placeholders];
+    $clone.deferreds = [...cloneFrom.deferreds];
+    $clone.orderSelectIndex = [...cloneFrom.orderSelectIndex];
+    $clone.ordersForCursor = [...cloneFrom.ordersForCursor];
 
-      this.executor = cloneFrom.executor;
-      this.contextId = cloneFrom.contextId;
+    $clone.executor = cloneFrom.executor;
 
-      this.isSyncAndSafe = cloneFrom.isSyncAndSafe;
-      this.alias = cloneFrom.alias;
+    $clone.isSyncAndSafe = cloneFrom.isSyncAndSafe;
+    $clone.alias = cloneFrom.alias;
+    if (cloneFromMatchingMode) {
+      $clone.selects = [...cloneFromMatchingMode.selects];
+      $clone.groups = [...cloneFromMatchingMode.groups];
+      $clone.havingConditions = [...cloneFromMatchingMode.havingConditions];
+      $clone.orders = [...cloneFromMatchingMode.orders];
+      $clone.firstStepId = cloneFromMatchingMode.firstStepId;
+      $clone.lastStepId = cloneFromMatchingMode.lastStepId;
+      $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
+      $clone.limitAndOffsetSQL = cloneFromMatchingMode.limitAndOffsetSQL;
+      $clone.innerLimitSQL = cloneFromMatchingMode.innerLimitSQL;
+      $clone.beforeStepId = cloneFromMatchingMode.beforeStepId;
+      $clone.afterStepId = cloneFromMatchingMode.afterStepId;
+      $clone.shouldReverseOrderId = cloneFromMatchingMode.shouldReverseOrderId;
+      $clone.lowerIndexStepId = cloneFromMatchingMode.lowerIndexStepId;
+      $clone.upperIndexStepId = cloneFromMatchingMode.upperIndexStepId;
+      $clone.limitAndOffsetId = cloneFromMatchingMode.limitAndOffsetId;
+    }
 
-      this.firstStepId = cloneFromMatchingMode
-        ? cloneFromMatchingMode.firstStepId
-        : null;
-      this.lastStepId = cloneFromMatchingMode
-        ? cloneFromMatchingMode.lastStepId
-        : null;
-      this.fetchOneExtra = cloneFromMatchingMode
-        ? cloneFromMatchingMode.fetchOneExtra
-        : false;
-      this.offsetStepId = cloneFromMatchingMode
-        ? cloneFromMatchingMode.offsetStepId
-        : null;
-      this.limitAndOffsetSQL = cloneFromMatchingMode
-        ? cloneFromMatchingMode.limitAndOffsetSQL
-        : null;
-      this.innerLimitSQL = cloneFromMatchingMode
-        ? cloneFromMatchingMode.innerLimitSQL
-        : null;
-      this.beforeStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
-          ? cloneFromMatchingMode.beforeStepId
-          : null;
-      this.afterStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
-          ? cloneFromMatchingMode.afterStepId
-          : null;
-      this.shouldReverseOrderId =
-        cloneFromMatchingMode &&
-        cloneFromMatchingMode.shouldReverseOrderId != null
-          ? cloneFromMatchingMode.shouldReverseOrderId
-          : null;
-      this.lowerIndexStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
-          ? cloneFromMatchingMode.lowerIndexStepId
-          : null;
-      this.upperIndexStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
-          ? cloneFromMatchingMode.upperIndexStepId
-          : null;
-      this.limitAndOffsetId =
-        cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
-          ? cloneFromMatchingMode.limitAndOffsetId
-          : null;
-    } else {
-      this.firstStepId = null;
-      this.lastStepId = null;
-      this.offsetStepId = null;
-      this.lowerIndexStepId = null;
-      this.upperIndexStepId = null;
-      this.limitAndOffsetId = null;
-      this.beforeStepId = null;
-      this.afterStepId = null;
-      this.shouldReverseOrderId = null;
-      this.limitAndOffsetSQL = null;
-      this.innerLimitSQL = null;
+    return $clone;
+  }
 
-      const spec = specOrCloneFrom;
-      this.mode = overrideMode ?? spec.mode ?? "normal";
+  constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
+    super();
+    {
+      this.mode = spec.mode ?? "normal";
 
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
@@ -645,7 +604,6 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
-      this.forceIdentity = false;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -666,16 +624,6 @@ export class PgUnionAllStep<
       this.symbol = Symbol(spec.name ?? "union");
       this.alias = sql.identifier(this.symbol);
 
-      this.selects = [];
-      this.placeholders = [];
-      this.deferreds = [];
-      this.groups = [];
-      this.havingConditions = [];
-      this.orders = [];
-      this.orderSelectIndex = [];
-      this.ordersForCursor = [];
-
-      this.memberDigests = [];
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
@@ -803,7 +751,7 @@ on (${sql.indent(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
-    const $plan = new PgUnionAllStep(this, mode);
+    const $plan = PgUnionAllStep.clone(this, mode);
     // In case any errors are raised
     $plan.connectionDepId = $plan.addDependency($connection);
     return $plan;
