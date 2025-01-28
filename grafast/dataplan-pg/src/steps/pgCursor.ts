@@ -1,8 +1,17 @@
-import type { UnbatchedExecutionExtra } from "grafast";
+import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
-import { PgSelectSingleStep } from "./pgSelectSingle.js";
+import type { PgCodec } from "../index.js";
+import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
+
+export interface PgCursorDetails {
+  readonly digest: string;
+  readonly indicies: ReadonlyArray<{
+    index: number;
+    codec: PgCodec;
+  }>;
+}
 
 /**
  * Given a PgSelectSingleStep, this will build a cursor by looking at all the
@@ -18,36 +27,36 @@ export class PgCursorStep<
   };
   isSyncAndSafe = true;
 
-  private cursorValuesDepId: number;
-  private classSingleStepId: number;
-  private digest: string;
+  itemDepId: number;
+  cursorDetailsDepId: number;
 
-  constructor(itemPlan: TStep) {
+  constructor(
+    $item: TStep,
+    $cursorDetails: ExecutableStep<PgCursorDetails | null>,
+  ) {
     super();
-    this.classSingleStepId = itemPlan.id;
-    const [digest, step] = itemPlan.getCursorDigestAndStep();
-    this.digest = digest;
-    this.cursorValuesDepId = this.addDependency(step);
-  }
-
-  public getClassSingleStep(): TStep {
-    const plan = this.getStep(this.classSingleStepId);
-    if (!(plan instanceof PgSelectSingleStep)) {
-      throw new Error(
-        `Expected ${this.classSingleStepId} (${plan}) to be a PgSelectSingleStep`,
-      );
-    }
-    return plan as TStep;
+    this.itemDepId = this.addDependency($item);
+    this.cursorDetailsDepId = this.addDependency($cursorDetails);
   }
 
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
-    v: any[] | null,
+    itemTuple: any[] | null,
+    cursorDetails: PgCursorDetails | null,
   ): string | null {
-    return v == null || v!.every((v) => v == null)
-      ? null
-      : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(
-          "base64",
-        );
+    if (itemTuple == null || cursorDetails == null) return null;
+    const { digest, indicies } = cursorDetails;
+    const cursorTuple = [digest];
+    let hasNonNull = false;
+    for (let i = 0, l = indicies.length; i < l; i++) {
+      const { index, codec } = indicies[i];
+      const orderVal = itemTuple[index];
+      if (!hasNonNull && orderVal != null) {
+        hasNonNull = true;
+      }
+      cursorTuple.push(codec.fromPg(orderVal));
+    }
+    if (!hasNonNull) return null;
+    return Buffer.from(JSON.stringify(cursorTuple), "utf8").toString("base64");
   }
 }

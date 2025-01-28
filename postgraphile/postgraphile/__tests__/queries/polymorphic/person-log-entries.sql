@@ -1,6 +1,7 @@
 select
   __people__."person_id"::text as "0",
-  __people__."username" as "1"
+  __people__."username" as "1",
+  __people__."person_id" as "2"
 from "polymorphic"."people" as __people__
 order by __people__."person_id" asc;
 

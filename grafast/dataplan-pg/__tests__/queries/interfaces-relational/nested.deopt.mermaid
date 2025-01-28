@@ -9,329 +9,17 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda245{{"Lambda[245∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access249{{"Access[249∈0] ➊<br />ᐸ248.0ᐳ"}}:::plan
-    Lambda734{{"Lambda[734∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda739{{"Lambda[739∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object9 & Lambda245 & Access249 & Lambda734 & Lambda739 --> PgSelect6
-    Object253{{"Object[253∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant250{{"Constant[250∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant251{{"Constant[251∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Constant252{{"Constant[252∈0] ➊<br />ᐸRecordCodec(relational_topics)ᐳ"}}:::plan
-    Lambda245 & Constant250 & Constant251 & Constant252 --> Object253
-    Object268{{"Object[268∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant265{{"Constant[265∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant266{{"Constant[266∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Constant267{{"Constant[267∈0] ➊<br />ᐸRecordCodec(relational_posts)ᐳ"}}:::plan
-    Lambda245 & Constant265 & Constant266 & Constant267 --> Object268
-    Object283{{"Object[283∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant280{{"Constant[280∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant281{{"Constant[281∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Constant282{{"Constant[282∈0] ➊<br />ᐸRecordCodec(relational_dividers)ᐳ"}}:::plan
-    Lambda245 & Constant280 & Constant281 & Constant282 --> Object283
-    Object298{{"Object[298∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant295{{"Constant[295∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant296{{"Constant[296∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Constant297{{"Constant[297∈0] ➊<br />ᐸRecordCodec(relational_checklists)ᐳ"}}:::plan
-    Lambda245 & Constant295 & Constant296 & Constant297 --> Object298
-    Object313{{"Object[313∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant310{{"Constant[310∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant311{{"Constant[311∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Constant312{{"Constant[312∈0] ➊<br />ᐸRecordCodec(relational_checklist_items)ᐳ"}}:::plan
-    Lambda245 & Constant310 & Constant311 & Constant312 --> Object313
-    Object328{{"Object[328∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant325{{"Constant[325∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant326{{"Constant[326∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Lambda245 & Constant325 & Constant326 & Constant252 --> Object328
-    Object343{{"Object[343∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant340{{"Constant[340∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant341{{"Constant[341∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Lambda245 & Constant340 & Constant341 & Constant267 --> Object343
-    Object358{{"Object[358∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant355{{"Constant[355∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant356{{"Constant[356∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Lambda245 & Constant355 & Constant356 & Constant282 --> Object358
-    Object373{{"Object[373∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant370{{"Constant[370∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant371{{"Constant[371∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Lambda245 & Constant370 & Constant371 & Constant297 --> Object373
-    Object388{{"Object[388∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant385{{"Constant[385∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant386{{"Constant[386∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Lambda245 & Constant385 & Constant386 & Constant312 --> Object388
-    Object403{{"Object[403∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant400{{"Constant[400∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant401{{"Constant[401∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Lambda245 & Constant400 & Constant401 & Constant252 --> Object403
-    Object418{{"Object[418∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant415{{"Constant[415∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant416{{"Constant[416∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Lambda245 & Constant415 & Constant416 & Constant267 --> Object418
-    Object433{{"Object[433∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant430{{"Constant[430∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant431{{"Constant[431∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Lambda245 & Constant430 & Constant431 & Constant282 --> Object433
-    Object448{{"Object[448∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant445{{"Constant[445∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant446{{"Constant[446∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Lambda245 & Constant445 & Constant446 & Constant297 --> Object448
-    Object463{{"Object[463∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant460{{"Constant[460∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant461{{"Constant[461∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Lambda245 & Constant460 & Constant461 & Constant312 --> Object463
-    Object478{{"Object[478∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant475{{"Constant[475∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant476{{"Constant[476∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Lambda245 & Constant475 & Constant476 & Constant252 --> Object478
-    Object493{{"Object[493∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant490{{"Constant[490∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant491{{"Constant[491∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Lambda245 & Constant490 & Constant491 & Constant267 --> Object493
-    Object508{{"Object[508∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant505{{"Constant[505∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant506{{"Constant[506∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Lambda245 & Constant505 & Constant506 & Constant282 --> Object508
-    Object523{{"Object[523∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant520{{"Constant[520∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant521{{"Constant[521∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Lambda245 & Constant520 & Constant521 & Constant297 --> Object523
-    Object538{{"Object[538∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant535{{"Constant[535∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant536{{"Constant[536∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Lambda245 & Constant535 & Constant536 & Constant312 --> Object538
-    Object553{{"Object[553∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant550{{"Constant[550∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant551{{"Constant[551∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Lambda245 & Constant550 & Constant551 & Constant252 --> Object553
-    Object568{{"Object[568∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant565{{"Constant[565∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant566{{"Constant[566∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Lambda245 & Constant565 & Constant566 & Constant267 --> Object568
-    Object583{{"Object[583∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant580{{"Constant[580∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant581{{"Constant[581∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Lambda245 & Constant580 & Constant581 & Constant282 --> Object583
-    Object598{{"Object[598∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant595{{"Constant[595∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant596{{"Constant[596∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Lambda245 & Constant595 & Constant596 & Constant297 --> Object598
-    Object613{{"Object[613∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant610{{"Constant[610∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant611{{"Constant[611∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Lambda245 & Constant610 & Constant611 & Constant312 --> Object613
-    Object628{{"Object[628∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant625{{"Constant[625∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant626{{"Constant[626∈0] ➊<br />ᐸsql.identifier(”relational_topics”)ᐳ"}}:::plan
-    Lambda245 & Constant625 & Constant626 & Constant252 --> Object628
-    Object643{{"Object[643∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant640{{"Constant[640∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant641{{"Constant[641∈0] ➊<br />ᐸsql.identifier(”relational_posts”)ᐳ"}}:::plan
-    Lambda245 & Constant640 & Constant641 & Constant267 --> Object643
-    Object658{{"Object[658∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant655{{"Constant[655∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant656{{"Constant[656∈0] ➊<br />ᐸsql.identifier(”relational_dividers”)ᐳ"}}:::plan
-    Lambda245 & Constant655 & Constant656 & Constant282 --> Object658
-    Object673{{"Object[673∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant670{{"Constant[670∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant671{{"Constant[671∈0] ➊<br />ᐸsql.identifier(”relational_checklists”)ᐳ"}}:::plan
-    Lambda245 & Constant670 & Constant671 & Constant297 --> Object673
-    Object688{{"Object[688∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant685{{"Constant[685∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant686{{"Constant[686∈0] ➊<br />ᐸsql.identifier(”relational_checklist_items”)ᐳ"}}:::plan
-    Lambda245 & Constant685 & Constant686 & Constant312 --> Object688
-    Object703{{"Object[703∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant700{{"Constant[700∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant701{{"Constant[701∈0] ➊<br />ᐸsql.identifier(”relational_items”)ᐳ"}}:::plan
-    Constant702{{"Constant[702∈0] ➊<br />ᐸRecordCodec(relational_items)ᐳ"}}:::plan
-    Lambda245 & Constant700 & Constant701 & Constant702 --> Object703
-    Object718{{"Object[718∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant715{{"Constant[715∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 266, [Symbol(pg-sql2-tyᐳ"}}:::plan
-    Constant716{{"Constant[716∈0] ➊<br />ᐸsql.identifier(”relational_items”)ᐳ"}}:::plan
-    Lambda245 & Constant715 & Constant716 & Constant702 --> Object718
-    Object733{{"Object[733∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant730{{"Constant[730∈0] ➊<br />ᐸ[ { fragment: { n: [Array], f: 0, c: 1024, [Symbol(pg-sql2-tᐳ"}}:::plan
-    Constant731{{"Constant[731∈0] ➊<br />ᐸsql.identifier(”people”)ᐳ"}}:::plan
-    Constant732{{"Constant[732∈0] ➊<br />ᐸRecordCodec(people)ᐳ"}}:::plan
-    Lambda245 & Constant730 & Constant731 & Constant732 --> Object733
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object9 --> PgSelect6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
     PgSelectRows10[["PgSelectRows[10∈0] ➊"]]:::plan
     PgSelect6 --> PgSelectRows10
-    Constant740{{"Constant[740∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant740 --> Lambda245
-    Lambda248{{"Lambda[248∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant741{{"Constant[741∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant741 --> Lambda248
-    Lambda248 --> Access249
-    Lambda254{{"Lambda[254∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object253 --> Lambda254
-    Lambda259{{"Lambda[259∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant742{{"Constant[742∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant742 --> Lambda259
-    Lambda269{{"Lambda[269∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object268 --> Lambda269
-    Lambda274{{"Lambda[274∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant743{{"Constant[743∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant743 --> Lambda274
-    Lambda284{{"Lambda[284∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object283 --> Lambda284
-    Lambda289{{"Lambda[289∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant744{{"Constant[744∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant744 --> Lambda289
-    Lambda299{{"Lambda[299∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object298 --> Lambda299
-    Lambda304{{"Lambda[304∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant745{{"Constant[745∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant745 --> Lambda304
-    Lambda314{{"Lambda[314∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object313 --> Lambda314
-    Lambda319{{"Lambda[319∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant746{{"Constant[746∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant746 --> Lambda319
-    Lambda329{{"Lambda[329∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object328 --> Lambda329
-    Lambda334{{"Lambda[334∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant747{{"Constant[747∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant747 --> Lambda334
-    Lambda344{{"Lambda[344∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object343 --> Lambda344
-    Lambda349{{"Lambda[349∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant748{{"Constant[748∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant748 --> Lambda349
-    Lambda359{{"Lambda[359∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object358 --> Lambda359
-    Lambda364{{"Lambda[364∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant749{{"Constant[749∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant749 --> Lambda364
-    Lambda374{{"Lambda[374∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object373 --> Lambda374
-    Lambda379{{"Lambda[379∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant750{{"Constant[750∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant750 --> Lambda379
-    Lambda389{{"Lambda[389∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object388 --> Lambda389
-    Lambda394{{"Lambda[394∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant751{{"Constant[751∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant751 --> Lambda394
-    Lambda404{{"Lambda[404∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object403 --> Lambda404
-    Lambda409{{"Lambda[409∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant752{{"Constant[752∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant752 --> Lambda409
-    Lambda419{{"Lambda[419∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object418 --> Lambda419
-    Lambda424{{"Lambda[424∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant753{{"Constant[753∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant753 --> Lambda424
-    Lambda434{{"Lambda[434∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object433 --> Lambda434
-    Lambda439{{"Lambda[439∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant754{{"Constant[754∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant754 --> Lambda439
-    Lambda449{{"Lambda[449∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object448 --> Lambda449
-    Lambda454{{"Lambda[454∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant755{{"Constant[755∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant755 --> Lambda454
-    Lambda464{{"Lambda[464∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object463 --> Lambda464
-    Lambda469{{"Lambda[469∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant756{{"Constant[756∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant756 --> Lambda469
-    Lambda479{{"Lambda[479∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object478 --> Lambda479
-    Lambda484{{"Lambda[484∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant757{{"Constant[757∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant757 --> Lambda484
-    Lambda494{{"Lambda[494∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object493 --> Lambda494
-    Lambda499{{"Lambda[499∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant758{{"Constant[758∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant758 --> Lambda499
-    Lambda509{{"Lambda[509∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object508 --> Lambda509
-    Lambda514{{"Lambda[514∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant759{{"Constant[759∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant759 --> Lambda514
-    Lambda524{{"Lambda[524∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object523 --> Lambda524
-    Lambda529{{"Lambda[529∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant760{{"Constant[760∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant760 --> Lambda529
-    Lambda539{{"Lambda[539∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object538 --> Lambda539
-    Lambda544{{"Lambda[544∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant761{{"Constant[761∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant761 --> Lambda544
-    Lambda554{{"Lambda[554∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object553 --> Lambda554
-    Lambda559{{"Lambda[559∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant762{{"Constant[762∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant762 --> Lambda559
-    Lambda569{{"Lambda[569∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object568 --> Lambda569
-    Lambda574{{"Lambda[574∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant763{{"Constant[763∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant763 --> Lambda574
-    Lambda584{{"Lambda[584∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object583 --> Lambda584
-    Lambda589{{"Lambda[589∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant764{{"Constant[764∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant764 --> Lambda589
-    Lambda599{{"Lambda[599∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object598 --> Lambda599
-    Lambda604{{"Lambda[604∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant765{{"Constant[765∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant765 --> Lambda604
-    Lambda614{{"Lambda[614∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object613 --> Lambda614
-    Lambda619{{"Lambda[619∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant766{{"Constant[766∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant766 --> Lambda619
-    Lambda629{{"Lambda[629∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object628 --> Lambda629
-    Lambda634{{"Lambda[634∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant767{{"Constant[767∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant767 --> Lambda634
-    Lambda644{{"Lambda[644∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object643 --> Lambda644
-    Lambda649{{"Lambda[649∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant768{{"Constant[768∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant768 --> Lambda649
-    Lambda659{{"Lambda[659∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object658 --> Lambda659
-    Lambda664{{"Lambda[664∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant769{{"Constant[769∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant769 --> Lambda664
-    Lambda674{{"Lambda[674∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object673 --> Lambda674
-    Lambda679{{"Lambda[679∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant770{{"Constant[770∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant770 --> Lambda679
-    Lambda689{{"Lambda[689∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object688 --> Lambda689
-    Lambda694{{"Lambda[694∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant771{{"Constant[771∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant771 --> Lambda694
-    Lambda704{{"Lambda[704∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object703 --> Lambda704
-    Lambda709{{"Lambda[709∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant772{{"Constant[772∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”relatiᐳ"}}:::plan
-    Constant772 --> Lambda709
-    Lambda719{{"Lambda[719∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object718 --> Lambda719
-    Lambda724{{"Lambda[724∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant773{{"Constant[773∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
-    Constant773 --> Lambda724
-    Object733 --> Lambda734
-    Constant774{{"Constant[774∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { fragment: [Object], codec: Coᐳ"}}:::plan
-    Constant774 --> Lambda739
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item11[/"__Item[11∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelectRows10 ==> __Item11
@@ -339,7 +27,7 @@ graph TD
     __Item11 --> PgSelectSingle12
     PgSelect15[["PgSelect[15∈2]<br />ᐸrelational_itemsᐳ"]]:::plan
     PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object9 & PgClassExpression14 & Lambda245 & Access249 & Lambda719 & Lambda724 --> PgSelect15
+    Object9 & PgClassExpression14 --> PgSelect15
     __ListTransform19[["__ListTransform[19∈2]<br />ᐸeach:15ᐳ"]]:::plan
     PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
     PgSelectRows20 & PgSelect15 --> __ListTransform19
@@ -361,34 +49,34 @@ graph TD
     PgSelectSingle24 --> PgClassExpression25
     PgSelect28[["PgSelect[28∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression27 & Lambda245 & Access249 & Lambda254 & Lambda259 --> PgSelect28
+    Object9 & PgClassExpression27 --> PgSelect28
     PgSelect36[["PgSelect[36∈5]<br />ᐸrelational_itemsᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"]]:::plan
     PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__relation...parent_id”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression35 & Lambda245 & Access249 & Lambda704 & Lambda709 --> PgSelect36
-    PgSelect75[["PgSelect[75∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression27 & Lambda245 & Access249 & Lambda269 & Lambda274 --> PgSelect75
-    PgSelect117[["PgSelect[117∈5]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression27 & Lambda245 & Access249 & Lambda284 & Lambda289 --> PgSelect117
-    PgSelect159[["PgSelect[159∈5]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression27 & Lambda245 & Access249 & Lambda299 & Lambda304 --> PgSelect159
-    PgSelect201[["PgSelect[201∈5]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression27 & Lambda245 & Access249 & Lambda314 & Lambda319 --> PgSelect201
+    Object9 & PgClassExpression35 --> PgSelect36
     PgPolymorphic42{{"PgPolymorphic[42∈5]<br />ᐳRelationalTopic"}}:::plan
     PgSelectSingle40{{"PgSelectSingle[40∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle40 & PgClassExpression41 --> PgPolymorphic42
+    PgSelect75[["PgSelect[75∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
+    Object9 & PgClassExpression27 --> PgSelect75
     PgPolymorphic86{{"PgPolymorphic[86∈5]<br />ᐳRelationalPost"}}:::plan
     PgSelectSingle84{{"PgSelectSingle[84∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression85{{"PgClassExpression[85∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle84 & PgClassExpression85 --> PgPolymorphic86
+    PgSelect117[["PgSelect[117∈5]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
+    Object9 & PgClassExpression27 --> PgSelect117
     PgPolymorphic128{{"PgPolymorphic[128∈5]<br />ᐳRelationalDivider"}}:::plan
     PgSelectSingle126{{"PgSelectSingle[126∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression127{{"PgClassExpression[127∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle126 & PgClassExpression127 --> PgPolymorphic128
+    PgSelect159[["PgSelect[159∈5]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
+    Object9 & PgClassExpression27 --> PgSelect159
     PgPolymorphic170{{"PgPolymorphic[170∈5]<br />ᐳRelationalChecklist"}}:::plan
     PgSelectSingle168{{"PgSelectSingle[168∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression169{{"PgClassExpression[169∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle168 & PgClassExpression169 --> PgPolymorphic170
+    PgSelect201[["PgSelect[201∈5]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
+    Object9 & PgClassExpression27 --> PgSelect201
     PgPolymorphic212{{"PgPolymorphic[212∈5]<br />ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle210{{"PgSelectSingle[210∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     PgClassExpression211{{"PgClassExpression[211∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
@@ -459,15 +147,15 @@ graph TD
     PgSelectSingle210 --> PgClassExpression211
     PgSelect44[["PgSelect[44∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopicᐳRelationalTopic"]]:::plan
     PgClassExpression43{{"PgClassExpression[43∈6]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopicᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression43 & Lambda245 & Access249 & Lambda329 & Lambda334 --> PgSelect44
+    Object9 & PgClassExpression43 --> PgSelect44
     PgSelect53[["PgSelect[53∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalTopicᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression43 & Lambda245 & Access249 & Lambda344 & Lambda349 --> PgSelect53
+    Object9 & PgClassExpression43 --> PgSelect53
     PgSelect58[["PgSelect[58∈6]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalTopicᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression43 & Lambda245 & Access249 & Lambda359 & Lambda364 --> PgSelect58
+    Object9 & PgClassExpression43 --> PgSelect58
     PgSelect63[["PgSelect[63∈6]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalTopicᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression43 & Lambda245 & Access249 & Lambda374 & Lambda379 --> PgSelect63
+    Object9 & PgClassExpression43 --> PgSelect63
     PgSelect68[["PgSelect[68∈6]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalTopicᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression43 & Lambda245 & Access249 & Lambda389 & Lambda394 --> PgSelect68
+    Object9 & PgClassExpression43 --> PgSelect68
     PgSelectSingle40 --> PgClassExpression43
     First48{{"First[48∈6]"}}:::plan
     PgSelectRows49[["PgSelectRows[49∈6]"]]:::plan
@@ -503,15 +191,15 @@ graph TD
     First70 --> PgSelectSingle72
     PgSelect88[["PgSelect[88∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalPostᐳRelationalTopic"]]:::plan
     PgClassExpression87{{"PgClassExpression[87∈7]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalPostᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression87 & Lambda245 & Access249 & Lambda404 & Lambda409 --> PgSelect88
+    Object9 & PgClassExpression87 --> PgSelect88
     PgSelect97[["PgSelect[97∈7]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPostᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression87 & Lambda245 & Access249 & Lambda419 & Lambda424 --> PgSelect97
+    Object9 & PgClassExpression87 --> PgSelect97
     PgSelect102[["PgSelect[102∈7]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalPostᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression87 & Lambda245 & Access249 & Lambda434 & Lambda439 --> PgSelect102
+    Object9 & PgClassExpression87 --> PgSelect102
     PgSelect107[["PgSelect[107∈7]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalPostᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression87 & Lambda245 & Access249 & Lambda449 & Lambda454 --> PgSelect107
+    Object9 & PgClassExpression87 --> PgSelect107
     PgSelect112[["PgSelect[112∈7]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalPostᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression87 & Lambda245 & Access249 & Lambda464 & Lambda469 --> PgSelect112
+    Object9 & PgClassExpression87 --> PgSelect112
     PgSelectSingle84 --> PgClassExpression87
     First92{{"First[92∈7]"}}:::plan
     PgSelectRows93[["PgSelectRows[93∈7]"]]:::plan
@@ -547,15 +235,15 @@ graph TD
     First114 --> PgSelectSingle116
     PgSelect130[["PgSelect[130∈8]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalDividerᐳRelationalTopic"]]:::plan
     PgClassExpression129{{"PgClassExpression[129∈8]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalDividerᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression129 & Lambda245 & Access249 & Lambda479 & Lambda484 --> PgSelect130
+    Object9 & PgClassExpression129 --> PgSelect130
     PgSelect139[["PgSelect[139∈8]<br />ᐸrelational_postsᐳ<br />ᐳRelationalDividerᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression129 & Lambda245 & Access249 & Lambda494 & Lambda499 --> PgSelect139
+    Object9 & PgClassExpression129 --> PgSelect139
     PgSelect144[["PgSelect[144∈8]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDividerᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression129 & Lambda245 & Access249 & Lambda509 & Lambda514 --> PgSelect144
+    Object9 & PgClassExpression129 --> PgSelect144
     PgSelect149[["PgSelect[149∈8]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalDividerᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression129 & Lambda245 & Access249 & Lambda524 & Lambda529 --> PgSelect149
+    Object9 & PgClassExpression129 --> PgSelect149
     PgSelect154[["PgSelect[154∈8]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalDividerᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression129 & Lambda245 & Access249 & Lambda539 & Lambda544 --> PgSelect154
+    Object9 & PgClassExpression129 --> PgSelect154
     PgSelectSingle126 --> PgClassExpression129
     First134{{"First[134∈8]"}}:::plan
     PgSelectRows135[["PgSelectRows[135∈8]"]]:::plan
@@ -591,15 +279,15 @@ graph TD
     First156 --> PgSelectSingle158
     PgSelect172[["PgSelect[172∈9]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalChecklistᐳRelationalTopic"]]:::plan
     PgClassExpression171{{"PgClassExpression[171∈9]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalChecklistᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression171 & Lambda245 & Access249 & Lambda554 & Lambda559 --> PgSelect172
+    Object9 & PgClassExpression171 --> PgSelect172
     PgSelect181[["PgSelect[181∈9]<br />ᐸrelational_postsᐳ<br />ᐳRelationalChecklistᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression171 & Lambda245 & Access249 & Lambda569 & Lambda574 --> PgSelect181
+    Object9 & PgClassExpression171 --> PgSelect181
     PgSelect186[["PgSelect[186∈9]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalChecklistᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression171 & Lambda245 & Access249 & Lambda584 & Lambda589 --> PgSelect186
+    Object9 & PgClassExpression171 --> PgSelect186
     PgSelect191[["PgSelect[191∈9]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklistᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression171 & Lambda245 & Access249 & Lambda599 & Lambda604 --> PgSelect191
+    Object9 & PgClassExpression171 --> PgSelect191
     PgSelect196[["PgSelect[196∈9]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression171 & Lambda245 & Access249 & Lambda614 & Lambda619 --> PgSelect196
+    Object9 & PgClassExpression171 --> PgSelect196
     PgSelectSingle168 --> PgClassExpression171
     First176{{"First[176∈9]"}}:::plan
     PgSelectRows177[["PgSelectRows[177∈9]"]]:::plan
@@ -635,15 +323,15 @@ graph TD
     First198 --> PgSelectSingle200
     PgSelect214[["PgSelect[214∈10]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalChecklistItemᐳRelationalTopic"]]:::plan
     PgClassExpression213{{"PgClassExpression[213∈10]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalChecklistItemᐳRelationalTopic"}}:::plan
-    Object9 & PgClassExpression213 & Lambda245 & Access249 & Lambda629 & Lambda634 --> PgSelect214
+    Object9 & PgClassExpression213 --> PgSelect214
     PgSelect223[["PgSelect[223∈10]<br />ᐸrelational_postsᐳ<br />ᐳRelationalChecklistItemᐳRelationalPost"]]:::plan
-    Object9 & PgClassExpression213 & Lambda245 & Access249 & Lambda644 & Lambda649 --> PgSelect223
+    Object9 & PgClassExpression213 --> PgSelect223
     PgSelect228[["PgSelect[228∈10]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalChecklistItemᐳRelationalDivider"]]:::plan
-    Object9 & PgClassExpression213 & Lambda245 & Access249 & Lambda659 & Lambda664 --> PgSelect228
+    Object9 & PgClassExpression213 --> PgSelect228
     PgSelect233[["PgSelect[233∈10]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklistItemᐳRelationalChecklist"]]:::plan
-    Object9 & PgClassExpression213 & Lambda245 & Access249 & Lambda674 & Lambda679 --> PgSelect233
+    Object9 & PgClassExpression213 --> PgSelect233
     PgSelect238[["PgSelect[238∈10]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"]]:::plan
-    Object9 & PgClassExpression213 & Lambda245 & Access249 & Lambda689 & Lambda694 --> PgSelect238
+    Object9 & PgClassExpression213 --> PgSelect238
     PgSelectSingle210 --> PgClassExpression213
     First218{{"First[218∈10]"}}:::plan
     PgSelectRows219[["PgSelectRows[219∈10]"]]:::plan
@@ -681,37 +369,37 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/interfaces-relational/nested"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 250, 251, 252, 265, 266, 267, 280, 281, 282, 295, 296, 297, 310, 311, 312, 325, 326, 340, 341, 355, 356, 370, 371, 385, 386, 400, 401, 415, 416, 430, 431, 445, 446, 460, 461, 475, 476, 490, 491, 505, 506, 520, 521, 535, 536, 550, 551, 565, 566, 580, 581, 595, 596, 610, 611, 625, 626, 640, 641, 655, 656, 670, 671, 685, 686, 700, 701, 702, 715, 716, 730, 731, 732, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 9, 245, 248, 249, 253, 254, 259, 268, 269, 274, 283, 284, 289, 298, 299, 304, 313, 314, 319, 328, 329, 334, 343, 344, 349, 358, 359, 364, 373, 374, 379, 388, 389, 394, 403, 404, 409, 418, 419, 424, 433, 434, 439, 448, 449, 454, 463, 464, 469, 478, 479, 484, 493, 494, 499, 508, 509, 514, 523, 524, 529, 538, 539, 544, 553, 554, 559, 568, 569, 574, 583, 584, 589, 598, 599, 604, 613, 614, 619, 628, 629, 634, 643, 644, 649, 658, 659, 664, 673, 674, 679, 688, 689, 694, 703, 704, 709, 718, 719, 724, 733, 734, 739<br />2: PgSelect[6]<br />3: PgSelectRows[10]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,PgSelectRows10,Lambda245,Lambda248,Access249,Constant250,Constant251,Constant252,Object253,Lambda254,Lambda259,Constant265,Constant266,Constant267,Object268,Lambda269,Lambda274,Constant280,Constant281,Constant282,Object283,Lambda284,Lambda289,Constant295,Constant296,Constant297,Object298,Lambda299,Lambda304,Constant310,Constant311,Constant312,Object313,Lambda314,Lambda319,Constant325,Constant326,Object328,Lambda329,Lambda334,Constant340,Constant341,Object343,Lambda344,Lambda349,Constant355,Constant356,Object358,Lambda359,Lambda364,Constant370,Constant371,Object373,Lambda374,Lambda379,Constant385,Constant386,Object388,Lambda389,Lambda394,Constant400,Constant401,Object403,Lambda404,Lambda409,Constant415,Constant416,Object418,Lambda419,Lambda424,Constant430,Constant431,Object433,Lambda434,Lambda439,Constant445,Constant446,Object448,Lambda449,Lambda454,Constant460,Constant461,Object463,Lambda464,Lambda469,Constant475,Constant476,Object478,Lambda479,Lambda484,Constant490,Constant491,Object493,Lambda494,Lambda499,Constant505,Constant506,Object508,Lambda509,Lambda514,Constant520,Constant521,Object523,Lambda524,Lambda529,Constant535,Constant536,Object538,Lambda539,Lambda544,Constant550,Constant551,Object553,Lambda554,Lambda559,Constant565,Constant566,Object568,Lambda569,Lambda574,Constant580,Constant581,Object583,Lambda584,Lambda589,Constant595,Constant596,Object598,Lambda599,Lambda604,Constant610,Constant611,Object613,Lambda614,Lambda619,Constant625,Constant626,Object628,Lambda629,Lambda634,Constant640,Constant641,Object643,Lambda644,Lambda649,Constant655,Constant656,Object658,Lambda659,Lambda664,Constant670,Constant671,Object673,Lambda674,Lambda679,Constant685,Constant686,Object688,Lambda689,Lambda694,Constant700,Constant701,Constant702,Object703,Lambda704,Lambda709,Constant715,Constant716,Object718,Lambda719,Lambda724,Constant730,Constant731,Constant732,Object733,Lambda734,Lambda739,Constant740,Constant741,Constant742,Constant743,Constant744,Constant745,Constant746,Constant747,Constant748,Constant749,Constant750,Constant751,Constant752,Constant753,Constant754,Constant755,Constant756,Constant757,Constant758,Constant759,Constant760,Constant761,Constant762,Constant763,Constant764,Constant765,Constant766,Constant767,Constant768,Constant769,Constant770,Constant771,Constant772,Constant773,Constant774 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 9, 245, 249, 719, 724, 254, 259, 704, 709, 269, 274, 284, 289, 299, 304, 314, 319, 329, 334, 344, 349, 359, 364, 374, 379, 389, 394, 404, 409, 419, 424, 434, 439, 449, 454, 464, 469, 479, 484, 494, 499, 509, 514, 524, 529, 539, 544, 554, 559, 569, 574, 584, 589, 599, 604, 614, 619, 629, 634, 644, 649, 659, 664, 674, 679, 689, 694<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,PgSelectRows10 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 9<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 9, 245, 249, 719, 724, 254, 259, 704, 709, 269, 274, 284, 289, 299, 304, 314, 319, 329, 334, 344, 349, 359, 364, 374, 379, 389, 394, 404, 409, 419, 424, 434, 439, 449, 454, 464, 469, 479, 484, 494, 499, 509, 514, 524, 529, 539, 544, 554, 559, 569, 574, 584, 589, 599, 604, 614, 619, 629, 634, 644, 649, 659, 664, 674, 679, 689, 694<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />4: __ListTransform[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 9<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />4: __ListTransform[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,__ListTransform19,PgSelectRows20 bucket2
     Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgSelectSingle{3}ᐸrelational_itemsᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item21,PgSelectSingle22 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 9, 245, 249, 254, 259, 704, 709, 269, 274, 284, 289, 299, 304, 314, 319, 329, 334, 344, 349, 359, 364, 374, 379, 389, 394, 404, 409, 419, 424, 434, 439, 449, 454, 464, 469, 479, 484, 494, 499, 509, 514, 524, 529, 539, 544, 554, 559, 569, 574, 584, 589, 599, 604, 614, 619, 629, 634, 644, 649, 659, 664, 674, 679, 689, 694<br /><br />ROOT __Item{4}ᐸ19ᐳ[23]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />Deps: 9<br /><br />ROOT __Item{4}ᐸ19ᐳ[23]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item23,PgSelectSingle24,PgClassExpression25,PgPolymorphic26 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 24, 9, 245, 249, 254, 259, 704, 709, 269, 274, 284, 289, 299, 304, 314, 319, 26, 329, 334, 344, 349, 359, 364, 374, 379, 389, 394, 404, 409, 419, 424, 434, 439, 449, 454, 464, 469, 479, 484, 494, 499, 509, 514, 524, 529, 539, 544, 554, 559, 569, 574, 584, 589, 599, 604, 614, 619, 629, 634, 644, 649, 659, 664, 674, 679, 689, 694, 25<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 27, 35, 74<br />2: 28, 36, 75, 117, 159, 201<br />3: 33, 39, 78, 83, 120, 125, 162, 167, 204, 209<br />ᐳ: 32, 34, 38, 40, 41, 42, 77, 79, 82, 84, 85, 86, 119, 121, 124, 126, 127, 128, 161, 163, 166, 168, 169, 170, 203, 205, 208, 210, 211, 212"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 24, 9, 26, 25<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 27, 35, 74<br />2: 28, 36, 75, 117, 159, 201<br />3: 33, 39, 78, 83, 120, 125, 162, 167, 204, 209<br />ᐳ: 32, 34, 38, 40, 41, 42, 77, 79, 82, 84, 85, 86, 119, 121, 124, 126, 127, 128, 161, 163, 166, 168, 169, 170, 203, 205, 208, 210, 211, 212"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression27,PgSelect28,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression35,PgSelect36,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41,PgPolymorphic42,PgClassExpression74,PgSelect75,First77,PgSelectRows78,PgSelectSingle79,First82,PgSelectRows83,PgSelectSingle84,PgClassExpression85,PgPolymorphic86,PgSelect117,First119,PgSelectRows120,PgSelectSingle121,First124,PgSelectRows125,PgSelectSingle126,PgClassExpression127,PgPolymorphic128,PgSelect159,First161,PgSelectRows162,PgSelectSingle163,First166,PgSelectRows167,PgSelectSingle168,PgClassExpression169,PgPolymorphic170,PgSelect201,First203,PgSelectRows204,PgSelectSingle205,First208,PgSelectRows209,PgSelectSingle210,PgClassExpression211,PgPolymorphic212 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 40, 9, 245, 249, 329, 334, 344, 349, 359, 364, 374, 379, 389, 394, 42, 41<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 43, 52<br />2: 44, 53, 58, 63, 68<br />3: 49, 56, 61, 66, 71<br />ᐳ: 48, 50, 55, 57, 60, 62, 65, 67, 70, 72"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 40, 9, 42, 41<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 43, 52<br />2: 44, 53, 58, 63, 68<br />3: 49, 56, 61, 66, 71<br />ᐳ: 48, 50, 55, 57, 60, 62, 65, 67, 70, 72"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression43,PgSelect44,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression52,PgSelect53,First55,PgSelectRows56,PgSelectSingle57,PgSelect58,First60,PgSelectRows61,PgSelectSingle62,PgSelect63,First65,PgSelectRows66,PgSelectSingle67,PgSelect68,First70,PgSelectRows71,PgSelectSingle72 bucket6
-    Bucket7("Bucket 7 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 84, 9, 245, 249, 404, 409, 419, 424, 434, 439, 449, 454, 464, 469, 86, 85<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 87, 96<br />2: 88, 97, 102, 107, 112<br />3: 93, 100, 105, 110, 115<br />ᐳ: 92, 94, 99, 101, 104, 106, 109, 111, 114, 116"):::bucket
+    Bucket7("Bucket 7 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 84, 9, 86, 85<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 87, 96<br />2: 88, 97, 102, 107, 112<br />3: 93, 100, 105, 110, 115<br />ᐳ: 92, 94, 99, 101, 104, 106, 109, 111, 114, 116"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression87,PgSelect88,First92,PgSelectRows93,PgSelectSingle94,PgClassExpression96,PgSelect97,First99,PgSelectRows100,PgSelectSingle101,PgSelect102,First104,PgSelectRows105,PgSelectSingle106,PgSelect107,First109,PgSelectRows110,PgSelectSingle111,PgSelect112,First114,PgSelectRows115,PgSelectSingle116 bucket7
-    Bucket8("Bucket 8 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 126, 9, 245, 249, 479, 484, 494, 499, 509, 514, 524, 529, 539, 544, 128, 127<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 129, 138<br />2: 130, 139, 144, 149, 154<br />3: 135, 142, 147, 152, 157<br />ᐳ: 134, 136, 141, 143, 146, 148, 151, 153, 156, 158"):::bucket
+    Bucket8("Bucket 8 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 126, 9, 128, 127<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 129, 138<br />2: 130, 139, 144, 149, 154<br />3: 135, 142, 147, 152, 157<br />ᐳ: 134, 136, 141, 143, 146, 148, 151, 153, 156, 158"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression129,PgSelect130,First134,PgSelectRows135,PgSelectSingle136,PgClassExpression138,PgSelect139,First141,PgSelectRows142,PgSelectSingle143,PgSelect144,First146,PgSelectRows147,PgSelectSingle148,PgSelect149,First151,PgSelectRows152,PgSelectSingle153,PgSelect154,First156,PgSelectRows157,PgSelectSingle158 bucket8
-    Bucket9("Bucket 9 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 168, 9, 245, 249, 554, 559, 569, 574, 584, 589, 599, 604, 614, 619, 170, 169<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 171, 180<br />2: 172, 181, 186, 191, 196<br />3: 177, 184, 189, 194, 199<br />ᐳ: 176, 178, 183, 185, 188, 190, 193, 195, 198, 200"):::bucket
+    Bucket9("Bucket 9 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 168, 9, 170, 169<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 171, 180<br />2: 172, 181, 186, 191, 196<br />3: 177, 184, 189, 194, 199<br />ᐳ: 176, 178, 183, 185, 188, 190, 193, 195, 198, 200"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgClassExpression171,PgSelect172,First176,PgSelectRows177,PgSelectSingle178,PgClassExpression180,PgSelect181,First183,PgSelectRows184,PgSelectSingle185,PgSelect186,First188,PgSelectRows189,PgSelectSingle190,PgSelect191,First193,PgSelectRows194,PgSelectSingle195,PgSelect196,First198,PgSelectRows199,PgSelectSingle200 bucket9
-    Bucket10("Bucket 10 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 210, 9, 245, 249, 629, 634, 644, 649, 659, 664, 674, 679, 689, 694, 212, 211<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 213, 222<br />2: 214, 223, 228, 233, 238<br />3: 219, 226, 231, 236, 241<br />ᐳ: 218, 220, 225, 227, 230, 232, 235, 237, 240, 242"):::bucket
+    Bucket10("Bucket 10 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 210, 9, 212, 211<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 213, 222<br />2: 214, 223, 228, 233, 238<br />3: 219, 226, 231, 236, 241<br />ᐳ: 218, 220, 225, 227, 230, 232, 235, 237, 240, 242"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgClassExpression213,PgSelect214,First218,PgSelectRows219,PgSelectSingle220,PgClassExpression222,PgSelect223,First225,PgSelectRows226,PgSelectSingle227,PgSelect228,First230,PgSelectRows231,PgSelectSingle232,PgSelect233,First235,PgSelectRows236,PgSelectSingle237,PgSelect238,First240,PgSelectRows241,PgSelectSingle242 bucket10
     Bucket0 --> Bucket1

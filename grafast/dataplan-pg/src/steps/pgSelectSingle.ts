@@ -3,12 +3,7 @@ import type {
   ExecutableStep,
   UnbatchedExecutionExtra,
 } from "grafast";
-import {
-  exportAs,
-  list,
-  polymorphicWrap,
-  UnbatchedExecutableStep,
-} from "grafast";
+import { exportAs, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -34,7 +29,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
-import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
+import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");
@@ -428,42 +423,15 @@ export class PgSelectSingleStep<
   }
 
   /**
-   * @internal
-   * For use by PgCursorStep
-   */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
-    const classPlan = this.getClassStep();
-    const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderBy();
-    const step = list(
-      orders.length > 0
-        ? orders.map((o) => {
-            const [frag, codec] = getFragmentAndCodecFromOrder(
-              this.getClassStep().alias,
-              o,
-              this.getClassStep().resource.codec,
-            );
-            return this.select(frag, codec, o.nullable === false);
-          })
-        : // No ordering; so use row number
-          [
-            this.select(
-              sql`row_number() over (partition by 1)`,
-              TYPES.int,
-              true,
-            ),
-          ],
-    );
-    return [digest, step];
-  }
-
-  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
   public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(this);
+    const cursorPlan = new PgCursorStep<this>(
+      this,
+      this.getClassStep().getCursorDetails(),
+    );
     return cursorPlan;
   }
 

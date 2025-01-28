@@ -9,21 +9,12 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda20{{"Lambda[20∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access24{{"Access[24∈0] ➊<br />ᐸ23.0ᐳ"}}:::plan
-    Lambda29{{"Lambda[29∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda34{{"Lambda[34∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object9 & Lambda20 & Access24 & Lambda29 & Lambda34 --> PgSelect6
-    Object28{{"Object[28∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸsql.identifier(”random_user”)ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
-    Lambda20 & Constant25 & Constant26 & Constant27 --> Object28
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
+    Object9 --> PgSelect6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
@@ -33,21 +24,12 @@ graph TD
     PgSelect6 --> PgSelectRows11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸusersᐳ"}}:::plan
     First10 --> PgSelectSingle12
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant36 --> Lambda20
-    Lambda23{{"Lambda[23∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant37 --> Lambda23
-    Lambda23 --> Access24
-    Object28 --> Lambda29
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”randomᐳ"}}:::plan
-    Constant38 --> Lambda34
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ§{ hashType: 'sha1' }ᐳ"}}:::plan
+    Constant19{{"Constant[19∈0] ➊<br />ᐸ§{ hashType: 'sha1' }ᐳ"}}:::plan
     GraphQLResolver17[["GraphQLResolver[17∈1] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
     Object15{{"Object[15∈1] ➊<br />ᐸ{username}ᐳ"}}:::plan
-    Object15 & Constant39 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
+    Object15 & Constant19 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
     PgClassExpression13 --> Object15
@@ -55,10 +37,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/resolvers/basics"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 25, 26, 27, 36, 37, 38, 39, 9, 20, 23, 24, 28, 29, 34<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />ᐳ: First[10], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 19, 9<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />ᐳ: First[10], PgSelectSingle[12]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12,Lambda20,Lambda23,Access24,Constant25,Constant26,Constant27,Object28,Lambda29,Lambda34,Constant36,Constant37,Constant38,Constant39 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 39, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13], Object[15]<br />2: GraphQLResolver[17]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12,Constant19 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 19, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13], Object[15]<br />2: GraphQLResolver[17]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,Object15,GraphQLResolver17 bucket1
     Bucket0 --> Bucket1

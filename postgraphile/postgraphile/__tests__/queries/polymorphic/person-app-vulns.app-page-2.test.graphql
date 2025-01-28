@@ -3,7 +3,7 @@
 #> simpleCollections: "both"
 ## expect(data.allPeople.nodes[0].applications.edges[0].node.__typename).toEqual("AwsApplication")
 ## expect(data.allPeople.nodes[0].applications.edges[0].node.id).toEqual(5)
-## expect(data.allPeople.nodes[0].applications.edges[0].cursor).toEqual("WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=")
+## expect(data.allPeople.nodes[0].applications.edges[0].cursor).toEqual("WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=")
 
 {
   allPeople(first: 4) {
@@ -12,7 +12,7 @@
       username
       applications(
         first: 1
-        after: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=" # AwsApplication/4
+        after: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=" # AwsApplication/4
       ) {
         edges {
           cursor

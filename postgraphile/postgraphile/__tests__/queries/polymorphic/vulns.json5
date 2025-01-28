@@ -2,7 +2,7 @@
   allVulnerabilities: {
     edges: [
       {
-        cursor: "WyIzMDY3N2Q5ZTIyIiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+        cursor: "WyJkNGRlODQ2NjQ3IiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           id: 2,
@@ -12,7 +12,7 @@
         },
       },
       {
-        cursor: "WyIzMDY3N2Q5ZTIyIiwiNy43IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+        cursor: "WyJkNGRlODQ2NjQ3IiwiNy43IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           id: 3,
@@ -21,7 +21,7 @@
         },
       },
       {
-        cursor: "WyIzMDY3N2Q5ZTIyIiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+        cursor: "WyJkNGRlODQ2NjQ3IiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           id: 1,
@@ -33,8 +33,8 @@
     ],
     totalCount: 11,
     pageInfo: {
-      startCursor: "WyIzMDY3N2Q5ZTIyIiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
-      endCursor: "WyIzMDY3N2Q5ZTIyIiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+      startCursor: "WyJkNGRlODQ2NjQ3IiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+      endCursor: "WyJkNGRlODQ2NjQ3IiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
       hasNextPage: true,
       hasPreviousPage: false,
     },
