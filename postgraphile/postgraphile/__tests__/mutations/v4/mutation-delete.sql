@@ -105,6 +105,7 @@ delete from "c"."person" as __person__ where (__person__."id" = $1::"int4") retu
 select
   "c"."person_first_name"(__person__) as "0",
   __person__."id"::text as "1",
-  __person__."email" as "2"
+  __person__."email" as "2",
+  __person__."id" as "3"
 from (select ($1::"c"."person").*) as __person__
 order by "c"."person_first_name"(__person__) asc, __person__."id" asc;
