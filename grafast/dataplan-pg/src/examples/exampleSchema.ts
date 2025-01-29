@@ -5325,7 +5325,9 @@ function getEnumExtensionPropertyValueLookups(
     );
     const lookupValues = <T>(values: any) =>
       values?.map((v: any) => lookup[v] as T | undefined);
+    lookupValues.displayName = `extractList_${extensionsProperty}`;
     const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
+    lookupValue.displayName = `extract_${extensionsProperty}`;
     enumType[$$extensionsByValue][extensionsProperty] = {
       lookupValues,
       lookupValue,
