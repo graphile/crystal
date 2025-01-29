@@ -41,8 +41,11 @@ import type {
   PgCodecRelation,
   PgGroupSpec,
   PgOrderSpec,
+  PgQueryBuilder,
+  PgSelectQueryBuilderCallback,
   PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -380,6 +383,8 @@ export class PgSelectStep<
   // Connection
   private connectionDepId: number | null = null;
 
+  private applyDepIds: number[] = [];
+
   // --------------------
 
   /**
@@ -504,6 +509,7 @@ export class PgSelectStep<
       }
     });
 
+    $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.identifierMatches = [...cloneFrom.identifierMatches];
     $clone.arguments = [...cloneFrom.arguments];
     $clone.isTrusted = cloneFrom.isTrusted;
@@ -936,6 +942,14 @@ export class PgSelectStep<
     this.isOrderUnique = true;
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   protected assertCursorPaginationAllowed(): void {
     if (this.mode === "aggregate") {
       throw new SafeError(
@@ -1031,6 +1045,8 @@ export class PgSelectStep<
       joins: this.joins,
       arguments: this.arguments,
       needsCursor: this.needsCursor,
+      applyDepIds: this.applyDepIds,
+      relationJoins: this.relationJoins,
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1857,17 +1873,23 @@ interface PgSelectQueryInfo<
   readonly joins: ReadonlyArray<PgSelectPlanJoin>;
   readonly conditions: ReadonlyArray<SQL>;
   readonly orders: ReadonlyArray<PgOrderSpec>;
+  readonly relationJoins: ReadonlyMap<
+    keyof GetPgResourceRelations<TResource>,
+    SQL
+  >;
 }
 interface MutablePgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends PgSelectQueryInfo<TResource>,
     MutablePgStmtCommonQueryInfo {
   readonly selects: Array<SQL>;
+  readonly joins: Array<PgSelectPlanJoin>;
   readonly conditions: Array<SQL>;
   readonly orders: Array<PgOrderSpec>;
   readonly groups: Array<PgGroupSpec>;
   readonly havingConditions: Array<SQL>;
   isOrderUnique: boolean;
+  readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
 }
 
 function buildTheQuery<
@@ -1882,6 +1904,8 @@ function buildTheQuery<
     orders: [...rawInfo.orders],
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
+    relationJoins: new Map(rawInfo.relationJoins),
+    joins: [...rawInfo.joins],
 
     // Will be populated by applyConditionFromCursor
     cursorLower: null,
@@ -1905,13 +1929,80 @@ function buildTheQuery<
   }
 
   // TODO: evaluate runtime orders, conditions, etc here
+  const queryBuilder: PgSelectQueryBuilder = {
+    alias: info.alias,
+    [$$toSQL]() {
+      return info.alias;
+    },
+    orderBy(spec) {
+      info.orders.push(spec);
+    },
+    singleRelation(relationIdentifier) {
+      // NOTE: this is almost an exact copy of the same method on PgSelectStep,
+      // except using `info`... We should harmonize them.
+      const relation = info.resource.getRelation(
+        relationIdentifier,
+      ) as PgCodecRelation;
+      if (!relation) {
+        throw new Error(
+          `${info.resource} does not have a relation named '${String(
+            relationIdentifier,
+          )}'`,
+        );
+      }
+      if (!relation.isUnique) {
+        throw new Error(
+          `${info.resource} relation '${String(
+            relationIdentifier,
+          )}' is not unique so cannot be used with singleRelation`,
+        );
+      }
+
+      const { remoteResource, localAttributes, remoteAttributes } = relation;
+
+      // Join to this relation if we haven't already
+      const cachedAlias = info.relationJoins.get(relationIdentifier);
+      if (cachedAlias) {
+        return cachedAlias;
+      }
+      const alias = sql.identifier(Symbol(relationIdentifier as string));
+      if (typeof remoteResource.from === "function") {
+        throw new Error(
+          "Callback sources not currently supported via singleRelation",
+        );
+      }
+      info.joins.push({
+        type: "left",
+        from: remoteResource.from,
+        alias,
+        conditions: localAttributes.map(
+          (col, i) =>
+            sql`${info.alias}.${sql.identifier(
+              col as string,
+            )} = ${alias}.${sql.identifier(remoteAttributes[i] as string)}`,
+        ),
+      });
+      info.relationJoins.set(relationIdentifier, alias);
+      return alias;
+    },
+  };
+
+  const { count, stream, values } = info.executionDetails;
+
+  for (const applyDepId of info.applyDepIds) {
+    const val = values[applyDepId].unaryValue();
+    if (Array.isArray(val)) {
+      val.forEach((v) => v?.(queryBuilder));
+    } else {
+      val?.(queryBuilder);
+    }
+  }
 
   // beforeLock("orderBy"): Now the runtime orders/etc have been added, mutate `orders` to be unique
   makeOrderUniqueIfPossible(info);
 
   // afterLock("orderBy"): Now the runtime orders/etc have been performed,
 
-  const { count, stream, values } = info.executionDetails;
   const after = getUnary<any[] | null>(values, info.afterStepId);
   const before = getUnary<any[] | null>(values, info.beforeStepId);
 
@@ -2631,4 +2722,17 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
       codec,
     }),
   };
+}
+
+export interface PgSelectQueryBuilder<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends PgQueryBuilder {
+  /** Instruct to add another order */
+  orderBy(spec: PgOrderSpec): void;
+  /** Returns the SQL alias representing the table related to this relation */
+  singleRelation<
+    TRelationName extends keyof GetPgResourceRelations<TResource> & string,
+  >(
+    relationIdentifier: TRelationName,
+  ): SQL;
 }
