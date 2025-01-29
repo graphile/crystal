@@ -33,6 +33,7 @@ debugFactory.formatters.c = grafastPrint;
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
@@ -308,6 +309,7 @@ export {
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
+  defaultPlanResolver,
   defer,
   Deferred,
   each,
@@ -611,6 +613,7 @@ exportAsMany("grafast", {
   flagError,
   SafeError,
   isUnaryStep,
+  defaultPlanResolver,
   multistep,
 });
 

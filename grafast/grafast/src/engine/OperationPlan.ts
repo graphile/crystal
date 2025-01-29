@@ -71,7 +71,6 @@ import {
   isUnbatchedExecutableStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
-import { access } from "../steps/access.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
@@ -97,6 +96,7 @@ import type {
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
+import { defaultPlanResolver } from "./lib/defaultPlanResolver.js";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
@@ -806,6 +806,7 @@ export class OperationPlan {
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
+        fieldName,
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
@@ -1089,8 +1090,7 @@ export class OperationPlan {
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
-          rawPlanResolver ??
-          (resolver ? undefined : makeDefaultPlan(fieldName));
+          rawPlanResolver ?? (resolver ? undefined : defaultPlanResolver);
 
         /*
          *  When considering resolvers on fields, there's three booleans to
@@ -1258,6 +1258,7 @@ export class OperationPlan {
         }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
+            fieldName,
             fieldLayerPlan,
             fieldPath,
             polymorphicPaths,
@@ -1932,6 +1933,7 @@ export class OperationPlan {
   }
 
   private planField(
+    fieldName: string,
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
@@ -1969,6 +1971,7 @@ export class OperationPlan {
         applyAfterMode,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
+            fieldName,
             field,
             schema: this.schema,
           }),
@@ -3909,15 +3912,6 @@ export class OperationPlan {
   public withRootLayerPlan<T>(cb: () => T): T {
     return withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, cb);
   }
-}
-
-function makeDefaultPlan(fieldName: string) {
-  return (
-    $step: ExecutableStep & { get?: (field: string) => ExecutableStep },
-  ) =>
-    typeof $step.get === "function"
-      ? $step.get(fieldName)
-      : access($step, [fieldName]);
 }
 
 function makeMetaByMetaKeysFactory(
