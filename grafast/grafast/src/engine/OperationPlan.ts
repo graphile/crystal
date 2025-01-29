@@ -99,6 +99,7 @@ import type {
 import { LayerPlan } from "./LayerPlan.js";
 import {
   currentLayerPlan,
+  currentPolymorphicPaths,
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
@@ -3845,8 +3846,11 @@ export class OperationPlan {
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
+    const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${
+        paths ? [...paths].join(",") : ""
+      }`
     ] ??= new Map());
 
     const cacheIt = () => {
