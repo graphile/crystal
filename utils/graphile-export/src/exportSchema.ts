@@ -1831,23 +1831,23 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
-        const applyPlanAST = enumValueConfig.extensions?.grafast?.applyPlan
+        const extensionsAST = enumValueConfig.extensions
           ? convertToIdentifierViaAST(
               file,
-              enumValueConfig.extensions.grafast.applyPlan,
-              `${type.name}_${enumValueName}ApplyPlan`,
-              `${type.name}.values[${enumValueName}].extensions.grafast.applyPlan`,
+              enumValueConfig.extensions,
+              `${type.name}_${enumValueName}Extensions`,
+              `${type.name}.values[${enumValueName}].extensions`,
             )
           : null;
 
-        if (valueAST || applyPlanAST) {
+        if (valueAST || extensionsAST) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
               t.objectExpression(
                 objectToObjectProperties({
                   value: valueAST,
-                  applyPlan: applyPlanAST,
+                  extensions: extensionsAST,
                 }),
               ),
             ),
