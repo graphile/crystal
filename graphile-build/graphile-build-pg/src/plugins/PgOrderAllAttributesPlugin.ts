@@ -1,7 +1,10 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { PgCodecWithAttributes } from "@dataplan/pg";
+import type {
+  PgCodecWithAttributes,
+  PgSelectQueryBuilderCallback,
+} from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
@@ -121,48 +124,26 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 {
                   [ascFieldName]: {
                     extensions: {
-                      grafast: {
-                        applyPlan: EXPORTABLE(
-                          (
-                            PgSelectStep,
-                            PgUnionAllStep,
-                            attributeName,
-                            isUnique,
-                            pgOrderByNullsLast,
-                          ) =>
-                            (plan: ExecutableStep | ModifierStep): void => {
-                              if (
-                                !(plan instanceof PgSelectStep) &&
-                                !(plan instanceof PgUnionAllStep)
-                              ) {
-                                throw new Error(
-                                  "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
-                                );
-                              }
-                              plan.orderBy({
-                                attribute: attributeName,
-                                direction: "ASC",
-                                ...(pgOrderByNullsLast != null
-                                  ? {
-                                      nulls: pgOrderByNullsLast
-                                        ? "LAST"
-                                        : "FIRST",
-                                    }
-                                  : null),
-                              });
-                              if (isUnique) {
-                                plan.setOrderIsUnique();
-                              }
-                            },
-                          [
-                            PgSelectStep,
-                            PgUnionAllStep,
-                            attributeName,
-                            isUnique,
-                            pgOrderByNullsLast,
-                          ],
-                        ),
-                      },
+                      pgSelectApply: EXPORTABLE(
+                        (attributeName, isUnique, pgOrderByNullsLast) =>
+                          ((queryBuilder): void => {
+                            queryBuilder.orderBy({
+                              attribute: attributeName,
+                              direction: "ASC",
+                              ...(pgOrderByNullsLast != null
+                                ? {
+                                    nulls: pgOrderByNullsLast
+                                      ? "LAST"
+                                      : "FIRST",
+                                  }
+                                : null),
+                            });
+                            if (isUnique) {
+                              queryBuilder.setOrderIsUnique();
+                            }
+                          }) as PgSelectQueryBuilderCallback,
+                        [attributeName, isUnique, pgOrderByNullsLast],
+                      ),
                     },
                   },
                 },
@@ -180,48 +161,26 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 {
                   [descFieldName]: {
                     extensions: {
-                      grafast: {
-                        applyPlan: EXPORTABLE(
-                          (
-                            PgSelectStep,
-                            PgUnionAllStep,
-                            attributeName,
-                            isUnique,
-                            pgOrderByNullsLast,
-                          ) =>
-                            (plan: ExecutableStep | ModifierStep): void => {
-                              if (
-                                !(plan instanceof PgSelectStep) &&
-                                !(plan instanceof PgUnionAllStep)
-                              ) {
-                                throw new Error(
-                                  "Expected a PgSelectStep or PgUnionAllStep when applying ordering value",
-                                );
-                              }
-                              plan.orderBy({
-                                attribute: attributeName,
-                                direction: "DESC",
-                                ...(pgOrderByNullsLast != null
-                                  ? {
-                                      nulls: pgOrderByNullsLast
-                                        ? "LAST"
-                                        : "FIRST",
-                                    }
-                                  : null),
-                              });
-                              if (isUnique) {
-                                plan.setOrderIsUnique();
-                              }
-                            },
-                          [
-                            PgSelectStep,
-                            PgUnionAllStep,
-                            attributeName,
-                            isUnique,
-                            pgOrderByNullsLast,
-                          ],
-                        ),
-                      },
+                      pgSelectApply: EXPORTABLE(
+                        (attributeName, isUnique, pgOrderByNullsLast) =>
+                          ((queryBuilder): void => {
+                            queryBuilder.orderBy({
+                              attribute: attributeName,
+                              direction: "DESC",
+                              ...(pgOrderByNullsLast != null
+                                ? {
+                                    nulls: pgOrderByNullsLast
+                                      ? "LAST"
+                                      : "FIRST",
+                                  }
+                                : null),
+                            });
+                            if (isUnique) {
+                              queryBuilder.setOrderIsUnique();
+                            }
+                          }) as PgSelectQueryBuilderCallback,
+                        [attributeName, isUnique, pgOrderByNullsLast],
+                      ),
                     },
                   },
                 },

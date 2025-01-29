@@ -4,7 +4,7 @@ import type {
   GrafastFieldConfig,
   OutputPlanForType,
 } from "grafast";
-import { inputObjectFieldSpec, objectSpec } from "grafast";
+import { defaultPlanResolver, inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -30,6 +30,7 @@ import {
 import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";
+import type { PostPlanResolver } from "../interfaces.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
 import { EXPORTABLE } from "../utils.js";
 
@@ -271,9 +272,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
+                const postPlanResolvers: PostPlanResolver<any, any, any>[] = [];
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
                   {
                     ...fieldContext,
+                    addToPlanResolver(cb) {
+                      postPlanResolvers.push(cb);
+                    },
                   };
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
@@ -309,6 +314,22 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     argContext,
                     `|${typeName}.fields.${fieldName}.args.${argName}`,
                   );
+                }
+
+                if (postPlanResolvers.length > 0) {
+                  if (!finalFieldSpec.plan) {
+                    throw new Error(`Cannot`);
+                  }
+                  const basePlan = finalFieldSpec.plan ?? defaultPlanResolver;
+                  finalFieldSpec.plan = EXPORTABLE(
+                    (basePlan, postPlanResolvers) => ($parent, fieldArgs, info) => {
+                      let $result = basePlan($parent, fieldArgs, info);
+                      for (const ppr of postPlanResolvers) {
+                        $result = ppr($result, $parent, fieldArgs, info);
+                      }
+                      return $result;
+                    },
+                  [basePlan, postPlanResolvers]);
                 }
 
                 processedFields.push(finalFieldSpec);

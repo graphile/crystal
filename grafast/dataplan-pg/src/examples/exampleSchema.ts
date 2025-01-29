@@ -3931,7 +3931,7 @@ export function makeExampleSchema(
             extractEnumExtensionValue,
             messageResource,
           ) =>
-            function plan(_, { $orderBy }, c) {
+            function plan(_, { $orderBy }, { field }) {
               const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
@@ -3939,7 +3939,7 @@ export function makeExampleSchema(
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
               const $connectionPlan = connection($messages);
-              const orderByArg = c.field.args.find((a) => a.name === "orderBy");
+              const orderByArg = field.args.find((a) => a.name === "orderBy");
               $messages.apply(
                 extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                   orderByArg!.type,
