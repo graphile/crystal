@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-heroku/
 title: Deploying to Heroku
 ---
 
@@ -108,8 +106,6 @@ at `https://<myappname>.herokuapp.com`
 For a more in-depth and automated setup, including instructions on configuring a
 job queue and sending emails, see the
 [Deploying to Heroku instructions in Graphile Starter](https://github.com/graphile/starter#deploying-to-heroku).
-(NOTE: at time of writing, Graphile Starter is under development and is only
-available to sponsors ─ reach out in Discord for early access.)
 
 ### Cleanup
 

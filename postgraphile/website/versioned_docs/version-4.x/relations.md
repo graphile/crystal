@@ -1,7 +1,6 @@
 ---
-layout: page
-path: /postgraphile/relations/
 title: Relations
+toc_max_heading_level: 4
 ---
 
 We automatically discover relations between database tables by inspecting their

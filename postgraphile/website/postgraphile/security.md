@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/security/
 title: Security
 ---
 
@@ -26,7 +24,7 @@ permission constraints to the existing table- and column-based permissions.
 
 Now that this functionality is stable and proven (and especially with the
 performance improvements in the latest PostgreSQL releases), we advise that you
-protect your lowest level - the data itself. By doing so you can be sure that no
+protect your lowest level — the data itself. By doing so you can be sure that no
 matter how many services interact with your database they will all be protected
 by the same underlying permissions logic, which you only need to maintain in one
 place. You can add as many microservices as you like, and they can talk to the
@@ -40,7 +38,7 @@ If you already have a secure database schema that implements these technologies
 to protect your data at the lowest levels then you can leverage `postgraphile`
 to generate a powerful, secure and fast API very rapidly. You just need to
 generate JWT tokens for your users (and we even help you with that), or use
-[pgSettings](./usage-library/#pgsettings-function) to indicate the current user.
+[pgSettings](./config#pgsettings) to indicate the current user.
 
 ### Processing JWTs
 
@@ -247,7 +245,7 @@ commit;
 
 :::info
 
-To save roundtrips, many adaptors perform just one query to set all configs via:
+To save round-trips, many adaptors perform just one query to set all configs via:
 
 ```sql
 select set_config('role', 'app_user', true), set_config('user_id', '2', true), ...

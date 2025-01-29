@@ -1,12 +1,10 @@
 ---
-layout: page
-path: /postgraphile/make-add-pg-table-order-by-plugin/
 title: makeAddPgTableOrderByPlugin
 ---
 
 PostGraphile adds `orderBy` arguments to various of the table collection fields
 it builds so that you can control the order in which you receive the results. By
-default we add the table's columns (or, if `--no-ignore-indexes` is enabled,
+default we add the table’s columns (or, if `--no-ignore-indexes` is enabled,
 only the columns _that are indexed_) in both ascending and descending order. For
 example, you could request the list of all forums ordered from newest to oldest:
 
@@ -27,7 +25,7 @@ or by a computation, or something else.
 
 This plugin generator helps you build new `orderBy` enum values so that you can
 sort more flexibly (though you should keep in mind that they are enum values so
-they cannot accept arguments). Let's make this clearer with an example:
+they cannot accept arguments). Let’s make this clearer with an example:
 
 ## Example
 
@@ -65,7 +63,7 @@ export default makeAddPgTableOrderByPlugin(
 );
 ```
 
-:::tip
+:::tip Easily create `orderBy` variants
 
 We used the `orderByAscDesc` helper to easily create the `_ASC` and
 `_DESC` variants without needing redundant code.
@@ -127,9 +125,9 @@ be used to apply the ordering to the parent PgSelectStep via
 unique via `$select.setOrderIsUnique()`, which will mean that the primary key
 will not need to be added to the order by clause.
 
-:::tip
+:::tip Use helpers
 
-Note that you wouldn't typically build the `MakeAddPgTableOrderByPluginOrders`
+Note that you wouldn’t typically build the `MakeAddPgTableOrderByPluginOrders`
 yourself, instead you would use the `orderByAscDesc` helper.
 
 :::
@@ -156,8 +154,8 @@ The `baseName` will have `_ASC` and `_DESC` appended for the two enum values
 this function creates.
 
 `orderBySpec` is where the order is specified, it either specifies a column
-name (string), an order spec without the "direction", or a callback which
-returns the order spec without the "direction".
+name (string), an order spec without the “direction”, or a callback which
+returns the order spec without the “direction”.
 
 `uniqueOrOptions` define 1) whether the sort order is unique, and 2) how to sort
 null values when sorting by ascending and descending order. Only set
@@ -195,7 +193,7 @@ The `nulls` option extends the `ORDER BY` clause of the SQL query with either
   behavior.
 
 For example, you may wish to create a plugin to sort movies by either top-rated
-or lowest-rated first (meaning the average of the movie's reviews):
+or lowest-rated first (meaning the average of the movie’s reviews):
 
 ```ts
 const customOrderBy = orderByAscDesc(
@@ -216,14 +214,14 @@ To get the top-rated movies, one would then use the `RATING_DESC` option in the
 GraphQL query. However, by default, `RATING_DESC` would put movies with no
 reviews (and thus an average of `null`) first, followed by the sorted movies. A
 movie with no ratings is not exactly what one thinks of when one hears
-"top-rated"! By specifying `{ nulls: 'last' }`, however, PostGraphile knows that
+“top-rated”! By specifying `{ nulls: 'last' }`, however, PostGraphile knows that
 this orderBy plugin should still show the movies without any reviews, but just
 put them at the end of the list.
 
-:::warning
+:::warning Be explicit about nullability
 
 If your column or expression is nullable, you must either specify `nullable:
-true` or pass a value for `nulls`; if you don't do this then PostGraphile will
+true` or pass a value for `nulls`; if you don’t do this then PostGraphile will
 use a simpler expression for comparisons which is not null-capable, and this
 will break cursor pagination when nulls occur.
 

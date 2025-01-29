@@ -5,7 +5,7 @@ export default function Pro() {
   return (
     <>
       <span className={styles.proTag}>
-        <a href="/pricing/">
+        <a href="/pricing">
           <span className={styles.firstLetter}>P</span>ro
         </a>
       </span>

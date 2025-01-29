@@ -1,10 +1,10 @@
 ---
-title: "Custom plugins"
+title: "Custom Plugins"
 toc_min_heading_level: 2
 toc_max_heading_level: 4
 ---
 
-# Migrating custom plugins
+# Migrating Custom Plugins
 
 If you've written some PostGraphile V4 plugins by hand (not using one of the
 `make...Plugin` helpers) then this migration guide is for you. We'll step you
@@ -132,7 +132,7 @@ Huh... that rhymed. But yeah, just use `postgraphile` instead.
 It's really annoying when you end up with version conflicts, so in V5 we've
 made it easy for you to consistently install one version of the package and
 depend on parts within that; instead of `import { ... } from "graphile-build"`
-you would now do `import { ... } from "postgraphile/graphile-build"` - that way
+you would now do `import { ... } from "postgraphile/graphile-build"` — that way
 you don't need to list `graphile-build` as a dependency. Your package.json can
 now be just:
 
@@ -262,7 +262,7 @@ thanks for contributing to making everyone's migration to V5 easier!
 
 This is optional, you only need it if you want people to be able to use
 Graphile Export to export a schema using this plugin as executable code, for
-example to use in serverless situations where bootup time is at a premium.
+example to use in serverless situations where boot-up time is at a premium.
 
 TODO: document this! For now, see: [Exporting your schema](../exporting-schema)
 and https://star.graphile.org/graphile-export/
@@ -435,7 +435,7 @@ In V5 we've split the schema build process into two parts:
 Introspection data is only available in the `gather` phase, from there it's
 converted into abstractions (resources, codecs, relations and behaviors) which
 are used during the `schema` phase. Further the introspection system has been
-replaced by a standalone module `pg-introspection` which is strongly typed - it
+replaced by a standalone module `pg-introspection` which is strongly typed — it
 actually embeds parts of the TypeScript documentation so that when you hover
 over its various properties in your editor it will tell you how Postgres
 describes those fields!
@@ -519,14 +519,14 @@ V4 "schema" plugins are now primarily concerned with these scopes:
 
 Server plugins are likely more concerned with these scopes:
 
-- `grafserv` - handing HTTP requessts
+- `grafserv` - handing HTTP requests
 - `grafast` - handling the GraphQL request (e.g. manipulating the context, etc)
 
 :::info
 
-Currently the `postgraphile` CLI does not accept many options - it is intended
+Currently the `postgraphile` CLI does not accept many options — it is intended
 that users will provide options via the `graphile.config.ts` (or similar)
-file - so there is no plugin interface for adding CLI flags.
+file — so there is no plugin interface for adding CLI flags.
 
 :::
 
@@ -537,7 +537,7 @@ schema. In V5, inflection has been promoted to its own phase, primarily because
 "naming things" is a global concern that applies to both the `gather` and
 `schema` phases (see below). Inflectors are also now defined in a declarative
 (i.e. object properties) way, rather than an imperative (i.e. function calls)
-way - this allows the system to inspect plugins without executing them.
+way — this allows the system to inspect plugins without executing them.
 
 #### .add
 
@@ -633,7 +633,7 @@ export const PgAllThePeoplePlugin: GraphileConfig.Plugin = {
 
 If your plugin did anything asynchronous (extremely unlikely) then that work
 would now be done during the `gather` phase. If this is the case, please reach
-out to Benjie for additional documentation!
+out to [Benjie](https://graphile.org/support) for additional documentation!
 
 ### plugin.schema
 
@@ -644,7 +644,7 @@ Configures the behavior system and implements the schema hooks
 The '@omit' and '@simpleCollections' smart tags have been replaced with the
 behavior system in V5. Though the V4 preset adds compatibility with the V4
 @omit system (by converting the @omit tags to behaviors), your plugins _should
-not_ use the data from @omit - they should use the behavior data exclusively.
+not_ use the data from @omit — they should use the behavior data exclusively.
 
 For more information on behavior, see [Behavior](../behavior).
 
@@ -749,7 +749,7 @@ export const FlibblePlugin: GraphileConfig.Plugin = {
 ### Extending scopes
 
 Similarly all of the scopes and contexts are typed within each hook by
-camelcasing the hook name and prepending `Scope` or `Context`. For example, the
+camelCasing the hook name and prepending `Scope` or `Context`. For example, the
 scope in the `GraphQLObjectType_fields_field` hook is now
 `ScopeObjectFieldsField`. If you need to add additional entries to any of these
 you should do so via declaration merging, and you should ensure that the
@@ -787,7 +787,7 @@ declare global {
 ```
 
 Note also that tools like `graphile config options` will look at these
-TypeScript definitions and use them to provide documentation to the user - as
+TypeScript definitions and use them to provide documentation to the user — as
 such you should be sure to add a `/** ... */` comment describing the feature,
 as we have above.
 
@@ -835,7 +835,7 @@ $pgSelect.where(sql`${archivedAtFrag} is not true`);
 (`$parent`), which is the step that the field itself was called on. The second
 is the target step (`$pgSelect`), which is typically the result of the fields'
 plan resolver. Note that input objects' `applyPlan`s only have the latter 3
-arguments - they do not have access to the parent step unless their parent
+arguments — they do not have access to the parent step unless their parent
 input object or argument `applyPlan` explicitly pass them down.
 
 :::

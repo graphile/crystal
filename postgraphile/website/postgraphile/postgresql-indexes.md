@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/postgresql-indexes/
-title: PostgreSQL indexes
+title: PostgreSQL Indexes
 ---
 
 It’s important that your queries stay fast for your users, this section outlines
@@ -22,7 +20,7 @@ some resources to help you optimize you queries with indexes.
 _This article was originally written by
 [Caleb Meredith](https://twitter.com/calebmer)._
 
-### Advice - Foreign Key Indexes
+### Advice — Foreign Key Indexes
 
 Many people don't realise that when you create a [foreign key
 relation](./relations), PostgreSQL does NOT automatically create an index on

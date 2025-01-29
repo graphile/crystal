@@ -1,15 +1,13 @@
 ---
-layout: page
-path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
 PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
-you; but it's rare that these will cover all your needs - and many people just
+you; but it’s rare that these will cover all your needs — and many people just
 disable them outright. Custom mutations enable you to write exactly the business
 logic you need with access to all of your data all wrapped up in a PostgreSQL
 function. You can even bypass the RLS and GRANT checks, should you so choose, by
-tagging your function as `SECURITY DEFINER` - but be very careful when you do
+tagging your function as `SECURITY DEFINER` — but be very careful when you do
 so!
 
 ### Rules
@@ -45,7 +43,7 @@ Look at the documentation in Ruru/Graph*i*QL to find the parameters you may use.
 
 ### Example
 
-Here's an example of a custom mutation, which will generate the GraphQL
+Here’s an example of a custom mutation, which will generate the GraphQL
 `acceptTeamInvite` mutation:
 
 ```sql
@@ -80,7 +78,7 @@ Notes on the above function:
 
 ### pgStrictFunctions
 
-If you'd like PostGraphile to treat all function arguments as required
+If you’d like PostGraphile to treat all function arguments as required
 (non-null) unless they have a default then you can use the
 `preset.gather.pgStrictFunctions` setting:
 
@@ -103,7 +101,7 @@ Int, d: Int)`.
 
 ### Bulk Insert Example
 
-Here's an example of a custom mutation that performs a "bulk insert" - inserting
+Here’s an example of a custom mutation that performs a “bulk insert” — inserting
 and returning a set of records:
 
 ```sql

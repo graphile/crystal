@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/functions/
-title: Database Functions
+title: Functions
 ---
+
+# Database Functions
 
 One of the easiest ways to add more capabilities to your PostGraphile schema is
 with PostgreSQL functions. The three main methods are:

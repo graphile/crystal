@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/extending-raw/
-title: Schema Plugins - Graphile Build
+title: Graphile Build
 ---
+
+# Schema Plugins — Graphile Build
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Build plugins. The core PG-related plugins can be found here:
@@ -15,7 +15,7 @@ export in
 [`src/preset.ts`](https://github.com/benjie/crystal/blob/main/graphile-build/graphile-build-pg/src/preset.ts)
 of the `graphile-build-pg` module.
 
-You can extend PostGraphile's GraphQL schema by adding plugins or presets. You
+You can extend PostGraphile’s GraphQL schema by adding plugins or presets. You
 may even opt to replace the entire list of plugins used to build the schema.
 Graphile Build plugins are built on top of the [GraphQL reference JS
 implementation](http://graphql.org/graphql-js/), so it is recommended that you
@@ -51,8 +51,8 @@ export default makeExtendSchemaPlugin({
 ```
 
 If you need to do this using the low-level plugins API for some reason (for
-example you're defining the fields in a more automated way) then you can use a
-'GraphQLObjectType_fields' hook and to add our new field:
+example you’re defining the fields in a more automated way) then you can use a
+‘GraphQLObjectType_fields’ hook and to add our new field:
 
 ```ts title="add-http-bin-plugin-raw.js"
 import fetch from "node-fetch";
@@ -109,7 +109,7 @@ const AddHttpBinPlugin = {
 export default AddHttpBinPlugin;
 ```
 
-(If you wanted to add a mutation you'd use `isRootMutation` rather than
+(If you wanted to add a mutation you’d use `isRootMutation` rather than
 `isRootQuery`.)
 
 We can then load our plugin into PostGraphile by adding it to our preset:
@@ -125,17 +125,17 @@ export default {
 
 Note that the types of added fields can use standard GraphQL objects in
 addition to types generated via the Graphile Build system. (However, if you do
-not build your object types via Graphile Build's `registerObjectType` (or
+not build your object types via Graphile Build’s `registerObjectType` (or
 similar) then the objects referenced cannot be extended via plugins.)
 
 ### Removing things from the schema
 
-**If you're looking for an easy way to prevent certain tables, fields, functions
+**If you’re looking for an easy way to prevent certain tables, fields, functions
 or relations being added to your GraphQL schema, check out
 [smart comments](./smart-comments).**
 
 If you want to prevent a class of things from being added to the schema then
-you can disable the plugin that adds them; for example if you didn't want
+you can disable the plugin that adds them; for example if you didn’t want
 Postgres functions added you could disable `PgCustomTypeFieldPlugin`:
 
 ```ts title="graphile.config.mjs"
@@ -145,21 +145,21 @@ export default {
 };
 ```
 
-:::tip
+:::tip It's more efficient to stop generation than to remove fields later
 
-For efficiency's sake, it's advised that rather than removing things from the
+For efficiency’s sake, it’s advised that rather than removing things from the
 schema, you instead avoid them being generated in the first place using the
 tips above.
 
 :::
 
-However, sometimes the above strategies don't allow you to make the changes you
+However, sometimes the above strategies don’t allow you to make the changes you
 desire. To remove something manually, you need to add a hook to the thing that
-owns the thing you wish to remove - for example if you want to remove a field
+owns the thing you wish to remove — for example if you want to remove a field
 `bar` from an object type `Foo` you could hook `GraphQLObjectType_fields` and
 return the set of fields less the one you want removed.
 
-Here's an example of a plugin generator you could use to generate plugins to
+Here’s an example of a plugin generator you could use to generate plugins to
 remove individual fields. This is just to demonstrate how a plugin to do this
 might work, [smart comments](./smart-comments) are likely a better approach.
 

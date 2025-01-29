@@ -1,10 +1,10 @@
 ---
-layout: page
-path: /postgraphile/make-extend-schema-plugin/
-title: makeExtendSchemaPlugin (graphile-utils)
+title: makeExtendSchemaPlugin
 ---
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
+# makeExtendSchemaPlugin (graphile-utils)
+
+**This documentation applies to PostGraphile v4.1.0+**
 
 The `graphile-utils` module contains some helpers for extending your
 PostGraphile (or Graphile Engine) GraphQL schema without having to understand
@@ -44,7 +44,7 @@ The `build` argument to the makeExtendSchemaPlugin callback contains lots of
 information and helpers defined by various plugins, most importantly it includes
 the introspection results (`build.pgIntrospectionResultsByKind`), inflection
 functions (`build.inflection`), and SQL helper (`build.pgSql`, which is an
-instance of [pg-sql2](https://www.npmjs.com/package/pg-sql2)).
+instance of [pg-sql2](https://star.graphile.org/pg-sql2)).
 
 The callback should return an object with two keys:
 
@@ -63,7 +63,7 @@ Note that the resolve functions defined in `resolvers` will be sent the standard
 4 GraphQL resolve arguments (`parent`, `args`, `context`, `resolveInfo`); but
 the 4th argument (`resolveInfo`) will also contain graphile-specific helpers.
 
-### The `gql` and `embed` helpers
+## The `gql` and `embed` helpers
 
 The `gql` helper is responsible for turning the human-readable GraphQL schema
 language you write into an abstract syntax tree (AST) that the application can
@@ -113,7 +113,7 @@ const typeDefs = gql`
 `;
 ```
 
-### Querying the database inside a resolver
+## Querying the database inside a resolver
 
 PostGraphile provisions, sets up and tears down a PostgreSQL client
 automatically for each GraphQL query. Setup involves beginning a transaction and
@@ -154,7 +154,7 @@ fields, you must not return query results such as these directly. Instead use
 documented below. The results of your `pgClient.query` should be used within the
 resolver only, and should not "leak" (in general).
 
-### Reading database column values
+## Reading database column values
 
 When extending a schema, it's often because you want to expose data from Node.js
 that would be too difficult (or impossible) to access from PostgreSQL. When
@@ -231,18 +231,22 @@ app.use(
 app.listen(3030);
 ```
 
-### The `selectGraphQLResultFromTable` helper
+## The `selectGraphQLResultFromTable` helper
 
-**IMPORTANT**: this helper is for populating data you return from your
+:::important important
+this helper is for populating data you return from your
 \*resolver; you _should not_ use `selectGraphQLResultFromTable` to retrieve data
 for your resolver to process. Instead use `context.pgClient` directly.
+:::
 
-**IMPORTANT**: `selectGraphQLResultFromTable` should only be called once per
+:::important important
+`selectGraphQLResultFromTable` should only be called once per
 resolver; it doesn't make sense to call it multiple times, and attempting to
 combine the results is liable to cause issues. If you feel the need to call it
 multiple times, please read the IMPORTANT note above, and/or consider
 implementing your requirement via multiple fields/resolvers rather than trying
 to do it all in one.
+:::
 
 Resolvers are passed 4 arguments: `parent, args, context, resolveInfo`. In the
 `context.pgClient` is an instance of a database client from the `pg` module
@@ -267,7 +271,7 @@ returning a record type directly (for example you're returning a mutation
 payload, or a connection interface), you should use the `@pgField` directive as
 shown below so that the Look Ahead feature continues to work.
 
-#### Usage for non-tables
+### Usage for non-tables
 
 Despite the (unfortunate) name; `selectGraphQLResultFromTable` can be used with
 any table-like source, including a table-defining sub-query, however it should
@@ -290,10 +294,10 @@ const matchingUserResolver = async (parent, args, context, resolveInfo) => {
 };
 ```
 
-#### QueryBuilder
+### QueryBuilder
 
 `queryBuilder` is an instance of `QueryBuilder`, a helper that uses an SQL AST
-constructed via [`pg-sql2` methods](https://www.npmjs.com/package/pg-sql2#api)
+constructed via [`pg-sql2` methods](https://star.graphile.org/pg-sql2/api/)
 to dynamically create powerful SQL queries without risking SQL injection
 attacks. The `queryBuilder` has a number of methods which affect the query which
 will be generated. The main ones you're likely to want are:
@@ -319,7 +323,7 @@ On top of these methods, `QueryBuilder` has the following useful properties:
 There are many other internal properties and methods, but you probably shouldn't
 call them. Only rely on the methods and properties documented above.
 
-##### QueryBuilder named children
+#### QueryBuilder named children
 
 In very rare circumstances you might also need to use the following methods:
 
@@ -349,10 +353,10 @@ subquery so that we can add conditions to it's `WHERE` clause.
 In most cases you're only dealing with one or two tables so you won't need this
 level of complexity.
 
-#### Query Example
+### Query Example
 
 The below is a simple example which would have been better served by
-[Custom Query SQL Procedures](./custom-queries/#custom-query-sql-procedures);
+[Custom Query SQL Procedures](./custom-queries#custom-query-sql-procedures);
 however it demonstrates using `makeExtendSchemaPlugin` with a database record,
 table connection, and list of database records.
 
@@ -435,7 +439,7 @@ app.use(
 app.listen(3030);
 ```
 
-#### Mutation Example
+### Mutation Example
 
 For example, you might want to add a custom `registerUser` mutation which
 inserts the new user into the database and also sends them an email:
@@ -534,7 +538,7 @@ const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 Note that the `@pgField` directive here is necessary for PostGraphile to "look
 ahead" and determine what to request from the database.
 
-#### Working with arrays via `json_array_elements`
+### Working with arrays via `json_array_elements`
 
 Here's an example of working with a join table, and bulk inserting multiple
 records from a GraphQL list.
@@ -598,14 +602,17 @@ resolvers: {
 }
 ```
 
-### Mutation Example with Node ID
+## Mutation Example with Node ID
 
 In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to
 soft-delete an entry from our `app_public.items` table. We're also going to
 check that the user performing the soft-delete is the owner of the record.
 
-**Aside**: if you're interested in soft-deletes, check out
+:::tip
+
+If you're interested in soft-deletes, check out
 [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived)
+:::
 
 ```js
 const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
@@ -672,7 +679,7 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-### Using the `@pgQuery` directive for non-root queries and better performance
+## Using the `@pgQuery` directive for non-root queries and better performance
 
 If your field is not defined on the `Query`/`Mutation` type directly (i.e. it's
 not defined at the root level) then for performance reasons you should hook into
@@ -681,9 +688,9 @@ using a resolver. You can achieve this with the `@pgQuery` directive, as shown
 below. Alternative approaches you may wish to consider are
 [Smart Comments](./smart-comments) and [Computed Columns](./computed-columns).
 
-#### @pgQuery with an object type
+### @pgQuery with an object type
 
-**NOTE: this section applies to PostGraphile v4.4.0+**
+**This section applies to PostGraphile v4.4.0+**
 
 When returning an object type (e.g. a table/composite type, connection, etc),
 the `@pgQuery` directive accepts the following inputs:
@@ -736,12 +743,16 @@ Notes:
 - Regular connection arguments are added automatically thanks to the plugin
   system
 
-#### @pgQuery with a leaf type
+### @pgQuery with a leaf type
 
-**NOTE: this section applies to PostGraphile v4.4.6+**
+**This section applies to PostGraphile v4.4.6+**
 
-**BUG: it seems `@pgQuery` only supports _scalars_ (not _enums_) right now:
+:::caution bug
+
+It seems `@pgQuery` only supports _scalars_ (not _enums_) right now:
 https://github.com/graphile/postgraphile/issues/1601**
+
+:::
 
 The @pgQuery directive can also be used with leaf fields (those returning a
 scalar or list thereof). To do so, we pass `@pgQuery` a `fragment:` argument.
@@ -783,7 +794,7 @@ Notes:
 You can see more examples of these use cases
 [in the tests](https://github.com/graphile/graphile-engine/blob/49259c291d651ab8b70d1f1785cf273bdd97fcf1/packages/graphile-utils/__tests__/ExtendSchemaPlugin-pg.test.js#L713-L832).
 
-### Plugin SQL Privileges
+## Plugin SQL Privileges
 
 Plugins access the database with the same privileges as everything else - they
 are subject to RLS/RBAC/etc. If your user does not have privileges to perform

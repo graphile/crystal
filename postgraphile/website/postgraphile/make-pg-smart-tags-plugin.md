@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-pg-smart-tags-plugin/
 title: makePgSmartTagsPlugin
 ---
 
@@ -140,7 +138,7 @@ in [the postgraphile.tags.json5 file documentation](./smart-tags-file).
 
 ### Details
 
-Within the config object, we can add entries for each supported "kind" of
+Within the config object, we can add entries for each supported “kind” of
 PostgreSQL entity. The supported entities include:
 
 - `class` - for tables, views, materialized views, compound types and other

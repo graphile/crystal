@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/production/
 title: Production Considerations
 ---
 
@@ -12,7 +10,7 @@ there's a few things you'll want to think about including topics such as
 logging, security and stability. This article outlines some of the issues you
 might face, and how to solve them.
 
-### Database Access Considerations
+## Database Access Considerations
 
 PostGraphile is just a node app / middleware, so you can deploy it to any number
 of places: Heroku, Now.sh, a VM, a container such as Docker, or of course onto
@@ -51,7 +49,7 @@ union of all these permissions. Using this flag is recommended, as it results in
 a much leaner schema that doesn't contain functionality that you can't actually
 use.
 
-### Common Middleware Considerations
+## Common Middleware Considerations
 
 In a production app, you typically want to add a few common enhancements, e.g.
 
@@ -92,7 +90,7 @@ do so. Here's an example plugin that uses Nuxt's consola library for logging,
 you could use it as a base for your own plugin:
 https://github.com/graphile/postgraphile-log-consola
 
-### Denial of Service Considerations
+## Denial of Service Considerations
 
 When you run PostGraphile in production you'll want to ensure that people cannot
 easily trigger denial of service (DOS) attacks against you. Due to the nature of
@@ -133,7 +131,7 @@ allUsers {
 
 There's lots of techniques for protecting your server from these kinds of
 queries; a great introduction to this subject is
-[this blog post](https://dev-blog.apollodata.com/securing-your-graphql-api-from-malicious-queries-16130a324a6b)
+[this blog post](https://www.apollographql.com/blog/securing-your-graphql-api-from-malicious-queries)
 from Apollo.
 
 These techniques should be used in conjunction with common HTTP protection
@@ -142,7 +140,7 @@ separate layer; for example you could use
 [Cloudflare rate limiting](https://www.cloudflare.com/rate-limiting/) for this,
 or an Express.js middleware.
 
-#### Statement Timeout
+### Statement Timeout
 
 One simple solution to this issue is to place a timeout on the database
 operations via the
@@ -189,7 +187,7 @@ app.use(postgraphile(pool, "public", { ... }));
 // ...
 ```
 
-#### Simple: Query Allowlist ("persisted queries" / "persisted operations")
+### Simple: Query Allowlist ("persisted queries" / "persisted operations")
 
 If you do not intend to allow third parties to run arbitrary operations against
 your API then using
@@ -227,7 +225,7 @@ source
 [@graphile/persisted-operations](https://github.com/graphile/persisted-operations)
 plugin; we recommend its use to the vast majority of our users.
 
-#### Advanced
+### Advanced
 
 Using a query allowlist puts the decision in the hands of your engineers whether
 a particular query should be accepted or not. Sometimes this isn't enough - it
@@ -252,7 +250,7 @@ on how you might go about solving the issues for yourself. Many of these
 techniques can be implemented outside of PostGraphile, for example in an express
 middleware or a nginx reverse proxy between PostGraphile and the client.
 
-#### Sending queries to read replicas
+### Sending queries to read replicas
 
 Probably the most important thing regarding scalability is making sure that your
 master database doesn't bow under the pressure of all the clients talking to it.
@@ -272,11 +270,13 @@ string passed via `--connection` which will now be used only for mutations.
 (If you're using middleware, then you should use the `readOnlyConnection` option
 instead.)
 
-> NOTE: We don't currently support the multi-host syntax for this connection
-> string, but you can use a PostgreSQL proxy such a PgPool or PgBouncer between
-> PostGraphile and your database to enable connecting to multiple read replicas.
+:::note
+We don't currently support the multi-host syntax for this connection
+string, but you can use a PostgreSQL proxy such a PgPool or PgBouncer between
+PostGraphile and your database to enable connecting to multiple read replicas.
+:::
 
-#### Pagination caps
+### Pagination caps
 
 It's unlikely that you want users to request `allUsers` and receive back
 literally all of the users in the database. More likely you want users to use
@@ -294,7 +294,7 @@ comment on table users is
   E'@paginationCap 20\nSomeone who can log in.';
 ```
 
-#### Limiting GraphQL query depth
+### Limiting GraphQL query depth
 
 Most GraphQL queries tend to be only a few levels deep, queries like the deep
 one at the top of this article are generally not required. You may use
@@ -302,7 +302,7 @@ one at the top of this article are generally not required. You may use
 that hit PostGraphile - any deeper than this will be discarded during query
 validation.
 
-#### [EXPERIMENTAL] GraphQL cost limit
+### [EXPERIMENTAL] GraphQL cost limit
 
 The most powerful way of preventing DOS is to limit the cost of GraphQL queries
 that may be executed against your GraphQL server. The Pro Plugin contains a

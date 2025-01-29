@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/realtime/
-title: PostGraphile Realtime
+title: Realtime
 ---
+
+# PostGraphile Realtime
 
 Every application is different, and no more so than when it comes to their
 realtime requirements. Some applications are read-heavy, others write-heavy, and

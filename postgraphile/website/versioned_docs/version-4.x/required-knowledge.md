@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/required-knowledge/
 title: Required Knowledge
 ---
 
@@ -14,7 +12,7 @@ This page aims to outline some of the things you might want to do with
 PostGraphile and what knowledge you may need (and where to get it) to do those
 things well.
 
-### Database - basics
+## Database - basics
 
 Below outlines some of the SQL syntax and features you will probably want to be
 familiar with to make the most of your PostGraphile usage. PostGraphile is
@@ -23,7 +21,7 @@ write this syntax depending on what technologies you use to manage your DB (for
 example, you might use a graphical tool), but if you can read it then it will
 help you to read the PostGraphile documentation.
 
-#### Case insensitive unless quoted
+### Case insensitive unless quoted
 
 SQL is case insensitive, both keywords and identifiers, so the following are all
 equivalent:
@@ -44,7 +42,7 @@ as "shouty".
 It's common to use snake_case as the naming convention in SQL because of this
 case-insensitivity, to save having to escape all the identifiers.
 
-#### The word `user` is reserved
+### The word `user` is reserved
 
 If you want to call your table `user` you need to escape it; e.g.
 
@@ -58,7 +56,7 @@ https://www.postgresql.org/docs/current/sql-keywords-appendix.html
 Most keywords are singular, which is why Benjie prefers to use plurals when
 naming tables as it helps avoid potential keyword clashes.
 
-#### PostgreSQL doc versioning
+### PostgreSQL doc versioning
 
 PostgreSQL docs are found at `https://postgresql.org/docs/VERSION/...`. Often
 when you google you will be taken to out of date docs, like those for version
@@ -70,7 +68,7 @@ In our documentation, we always try and link to `/docs/current/...` which is a
 special URL that always shows the latest stable version of PostgreSQL. If you
 are using an older version you should make sure to switch to the older docs.
 
-#### Defining tables
+### Defining tables
 
 ```sql
 create table users (
@@ -104,7 +102,7 @@ create table users (
 - `default` if the column is not specified, what should its value default to
   (only applies to `INSERT`)
 
-#### Creating roles
+### Creating roles
 
 ```sql
 create role my_superuser with login password 'password here' superuser;
@@ -124,7 +122,7 @@ grant app_visitor to app_authenticator;
   actually take any actions without first switching into another role (e.g.
   `app_visitor` or `app_admin`).
 
-#### Granting permissions
+### Granting permissions
 
 ```sql
 grant
@@ -146,7 +144,7 @@ on my_table to app_visitor;
   honed GraphQL schema.
 - `delete`: column-level grants don't make sense on delete.
 
-#### Creating security policies
+### Creating security policies
 
 Check out our Row-Level security infosheet here:
 https://learn.graphile.org/docs/PostgreSQL_Row_Level_Security_Infosheet.pdf
@@ -177,7 +175,7 @@ create policy friend_insert on my_other_table for insert with check ( are_friend
 - NOTE: if `with check` is not specified then the `using` clause will also be
   used for `with check` automatically.
 
-#### Recommended path
+### Recommended path
 
 A good way to tackle and make sense of PostGraphile is to go through these
 steps:

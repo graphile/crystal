@@ -26,7 +26,7 @@ In V5, the signature has changed a little.
 The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
-The second change, however, is much more significant - condition generation now
+The second change, however, is much more significant — condition generation now
 operates based on the Gra*fast* plan system (which operates based on "steps"
 which represent all possible values) rather than V4's lookahead engine (which
 deals in concrete runtime values).
@@ -85,7 +85,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
 ```
 
 Whereas in V5 the condition callback is called on every single GraphQL request,
-in V5 it is only called each time a new operation is planned - operations that
+in V5 it is only called each time a new operation is planned — operations that
 reuse the plan do not call the condition callback again. `value.get()` gives us
 a step (`$val`) that represents all potential values for that input; we then
 feed this into the SQL statement via a placeholder (since it is not a concrete

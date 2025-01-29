@@ -1,10 +1,10 @@
 ---
-layout: page
-path: /postgraphile/make-change-nullability-plugin/
-title: makeChangeNullabilityPlugin (graphile-utils)
+title: makeChangeNullabilityPlugin
 ---
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
+# makeChangeNullabilityPlugin (graphile-utils)
+
+**This documentation applies to PostGraphile v4.1.0+**
 
 Use this plugin to easily change the nullability of fields in your GraphQL,
 where true = nullable (e.g. `String`), false = non-nullable (e.g. `String!`).

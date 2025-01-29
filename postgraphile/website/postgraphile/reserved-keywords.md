@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/reserved-keywords/
-title: Reserved keywords and table names
+title: Reserved Keywords
 ---
+
+# Reserved Keywords and Table Names
 
 Some table, column, function and argument names can cause issues with
 PostGraphile due to conflicts with auto-generated type and field names. In these
@@ -32,6 +32,6 @@ please consider using the "Edit this page" link to suggest some changes!
 If there exists multiple schemas with the same table name inside of them, it
 can cause naming conflicts as the same name will be generated for each. To
 support non-unique table names you should either apply an `@name` [smart
-tag](./smart-tags) to one or both tables, or implement an [inflection
-override](./inflection/#overriding-inflection---general) that will change how
+tag](./smart-tags#name) to one or both tables, or implement an [inflection
+override](./inflection/#overriding-inflection) that will change how
 the GraphQL type names are generated from the raw table name.

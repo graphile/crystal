@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/running-postgraphile-as-a-library-in-docker/
-title: Running PostGraphile as a library in Docker
+title: Running PostGraphile as a Library in Docker
 ---
 
 The following guide describes how to run a network of Docker containers on a
@@ -18,9 +16,9 @@ Follow the steps provided in the guide
 **[Running PostGraphile in Docker](./running-postgraphile-in-docker)** and come
 back to this guide to create the GraphQL container.
 
-### Create PostGraphile Container
+## Create PostGraphile Container
 
-At this stage, the repository should look like this.
+At this stage, the repository should look like this:
 
 ```
 /
@@ -33,21 +31,21 @@ At this stage, the repository should look like this.
 └─ docker-compose.yml
 ```
 
-#### Update Environment Variables
+### Update Environment Variables
 
 Update the file `.env` to add the `PORT` and `DATABASE_URL` which will be used
 by PostGraphile to connect to the PostgreSQL database. Note the `DATABASE_URL`
 follows the syntax `postgres://<user>:<password>@db:5432/<db_name>`.
 
 ```
-[...]
+[...]ini
 # GRAPHQL
 # Parameters used by graphql container
 DATABASE_URL=postgres://postgres:change_me@db:5432/forum_example
 PORT=5433
 ```
 
-#### Create Node.js Application
+### Create Node.js Application
 
 Create a new folder `graphql` at the root of the repository. It will be used to
 store the files necessary to create the PostGraphile container. In the `graphql`
@@ -92,7 +90,7 @@ http
   .listen(process.env.PORT);
 ```
 
-#### Create PostGraphile Dockerfile
+### Create PostGraphile Dockerfile
 
 Create a new file `Dockerfile` in the `graphql` folder (not in the folder `src`)
 with the following content.
@@ -120,7 +118,7 @@ EXPOSE 8080
 CMD [ "node", "server.js" ]
 ```
 
-#### Update Docker Compose File
+### Update Docker Compose File
 
 Update the file `docker-compose.yml` under the `services` section to include the
 GraphQL service.
@@ -147,7 +145,7 @@ services:
 [...]
 ```
 
-At this stage, the repository should look like this.
+At this stage, the repository should look like this:
 
 ```
 /
@@ -165,14 +163,14 @@ At this stage, the repository should look like this.
 └─ docker-compose.yml
 ```
 
-### Build Images And Run Containers
+## Build Images And Run Containers
 
-#### Build Images
+### Build Images
 
 You can build the Docker images by executing the following command from the root
 of the repository.
 
-```
+```shell
 # Build images for all services in docker-compose.yml
 $ docker-compose build
 
@@ -184,7 +182,7 @@ $ docker-compose build db
 $ docker-compose build graphql
 ```
 
-#### Run Containers
+### Run Containers
 
 You can run the Docker containers by executing the following command from the
 root of the repository. Note when running the database container for the first
@@ -192,7 +190,7 @@ time, Docker will automatically create a Docker Volume to persist the data from
 the database. The Docker Volume is automatically named as
 `<your_repository_name>_db`.
 
-```
+```shell
 # Run containers for all services in docker-compose.yml
 $ docker-compose up
 
@@ -216,7 +214,7 @@ the command `$ docker-machine ip default`.
 | GraphQL API               | `http://localhost:5433/graphql`  | `http://your_docker_machine_ip:5433/graphql`  |
 | PostgreSQL Database       | host: `localhost`, port: `5432`  | host: `your_docker_machine_ip`, port: `5432`  |
 
-#### Re-initialize The Database
+### Re-initialize The Database
 
 In case you do changes to the database schema by modifying the files in
 `/db/init`, you will need to re-initialize the database to see these changes.

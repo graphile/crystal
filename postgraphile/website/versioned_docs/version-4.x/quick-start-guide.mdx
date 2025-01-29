@@ -1,18 +1,20 @@
 ---
-layout: page
-path: /postgraphile/quick-start-guide/
 title: Quick Start Guide
 ---
+
+import TOCInline from "@theme/TOCInline";
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
 
 This quick start guide will walk you through spinning up your first PostGraphile
 server, including installing the prerequisites such as Node and PostgreSQL.
 
-### Table of Contents
+</p>
 
-- [Install Node](#install-node)
-- [Install PostgreSQL](#install-postgresql)
-- [Create a Database](#create-a-database)
-- [Install PostGraphile](#install-postgraphile)
+# Table of Contents
+
+<TOCInline toc={toc} />
 
 ### Install Node
 
@@ -127,11 +129,15 @@ It is easy to install PostGraphile with
 $ npm install -g postgraphile
 ```
 
-> **NOTE**: _we do not recommend installing PostGraphile globally (with the `-g`
-> flag to `npm` used here) - local installs are preferred. However, if you're
-> just getting started with Node.js then using the global install method is much
-> simpler. Once you start wanting to use plugins with PostGraphile we recommend
-> you move to using a local install._
+:::note
+
+We do not recommend installing PostGraphile globally (with the `-g`
+flag to `npm` used here) - local installs are preferred. However, if you're
+just getting started with Node.js then using the global install method is much
+simpler. Once you start wanting to use plugins with PostGraphile we recommend
+you move to using a local install.
+
+:::
 
 To run PostGraphile, you’ll use the same URL that you used for `psql` with the
 database name added:

@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/node-id/
-title: Globally Unique Object Identification ("nodeId" / "id")
+title: nodeId / id
 ---
+
+# Globally Unique Object Identification ("nodeId" / "id")
 
 We implement the
 [GraphQL Global Object Identification Specification](https://facebook.github.io/relay/graphql/objectidentification.htm),
@@ -25,11 +25,13 @@ export const client = new ApolloClient({
 });
 ```
 
-**WARNING**: by default, we call the Global Object Identifier `nodeId` to avoid
+:::caution warning
+By default, we call the Global Object Identifier `nodeId` to avoid
 clashing with the `id` field that's common practice in database design. If you
 wish to call the Global Object Identifier field `id` instead (as is mandated by
 the specification), you can do so with our `--classic-ids` CLI flag. In doing
 so, any `id` column will automatically be renamed to `rowId`.
+:::
 
 ### Disabling the Global Object Identifier
 
@@ -43,6 +45,9 @@ postgraphile --skip-plugins graphile-build:NodePlugin ...
 Ensure that you have a good way of generating cache identifiers for your GraphQL
 client though!
 
-(Note: the GraphQL Global Object Identification Specification was previously
+:::note
+
+The GraphQL Global Object Identification Specification was previously
 known as the Relay Global Object Identification Specification, but it's not
-specific to Relay.)
+specific to Relay.
+:::

@@ -1,10 +1,8 @@
 ---
-layout: page
-path: /postgraphile/usage-schema/
-title: Direct schema usage
+title: Direct Schema Usage
 ---
 
-# PostGraphile schema-only usage
+# PostGraphile Schema-Only Usage
 
 The PostGraphile library mode gives you a lot of excellent features for running
 your own GraphQL server. However, if you want to execute a PostGraphile query in
@@ -41,7 +39,7 @@ const { schema, resolvedPreset } = await pgl.getSchemaResult();
 ```
 
 You should call the above function whenever you need the schema, rather than
-caching the result - the reason is that in "watch" mode the schema (and preset)
+caching the result — the reason is that in "watch" mode the schema (and preset)
 may change over time, so this is a safe way to get the latest schema.
 
 :::info
@@ -148,7 +146,7 @@ validating the GraphQL request yourself.
 :::tip
 
 If you're doing this inside a server framework, they will often give you a way
-to hook the args before they're dispatched to execute - that is where you would
+to hook the args before they're dispatched to execute — that is where you would
 call `hookArgs()`.
 
 :::

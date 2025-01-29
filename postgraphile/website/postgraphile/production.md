@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/production/
-title: Production considerations
+title: Production Considerations
 ---
 
 When it comes time to deploy your PostGraphile application to production,
@@ -61,7 +59,7 @@ seconds, no matter how fast your queries actually are.
 Run PostGraphile in the same city as your database, preferably in the same data
 centre.
 
-## Grafast Considerations
+## Gra*fast* Considerations
 
 Since PostGraphile uses Gra*fast* under the hood, you should also familiarize
 yourself with [Gra*fast*'s production
@@ -138,7 +136,7 @@ allUsers {
 
 There's lots of techniques for protecting your server from these kinds of
 queries; a great introduction to this subject is
-[this blog post](https://dev-blog.apollodata.com/securing-your-graphql-api-from-malicious-queries-16130a324a6b)
+[this blog post](https://www.apollographql.com/blog/securing-your-graphql-api-from-malicious-queries)
 from Apollo.
 
 These techniques should be used in conjunction with common HTTP protection
@@ -232,7 +230,7 @@ GraphQL clients, but it does have a few caveats:
 - Your API will only accept operations that you've approved, so it's not
   suitable if you want third parties to run arbitrary custom operations.
 - You must be able to generate a unique ID (e.g. a hash) from each operation at
-  build time of your application/web page - your GraphQL operations must be
+  build time of your application/web page — your GraphQL operations must be
   "static". It's important to note this only applies to the operation document
   itself, the variables can of course change at runtime.
 - You must have a way of sharing these static operations from the application

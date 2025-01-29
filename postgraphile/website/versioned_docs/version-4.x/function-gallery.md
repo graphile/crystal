@@ -1,9 +1,8 @@
 ---
-layout: page
-path: /postgraphile/function-gallery/
-title: Database Function Gallery
-showExamples: functions
+title: Function Gallery
 ---
+
+# Database Function Gallery
 
 Below you'll find some examples of various PostgreSQL functions, and their
 effects on PostGraphile.

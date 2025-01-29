@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/community-contributions/
-title: Community contributions
+title: Community Contributions
 ---
 
 The community contributes to PostGraphile development in many ways.
@@ -19,4 +17,4 @@ code/projects/tutorials/blog posts. Here are links to some of these (use the
 
 And of course, we couldn't keep progressing this project like we do if it wasn't
 for the financial support of many
-[community members](https://github.com/graphile/postgraphile/blob/master/SPONSORS.md).
+[community members](https://graphile.org/sponsor).

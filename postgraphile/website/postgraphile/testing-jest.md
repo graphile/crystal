@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/testing-jest/
 title: Testing with Jest
 ---
 
@@ -223,7 +221,7 @@ For more thorough test helpers (and to see this working in practice), check out
 ### Testing the GraphQL middleware
 
 Whereas testing the database functionality can be thought of as unit tests,
-testing the GraphQL middleware is more akin to integration tests - they pretend
+testing the GraphQL middleware is more akin to integration tests — they pretend
 to go through the middleware (exercising pgSettings / JWT / etc) and you can
 place assertions on the results.
 

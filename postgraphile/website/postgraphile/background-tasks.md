@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/background-tasks/
-title: Background Tasks in PostGraphile
+title: Background Tasks
 ---
+
+# Background Tasks in PostGraphile
 
 In your GraphQL server typically most processing will be done in the
 "foreground", as part of the request-response cycle. However, since clients
@@ -32,10 +32,10 @@ workers and handle errors and re-tries.
 
 ### Tasks queues and workers for Postgres
 
-There are several exisiting solutions that can integrate with a PostgreSQL
+There are several existing solutions that can integrate with a PostgreSQL
 database or expose a Node.js-friendly API.
 
-- [Graphile Worker](https://github.com/graphile/worker)
+- [Graphile Worker](https://worker.graphile.org)
 - [GCP Cloud Tasks](https://cloud.google.com/tasks/) (via Graphile Worker)
 - [Faktory](http://contribsys.com/faktory/) (via Graphile Worker)
 - [RabbitMQ](https://www.rabbitmq.com/)
@@ -56,7 +56,7 @@ Other important considerations when choosing a task queue would be:
 - Complexity
 - Throughput requirements
 - DevOps complexity
-- Tracability
+- Traceability
 - Privacy
 
 ### Graphile Worker
@@ -86,7 +86,7 @@ module.exports = async (payload, helpers) => {
 };
 ```
 
-Check the [Graphile Worker docs](https://github.com/graphile/worker) for details
+Check the [Graphile Worker docs](https://worker.graphile.org) for details
 on how to set up and use it.
 
 #### Limitations
@@ -94,5 +94,5 @@ on how to set up and use it.
 Despite all the benefits, Graphile Worker stills lacks some features provided by
 other more mature tasks queues
 
-- Currently Graphile Worker doesn't expose a GUI to monitor or manage tasks.
+- Currently Graphile Worker doesn’t expose a GUI to monitor or manage tasks.
 - ??

@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/bundling-webpack/
-title: Bundling PostGraphile with Webpack
+title: Bundling with Webpack
 ---
+
+# Bundling PostGraphile with Webpack
 
 PostGraphile is designed to be ran as a standard Node.js application on the
 server, using the built in `require` functionality which reads code from the
@@ -51,7 +51,7 @@ module.exports = {
 };
 ```
 
-A more invasive and optimised config can be found in our
+A more invasive and optimized config can be found in our
 [Lambda example](https://github.com/graphile/postgraphile-lambda-example); note
 that it cannot be used with watch mode and does not support subscriptions.
 Here's a simplified and commented version of it:

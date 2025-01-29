@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/versioning-policy/
-title: Versioning Policy
+title: Versioning Policy?
 ---
+
+# Versioning Policy
 
 TL;DR: breaking changes to the GraphQL schema require a major version update.
 Breaking changes to the plugin interface would typically require a major version
@@ -27,7 +27,7 @@ exceptional situations be included in a minor version update (e.g. 4.0.0 ->
 4.1.0). This will change in a later major release of PostGraphile, once the
 plugin interface is more stable. Despite this, breaking changes to the plugin
 interface are seen as a major issue and will be avoided as much as possible.
-Interfaces that are documented on the Graphile website will not be broken
+Interfaces that are documented on a Graphile website will not be broken
 without a **very good reason**.
 
 ### What about breaking changes in GraphQL itself (and other dependencies)?

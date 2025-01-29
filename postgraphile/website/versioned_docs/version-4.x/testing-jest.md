@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/testing-jest/
 title: Testing with Jest
 ---
 

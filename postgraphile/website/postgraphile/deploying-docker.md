@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-docker/
 title: Deploying with Docker
 ---
 
@@ -80,7 +78,7 @@ node_modules
 The content of your `Dockerfile` will vary greatly depending on your repository
 setup, but here's an example for inspiration:
 
-```Dockerfile
+```dockerfile
 # Dockerfile
 
 # Global args, set before the first FROM, shared by all stages

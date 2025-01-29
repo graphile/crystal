@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1200"
+   height="1200"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="graphile.optimized.centered.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.60958374"
+     inkscape:cx="600.40972"
+     inkscape:cy="598.76925"
+     inkscape:window-width="1680"
+     inkscape:window-height="1201"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg9" />
+  <!--This file is Copyright © 2018 Benjie Gillam. All rights reserved.-->
+  <g
+     id="g9"
+     transform="translate(0,60)">
+    <path
+       fill="#c0201c"
+       d="M 100,615 25,360 260,25 715,615 Z"
+       class="seg3"
+       shape-rendering="geometricPrecision"
+       id="path1" />
+    <path
+       fill="#fd504e"
+       d="M 25,360 260,25 600,130 715,615 Z"
+       class="seg2"
+       shape-rendering="geometricPrecision"
+       id="path2" />
+    <path
+       fill="#cd4948"
+       d="M 260,25 600,130 940,25 715,615 Z"
+       class="seg1"
+       shape-rendering="geometricPrecision"
+       id="path3" />
+    <path
+       fill="#fd504e"
+       d="M 600,130 940,25 1175,360 715,615 Z"
+       class="seg2"
+       shape-rendering="geometricPrecision"
+       id="path4" />
+    <path
+       fill="#c0201c"
+       d="m 940,25 235,335 -75,255 H 715 Z"
+       class="seg3"
+       shape-rendering="geometricPrecision"
+       id="path5" />
+    <path
+       fill="#7e120e"
+       d="M 1175,360 1100,615 600,1055 715,615 Z"
+       class="seg4"
+       shape-rendering="geometricPrecision"
+       id="path6" />
+    <path
+       fill="#610f0d"
+       d="M 1100,615 600,1055 100,615 h 615 z"
+       class="seg5"
+       shape-rendering="geometricPrecision"
+       id="path7" />
+    <path
+       fill="#7e120e"
+       d="M 600,1055 100,615 25,360 715,615 Z"
+       class="seg4"
+       shape-rendering="geometricPrecision"
+       id="path8" />
+    <path
+       fill="#c0201c"
+       d="M 100,615 25,360 715,615 Z"
+       class="seg3"
+       shape-rendering="geometricPrecision"
+       id="path9" />
+  </g>
+  <!--polygon points="25,360 260,25 260,25 600,130 600,130 940,25 940,25 1175,360 1175,360 1100,615 1100,615 600,1055 600,1055 100,615 100,615 25,360" class="heart-outline" /-->
+</svg>

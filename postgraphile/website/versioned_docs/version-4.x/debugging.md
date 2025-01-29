@@ -1,7 +1,6 @@
 ---
-layout: page
-path: /postgraphile/debugging/
 title: Debugging
+toc_max_heading_level: 4
 ---
 
 When something's wrong with your app it can be hugely frustrating; so we want to

@@ -1,19 +1,19 @@
-# Exporting your schema
+# Exporting Your Schema
 
 One of the major new features of PostGraphile V5 is the ability to export your
-schema as executable code. You might use this as a way to "eject" your schema so
+schema as executable code. You might use this as a way to “eject” your schema so
 that you can take care of writing it yourself, or you could use it to make
 startup in production faster by removing the need for introspection and the
 plugin systems of graphile-build, or you might just use it to get a better
 understanding of how your schema works.
 
-However you plan to use it, it's a powerful and exciting new feature! To use
+However you plan to use it, it’s a powerful and exciting new feature! To use
 this feature:
 
 1. build your schema
 2. call `exportSchema` on it
 
-Here's a simple example:
+Here’s a simple example:
 
 ```ts
 import { exportSchema } from "graphile-export";
@@ -44,14 +44,14 @@ main()
 ```
 
 Run this file, and you should see a `exported-schema.mjs` file containing your
-executable schema. You'll notice that this schema does not import
-graphile-build, graphile-build-pg, etc - it just imports what it needs from
+executable schema. You’ll notice that this schema does not import
+graphile-build, graphile-build-pg, etc — it just imports what it needs from
 `graphql`, `grafast` and similar runtime modules.
 
 :::warning For a schema to be exported, all plugins must support exporting
 
 Not all PostGraphile plugins support exporting the schema, if you use plugins
-that don't support exporting then your exported schema is likely to have
+that don’t support exporting then your exported schema is likely to have
 runtime or even security issues. It is essential that you thoroughly test
 your exported schema before relying on it.
 
@@ -62,12 +62,12 @@ your exported schema before relying on it.
 Exporting a GraphQL schema is error-prone, so you should test your exported
 schema thoroughly. The main failure mode for exported schemas is runtime errors
 or incorrect variable references when an exported function attempts to
-reference a variable in the parent scope and that variable wasn't correctly
+reference a variable in the parent scope and that variable wasn’t correctly
 handled via the `EXPORTABLE()` function from `graphile-export`. Using
 `eslint-plugin-graphile-export` will help catch most of these kinds of errors,
 but you should be careful to ensure that every function that will be exported
 is either wrapped with `EXPORTABLE` (with the correct args) or is from a
-declared module - see the `graphile-export` documentation.
+declared module — see the `graphile-export` documentation.
 
 TODO: update this warning, since this is less of an issue now that
 graphile-export does its own internal consistency checks.
@@ -100,7 +100,7 @@ codebase can be reverted.)
 
 :::
 
-:::tip
+:::tip Run code validation against exported code
 
 You may get value from running ESLint, TypeScript, and/or other code validation
 tooling against the exported code to ensure there are no undefined variable
@@ -125,7 +125,7 @@ console.log("Listening on http://localhost:5555/");
 
 :::note Only import what you need!
 
-You'll notice that we import the `node` grafserv adaptor, our exported schema,
+You’ll notice that we import the `node` grafserv adaptor, our exported schema,
 and our preset, but no other PostGraphile-specific imports. The schema export
 itself will pull in a few other modules, but there should be no need to import
 `postgraphile` itself or the `graphile-build` system, since the schema has

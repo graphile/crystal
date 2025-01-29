@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/enums/
 title: Enums
 ---
 
@@ -46,9 +44,12 @@ tell PostGraphile that it is an enum table using the `@enum`
 [smart comment](./smart-comments). You may also include a column named
 'description' to provide the description for the enum value.
 
-**IMPORTANT**: this is one of the few places where a smart tag and a smart
+:::info Important
+
+This is one of the few places where a smart tag and a smart
 comment is not equivalent, this **must** be achieved with a smart comment since
 smart tags have not yet loaded at this stage in introspection.
+:::
 
 ```sql
 create table animal_type (

@@ -1,10 +1,10 @@
 ---
-layout: page
-path: /postgraphile/make-plugin-by-combining-plugins/
-title: makePluginByCombiningPlugins (graphile-utils)
+title: makePluginByCombiningPlugins
 ---
 
-**NOTE: this documentation applies to PostGraphile v4.1.0+**
+# makePluginByCombiningPlugins (graphile-utils)
+
+**This documentation applies to PostGraphile v4.1.0+**
 
 This is a simple helper for combining multiple smaller plugins into one plugin
 for ease of use.
