@@ -40,6 +40,7 @@ import {
   ExecutableStep,
   filter,
   getEnumValueConfig,
+  getEnumValueConfigs,
   groupBy,
   lambda,
   list,
@@ -5293,7 +5294,41 @@ if (require.main === module) {
   });
 }
 
-function getEnumExtensionValue<T>(
+declare module "graphql" {
+  interface GraphQLEnumType {
+    [$$extensionsByValue]?: Record<string, Record<string, any>>;
+  }
+}
+
+const $$extensionsByValue = Symbol("extensionsByValue");
+function getEnumExtensionPropertyByValue(
+  enumType: GraphQLEnumType,
+  extensionsProperty: string,
+) {
+  const enumValueConfigs = getEnumValueConfigs(enumType);
+  if (enumType[$$extensionsByValue] === undefined) {
+    enumType[$$extensionsByValue] = Object.create(null) as {};
+  }
+  if (enumType[$$extensionsByValue][extensionsProperty] === undefined) {
+    enumType[$$extensionsByValue][extensionsProperty] = Object.entries(
+      enumValueConfigs,
+    ).reduce((memo, [value, config]) => {
+      memo[value] = config?.extensions?.[extensionsProperty];
+      return memo;
+    }, Object.create(null));
+  }
+  return enumType[$$extensionsByValue]![extensionsProperty];
+}
+
+type LambdaArg = { lookup: Record<string, any>; value: any };
+function enumExtensionValues<T>({ lookup, value }: LambdaArg) {
+  return value?.map((v: any) => lookup[v] as T | undefined);
+}
+function enumExtensionValue<T>({ lookup, value }: LambdaArg) {
+  return lookup[value] as T | undefined;
+}
+
+export function getEnumExtensionValue<T>(
   type: GraphQLInputType,
   $step: InputStep,
   extensionsProperty: string,
@@ -5303,24 +5338,11 @@ function getEnumExtensionValue<T>(
   if (!isEnumType(enumType)) {
     throw new Error(`Only enum types are supported by this method`);
   }
-  if (isListType(nullableType)) {
-    return lambda(
-      $step,
-      (val) =>
-        val?.map(
-          (v: any) =>
-            getEnumValueConfig(enumType, v)?.extensions?.[
-              extensionsProperty
-            ] as T | undefined,
-        ),
-    );
-  } else {
-    return lambda(
-      $step,
-      (val) =>
-        getEnumValueConfig(enumType, val)?.extensions?.[extensionsProperty] as
-          | T
-          | undefined,
-    );
-  }
+  const $lookup = constant(
+    getEnumExtensionPropertyByValue(enumType, extensionsProperty),
+  );
+  return lambda(
+    { lookup: $lookup, value: $step },
+    isListType(nullableType) ? enumExtensionValues : enumExtensionValue,
+  );
 }
