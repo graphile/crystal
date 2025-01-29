@@ -5296,12 +5296,18 @@ if (require.main === module) {
 
 declare module "graphql" {
   interface GraphQLEnumType {
-    [$$extensionsByValue]?: Record<string, Record<string, any>>;
+    [$$extensionsByValue]?: Record<
+      string,
+      {
+        lookupValues: (values: any[]) => any;
+        lookupValue: (value: any) => any;
+      }
+    >;
   }
 }
 
 const $$extensionsByValue = Symbol("extensionsByValue");
-function getEnumExtensionPropertyByValue(
+function getEnumExtensionPropertyValueLookups(
   enumType: GraphQLEnumType,
   extensionsProperty: string,
 ) {
@@ -5310,22 +5316,22 @@ function getEnumExtensionPropertyByValue(
     enumType[$$extensionsByValue] = Object.create(null) as {};
   }
   if (enumType[$$extensionsByValue][extensionsProperty] === undefined) {
-    enumType[$$extensionsByValue][extensionsProperty] = Object.entries(
-      enumValueConfigs,
-    ).reduce((memo, [value, config]) => {
-      memo[value] = config?.extensions?.[extensionsProperty];
-      return memo;
-    }, Object.create(null));
+    const lookup = Object.entries(enumValueConfigs).reduce(
+      (memo, [value, config]) => {
+        memo[value] = config?.extensions?.[extensionsProperty];
+        return memo;
+      },
+      Object.create(null),
+    );
+    const lookupValues = <T>(values: any) =>
+      values?.map((v: any) => lookup[v] as T | undefined);
+    const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
+    enumType[$$extensionsByValue][extensionsProperty] = {
+      lookupValues,
+      lookupValue,
+    };
   }
-  return enumType[$$extensionsByValue]![extensionsProperty];
-}
-
-type LambdaArg = { lookup: Record<string, any>; value: any };
-function enumExtensionValues<T>({ lookup, value }: LambdaArg) {
-  return value?.map((v: any) => lookup[v] as T | undefined);
-}
-function enumExtensionValue<T>({ lookup, value }: LambdaArg) {
-  return lookup[value] as T | undefined;
+  return enumType[$$extensionsByValue]![extensionsProperty]!;
 }
 
 export function getEnumExtensionValue<T>(
@@ -5338,11 +5344,16 @@ export function getEnumExtensionValue<T>(
   if (!isEnumType(enumType)) {
     throw new Error(`Only enum types are supported by this method`);
   }
-  const $lookup = constant(
-    getEnumExtensionPropertyByValue(enumType, extensionsProperty),
+  const { lookupValues, lookupValue } = getEnumExtensionPropertyValueLookups(
+    enumType,
+    extensionsProperty,
   );
-  return lambda(
-    { lookup: $lookup, value: $step },
-    isListType(nullableType) ? enumExtensionValues : enumExtensionValue,
-  );
+  if (
+    // Quicker than but equivalent to isListType(nullableType):
+    nullableType !== enumType
+  ) {
+    return lambda($step, lookupValues, true);
+  } else {
+    return lambda($step, lookupValue, true);
+  }
 }
