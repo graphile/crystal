@@ -1,18 +1,20 @@
-import type { PgOrderSpec, PgSelectStep } from "@dataplan/pg";
+import type {
+  PgOrderSpec,
+  PgSelectQueryBuilder,
+  PgSelectQueryBuilderCallback,
+} from "@dataplan/pg";
 
 import { EXPORTABLE } from "./exportable.js";
 
 type OrderBySpecIdentity =
   | string // Attribute name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | ((queryBuilder: PgSelectQueryBuilder) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
-      grafast: {
-        applyPlan($select: PgSelectStep): void;
-      };
+      pgSelectApply: PgSelectQueryBuilderCallback;
     };
   };
 }
@@ -133,22 +135,20 @@ export function orderByAscDesc(
       ? "FIRST"
       : "LAST";
 
-  type Plan = ($select: PgSelectStep) => void;
-
   let spec: PgOrderSpec;
-  const ascendingPlan: Plan =
+  const ascendingCb: PgSelectQueryBuilderCallback =
     typeof attributeOrSqlFragment === "string"
       ? EXPORTABLE(
           (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy({
                 nulls: ascendingNulls,
                 attribute: attributeOrSqlFragment,
                 direction: "ASC",
                 nullable,
               });
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [ascendingNulls, attributeOrSqlFragment, nullable, unique],
@@ -156,15 +156,15 @@ export function orderByAscDesc(
       : typeof attributeOrSqlFragment === "function"
       ? EXPORTABLE(
           (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy({
                 nulls: ascendingNulls,
-                ...attributeOrSqlFragment($select),
+                ...attributeOrSqlFragment(queryBuilder),
                 direction: "ASC",
                 nullable,
               } as PgOrderSpec);
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [ascendingNulls, attributeOrSqlFragment, nullable, unique],
@@ -177,27 +177,27 @@ export function orderByAscDesc(
         } as PgOrderSpec),
         EXPORTABLE(
           (spec, unique) =>
-            function applyPlan($select) {
-              $select.orderBy(spec);
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy(spec);
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [spec, unique],
         ));
-  const descendingPlan: Plan =
+  const descendingCb: PgSelectQueryBuilderCallback =
     typeof attributeOrSqlFragment === "string"
       ? EXPORTABLE(
           (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy({
                 nulls: descendingNulls,
                 attribute: attributeOrSqlFragment,
                 direction: "DESC",
                 nullable,
               });
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [attributeOrSqlFragment, descendingNulls, nullable, unique],
@@ -205,15 +205,15 @@ export function orderByAscDesc(
       : typeof attributeOrSqlFragment === "function"
       ? EXPORTABLE(
           (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
-            function applyPlan($select) {
-              $select.orderBy({
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy({
                 nulls: descendingNulls,
-                ...attributeOrSqlFragment($select),
+                ...attributeOrSqlFragment(queryBuilder),
                 direction: "DESC",
                 nullable,
               } as PgOrderSpec);
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [attributeOrSqlFragment, descendingNulls, nullable, unique],
@@ -226,10 +226,10 @@ export function orderByAscDesc(
         } as PgOrderSpec),
         EXPORTABLE(
           (spec, unique) =>
-            function applyPlan($select) {
-              $select.orderBy(spec);
+            function pgSelectApply(queryBuilder) {
+              queryBuilder.orderBy(spec);
               if (unique) {
-                $select.setOrderIsUnique();
+                queryBuilder.setOrderIsUnique();
               }
             },
           [spec, unique],
@@ -238,16 +238,12 @@ export function orderByAscDesc(
   const orders: MakeAddPgTableOrderByPluginOrders = {
     [`${baseName}_ASC`]: {
       extensions: {
-        grafast: {
-          applyPlan: ascendingPlan,
-        },
+        pgSelectApply: ascendingCb,
       },
     },
     [`${baseName}_DESC`]: {
       extensions: {
-        grafast: {
-          applyPlan: descendingPlan,
-        },
+        pgSelectApply: descendingCb,
       },
     },
   };
