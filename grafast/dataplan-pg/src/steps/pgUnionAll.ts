@@ -82,6 +82,7 @@ const digestSpecificExpressionFromAttributeName = (
 };
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
@@ -253,7 +254,11 @@ export class PgUnionAllSingleStep
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    return this.getDep<any>(0).getDep(0);
+    // TODO: we should add validation of this!
+    const $item = this.getDep<any>(0);
+    const $rows = $item.getDep(0);
+    const $pgUnionAll = $rows.getDep(0);
+    return $pgUnionAll;
   }
 
   public node() {
@@ -403,6 +408,12 @@ interface QueryBuildResult {
   queryValues: Array<QueryValue>;
 }
 
+interface PgUnionAllStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]>;
+}
+
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
  * resources, but must return a consistent data shape.
@@ -411,7 +422,7 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >
-  extends PgStmtBaseStep<unknown>
+  extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
     ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
@@ -903,6 +914,10 @@ on (${sql.indent(
     return new PgUnionAllSingleStep(this, $row);
   }
 
+  public items() {
+    return new PgUnionAllRowsStep(this);
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -1290,7 +1305,7 @@ and ${condition(i + 1)}`}
     }
     if (this.memberDigests.length === 0) {
       // We have no implementations, we'll never return anything
-      return constant([], false);
+      return constant(NO_ROWS, false);
     }
 
     // We must lock here otherwise we might try and create cursor validation
@@ -1735,8 +1750,11 @@ ${lateralText};`;
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
+      if (isPromiseLike(allVals)) {
+        // Must be an error!
         return allVals;
+      } else if (allVals == null) {
+        return NO_ROWS;
       }
       const limit = first ?? last;
       const firstAndLast = first != null && last != null && last < first;
@@ -1754,15 +1772,46 @@ ${lateralText};`;
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
+      return {
+        hasMore,
+        items: orderedRows,
+      };
     });
   }
 
   [$$toSQL]() {
     return this.alias;
+  }
+}
+
+export class PgUnionAllRowsStep<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgUnionAllRowsStep",
+  };
+
+  constructor($pgSelect: PgUnionAllStep<TAttributes, TTypeNames>) {
+    super();
+    this.addDependency($pgSelect);
+  }
+  public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
+    return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    return this.getClassStep().listItem(itemPlan);
+  }
+
+  optimize() {
+    return access(this.getClassStep(), "items");
+  }
+
+  execute(executionDetails: ExecutionDetails) {
+    const pgSelect = executionDetails.values[0];
+    return executionDetails.indexMap((i) => pgSelect.at(i).items);
   }
 }
 

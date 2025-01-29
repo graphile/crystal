@@ -9,16 +9,16 @@ graph TD
 
 
     %% plan dependencies
-    Object45{{"Object[45∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda37{{"Lambda[37∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ[ { attribute: 'col2', direction: 'ASC', nulls: 'LAST' }, { ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸsql.identifier(”similar_table_1”)ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸRecordCodec(similarTable1)ᐳ"}}:::plan
-    Lambda37 & Constant42 & Constant43 & Constant44 --> Object45
-    Object60{{"Object[60∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant57{{"Constant[57∈0] ➊<br />ᐸ[ { attribute: 'col2', direction: 'DESC', nulls: 'LAST' }, {ᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸsql.identifier(”similar_table_1”)ᐳ"}}:::plan
-    Lambda37 & Constant57 & Constant58 & Constant44 --> Object60
+    Object47{{"Object[47∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda39{{"Lambda[39∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ[ { attribute: 'col2', direction: 'ASC', nulls: 'LAST' }, { ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸsql.identifier(”similar_table_1”)ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸRecordCodec(similarTable1)ᐳ"}}:::plan
+    Lambda39 & Constant44 & Constant45 & Constant46 --> Object47
+    Object62{{"Object[62∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ[ { attribute: 'col2', direction: 'DESC', nulls: 'LAST' }, {ᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸsql.identifier(”similar_table_1”)ᐳ"}}:::plan
+    Lambda39 & Constant59 & Constant60 & Constant46 --> Object62
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -26,80 +26,84 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant67 --> Lambda37
-    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant68 --> Lambda40
-    Access41{{"Access[41∈0] ➊<br />ᐸ40.0ᐳ"}}:::plan
-    Lambda40 --> Access41
-    Lambda46{{"Lambda[46∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object45 --> Lambda46
-    Lambda51{{"Lambda[51∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col2', direction:ᐳ"}}:::plan
-    Constant69 --> Lambda51
-    Lambda61{{"Lambda[61∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object60 --> Lambda61
-    Lambda66{{"Lambda[66∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col2', direction:ᐳ"}}:::plan
-    Constant70 --> Lambda66
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant69 --> Lambda39
+    Lambda42{{"Lambda[42∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant70 --> Lambda42
+    Access43{{"Access[43∈0] ➊<br />ᐸ42.0ᐳ"}}:::plan
+    Lambda42 --> Access43
+    Lambda48{{"Lambda[48∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object47 --> Lambda48
+    Lambda53{{"Lambda[53∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant71{{"Constant[71∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col2', direction:ᐳ"}}:::plan
+    Constant71 --> Lambda53
+    Lambda63{{"Lambda[63∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object62 --> Lambda63
+    Lambda68{{"Lambda[68∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant72{{"Constant[72∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { attribute: 'col2', direction:ᐳ"}}:::plan
+    Constant72 --> Lambda68
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant17{{"Constant[17∈0] ➊<br />ᐸ'similar_table_1S'ᐳ"}}:::plan
-    Connection26{{"Connection[26∈0] ➊<br />ᐸ24ᐳ"}}:::plan
+    Constant18{{"Constant[18∈0] ➊<br />ᐸ'similar_table_1S'ᐳ"}}:::plan
+    Connection27{{"Connection[27∈0] ➊<br />ᐸ25ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object12 & Connection13 & Lambda37 & Access41 & Lambda46 & Lambda51 --> PgSelect14
-    __Item15[/"__Item[15∈2]<br />ᐸ14ᐳ"\]:::itemplan
-    PgSelect14 ==> __Item15
-    PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸsimilar_table_1ᐳ"}}:::plan
-    __Item15 --> PgSelectSingle16
-    List19{{"List[19∈3]<br />ᐸ17,18ᐳ"}}:::plan
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
-    Constant17 & PgClassExpression18 --> List19
-    PgSelectSingle16 --> PgClassExpression18
-    Lambda20{{"Lambda[20∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List19 --> Lambda20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression21
-    PgSelect27[["PgSelect[27∈4] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object12 & Connection26 & Lambda37 & Access41 & Lambda61 & Lambda66 --> PgSelect27
-    __Item28[/"__Item[28∈5]<br />ᐸ27ᐳ"\]:::itemplan
-    PgSelect27 ==> __Item28
-    PgSelectSingle29{{"PgSelectSingle[29∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
-    __Item28 --> PgSelectSingle29
-    List32{{"List[32∈6]<br />ᐸ17,31ᐳ"}}:::plan
-    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
-    Constant17 & PgClassExpression31 --> List32
-    PgSelectSingle29 --> PgClassExpression31
-    Lambda33{{"Lambda[33∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List32 --> Lambda33
-    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression34
+    Object12 & Connection13 & Lambda39 & Access43 & Lambda48 & Lambda53 --> PgSelect14
+    PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
+    PgSelect14 --> PgSelectRows15
+    __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
+    PgSelectRows15 ==> __Item16
+    PgSelectSingle17{{"PgSelectSingle[17∈2]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    __Item16 --> PgSelectSingle17
+    List20{{"List[20∈3]<br />ᐸ18,19ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    Constant18 & PgClassExpression19 --> List20
+    PgSelectSingle17 --> PgClassExpression19
+    Lambda21{{"Lambda[21∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List20 --> Lambda21
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    PgSelectSingle17 --> PgClassExpression22
+    PgSelect28[["PgSelect[28∈4] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
+    Object12 & Connection27 & Lambda39 & Access43 & Lambda63 & Lambda68 --> PgSelect28
+    PgSelectRows29[["PgSelectRows[29∈4] ➊"]]:::plan
+    PgSelect28 --> PgSelectRows29
+    __Item30[/"__Item[30∈5]<br />ᐸ29ᐳ"\]:::itemplan
+    PgSelectRows29 ==> __Item30
+    PgSelectSingle31{{"PgSelectSingle[31∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    __Item30 --> PgSelectSingle31
+    List34{{"List[34∈6]<br />ᐸ18,33ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    Constant18 & PgClassExpression33 --> List34
+    PgSelectSingle31 --> PgClassExpression33
+    Lambda35{{"Lambda[35∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List34 --> Lambda35
+    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression36
 
     %% define steps
 
     subgraph "Buckets for queries/v4/orderByNullsLast"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant17,Connection26,Lambda37,Lambda40,Access41,Constant42,Constant43,Constant44,Object45,Lambda46,Lambda51,Constant57,Constant58,Object60,Lambda61,Lambda66,Constant67,Constant68,Constant69,Constant70 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 37, 41, 46, 51, 17<br /><br />ROOT Connectionᐸ9ᐳ[13]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Constant18,Connection27,Lambda39,Lambda42,Access43,Constant44,Constant45,Constant46,Object47,Lambda48,Lambda53,Constant59,Constant60,Object62,Lambda63,Lambda68,Constant69,Constant70,Constant71,Constant72 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 39, 43, 48, 53, 18<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ14ᐳ[15]"):::bucket
+    class Bucket1,PgSelect14,PgSelectRows15 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 18<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item15,PgSelectSingle16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 17<br /><br />ROOT PgSelectSingle{2}ᐸsimilar_table_1ᐳ[16]"):::bucket
+    class Bucket2,__Item16,PgSelectSingle17 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT PgSelectSingle{2}ᐸsimilar_table_1ᐳ[17]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,List19,Lambda20,PgClassExpression21 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 26, 37, 41, 61, 66, 17<br /><br />ROOT Connectionᐸ24ᐳ[26]"):::bucket
+    class Bucket3,PgClassExpression19,List20,Lambda21,PgClassExpression22 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 12, 27, 39, 43, 63, 68, 18<br /><br />ROOT Connectionᐸ25ᐳ[27]<br />1: PgSelect[28]<br />2: PgSelectRows[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect27 bucket4
-    Bucket5("Bucket 5 (listItem)<br />Deps: 17<br /><br />ROOT __Item{5}ᐸ27ᐳ[28]"):::bucket
+    class Bucket4,PgSelect28,PgSelectRows29 bucket4
+    Bucket5("Bucket 5 (listItem)<br />Deps: 18<br /><br />ROOT __Item{5}ᐸ29ᐳ[30]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item28,PgSelectSingle29 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 29, 17<br /><br />ROOT PgSelectSingle{5}ᐸsimilar_table_1ᐳ[29]"):::bucket
+    class Bucket5,__Item30,PgSelectSingle31 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 31, 18<br /><br />ROOT PgSelectSingle{5}ᐸsimilar_table_1ᐳ[31]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression31,List32,Lambda33,PgClassExpression34 bucket6
+    class Bucket6,PgClassExpression33,List34,Lambda35,PgClassExpression36 bucket6
     Bucket0 --> Bucket1 & Bucket4
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

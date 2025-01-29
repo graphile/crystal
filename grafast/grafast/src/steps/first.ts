@@ -5,6 +5,8 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import type { ConnectionCapableStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
 export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
@@ -15,9 +17,13 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  constructor(parentPlan: ExecutableStep<ReadonlyArray<TData>>) {
+  constructor(
+    parentPlan:
+      | ExecutableStep<ReadonlyArray<TData>>
+      | ConnectionCapableStep<ExecutableStep<TData>, any>,
+  ) {
     super();
-    this.addDependency(parentPlan);
+    this.addDependency(itemsOrStep(parentPlan));
   }
 
   execute({
@@ -50,7 +56,9 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
  * plan.
  */
 export function first<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
+  plan:
+    | ExecutableStep<ReadonlyArray<TData>>
+    | ConnectionCapableStep<ExecutableStep<TData>, any>,
 ): FirstStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,

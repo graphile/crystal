@@ -16,6 +16,8 @@ import { $$deepDepSkip } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
+import type { ItemsStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,
@@ -27,19 +29,24 @@ export type ListTransformItemPlanCallback<
   TListStep extends ExecutableStep<readonly any[]>,
   TDepsStep extends ExecutableStep,
 > = (
-  listItemPlan: TListStep extends ListCapableStep<any, any>
-    ? ReturnType<TListStep["listItem"]>
+  listItemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
+    ? ReturnType<ItemsStep<TListStep>["listItem"]>
     : __ItemStep<any>,
 ) => TDepsStep;
 
 export interface ListTransformOptions<
-  TListStep extends ExecutableStep<readonly any[]>,
+  TListStep extends
+    | ExecutableStep<readonly any[]>
+    | ConnectionCapableStep<ExecutableStep<any>, any>,
   TDepsStep extends ExecutableStep,
   TMemo,
   TItemStep extends ExecutableStep | undefined = undefined,
 > {
   listStep: TListStep;
-  itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
+  itemPlanCallback: ListTransformItemPlanCallback<
+    ItemsStep<TListStep>,
+    TDepsStep
+  >;
   initialState(): TMemo;
   reduceCallback: ListTransformReduce<
     TMemo,
@@ -64,9 +71,11 @@ export interface ListTransformOptions<
  * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformStep<
-  TListStep extends ExecutableStep<readonly any[]> = ExecutableStep<
-    readonly any[]
-  >,
+  TListStep extends
+    | ExecutableStep<readonly any[]>
+    | ConnectionCapableStep<any, any> =
+    | ExecutableStep<readonly any[]>
+    | ConnectionCapableStep<any, any>,
   TDepsStep extends ExecutableStep = ExecutableStep,
   TMemo = any,
   TItemStep extends ExecutableStep | undefined = ExecutableStep | undefined,
@@ -79,7 +88,11 @@ export class __ListTransformStep<
   isSyncAndSafe = false;
 
   private listStepDepId: number;
-  public itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
+  private rawListStepDepId: number;
+  public itemPlanCallback: ListTransformItemPlanCallback<
+    ItemsStep<TListStep>,
+    TDepsStep
+  >;
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
     TMemo,
@@ -106,7 +119,7 @@ export class __ListTransformStep<
   ) {
     super();
     const {
-      listStep,
+      listStep: rawListStep,
       itemPlanCallback,
       initialState,
       reduceCallback,
@@ -116,7 +129,15 @@ export class __ListTransformStep<
       optimize,
       connectionClone,
     } = options;
+    const listStep = itemsOrStep(rawListStep);
     this.listStepDepId = this.addDependency(listStep);
+
+    // PERF: This is just so we can populate getListStep() correctly... Ideally we could mark this as a "plan-time-only" dependency.
+    this.rawListStepDepId =
+      rawListStep === listStep
+        ? this.listStepDepId
+        : this.addDependency(rawListStep);
+
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -167,7 +188,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep<TListStep>(this.listStepDepId);
+    return this.getDep<TListStep>(this.rawListStepDepId);
   }
 
   [$$deepDepSkip]() {
@@ -175,7 +196,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.dependencies[this.listStepDepId] as TListStep;
+    return this.dependencies[this.rawListStepDepId] as TListStep;
   }
 
   deduplicate(
@@ -352,7 +373,9 @@ export class __ListTransformStep<
  * {@page ~grafast/steps/listTransform.md}
  */
 export function listTransform<
-  TListStep extends ExecutableStep<readonly any[]>,
+  TListStep extends
+    | ExecutableStep<readonly any[]>
+    | ConnectionCapableStep<any, any>,
   TDepsStep extends ExecutableStep,
   TMemo,
   TItemStep extends ExecutableStep | undefined = undefined,

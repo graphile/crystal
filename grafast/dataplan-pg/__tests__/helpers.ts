@@ -362,6 +362,7 @@ export async function runTestQuery(
           if (!checkErrorSnapshots && errors) {
             const originalError = result.errors?.[0]?.originalError;
             console.error(originalError || errors[0]);
+            console.error("Occurred at", errors[0].path);
           }
           if (options.callback) {
             throw new Error(
@@ -549,10 +550,13 @@ export const assertSnapshotsMatch = async (
     const planOp = extensions?.explain?.operations?.find(
       (op) => op.type === "plan",
     );
+    if (!planOp) {
+      throw new Error("No plan was emitted for this test!");
+    }
     const graphString = planToMermaid(planOp.plan);
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
-      throw new Error("No plan was emitted for this test!");
+      throw new Error("Was unable to generate plan diagram for this test!");
     }
     const lines = graphString.split("\n");
     const relativePath = relative(__dirname, basePath);

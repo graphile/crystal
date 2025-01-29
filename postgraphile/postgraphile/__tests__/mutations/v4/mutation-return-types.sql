@@ -31,18 +31,17 @@ select
 from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
-  (select json_agg(s) from (
-    select
-      __post__."id"::text as "0"
-    from "a"."post" as __post__
-    where (
-      __person__."id"::"int4" = __post__."author_id"
-    )
-    order by __post__."id" asc
-  ) s) as "0",
-  __person__."id"::text as "1",
-  __person__."person_full_name" as "2"
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
 from (select ($1::"c"."person").*) as __person__;
+
+select
+  __post__."id"::text as "0"
+from "a"."post" as __post__
+where (
+  __post__."author_id" = $1::"int4"
+)
+order by __post__."id" asc;
 
 select
   __mutation_out_complex_setof__."x"::text as "0",
@@ -62,18 +61,17 @@ select
 from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
-  (select json_agg(s) from (
-    select
-      __post__."id"::text as "0"
-    from "a"."post" as __post__
-    where (
-      __person__."id"::"int4" = __post__."author_id"
-    )
-    order by __post__."id" asc
-  ) s) as "0",
-  __person__."id"::text as "1",
-  __person__."person_full_name" as "2"
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
 from (select ($1::"c"."person").*) as __person__;
+
+select
+  __post__."id"::text as "0"
+from "a"."post" as __post__
+where (
+  __post__."author_id" = $1::"int4"
+)
+order by __post__."id" asc;
 
 select
   __mutation_out_out__."first_out"::text as "0",

@@ -1,41 +1,34 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
-  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
-  GrafastResultStreamList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
-  StepOptimizeOptions,
-  StepStreamOptions,
-  StreamableStep,
 } from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
+  __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
   access,
   arrayOfLength,
   constant,
+  ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
   isDev,
   isPromiseLike,
   lambda,
-  list,
   operationPlan,
-  remapKeys,
   reverseArray,
   SafeError,
   stepAMayDependOnStepB,
-  stepsAreInSamePhase,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
@@ -83,6 +76,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({ hasMore: false, items: [] });
 
 type PgSelectPlanJoin =
   | {
@@ -252,6 +246,12 @@ interface QueryBuildResult {
   queryValues: Array<QueryValue>;
 }
 
+interface PgSelectStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
+}
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <attributes>, <cursor?> FROM <table>`. You can also add
@@ -264,11 +264,8 @@ interface QueryBuildResult {
 export class PgSelectStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends PgStmtBaseStep<
-    ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
-  >
+  extends PgStmtBaseStep<PgSelectStepResult>
   implements
-    StreamableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -430,13 +427,6 @@ export class PgSelectStep<
    * The id for the PostgreSQL context plan.
    */
   private contextId: number;
-
-  /**
-   * If this plan going to stream, the options for the stream (e.g.
-   * initialCount). Set during the `optimize` call - do not trust it before
-   * then. If null then the plan is not expected to stream.
-   */
-  private streamOptions: StepStreamOptions | null = null;
 
   // --------------------
 
@@ -1064,6 +1054,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
+  public items() {
+    return new PgSelectRowsStep(this);
+  }
+
   public pageInfo(
     $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
   ): PgPageInfoStep<this> {
@@ -1086,97 +1080,17 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    */
   async execute(
     executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  ): Promise<GrafastResultsList<PgSelectStepResult>> {
     const { first, last } = this.getExecutionCommon(executionDetails);
     const {
       indexMap,
       count,
       values,
       extra: { eventEmitter },
+      stream,
     } = executionDetails;
     if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
-    }
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      queryValues,
-      shouldReverseOrder,
-    } = this.buildTheQuery(executionDetails);
-    const contextDep = values[this.contextId];
-
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? null : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.resource[executeMethod](specs, {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      eventEmitter,
-      useTransaction: this.mode === "mutation",
-    });
-    // debugExecute("%s; result: %c", this, executionResult);
-
-    return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
-        return allVals;
-      }
-      const limit = first ?? last;
-      const firstAndLast = first != null && last != null && last < first;
-      const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
-      const trimFromStart =
-        !shouldReverseOrder && last != null && first == null;
-      const limitedRows = hasMore
-        ? trimFromStart
-          ? allVals.slice(Math.max(0, allVals.length - limit!))
-          : allVals.slice(0, limit!)
-        : allVals;
-      const slicedRows =
-        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-      const orderedRows = shouldReverseOrder
-        ? reverseArray(slicedRows)
-        : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
-    });
-  }
-
-  /**
-   * Like `execute`, but stream the results via async iterables.
-   */
-  async stream(
-    executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultStreamList<unknown[]>> {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
-    const { first, last } = this.getExecutionCommon(executionDetails);
-    if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
+      return arrayOfLength(count, NO_ROWS);
     }
     const {
       text,
@@ -1184,22 +1098,15 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       textForDeclare,
       rawSqlValuesForDeclare,
       identifierIndex,
+      name,
       streamInitialCount,
       queryValues,
       shouldReverseOrder,
     } = this.buildTheQuery(executionDetails);
-
-    if (shouldReverseOrder !== false) {
-      throw new Error("shouldReverseOrder must be false for stream");
-    }
-    if (!rawSqlValuesForDeclare || !textForDeclare) {
-      throw new Error("declare query must exist for stream");
-    }
-
     const contextDep = values[this.contextId];
-    let specs: readonly PgExecutorInput<any>[] | null = null;
-    if (text) {
-      specs = indexMap((i) => {
+
+    if (stream == null) {
+      const specs = indexMap<PgExecutorInput<any>>((i) => {
         const context = contextDep.at(i);
         return {
           // The context is how we'd handle different connections with different claims
@@ -1213,51 +1120,123 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               : EMPTY_ARRAY,
         };
       });
-    }
-    const initialFetchResult = specs
-      ? (
-          await this.resource.executeWithoutCache(specs, {
-            text,
-            rawSqlValues,
-            identifierIndex,
-            eventEmitter,
-          })
-        ).values
-      : null;
-
-    const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? val : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const streams = (
-      await this.resource.executeStream(streamSpecs, {
-        text: textForDeclare,
-        rawSqlValues: rawSqlValuesForDeclare,
+      const executeMethod =
+        this.operationPlan.operation.operation === "query"
+          ? "executeWithCache"
+          : "executeWithoutCache";
+      const executionResult = await this.resource[executeMethod](specs, {
+        text,
+        rawSqlValues,
         identifierIndex,
+        name,
         eventEmitter,
-      })
-    ).streams;
+        useTransaction: this.mode === "mutation",
+      });
+      // debugExecute("%s; result: %c", this, executionResult);
 
-    if (initialFetchResult) {
-      // Munge the initialCount records into the streams
+      return executionResult.values.map((allVals) => {
+        if (isPromiseLike(allVals)) {
+          // Must be an error
+          return allVals as never;
+        }
+        if (allVals == null) {
+          return allVals;
+        }
+        const limit = first ?? last;
+        const firstAndLast = first != null && last != null && last < first;
+        const hasMore =
+          this.fetchOneExtra && limit != null && allVals.length > limit;
+        const trimFromStart =
+          !shouldReverseOrder && last != null && first == null;
+        const limitedRows = hasMore
+          ? trimFromStart
+            ? allVals.slice(Math.max(0, allVals.length - limit!))
+            : allVals.slice(0, limit!)
+          : allVals;
+        const slicedRows =
+          firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+        const orderedRows = shouldReverseOrder
+          ? reverseArray(slicedRows)
+          : slicedRows;
+        return {
+          items: orderedRows,
+          hasMore,
+        };
+      });
+    } else {
+      if (shouldReverseOrder !== false) {
+        throw new Error("shouldReverseOrder must be false for stream");
+      }
+      if (!rawSqlValuesForDeclare || !textForDeclare) {
+        throw new Error("declare query must exist for stream");
+      }
 
-      return streams.map((stream, idx) => {
-        if (!isAsyncIterable(stream)) {
-          return stream;
+      let specs: readonly PgExecutorInput<any>[] | null = null;
+      if (text) {
+        specs = indexMap((i) => {
+          const context = contextDep.at(i);
+          return {
+            // The context is how we'd handle different connections with different claims
+            context,
+            queryValues:
+              identifierIndex != null
+                ? queryValues.map(({ dependencyIndex, codec }) => {
+                    const val = values[dependencyIndex].at(i);
+                    return val == null ? null : codec.toPg(val);
+                  })
+                : EMPTY_ARRAY,
+          };
+        });
+      }
+      const initialFetchResult = specs
+        ? (
+            await this.resource.executeWithoutCache(specs, {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              eventEmitter,
+            })
+          ).values
+        : null;
+
+      const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
+        const context = contextDep.at(i);
+
+        return {
+          // The context is how we'd handle different connections with different claims
+          context,
+          queryValues:
+            identifierIndex != null
+              ? queryValues.map(({ dependencyIndex, codec }) => {
+                  const val = values[dependencyIndex].at(i);
+                  return val == null ? val : codec.toPg(val);
+                })
+              : EMPTY_ARRAY,
+        };
+      });
+      const streams = (
+        await this.resource.executeStream(streamSpecs, {
+          text: textForDeclare,
+          rawSqlValues: rawSqlValuesForDeclare,
+          identifierIndex,
+          eventEmitter,
+        })
+      ).streams;
+
+      return streams.map((iterable, idx) => {
+        if (!isAsyncIterable(iterable)) {
+          // Must be an error
+          return iterable;
+        }
+        if (!initialFetchResult) {
+          return {
+            items: iterable,
+            hasMore: false,
+          };
         }
 
-        const innerIterator = stream[Symbol.asyncIterator]();
+        // Munge the initialCount records into the streams
+        const innerIterator = iterable[Symbol.asyncIterator]();
 
         let i = 0;
         let done = false;
@@ -1297,10 +1276,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             return this;
           },
         };
-        return mergedGenerator;
+        return {
+          items: mergedGenerator,
+          hasMore: false,
+        };
       });
-    } else {
-      return streams;
     }
   }
 
@@ -1584,7 +1564,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   }
 
   private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count } = executionDetails;
+    const { count, stream } = executionDetails;
     const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
 
     const extraWheres: SQL[] = [];
@@ -1625,7 +1605,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       rawSqlValues: SQLRawValue[];
       identifierIndex: number | null;
     } => {
-      const forceOrder = (this.streamOptions && shouldReverseOrder) || false;
+      const forceOrder = (stream && shouldReverseOrder) || false;
       if (
         queryValues.length > 0 ||
         (count !== 1 && (this.forceIdentity || this.hasSideEffects))
@@ -1800,11 +1780,11 @@ ${lateralText};`;
       }
     };
 
-    if (this.streamOptions) {
+    if (stream) {
       // PERF: should use the queryForSingle optimization in here too
 
       // When streaming we can't reverse order in JS - we must do it in the DB.
-      if (this.streamOptions.initialCount > 0) {
+      if (stream.initialCount > 0) {
         /*
          * Here our stream is constructed of two parts - an
          * `initialFetchQuery` to satisfy the `initialCount` and then a
@@ -1816,7 +1796,7 @@ ${lateralText};`;
           rawSqlValues,
           identifierIndex: initialFetchIdentifierIndex,
         } = makeQuery({
-          limit: this.streamOptions.initialCount,
+          limit: stream.initialCount,
           options: { placeholderValues },
         });
         const {
@@ -1824,7 +1804,7 @@ ${lateralText};`;
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex: streamIdentifierIndex,
         } = makeQuery({
-          offset: this.streamOptions.initialCount,
+          offset: stream.initialCount,
           options: { placeholderValues },
         });
         if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
@@ -1840,7 +1820,7 @@ ${lateralText};`;
           rawSqlValuesForDeclare,
           identifierIndex,
           shouldReverseOrder: false,
-          streamInitialCount: this.streamOptions.initialCount,
+          streamInitialCount: stream.initialCount,
           queryValues,
         };
       } else {
@@ -2199,15 +2179,10 @@ ${lateralText};`;
     }
   }
 
-  optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    this.streamOptions = stream;
-
+  optimize(): ExecutableStep {
     // In case we have any lock actions in future:
     this.lock();
 
-    // Now we need to be able to mess with ourself, but be sure to lock again
-    // at the end.
-    this.locker.locked = false;
     const $shouldReverseOrder = this.shouldReverseOrder();
     this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
     // This cannot be done in deduplicate because setting fetchOneExtra comes later.
@@ -2221,278 +2196,6 @@ ${lateralText};`;
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
-
-    const otherDeps: ExecutableStep[] = [];
-
-    if (
-      !this.isInliningForbidden &&
-      !this.hasSideEffects &&
-      !stream &&
-      !this.joins.some((j) => j.type !== "left")
-    ) {
-      // Inline ourself into our parent if we can.
-      let t: Maybe<PgSelectStep<PgResource>> = undefined;
-      let p: ExecutableStep | undefined = undefined;
-      // Scan through the dependencies to find a suitable ancestor step to merge with
-      for (
-        let dependencyIndex = 0, l = this.dependencies.length;
-        dependencyIndex < l;
-        dependencyIndex++
-      ) {
-        if (dependencyIndex === this.contextId) {
-          // We check myContext vs tsContext below; so lets assume it's fine
-          // for now.
-          continue;
-        }
-        const dep = this.getDep(dependencyIndex);
-        if (dep instanceof PgClassExpressionStep) {
-          const t2Parent = dep.getParentStep();
-          if (!(t2Parent instanceof PgSelectSingleStep)) {
-            continue;
-          }
-          const t2 = t2Parent.getClassStep();
-          if (t2 === this) {
-            throw new Error(
-              `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
-            );
-          }
-
-          if (t2.hasSideEffects) {
-            // It's a mutation; don't merge
-            continue;
-          }
-
-          // Don't allow merging across a stream/defer/subscription boundary
-          if (!stepsAreInSamePhase(t2, this)) {
-            continue;
-          }
-
-          // Don't want to make this a join as it can result in the order being
-          // messed up
-          if (t2.hasImplicitOrder && !this.joinAsLateral && this.isUnique) {
-            continue;
-          }
-
-          /*
-          if (!planGroupsOverlap(this, t2)) {
-            // We're not in the same group (i.e. there's probably a @defer or
-            // @stream between us) - do not merge.
-            continue;
-          }
-          */
-
-          if (t === undefined && p === undefined) {
-            p = t2Parent;
-            t = t2;
-          } else if (t2 !== t) {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
-              this,
-              dep,
-              t2,
-              t,
-            );
-            t = null;
-            break;
-          } else if (t2Parent !== p) {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
-              this,
-              t2Parent,
-              p,
-            );
-            t = null;
-            break;
-          }
-        } else {
-          otherDeps.push(dep);
-        }
-      }
-      // Check the contexts are the same
-      if (t != null && p != null) {
-        const myContext = this.getDep(this.contextId);
-        const tsContext = t.getDep(t.contextId);
-        if (myContext != tsContext) {
-          debugPlanVerbose(
-            "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
-            this,
-            myContext,
-            tsContext,
-            t.dependencies[t.contextId],
-            t,
-          );
-          t = null;
-        }
-      }
-      // Check the dependencies can be moved across to `t`
-      if (t != null && p != null) {
-        for (const dep of otherDeps) {
-          if (t.canAddDependency(dep)) {
-            // All good; just move the dependency over
-          } else {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to dependency %c which cannot be added as a dependency of %c",
-              this,
-              dep,
-              t,
-            );
-            t = null;
-            break;
-          }
-        }
-      }
-      if (t != null && p != null) {
-        // Looks feasible.
-
-        const table = t;
-        const parent = p;
-
-        if ((table as PgSelectStep<any>) === this) {
-          throw new Error(
-            `Something's gone catastrophically wrong - ${this} is trying to merge with itself!`,
-          );
-        }
-
-        const tableWasLocked = table.locker.locked;
-        table.locker.locked = false;
-
-        if (
-          this.isUnique &&
-          // TODO: this was previously first==null,last==null,offset==null which isn't the same thing.
-          this.firstStepId == null &&
-          this.lastStepId == null &&
-          this.offsetStepId == null &&
-          // End TODO
-          this.mode !== "aggregate" &&
-          table.mode !== "aggregate" &&
-          // For uniques these should all pass anyway, but pays to be cautious..
-          this.groups.length === 0 &&
-          this.havingConditions.length === 0 &&
-          this.orders.length === 0 &&
-          !this.fetchOneExtra
-        ) {
-          if (this.selects.length > 0) {
-            debugPlanVerbose(
-              "Merging %c into %c (via %c)",
-              this,
-              table,
-              parent,
-            );
-            const { sql: where } = this.buildWhereOrHaving(
-              sql`/* WHERE becoming ON */`,
-              this.conditions,
-            );
-            const conditions = [
-              ...this.identifierMatches.map((identifierMatch) => {
-                const { dependencyIndex, codec, expression } = identifierMatch;
-                const step = this.getDep(dependencyIndex);
-                if (step instanceof PgClassExpressionStep) {
-                  return sql`${step.toSQL()}::${codec.sqlType} = ${expression}`;
-                } else {
-                  return sql`${this.placeholder(step, codec)} = ${expression}`;
-                }
-              }),
-              // Note the WHERE is now part of the JOIN condition (since
-              // it's a LEFT JOIN).
-              ...(where !== sql.blank ? [where] : []),
-            ];
-            this.mergePlaceholdersInto(table);
-            for (const [a, b] of this._symbolSubstitutes.entries()) {
-              if (isDev) {
-                if (
-                  table._symbolSubstitutes.has(a) &&
-                  table._symbolSubstitutes.get(a) !== b
-                ) {
-                  throw new Error(
-                    `Conflict when setting a substitute whilst merging ${this} into ${table}; symbol already has a substitute, and it's different.`,
-                  );
-                }
-              }
-              table._symbolSubstitutes.set(a, b);
-            }
-            table.joins.push(
-              {
-                type: "left",
-                from: this.fromExpression(),
-                alias: this.alias,
-                attributeNames: this.resource.codec.attributes
-                  ? sql.blank
-                  : sql`(v)`,
-                conditions,
-                lateral: this.joinAsLateral,
-              },
-              ...this.joins,
-            );
-            const actualKeyByDesiredKey = this.mergeSelectsWith(table);
-            // We return a list here because our children are going to use a
-            // `first` plan on us.
-            // NOTE: we don't need to reverse the list for relay pagination
-            // because it only contains one entry.
-            return list([remapKeys(parent, actualKeyByDesiredKey)]);
-          } else {
-            debugPlanVerbose(
-              "Skipping merging %c into %c (via %c) due to no attributes being selected",
-              this,
-              table,
-              parent,
-            );
-            // We return a list here because our children are going to use a
-            // `first` plan on us.
-            return list([parent]);
-          }
-        } else if (
-          parent instanceof PgSelectSingleStep &&
-          parent.getClassStep().mode !== "aggregate"
-        ) {
-          const parent2 = parent.getItemStep();
-          this.identifierMatches.forEach((identifierMatch) => {
-            const { dependencyIndex, codec, expression } = identifierMatch;
-            const step = this.getDep(dependencyIndex);
-            if (step instanceof PgClassExpressionStep) {
-              return this.where(
-                sql`${step.toSQL()}::${codec.sqlType} = ${expression}`,
-              );
-            } else {
-              return this.where(
-                sql`${this.placeholder(step, codec)} = ${expression}`,
-              );
-            }
-          });
-          this.mergePlaceholdersInto(table);
-          const { sql: query } = this.buildQuery({
-            // No need to do arrays; the json_agg handles this for us - we can
-            // return objects with numeric keys just fine and JS will be fine
-            // with it.
-            asJsonAgg: true,
-          });
-          const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
-          debugPlanVerbose(
-            "Optimising %c (via %c and %c)",
-            this,
-            table,
-            parent2,
-          );
-          const $first = this.getDepOrConstant(this.firstStepId, null);
-          const $last = this.getDepOrConstant(this.lastStepId, null);
-          const rowsPlan = access<any[]>(parent2, [selfIndex], []);
-          return lambda(
-            {
-              rows: rowsPlan,
-              first: $first,
-              last: $last,
-              shouldReverseOrder: $shouldReverseOrder,
-              fetchOneExtra: constant(this.fetchOneExtra, false),
-            },
-            reverseIfNecessary,
-            true,
-          );
-        }
-
-        table.locker.locked = tableWasLocked;
-      }
-    }
-
-    this.locker.locked = true;
 
     return this;
   }
@@ -2589,8 +2292,41 @@ ${lateralText};`;
   [$$toSQL]() {
     return this.alias;
   }
+}
 
-  // --------------------
+export class PgSelectRowsStep<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectRowsStep",
+  };
+
+  public isSyncAndSafe = false;
+
+  constructor($pgSelect: PgSelectStep<TResource>) {
+    super();
+    this.addDependency($pgSelect);
+  }
+
+  public getClassStep(): PgSelectStep<TResource> {
+    return this.getDep<PgSelectStep<TResource>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    return this.getClassStep().listItem(itemPlan);
+  }
+
+  // optimize() {
+  //   const $access = access(this.getClassStep(), "items");
+  //   $access.isSyncAndSafe = false;
+  //   return $access;
+  // }
+
+  execute(executionDetails: ExecutionDetails) {
+    const pgSelect = executionDetails.values[0];
+    return executionDetails.indexMap((i) => pgSelect.at(i).items);
+  }
 }
 
 function joinMatches(
@@ -2773,36 +2509,6 @@ export function getFragmentAndCodecFromOrder(
       : [colFrag, colCodec, isNullable];
   } else {
     return [order.fragment, order.codec, order.nullable];
-  }
-}
-
-function reverseIfNecessary(params: {
-  rows: any[];
-  shouldReverseOrder: boolean;
-  first: Maybe<number>;
-  last: Maybe<number>;
-  fetchOneExtra: boolean;
-}) {
-  const { rows, shouldReverseOrder, first, last, fetchOneExtra } = params;
-  const limit = first ?? last;
-  const firstAndLast = first != null && last != null && last < first;
-  if ((fetchOneExtra || firstAndLast) && limit != null) {
-    if (!rows) {
-      return rows;
-    }
-    const hasMore = rows.length > limit;
-    const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-    const slicedRows =
-      firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-    const orderedRows = shouldReverseOrder
-      ? reverseArray(slicedRows)
-      : slicedRows;
-    if (hasMore) {
-      (orderedRows as any).hasMore = true;
-    }
-    return orderedRows;
-  } else {
-    return shouldReverseOrder ? reverseArray(rows) : rows;
   }
 }
 

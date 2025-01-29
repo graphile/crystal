@@ -54,7 +54,6 @@ import type {
   ParseAndValidateEvent,
   PrepareArgsEvent,
   ScalarInputPlanResolver,
-  StreamStepEvent,
   UnaryExecutionValue,
   ValidateSchemaEvent,
 } from "./interfaces.js";
@@ -74,9 +73,12 @@ import {
   EventCallback,
   EventMapKey,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -123,13 +125,11 @@ import {
   isListLikeStep,
   isModifierStep,
   isObjectLikeStep,
-  isStreamableStep,
   ListCapableStep,
   ListLikeStep,
   ModifierStep,
   ObjectLikeStep,
   PolymorphicStep,
-  StreamableStep,
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
@@ -321,9 +321,12 @@ export {
   ExecutableStep,
   execute,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
   ExecutionValue,
   exportAs,
   exportAsMany,
@@ -380,7 +383,6 @@ export {
   isObjectLikeStep,
   isPromiseLike,
   isSafeError,
-  isStreamableStep,
   isUnaryStep,
   JSONArray,
   JSONObject,
@@ -467,7 +469,6 @@ export {
   StepOptimizeOptions,
   stepsAreInSamePhase,
   StepStreamOptions,
-  StreamableStep,
   stringifyPayload,
   stripAnsi,
   subscribe,
@@ -508,7 +509,6 @@ exportAsMany("grafast", {
   isModifierStep,
   isObjectLikeStep,
   isListLikeStep,
-  isStreamableStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
@@ -780,9 +780,6 @@ declare global {
       executeStep(
         event: ExecuteStepEvent,
       ): PromiseOrDirect<GrafastResultsList<any>>;
-      streamStep(
-        event: StreamStepEvent,
-      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {

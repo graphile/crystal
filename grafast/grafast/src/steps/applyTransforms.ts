@@ -19,6 +19,8 @@ import {
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
+import type { ConnectionCapableStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 
 /**
  * @internal
@@ -40,8 +42,11 @@ export class ApplyTransformsStep extends ExecutableStep {
    */
   public subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
-  constructor(listPlan: ListCapableStep<any, any>) {
+  constructor(
+    $step: ListCapableStep<any, any> | ConnectionCapableStep<any, any>,
+  ) {
     super();
+    const listPlan = itemsOrStep($step);
     this.addDependency(listPlan);
 
     // Plan this subroutine

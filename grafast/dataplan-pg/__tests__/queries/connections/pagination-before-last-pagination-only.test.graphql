@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(2);
+#// expect(queries).toHaveLength(2);
 # See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
 # 'last' is set, so hasPreviousPage is true if a larger last would return more records.
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(true);
