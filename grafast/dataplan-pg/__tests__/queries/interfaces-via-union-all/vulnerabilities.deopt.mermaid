@@ -28,15 +28,15 @@ graph TD
     Access41 ==> __Item14
     PgUnionAllSingle15["PgUnionAllSingle[15∈1]"]:::plan
     __Item14 --> PgUnionAllSingle15
+    Access16{{"Access[16∈1]<br />ᐸ15.1ᐳ"}}:::plan
+    PgUnionAllSingle15 --> Access16
     PgSelect19[["PgSelect[19∈2]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access18{{"Access[18∈2]<br />ᐸ17.0ᐳ"}}:::plan
     Object11 & Access18 --> PgSelect19
     PgSelect32[["PgSelect[32∈2]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Access31{{"Access[31∈2]<br />ᐸ30.0ᐳ"}}:::plan
     Object11 & Access31 --> PgSelect32
-    Access16{{"Access[16∈2]<br />ᐸ15.1ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
-    PgUnionAllSingle15 --> Access16
-    JSONParse17[["JSONParse[17∈2]<br />ᐸ16ᐳ"]]:::plan
+    JSONParse17[["JSONParse[17∈2]<br />ᐸ16ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access16 --> JSONParse17
     JSONParse17 --> Access18
     First23{{"First[23∈2]"}}:::plan
@@ -79,10 +79,10 @@ graph TD
     class Bucket0,__Value2,__Value4,PgUnionAll8,Access9,Access10,Object11,Constant12,Access41,Constant42,Constant43 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 11<br /><br />ROOT __Item{1}ᐸ41ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item14,PgUnionAllSingle15 bucket1
-    Bucket2("Bucket 2 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 15, 11<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: <br />ᐳ: Access[16]<br />2: JSONParse[17], JSONParse[30]<br />ᐳ: Access[18], Access[31]<br />3: PgSelect[19], PgSelect[32]<br />4: PgSelectRows[24], PgSelectRows[35]<br />ᐳ: 23, 25, 26, 27, 28, 29, 34, 36, 37, 38, 39, 40"):::bucket
+    class Bucket1,__Item14,PgUnionAllSingle15,Access16 bucket1
+    Bucket2("Bucket 2 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 16, 11, 15<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[17], JSONParse[30]<br />ᐳ: Access[18], Access[31]<br />2: PgSelect[19], PgSelect[32]<br />3: PgSelectRows[24], PgSelectRows[35]<br />ᐳ: 23, 25, 26, 27, 28, 29, 34, 36, 37, 38, 39, 40"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access16,JSONParse17,Access18,PgSelect19,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29,JSONParse30,Access31,PgSelect32,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40 bucket2
+    class Bucket2,JSONParse17,Access18,PgSelect19,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29,JSONParse30,Access31,PgSelect32,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

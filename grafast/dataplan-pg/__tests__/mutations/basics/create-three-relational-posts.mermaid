@@ -73,20 +73,25 @@ graph TD
     PgSelect50 --> PgSelectRows55
     First54 --> PgSelectSingle56
     PgSelectSingle56 --> PgClassExpression57
+    PgClassExpression59{{"PgClassExpression[59∈2] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression59
     First93{{"First[93∈2] ➊"}}:::plan
     PgSelectRows94[["PgSelectRows[94∈2] ➊"]]:::plan
     PgSelectRows94 --> First93
     PgSelect91 --> PgSelectRows94
     First93 --> PgSelectSingle95
     PgSelectSingle95 --> PgClassExpression96
+    PgClassExpression98{{"PgClassExpression[98∈2] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle95 --> PgClassExpression98
     First132{{"First[132∈2] ➊"}}:::plan
     PgSelectRows133[["PgSelectRows[133∈2] ➊"]]:::plan
     PgSelectRows133 --> First132
     PgSelect130 --> PgSelectRows133
     First132 --> PgSelectSingle134
     PgSelectSingle134 --> PgClassExpression135
+    PgClassExpression137{{"PgClassExpression[137∈2] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle134 --> PgClassExpression137
     PgSelect60[["PgSelect[60∈4] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression59{{"PgClassExpression[59∈4] ➊<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object11 & PgClassExpression59 --> PgSelect60
     PgSelect67[["PgSelect[67∈4] ➊<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression59 --> PgSelect67
@@ -96,7 +101,6 @@ graph TD
     Object11 & PgClassExpression59 --> PgSelect80
     PgSelect85[["PgSelect[85∈4] ➊<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object11 & PgClassExpression59 --> PgSelect85
-    PgSelectSingle56 --> PgClassExpression59
     First64{{"First[64∈4] ➊"}}:::plan
     PgSelectRows65[["PgSelectRows[65∈4] ➊"]]:::plan
     PgSelectRows65 --> First64
@@ -134,7 +138,6 @@ graph TD
     PgSelectSingle89{{"PgSelectSingle[89∈4] ➊<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First87 --> PgSelectSingle89
     PgSelect99[["PgSelect[99∈5] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression98{{"PgClassExpression[98∈5] ➊<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object11 & PgClassExpression98 --> PgSelect99
     PgSelect106[["PgSelect[106∈5] ➊<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression98 --> PgSelect106
@@ -144,7 +147,6 @@ graph TD
     Object11 & PgClassExpression98 --> PgSelect119
     PgSelect124[["PgSelect[124∈5] ➊<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object11 & PgClassExpression98 --> PgSelect124
-    PgSelectSingle95 --> PgClassExpression98
     First103{{"First[103∈5] ➊"}}:::plan
     PgSelectRows104[["PgSelectRows[104∈5] ➊"]]:::plan
     PgSelectRows104 --> First103
@@ -182,7 +184,6 @@ graph TD
     PgSelectSingle128{{"PgSelectSingle[128∈5] ➊<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First126 --> PgSelectSingle128
     PgSelect138[["PgSelect[138∈6] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression137{{"PgClassExpression[137∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object11 & PgClassExpression137 --> PgSelect138
     PgSelect145[["PgSelect[145∈6] ➊<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression137 --> PgSelect145
@@ -192,7 +193,6 @@ graph TD
     Object11 & PgClassExpression137 --> PgSelect158
     PgSelect163[["PgSelect[163∈6] ➊<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object11 & PgClassExpression137 --> PgSelect163
-    PgSelectSingle134 --> PgClassExpression137
     First142{{"First[142∈6] ➊"}}:::plan
     PgSelectRows143[["PgSelectRows[143∈6] ➊"]]:::plan
     PgSelectRows143 --> First142
@@ -243,21 +243,21 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 6, 7, 13, 14, 15, 27, 28, 41, 42, 168, 169, 170, 4<br /><br />1: PgInsertSingle[8]<br />2: PgClassExpression[12]<br />3: PgInsertSingle[16]<br />4: PgInsertSingle[22]<br />5: PgClassExpression[26]<br />6: PgInsertSingle[30]<br />7: PgInsertSingle[36]<br />8: PgClassExpression[40]<br />9: PgInsertSingle[44]<br />10: <br />ᐳ: PgClassExpression[48]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle8,PgClassExpression12,PgInsertSingle16,PgInsertSingle22,PgClassExpression26,PgInsertSingle30,PgInsertSingle36,PgClassExpression40,PgInsertSingle44,PgClassExpression48 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 168, 169, 170, 48, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[48]<br />1: 50, 91, 130<br />2: 55, 94, 133<br />ᐳ: 54, 56, 57, 58, 93, 95, 96, 97, 132, 134, 135, 136"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 168, 169, 170, 48, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[48]<br />1: 50, 91, 130<br />2: 55, 94, 133<br />ᐳ: 54, 56, 57, 58, 59, 93, 95, 96, 97, 98, 132, 134, 135, 136, 137"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect50,First54,PgSelectRows55,PgSelectSingle56,PgClassExpression57,PgPolymorphic58,PgSelect91,First93,PgSelectRows94,PgSelectSingle95,PgClassExpression96,PgPolymorphic97,PgSelect130,First132,PgSelectRows133,PgSelectSingle134,PgClassExpression135,PgPolymorphic136 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 56, 11, 58, 95, 97, 134, 136<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
+    class Bucket2,PgSelect50,First54,PgSelectRows55,PgSelectSingle56,PgClassExpression57,PgPolymorphic58,PgClassExpression59,PgSelect91,First93,PgSelectRows94,PgSelectSingle95,PgClassExpression96,PgPolymorphic97,PgClassExpression98,PgSelect130,First132,PgSelectRows133,PgSelectSingle134,PgClassExpression135,PgPolymorphic136,PgClassExpression137 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 11, 59, 58, 98, 97, 137, 136<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 56, 11, 58<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[59]<br />2: 60, 67, 75, 80, 85<br />3: 65, 70, 78, 83, 88<br />ᐳ: 64, 66, 69, 71, 72, 73, 74, 77, 79, 82, 84, 87, 89"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 59, 58<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 60, 67, 75, 80, 85<br />2: 65, 70, 78, 83, 88<br />ᐳ: 64, 66, 69, 71, 72, 73, 74, 77, 79, 82, 84, 87, 89"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression59,PgSelect60,First64,PgSelectRows65,PgSelectSingle66,PgSelect67,First69,PgSelectRows70,PgSelectSingle71,PgClassExpression72,PgClassExpression73,PgClassExpression74,PgSelect75,First77,PgSelectRows78,PgSelectSingle79,PgSelect80,First82,PgSelectRows83,PgSelectSingle84,PgSelect85,First87,PgSelectRows88,PgSelectSingle89 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 95, 11, 97<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[98]<br />2: 99, 106, 114, 119, 124<br />3: 104, 109, 117, 122, 127<br />ᐳ: 103, 105, 108, 110, 111, 112, 113, 116, 118, 121, 123, 126, 128"):::bucket
+    class Bucket4,PgSelect60,First64,PgSelectRows65,PgSelectSingle66,PgSelect67,First69,PgSelectRows70,PgSelectSingle71,PgClassExpression72,PgClassExpression73,PgClassExpression74,PgSelect75,First77,PgSelectRows78,PgSelectSingle79,PgSelect80,First82,PgSelectRows83,PgSelectSingle84,PgSelect85,First87,PgSelectRows88,PgSelectSingle89 bucket4
+    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 98, 97<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 99, 106, 114, 119, 124<br />2: 104, 109, 117, 122, 127<br />ᐳ: 103, 105, 108, 110, 111, 112, 113, 116, 118, 121, 123, 126, 128"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression98,PgSelect99,First103,PgSelectRows104,PgSelectSingle105,PgSelect106,First108,PgSelectRows109,PgSelectSingle110,PgClassExpression111,PgClassExpression112,PgClassExpression113,PgSelect114,First116,PgSelectRows117,PgSelectSingle118,PgSelect119,First121,PgSelectRows122,PgSelectSingle123,PgSelect124,First126,PgSelectRows127,PgSelectSingle128 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 134, 11, 136<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[137]<br />2: 138, 145, 153, 158, 163<br />3: 143, 148, 156, 161, 166<br />ᐳ: 142, 144, 147, 149, 150, 151, 152, 155, 157, 160, 162, 165, 167"):::bucket
+    class Bucket5,PgSelect99,First103,PgSelectRows104,PgSelectSingle105,PgSelect106,First108,PgSelectRows109,PgSelectSingle110,PgClassExpression111,PgClassExpression112,PgClassExpression113,PgSelect114,First116,PgSelectRows117,PgSelectSingle118,PgSelect119,First121,PgSelectRows122,PgSelectSingle123,PgSelect124,First126,PgSelectRows127,PgSelectSingle128 bucket5
+    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 137, 136<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 138, 145, 153, 158, 163<br />2: 143, 148, 156, 161, 166<br />ᐳ: 142, 144, 147, 149, 150, 151, 152, 155, 157, 160, 162, 165, 167"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression137,PgSelect138,First142,PgSelectRows143,PgSelectSingle144,PgSelect145,First147,PgSelectRows148,PgSelectSingle149,PgClassExpression150,PgClassExpression151,PgClassExpression152,PgSelect153,First155,PgSelectRows156,PgSelectSingle157,PgSelect158,First160,PgSelectRows161,PgSelectSingle162,PgSelect163,First165,PgSelectRows166,PgSelectSingle167 bucket6
+    class Bucket6,PgSelect138,First142,PgSelectRows143,PgSelectSingle144,PgSelect145,First147,PgSelectRows148,PgSelectSingle149,PgClassExpression150,PgClassExpression151,PgClassExpression152,PgSelect153,First155,PgSelectRows156,PgSelectSingle157,PgSelect158,First160,PgSelectRows161,PgSelectSingle162,PgSelect163,First165,PgSelectRows166,PgSelectSingle167 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
