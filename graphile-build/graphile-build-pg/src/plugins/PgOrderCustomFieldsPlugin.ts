@@ -4,6 +4,7 @@ import "graphile-config";
 import type {
   PgResource,
   PgResourceParameter,
+  PgSelectQueryBuilderCallback,
   PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
@@ -120,29 +121,27 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                 {
                   [valueName]: {
                     extensions: {
-                      grafast: {
-                        applyPlan: EXPORTABLE(
-                          (ascDesc, pgFieldSource, sql) =>
-                            (step: PgSelectStep) => {
-                              if (typeof pgFieldSource.from !== "function") {
-                                throw new Error(
-                                  "Invalid computed attribute 'from'",
-                                );
-                              }
-                              const expression = sql`${pgFieldSource.from({
-                                placeholder: step.alias,
-                              })}`;
-                              step.orderBy({
-                                codec: pgFieldSource.codec,
-                                fragment: expression,
-                                direction: ascDesc.toUpperCase() as
-                                  | "ASC"
-                                  | "DESC",
-                              });
-                            },
-                          [ascDesc, pgFieldSource, sql],
-                        ),
-                      },
+                      pgSelectApply: EXPORTABLE(
+                        (ascDesc, pgFieldSource, sql) =>
+                          ((queryBuilder) => {
+                            if (typeof pgFieldSource.from !== "function") {
+                              throw new Error(
+                                "Invalid computed attribute 'from'",
+                              );
+                            }
+                            const expression = sql`${pgFieldSource.from({
+                              placeholder: queryBuilder.alias,
+                            })}`;
+                            queryBuilder.orderBy({
+                              codec: pgFieldSource.codec,
+                              fragment: expression,
+                              direction: ascDesc.toUpperCase() as
+                                | "ASC"
+                                | "DESC",
+                            });
+                          }) as PgSelectQueryBuilderCallback,
+                        [ascDesc, pgFieldSource, sql],
+                      ),
                     },
                   },
                 },

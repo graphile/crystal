@@ -1942,6 +1942,9 @@ function buildTheQuery<
         // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
       }
     },
+    setOrderIsUnique() {
+      info.isOrderUnique = true;
+    },
     singleRelation(relationIdentifier) {
       // NOTE: this is almost an exact copy of the same method on PgSelectStep,
       // except using `info`... We should harmonize them.
@@ -2734,6 +2737,8 @@ export interface PgSelectQueryBuilder<
 > extends PgQueryBuilder {
   /** Instruct to add another order */
   orderBy(spec: PgOrderSpec): void;
+  /** Inform that the resulting order is now unique */
+  setOrderIsUnique(): void;
   /** Returns the SQL alias representing the table related to this relation */
   singleRelation<
     TRelationName extends keyof GetPgResourceRelations<TResource> & string,

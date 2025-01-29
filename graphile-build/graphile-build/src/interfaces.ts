@@ -1,3 +1,8 @@
+import type {
+  BaseGraphQLArguments,
+  ExecutableStep,
+  FieldPlanResolver,
+} from "grafast";
 import type { AsyncHooks } from "graphile-config";
 
 import type { EXPORTABLE } from "./utils.js";
@@ -75,3 +80,13 @@ export interface GatherPluginContext<
    */
   cache: TCache;
 }
+
+// TODO: rename
+export type PostPlanResolver<
+  _TArgs extends BaseGraphQLArguments,
+  TParentStep extends ExecutableStep | null,
+  TResultStep extends ExecutableStep,
+> = (
+  $result: ReturnType<FieldPlanResolver<_TArgs, TParentStep, TResultStep>>,
+  ...rest: Parameters<FieldPlanResolver<_TArgs, TParentStep, TResultStep>>
+) => ReturnType<FieldPlanResolver<_TArgs, TParentStep, TResultStep>>;
