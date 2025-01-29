@@ -1249,7 +1249,9 @@ function buildTheQuery<
       return info.alias;
     },
     orderBy(spec) {
-      info.orderSpecs.push(spec);
+      if (info.mode !== "aggregate") {
+        info.orderSpecs.push(spec);
+      }
     },
   };
 
@@ -1261,6 +1263,8 @@ function buildTheQuery<
       val?.(queryBuilder);
     }
   }
+
+  // Now turn order specs into orders
 
   for (const orderSpec of info.orderSpecs) {
     if (!info.attributes) {
