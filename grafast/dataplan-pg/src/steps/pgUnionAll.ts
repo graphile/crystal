@@ -38,8 +38,11 @@ import type {
   PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
+  PgQueryBuilder,
   PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
+  PgUnionAllQueryBuilderCallback,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
@@ -481,6 +484,8 @@ export class PgUnionAllStep<
   private memberDigests: Readonly<MutableMemberDigest<TTypeNames>>[] = [];
   private _limitToTypes: string[] | undefined;
 
+  private applyDepIds: number[] = [];
+
   /**
    * Set this true if your query includes any `VOLATILE` function (including
    * seemingly innocuous things such as `random()`) otherwise we might only
@@ -521,6 +526,7 @@ export class PgUnionAllStep<
       }
     });
 
+    $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.contextId = cloneFrom.contextId;
     $clone.memberDigests = cloneFrom.memberDigests.map(cloneMemberDigest);
     if (cloneFrom._limitToTypes) {
@@ -776,6 +782,14 @@ on (${sql.indent(
     return new PgUnionAllSingleStep(this, $row);
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgUnionAllQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   public items() {
     return this.operationPlan.cacheStep(
       this,
@@ -1002,6 +1016,7 @@ on (${sql.indent(
       memberDigests: this.memberDigests,
       fetchOneExtra,
       needsCursor: this.needsCursor,
+      applyDepIds: this.applyDepIds,
     });
 
     if (first === 0 || last === 0) {
@@ -1150,6 +1165,7 @@ interface MutablePgUnionAllQueryInfo<
   readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
   readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
 
+  readonly orderSpecs: Array<PgUnionAllStepOrder<TAttributes>>;
   readonly orders: Array<PgOrderFragmentSpec>;
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
@@ -1166,6 +1182,7 @@ function buildTheQuery<
 
     // Copy and make mutable
     selects: [...rawInfo.selects],
+    orderSpecs: [...rawInfo.orderSpecs],
     orders: [],
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
@@ -1225,6 +1242,25 @@ function buildTheQuery<
   }
 
   // TODO: evaluate runtime orders, conditions, etc here
+
+  const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
+    alias: info.alias,
+    [$$toSQL]() {
+      return info.alias;
+    },
+    orderBy(spec) {
+      info.orderSpecs.push(spec);
+    },
+  };
+
+  for (const applyDepId of info.applyDepIds) {
+    const val = values[applyDepId].unaryValue();
+    if (Array.isArray(val)) {
+      val.forEach((v) => v(queryBuilder));
+    } else {
+      val(queryBuilder);
+    }
+  }
 
   for (const orderSpec of info.orderSpecs) {
     if (!info.attributes) {
@@ -1925,4 +1961,11 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     orders: [...memberDigest.orders],
     conditions: [...memberDigest.conditions],
   };
+}
+export interface PgUnionAllQueryBuilder<
+  TAttributes extends string = string,
+  _TTypeNames extends string = string,
+> extends PgQueryBuilder {
+  /** Instruct to add another order */
+  orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
 }
