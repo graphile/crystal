@@ -1,7 +1,6 @@
 import type {
   BaseGraphQLArguments,
   ExecutableStep,
-  FieldPlanResolver,
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
