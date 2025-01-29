@@ -21,83 +21,86 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
-    Access40{{"Access[40∈0] ➊<br />ᐸ0.myVal2ᐳ"}}:::plan
-    __Value0 --> Access40
+    Lambda18{{"Lambda[18∈0] ➊<br />ᐸextractList_pgSelectApplyᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
+    Constant58 --> Lambda18
+    Access42{{"Access[42∈0] ➊<br />ᐸ0.myVal2ᐳ"}}:::plan
+    __Value0 --> Access42
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection17{{"Connection[17∈0] ➊<br />ᐸ13ᐳ"}}:::plan
-    __InputDynamicScalar27{{"__InputDynamicScalar[27∈0] ➊"}}:::plan
-    Connection30{{"Connection[30∈0] ➊<br />ᐸ28ᐳ"}}:::plan
-    Connection44{{"Connection[44∈0] ➊<br />ᐸ42ᐳ"}}:::plan
-    PgSelect18[["PgSelect[18∈1] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object16 & __InputDynamicScalar10 & Connection17 --> PgSelect18
-    PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
-    PgSelect18 --> PgSelectRows19
-    __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
-    PgSelectRows19 ==> __Item20
-    PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item20 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
-    PgSelect31[["PgSelect[31∈4] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object16 & __InputDynamicScalar27 & Connection30 --> PgSelect31
-    PgSelectRows32[["PgSelectRows[32∈4] ➊"]]:::plan
-    PgSelect31 --> PgSelectRows32
-    __Item33[/"__Item[33∈5]<br />ᐸ32ᐳ"\]:::itemplan
-    PgSelectRows32 ==> __Item33
-    PgSelectSingle34{{"PgSelectSingle[34∈5]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item33 --> PgSelectSingle34
-    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression36
-    PgSelect45[["PgSelect[45∈7] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object16 & Access40 & Connection44 --> PgSelect45
-    PgSelectRows46[["PgSelectRows[46∈7] ➊"]]:::plan
-    PgSelect45 --> PgSelectRows46
-    __Item47[/"__Item[47∈8]<br />ᐸ46ᐳ"\]:::itemplan
-    PgSelectRows46 ==> __Item47
-    PgSelectSingle48{{"PgSelectSingle[48∈8]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item47 --> PgSelectSingle48
-    PgClassExpression49{{"PgClassExpression[49∈9]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression49
-    PgClassExpression50{{"PgClassExpression[50∈9]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression50
+    __InputDynamicScalar28{{"__InputDynamicScalar[28∈0] ➊"}}:::plan
+    Connection31{{"Connection[31∈0] ➊<br />ᐸ29ᐳ"}}:::plan
+    Connection46{{"Connection[46∈0] ➊<br />ᐸ44ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    Object16 & Lambda18 & __InputDynamicScalar10 & Connection17 --> PgSelect19
+    PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
+    PgSelect19 --> PgSelectRows20
+    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
+    PgSelectRows20 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item21 --> PgSelectSingle22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression24
+    PgSelect33[["PgSelect[33∈4] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    Object16 & Lambda18 & __InputDynamicScalar28 & Connection31 --> PgSelect33
+    PgSelectRows34[["PgSelectRows[34∈4] ➊"]]:::plan
+    PgSelect33 --> PgSelectRows34
+    __Item35[/"__Item[35∈5]<br />ᐸ34ᐳ"\]:::itemplan
+    PgSelectRows34 ==> __Item35
+    PgSelectSingle36{{"PgSelectSingle[36∈5]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item35 --> PgSelectSingle36
+    PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression38
+    PgSelect48[["PgSelect[48∈7] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    Object16 & Lambda18 & Access42 & Connection46 --> PgSelect48
+    PgSelectRows49[["PgSelectRows[49∈7] ➊"]]:::plan
+    PgSelect48 --> PgSelectRows49
+    __Item50[/"__Item[50∈8]<br />ᐸ49ᐳ"\]:::itemplan
+    PgSelectRows49 ==> __Item50
+    PgSelectSingle51{{"PgSelectSingle[51∈8]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item50 --> PgSelectSingle51
+    PgClassExpression52{{"PgClassExpression[52∈9]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
+    PgSelectSingle51 --> PgClassExpression52
+    PgClassExpression53{{"PgClassExpression[53∈9]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
+    PgSelectSingle51 --> PgClassExpression53
 
     %% define steps
 
     subgraph "Buckets for queries/v4/dynamic-json.condition-json-field-variable"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputDynamicScalar10,Access11,Access14,Access15,Object16,Connection17,__InputDynamicScalar27,Connection30,Access40,Connection44 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 10, 17<br /><br />ROOT Connectionᐸ13ᐳ[17]<br />1: PgSelect[18]<br />2: PgSelectRows[19]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,__InputDynamicScalar10,Access11,Access14,Access15,Object16,Connection17,Lambda18,__InputDynamicScalar28,Connection31,Access42,Connection46,Constant58 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 18, 10, 17<br /><br />ROOT Connectionᐸ13ᐳ[17]<br />1: PgSelect[19]<br />2: PgSelectRows[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect18,PgSelectRows19 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
+    class Bucket1,PgSelect19,PgSelectRows20 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item20,PgSelectSingle21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸmy_tableᐳ[21]"):::bucket
+    class Bucket2,__Item21,PgSelectSingle22 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸmy_tableᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16, 27, 30<br /><br />ROOT Connectionᐸ28ᐳ[30]<br />1: PgSelect[31]<br />2: PgSelectRows[32]"):::bucket
+    class Bucket3,PgClassExpression23,PgClassExpression24 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16, 18, 28, 31<br /><br />ROOT Connectionᐸ29ᐳ[31]<br />1: PgSelect[33]<br />2: PgSelectRows[34]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect31,PgSelectRows32 bucket4
-    Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ32ᐳ[33]"):::bucket
+    class Bucket4,PgSelect33,PgSelectRows34 bucket4
+    Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ34ᐳ[35]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item33,PgSelectSingle34 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{5}ᐸmy_tableᐳ[34]"):::bucket
+    class Bucket5,__Item35,PgSelectSingle36 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{5}ᐸmy_tableᐳ[36]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression35,PgClassExpression36 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 16, 40, 44<br /><br />ROOT Connectionᐸ42ᐳ[44]<br />1: PgSelect[45]<br />2: PgSelectRows[46]"):::bucket
+    class Bucket6,PgClassExpression37,PgClassExpression38 bucket6
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 16, 18, 42, 46<br /><br />ROOT Connectionᐸ44ᐳ[46]<br />1: PgSelect[48]<br />2: PgSelectRows[49]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgSelect45,PgSelectRows46 bucket7
-    Bucket8("Bucket 8 (listItem)<br /><br />ROOT __Item{8}ᐸ46ᐳ[47]"):::bucket
+    class Bucket7,PgSelect48,PgSelectRows49 bucket7
+    Bucket8("Bucket 8 (listItem)<br /><br />ROOT __Item{8}ᐸ49ᐳ[50]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,__Item47,PgSelectSingle48 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 48<br /><br />ROOT PgSelectSingle{8}ᐸmy_tableᐳ[48]"):::bucket
+    class Bucket8,__Item50,PgSelectSingle51 bucket8
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 51<br /><br />ROOT PgSelectSingle{8}ᐸmy_tableᐳ[51]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgClassExpression49,PgClassExpression50 bucket9
+    class Bucket9,PgClassExpression52,PgClassExpression53 bucket9
     Bucket0 --> Bucket1 & Bucket4 & Bucket7
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
