@@ -5,7 +5,6 @@ import type {
   PgCodecWithAttributes,
   PgResourceUnique,
   PgSelectQueryBuilderCallback,
-  PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
