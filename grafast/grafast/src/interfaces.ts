@@ -298,6 +298,7 @@ export type AnyInputStepDollars = {
 };
 
 export interface FieldInfo {
+  fieldName: string;
   field: GraphQLField<any, any, any>;
   schema: GraphQLSchema;
 }
@@ -322,12 +323,8 @@ export interface FieldInfo {
 export type FieldPlanResolver<
   _TArgs extends BaseGraphQLArguments,
   TParentStep extends ExecutableStep | null,
-  TResultStep extends ExecutableStep,
-> = (
-  $parentPlan: TParentStep,
-  args: FieldArgs,
-  info: FieldInfo,
-) => TResultStep | null;
+  TResultStep extends ExecutableStep | null,
+> = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
 // TYPES: review _TContext
 /**
