@@ -24,9 +24,7 @@ import type {
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastSubscriber,
-  InputStep,
   ListStep,
-  Maybe,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -39,8 +37,6 @@ import {
   error,
   ExecutableStep,
   filter,
-  getEnumValueConfig,
-  getEnumValueConfigs,
   groupBy,
   lambda,
   list,
@@ -51,10 +47,8 @@ import {
   object,
   rootValue,
 } from "grafast";
-import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
+import type { GraphQLOutputType } from "grafast/graphql";
 import {
-  getNamedType,
-  getNullableType,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
@@ -66,8 +60,6 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
-  isEnumType,
-  isListType,
   printSchema,
 } from "grafast/graphql";
 import sql from "pg-sql2";
@@ -117,8 +109,8 @@ import type {
   PgCodec,
   PgSelectQueryBuilderCallback,
   PgUnionAllQueryBuilderCallback,
-  ReadonlyArrayOrDirect,
 } from "../interfaces";
+import { extractEnumExtensionValue } from "../steps/extractEnumExtensionValue.js";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -129,7 +121,6 @@ import {
   WithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function EXPORTABLE<T, TScope extends any[]>(
@@ -3937,7 +3928,7 @@ export function makeExampleSchema(
           (
             connection,
             deoptimizeIfAppropriate,
-            getEnumExtensionValue,
+            extractEnumExtensionValue,
             messageResource,
           ) =>
             function plan(_, { $orderBy }, c) {
@@ -3950,10 +3941,10 @@ export function makeExampleSchema(
               const $connectionPlan = connection($messages);
               const orderByArg = c.field.args.find((a) => a.name === "orderBy");
               $messages.apply(
-                getEnumExtensionValue<PgSelectQueryBuilderCallback>(
+                extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                   orderByArg!.type,
-                  $orderBy,
                   "pgSelectApply",
+                  $orderBy,
                 ),
               );
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
@@ -3963,7 +3954,7 @@ export function makeExampleSchema(
           [
             connection,
             deoptimizeIfAppropriate,
-            getEnumExtensionValue,
+            extractEnumExtensionValue,
             messageResource,
           ],
         ),
@@ -4656,8 +4647,8 @@ export function makeExampleSchema(
           (
             TYPES,
             connection,
+            extractEnumExtensionValue,
             firstPartyVulnerabilitiesResource,
-            getEnumExtensionValue,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ) =>
@@ -4678,10 +4669,10 @@ export function makeExampleSchema(
               });
               const orderByArg = field.args.find((a) => a.name === "orderBy");
               $vulnerabilities.apply(
-                getEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
+                extractEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
                   orderByArg!.type,
-                  $orderBy,
                   "pgUnionAllApply",
+                  $orderBy,
                 ),
               );
               return connection($vulnerabilities);
@@ -4689,8 +4680,8 @@ export function makeExampleSchema(
           [
             TYPES,
             connection,
+            extractEnumExtensionValue,
             firstPartyVulnerabilitiesResource,
-            getEnumExtensionValue,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ],
@@ -5292,70 +5283,4 @@ if (require.main === module) {
     console.error(e);
     process.exit(1);
   });
-}
-
-declare module "graphql" {
-  interface GraphQLEnumType {
-    [$$extensionsByValue]?: Record<
-      string,
-      {
-        lookupValues: (values: any[]) => any;
-        lookupValue: (value: any) => any;
-      }
-    >;
-  }
-}
-
-const $$extensionsByValue = Symbol("extensionsByValue");
-function getEnumExtensionPropertyValueLookups(
-  enumType: GraphQLEnumType,
-  extensionsProperty: string,
-) {
-  const enumValueConfigs = getEnumValueConfigs(enumType);
-  if (enumType[$$extensionsByValue] === undefined) {
-    enumType[$$extensionsByValue] = Object.create(null) as {};
-  }
-  if (enumType[$$extensionsByValue][extensionsProperty] === undefined) {
-    const lookup = Object.entries(enumValueConfigs).reduce(
-      (memo, [value, config]) => {
-        memo[value] = config?.extensions?.[extensionsProperty];
-        return memo;
-      },
-      Object.create(null),
-    );
-    const lookupValues = <T>(values: any) =>
-      values?.map((v: any) => lookup[v] as T | undefined);
-    lookupValues.displayName = `extractList_${extensionsProperty}`;
-    const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
-    lookupValue.displayName = `extract_${extensionsProperty}`;
-    enumType[$$extensionsByValue][extensionsProperty] = {
-      lookupValues,
-      lookupValue,
-    };
-  }
-  return enumType[$$extensionsByValue]![extensionsProperty]!;
-}
-
-export function getEnumExtensionValue<T>(
-  type: GraphQLInputType,
-  $step: InputStep,
-  extensionsProperty: string,
-): ExecutableStep<ReadonlyArrayOrDirect<Maybe<T>>> {
-  const nullableType = getNullableType(type);
-  const enumType = getNamedType(nullableType);
-  if (!isEnumType(enumType)) {
-    throw new Error(`Only enum types are supported by this method`);
-  }
-  const { lookupValues, lookupValue } = getEnumExtensionPropertyValueLookups(
-    enumType,
-    extensionsProperty,
-  );
-  if (
-    // Quicker than but equivalent to isListType(nullableType):
-    nullableType !== enumType
-  ) {
-    return lambda($step, lookupValues, true);
-  } else {
-    return lambda($step, lookupValue, true);
-  }
 }
