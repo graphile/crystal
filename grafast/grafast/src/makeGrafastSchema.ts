@@ -94,6 +94,8 @@ export type EnumPlans = {
     | boolean
     | {
         value?: unknown;
+        extensions?: graphql.GraphQLEnumValueExtensions;
+        /** @deprecated Use extensions */
         applyPlan?: EnumValueApplyPlanResolver;
       };
 };
@@ -524,12 +526,19 @@ export function makeGrafastSchema(details: {
               enumValueSpec != null
             ) {
               // It's a full spec
+              if (enumValueSpec.extensions) {
+                exportNameHint(
+                  enumValueSpec.extensions,
+                  `${typeName}_${enumValueName}_extensions`,
+                );
+                Object.assign(enumValue.extensions!, enumValueSpec.extensions);
+              }
               if (enumValueSpec.applyPlan) {
                 exportNameHint(
                   enumValueSpec.applyPlan,
                   `${typeName}_${enumValueName}_applyPlan`,
                 );
-                (enumValue.extensions as any).grafast = {
+                enumValue.extensions!.grafast = {
                   applyPlan: enumValueSpec.applyPlan,
                 } as Grafast.EnumValueExtensions;
               }
