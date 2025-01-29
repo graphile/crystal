@@ -68,13 +68,3 @@ lateral (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
     )
 ) as __single_table_items_result__;
-
-select
-  __people__."username" as "0"
-from interfaces_and_unions.people as __people__
-where
-  (
-    true /* authorization checks */
-  ) and (
-    __people__."person_id" = $1::"int4"
-  );

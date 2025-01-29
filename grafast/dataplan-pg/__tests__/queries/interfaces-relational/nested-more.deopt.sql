@@ -141,16 +141,6 @@ lateral (
 ) as __relational_checklist_items_result__;
 
 select
-  __people__."username" as "0"
-from interfaces_and_unions.people as __people__
-where
-  (
-    true /* authorization checks */
-  ) and (
-    __people__."person_id" = $1::"int4"
-  );
-
-select
   __relational_posts__."id"::text as "0"
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
