@@ -3016,6 +3016,11 @@ export class OperationPlan {
       winner.polymorphicPaths = polymorphicPaths;
     }
 
+    // Equivalent steps cannot be streaming; so we can no longer stream either.
+    if (equivalentSteps.length > 0) {
+      winner._stepOptions.stream = null;
+    }
+
     // Give the steps a chance to pass their responsibilities to the winner.
     if (winner !== step) {
       const wasLocked = isDev && unlock(step);
@@ -3023,6 +3028,7 @@ export class OperationPlan {
       if (wasLocked) lock(step);
       this.stepTracker.replaceStep(step, winner);
     }
+
     for (const target of equivalentSteps) {
       if (winner !== target) {
         const wasLocked = isDev && unlock(target);
