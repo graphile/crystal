@@ -1935,7 +1935,12 @@ function buildTheQuery<
       return info.alias;
     },
     orderBy(spec) {
-      info.orders.push(spec);
+      if (info.mode !== "aggregate") {
+        info.orders.push(spec);
+      } else {
+        // Throw it away?
+        // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
+      }
     },
     singleRelation(relationIdentifier) {
       // NOTE: this is almost an exact copy of the same method on PgSelectStep,
