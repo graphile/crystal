@@ -1,8 +1,7 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, extractEnumExtensionValue, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
@@ -1102,26 +1101,30 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.ReferencingTable);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
-};
+function basePlan() {
+  return connection(pgResource_letter_descriptionsPgResource.find());
+}
+const postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+  return $connection;
+}];
+function basePlan2() {
+  return connection(pgResource_referencing_tablePgResource.find());
+}
+const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+  return $connection;
+}];
 function CursorSerialize(value) {
   return "" + value;
 }
@@ -2154,8 +2157,12 @@ export const plans = {
       }
     },
     allLetterDescriptions: {
-      plan() {
-        return connection(pgResource_letter_descriptionsPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = basePlan($parent, fieldArgs, info);
+        for (const ppr of postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -2188,15 +2195,7 @@ export const plans = {
             $connection.setAfter(val.getRaw());
           }
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
-            return null;
-          }
-        },
+        orderBy: undefined,
         condition: {
           autoApplyAfterParentPlan: true,
           applyPlan(_condition, $connection) {
@@ -2207,8 +2206,12 @@ export const plans = {
       }
     },
     allReferencingTables: {
-      plan() {
-        return connection(pgResource_referencing_tablePgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = basePlan2($parent, fieldArgs, info);
+        for (const ppr of postPlanResolvers2) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -2241,15 +2244,7 @@ export const plans = {
             $connection.setAfter(val.getRaw());
           }
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
-            return null;
-          }
-        },
+        orderBy: undefined,
         condition: {
           autoApplyAfterParentPlan: true,
           applyPlan(_condition, $connection) {
@@ -2279,6 +2274,34 @@ export const plans = {
       return $record.get("description");
     }
   },
+  LetterAToD: {
+    A: {
+      extensions: Object.create(null)
+    },
+    B: {
+      extensions: Object.create(null)
+    },
+    C: {
+      extensions: Object.create(null)
+    },
+    D: {
+      extensions: Object.create(null)
+    }
+  },
+  LetterAToDViaView: {
+    A: {
+      extensions: Object.create(null)
+    },
+    B: {
+      extensions: Object.create(null)
+    },
+    C: {
+      extensions: Object.create(null)
+    },
+    D: {
+      extensions: Object.create(null)
+    }
+  },
   ReferencingTable: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
@@ -2303,58 +2326,74 @@ export const plans = {
   },
   EnumTheFirst: {
     A1: {
-      value: "a1"
+      value: "a1",
+      extensions: Object.create(null)
     },
     A2: {
-      value: "a2"
+      value: "a2",
+      extensions: Object.create(null)
     },
     A3: {
-      value: "a3"
+      value: "a3",
+      extensions: Object.create(null)
     },
     A4: {
-      value: "a4"
+      value: "a4",
+      extensions: Object.create(null)
     }
   },
   EnumTheSecond: {
     B1: {
-      value: "b1"
+      value: "b1",
+      extensions: Object.create(null)
     },
     B2: {
-      value: "b2"
+      value: "b2",
+      extensions: Object.create(null)
     },
     B3: {
-      value: "b3"
+      value: "b3",
+      extensions: Object.create(null)
     },
     B4: {
-      value: "b4"
+      value: "b4",
+      extensions: Object.create(null)
     }
   },
   LotsOfEnumsEnum3: {
     C1: {
-      value: "c1"
+      value: "c1",
+      extensions: Object.create(null)
     },
     C2: {
-      value: "c2"
+      value: "c2",
+      extensions: Object.create(null)
     },
     C3: {
-      value: "c3"
+      value: "c3",
+      extensions: Object.create(null)
     },
     C4: {
-      value: "c4"
+      value: "c4",
+      extensions: Object.create(null)
     }
   },
   SimpleEnum: {
     FOO: {
-      value: "Foo"
+      value: "Foo",
+      extensions: Object.create(null)
     },
     BAR: {
-      value: "Bar"
+      value: "Bar",
+      extensions: Object.create(null)
     },
     BAZ: {
-      value: "Baz"
+      value: "Baz",
+      extensions: Object.create(null)
     },
     QUX: {
-      value: "Qux"
+      value: "Qux",
+      extensions: Object.create(null)
     }
   },
   LetterDescriptionsConnection: {
@@ -2409,175 +2448,171 @@ export const plans = {
   },
   LetterDescriptionsOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: Object.create(null)
     },
     PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-          const attribute = letterDescriptionsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+            const attribute = letterDescriptionsCodec.attributes[attributeName];
+            queryBuilder.orderBy({
+              codec: attribute.codec,
+              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+          });
+          queryBuilder.setOrderIsUnique();
+        }
+      })
+    },
+    PRIMARY_KEY_DESC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+            const attribute = letterDescriptionsCodec.attributes[attributeName];
+            queryBuilder.orderBy({
+              codec: attribute.codec,
+              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+          });
+          queryBuilder.setOrderIsUnique();
+        }
+      })
+    },
+    ID_ASC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "id",
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
             } : null)
           });
-        });
-        step.setOrderIsUnique();
-      }
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
+        }
+      })
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-          const attribute = letterDescriptionsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+    ID_DESC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "id",
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
             } : null)
           });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     LETTER_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "letter",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "letter",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     LETTER_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "letter",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "letter",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     LETTER_VIA_VIEW_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "letter_via_view",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "letter_via_view",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     LETTER_VIA_VIEW_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "letter_via_view",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "letter_via_view",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     DESCRIPTION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "description",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     DESCRIPTION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "description",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     }
   },
   LetterDescriptionCondition: {
@@ -2701,209 +2736,203 @@ export const plans = {
   },
   ReferencingTablesOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: Object.create(null)
     },
     PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        referencing_tableUniques[0].attributes.forEach(attributeName => {
-          const attribute = referencingTableCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          referencing_tableUniques[0].attributes.forEach(attributeName => {
+            const attribute = referencingTableCodec.attributes[attributeName];
+            queryBuilder.orderBy({
+              codec: attribute.codec,
+              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+          });
+          queryBuilder.setOrderIsUnique();
+        }
+      })
+    },
+    PRIMARY_KEY_DESC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          referencing_tableUniques[0].attributes.forEach(attributeName => {
+            const attribute = referencingTableCodec.attributes[attributeName];
+            queryBuilder.orderBy({
+              codec: attribute.codec,
+              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+          });
+          queryBuilder.setOrderIsUnique();
+        }
+      })
+    },
+    ID_ASC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "id",
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
             } : null)
           });
-        });
-        step.setOrderIsUnique();
-      }
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
+        }
+      })
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        referencing_tableUniques[0].attributes.forEach(attributeName => {
-          const attribute = referencingTableCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+    ID_DESC: {
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "id",
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
             } : null)
           });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+          if (true) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_1_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_1",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_1",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_1_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_1",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_1",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_2_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_2",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_2",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_2_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_2",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_2",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_3_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_3",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_3",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     ENUM_3_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "enum_3",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "enum_3",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     SIMPLE_ENUM_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "simple_enum",
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "simple_enum",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     },
     SIMPLE_ENUM_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+      extensions: Object.assign(Object.create(null), {
+        pgSelectApply(queryBuilder) {
+          queryBuilder.orderBy({
+            attribute: "simple_enum",
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+          if (false) {
+            queryBuilder.setOrderIsUnique();
+          }
         }
-        plan.orderBy({
-          attribute: "simple_enum",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      })
     }
   },
   ReferencingTableCondition: {
@@ -3358,7 +3387,11 @@ export const plans = {
       return rootValue();
     },
     letterDescriptionEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3375,8 +3408,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
@@ -3449,7 +3482,11 @@ export const plans = {
       return rootValue();
     },
     referencingTableEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3466,8 +3503,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
@@ -3507,7 +3544,11 @@ export const plans = {
       return rootValue();
     },
     letterDescriptionEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3524,8 +3565,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
@@ -3639,7 +3680,11 @@ export const plans = {
       return rootValue();
     },
     referencingTableEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3656,8 +3701,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
@@ -3755,7 +3800,11 @@ export const plans = {
       return rootValue();
     },
     letterDescriptionEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3772,8 +3821,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
@@ -3835,7 +3884,11 @@ export const plans = {
       return rootValue();
     },
     referencingTableEdge: {
-      plan($mutation, args, info) {
+      plan($mutation, {
+        $orderBy
+      }, {
+        field
+      }) {
         const $result = $mutation.getStepForKey("result", true);
         if (!$result) {
           return constant(null);
@@ -3852,8 +3905,8 @@ export const plans = {
           }
         })();
         // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
+        const orderByArg = field.args.find(a => a.name === "orderBy");
+        $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
         const $connection = connection($select);
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
