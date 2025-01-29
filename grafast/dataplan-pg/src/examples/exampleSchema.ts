@@ -24,7 +24,9 @@ import type {
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastSubscriber,
+  InputStep,
   ListStep,
+  Maybe,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -48,11 +50,12 @@ import {
   object,
   rootValue,
 } from "grafast";
-import type { GraphQLOutputType } from "grafast/graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import {
+  getNamedType,
+  getNullableType,
   GraphQLBoolean,
   GraphQLEnumType,
-  GraphQLError,
   GraphQLFloat,
   GraphQLInt,
   GraphQLInterfaceType,
@@ -62,12 +65,13 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
+  isEnumType,
+  isListType,
   printSchema,
 } from "grafast/graphql";
 import sql from "pg-sql2";
-//import prettier from "prettier";
-import { inspect } from "util";
 
+//import prettier from "prettier";
 import type {
   GetPgResourceRelations,
   PgCodecAttribute,
@@ -107,7 +111,13 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgResourceAttributes, PgCodec } from "../interfaces";
+import type {
+  GetPgResourceAttributes,
+  PgCodec,
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
+  ReadonlyArrayOrDirect,
+} from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -1984,68 +1994,60 @@ export function makeExampleSchema(
     values: {
       BODY_ASC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
-                step.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${step}.body`,
-                  direction: "ASC",
-                });
-              },
-              [TYPES, sql],
-            ),
-          },
+          pgSelectApply: EXPORTABLE(
+            (TYPES, sql) => (qb) => {
+              qb.orderBy({
+                codec: TYPES.text,
+                fragment: sql`${qb}.body`,
+                direction: "ASC",
+              });
+            },
+            [TYPES, sql],
+          ),
         },
       },
       BODY_DESC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
-                step.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${step}.body`,
-                  direction: "DESC",
-                });
-              },
-              [TYPES, sql],
-            ),
-          },
+          pgSelectApply: EXPORTABLE(
+            (TYPES, sql) => (qb) => {
+              qb.orderBy({
+                codec: TYPES.text,
+                fragment: sql`${qb}.body`,
+                direction: "DESC",
+              });
+            },
+            [TYPES, sql],
+          ),
         },
       },
       AUTHOR_USERNAME_ASC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
-                const authorAlias = step.singleRelation("author");
-                step.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${authorAlias}.username`,
-                  direction: "ASC",
-                });
-              },
-              [TYPES, sql],
-            ),
-          },
+          pgSelectApply: EXPORTABLE(
+            (TYPES, sql) => (qb) => {
+              const authorAlias = qb.singleRelation("author");
+              qb.orderBy({
+                codec: TYPES.text,
+                fragment: sql`${authorAlias}.username`,
+                direction: "ASC",
+              });
+            },
+            [TYPES, sql],
+          ),
         },
       },
       AUTHOR_USERNAME_DESC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
-                const authorAlias = step.singleRelation("author");
-                step.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${authorAlias}.username`,
-                  direction: "DESC",
-                });
-              },
-              [TYPES, sql],
-            ),
-          },
+          pgSelectApply: EXPORTABLE(
+            (TYPES, sql) => (qb) => {
+              const authorAlias = qb.singleRelation("author");
+              qb.orderBy({
+                codec: TYPES.text,
+                fragment: sql`${authorAlias}.username`,
+                direction: "DESC",
+              });
+            },
+            [TYPES, sql],
+          ),
         },
       },
     },
@@ -3686,32 +3688,28 @@ export function makeExampleSchema(
     values: {
       CVSS_SCORE_ASC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep) => {
-                step.orderBy({
-                  attribute: "cvss_score",
-                  direction: "ASC",
-                });
-              },
-              [],
-            ),
-          },
+          pgUnionAllApply: EXPORTABLE(
+            () => (qb) => {
+              qb.orderBy({
+                attribute: "cvss_score",
+                direction: "ASC",
+              });
+            },
+            [],
+          ),
         },
       },
       CVSS_SCORE_DESC: {
         extensions: {
-          grafast: {
-            applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep) => {
-                step.orderBy({
-                  attribute: "cvss_score",
-                  direction: "DESC",
-                });
-              },
-              [],
-            ),
-          },
+          pgUnionAllApply: EXPORTABLE(
+            () => (qb) => {
+              qb.orderBy({
+                attribute: "cvss_score",
+                direction: "DESC",
+              });
+            },
+            [],
+          ),
         },
       },
     },
@@ -3932,45 +3930,16 @@ export function makeExampleSchema(
           },
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
-            autoApplyAfterParentPlan: true,
-            applyPlan: EXPORTABLE(
-              (GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect) =>
-                function plan(
-                  _$root,
-                  $connection: ResourceConnectionPlan<typeof messageResource>,
-                  arg,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  const val = arg.getRaw().eval();
-                  if (!Array.isArray(val)) {
-                    throw new GraphQLError(
-                      "Invalid valus supplied to 'orderBy'",
-                    );
-                  }
-                  val.forEach((order) => {
-                    const config = getEnumValueConfig(MessagesOrderBy, order);
-                    const plan = config?.extensions?.grafast?.applyPlan;
-                    if (typeof plan !== "function") {
-                      console.error(
-                        `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                          plan,
-                        )}`,
-                      );
-                      throw new GraphQLError(
-                        "Internal server error: invalid orderBy configuration",
-                      );
-                    }
-                    plan($messages);
-                  });
-                  return null;
-                },
-              [GraphQLError, MessagesOrderBy, getEnumValueConfig, inspect],
-            ),
           },
         },
         plan: EXPORTABLE(
-          (connection, deoptimizeIfAppropriate, messageResource) =>
-            function plan() {
+          (
+            connection,
+            deoptimizeIfAppropriate,
+            getEnumExtensionValue,
+            messageResource,
+          ) =>
+            function plan(_, { $orderBy }, c) {
               const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
@@ -3978,12 +3947,24 @@ export function makeExampleSchema(
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
               const $connectionPlan = connection($messages);
-              // $connectionPlan.orderBy... ?
+              const orderByArg = c.field.args.find((a) => a.name === "orderBy");
+              $messages.apply(
+                getEnumExtensionValue<PgSelectQueryBuilderCallback>(
+                  orderByArg!.type,
+                  $orderBy,
+                  "pgSelectApply",
+                ),
+              );
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [connection, deoptimizeIfAppropriate, messageResource],
+          [
+            connection,
+            deoptimizeIfAppropriate,
+            getEnumExtensionValue,
+            messageResource,
+          ],
         ),
       },
 
@@ -4668,51 +4649,6 @@ export function makeExampleSchema(
           },
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(VulnerabilitiesOrderBy)),
-            autoApplyAfterParentPlan: true,
-            applyPlan: EXPORTABLE(
-              (
-                GraphQLError,
-                VulnerabilitiesOrderBy,
-                getEnumValueConfig,
-                inspect,
-              ) =>
-                function plan(
-                  _$root,
-                  $connection: ResourceConnectionPlan<typeof messageResource>,
-                  arg,
-                ) {
-                  const $collection = $connection.getSubplan();
-                  const val = arg.getRaw().eval();
-                  if (!Array.isArray(val)) {
-                    throw new Error("Invalid!");
-                  }
-                  val.forEach((order) => {
-                    const config = getEnumValueConfig(
-                      VulnerabilitiesOrderBy,
-                      order,
-                    );
-                    const plan = config?.extensions?.grafast?.applyPlan;
-                    if (typeof plan !== "function") {
-                      console.error(
-                        `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                          plan,
-                        )}`,
-                      );
-                      throw new GraphQLError(
-                        "Internal server error: invalid orderBy configuration",
-                      );
-                    }
-                    plan($collection);
-                  });
-                  return null;
-                },
-              [
-                GraphQLError,
-                VulnerabilitiesOrderBy,
-                getEnumValueConfig,
-                inspect,
-              ],
-            ),
           },
         },
         plan: EXPORTABLE(
@@ -4720,10 +4656,11 @@ export function makeExampleSchema(
             TYPES,
             connection,
             firstPartyVulnerabilitiesResource,
+            getEnumExtensionValue,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ) =>
-            function plan() {
+            function plan(_, { $orderBy }, { field }) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 name: "vulnerabilities",
@@ -4738,12 +4675,21 @@ export function makeExampleSchema(
                   ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
               });
+              const orderByArg = field.args.find((a) => a.name === "orderBy");
+              $vulnerabilities.apply(
+                getEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
+                  orderByArg!.type,
+                  $orderBy,
+                  "pgUnionAllApply",
+                ),
+              );
               return connection($vulnerabilities);
             },
           [
             TYPES,
             connection,
             firstPartyVulnerabilitiesResource,
+            getEnumExtensionValue,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ],
@@ -5345,4 +5291,36 @@ if (require.main === module) {
     console.error(e);
     process.exit(1);
   });
+}
+
+function getEnumExtensionValue<T>(
+  type: GraphQLInputType,
+  $step: InputStep,
+  extensionsProperty: string,
+): ExecutableStep<ReadonlyArrayOrDirect<Maybe<T>>> {
+  const nullableType = getNullableType(type);
+  const enumType = getNamedType(nullableType);
+  if (!isEnumType(enumType)) {
+    throw new Error(`Only enum types are supported by this method`);
+  }
+  if (isListType(nullableType)) {
+    return lambda(
+      $step,
+      (val) =>
+        val?.map(
+          (v: any) =>
+            getEnumValueConfig(enumType, v)?.extensions?.[
+              extensionsProperty
+            ] as T | undefined,
+        ),
+    );
+  } else {
+    return lambda(
+      $step,
+      (val) =>
+        getEnumValueConfig(enumType, val)?.extensions?.[extensionsProperty] as
+          | T
+          | undefined,
+    );
+  }
 }
