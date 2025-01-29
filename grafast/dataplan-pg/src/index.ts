@@ -65,6 +65,10 @@ import { PgBooleanFilterStep } from "./filters/pgBooleanFilter.js";
 import { PgClassFilterStep } from "./filters/pgClassFilter.js";
 import { PgManyFilterStep } from "./filters/pgManyFilter.js";
 import { PgOrFilterStep } from "./filters/pgOrFilter.js";
+import type {
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
+} from "./interfaces.js";
 import {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
@@ -533,5 +537,12 @@ declare global {
     interface PgCodecAttributeExtensions {}
     interface PgRefDefinitionExtensions {}
     interface PgCodecRelationExtensions {}
+  }
+}
+
+declare module "graphql" {
+  interface GraphQLEnumValueExtensions {
+    pgSelectApply?: PgSelectQueryBuilderCallback;
+    pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
   }
 }

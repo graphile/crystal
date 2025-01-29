@@ -1,5 +1,6 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
@@ -13,7 +14,9 @@ import type {
 import type { PgExecutor } from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
+import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
 
 /**
@@ -737,3 +740,15 @@ export type PgSQLCallback<TResult> = (
   sql: PgSQL<PgTypedExecutableStep<PgCodec>>,
 ) => TResult;
 export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
+
+export interface PgQueryBuilder {
+  /** The alias of the current table */
+  alias: SQL;
+  [$$toSQL](): SQL;
+}
+
+export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;
+export type PgUnionAllQueryBuilderCallback = (
+  qb: PgUnionAllQueryBuilder,
+) => void;
+export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
