@@ -1,0 +1,34 @@
+## expect(errors).toBeFalsy()
+#// expect(queries).toHaveLength(13);
+{
+  forums(includeArchived: EXCLUSIVELY) {
+    name
+    messagesConnection(includeArchived: INHERIT) {
+      nodes @stream {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+      # No @stream here. `edges` and `nodes` should still deduplicate and the
+      # list should be populated from this without streaming even though the
+      # results may still stream
+      edges {
+        cursor
+        node {
+          author {
+            username
+          }
+        }
+      }
+      ... @defer {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+        totalCount
+      }
+    }
+  }
+}
