@@ -18,7 +18,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect53[["PgSelect[53∈1] ➊<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Object16{{"Object[16∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
-    Access131{{"Access[131∈1] ➊<br />ᐸ8.base64JSON.1ᐳ<br />ᐳInput"}}:::plan
+    Access131{{"Access[131∈1] ➊<br />ᐸ8.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access132{{"Access[132∈1] ➊<br />ᐸ8.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
     Object16 -->|rejectNull| PgSelect53
     Access131 -->|rejectNull| PgSelect53
@@ -26,8 +26,8 @@ graph TD
     PgSelect13[["PgSelect[13∈1] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
     Object16 -->|rejectNull| PgSelect13
     Access131 --> PgSelect13
-    Access14{{"Access[14∈1] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳInput"}}:::plan
-    Access15{{"Access[15∈1] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳInput"}}:::plan
+    Access14{{"Access[14∈1] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
+    Access15{{"Access[15∈1] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access14 & Access15 --> Object16
     PgSelect21[["PgSelect[21∈1] ➊<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
     Object16 -->|rejectNull| PgSelect21

@@ -45,15 +45,15 @@ graph TD
     PgUnionAll29 --> Access33
     PgCursor34{{"PgCursor[34∈5]"}}:::plan
     PgUnionAllSingle32 & Access33 --> PgCursor34
+    Access35{{"Access[35∈5]<br />ᐸ32.1ᐳ"}}:::plan
+    PgUnionAllSingle32 --> Access35
     PgSelect38[["PgSelect[38∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access37{{"Access[37∈6]<br />ᐸ36.0ᐳ"}}:::plan
     Object13 & Access37 --> PgSelect38
     PgSelect50[["PgSelect[50∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
     Access49{{"Access[49∈6]<br />ᐸ48.0ᐳ"}}:::plan
     Object13 & Access49 --> PgSelect50
-    Access35{{"Access[35∈6]<br />ᐸ32.1ᐳ<br />ᐳAwsApplication"}}:::plan
-    PgUnionAllSingle32 --> Access35
-    JSONParse36[["JSONParse[36∈6]<br />ᐸ35ᐳ"]]:::plan
+    JSONParse36[["JSONParse[36∈6]<br />ᐸ35ᐳ<br />ᐳAwsApplication"]]:::plan
     Access35 --> JSONParse36
     JSONParse36 --> Access37
     First42{{"First[42∈6]"}}:::plan
@@ -104,10 +104,10 @@ graph TD
     class Bucket4,__Item31,PgUnionAllSingle32,Access33 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 32, 33, 13<br /><br />ROOT PgUnionAllSingle{4}[32]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgCursor34 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 32, 13<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: <br />ᐳ: Access[35]<br />2: JSONParse[36], JSONParse[48]<br />ᐳ: Access[37], Access[49]<br />3: PgSelect[38], PgSelect[50]<br />4: PgSelectRows[43], PgSelectRows[53]<br />ᐳ: 42, 44, 45, 46, 47, 52, 54, 55, 56, 57"):::bucket
+    class Bucket5,PgCursor34,Access35 bucket5
+    Bucket6("Bucket 6 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 35, 13, 32<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[36], JSONParse[48]<br />ᐳ: Access[37], Access[49]<br />2: PgSelect[38], PgSelect[50]<br />3: PgSelectRows[43], PgSelectRows[53]<br />ᐳ: 42, 44, 45, 46, 47, 52, 54, 55, 56, 57"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,Access35,JSONParse36,Access37,PgSelect38,First42,PgSelectRows43,PgSelectSingle44,PgClassExpression45,PgClassExpression46,PgClassExpression47,JSONParse48,Access49,PgSelect50,First52,PgSelectRows53,PgSelectSingle54,PgClassExpression55,PgClassExpression56,PgClassExpression57 bucket6
+    class Bucket6,JSONParse36,Access37,PgSelect38,First42,PgSelectRows43,PgSelectSingle44,PgClassExpression45,PgClassExpression46,PgClassExpression47,JSONParse48,Access49,PgSelect50,First52,PgSelectRows53,PgSelectSingle54,PgClassExpression55,PgClassExpression56,PgClassExpression57 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
