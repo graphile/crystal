@@ -317,19 +317,18 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }
 
                 if (postPlanResolvers.length > 0) {
-                  if (!finalFieldSpec.plan) {
-                    throw new Error(`Cannot`);
-                  }
                   const basePlan = finalFieldSpec.plan ?? defaultPlanResolver;
                   finalFieldSpec.plan = EXPORTABLE(
-                    (basePlan, postPlanResolvers) => ($parent, fieldArgs, info) => {
-                      let $result = basePlan($parent, fieldArgs, info);
-                      for (const ppr of postPlanResolvers) {
-                        $result = ppr($result, $parent, fieldArgs, info);
-                      }
-                      return $result;
-                    },
-                  [basePlan, postPlanResolvers]);
+                    (basePlan, postPlanResolvers) =>
+                      ($parent, fieldArgs, info) => {
+                        let $result = basePlan($parent, fieldArgs, info);
+                        for (const ppr of postPlanResolvers) {
+                          $result = ppr($result, $parent, fieldArgs, info);
+                        }
+                        return $result;
+                      },
+                    [basePlan, postPlanResolvers],
+                  );
                 }
 
                 processedFields.push(finalFieldSpec);
