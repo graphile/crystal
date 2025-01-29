@@ -1581,6 +1581,11 @@ export class PgSelectRowsStep<
     return this.getClassStep().listItem(itemPlan);
   }
 
+  public deduplicate(_peers: readonly ExecutableStep[]) {
+    // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
+    return _peers;
+  }
+
   // optimize() {
   //   const $access = access(this.getClassStep(), "items");
   //   $access.isSyncAndSafe = false;
