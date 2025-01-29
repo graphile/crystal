@@ -2388,15 +2388,17 @@ export class OperationPlan {
       return EMPTY_ARRAY;
     }
 
-    if (step._stepOptions.stream != null) {
-      // PERF: re-evaluate this... should be okay to merge streams if we're careful?
+    // NOTE: Streams have no peers - we cannot reference the stream more than
+    // once (and we aim to not cache the stream because we want its entries to
+    // be garbage collected) - however if we're already fetching the list then
+    // we shouldn't fetch it again via stream... We should deduplicate a stream
+    // to return a non-stream.
 
-      // Streams have no peers - we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      //
-      // HOWEVER! There may be lifecycle parts that need to be called... So
-      // call the function with an empty array; ignore the result.
+    if (step._stepOptions.stream != null) {
+      // TODO: remove this if block when we implement the new stream/defer -
+      // deduplicating a stream should be fine. (Not subscriptions though - may
+      // need a check for that!)
+
       return EMPTY_ARRAY;
     }
 
