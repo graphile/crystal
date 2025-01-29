@@ -88,8 +88,11 @@ graph TD
     PgSelectRows62 ==> __Item63
     PgSelectSingle64{{"PgSelectSingle[64∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
     __Item63 --> PgSelectSingle64
+    PgClassExpression65{{"PgClassExpression[65∈5]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression65
+    PgClassExpression77{{"PgClassExpression[77∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression77
     PgSelect66[["PgSelect[66∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object38 & PgClassExpression65 --> PgSelect66
     List75{{"List[75∈6]<br />ᐸ73,74ᐳ<br />ᐳRelationalTopic"}}:::plan
     PgClassExpression74{{"PgClassExpression[74∈6]<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
@@ -114,7 +117,6 @@ graph TD
     List112{{"List[112∈6]<br />ᐸ110,111ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
     PgClassExpression111{{"PgClassExpression[111∈6]<br />ᐸ__relation...m_item_id”ᐳ"}}:::plan
     Constant110 & PgClassExpression111 --> List112
-    PgSelectSingle64 --> PgClassExpression65
     First70{{"First[70∈6]"}}:::plan
     PgSelectRows71[["PgSelectRows[71∈6]"]]:::plan
     PgSelectRows71 --> First70
@@ -124,8 +126,6 @@ graph TD
     PgSelectSingle72 --> PgClassExpression74
     Lambda76{{"Lambda[76∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List75 --> Lambda76
-    PgClassExpression77{{"PgClassExpression[77∈6]<br />ᐸ__relation...s__.”type”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle64 --> PgClassExpression77
     First80{{"First[80∈6]"}}:::plan
     PgSelectRows81[["PgSelectRows[81∈6]"]]:::plan
     PgSelectRows81 --> First80
@@ -183,10 +183,10 @@ graph TD
     class Bucket4,PgSelect61,PgSelectRows62 bucket4
     Bucket5("Bucket 5 (listItem)<br />Deps: 38, 73, 83, 92, 101, 110<br /><br />ROOT __Item{5}ᐸ62ᐳ[63]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item63,PgSelectSingle64 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 64, 38, 73, 83, 92, 101, 110<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 65, 77<br />2: 66, 78, 87, 96, 105<br />3: 71, 81, 90, 99, 108<br />ᐳ: 70, 72, 74, 75, 76, 80, 82, 84, 85, 86, 89, 91, 93, 94, 95, 98, 100, 102, 103, 104, 107, 109, 111, 112, 113"):::bucket
+    class Bucket5,__Item63,PgSelectSingle64,PgClassExpression65,PgClassExpression77 bucket5
+    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 38, 65, 73, 83, 92, 101, 110, 64, 77<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 66, 78, 87, 96, 105<br />2: 71, 81, 90, 99, 108<br />ᐳ: 70, 72, 74, 75, 76, 80, 82, 84, 85, 86, 89, 91, 93, 94, 95, 98, 100, 102, 103, 104, 107, 109, 111, 112, 113"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression65,PgSelect66,First70,PgSelectRows71,PgSelectSingle72,PgClassExpression74,List75,Lambda76,PgClassExpression77,PgSelect78,First80,PgSelectRows81,PgSelectSingle82,PgClassExpression84,List85,Lambda86,PgSelect87,First89,PgSelectRows90,PgSelectSingle91,PgClassExpression93,List94,Lambda95,PgSelect96,First98,PgSelectRows99,PgSelectSingle100,PgClassExpression102,List103,Lambda104,PgSelect105,First107,PgSelectRows108,PgSelectSingle109,PgClassExpression111,List112,Lambda113 bucket6
+    class Bucket6,PgSelect66,First70,PgSelectRows71,PgSelectSingle72,PgClassExpression74,List75,Lambda76,PgSelect78,First80,PgSelectRows81,PgSelectSingle82,PgClassExpression84,List85,Lambda86,PgSelect87,First89,PgSelectRows90,PgSelectSingle91,PgClassExpression93,List94,Lambda95,PgSelect96,First98,PgSelectRows99,PgSelectSingle100,PgClassExpression102,List103,Lambda104,PgSelect105,First107,PgSelectRows108,PgSelectSingle109,PgClassExpression111,List112,Lambda113 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

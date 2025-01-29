@@ -79,22 +79,22 @@ graph TD
     PgSelectRows54 ==> __Item55
     PgSelectSingle56{{"PgSelectSingle[56∈7]<br />ᐸrelational_itemsᐳ"}}:::plan
     __Item55 --> PgSelectSingle56
+    PgClassExpression57{{"PgClassExpression[57∈7]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression57
+    PgClassExpression65{{"PgClassExpression[65∈7]<br />ᐸ__relation...nstructor”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression65
+    PgClassExpression66{{"PgClassExpression[66∈7]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression66
     PgSelect58[["PgSelect[58∈8]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object10 & PgClassExpression57 --> PgSelect58
     PgSelect68[["PgSelect[68∈8]<br />ᐸrelational_statusᐳ<br />ᐳRelationalStatus"]]:::plan
     Object10 & PgClassExpression57 --> PgSelect68
-    PgSelectSingle56 --> PgClassExpression57
     First62{{"First[62∈8]"}}:::plan
     PgSelectRows63[["PgSelectRows[63∈8]"]]:::plan
     PgSelectRows63 --> First62
     PgSelect58 --> PgSelectRows63
     PgSelectSingle64{{"PgSelectSingle[64∈8]<br />ᐸrelational_topicsᐳ"}}:::plan
     First62 --> PgSelectSingle64
-    PgClassExpression65{{"PgClassExpression[65∈8]<br />ᐸ__relation...nstructor”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle56 --> PgClassExpression65
-    PgClassExpression66{{"PgClassExpression[66∈8]<br />ᐸ__relation...s__.”type”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle56 --> PgClassExpression66
     PgClassExpression67{{"PgClassExpression[67∈8]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression67
     First70{{"First[70∈8]"}}:::plan
@@ -132,10 +132,10 @@ graph TD
     class Bucket6,PgSelect53,PgSelectRows54 bucket6
     Bucket7("Bucket 7 (listItem)<br />Deps: 10<br /><br />ROOT __Item{7}ᐸ54ᐳ[55]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,__Item55,PgSelectSingle56 bucket7
-    Bucket8("Bucket 8 (polymorphic)<br />RelationalTopic,RelationalStatus<br />Deps: 56, 10<br />ᐳRelationalTopic<br />ᐳRelationalStatus<br /><br />1: <br />ᐳ: 57, 65, 66<br />2: PgSelect[58], PgSelect[68]<br />3: PgSelectRows[63], PgSelectRows[71]<br />ᐳ: 62, 64, 67, 70, 72, 73"):::bucket
+    class Bucket7,__Item55,PgSelectSingle56,PgClassExpression57,PgClassExpression65,PgClassExpression66 bucket7
+    Bucket8("Bucket 8 (polymorphic)<br />RelationalTopic,RelationalStatus<br />Deps: 10, 57, 56, 65, 66<br />ᐳRelationalTopic<br />ᐳRelationalStatus<br /><br />1: PgSelect[58], PgSelect[68]<br />2: PgSelectRows[63], PgSelectRows[71]<br />ᐳ: 62, 64, 67, 70, 72, 73"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression57,PgSelect58,First62,PgSelectRows63,PgSelectSingle64,PgClassExpression65,PgClassExpression66,PgClassExpression67,PgSelect68,First70,PgSelectRows71,PgSelectSingle72,PgClassExpression73 bucket8
+    class Bucket8,PgSelect58,First62,PgSelectRows63,PgSelectSingle64,PgClassExpression67,PgSelect68,First70,PgSelectRows71,PgSelectSingle72,PgClassExpression73 bucket8
     Bucket0 --> Bucket1 & Bucket3 & Bucket6
     Bucket1 --> Bucket2
     Bucket3 --> Bucket4

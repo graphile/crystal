@@ -35,15 +35,15 @@ graph TD
     __Item19 --> PgUnionAllSingle20
     PgCursor22{{"PgCursor[22∈3]"}}:::plan
     PgUnionAllSingle20 & Access21 --> PgCursor22
+    Access23{{"Access[23∈3]<br />ᐸ20.1ᐳ"}}:::plan
+    PgUnionAllSingle20 --> Access23
     PgSelect26[["PgSelect[26∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access25{{"Access[25∈4]<br />ᐸ24.0ᐳ"}}:::plan
     Object14 & Access25 --> PgSelect26
     PgSelect39[["PgSelect[39∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Access38{{"Access[38∈4]<br />ᐸ37.0ᐳ"}}:::plan
     Object14 & Access38 --> PgSelect39
-    Access23{{"Access[23∈4]<br />ᐸ20.1ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
-    PgUnionAllSingle20 --> Access23
-    JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ"]]:::plan
+    JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access23 --> JSONParse24
     JSONParse24 --> Access25
     First30{{"First[30∈4]"}}:::plan
@@ -92,10 +92,10 @@ graph TD
     class Bucket2,__Item19,PgUnionAllSingle20 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 14<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor22 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 20, 14<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: <br />ᐳ: Access[23]<br />2: JSONParse[24], JSONParse[37]<br />ᐳ: Access[25], Access[38]<br />3: PgSelect[26], PgSelect[39]<br />4: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
+    class Bucket3,PgCursor22,Access23 bucket3
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 23, 14, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[24], JSONParse[37]<br />ᐳ: Access[25], Access[38]<br />2: PgSelect[26], PgSelect[39]<br />3: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,Access23,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,JSONParse37,Access38,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
+    class Bucket4,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,JSONParse37,Access38,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
