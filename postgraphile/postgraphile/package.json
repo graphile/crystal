@@ -168,7 +168,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "yarn test:jest && yarn test:schema-exports && yarn test:operations-exports",
+    "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
     "test:operations-exports": "yarn test:operations-exports:typeDefs",
