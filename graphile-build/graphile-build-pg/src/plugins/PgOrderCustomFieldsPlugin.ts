@@ -5,7 +5,6 @@ import type {
   PgResource,
   PgResourceParameter,
   PgSelectQueryBuilderCallback,
-  PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 

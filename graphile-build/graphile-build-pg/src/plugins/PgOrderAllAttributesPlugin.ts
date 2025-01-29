@@ -5,8 +5,6 @@ import type {
   PgCodecWithAttributes,
   PgSelectQueryBuilderCallback,
 } from "@dataplan/pg";
-import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
-import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 

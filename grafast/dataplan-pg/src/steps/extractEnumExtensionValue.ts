@@ -1,17 +1,8 @@
-import {
-  InputStep,
-  Maybe,
-  getEnumValueConfigs,
-  ExecutableStep,
-  lambda,
-} from "grafast";
-import {
-  GraphQLEnumType,
-  GraphQLInputType,
-  getNamedType,
-  getNullableType,
-  isEnumType,
-} from "graphql";
+import type { ExecutableStep, InputStep, Maybe } from "grafast";
+import { getEnumValueConfigs, lambda } from "grafast";
+import type { GraphQLEnumType, GraphQLInputType } from "graphql";
+import { getNamedType, getNullableType, isEnumType } from "graphql";
+
 import type { ReadonlyArrayOrDirect } from "../interfaces.js";
 
 declare module "graphql" {
@@ -33,9 +24,9 @@ function getEnumExtensionPropertyValueLookups(
 ) {
   const enumValueConfigs = getEnumValueConfigs(enumType);
   if (enumType[$$extensionsByValue] === undefined) {
-    enumType[$$extensionsByValue] = Object.create(null) as {};
+    enumType[$$extensionsByValue] = Object.create(null);
   }
-  if (enumType[$$extensionsByValue][extensionsProperty] === undefined) {
+  if (enumType[$$extensionsByValue]![extensionsProperty] === undefined) {
     const lookup = Object.entries(enumValueConfigs).reduce(
       (memo, [value, config]) => {
         memo[value] = config?.extensions?.[extensionsProperty];
@@ -48,7 +39,7 @@ function getEnumExtensionPropertyValueLookups(
     lookupValues.displayName = `extractList_${extensionsProperty}`;
     const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
     lookupValue.displayName = `extract_${extensionsProperty}`;
-    enumType[$$extensionsByValue][extensionsProperty] = {
+    enumType[$$extensionsByValue]![extensionsProperty] = {
       lookupValues,
       lookupValue,
     };
