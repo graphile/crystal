@@ -1256,9 +1256,9 @@ function buildTheQuery<
   for (const applyDepId of info.applyDepIds) {
     const val = values[applyDepId].unaryValue();
     if (Array.isArray(val)) {
-      val.forEach((v) => v(queryBuilder));
+      val.forEach((v) => v?.(queryBuilder));
     } else {
-      val(queryBuilder);
+      val?.(queryBuilder);
     }
   }
 
