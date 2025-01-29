@@ -945,7 +945,12 @@ export class PgSelectStep<
   }
 
   public items() {
-    return new PgSelectRowsStep(this);
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgSelectRowsStep(this),
+    );
   }
 
   public pageInfo(
