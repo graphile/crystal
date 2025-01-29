@@ -49,14 +49,10 @@ graph TD
     PgPageInfo39{{"PgPageInfo[39∈1] ➊"}}:::plan
     Connection13 --> PgPageInfo39
     First41{{"First[41∈1] ➊"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈1] ➊"]]:::plan
-    PgSelectRows42 --> First41
-    PgSelect14 --> PgSelectRows42
+    PgSelectRows15 --> First41
     First41 --> PgSelectSingle43
     Last47{{"Last[47∈1] ➊"}}:::plan
-    PgSelectRows48[["PgSelectRows[48∈1] ➊"]]:::plan
-    PgSelectRows48 --> Last47
-    PgSelect14 --> PgSelectRows48
+    PgSelectRows15 --> Last47
     Last47 --> PgSelectSingle49
     PgSelect14 --> Access54
     Lambda56{{"Lambda[56∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
@@ -96,9 +92,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 6<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14], PgSelect[33]<br />ᐳ: 39, 18, 54, 55, 56, 59, 60<br />2: 15, 35, 42, 48<br />ᐳ: 34, 36, 37, 41, 43, 45, 47, 49, 51"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 6<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14], PgSelect[33]<br />ᐳ: 39, 18, 54, 55, 56, 59, 60<br />2: PgSelectRows[15], PgSelectRows[35]<br />ᐳ: 34, 36, 37, 41, 43, 45, 47, 49, 51"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14,PgSelectRows15,Access18,PgSelect33,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,PgPageInfo39,First41,PgSelectRows42,PgSelectSingle43,PgCursor45,Last47,PgSelectRows48,PgSelectSingle49,PgCursor51,Access54,Object55,Lambda56,Object59,Lambda60 bucket1
+    class Bucket1,PgSelect14,PgSelectRows15,Access18,PgSelect33,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,PgPageInfo39,First41,PgSelectSingle43,PgCursor45,Last47,PgSelectSingle49,PgCursor51,Access54,Object55,Lambda56,Object59,Lambda60 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 12<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2

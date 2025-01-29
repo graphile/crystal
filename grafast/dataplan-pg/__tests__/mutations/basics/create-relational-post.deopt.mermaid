@@ -73,13 +73,7 @@ graph TD
     First45 --> PgSelectSingle47
     PgClassExpression48{{"PgClassExpression[48∈3] ➊<br />ᐸ__relation..._archived”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression48
-    First51{{"First[51∈3] ➊"}}:::plan
-    PgSelectRows52[["PgSelectRows[52∈3] ➊"]]:::plan
-    PgSelectRows52 --> First51
-    PgSelect43 --> PgSelectRows52
-    PgSelectSingle53{{"PgSelectSingle[53∈3] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First51 --> PgSelectSingle53
-    PgSelectSingle53 --> PgClassExpression54
+    PgSelectSingle47 --> PgClassExpression54
     First57{{"First[57∈3] ➊"}}:::plan
     PgSelectRows58[["PgSelectRows[58∈3] ➊"]]:::plan
     PgSelectRows58 --> First57
@@ -103,9 +97,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: PgClassExpression[22]<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 15<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[29]<br />1: <br />ᐳ: 30, 31, 32, 33, 34<br />2: PgSelect[35], PgSelect[43]<br />3: 40, 46, 52<br />ᐳ: 39, 41, 42, 45, 47, 48, 51, 53, 54<br />4: PgSelect[55]<br />5: PgSelectRows[58]<br />ᐳ: First[57], PgSelectSingle[59]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29, 15<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[29]<br />1: <br />ᐳ: 30, 31, 32, 33, 34<br />2: PgSelect[35], PgSelect[43]<br />3: PgSelectRows[40], PgSelectRows[46]<br />ᐳ: 39, 41, 42, 45, 47, 48, 54<br />4: PgSelect[55]<br />5: PgSelectRows[58]<br />ᐳ: First[57], PgSelectSingle[59]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelect35,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,PgSelect43,First45,PgSelectRows46,PgSelectSingle47,PgClassExpression48,First51,PgSelectRows52,PgSelectSingle53,PgClassExpression54,PgSelect55,First57,PgSelectRows58,PgSelectSingle59 bucket3
+    class Bucket3,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgSelect35,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,PgSelect43,First45,PgSelectRows46,PgSelectSingle47,PgClassExpression48,PgClassExpression54,PgSelect55,First57,PgSelectRows58,PgSelectSingle59 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[59]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression60,PgClassExpression61 bucket4

@@ -40,12 +40,6 @@ graph TD
     PgSelectSingle34{{"PgSelectSingle[34∈2] ➊<br />ᐸpersonᐳ"}}:::plan
     First32 --> PgSelectSingle34
     PgSelectSingle17 --> PgClassExpression37
-    First42{{"First[42∈2] ➊"}}:::plan
-    PgSelectRows43[["PgSelectRows[43∈2] ➊"]]:::plan
-    PgSelectRows43 --> First42
-    PgSelect30 --> PgSelectRows43
-    PgSelectSingle44{{"PgSelectSingle[44∈2] ➊<br />ᐸpersonᐳ"}}:::plan
-    First42 --> PgSelectSingle44
     PgSelect20[["PgSelect[20∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
     Object14 & PgClassExpression19 --> PgSelect20
@@ -65,9 +59,9 @@ graph TD
     PgClassExpression36{{"PgClassExpression[36∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression36
     PgClassExpression45{{"PgClassExpression[45∈5] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression45
+    PgSelectSingle34 --> PgClassExpression45
     PgClassExpression46{{"PgClassExpression[46∈5] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression46
+    PgSelectSingle34 --> PgClassExpression46
 
     %% define steps
 
@@ -78,16 +72,16 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 47, 48, 49<br /><br />1: PgSelect[11]<br />2: PgSelectRows[16]<br />ᐳ: 15, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectRows16,PgSelectSingle17,Object18 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]<br />1: <br />ᐳ: PgClassExpression[37]<br />2: PgSelect[30]<br />3: PgSelectRows[33], PgSelectRows[43]<br />ᐳ: 32, 34, 42, 44"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]<br />1: <br />ᐳ: PgClassExpression[37]<br />2: PgSelect[30]<br />3: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression37,First42,PgSelectRows43,PgSelectSingle44 bucket2
+    class Bucket2,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression37 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 14, 34, 37<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[17]<br />1: <br />ᐳ: 19, 29<br />2: PgSelect[20]<br />3: PgSelectRows[25]<br />ᐳ: 24, 26, 27"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgSelect20,First24,PgSelectRows25,PgSelectSingle26,PgClassExpression27,PgClassExpression29 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[34]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression35,PgClassExpression36 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 44<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[44]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[34]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression45,PgClassExpression46 bucket5
     Bucket0 --> Bucket1
