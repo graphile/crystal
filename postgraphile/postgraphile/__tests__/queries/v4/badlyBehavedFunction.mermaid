@@ -22,11 +22,9 @@ graph TD
     PgSelect12[["PgSelect[12∈1] ➊<br />ᐸbadly_behaved_functionᐳ"]]:::plan
     Object10 & Connection11 --> PgSelect12
     __ListTransform23[["__ListTransform[23∈1] ➊<br />ᐸeach:22ᐳ"]]:::plan
-    PgSelectRows24[["PgSelectRows[24∈1] ➊"]]:::plan
-    PgSelectRows24 & PgSelect12 --> __ListTransform23
     PgSelectRows13[["PgSelectRows[13∈1] ➊"]]:::plan
+    PgSelectRows13 & PgSelect12 --> __ListTransform23
     PgSelect12 --> PgSelectRows13
-    PgSelect12 --> PgSelectRows24
     Access30{{"Access[30∈1] ➊<br />ᐸ12.cursorDetailsᐳ"}}:::plan
     PgSelect12 --> Access30
     __Item14[/"__Item[14∈2]<br />ᐸ13ᐳ"\]:::itemplan
@@ -41,8 +39,8 @@ graph TD
     List18 --> Lambda19
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ”c”.”perso...unction__)ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression21
-    __Item25[/"__Item[25∈4]<br />ᐸ24ᐳ"\]:::itemplan
-    PgSelectRows24 -.-> __Item25
+    __Item25[/"__Item[25∈4]<br />ᐸ13ᐳ"\]:::itemplan
+    PgSelectRows13 -.-> __Item25
     PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
     Edge29{{"Edge[29∈5]"}}:::plan
@@ -68,9 +66,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access8,Access9,Object10,Connection11,Constant16 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 11, 16<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: PgSelect[12]<br />ᐳ: Access[30]<br />2: PgSelectRows[13], PgSelectRows[24]<br />3: __ListTransform[23]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 11, 16<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: PgSelect[12]<br />ᐳ: Access[30]<br />2: PgSelectRows[13]<br />3: __ListTransform[23]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect12,PgSelectRows13,__ListTransform23,PgSelectRows24,Access30 bucket1
+    class Bucket1,PgSelect12,PgSelectRows13,__ListTransform23,Access30 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 16<br /><br />ROOT __Item{2}ᐸ13ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item14,PgSelectSingle15 bucket2
