@@ -777,7 +777,12 @@ on (${sql.indent(
   }
 
   public items() {
-    return new PgUnionAllRowsStep(this);
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgUnionAllRowsStep(this),
+    );
   }
 
   listItem(itemPlan: ExecutableStep) {
@@ -1088,9 +1093,9 @@ export class PgUnionAllRowsStep<
     exportName: "PgUnionAllRowsStep",
   };
 
-  constructor($pgSelect: PgUnionAllStep<TAttributes, TTypeNames>) {
+  constructor($pgUnionAll: PgUnionAllStep<TAttributes, TTypeNames>) {
     super();
-    this.addDependency($pgSelect);
+    this.addDependency($pgUnionAll);
   }
   public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
     return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
@@ -1100,13 +1105,18 @@ export class PgUnionAllRowsStep<
     return this.getClassStep().listItem(itemPlan);
   }
 
+  public deduplicate(_peers: readonly ExecutableStep[]) {
+    // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
+    return _peers;
+  }
+
   optimize() {
     return access(this.getClassStep(), "items");
   }
 
   execute(executionDetails: ExecutionDetails) {
-    const pgSelect = executionDetails.values[0];
-    return executionDetails.indexMap((i) => pgSelect.at(i).items);
+    const value = executionDetails.values[0];
+    return executionDetails.indexMap((i) => value.at(i).items);
   }
 }
 
