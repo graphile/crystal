@@ -152,6 +152,7 @@ import {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
   PgSelectRowsStep,
   PgSelectStep,
   sqlFromArgDigests,
@@ -169,6 +170,7 @@ import {
 import { PgTempTableStep } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
+  PgUnionAllQueryBuilder,
   PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
@@ -316,6 +318,7 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
   PgSelectQueryBuilderCallback,
   PgSelectRowsStep,
   pgSelectSingleFromRecord,
@@ -327,6 +330,7 @@ export {
   PgTempTableStep,
   PgTypedExecutableStep,
   pgUnionAll,
+  PgUnionAllQueryBuilder,
   PgUnionAllQueryBuilderCallback,
   PgUnionAllRowsStep,
   PgUnionAllSingleStep,
