@@ -777,7 +777,12 @@ on (${sql.indent(
   }
 
   public items() {
-    return new PgUnionAllRowsStep(this);
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgUnionAllRowsStep(this),
+    );
   }
 
   listItem(itemPlan: ExecutableStep) {
