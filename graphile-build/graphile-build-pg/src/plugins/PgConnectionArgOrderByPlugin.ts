@@ -4,18 +4,18 @@ import "graphile-config";
 import type {
   PgCodec,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilderCallback,
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
+import { extractEnumExtensionValue } from "@dataplan/pg";
 import type {
   ConnectionStep,
+  ExecutableStep,
   GrafastFieldConfigArgumentMap,
-  InputStep,
 } from "grafast";
-import { getEnumValueConfig, SafeError } from "grafast";
-import type { GraphQLEnumType, GraphQLSchema } from "grafast/graphql";
+import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import { inspect } from "util";
 
 import { version } from "../version.js";
 
@@ -109,12 +109,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               ),
               values: {
                 [inflection.builtin("NATURAL")]: {
-                  extensions: {
-                    grafast: {
-                      // NATURAL means to not change the sort order
-                      applyPlan: EXPORTABLE(() => () => {}, []),
-                    },
-                  },
+                  // No need for hooks, it doesn't change the order
                 },
               },
             }),
@@ -141,7 +136,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
         } = build;
-        const { scope, Self } = context;
+        const { scope, Self, addToPlanResolver } = context;
         const {
           fieldName,
           isPgFieldConnection,
@@ -185,102 +180,72 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           return args;
         }
 
+        // TODO: inflection
+        const argName = "orderBy";
+
+        if (isPgFieldConnection) {
+          addToPlanResolver<
+            any,
+            ExecutableStep,
+            ConnectionStep<
+              PgSelectSingleStep<any>,
+              PgSelectParsedCursorStep,
+              PgSelectStep<any>
+            >
+          >(
+            EXPORTABLE(
+              (argName, extractEnumExtensionValue) =>
+                ($connection, $parent, fieldArgs, { field }) => {
+                  const $orderBy = fieldArgs.getRaw(argName);
+                  const $select = $connection.getSubplan();
+                  const orderByArg = field.args.find((a) => a.name === argName);
+                  $select.apply(
+                    extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
+                      orderByArg!.type,
+                      "pgSelectApply",
+                      $orderBy,
+                    ),
+                  );
+                  return $connection;
+                },
+              [argName, extractEnumExtensionValue],
+            ),
+          );
+        } else {
+          addToPlanResolver<any, ExecutableStep, PgSelectStep<any>>(
+            EXPORTABLE(
+              (argName, extractEnumExtensionValue) =>
+                ($select, $parent, fieldArgs, { field }) => {
+                  const $orderBy = fieldArgs.getRaw(argName);
+                  const orderByArg = field.args.find((a) => a.name === argName);
+                  $select.apply(
+                    extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
+                      orderByArg!.type,
+                      "pgSelectApply",
+                      $orderBy,
+                    ),
+                  );
+                  return $select;
+                },
+              [argName, extractEnumExtensionValue],
+            ),
+          );
+        }
+
         return extend(
           args,
           {
-            orderBy: {
+            [argName]: {
               description: build.wrapDescription(
                 `The method to use when ordering \`${tableTypeName}\`.`,
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-              autoApplyAfterParentPlan: true,
-              applyPlan: isPgFieldConnection
-                ? EXPORTABLE(
-                    (applyOrderToPlan, tableOrderByTypeName) =>
-                      function plan(
-                        _: any,
-                        $connection: ConnectionStep<
-                          PgSelectSingleStep<any>,
-                          PgSelectParsedCursorStep,
-                          PgSelectStep<any>
-                        >,
-                        val,
-                        info: { schema: GraphQLSchema },
-                      ) {
-                        const $value = val.getRaw();
-                        const $select = $connection.getSubplan();
-                        applyOrderToPlan(
-                          $select,
-                          $value,
-                          info.schema.getType(
-                            tableOrderByTypeName,
-                          ) as GraphQLEnumType,
-                        );
-                        return null;
-                      },
-                    [applyOrderToPlan, tableOrderByTypeName],
-                  )
-                : EXPORTABLE(
-                    (applyOrderToPlan, tableOrderByTypeName) =>
-                      function plan(
-                        _: any,
-                        $select: PgSelectStep<any>,
-                        val,
-                        info: { schema: GraphQLSchema },
-                      ) {
-                        const $value = val.getRaw();
-                        applyOrderToPlan(
-                          $select,
-                          $value,
-                          info.schema.getType(
-                            tableOrderByTypeName,
-                          ) as GraphQLEnumType,
-                        );
-                        return null;
-                      },
-                    [applyOrderToPlan, tableOrderByTypeName],
-                  ),
             },
           } as GrafastFieldConfigArgumentMap<any, any, any, any>,
-          `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
+          `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
         );
       },
     },
   },
 };
-
-export const applyOrderToPlan = EXPORTABLE(
-  (SafeError, getEnumValueConfig, inspect) =>
-    (
-      $select: PgSelectStep<any>,
-      $value: InputStep,
-      TableOrderByType: GraphQLEnumType,
-    ) => {
-      if (!("evalLength" in $value)) {
-        return;
-      }
-      const length = $value.evalLength();
-      if (length == null) {
-        return;
-      }
-      for (let i = 0; i < length; i++) {
-        const order = $value.at(i).eval();
-        if (order == null) continue;
-        const config = getEnumValueConfig(TableOrderByType, order);
-        const plan = config?.extensions?.grafast?.applyPlan;
-        if (typeof plan !== "function") {
-          console.error(
-            `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-              plan,
-            )}`,
-          );
-          throw new SafeError(
-            "Internal server error: invalid orderBy configuration",
-          );
-        }
-        plan($select);
-      }
-    },
-  [SafeError, getEnumValueConfig, inspect],
-);
