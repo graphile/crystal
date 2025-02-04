@@ -464,10 +464,10 @@ const fetcher3 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.UserFile);
-function basePlan() {
+function Query_allFiles_plan() {
   return connection(pgResource_filePgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allFiles_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -476,10 +476,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allUsers_plan() {
   return connection(pgResource_userPgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allUsers_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -488,10 +488,10 @@ const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan3() {
+function Query_allUserFiles_plan() {
   return connection(pgResource_user_filePgResource.find());
 }
-const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
+const Query_allUserFiles_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -500,13 +500,13 @@ const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan4 = $record => {
+const User_userFilesByUserId_plan = $record => {
   const $records = pgResource_user_filePgResource.find({
     user_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
+const User_userFilesByUserId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1549,8 +1549,8 @@ export const plans = {
     },
     allFiles: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allFiles_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allFiles_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -1615,8 +1615,8 @@ export const plans = {
     },
     allUsers: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allUsers_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allUsers_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -1681,8 +1681,8 @@ export const plans = {
     },
     allUserFiles: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = Query_allUserFiles_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allUserFiles_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -1773,8 +1773,8 @@ export const plans = {
     },
     userFilesByUserId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan4($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers4) {
+        let $result = User_userFilesByUserId_plan($parent, fieldArgs, info);
+        for (const ppr of User_userFilesByUserId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

@@ -286,10 +286,10 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Geom);
-function basePlan() {
+function Query_allGeoms_plan() {
   return connection(pgResource_geomPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allGeoms_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -814,8 +814,8 @@ export const plans = {
     },
     allGeoms: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allGeoms_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allGeoms_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
