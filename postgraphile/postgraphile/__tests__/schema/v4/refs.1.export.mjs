@@ -48,7 +48,8 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
+const nodeIdCodecs = {
+  __proto__: null,
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
@@ -64,7 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -79,7 +80,8 @@ const peopleIdentifier = sql.identifier("refs", "people");
 const spec_people = {
   name: "people",
   identifier: peopleIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -98,7 +100,7 @@ const spec_people = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -107,7 +109,9 @@ const spec_people = {
       schemaName: "refs",
       name: "people"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 };
@@ -116,7 +120,8 @@ const postsIdentifier = sql.identifier("refs", "posts");
 const spec_posts = {
   name: "posts",
   identifier: postsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -138,7 +143,7 @@ const spec_posts = {
         }
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -147,10 +152,12 @@ const spec_posts = {
       schemaName: "refs",
       name: "posts"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       ref: "author via:(user_id)->people(id) singular"
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       author: {
         singular: true,
         graphqlType: undefined,
@@ -162,7 +169,7 @@ const spec_posts = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -172,7 +179,9 @@ const peopleUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_people_people = {
@@ -202,7 +211,9 @@ const postsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_posts_posts = {
@@ -230,23 +241,28 @@ const registryConfig_pgResources_posts_posts = {
   }
 };
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     text: TYPES.text,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     people: peopleCodec,
     posts: postsCodec
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     people: registryConfig_pgResources_people_people,
     posts: registryConfig_pgResources_posts_posts
-  }),
-  pgRelations: Object.assign(Object.create(null), {
-    people: Object.assign(Object.create(null), {
+  },
+  pgRelations: {
+    __proto__: null,
+    people: {
+      __proto__: null,
       postsByTheirUserId: {
         localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_posts_posts,
@@ -263,8 +279,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    posts: Object.assign(Object.create(null), {
+    },
+    posts: {
+      __proto__: null,
       peopleByMyUserId: {
         localCodec: postsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
@@ -281,12 +298,13 @@ const registry = makeRegistry({
           }
         }
       }
-    })
-  })
+    }
+  }
 });
 const pgResource_peoplePgResource = registry.pgResources["people"];
 const pgResource_postsPgResource = registry.pgResources["posts"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
   Query: handler,
   Person: {
     typeName: "Person",
@@ -326,7 +344,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "posts";
     }
   }
-});
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
@@ -654,47 +672,53 @@ export const plans = {
         return connection(pgResource_peoplePgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -704,8 +728,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -713,7 +738,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     },
     allPosts: {
@@ -721,47 +746,53 @@ export const plans = {
         return connection(pgResource_postsPgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -771,8 +802,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -780,7 +812,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     }
   },
@@ -864,14 +896,16 @@ export const plans = {
   },
   PeopleOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             peopleUniques[0].attributes.forEach(attributeName => {
@@ -888,10 +922,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             peopleUniques[0].attributes.forEach(attributeName => {
@@ -908,10 +943,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -929,10 +965,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -950,10 +987,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NAME_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -971,10 +1009,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NAME_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -992,7 +1031,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   PersonCondition: {
@@ -1070,14 +1109,16 @@ export const plans = {
   },
   PostsOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             postsUniques[0].attributes.forEach(attributeName => {
@@ -1094,10 +1135,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             postsUniques[0].attributes.forEach(attributeName => {
@@ -1114,10 +1156,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -1135,10 +1178,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -1156,7 +1200,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   PostCondition: {

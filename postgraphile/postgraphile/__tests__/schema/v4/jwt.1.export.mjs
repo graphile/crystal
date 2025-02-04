@@ -49,7 +49,8 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
+const nodeIdCodecs = {
+  __proto__: null,
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
@@ -65,7 +66,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -84,7 +85,9 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
       schemaName: "b",
       name: "guid"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -92,7 +95,8 @@ const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const spec_updatableView = {
   name: "updatableView",
   identifier: updatableViewIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     x: {
       description: undefined,
       codec: TYPES.int,
@@ -129,7 +133,7 @@ const spec_updatableView = {
         tags: {}
       }
     }
-  }),
+  },
   description: "YOYOYO!!",
   extensions: {
     isTableLike: true,
@@ -138,10 +142,11 @@ const spec_updatableView = {
       schemaName: "b",
       name: "updatable_view"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       uniqueKey: "x",
       unique: "x|@behavior -single -update -delete"
-    })
+    }
   },
   executor: executor
 };
@@ -150,7 +155,8 @@ const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
   identifier: jwtTokenIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     role: {
       description: undefined,
       codec: TYPES.text,
@@ -196,7 +202,7 @@ const jwtTokenCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -205,9 +211,10 @@ const jwtTokenCodec = recordCodec({
       schemaName: "b",
       name: "jwt_token"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       behavior: ["-table", "jwt"]
-    })
+    }
   },
   executor: executor
 });
@@ -218,7 +225,9 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
       schemaName: "pg_catalog",
       name: "_uuid"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -228,7 +237,8 @@ const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
   identifier: authPayloadIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     jwt: {
       description: undefined,
       codec: jwtTokenCodec,
@@ -256,7 +266,7 @@ const authPayloadCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -265,9 +275,10 @@ const authPayloadCodec = recordCodec({
       schemaName: "b",
       name: "auth_payload"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: "(id) references c.person"
-    })
+    }
   },
   executor: executor
 });
@@ -282,7 +293,9 @@ const colorCodec = enumCodec({
       schemaName: "b",
       name: "color"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const enumCapsCodec = enumCodec({
@@ -296,7 +309,9 @@ const enumCapsCodec = enumCodec({
       schemaName: "b",
       name: "enum_caps"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const enumWithEmptyStringCodec = enumCodec({
@@ -310,13 +325,16 @@ const enumWithEmptyStringCodec = enumCodec({
       schemaName: "b",
       name: "enum_with_empty_string"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const compoundTypeCodec = recordCodec({
   name: "compoundType",
   identifier: sql.identifier("c", "compound_type"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     a: {
       description: undefined,
       codec: TYPES.int,
@@ -389,7 +407,7 @@ const compoundTypeCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: "Awesome feature!",
   extensions: {
     isTableLike: false,
@@ -398,7 +416,9 @@ const compoundTypeCodec = recordCodec({
       schemaName: "c",
       name: "compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 });
@@ -410,7 +430,9 @@ const int4ArrayCodec = listOfCodec(TYPES.int, {
       schemaName: "pg_catalog",
       name: "_int4"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -423,7 +445,9 @@ const colorArrayCodec = listOfCodec(colorCodec, {
       schemaName: "b",
       name: "_color"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -436,7 +460,9 @@ const dateArrayCodec = listOfCodec(TYPES.date, {
       schemaName: "pg_catalog",
       name: "_date"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -449,7 +475,9 @@ const timestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
       schemaName: "pg_catalog",
       name: "_timestamptz"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -462,7 +490,9 @@ const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
       schemaName: "c",
       name: "_compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -475,7 +505,9 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
       schemaName: "pg_catalog",
       name: "_bytea"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -484,7 +516,8 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
 const spec_lists = {
   name: "lists",
   identifier: listsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -602,7 +635,7 @@ const spec_lists = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -611,7 +644,9 @@ const spec_lists = {
       schemaName: "b",
       name: "lists"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 };
@@ -625,7 +660,9 @@ const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int
       schemaName: "a",
       name: "an_int"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -637,7 +674,9 @@ const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", sql.identifier("
       schemaName: "b",
       name: "another_int"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -648,7 +687,9 @@ const textArrayCodec = listOfCodec(TYPES.text, {
       schemaName: "pg_catalog",
       name: "_text"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -662,7 +703,9 @@ const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sql.identifier("pg
       schemaName: "pg_catalog",
       name: "numrange"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_catalog", "daterange"), {
@@ -673,7 +716,9 @@ const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_
       schemaName: "pg_catalog",
       name: "daterange"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a", "an_int_range"), {
@@ -684,7 +729,9 @@ const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a
       schemaName: "a",
       name: "an_int_range"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const intervalArrayCodec = listOfCodec(TYPES.interval, {
@@ -694,7 +741,9 @@ const intervalArrayCodec = listOfCodec(TYPES.interval, {
       schemaName: "pg_catalog",
       name: "_interval"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -703,7 +752,8 @@ const intervalArrayCodec = listOfCodec(TYPES.interval, {
 const nestedCompoundTypeCodec = recordCodec({
   name: "nestedCompoundType",
   identifier: sql.identifier("b", "nested_compound_type"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     a: {
       description: undefined,
       codec: compoundTypeCodec,
@@ -731,7 +781,7 @@ const nestedCompoundTypeCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -740,7 +790,9 @@ const nestedCompoundTypeCodec = recordCodec({
       schemaName: "b",
       name: "nested_compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 });
@@ -752,7 +804,9 @@ const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sq
       schemaName: "c",
       name: "text_array_domain"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -763,7 +817,9 @@ const int8ArrayCodec = listOfCodec(TYPES.bigint, {
       schemaName: "pg_catalog",
       name: "_int8"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -777,7 +833,9 @@ const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sq
       schemaName: "c",
       name: "int8_array_domain"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -797,7 +855,8 @@ const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_at
 const spec_types = {
   name: "types",
   identifier: typesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1239,7 +1298,7 @@ const spec_types = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1248,9 +1307,10 @@ const spec_types = {
       schemaName: "b",
       name: "types"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: ["(smallint) references a.post", "(id) references a.post"]
-    })
+    }
   },
   executor: executor
 };
@@ -1263,7 +1323,9 @@ const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifie
       schemaName: "b",
       name: "not_null_url"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: true
 });
@@ -1309,7 +1371,9 @@ const listsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const typesUniques = [{
@@ -1317,7 +1381,9 @@ const typesUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_types_types = {
@@ -1351,10 +1417,12 @@ const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_functi
 const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     int4: TYPES.int,
     guid: guidCodec,
     varchar: TYPES.varchar,
@@ -1422,7 +1490,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "_jwt_token"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       typeDelim: ",",
       description: undefined,
@@ -1435,7 +1505,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "_types"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       typeDelim: ",",
       description: undefined,
@@ -1446,7 +1518,8 @@ const registry = makeRegistry({
     wrappedUrl: recordCodec({
       name: "wrappedUrl",
       identifier: sql.identifier("b", "wrapped_url"),
-      attributes: Object.assign(Object.create(null), {
+      attributes: {
+        __proto__: null,
         url: {
           description: undefined,
           codec: notNullUrlCodec,
@@ -1456,7 +1529,7 @@ const registry = makeRegistry({
             tags: {}
           }
         }
-      }),
+      },
       description: undefined,
       extensions: {
         isTableLike: false,
@@ -1465,12 +1538,15 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "wrapped_url"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       executor: executor
     })
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     mult_1: {
       executor,
       name: "mult_1",
@@ -1642,9 +1718,10 @@ const registry = makeRegistry({
         attributes: ["x"],
         description: undefined,
         extensions: {
-          tags: Object.assign(Object.create(null), {
+          tags: {
+            __proto__: null,
             behavior: "-single -update -delete"
-          })
+          }
         }
       }],
       isVirtual: false,
@@ -2159,12 +2236,15 @@ const registry = makeRegistry({
       },
       description: undefined
     })
-  }),
-  pgRelations: Object.create(null)
+  },
+  pgRelations: {
+    __proto__: null
+  }
 });
 const pgResource_listsPgResource = registry.pgResources["lists"];
 const pgResource_typesPgResource = registry.pgResources["types"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
   Query: handler,
   List: {
     typeName: "List",
@@ -2204,7 +2284,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "types";
     }
   }
-});
+};
 const argDetailsSimple = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -5519,46 +5599,51 @@ export const plans = {
         });
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        })
+        }
       }
     },
     typeFunction($root, args, _info) {
@@ -5582,47 +5667,53 @@ export const plans = {
         return connection(resource_updatable_viewPgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -5632,8 +5723,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -5641,7 +5733,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     },
     allLists: {
@@ -5649,47 +5741,53 @@ export const plans = {
         return connection(pgResource_listsPgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -5699,8 +5797,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -5708,7 +5807,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     },
     allTypes: {
@@ -5716,47 +5815,53 @@ export const plans = {
         return connection(pgResource_typesPgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -5766,8 +5871,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -5775,7 +5881,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     }
   },
@@ -6486,14 +6592,16 @@ export const plans = {
   },
   UpdatableViewsOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     X_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6511,10 +6619,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     X_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6532,10 +6641,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NAME_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6553,10 +6663,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NAME_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6574,10 +6685,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DESCRIPTION_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6595,10 +6707,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DESCRIPTION_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6616,10 +6729,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     CONSTANT_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6637,10 +6751,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     CONSTANT_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6658,7 +6773,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   UpdatableViewCondition: {
@@ -6782,14 +6897,16 @@ export const plans = {
   },
   ListsOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             listsUniques[0].attributes.forEach(attributeName => {
@@ -6806,10 +6923,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             listsUniques[0].attributes.forEach(attributeName => {
@@ -6826,10 +6944,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6847,10 +6966,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -6868,7 +6988,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   ListCondition: {
@@ -7128,14 +7248,16 @@ export const plans = {
   },
   TypesOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             typesUniques[0].attributes.forEach(attributeName => {
@@ -7152,10 +7274,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             typesUniques[0].attributes.forEach(attributeName => {
@@ -7172,10 +7295,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7193,10 +7317,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7214,10 +7339,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     SMALLINT_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7235,10 +7361,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     SMALLINT_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7256,10 +7383,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     BIGINT_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7277,10 +7405,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     BIGINT_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7298,10 +7427,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NUMERIC_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7319,10 +7449,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NUMERIC_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7340,10 +7471,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DECIMAL_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7361,10 +7493,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DECIMAL_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7382,10 +7515,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     BOOLEAN_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7403,10 +7537,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     BOOLEAN_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7424,10 +7559,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     VARCHAR_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7445,10 +7581,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     VARCHAR_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7466,10 +7603,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7487,10 +7625,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7508,10 +7647,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DOMAIN_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7529,10 +7669,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DOMAIN_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7550,10 +7691,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DOMAIN2_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7571,10 +7713,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DOMAIN2_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7592,10 +7735,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     JSON_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7613,10 +7757,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     JSON_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7634,10 +7779,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     JSONB_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7655,10 +7801,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     JSONB_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7676,10 +7823,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMESTAMP_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7697,10 +7845,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMESTAMP_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7718,10 +7867,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMESTAMPTZ_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7739,10 +7889,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMESTAMPTZ_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7760,10 +7911,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DATE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7781,10 +7933,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DATE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7802,10 +7955,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIME_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7823,10 +7977,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIME_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7844,10 +7999,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMETZ_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7865,10 +8021,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     TIMETZ_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7886,10 +8043,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     INTERVAL_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7907,10 +8065,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     INTERVAL_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7928,10 +8087,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     MONEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7949,10 +8109,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     MONEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7970,10 +8131,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     COMPOUND_TYPE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -7991,10 +8153,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     COMPOUND_TYPE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8012,10 +8175,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NESTED_COMPOUND_TYPE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8033,10 +8197,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NESTED_COMPOUND_TYPE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8054,10 +8219,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_COMPOUND_TYPE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8075,10 +8241,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_COMPOUND_TYPE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8096,10 +8263,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_NESTED_COMPOUND_TYPE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8117,10 +8285,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_NESTED_COMPOUND_TYPE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8138,10 +8307,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     POINT_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8159,10 +8329,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     POINT_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8180,10 +8351,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_POINT_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8201,10 +8373,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     NULLABLE_POINT_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8222,10 +8395,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     INET_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8243,10 +8417,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     INET_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8264,10 +8439,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     CIDR_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8285,10 +8461,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     CIDR_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8306,10 +8483,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     MACADDR_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8327,10 +8505,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     MACADDR_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8348,10 +8527,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGPROC_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8369,10 +8549,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGPROC_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8390,10 +8571,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGPROCEDURE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8411,10 +8593,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGPROCEDURE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8432,10 +8615,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGOPER_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8453,10 +8637,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGOPER_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8474,10 +8659,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGOPERATOR_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8495,10 +8681,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGOPERATOR_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8516,10 +8703,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGCLASS_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8537,10 +8725,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGCLASS_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8558,10 +8747,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGTYPE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8579,10 +8769,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGTYPE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8600,10 +8791,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGCONFIG_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8621,10 +8813,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGCONFIG_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8642,10 +8835,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGDICTIONARY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8663,10 +8857,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     REGDICTIONARY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8684,10 +8879,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LTREE_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8705,10 +8901,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LTREE_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -8726,7 +8923,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   TypeCondition: {
@@ -9877,14 +10074,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     mult2: {
@@ -9896,14 +10094,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     mult3: {
@@ -9915,14 +10114,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     mult4: {
@@ -9934,14 +10134,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     guidFn: {
@@ -9953,14 +10154,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     authenticateFail: {
@@ -9972,14 +10174,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     authenticate: {
@@ -9991,14 +10194,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     listBdeMutation: {
@@ -10010,14 +10214,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     authenticateMany: {
@@ -10029,14 +10234,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     authenticatePayload: {
@@ -10048,14 +10254,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     compoundTypeMutation: {
@@ -10067,14 +10274,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     compoundTypeSetMutation: {
@@ -10086,14 +10294,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     compoundTypeArrayMutation: {
@@ -10105,14 +10314,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     typeFunctionConnectionMutation: {
@@ -10124,14 +10334,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     typeFunctionMutation: {
@@ -10143,14 +10354,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     typeFunctionListMutation: {
@@ -10162,14 +10374,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     createUpdatableView: {
@@ -10181,14 +10394,15 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     createList: {
@@ -10200,14 +10414,15 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     createType: {
@@ -10219,14 +10434,15 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateList: {
@@ -10238,13 +10454,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateListById: {
@@ -10258,13 +10475,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateType: {
@@ -10276,13 +10494,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateTypeById: {
@@ -10296,13 +10515,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteList: {
@@ -10314,13 +10534,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteListById: {
@@ -10334,13 +10555,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteType: {
@@ -10352,13 +10574,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteTypeById: {
@@ -10372,13 +10595,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     }
   },

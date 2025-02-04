@@ -48,7 +48,8 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
+const nodeIdCodecs = {
+  __proto__: null,
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
@@ -64,7 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -79,7 +80,8 @@ const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const abcdCodec = recordCodec({
   name: "abcd",
   identifier: abcdIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     letter: {
       description: undefined,
       codec: TYPES.text,
@@ -100,7 +102,7 @@ const abcdCodec = recordCodec({
         }
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -109,10 +111,11 @@ const abcdCodec = recordCodec({
       schemaName: "enum_tables",
       name: "abcd"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       enum: true,
       enumName: "LetterAToD"
-    })
+    }
   },
   executor: executor
 });
@@ -120,7 +123,8 @@ const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
 const abcdViewCodec = recordCodec({
   name: "abcdView",
   identifier: abcdViewIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     letter: {
       description: undefined,
       codec: TYPES.text,
@@ -139,7 +143,7 @@ const abcdViewCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -148,11 +152,12 @@ const abcdViewCodec = recordCodec({
       schemaName: "enum_tables",
       name: "abcd_view"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       primaryKey: "letter",
       enum: true,
       enumName: "LetterAToDViaView"
-    })
+    }
   },
   executor: executor
 });
@@ -160,7 +165,8 @@ const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
 const simpleEnumCodec = recordCodec({
   name: "simpleEnum",
   identifier: simpleEnumIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     value: {
       description: undefined,
       codec: TYPES.text,
@@ -179,7 +185,7 @@ const simpleEnumCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -188,9 +194,10 @@ const simpleEnumCodec = recordCodec({
       schemaName: "enum_tables",
       name: "simple_enum"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       enum: true
-    })
+    }
   },
   executor: executor
 });
@@ -244,7 +251,8 @@ const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaView
 const spec_letterDescriptions = {
   name: "letterDescriptions",
   identifier: letterDescriptionsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -281,7 +289,7 @@ const spec_letterDescriptions = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -290,9 +298,10 @@ const spec_letterDescriptions = {
       schemaName: "enum_tables",
       name: "letter_descriptions"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
-    })
+    }
   },
   executor: executor
 };
@@ -393,7 +402,8 @@ const spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum = enumCo
 const spec_referencingTable = {
   name: "referencingTable",
   identifier: referencingTableIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -439,7 +449,7 @@ const spec_referencingTable = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -448,7 +458,9 @@ const spec_referencingTable = {
       schemaName: "enum_tables",
       name: "referencing_table"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 };
@@ -457,7 +469,8 @@ const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
 const spec_lotsOfEnums = {
   name: "lotsOfEnums",
   identifier: lotsOfEnumsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -512,7 +525,7 @@ const spec_lotsOfEnums = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -521,10 +534,11 @@ const spec_lotsOfEnums = {
       schemaName: "enum_tables",
       name: "lots_of_enums"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
@@ -540,7 +554,9 @@ const registryConfig_pgResources_abcd_abcd = {
     attributes: ["letter"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -572,7 +588,9 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
     attributes: ["letter"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -605,7 +623,9 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
     attributes: ["value"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -631,21 +651,27 @@ const letter_descriptionsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["letter"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["letter_via_view"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
@@ -677,7 +703,9 @@ const referencing_tableUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
@@ -713,45 +741,51 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
     attributes: ["id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_1"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true,
         enumName: "EnumTheFirst"
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_2"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true,
         enumName: "EnumTheSecond"
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_3"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_4"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true
-      })
+      }
     }
   }],
   isVirtual: false,
@@ -773,10 +807,12 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
   }
 };
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     abcd: abcdCodec,
     text: TYPES.text,
     abcdView: abcdViewCodec,
@@ -793,8 +829,9 @@ const registry = makeRegistry({
     lotsOfEnums: lotsOfEnumsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     abcd: registryConfig_pgResources_abcd_abcd,
     abcd_view: registryConfig_pgResources_abcd_view_abcd_view,
     simple_enum: registryConfig_pgResources_simple_enum_simple_enum,
@@ -829,9 +866,11 @@ const registry = makeRegistry({
     letter_descriptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
     referencing_table: registryConfig_pgResources_referencing_table_referencing_table,
     lots_of_enums: registryConfig_pgResources_lots_of_enums_lots_of_enums
-  }),
-  pgRelations: Object.assign(Object.create(null), {
-    abcd: Object.assign(Object.create(null), {
+  },
+  pgRelations: {
+    __proto__: null,
+    abcd: {
+      __proto__: null,
       letterDescriptionsByTheirLetter: {
         localCodec: abcdCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
@@ -847,8 +886,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    abcdView: Object.assign(Object.create(null), {
+    },
+    abcdView: {
+      __proto__: null,
       letterDescriptionsByTheirLetterViaView: {
         localCodec: abcdViewCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
@@ -864,8 +904,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    letterDescriptions: Object.assign(Object.create(null), {
+    },
+    letterDescriptions: {
+      __proto__: null,
       abcdViewByMyLetterViaView: {
         localCodec: letterDescriptionsCodec,
         remoteResourceOptions: registryConfig_pgResources_abcd_view_abcd_view,
@@ -896,8 +937,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    lotsOfEnums: Object.assign(Object.create(null), {
+    },
+    lotsOfEnums: {
+      __proto__: null,
       referencingTablesByTheirEnum1: {
         localCodec: lotsOfEnumsCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
@@ -943,8 +985,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    referencingTable: Object.assign(Object.create(null), {
+    },
+    referencingTable: {
+      __proto__: null,
       lotsOfEnumsByMyEnum1: {
         localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
@@ -1005,8 +1048,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    simpleEnum: Object.assign(Object.create(null), {
+    },
+    simpleEnum: {
+      __proto__: null,
       referencingTablesByTheirSimpleEnum: {
         localCodec: simpleEnumCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
@@ -1022,12 +1066,13 @@ const registry = makeRegistry({
           }
         }
       }
-    })
-  })
+    }
+  }
 });
 const pgResource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
 const pgResource_referencing_tablePgResource = registry.pgResources["referencing_table"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
   Query: handler,
   LetterDescription: {
     typeName: "LetterDescription",
@@ -1067,7 +1112,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "referencing_tables";
     }
   }
-});
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
@@ -2123,47 +2168,53 @@ export const plans = {
         return connection(pgResource_letter_descriptionsPgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -2173,8 +2224,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -2182,7 +2234,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     },
     allReferencingTables: {
@@ -2190,47 +2242,53 @@ export const plans = {
         return connection(pgResource_referencing_tablePgResource.find());
       },
       args: {
-        first: Object.assign(Object.create(null), {
+        first: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
           }
-        }),
-        last: Object.assign(Object.create(null), {
+        },
+        last: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
           }
-        }),
-        offset: Object.assign(Object.create(null), {
+        },
+        offset: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
           }
-        }),
-        before: Object.assign(Object.create(null), {
+        },
+        before: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
           }
-        }),
-        after: Object.assign(Object.create(null), {
+        },
+        after: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
           }
-        }),
-        orderBy: Object.assign(Object.create(null), {
+        },
+        orderBy: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val, info) {
@@ -2240,8 +2298,9 @@ export const plans = {
               return null;
             }
           }
-        }),
-        condition: Object.assign(Object.create(null), {
+        },
+        condition: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_condition, $connection) {
@@ -2249,7 +2308,7 @@ export const plans = {
               return $select.wherePlan();
             }
           }
-        })
+        }
       }
     }
   },
@@ -2402,14 +2461,16 @@ export const plans = {
   },
   LetterDescriptionsOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             letter_descriptionsUniques[0].attributes.forEach(attributeName => {
@@ -2426,10 +2487,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             letter_descriptionsUniques[0].attributes.forEach(attributeName => {
@@ -2446,10 +2508,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2467,10 +2530,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2488,10 +2552,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LETTER_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2509,10 +2574,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LETTER_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2530,10 +2596,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LETTER_VIA_VIEW_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2551,10 +2618,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     LETTER_VIA_VIEW_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2572,10 +2640,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DESCRIPTION_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2593,10 +2662,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     DESCRIPTION_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2614,7 +2684,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   LetterDescriptionCondition: {
@@ -2738,14 +2808,16 @@ export const plans = {
   },
   ReferencingTablesOrderBy: {
     NATURAL: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan() {}
         }
-      })
+      }
     },
     PRIMARY_KEY_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             referencing_tableUniques[0].attributes.forEach(attributeName => {
@@ -2762,10 +2834,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     PRIMARY_KEY_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(step) {
             referencing_tableUniques[0].attributes.forEach(attributeName => {
@@ -2782,10 +2855,11 @@ export const plans = {
             step.setOrderIsUnique();
           }
         }
-      })
+      }
     },
     ID_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2803,10 +2877,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ID_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2824,10 +2899,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_1_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2845,10 +2921,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_1_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2866,10 +2943,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_2_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2887,10 +2965,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_2_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2908,10 +2987,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_3_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2929,10 +3009,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     ENUM_3_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2950,10 +3031,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     SIMPLE_ENUM_ASC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2971,10 +3053,11 @@ export const plans = {
             }
           }
         }
-      })
+      }
     },
     SIMPLE_ENUM_DESC: {
-      extensions: Object.assign(Object.create(null), {
+      extensions: {
+        __proto__: null,
         grafast: {
           applyPlan(plan) {
             if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
@@ -2992,7 +3075,7 @@ export const plans = {
             }
           }
         }
-      })
+      }
     }
   },
   ReferencingTableCondition: {
@@ -3123,14 +3206,15 @@ export const plans = {
         });
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     createLetterDescription: {
@@ -3142,14 +3226,15 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     createReferencingTable: {
@@ -3161,14 +3246,15 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateLetterDescription: {
@@ -3180,13 +3266,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateLetterDescriptionById: {
@@ -3200,13 +3287,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateLetterDescriptionByLetter: {
@@ -3220,13 +3308,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateLetterDescriptionByLetterViaView: {
@@ -3240,13 +3329,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateReferencingTable: {
@@ -3258,13 +3348,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     updateReferencingTableById: {
@@ -3278,13 +3369,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteLetterDescription: {
@@ -3296,13 +3388,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteLetterDescriptionById: {
@@ -3316,13 +3409,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteLetterDescriptionByLetter: {
@@ -3336,13 +3430,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteLetterDescriptionByLetterViaView: {
@@ -3356,13 +3451,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteReferencingTable: {
@@ -3374,13 +3470,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     },
     deleteReferencingTableById: {
@@ -3394,13 +3491,14 @@ export const plans = {
         return plan;
       },
       args: {
-        input: Object.assign(Object.create(null), {
+        input: {
+          __proto__: null,
           grafast: {
             applyPlan(_, $object) {
               return $object;
             }
           }
-        })
+        }
       }
     }
   },
