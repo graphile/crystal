@@ -1923,7 +1923,7 @@ function buildTheQuery<
           index: selectAndReturnIndex(
             codec.castFromPg
               ? codec.castFromPg(frag, o.nullable === false)
-              : frag,
+              : sql`${frag}::text`,
           ),
           codec,
         });
