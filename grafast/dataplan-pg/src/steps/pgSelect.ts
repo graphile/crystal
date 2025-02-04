@@ -945,7 +945,12 @@ export class PgSelectStep<
   }
 
   public items() {
-    return new PgSelectRowsStep(this);
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgSelectRowsStep(this),
+    );
   }
 
   public pageInfo(
@@ -1579,6 +1584,11 @@ export class PgSelectRowsStep<
 
   listItem(itemPlan: ExecutableStep) {
     return this.getClassStep().listItem(itemPlan);
+  }
+
+  public deduplicate(_peers: readonly ExecutableStep[]) {
+    // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
+    return _peers;
   }
 
   // optimize() {

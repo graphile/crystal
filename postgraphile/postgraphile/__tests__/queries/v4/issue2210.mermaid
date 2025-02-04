@@ -39,9 +39,7 @@ graph TD
     Lambda39{{"Lambda[39∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
     Object38 --> Lambda39
     Last41{{"Last[41∈1] ➊"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈1] ➊"]]:::plan
-    PgSelectRows42 --> Last41
-    PgSelect16 --> PgSelectRows42
+    PgSelectRows17 --> Last41
     Last41 --> PgSelectSingle43
     PgSelect16 --> Access44
     __Item18[/"__Item[18∈2]<br />ᐸ17ᐳ"\]:::itemplan
@@ -75,9 +73,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Constant8,Access12,Access13,Object14,Connection15,Constant46,Constant47 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 46, 15, 47, 8<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[16]<br />ᐳ: 34, 37, 38, 39, 44<br />2: PgSelectRows[17], PgSelectRows[42]<br />ᐳ: 41, 43, 45"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 46, 15, 47, 8<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[16]<br />ᐳ: 34, 37, 38, 39, 44<br />2: PgSelectRows[17]<br />ᐳ: 41, 43, 45"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect16,PgSelectRows17,PgPageInfo34,Access37,Object38,Lambda39,Last41,PgSelectRows42,PgSelectSingle43,Access44,PgCursor45 bucket1
+    class Bucket1,PgSelect16,PgSelectRows17,PgPageInfo34,Access37,Object38,Lambda39,Last41,PgSelectSingle43,Access44,PgCursor45 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 14<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item18,PgSelectSingle19 bucket2

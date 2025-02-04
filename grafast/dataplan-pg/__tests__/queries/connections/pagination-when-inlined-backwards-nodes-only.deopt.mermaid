@@ -59,15 +59,11 @@ graph TD
     Lambda50{{"Lambda[50∈3]<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object49 --> Lambda50
     First52{{"First[52∈3]"}}:::plan
-    PgSelectRows53[["PgSelectRows[53∈3]"]]:::plan
-    PgSelectRows53 --> First52
-    PgSelect25 --> PgSelectRows53
+    PgSelectRows26 --> First52
     First52 --> PgSelectSingle54
     PgSelect25 --> Access55
     Last58{{"Last[58∈3]"}}:::plan
-    PgSelectRows59[["PgSelectRows[59∈3]"]]:::plan
-    PgSelectRows59 --> Last58
-    PgSelect25 --> PgSelectRows59
+    PgSelectRows26 --> Last58
     Last58 --> PgSelectSingle60
     First64{{"First[64∈3]"}}:::plan
     PgSelectRows65[["PgSelectRows[65∈3]"]]:::plan
@@ -110,9 +106,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 12, 24, 68, 8<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression16 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 12, 24, 68, 8<br /><br />ROOT Connectionᐸ20ᐳ[24]<br />1: <br />ᐳ: PgClassExpression[19], PgPageInfo[41]<br />2: PgSelect[25], PgSelect[63]<br />ᐳ: 44, 45, 46, 49, 50, 55<br />3: 26, 53, 59, 65<br />ᐳ: 52, 54, 56, 58, 60, 62, 64, 66, 67"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 12, 24, 68, 8<br /><br />ROOT Connectionᐸ20ᐳ[24]<br />1: <br />ᐳ: PgClassExpression[19], PgPageInfo[41]<br />2: PgSelect[25], PgSelect[63]<br />ᐳ: 44, 45, 46, 49, 50, 55<br />3: PgSelectRows[26], PgSelectRows[65]<br />ᐳ: 52, 54, 56, 58, 60, 62, 64, 66, 67"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression19,PgSelect25,PgSelectRows26,PgPageInfo41,Access44,Object45,Lambda46,Object49,Lambda50,First52,PgSelectRows53,PgSelectSingle54,Access55,PgCursor56,Last58,PgSelectRows59,PgSelectSingle60,PgCursor62,PgSelect63,First64,PgSelectRows65,PgSelectSingle66,PgClassExpression67 bucket3
+    class Bucket3,PgClassExpression19,PgSelect25,PgSelectRows26,PgPageInfo41,Access44,Object45,Lambda46,Object49,Lambda50,First52,PgSelectSingle54,Access55,PgCursor56,Last58,PgSelectSingle60,PgCursor62,PgSelect63,First64,PgSelectRows65,PgSelectSingle66,PgClassExpression67 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 12<br /><br />ROOT __Item{4}ᐸ26ᐳ[27]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item27,PgSelectSingle28 bucket4
