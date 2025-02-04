@@ -3,8 +3,7 @@ select
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
   __types__."bigint_domain_array_domain"::text as "3",
-  case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4",
-  __types__."id" as "5"
+  case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4"
 from "pg11"."types" as __types__
 order by __types__."id" asc;
 

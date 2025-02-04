@@ -6,8 +6,7 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -30,8 +29,7 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "email
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -54,8 +52,7 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -78,8 +75,7 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -102,8 +98,7 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -126,8 +121,7 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."em
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
@@ -213,8 +207,7 @@ update "c"."person" as __person__ set "email" = $1::"b"."email" where (__person_
   __person__."id"::text as "4";
 
 select
-  __person__."id"::text as "0",
-  __person__."id" as "1"
+  __person__."id"::text as "0"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"

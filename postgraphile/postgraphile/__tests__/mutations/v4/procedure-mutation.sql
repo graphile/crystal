@@ -152,8 +152,7 @@ where (
 
 select
   __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."id" as "2"
+  __post__."headline" as "1"
 from "a"."post" as __post__
 where (
   __post__."id" = $1::"int4"
@@ -176,8 +175,7 @@ where (
 
 select
   __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."id" as "2"
+  __post__."headline" as "1"
 from "a"."post" as __post__
 where (
   __post__."id" = $1::"int4"

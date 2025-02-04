@@ -319,8 +319,7 @@ select
   array(
     select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry_2
-  )::text as "49",
-  __types__."id" as "50"
+  )::text as "49"
 from "b"."types" as __types__
 order by __types__."id" asc;
 
@@ -776,8 +775,7 @@ select
   array(
     select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest(__types__."interval_array") __entry_2
-  )::text as "49",
-  __types__."id" as "50"
+  )::text as "49"
 from "b"."types" as __types__
 where (
   __types__."smallint" = $1::"int2"

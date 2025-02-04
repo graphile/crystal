@@ -2,8 +2,7 @@ select
   __post__."id"::text as "0",
   __post__."headline" as "1",
   "a"."post_headline_trimmed"(__post__) as "2",
-  __post__."author_id"::text as "3",
-  __post__."id" as "4"
+  __post__."author_id"::text as "3"
 from "a"."post" as __post__
 order by __post__."id" asc;
 

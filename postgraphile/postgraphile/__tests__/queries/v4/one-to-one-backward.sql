@@ -1,8 +1,7 @@
 select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1",
-  "c"."person_first_name"(__person__) as "2",
-  __person__."id" as "3"
+  "c"."person_first_name"(__person__) as "2"
 from "c"."person" as __person__
 order by __person__."id" asc;
 
