@@ -32,7 +32,7 @@ import { inspect } from "util";
 import type { ScopeForType, SpecForType } from "../global.js";
 import type { PostPlanResolver } from "../interfaces.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.js";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 
@@ -273,6 +273,10 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
                 const postPlanResolvers: PostPlanResolver<any, any, any>[] = [];
+                exportNameHint(
+                  postPlanResolvers,
+                  `${Self.name}_${fieldName}_postPlanResolvers`,
+                );
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
                   {
                     ...fieldContext,
@@ -318,6 +322,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
                 if (postPlanResolvers.length > 0) {
                   const basePlan = finalFieldSpec.plan ?? defaultPlanResolver;
+                  if (basePlan !== defaultPlanResolver) {
+                    exportNameHint(basePlan, `${Self.name}_${fieldName}_plan`);
+                  }
                   finalFieldSpec.plan = EXPORTABLE(
                     (basePlan, postPlanResolvers) =>
                       ($parent, fieldArgs, info) => {
