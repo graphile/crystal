@@ -1650,14 +1650,16 @@ function exportSchemaTypeDefs({
         const args = field.args
           ? Object.entries(field.args)
               .map(([argName, arg]) => {
+                const extensionsAST = extensions(
+                  file,
+                  arg.extensions,
+                  `${type.name}.${fieldName}.${argName}`,
+                  `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
+                );
+                if (!extensionsAST) return null;
                 return t.objectProperty(
                   identifierOrLiteral(argName),
-                  convertToIdentifierViaAST(
-                    file,
-                    arg.extensions?.grafast,
-                    `${type.name}.${fieldName}.${argName}`,
-                    `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast`,
-                  ),
+                  extensionsAST,
                 );
               })
               .filter(isNotNullish)
