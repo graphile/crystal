@@ -790,10 +790,10 @@ const fetcher4 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Type);
-function basePlan() {
+function Query_allAlwaysAsIdentities_plan() {
   return connection(pgResource_always_as_identityPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allAlwaysAsIdentities_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -802,10 +802,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allByDefaultAsIdentities_plan() {
   return connection(pgResource_by_default_as_identityPgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allByDefaultAsIdentities_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -814,10 +814,10 @@ const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan3() {
+function Query_allNetworks_plan() {
   return connection(pgResource_networkPgResource.find());
 }
-const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
+const Query_allNetworks_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -826,10 +826,10 @@ const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan4() {
+function Query_allTypes_plan() {
   return connection(pgResource_typesPgResource.find());
 }
-const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
+const Query_allTypes_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -2319,8 +2319,8 @@ export const plans = {
     },
     allAlwaysAsIdentities: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allAlwaysAsIdentities_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allAlwaysAsIdentities_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -2385,8 +2385,8 @@ export const plans = {
     },
     allByDefaultAsIdentities: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allByDefaultAsIdentities_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allByDefaultAsIdentities_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -2451,8 +2451,8 @@ export const plans = {
     },
     allNetworks: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = Query_allNetworks_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allNetworks_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -2517,8 +2517,8 @@ export const plans = {
     },
     allTypes: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan4($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers4) {
+        let $result = Query_allTypes_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allTypes_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

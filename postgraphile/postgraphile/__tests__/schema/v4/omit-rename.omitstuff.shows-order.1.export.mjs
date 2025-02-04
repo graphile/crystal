@@ -1451,10 +1451,10 @@ const fetcher6 = (handler => {
   return fn;
 })(nodeIdHandlerByTypeName.Person);
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
-function basePlan() {
+function Query_allRenamedTables_plan() {
   return connection(resource_renamed_tablePgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allRenamedTables_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1463,10 +1463,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allFilms_plan() {
   return connection(pgResource_filmsPgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allFilms_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1475,10 +1475,10 @@ const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan3() {
+function Query_allStudios_plan() {
   return connection(pgResource_studiosPgResource.find());
 }
-const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
+const Query_allStudios_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1487,10 +1487,10 @@ const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan4() {
+function Query_allPosts_plan() {
   return connection(pgResource_postPgResource.find());
 }
-const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
+const Query_allPosts_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1499,10 +1499,10 @@ const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan5() {
+function Query_allTvEpisodes_plan() {
   return connection(pgResource_tv_episodesPgResource.find());
 }
-const postPlanResolvers5 = [($connection, $parent, fieldArgs, {
+const Query_allTvEpisodes_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1511,10 +1511,10 @@ const postPlanResolvers5 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan6() {
+function Query_allPeople_plan() {
   return connection(pgResource_personPgResource.find());
 }
-const postPlanResolvers6 = [($connection, $parent, fieldArgs, {
+const Query_allPeople_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1523,13 +1523,13 @@ const postPlanResolvers6 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan7 = $record => {
+const TvShow_tvEpisodesByShowId_plan = $record => {
   const $records = pgResource_tv_episodesPgResource.find({
     show_id: $record.get("code")
   });
   return connection($records);
 };
-const postPlanResolvers7 = [($connection, $parent, fieldArgs, {
+const TvShow_tvEpisodesByShowId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1589,13 +1589,13 @@ const makeArgs4 = (args, path = []) => {
   }
   return selectArgs;
 };
-const basePlan8 = $record => {
+const Person_posts_plan = $record => {
   const $records = pgResource_postPgResource.find({
     author_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers8 = [($connection, $parent, fieldArgs, {
+const Person_posts_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -4033,8 +4033,8 @@ export const plans = {
     },
     allRenamedTables: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allRenamedTables_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRenamedTables_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4099,8 +4099,8 @@ export const plans = {
     },
     allFilms: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allFilms_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allFilms_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4165,8 +4165,8 @@ export const plans = {
     },
     allStudios: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = Query_allStudios_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allStudios_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4231,8 +4231,8 @@ export const plans = {
     },
     allPosts: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan4($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers4) {
+        let $result = Query_allPosts_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allPosts_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4297,8 +4297,8 @@ export const plans = {
     },
     allTvEpisodes: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan5($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers5) {
+        let $result = Query_allTvEpisodes_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allTvEpisodes_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4425,8 +4425,8 @@ export const plans = {
     },
     allPeople: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan6($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers6) {
+        let $result = Query_allPeople_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allPeople_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4619,8 +4619,8 @@ export const plans = {
     },
     tvEpisodesByShowId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan7($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers7) {
+        let $result = TvShow_tvEpisodesByShowId_plan($parent, fieldArgs, info);
+        for (const ppr of TvShow_tvEpisodesByShowId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -5148,8 +5148,8 @@ export const plans = {
     },
     posts: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan8($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers8) {
+        let $result = Person_posts_plan($parent, fieldArgs, info);
+        for (const ppr of Person_posts_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

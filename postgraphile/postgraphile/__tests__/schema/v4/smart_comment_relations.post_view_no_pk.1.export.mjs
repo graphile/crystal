@@ -1439,10 +1439,10 @@ const fetcher6 = (handler => {
   return fn;
 })(nodeIdHandlerByTypeName.Building);
 const resource_postsPgResource = registry.pgResources["posts"];
-function basePlan() {
+function Query_allPosts_plan() {
   return connection(resource_postsPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allPosts_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1451,10 +1451,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allOffers_plan() {
   return connection(pgResource_offersPgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allOffers_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1463,10 +1463,10 @@ const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan3() {
+function Query_allStreets_plan() {
   return connection(pgResource_streetsPgResource.find());
 }
-const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
+const Query_allStreets_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1475,10 +1475,10 @@ const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan4() {
+function Query_allProperties_plan() {
   return connection(pgResource_propertiesPgResource.find());
 }
-const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
+const Query_allProperties_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1487,10 +1487,10 @@ const postPlanResolvers4 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan5() {
+function Query_allStreetProperties_plan() {
   return connection(pgResource_street_propertyPgResource.find());
 }
-const postPlanResolvers5 = [($connection, $parent, fieldArgs, {
+const Query_allStreetProperties_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1499,10 +1499,10 @@ const postPlanResolvers5 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan6() {
+function Query_allHouses_plan() {
   return connection(pgResource_housesPgResource.find());
 }
-const postPlanResolvers6 = [($connection, $parent, fieldArgs, {
+const Query_allHouses_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1511,10 +1511,10 @@ const postPlanResolvers6 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan7() {
+function Query_allBuildings_plan() {
   return connection(pgResource_buildingsPgResource.find());
 }
-const postPlanResolvers7 = [($connection, $parent, fieldArgs, {
+const Query_allBuildings_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1523,13 +1523,13 @@ const postPlanResolvers7 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan8 = $record => {
+const Post_offersByPostId_plan = $record => {
   const $records = pgResource_offersPgResource.find({
     post_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers8 = [($connection, $parent, fieldArgs, {
+const Post_offersByPostId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1541,13 +1541,13 @@ const postPlanResolvers8 = [($connection, $parent, fieldArgs, {
 function CursorSerialize(value) {
   return "" + value;
 }
-const basePlan9 = $record => {
+const Street_propertiesByStreetId_plan = $record => {
   const $records = pgResource_propertiesPgResource.find({
     street_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers9 = [($connection, $parent, fieldArgs, {
+const Street_propertiesByStreetId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1556,13 +1556,13 @@ const postPlanResolvers9 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan10 = $record => {
+const Street_streetPropertiesByStrId_plan = $record => {
   const $records = pgResource_street_propertyPgResource.find({
     str_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers10 = [($connection, $parent, fieldArgs, {
+const Street_streetPropertiesByStrId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1571,13 +1571,13 @@ const postPlanResolvers10 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan11 = $record => {
+const Street_buildingsNamedAfterStreet_plan = $record => {
   const $records = pgResource_buildingsPgResource.find({
     name: $record.get("name")
   });
   return connection($records);
 };
-const postPlanResolvers11 = [($connection, $parent, fieldArgs, {
+const Street_buildingsNamedAfterStreet_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1586,13 +1586,13 @@ const postPlanResolvers11 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan12 = $record => {
+const Street_housesByStreetId_plan = $record => {
   const $records = pgResource_housesPgResource.find({
     street_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers12 = [($connection, $parent, fieldArgs, {
+const Street_housesByStreetId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1601,13 +1601,13 @@ const postPlanResolvers12 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan13 = $record => {
+const Property_streetPropertiesByPropId_plan = $record => {
   const $records = pgResource_street_propertyPgResource.find({
     prop_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers13 = [($connection, $parent, fieldArgs, {
+const Property_streetPropertiesByPropId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1616,13 +1616,13 @@ const postPlanResolvers13 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan14 = $record => {
+const Property_buildingsByPropertyId_plan = $record => {
   const $records = pgResource_buildingsPgResource.find({
     property_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers14 = [($connection, $parent, fieldArgs, {
+const Property_buildingsByPropertyId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1631,13 +1631,13 @@ const postPlanResolvers14 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan15 = $record => {
+const Property_housesByPropertyId_plan = $record => {
   const $records = pgResource_housesPgResource.find({
     property_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers15 = [($connection, $parent, fieldArgs, {
+const Property_housesByPropertyId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1646,13 +1646,13 @@ const postPlanResolvers15 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan16 = $record => {
+const Building_housesByBuildingId_plan = $record => {
   const $records = pgResource_housesPgResource.find({
     building_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers16 = [($connection, $parent, fieldArgs, {
+const Building_housesByBuildingId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -3956,8 +3956,8 @@ export const plans = {
     },
     allPosts: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allPosts_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allPosts_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4022,8 +4022,8 @@ export const plans = {
     },
     allOffers: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allOffers_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allOffers_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4088,8 +4088,8 @@ export const plans = {
     },
     allStreets: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = Query_allStreets_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allStreets_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4154,8 +4154,8 @@ export const plans = {
     },
     allProperties: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan4($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers4) {
+        let $result = Query_allProperties_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allProperties_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4220,8 +4220,8 @@ export const plans = {
     },
     allStreetProperties: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan5($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers5) {
+        let $result = Query_allStreetProperties_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allStreetProperties_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4286,8 +4286,8 @@ export const plans = {
     },
     allHouses: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan6($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers6) {
+        let $result = Query_allHouses_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allHouses_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4352,8 +4352,8 @@ export const plans = {
     },
     allBuildings: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan7($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers7) {
+        let $result = Query_allBuildings_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allBuildings_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4442,8 +4442,8 @@ export const plans = {
     },
     offersByPostId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan8($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers8) {
+        let $result = Post_offersByPostId_plan($parent, fieldArgs, info);
+        for (const ppr of Post_offersByPostId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4727,8 +4727,8 @@ export const plans = {
     },
     propertiesByStreetId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan9($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers9) {
+        let $result = Street_propertiesByStreetId_plan($parent, fieldArgs, info);
+        for (const ppr of Street_propertiesByStreetId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4793,8 +4793,8 @@ export const plans = {
     },
     streetPropertiesByStrId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan10($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers10) {
+        let $result = Street_streetPropertiesByStrId_plan($parent, fieldArgs, info);
+        for (const ppr of Street_streetPropertiesByStrId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4859,8 +4859,8 @@ export const plans = {
     },
     buildingsNamedAfterStreet: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan11($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers11) {
+        let $result = Street_buildingsNamedAfterStreet_plan($parent, fieldArgs, info);
+        for (const ppr of Street_buildingsNamedAfterStreet_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -4925,8 +4925,8 @@ export const plans = {
     },
     housesByStreetId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan12($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers12) {
+        let $result = Street_housesByStreetId_plan($parent, fieldArgs, info);
+        for (const ppr of Street_housesByStreetId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -5028,8 +5028,8 @@ export const plans = {
     },
     streetPropertiesByPropId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan13($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers13) {
+        let $result = Property_streetPropertiesByPropId_plan($parent, fieldArgs, info);
+        for (const ppr of Property_streetPropertiesByPropId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -5094,8 +5094,8 @@ export const plans = {
     },
     buildingsByPropertyId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan14($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers14) {
+        let $result = Property_buildingsByPropertyId_plan($parent, fieldArgs, info);
+        for (const ppr of Property_buildingsByPropertyId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -5160,8 +5160,8 @@ export const plans = {
     },
     housesByPropertyId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan15($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers15) {
+        let $result = Property_housesByPropertyId_plan($parent, fieldArgs, info);
+        for (const ppr of Property_housesByPropertyId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -5355,8 +5355,8 @@ export const plans = {
     },
     housesByBuildingId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan16($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers16) {
+        let $result = Building_housesByBuildingId_plan($parent, fieldArgs, info);
+        for (const ppr of Building_housesByBuildingId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

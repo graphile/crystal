@@ -377,10 +377,10 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Measurement);
-function basePlan() {
+function Query_allUsers_plan() {
   return connection(pgResource_usersPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allUsers_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -389,10 +389,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allMeasurements_plan() {
   return connection(pgResource_measurementsPgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allMeasurements_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -401,13 +401,13 @@ const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-const basePlan3 = $record => {
+const User_measurementsByUserId_plan = $record => {
   const $records = pgResource_measurementsPgResource.find({
     user_id: $record.get("id")
   });
   return connection($records);
 };
-const postPlanResolvers3 = [($connection, $parent, fieldArgs, {
+const User_measurementsByUserId_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1170,8 +1170,8 @@ export const plans = {
     },
     allUsers: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allUsers_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allUsers_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -1236,8 +1236,8 @@ export const plans = {
     },
     allMeasurements: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allMeasurements_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMeasurements_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -1315,8 +1315,8 @@ export const plans = {
     },
     measurementsByUserId: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = User_measurementsByUserId_plan($parent, fieldArgs, info);
+        for (const ppr of User_measurementsByUserId_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

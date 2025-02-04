@@ -237,10 +237,10 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Network);
-function basePlan() {
+function Query_allNetworks_plan() {
   return connection(pgResource_networkPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allNetworks_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -650,8 +650,8 @@ export const plans = {
     },
     allNetworks: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allNetworks_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allNetworks_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;

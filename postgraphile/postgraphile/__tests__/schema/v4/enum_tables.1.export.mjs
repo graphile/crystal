@@ -1146,10 +1146,10 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.ReferencingTable);
-function basePlan() {
+function Query_allLetterDescriptions_plan() {
   return connection(pgResource_letter_descriptionsPgResource.find());
 }
-const postPlanResolvers = [($connection, $parent, fieldArgs, {
+const Query_allLetterDescriptions_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -1158,10 +1158,10 @@ const postPlanResolvers = [($connection, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $connection;
 }];
-function basePlan2() {
+function Query_allReferencingTables_plan() {
   return connection(pgResource_referencing_tablePgResource.find());
 }
-const postPlanResolvers2 = [($connection, $parent, fieldArgs, {
+const Query_allReferencingTables_postPlanResolvers = [($connection, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -2168,8 +2168,8 @@ export const plans = {
     },
     allLetterDescriptions: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_allLetterDescriptions_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allLetterDescriptions_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -2234,8 +2234,8 @@ export const plans = {
     },
     allReferencingTables: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allReferencingTables_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allReferencingTables_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
