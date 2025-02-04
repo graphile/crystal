@@ -259,6 +259,10 @@ interface PgSelectStepResult {
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
 }
 
+function withIndexes(frag: SQL, idx: number) {
+  return sql`${frag} as ${sql.identifier(String(idx))}`;
+}
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <attributes>, <cursor?> FROM <table>`. You can also add
@@ -1308,6 +1312,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   private buildSelect(
     options: {
       extraSelects?: readonly SQL[];
+      asJsonAgg?: boolean;
     } = Object.create(null),
   ) {
     const { extraSelects = EMPTY_ARRAY } = options;
@@ -1315,20 +1320,22 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const l = this.selects.length;
     const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
-    const fragmentsWithAliases = selects.map(
-      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-    );
-
     const sqlAliases: SQL[] = [];
     for (const [a, b] of this._symbolSubstitutes.entries()) {
       sqlAliases.push(sql.symbolAlias(a, b));
     }
     const aliases = sql.join(sqlAliases, "");
 
-    const selection =
-      fragmentsWithAliases.length > 0
-        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-        : sql` /* NOTHING?! */`;
+    const selection = options.asJsonAgg
+      ? selects.length === 0
+        ? // Postgres "cannot accumulate empty arrays"
+          sql`\n${sql.indent`array[null::text]`}`
+        : sql`\n${sql.indent`array[${sql.indent(
+            sql.join(selects, ",\n"),
+          )}]::text[]`}`
+      : selects.length > 0
+      ? sql`\n${sql.indent(sql.join(selects.map(withIndexes), ",\n"))}`
+      : sql` /* NOTHING?! */`;
 
     return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
   }
@@ -1565,7 +1572,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
     const query = options.asJsonAgg
       ? // 's' for 'subquery'
-        sql`select json_agg(s) from (${sql.indent(baseQuery)}) s`
+        sql`array(${sql.indent(baseQuery)})::text`
       : baseQuery;
 
     return { sql: query, extraSelectIndexes };
