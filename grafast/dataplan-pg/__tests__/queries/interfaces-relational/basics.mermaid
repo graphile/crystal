@@ -47,8 +47,21 @@ graph TD
     __ListTransform19 ==> __Item23
     __Item23 --> PgSelectSingle24
     PgSelectSingle24 --> PgClassExpression25
+    PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression27
+    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression38
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression39
+    PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression40
+    PgClassExpression41{{"PgClassExpression[41∈4]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression41
     PgSelect28[["PgSelect[28∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__relation...ems__.”id”ᐳ<br />ᐳRelationalTopic"}}:::plan
     Object9 & PgClassExpression27 --> PgSelect28
     PgSelect42[["PgSelect[42∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object9 & PgClassExpression27 --> PgSelect42
@@ -58,25 +71,12 @@ graph TD
     Object9 & PgClassExpression27 --> PgSelect52
     PgSelect57[["PgSelect[57∈5]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object9 & PgClassExpression27 --> PgSelect57
-    PgSelectSingle24 --> PgClassExpression27
     First32{{"First[32∈5]"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈5]"]]:::plan
     PgSelectRows33 --> First32
     PgSelect28 --> PgSelectRows33
     PgSelectSingle34{{"PgSelectSingle[34∈5]<br />ᐸrelational_topicsᐳ"}}:::plan
     First32 --> PgSelectSingle34
-    PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__relation...__.”type2”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__relation...”position”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__relation...reated_at”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression38
-    PgClassExpression39{{"PgClassExpression[39∈5]<br />ᐸ__relation...pdated_at”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression39
-    PgClassExpression40{{"PgClassExpression[40∈5]<br />ᐸ__relation..._archived”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression40
-    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__relation...chived_at”ᐳ<br />ᐳRelationalTopic"}}:::plan
-    PgSelectSingle24 --> PgClassExpression41
     First44{{"First[44∈5]"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈5]"]]:::plan
     PgSelectRows45 --> First44
@@ -119,10 +119,10 @@ graph TD
     class Bucket3,__Item21,PgSelectSingle22 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 9<br /><br />ROOT __Item{4}ᐸ19ᐳ[23]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item23,PgSelectSingle24,PgClassExpression25,PgPolymorphic26 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 24, 9, 26, 25<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: <br />ᐳ: 27, 36, 37, 38, 39, 40, 41<br />2: 28, 42, 47, 52, 57<br />3: 33, 45, 50, 55, 60<br />ᐳ: 32, 34, 44, 46, 49, 51, 54, 56, 59, 61"):::bucket
+    class Bucket4,__Item23,PgSelectSingle24,PgClassExpression25,PgPolymorphic26,PgClassExpression27,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41 bucket4
+    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 9, 27, 26, 25, 36, 37, 38, 39, 40, 41<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 28, 42, 47, 52, 57<br />2: 33, 45, 50, 55, 60<br />ᐳ: 32, 34, 44, 46, 49, 51, 54, 56, 59, 61"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression27,PgSelect28,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41,PgSelect42,First44,PgSelectRows45,PgSelectSingle46,PgSelect47,First49,PgSelectRows50,PgSelectSingle51,PgSelect52,First54,PgSelectRows55,PgSelectSingle56,PgSelect57,First59,PgSelectRows60,PgSelectSingle61 bucket5
+    class Bucket5,PgSelect28,First32,PgSelectRows33,PgSelectSingle34,PgSelect42,First44,PgSelectRows45,PgSelectSingle46,PgSelect47,First49,PgSelectRows50,PgSelectSingle51,PgSelect52,First54,PgSelectRows55,PgSelectSingle56,PgSelect57,First59,PgSelectRows60,PgSelectSingle61 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3 & Bucket4

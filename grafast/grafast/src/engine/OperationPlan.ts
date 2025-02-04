@@ -99,6 +99,7 @@ import type {
 import { LayerPlan } from "./LayerPlan.js";
 import {
   currentLayerPlan,
+  currentPolymorphicPaths,
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
@@ -3836,6 +3837,10 @@ export class OperationPlan {
    * need to regenerate it on future calls, significantly reducing the load on
    * deduplication later.
    *
+   * Note: automatically extends the cached step into other (relevant)
+   * polymorphic paths; if this shouldn't be the case then don't use cacheStep
+   * and instead rely on deduplication as usual.
+   *
    * @experimental
    */
   cacheStep<T extends ExecutableStep>(
@@ -3845,6 +3850,7 @@ export class OperationPlan {
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
+    const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
       `${actionKey}|${layerPlan.id}|${ownerStep.id}`
     ] ??= new Map());
@@ -3868,7 +3874,20 @@ export class OperationPlan {
 
     const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
-    return cachedStep ?? cacheIt();
+    if (cachedStep) {
+      // Fix poly paths
+      if (paths && cachedStep.polymorphicPaths) {
+        const polymorphicPaths = new Set<string>([
+          ...cachedStep.polymorphicPaths,
+          ...paths,
+        ]);
+        cachedStep.polymorphicPaths = polymorphicPaths;
+      }
+
+      return cachedStep;
+    } else {
+      return cacheIt();
+    }
   }
 
   /**
