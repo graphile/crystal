@@ -1026,7 +1026,3 @@ export interface ExecuteStepEvent {
   step: ExecutableStep;
   executeDetails: ExecutionDetails;
 }
-export type EvaluatedStreamDetails = null | {
-  initialCount: number;
-  label: Maybe<string>;
-};
