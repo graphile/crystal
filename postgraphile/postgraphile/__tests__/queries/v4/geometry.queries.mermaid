@@ -9,12 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object75{{"Object[75∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda67{{"Lambda[67∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant72{{"Constant[72∈0] ➊<br />ᐸ[ { codec: Codec(int4), fragment: { n: [Array], f: 0, c: 266ᐳ"}}:::plan
-    Constant73{{"Constant[73∈0] ➊<br />ᐸsql.identifier(”geom”)ᐳ"}}:::plan
-    Constant74{{"Constant[74∈0] ➊<br />ᐸRecordCodec(geom)ᐳ"}}:::plan
-    Lambda67 & Constant72 & Constant73 & Constant74 --> Object75
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,22 +16,10 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant82 --> Lambda67
-    Lambda70{{"Lambda[70∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant83{{"Constant[83∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant83 --> Lambda70
-    Access71{{"Access[71∈0] ➊<br />ᐸ70.0ᐳ"}}:::plan
-    Lambda70 --> Access71
-    Lambda76{{"Lambda[76∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object75 --> Lambda76
-    Lambda81{{"Lambda[81∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ§{ reverse: false, orders: [ { codec: Codec(int4), fragment:ᐳ"}}:::plan
-    Constant84 --> Lambda81
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸgeomᐳ"]]:::plan
-    Object12 & Connection13 & Lambda67 & Access71 & Lambda76 & Lambda81 --> PgSelect14
+    Object12 & Connection13 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
@@ -80,8 +62,8 @@ graph TD
     subgraph "Buckets for queries/v4/geometry.queries"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Lambda67,Lambda70,Access71,Constant72,Constant73,Constant74,Object75,Lambda76,Lambda81,Constant82,Constant83,Constant84 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 67, 71, 76, 81<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket

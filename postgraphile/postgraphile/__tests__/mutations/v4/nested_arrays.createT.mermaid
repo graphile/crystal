@@ -9,11 +9,11 @@ graph TD
 
 
     %% plan dependencies
-    List153{{"List[153∈0] ➊<br />ᐸ57,122,187,187,187,187,187,187ᐳ"}}:::plan
+    List153{{"List[153∈0] ➊<br />ᐸ57,122,170,170,170,170,170,170ᐳ"}}:::plan
     List57{{"List[57∈0] ➊<br />ᐸ32ᐳ"}}:::plan
     List122{{"List[122∈0] ➊<br />ᐸ67,97ᐳ"}}:::plan
-    Constant187{{"Constant[187∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    List57 & List122 & Constant187 & Constant187 & Constant187 & Constant187 & Constant187 & Constant187 --> List153
+    Constant170{{"Constant[170∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    List57 & List122 & Constant170 & Constant170 & Constant170 & Constant170 & Constant170 & Constant170 --> List153
     Object32{{"Object[32∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
     Access37{{"Access[37∈0] ➊<br />ᐸ0.input.t.v.0.0.fromHoursᐳ"}}:::plan
     Access43{{"Access[43∈0] ➊<br />ᐸ0.input.t.v.0.0.fromMinutesᐳ"}}:::plan
@@ -32,12 +32,6 @@ graph TD
     Access114{{"Access[114∈0] ➊<br />ᐸ0.input.t.v.1.1.toHoursᐳ"}}:::plan
     Access120{{"Access[120∈0] ➊<br />ᐸ0.input.t.v.1.1.toMinutesᐳ"}}:::plan
     Access102 & Access108 & Access114 & Access120 --> Object97
-    Object180{{"Object[180∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda172{{"Lambda[172∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant177{{"Constant[177∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant178{{"Constant[178∈0] ➊<br />ᐸsql.identifier(”frmcdc_work_hour”)ᐳ"}}:::plan
-    Constant179{{"Constant[179∈0] ➊<br />ᐸDomainCodecᐸworkHourPartsᐳ(workHour)ᐳ"}}:::plan
-    Lambda172 & Constant177 & Constant178 & Constant179 --> Object180
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -60,18 +54,6 @@ graph TD
     __Value0 --> Access108
     __Value0 --> Access114
     __Value0 --> Access120
-    Constant188{{"Constant[188∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant188 --> Lambda172
-    Lambda175{{"Lambda[175∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant189{{"Constant[189∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant189 --> Lambda175
-    Access176{{"Access[176∈0] ➊<br />ᐸ175.0ᐳ"}}:::plan
-    Lambda175 --> Access176
-    Lambda181{{"Lambda[181∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object180 --> Lambda181
-    Lambda186{{"Lambda[186∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant190{{"Constant[190∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
-    Constant190 --> Lambda186
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle8[["PgInsertSingle[8∈1] ➊<br />ᐸt(v)ᐳ"]]:::sideeffectplan
     Object11 & List153 --> PgInsertSingle8
@@ -83,7 +65,7 @@ graph TD
     PgInsertSingle8 --> PgClassExpression155
     PgSelect159[["PgSelect[159∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
     __Item158[/"__Item[158∈5]<br />ᐸ155ᐳ"\]:::itemplan
-    Object11 & __Item158 & Lambda172 & Access176 & Lambda181 & Lambda186 --> PgSelect159
+    Object11 & __Item158 --> PgSelect159
     PgClassExpression155 ==> __Item158
     PgSelectRows163[["PgSelectRows[163∈5]"]]:::plan
     PgSelect159 --> PgSelectRows163
@@ -105,17 +87,17 @@ graph TD
     subgraph "Buckets for mutations/v4/nested_arrays.createT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access9,Access10,Object11,Object32,Access37,Access43,Access49,Access55,List57,Object67,Access72,Access78,Access84,Access90,Object97,Access102,Access108,Access114,Access120,List122,List153,Lambda172,Lambda175,Access176,Constant177,Constant178,Constant179,Object180,Lambda181,Lambda186,Constant187,Constant188,Constant189,Constant190 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 153, 172, 176, 181, 186<br /><br />1: PgInsertSingle[8]<br />2: <br />ᐳ: Object[12]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,Access9,Access10,Object11,Object32,Access37,Access43,Access49,Access55,List57,Object67,Access72,Access78,Access84,Access90,Object97,Access102,Access108,Access114,Access120,List122,List153,Constant170 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 153<br /><br />1: PgInsertSingle[8]<br />2: <br />ᐳ: Object[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle8,Object12 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 8, 11, 172, 176, 181, 186<br /><br />ROOT Object{1}ᐸ{result}ᐳ[12]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 8, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[12]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8, 11, 172, 176, 181, 186<br /><br />ROOT PgInsertSingle{1}ᐸt(v)ᐳ[8]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8, 11<br /><br />ROOT PgInsertSingle{1}ᐸt(v)ᐳ[8]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression154,PgClassExpression155 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 11, 172, 176, 181, 186<br /><br />ROOT __Item{5}ᐸ155ᐳ[158]<br />1: PgSelect[159]<br />2: PgSelectRows[163]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 11<br /><br />ROOT __Item{5}ᐸ155ᐳ[158]<br />1: PgSelect[159]<br />2: PgSelectRows[163]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item158,PgSelect159,PgSelectRows163 bucket5
     Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ163ᐳ[164]"):::bucket

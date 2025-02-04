@@ -6,7 +6,7 @@
 {
   vulnerabilitiesConnection(
     orderBy: [CVSS_SCORE_ASC]
-    after: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=" # id=4
+    after: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=" # id=4
     first: 2
   ) {
     edges {

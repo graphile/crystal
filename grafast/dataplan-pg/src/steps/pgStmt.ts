@@ -2,15 +2,17 @@ import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
 import {
   access,
   applyTransforms,
-  constant,
   ExecutableStep,
   lambda,
-  operationPlan,
   SafeError,
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import type { PgCodec, PgTypedExecutableStep } from "../interfaces.js";
+import type {
+  PgCodec,
+  PgGroupSpec,
+  PgTypedExecutableStep,
+} from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
@@ -65,11 +67,8 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   protected abstract offsetStepId: number | null;
   protected abstract beforeStepId: number | null;
   protected abstract afterStepId: number | null;
-  /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected abstract lowerIndexStepId: number | null;
-  /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected abstract upperIndexStepId: number | null;
-  protected abstract shouldReverseOrderId: number | null;
+
+  protected needsCursor = false;
 
   public scopedSQL = makeScopedSQL(this);
 
@@ -244,23 +243,6 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     return $parsedCursorPlan;
   }
 
-  shouldReverseOrder() {
-    return operationPlan().withRootLayerPlan(() => {
-      const numberDep = (stepId: number | null) =>
-        this.getDepOrConstant<Maybe<number>>(stepId, null);
-      return lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-        },
-        calculateShouldReverseOrder,
-        true,
-      );
-    });
-  }
-
   /**
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
@@ -268,55 +250,6 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   public hasMore(): ExecutableStep<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
-  }
-
-  protected getExecutionCommon(executionDetails: ExecutionDetails) {
-    const { values } = executionDetails;
-
-    const first = getUnary<Maybe<number>>(values, this.firstStepId);
-    const last = getUnary<Maybe<number>>(values, this.lastStepId);
-    const offset = getUnary<Maybe<number>>(values, this.offsetStepId);
-
-    if (offset != null && last != null) {
-      throw new SafeError("Cannot use 'offset' with 'last'");
-    }
-
-    if (!this.shouldReverseOrderId) {
-      throw new Error(
-        `Cannot call getExecutionCommon before shouldReverseOrderId has been set`,
-      );
-    }
-
-    /**
-     * If `last` is in use then we reverse the order from the database and then
-     * re-reverse it in JS-land.
-     */
-    const shouldReverseOrder = getUnary<boolean>(
-      values,
-      this.shouldReverseOrderId,
-    );
-
-    return { first, last, offset, shouldReverseOrder };
-  }
-
-  protected abstract limitAndOffsetSQL: SQL | null;
-  protected planLimitAndOffsets() {
-    const numberDep = (stepId: number | null) =>
-      this.getDepOrConstant<Maybe<number>>(stepId, null);
-    return this.operationPlan.withRootLayerPlan(() =>
-      lambda(
-        {
-          first: numberDep(this.firstStepId),
-          last: numberDep(this.lastStepId),
-          cursorLower: numberDep(this.lowerIndexStepId),
-          cursorUpper: numberDep(this.upperIndexStepId),
-          offset: numberDep(this.offsetStepId),
-          fetchOneExtra: constant(this.fetchOneExtra, false),
-        },
-        calculateLimitAndOffsetSQL,
-        true,
-      ),
-    );
   }
 }
 
@@ -345,18 +278,6 @@ function parseCursor(cursor: string | null) {
 }
 parseCursor.isSyncAndSafe = true; // Optimization
 
-function calculateShouldReverseOrder(params: {
-  first: Maybe<number>;
-  last: Maybe<number>;
-  cursorLower: Maybe<number>;
-  cursorUpper: Maybe<number>;
-}) {
-  const { first, last, cursorLower, cursorUpper } = params;
-  return (
-    first == null && last != null && cursorLower == null && cursorUpper == null
-  );
-}
-
 export function getUnary<T>(
   values: ExecutionDetails["values"],
   stepId: number,
@@ -372,7 +293,7 @@ export function getUnary<T>(
   return stepId == null ? undefined : (values[stepId].unaryValue() as T);
 }
 
-function calculateLimitAndOffsetSQL(params: {
+export function calculateLimitAndOffsetSQL(params: {
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   first: Maybe<number>;
@@ -520,4 +441,151 @@ function calculateLimitAndOffsetSQL(params: {
       ? sql`\nlimit ${sql.literal(innerLimitValue)}`
       : sql.blank;
   return [limitAndOffset, innerLimitSQL];
+}
+
+export interface PgStmtCommonQueryInfo {
+  readonly alias: SQL;
+  readonly hasSideEffects: boolean;
+
+  readonly executionDetails: ExecutionDetails;
+  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
+  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+  readonly fetchOneExtra: boolean;
+  readonly forceIdentity: boolean;
+  readonly needsCursor: boolean;
+
+  readonly firstStepId: number | null;
+  readonly lastStepId: number | null;
+  readonly offsetStepId: number | null;
+  readonly beforeStepId: number | null;
+  readonly afterStepId: number | null;
+
+  readonly groups: ReadonlyArray<PgGroupSpec>;
+  readonly havingConditions: ReadonlyArray<SQL>;
+}
+
+export interface MutablePgStmtCommonQueryInfo {
+  // New properties
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+
+  first: Maybe<number>;
+  last: Maybe<number>;
+  shouldReverseOrder: boolean;
+  offset: Maybe<number>;
+
+  cursorDigest: string | null;
+  readonly cursorIndicies: Array<{ index: number; codec: PgCodec }> | null;
+}
+
+export function calculateLimitAndOffsetSQLFromInfo(
+  info: PgStmtCommonQueryInfo & {
+    readonly cursorLower: Maybe<number>;
+    readonly cursorUpper: Maybe<number>;
+  },
+) {
+  const {
+    executionDetails: { values },
+    fetchOneExtra,
+    cursorUpper,
+    cursorLower,
+  } = info;
+  return calculateLimitAndOffsetSQL({
+    first: getUnary(values, info.firstStepId),
+    last: getUnary(values, info.lastStepId),
+    offset: getUnary(values, info.offsetStepId),
+    cursorLower,
+    cursorUpper,
+    fetchOneExtra,
+  });
+}
+
+export function applyCommonPaginationStuff(
+  info: PgStmtCommonQueryInfo & MutablePgStmtCommonQueryInfo,
+): void {
+  const {
+    cursorUpper,
+    cursorLower,
+    executionDetails: { values },
+  } = info;
+
+  const first = getUnary<Maybe<number>>(values, info.firstStepId);
+  const last = getUnary<Maybe<number>>(values, info.lastStepId);
+  const offset = getUnary<Maybe<number>>(values, info.offsetStepId);
+
+  if (offset != null && last != null) {
+    throw new SafeError("Cannot use 'offset' with 'last'");
+  }
+  info.first = first;
+  info.last = last;
+  info.offset = offset;
+  /**
+   * If `last` is in use then we reverse the order from the database and then
+   * re-reverse it in JS-land.
+   */
+  info.shouldReverseOrder =
+    first == null && last != null && cursorLower == null && cursorUpper == null;
+}
+
+export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
+  const { executionDetails, placeholders, deferreds } = info;
+  const { values, count } = executionDetails;
+  const identifiersSymbol = Symbol(name + "_identifiers");
+  const identifiersAlias = sql.identifier(identifiersSymbol);
+  /**
+   * Since this is effectively like a DataLoader it processes the data for many
+   * different resolvers at once. This list of (hopefully scalar) plans is used
+   * to represent queryValues the query will need such as identifiers for which
+   * records in the result set should be returned to which GraphQL resolvers,
+   * parameters for conditions or orders, etc.
+   */
+  const queryValues: Array<QueryValue> = [];
+  const placeholderValues = new Map<symbol, SQL>();
+  const handlePlaceholder = (placeholder: PgStmtDeferredPlaceholder) => {
+    const { symbol, dependencyIndex, codec, alreadyEncoded } = placeholder;
+    const ev = values[dependencyIndex];
+    if (!ev.isBatch || count === 1) {
+      const value = ev.at(0);
+      const encodedValue =
+        value == null ? null : alreadyEncoded ? value : codec.toPg(value);
+      placeholderValues.set(
+        symbol,
+        sql`${sql.value(encodedValue)}::${codec.sqlType}`,
+      );
+    } else {
+      // Fine a existing match for this dependency of this type
+      const existingIndex = queryValues.findIndex(
+        (v) => v.dependencyIndex === dependencyIndex && v.codec === codec,
+      );
+
+      // If none exists, add one to our query values
+      const idx =
+        existingIndex >= 0 ? existingIndex : queryValues.push(placeholder) - 1;
+
+      // Finally alias this symbol to a reference to this placeholder
+      placeholderValues.set(
+        placeholder.symbol,
+        sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
+      );
+    }
+  };
+  placeholders.forEach(handlePlaceholder);
+
+  // Handle deferreds
+  deferreds.forEach((placeholder) => {
+    const { symbol, dependencyIndex } = placeholder;
+    const fragment = values[dependencyIndex].unaryValue();
+    if (!sql.isSQL(fragment)) {
+      throw new Error(`Deferred SQL must be a valid SQL fragment`);
+    }
+    placeholderValues.set(symbol, fragment);
+  });
+
+  return {
+    queryValues,
+    placeholderValues,
+    identifiersSymbol,
+    identifiersAlias,
+    handlePlaceholder,
+  };
 }

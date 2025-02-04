@@ -9,12 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object27{{"Object[27∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda19{{"Lambda[19∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸsql.identifier(”authenticate_fail”)ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸRecordCodec(jwtToken)ᐳ"}}:::plan
-    Lambda19 & Constant24 & Constant25 & Constant26 --> Object27
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,21 +16,9 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant34 --> Lambda19
-    Lambda22{{"Lambda[22∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant35 --> Lambda22
-    Access23{{"Access[23∈0] ➊<br />ᐸ22.0ᐳ"}}:::plan
-    Lambda22 --> Access23
-    Lambda28{{"Lambda[28∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object27 --> Lambda28
-    Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”authenᐳ"}}:::plan
-    Constant36 --> Lambda33
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect8[["PgSelect[8∈1] ➊<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
-    Object11 & Lambda19 & Access23 & Lambda28 & Lambda33 --> PgSelect8
+    Object11 --> PgSelect8
     First12{{"First[12∈1] ➊"}}:::plan
     PgSelectRows13[["PgSelectRows[13∈1] ➊"]]:::plan
     PgSelectRows13 --> First12
@@ -53,8 +35,8 @@ graph TD
     subgraph "Buckets for mutations/v4/authenticateFail"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Lambda19,Lambda22,Access23,Constant24,Constant25,Constant26,Object27,Lambda28,Lambda33,Constant34,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 19, 23, 28, 33<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket

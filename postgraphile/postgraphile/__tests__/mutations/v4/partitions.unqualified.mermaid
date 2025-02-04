@@ -9,16 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object65{{"Object[65∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda57{{"Lambda[57∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant62{{"Constant[62∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸRecordCodec(users)ᐳ"}}:::plan
-    Lambda57 & Constant62 & Constant63 & Constant64 --> Object65
-    Object80{{"Object[80∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸsql.identifier(”users”)ᐳ"}}:::plan
-    Lambda57 & Constant77 & Constant78 & Constant64 --> Object80
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -26,36 +16,19 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
-    Constant92{{"Constant[92∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant92 --> Lambda57
-    Lambda60{{"Lambda[60∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant93 --> Lambda60
-    Access61{{"Access[61∈0] ➊<br />ᐸ60.0ᐳ"}}:::plan
-    Lambda60 --> Access61
-    Lambda66{{"Lambda[66∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object65 --> Lambda66
-    Lambda71{{"Lambda[71∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
-    Constant94 --> Lambda71
-    Lambda81{{"Lambda[81∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object80 --> Lambda81
-    Lambda86{{"Lambda[86∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant95{{"Constant[95∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”users”ᐳ"}}:::plan
-    Constant95 --> Lambda86
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ'2023-05-24T07:43:00Z'ᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ'temp'ᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ12.7ᐳ"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ13ᐳ"}}:::plan
+    Constant55{{"Constant[55∈0] ➊<br />ᐸ'2023-05-24T07:43:00Z'ᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ'temp'ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ12.7ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ13ᐳ"}}:::plan
     PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸmeasurements(timestamp,key,value,user_id)ᐳ"]]:::sideeffectplan
-    Object16 & Constant87 & Constant88 & Constant89 & Constant90 --> PgInsertSingle13
+    Object16 & Constant55 & Constant56 & Constant57 & Constant58 --> PgInsertSingle13
     Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle13 --> Object17
     PgSelect22[["PgSelect[22∈3] ➊<br />ᐸusersᐳ"]]:::plan
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
-    Object16 & PgClassExpression21 & Lambda57 & Access61 & Lambda66 & Lambda71 --> PgSelect22
+    Object16 & PgClassExpression21 --> PgSelect22
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
     PgInsertSingle13 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
@@ -75,7 +48,7 @@ graph TD
     PgSelectSingle28 --> PgClassExpression30
     PgUpdateSingle37[["PgUpdateSingle[37∈5] ➊<br />ᐸmeasurements(timestamp,key;value)ᐳ"]]:::sideeffectplan
     Object40{{"Object[40∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object40 & Constant87 & Constant88 & Constant91 --> PgUpdateSingle37
+    Object40 & Constant55 & Constant56 & Constant59 --> PgUpdateSingle37
     Access38{{"Access[38∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access39{{"Access[39∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access38 & Access39 --> Object40
@@ -85,7 +58,7 @@ graph TD
     PgUpdateSingle37 --> Object41
     PgSelect46[["PgSelect[46∈7] ➊<br />ᐸusersᐳ"]]:::plan
     PgClassExpression45{{"PgClassExpression[45∈7] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
-    Object40 & PgClassExpression45 & Lambda57 & Access61 & Lambda81 & Lambda86 --> PgSelect46
+    Object40 & PgClassExpression45 --> PgSelect46
     PgClassExpression42{{"PgClassExpression[42∈7] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
     PgUpdateSingle37 --> PgClassExpression42
     PgClassExpression43{{"PgClassExpression[43∈7] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
@@ -109,26 +82,26 @@ graph TD
     subgraph "Buckets for mutations/v4/partitions.unqualified"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access14,Access15,Object16,Lambda57,Lambda60,Access61,Constant62,Constant63,Constant64,Object65,Lambda66,Lambda71,Constant77,Constant78,Object80,Lambda81,Lambda86,Constant87,Constant88,Constant89,Constant90,Constant91,Constant92,Constant93,Constant94,Constant95 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 87, 88, 89, 90, 57, 61, 66, 71<br /><br />1: PgInsertSingle[13]<br />2: <br />ᐳ: Object[17]"):::bucket
+    class Bucket0,__Value2,__Value4,Access14,Access15,Object16,Constant55,Constant56,Constant57,Constant58,Constant59 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 55, 56, 57, 58<br /><br />1: PgInsertSingle[13]<br />2: <br />ᐳ: Object[17]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle13,Object17 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 13, 16, 57, 61, 66, 71<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 13, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13, 16, 57, 61, 66, 71<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements(timestamp,key,value,user_id)ᐳ[13]<br />1: <br />ᐳ: 18, 19, 20, 21<br />2: PgSelect[22]<br />3: PgSelectRows[27]<br />ᐳ: First[26], PgSelectSingle[28]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13, 16<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements(timestamp,key,value,user_id)ᐳ[13]<br />1: <br />ᐳ: 18, 19, 20, 21<br />2: PgSelect[22]<br />3: PgSelectRows[27]<br />ᐳ: First[26], PgSelectSingle[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgSelect22,First26,PgSelectRows27,PgSelectSingle28 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[28]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression29,PgClassExpression30 bucket4
-    Bucket5("Bucket 5 (mutationField)<br />Deps: 87, 88, 91, 2, 57, 61, 81, 86<br /><br />1: Access[38]<br />2: Access[39]<br />3: Object[40]<br />4: PgUpdateSingle[37]<br />5: <br />ᐳ: Object[41]"):::bucket
+    Bucket5("Bucket 5 (mutationField)<br />Deps: 55, 56, 59, 2<br /><br />1: Access[38]<br />2: Access[39]<br />3: Object[40]<br />4: PgUpdateSingle[37]<br />5: <br />ᐳ: Object[41]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgUpdateSingle37,Access38,Access39,Object40,Object41 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41, 37, 40, 57, 61, 81, 86<br /><br />ROOT Object{5}ᐸ{result}ᐳ[41]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41, 37, 40<br /><br />ROOT Object{5}ᐸ{result}ᐳ[41]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 37, 40, 57, 61, 81, 86<br /><br />ROOT PgUpdateSingle{5}ᐸmeasurements(timestamp,key;value)ᐳ[37]<br />1: <br />ᐳ: 42, 43, 44, 45<br />2: PgSelect[46]<br />3: PgSelectRows[51]<br />ᐳ: First[50], PgSelectSingle[52]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 37, 40<br /><br />ROOT PgUpdateSingle{5}ᐸmeasurements(timestamp,key;value)ᐳ[37]<br />1: <br />ᐳ: 42, 43, 44, 45<br />2: PgSelect[46]<br />3: PgSelectRows[51]<br />ᐳ: First[50], PgSelectSingle[52]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression42,PgClassExpression43,PgClassExpression44,PgClassExpression45,PgSelect46,First50,PgSelectRows51,PgSelectSingle52 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 52<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[52]"):::bucket

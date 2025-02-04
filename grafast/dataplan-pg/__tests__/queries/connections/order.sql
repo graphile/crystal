@@ -1,9 +1,9 @@
 select
-  __author__.username as "0",
-  __messages__.body as "1",
+  __messages__."body" as "0",
+  __messages__."author_id" as "1",
   __messages__."id" as "2",
-  __messages__."body" as "3",
-  __messages__."author_id" as "4"
+  __author__.username as "3",
+  __messages__.body as "4"
 from app_public.messages as __messages__
 left outer join app_public.users as __author__
 on (__messages__."author_id" = __author__."id")

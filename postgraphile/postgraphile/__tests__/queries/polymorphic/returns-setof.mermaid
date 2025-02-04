@@ -9,12 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Object27{{"Object[27∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda19{{"Lambda[19∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸsql.identifier(”all_single_tables”)ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸRecordCodec(singleTableItems)ᐳ"}}:::plan
-    Lambda19 & Constant24 & Constant25 & Constant26 --> Object27
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,22 +16,10 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant34 --> Lambda19
-    Lambda22{{"Lambda[22∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant35 --> Lambda22
-    Access23{{"Access[23∈0] ➊<br />ᐸ22.0ᐳ"}}:::plan
-    Lambda22 --> Access23
-    Lambda28{{"Lambda[28∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object27 --> Lambda28
-    Lambda33{{"Lambda[33∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”all_siᐳ"}}:::plan
-    Constant36 --> Lambda33
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection11{{"Connection[11∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
-    Object10 & Connection11 & Lambda19 & Access23 & Lambda28 & Lambda33 --> PgSelect12
+    Object10 & Connection11 --> PgSelect12
     First13{{"First[13∈1] ➊"}}:::plan
     PgSelectRows14[["PgSelectRows[14∈1] ➊"]]:::plan
     PgSelectRows14 --> First13
@@ -52,8 +34,8 @@ graph TD
     subgraph "Buckets for queries/polymorphic/returns-setof"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access8,Access9,Object10,Connection11,Lambda19,Lambda22,Access23,Constant24,Constant25,Constant26,Object27,Lambda28,Lambda33,Constant34,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 11, 19, 23, 28, 33<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: PgSelect[12]<br />2: PgSelectRows[14]<br />ᐳ: 13, 15, 16"):::bucket
+    class Bucket0,__Value2,__Value4,Access8,Access9,Object10,Connection11 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 11<br /><br />ROOT Connectionᐸ7ᐳ[11]<br />1: PgSelect[12]<br />2: PgSelectRows[14]<br />ᐳ: 13, 15, 16"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First13,PgSelectRows14,PgSelectSingle15,PgClassExpression16 bucket1
     Bucket0 --> Bucket1
