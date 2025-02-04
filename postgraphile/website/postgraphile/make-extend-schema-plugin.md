@@ -606,6 +606,36 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
+## Returning Connection
+When returning a connection in `makeExtendSchemaPlugin`, you must wrap the return value with `connection(...)`.  
+
+For example, if you want to expose a related `ReviewConnection` from `Product`:
+
+```js
+import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { connection } from 'postgraphile/grafast';
+
+export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
+  const { reviews } = build.input.pgRegistry.pgResources;
+
+  return {
+    typeDefs: gql`
+      extend type Product {
+        reviews: ReviewConnection
+      }
+    `,
+    plans: {
+      Product: {
+        reviews() {
+          // highlight-next-line
+          return connection(reviews.find());
+        },
+      },
+    },
+  };
+});
+```
+
 ## Mutation Example
 
 You might want to add a custom `registerUser` mutation which inserts the new
