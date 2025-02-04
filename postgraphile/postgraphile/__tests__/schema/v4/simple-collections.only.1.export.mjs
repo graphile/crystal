@@ -7022,11 +7022,11 @@ const makeArgs29 = (args, path = []) => {
   return selectArgs;
 };
 const resource_table_set_queryPgResource = registry.pgResources["table_set_query"];
-const basePlan = ($root, args, _info) => {
+const Query_tableSetQueryList_plan = ($root, args, _info) => {
   const selectArgs = makeArgs29(args);
   return resource_table_set_queryPgResource.execute(selectArgs);
 };
-const postPlanResolvers = [($select, $parent, fieldArgs, {
+const Query_tableSetQueryList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7154,10 +7154,10 @@ const fetcher7 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Person);
-function basePlan2() {
+function Query_allMyTablesList_plan() {
   return pgResource_my_tablePgResource.find();
 }
-const postPlanResolvers2 = [($select, $parent, fieldArgs, {
+const Query_allMyTablesList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7165,10 +7165,10 @@ const postPlanResolvers2 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan3() {
+function Query_allPersonSecretsList_plan() {
   return pgResource_person_secretPgResource.find();
 }
-const postPlanResolvers3 = [($select, $parent, fieldArgs, {
+const Query_allPersonSecretsList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7176,10 +7176,10 @@ const postPlanResolvers3 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan4() {
+function Query_allCompoundKeysList_plan() {
   return pgResource_compound_keyPgResource.find();
 }
-const postPlanResolvers4 = [($select, $parent, fieldArgs, {
+const Query_allCompoundKeysList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7187,10 +7187,10 @@ const postPlanResolvers4 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan5() {
+function Query_allNullTestRecordsList_plan() {
   return pgResource_null_test_recordPgResource.find();
 }
-const postPlanResolvers5 = [($select, $parent, fieldArgs, {
+const Query_allNullTestRecordsList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7199,10 +7199,10 @@ const postPlanResolvers5 = [($select, $parent, fieldArgs, {
   return $select;
 }];
 const resource_edge_casePgResource = registry.pgResources["edge_case"];
-function basePlan6() {
+function Query_allEdgeCasesList_plan() {
   return resource_edge_casePgResource.find();
 }
-const postPlanResolvers6 = [($select, $parent, fieldArgs, {
+const Query_allEdgeCasesList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7210,10 +7210,10 @@ const postPlanResolvers6 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan7() {
+function Query_allLeftArmsList_plan() {
   return pgResource_left_armPgResource.find();
 }
-const postPlanResolvers7 = [($select, $parent, fieldArgs, {
+const Query_allLeftArmsList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7221,10 +7221,10 @@ const postPlanResolvers7 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan8() {
+function Query_allIssue756SList_plan() {
   return pgResource_issue756PgResource.find();
 }
-const postPlanResolvers8 = [($select, $parent, fieldArgs, {
+const Query_allIssue756SList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -7232,10 +7232,10 @@ const postPlanResolvers8 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-function basePlan9() {
+function Query_allPeopleList_plan() {
   return pgResource_personPgResource.find();
 }
-const postPlanResolvers9 = [($select, $parent, fieldArgs, {
+const Query_allPeopleList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -8102,7 +8102,7 @@ const makeArgs46 = (args, path = []) => {
   return selectArgs;
 };
 const resource_person_friendsPgResource = registry.pgResources["person_friends"];
-const basePlan10 = ($in, args, _info) => {
+const Person_friendsList_plan = ($in, args, _info) => {
   if (!hasRecord($in)) {
     throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
   }
@@ -8146,7 +8146,7 @@ const basePlan10 = ($in, args, _info) => {
   // PERF: or here, if scalar add select to `$row`?
   return resource_person_friendsPgResource.execute(selectArgs);
 };
-const postPlanResolvers10 = [($select, $parent, fieldArgs, {
+const Person_friendsList_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -8299,10 +8299,10 @@ const makeArgs49 = (args, path = []) => {
 };
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
-const basePlan11 = $record => pgResource_compound_keyPgResource.find({
+const Person_compoundKeysByPersonId1List_plan = $record => pgResource_compound_keyPgResource.find({
   person_id_1: $record.get("id")
 });
-const postPlanResolvers11 = [($select, $parent, fieldArgs, {
+const Person_compoundKeysByPersonId1List_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -8310,10 +8310,10 @@ const postPlanResolvers11 = [($select, $parent, fieldArgs, {
   $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
   return $select;
 }];
-const basePlan12 = $record => pgResource_compound_keyPgResource.find({
+const Person_compoundKeysByPersonId2List_plan = $record => pgResource_compound_keyPgResource.find({
   person_id_2: $record.get("id")
 });
-const postPlanResolvers12 = [($select, $parent, fieldArgs, {
+const Person_compoundKeysByPersonId2List_postPlanResolvers = [($select, $parent, fieldArgs, {
   field
 }) => {
   const $orderBy = fieldArgs.getRaw("orderBy");
@@ -13953,8 +13953,8 @@ export const plans = {
     },
     tableSetQueryList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers) {
+        let $result = Query_tableSetQueryList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_tableSetQueryList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14045,8 +14045,8 @@ export const plans = {
     },
     allMyTablesList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan2($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers2) {
+        let $result = Query_allMyTablesList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMyTablesList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14083,8 +14083,8 @@ export const plans = {
     },
     allPersonSecretsList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan3($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers3) {
+        let $result = Query_allPersonSecretsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allPersonSecretsList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14121,8 +14121,8 @@ export const plans = {
     },
     allCompoundKeysList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan4($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers4) {
+        let $result = Query_allCompoundKeysList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allCompoundKeysList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14159,8 +14159,8 @@ export const plans = {
     },
     allNullTestRecordsList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan5($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers5) {
+        let $result = Query_allNullTestRecordsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allNullTestRecordsList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14197,8 +14197,8 @@ export const plans = {
     },
     allEdgeCasesList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan6($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers6) {
+        let $result = Query_allEdgeCasesList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allEdgeCasesList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14235,8 +14235,8 @@ export const plans = {
     },
     allLeftArmsList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan7($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers7) {
+        let $result = Query_allLeftArmsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allLeftArmsList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14273,8 +14273,8 @@ export const plans = {
     },
     allIssue756SList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan8($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers8) {
+        let $result = Query_allIssue756SList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allIssue756SList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -14311,8 +14311,8 @@ export const plans = {
     },
     allPeopleList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan9($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers9) {
+        let $result = Query_allPeopleList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allPeopleList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -15062,8 +15062,8 @@ export const plans = {
     },
     friendsList: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan10($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers10) {
+        let $result = Person_friendsList_plan($parent, fieldArgs, info);
+        for (const ppr of Person_friendsList_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -15294,8 +15294,8 @@ export const plans = {
     },
     compoundKeysByPersonId1List: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan11($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers11) {
+        let $result = Person_compoundKeysByPersonId1List_plan($parent, fieldArgs, info);
+        for (const ppr of Person_compoundKeysByPersonId1List_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
@@ -15332,8 +15332,8 @@ export const plans = {
     },
     compoundKeysByPersonId2List: {
       plan($parent, fieldArgs, info) {
-        let $result = basePlan12($parent, fieldArgs, info);
-        for (const ppr of postPlanResolvers12) {
+        let $result = Person_compoundKeysByPersonId2List_plan($parent, fieldArgs, info);
+        for (const ppr of Person_compoundKeysByPersonId2List_postPlanResolvers) {
           $result = ppr($result, $parent, fieldArgs, info);
         }
         return $result;
