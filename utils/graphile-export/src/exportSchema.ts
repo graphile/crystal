@@ -1217,10 +1217,9 @@ function extensions(
   locationHint: string,
   nameHint: string,
 ): t.Expression | null {
-  if (extensions == null || Object.keys(extensions).length === 0) {
-    return null;
-  }
-  return convertToIdentifierViaAST(file, extensions, nameHint, locationHint);
+  return isNotEmpty(extensions)
+    ? convertToIdentifierViaAST(file, extensions, nameHint, locationHint)
+    : null;
 }
 
 /** Maps to `Object.assign(Object.create(null), {...})` */
@@ -1831,14 +1830,12 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
-        const extensionsAST = enumValueConfig.extensions
-          ? convertToIdentifierViaAST(
-              file,
-              enumValueConfig.extensions,
-              `${type.name}_${enumValueName}Extensions`,
-              `${type.name}.values[${enumValueName}].extensions`,
-            )
-          : null;
+        const extensionsAST = extensions(
+          file,
+          enumValueConfig.extensions,
+          `${type.name}_${enumValueName}Extensions`,
+          `${type.name}.values[${enumValueName}].extensions`,
+        );
 
         if (valueAST || extensionsAST) {
           enumValues.push(
@@ -2077,4 +2074,24 @@ export async function exportSchema(
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
   await lint(formatted, toPath);
+}
+
+/**
+ * Returns `false` for nullish values and empty objects, true otherwise.
+ */
+function isNotEmpty(
+  value: undefined | null | Record<any, any>,
+): value is Record<any, any> {
+  if (value == null) return false;
+  if (typeof value !== "object") return true;
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) return true;
+  if (
+    Object.getOwnPropertyNames(value).length === 0 &&
+    Object.getOwnPropertySymbols(value).length === 0
+  ) {
+    // Empty object!
+    return false;
+  }
+  return true;
 }
