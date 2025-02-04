@@ -293,11 +293,11 @@ export function executeBucket(
           return;
         }
 
-        const valueIsAsyncIterable = isAsyncIterable(value);
+        let valueIsAsyncIterable;
         if (
           finishedStep._stepOptions.walkIterable &&
           // PERF: do we want to handle arrays differently?
-          (valueIsAsyncIterable || isIterable(value))
+          ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
         ) {
           // PERF: we've already calculated this once; can we reference that again here?
           const stream = evaluateStream(bucket, finishedStep);
