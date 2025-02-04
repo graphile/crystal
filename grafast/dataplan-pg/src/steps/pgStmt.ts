@@ -243,11 +243,6 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     return $parsedCursorPlan;
   }
 
-  // TODO: delete this
-  shouldReverseOrder() {
-    throw new Error("shouldReverseOrder RUNTIME ONLY PLZ");
-  }
-
   /**
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
