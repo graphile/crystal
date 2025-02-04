@@ -9,12 +9,12 @@ graph TD
 
 
     %% plan dependencies
-    Object29{{"Object[29∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda21{{"Lambda[21∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸsql.identifier(”authenticate”)ᐳ"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸRecordCodec(jwtToken)ᐳ"}}:::plan
-    Lambda21 & Constant26 & Constant27 & Constant28 --> Object29
+    Object30{{"Object[30∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda22{{"Lambda[22∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant27{{"Constant[27∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸsql.identifier(”authenticate”)ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸRecordCodec(jwtToken)ᐳ"}}:::plan
+    Lambda22 & Constant27 & Constant28 & Constant29 --> Object30
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,45 +22,47 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant39 --> Lambda21
-    Lambda24{{"Lambda[24∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
     Constant40{{"Constant[40∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant40 --> Lambda24
-    Access25{{"Access[25∈0] ➊<br />ᐸ24.0ᐳ"}}:::plan
-    Lambda24 --> Access25
-    Lambda30{{"Lambda[30∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object29 --> Lambda30
-    Lambda35{{"Lambda[35∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”authenᐳ"}}:::plan
-    Constant41 --> Lambda35
+    Constant40 --> Lambda22
+    Lambda25{{"Lambda[25∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant41 --> Lambda25
+    Access26{{"Access[26∈0] ➊<br />ᐸ25.0ᐳ"}}:::plan
+    Lambda25 --> Access26
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object30 --> Lambda31
+    Lambda36{{"Lambda[36∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”authenᐳ"}}:::plan
+    Constant42 --> Lambda36
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    Object14 & Constant36 & Constant37 & Constant38 & Lambda21 & Access25 & Lambda30 & Lambda35 --> PgSelect11
+    Object14 & Constant37 & Constant38 & Constant39 & Lambda22 & Access26 & Lambda31 & Lambda36 --> PgSelect11
     First15{{"First[15∈1] ➊"}}:::plan
-    PgSelect11 --> First15
-    PgSelectSingle16{{"PgSelectSingle[16∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
-    First15 --> PgSelectSingle16
-    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle16 --> Object17
-    PgClassExpression18{{"PgClassExpression[18∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression18
+    PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
+    PgSelectRows16 --> First15
+    PgSelect11 --> PgSelectRows16
+    PgSelectSingle17{{"PgSelectSingle[17∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
+    First15 --> PgSelectSingle17
+    Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle17 --> Object18
+    PgClassExpression19{{"PgClassExpression[19∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
+    PgSelectSingle17 --> PgClassExpression19
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Lambda21,Lambda24,Access25,Constant26,Constant27,Constant28,Object29,Lambda30,Lambda35,Constant36,Constant37,Constant38,Constant39,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 36, 37, 38, 21, 25, 30, 35<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: 15, 16, 17"):::bucket
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Lambda22,Lambda25,Access26,Constant27,Constant28,Constant29,Object30,Lambda31,Lambda36,Constant37,Constant38,Constant39,Constant40,Constant41,Constant42 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 37, 38, 39, 22, 26, 31, 36<br /><br />1: PgSelect[11]<br />2: PgSelectRows[16]<br />ᐳ: 15, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect11,First15,PgSelectSingle16,Object17 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
+    class Bucket1,PgSelect11,First15,PgSelectRows16,PgSelectSingle17,Object18 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression18 bucket2
+    class Bucket2,PgClassExpression19 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

@@ -1359,15 +1359,19 @@ function makeArrayExecutor<TAsString extends boolean>(
           | AsyncIterableIterator<any>
           | undefined;
         if (stream !== undefined) {
+          const labelStepId = (
+            childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
+          ).reason.stream?.labelStepId;
           root.streams.push({
             root,
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
             outputPlan: childOutputPlan,
-            label: (
-              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
-            ).reason.stream?.label,
+            label:
+              labelStepId != null
+                ? bucket.store.get(labelStepId)?.unaryValue()
+                : undefined,
             stream,
             startIndex: bucketRootValue.length,
           });

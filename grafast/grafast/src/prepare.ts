@@ -445,6 +445,7 @@ function executePreemptive(
       return payload;
     }
 
+    // NOTE: this is where we determine whether to stream or not
     if (
       bucketRootValue != null &&
       subscriptionLayerPlan != null &&
@@ -678,7 +679,7 @@ function newIterator<T = any>(
     [Symbol.asyncIterator]() {
       return this;
     },
-    push(v: T) {
+    push(v: T | PromiseLike<T>) {
       if (done) {
         // LOGGING: should we raise this as a bigger issue?
         console.warn(
@@ -690,7 +691,7 @@ function newIterator<T = any>(
       if (cbs !== undefined) {
         if (isPromiseLike(v)) {
           v.then(
-            (v) => cbs[0]({ done, value: v }),
+            (v) => cbs[0]({ done: false, value: v }),
             (e) => {
               try {
                 const r = cbs[1](e);
@@ -704,7 +705,7 @@ function newIterator<T = any>(
             },
           );
         } else {
-          cbs[0]({ done, value: v });
+          cbs[0]({ done: false, value: v });
         }
       } else {
         valueQueue.push(v);
@@ -733,7 +734,7 @@ function newIterator<T = any>(
         abort();
         for (const entry of pullQueue) {
           try {
-            entry[0]({ done, value: undefined });
+            entry[0]({ done: true, value: undefined });
           } catch (e) {
             // ignore
           }

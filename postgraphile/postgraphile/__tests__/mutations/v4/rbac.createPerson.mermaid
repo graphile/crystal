@@ -9,12 +9,12 @@ graph TD
 
 
     %% plan dependencies
-    Object48{{"Object[48∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda40{{"Lambda[40∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸsql.identifier(”frmcdc_wrapped_url”)ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸRecordCodec(wrappedUrl)ᐳ"}}:::plan
-    Lambda40 & Constant45 & Constant46 & Constant47 --> Object48
+    Object49{{"Object[49∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
+    Lambda41{{"Lambda[41∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸsql.identifier(”frmcdc_wrapped_url”)ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0] ➊<br />ᐸRecordCodec(wrappedUrl)ᐳ"}}:::plan
+    Lambda41 & Constant46 & Constant47 & Constant48 --> Object49
     Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -22,31 +22,31 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access18
     __Value2 --> Access19
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant61 --> Lambda40
-    Lambda43{{"Lambda[43∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
     Constant62{{"Constant[62∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant62 --> Lambda43
-    Access44{{"Access[44∈0] ➊<br />ᐸ43.0ᐳ"}}:::plan
-    Lambda43 --> Access44
-    Lambda49{{"Lambda[49∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object48 --> Lambda49
-    Lambda54{{"Lambda[54∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
-    Constant63 --> Lambda54
+    Constant62 --> Lambda41
+    Lambda44{{"Lambda[44∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
+    Constant63{{"Constant[63∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
+    Constant63 --> Lambda44
+    Access45{{"Access[45∈0] ➊<br />ᐸ44.0ᐳ"}}:::plan
+    Lambda44 --> Access45
+    Lambda50{{"Lambda[50∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Object49 --> Lambda50
+    Lambda55{{"Lambda[55∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
+    Constant64 --> Lambda55
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ§{ url: 'http://example.com' }ᐳ"}}:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
+    Constant60{{"Constant[60∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
+    Constant66{{"Constant[66∈0] ➊<br />ᐸ§{ url: 'http://example.com' }ᐳ"}}:::plan
     PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
-    Object20 & Constant55 & Constant64 & Constant58 & Constant59 & Constant65 --> PgInsertSingle17
+    Object20 & Constant56 & Constant65 & Constant59 & Constant60 & Constant66 --> PgInsertSingle17
     Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle17 --> Object21
     PgSelect31[["PgSelect[31∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
-    Object20 & PgClassExpression30 & Lambda40 & Access44 & Lambda49 & Lambda54 --> PgSelect31
+    Object20 & PgClassExpression30 & Lambda41 & Access45 & Lambda50 & Lambda55 --> PgSelect31
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -59,35 +59,37 @@ graph TD
     PgInsertSingle17 --> PgClassExpression29
     PgInsertSingle17 --> PgClassExpression30
     First35{{"First[35∈3] ➊"}}:::plan
-    PgSelect31 --> First35
-    PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
-    First35 --> PgSelectSingle36
+    PgSelectRows36[["PgSelectRows[36∈3] ➊"]]:::plan
+    PgSelectRows36 --> First35
+    PgSelect31 --> PgSelectRows36
+    PgSelectSingle37{{"PgSelectSingle[37∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
+    First35 --> PgSelectSingle37
     __Item27[/"__Item[27∈4]<br />ᐸ26ᐳ"\]:::itemplan
     PgClassExpression26 ==> __Item27
-    PgClassExpression37{{"PgClassExpression[37∈5] ➊<br />ᐸ__frmcdc_w...rl__.”url”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈5] ➊<br />ᐸ__frmcdc_w...rl__.”url”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression38
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/rbac.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access18,Access19,Object20,Lambda40,Lambda43,Access44,Constant45,Constant46,Constant47,Object48,Lambda49,Lambda54,Constant55,Constant58,Constant59,Constant61,Constant62,Constant63,Constant64,Constant65 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 55, 64, 58, 59, 65, 40, 44, 49, 54<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Access18,Access19,Object20,Lambda41,Lambda44,Access45,Constant46,Constant47,Constant48,Object49,Lambda50,Lambda55,Constant56,Constant59,Constant60,Constant62,Constant63,Constant64,Constant65,Constant66 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 56, 65, 59, 60, 66, 41, 45, 50, 55<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 17, 20, 40, 44, 49, 54<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 17, 20, 41, 45, 50, 55<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20, 40, 44, 49, 54<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[17]<br />1: <br />ᐳ: 24, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />ᐳ: First[35], PgSelectSingle[36]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20, 41, 45, 50, 55<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[17]<br />1: <br />ᐳ: 24, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />3: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectSingle36 bucket3
+    class Bucket3,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectRows36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ26ᐳ[27]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item27 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrlᐳ[36]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrlᐳ[37]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression37 bucket5
+    class Bucket5,PgClassExpression38 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
