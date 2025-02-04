@@ -6,10 +6,10 @@ export default function NavbarItem(props) {
   const { docsPluginId = "graphile-build", type } = props;
   const { pathname } = useLocation();
 
-  const expectedPath = `/${docsPluginId}/`;
-  console.log(expectedPath, pathname);
-
-  if (type === "docsVersionDropdown" && !pathname.startsWith(expectedPath)) {
+  if (
+    type === "docsVersionDropdown" &&
+    !pathname.startsWith(`/${docsPluginId}/`)
+  ) {
     return null;
   }
 
