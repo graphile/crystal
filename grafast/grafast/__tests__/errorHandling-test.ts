@@ -65,7 +65,6 @@ class SyncListCallbackStep<
       })();
     }
   }
-  async stream({ indexMap, values: [values0] }: ExecutionDetails<[TIn]>) {}
 }
 
 const schema = makeGrafastSchema({

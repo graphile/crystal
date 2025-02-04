@@ -665,7 +665,11 @@ export interface StepOptions {
    * Details for the `@stream` directive.
    */
   stream: StepStreamOptions | null;
-  /** Should we walk an iterable if presented. This is important because we don't want to walk things like Map/Set except if we're doing it as part of a list step */
+  /**
+   * Should we walk an iterable if presented. This is important because we
+   * don't want to walk things like Map/Set except if we're doing it as part of
+   * a list step.
+   */
   walkIterable: boolean;
 }
 
