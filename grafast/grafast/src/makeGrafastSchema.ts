@@ -257,6 +257,11 @@ export function makeGrafastSchema(details: {
               type: mapType(rawFieldSpec.type),
             };
             fields[fieldName] = fieldConfig;
+            if (fieldConfig.args) {
+              for (const [_argName, arg] of Object.entries(fieldConfig.args)) {
+                arg.type = mapType(arg.type);
+              }
+            }
             if (fieldSpec) {
               if (typeof fieldSpec === "function") {
                 exportNameHint(fieldSpec, `${typeName}_${fieldName}_plan`);
@@ -304,7 +309,6 @@ export function makeGrafastSchema(details: {
                   for (const [argName, arg] of Object.entries(
                     fieldConfig.args,
                   )) {
-                    arg.type = mapType(arg.type);
                     const argSpec = fieldSpec.args?.[argName];
                     if (typeof argSpec === "function") {
                       // Invalid
