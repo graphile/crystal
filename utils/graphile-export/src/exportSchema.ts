@@ -1067,28 +1067,11 @@ function _convertToAST(
             ),
           ],
         );
-      } else if (propertyPairs.length === 0) {
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("create")),
-          [t.nullLiteral()],
-        );
       } else {
-        const obj = t.objectExpression(
+        const obj = objectNullPrototype(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
         );
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-          [
-            t.callExpression(
-              t.memberExpression(
-                t.identifier("Object"),
-                t.identifier("create"),
-              ),
-              [t.nullLiteral()],
-            ),
-            obj,
-          ],
-        );
+        return obj;
       }
     } else {
       if (hasUnsafeKeys) {
@@ -1222,21 +1205,17 @@ function extensions(
     : null;
 }
 
-/** Maps to `Object.assign(Object.create(null), {...})` */
+/**
+ * Maps to `{__proto__: null, ...}` which is similar to
+ * `Object.assign(Object.create(null), {...})`
+ */
 export function objectNullPrototype(
   properties: t.ObjectProperty[],
 ): t.Expression {
-  const objectCreateNull = t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("create")),
-    [t.nullLiteral()],
-  );
-  if (properties.length === 0) {
-    return objectCreateNull;
-  }
-  return t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-    [objectCreateNull, t.objectExpression(properties)],
-  );
+  return t.objectExpression([
+    t.objectProperty(t.identifier("__proto__"), t.nullLiteral()),
+    ...properties,
+  ]);
 }
 
 /*
