@@ -1067,28 +1067,11 @@ function _convertToAST(
             ),
           ],
         );
-      } else if (propertyPairs.length === 0) {
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("create")),
-          [t.nullLiteral()],
-        );
       } else {
-        const obj = t.objectExpression(
+        const obj = objectNullPrototype(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
         );
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-          [
-            t.callExpression(
-              t.memberExpression(
-                t.identifier("Object"),
-                t.identifier("create"),
-              ),
-              [t.nullLiteral()],
-            ),
-            obj,
-          ],
-        );
+        return obj;
       }
     } else {
       if (hasUnsafeKeys) {
@@ -1217,27 +1200,22 @@ function extensions(
   locationHint: string,
   nameHint: string,
 ): t.Expression | null {
-  if (extensions == null || Object.keys(extensions).length === 0) {
-    return null;
-  }
-  return convertToIdentifierViaAST(file, extensions, nameHint, locationHint);
+  return isNotEmpty(extensions)
+    ? convertToIdentifierViaAST(file, extensions, nameHint, locationHint)
+    : null;
 }
 
-/** Maps to `Object.assign(Object.create(null), {...})` */
+/**
+ * Maps to `{__proto__: null, ...}` which is similar to
+ * `Object.assign(Object.create(null), {...})`
+ */
 export function objectNullPrototype(
   properties: t.ObjectProperty[],
 ): t.Expression {
-  const objectCreateNull = t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("create")),
-    [t.nullLiteral()],
-  );
-  if (properties.length === 0) {
-    return objectCreateNull;
-  }
-  return t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-    [objectCreateNull, t.objectExpression(properties)],
-  );
+  return t.objectExpression([
+    t.objectProperty(t.identifier("__proto__"), t.nullLiteral()),
+    ...properties,
+  ]);
 }
 
 /*
@@ -1651,14 +1629,16 @@ function exportSchemaTypeDefs({
         const args = field.args
           ? Object.entries(field.args)
               .map(([argName, arg]) => {
+                const extensionsAST = extensions(
+                  file,
+                  arg.extensions,
+                  `${type.name}.${fieldName}.${argName}`,
+                  `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
+                );
+                if (!extensionsAST) return null;
                 return t.objectProperty(
                   identifierOrLiteral(argName),
-                  convertToIdentifierViaAST(
-                    file,
-                    arg.extensions?.grafast,
-                    `${type.name}.${fieldName}.${argName}`,
-                    `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast`,
-                  ),
+                  extensionsAST,
                 );
               })
               .filter(isNotNullish)
@@ -1831,23 +1811,21 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
-        const applyPlanAST = enumValueConfig.extensions?.grafast?.applyPlan
-          ? convertToIdentifierViaAST(
-              file,
-              enumValueConfig.extensions.grafast.applyPlan,
-              `${type.name}_${enumValueName}ApplyPlan`,
-              `${type.name}.values[${enumValueName}].extensions.grafast.applyPlan`,
-            )
-          : null;
+        const extensionsAST = extensions(
+          file,
+          enumValueConfig.extensions,
+          `${type.name}_${enumValueName}Extensions`,
+          `${type.name}.values[${enumValueName}].extensions`,
+        );
 
-        if (valueAST || applyPlanAST) {
+        if (valueAST || extensionsAST) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
               t.objectExpression(
                 objectToObjectProperties({
                   value: valueAST,
-                  applyPlan: applyPlanAST,
+                  extensions: extensionsAST,
                 }),
               ),
             ),
@@ -2077,4 +2055,24 @@ export async function exportSchema(
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
   await lint(formatted, toPath);
+}
+
+/**
+ * Returns `false` for nullish values and empty objects, true otherwise.
+ */
+function isNotEmpty(
+  value: undefined | null | Record<any, any>,
+): value is Record<any, any> {
+  if (value == null) return false;
+  if (typeof value !== "object") return true;
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) return true;
+  if (
+    Object.getOwnPropertyNames(value).length === 0 &&
+    Object.getOwnPropertySymbols(value).length === 0
+  ) {
+    // Empty object!
+    return false;
+  }
+  return true;
 }

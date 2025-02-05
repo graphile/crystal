@@ -49,7 +49,8 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
+const nodeIdCodecs = {
+  __proto__: null,
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
@@ -65,7 +66,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -84,7 +85,9 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
       schemaName: "b",
       name: "guid"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -92,7 +95,8 @@ const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const spec_updatableView = {
   name: "updatableView",
   identifier: updatableViewIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     x: {
       description: undefined,
       codec: TYPES.int,
@@ -129,7 +133,7 @@ const spec_updatableView = {
         tags: {}
       }
     }
-  }),
+  },
   description: "YOYOYO!!",
   extensions: {
     isTableLike: true,
@@ -138,10 +142,11 @@ const spec_updatableView = {
       schemaName: "b",
       name: "updatable_view"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       uniqueKey: "x",
       unique: "x|@behavior -single -update -delete"
-    })
+    }
   },
   executor: executor
 };
@@ -150,7 +155,8 @@ const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
   identifier: jwtTokenIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     role: {
       description: undefined,
       codec: TYPES.text,
@@ -196,7 +202,7 @@ const jwtTokenCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -205,9 +211,10 @@ const jwtTokenCodec = recordCodec({
       schemaName: "b",
       name: "jwt_token"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       behavior: ["-table", "jwt"]
-    })
+    }
   },
   executor: executor
 });
@@ -218,7 +225,9 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
       schemaName: "pg_catalog",
       name: "_uuid"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -228,7 +237,8 @@ const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
   identifier: authPayloadIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     jwt: {
       description: undefined,
       codec: jwtTokenCodec,
@@ -256,7 +266,7 @@ const authPayloadCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -265,9 +275,10 @@ const authPayloadCodec = recordCodec({
       schemaName: "b",
       name: "auth_payload"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: "(id) references c.person"
-    })
+    }
   },
   executor: executor
 });
@@ -282,7 +293,9 @@ const colorCodec = enumCodec({
       schemaName: "b",
       name: "color"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const enumCapsCodec = enumCodec({
@@ -296,7 +309,9 @@ const enumCapsCodec = enumCodec({
       schemaName: "b",
       name: "enum_caps"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const enumWithEmptyStringCodec = enumCodec({
@@ -310,13 +325,16 @@ const enumWithEmptyStringCodec = enumCodec({
       schemaName: "b",
       name: "enum_with_empty_string"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const compoundTypeCodec = recordCodec({
   name: "compoundType",
   identifier: sql.identifier("c", "compound_type"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     a: {
       description: undefined,
       codec: TYPES.int,
@@ -389,7 +407,7 @@ const compoundTypeCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: "Awesome feature!",
   extensions: {
     isTableLike: false,
@@ -398,7 +416,9 @@ const compoundTypeCodec = recordCodec({
       schemaName: "c",
       name: "compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 });
@@ -410,7 +430,9 @@ const int4ArrayCodec = listOfCodec(TYPES.int, {
       schemaName: "pg_catalog",
       name: "_int4"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -423,7 +445,9 @@ const colorArrayCodec = listOfCodec(colorCodec, {
       schemaName: "b",
       name: "_color"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -436,7 +460,9 @@ const dateArrayCodec = listOfCodec(TYPES.date, {
       schemaName: "pg_catalog",
       name: "_date"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -449,7 +475,9 @@ const timestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
       schemaName: "pg_catalog",
       name: "_timestamptz"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -462,7 +490,9 @@ const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
       schemaName: "c",
       name: "_compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -475,7 +505,9 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
       schemaName: "pg_catalog",
       name: "_bytea"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -484,7 +516,8 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
 const spec_lists = {
   name: "lists",
   identifier: listsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -602,7 +635,7 @@ const spec_lists = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -611,7 +644,9 @@ const spec_lists = {
       schemaName: "b",
       name: "lists"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 };
@@ -625,7 +660,9 @@ const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int
       schemaName: "a",
       name: "an_int"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -637,7 +674,9 @@ const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", sql.identifier("
       schemaName: "b",
       name: "another_int"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -648,7 +687,9 @@ const textArrayCodec = listOfCodec(TYPES.text, {
       schemaName: "pg_catalog",
       name: "_text"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -662,7 +703,9 @@ const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sql.identifier("pg
       schemaName: "pg_catalog",
       name: "numrange"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_catalog", "daterange"), {
@@ -673,7 +716,9 @@ const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_
       schemaName: "pg_catalog",
       name: "daterange"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a", "an_int_range"), {
@@ -684,7 +729,9 @@ const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a
       schemaName: "a",
       name: "an_int_range"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const intervalArrayCodec = listOfCodec(TYPES.interval, {
@@ -694,7 +741,9 @@ const intervalArrayCodec = listOfCodec(TYPES.interval, {
       schemaName: "pg_catalog",
       name: "_interval"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -703,7 +752,8 @@ const intervalArrayCodec = listOfCodec(TYPES.interval, {
 const nestedCompoundTypeCodec = recordCodec({
   name: "nestedCompoundType",
   identifier: sql.identifier("b", "nested_compound_type"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     a: {
       description: undefined,
       codec: compoundTypeCodec,
@@ -731,7 +781,7 @@ const nestedCompoundTypeCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -740,7 +790,9 @@ const nestedCompoundTypeCodec = recordCodec({
       schemaName: "b",
       name: "nested_compound_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 });
@@ -752,7 +804,9 @@ const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sq
       schemaName: "c",
       name: "text_array_domain"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -763,7 +817,9 @@ const int8ArrayCodec = listOfCodec(TYPES.bigint, {
       schemaName: "pg_catalog",
       name: "_int8"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -777,7 +833,9 @@ const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sq
       schemaName: "c",
       name: "int8_array_domain"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
@@ -797,7 +855,8 @@ const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_at
 const spec_types = {
   name: "types",
   identifier: typesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1239,7 +1298,7 @@ const spec_types = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1248,9 +1307,10 @@ const spec_types = {
       schemaName: "b",
       name: "types"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: ["(smallint) references a.post", "(id) references a.post"]
-    })
+    }
   },
   executor: executor
 };
@@ -1263,7 +1323,9 @@ const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifie
       schemaName: "b",
       name: "not_null_url"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: true
 });
@@ -1309,7 +1371,9 @@ const listsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const typesUniques = [{
@@ -1317,7 +1381,9 @@ const typesUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_types_types = {
@@ -1351,10 +1417,12 @@ const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_functi
 const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     int4: TYPES.int,
     guid: guidCodec,
     varchar: TYPES.varchar,
@@ -1422,7 +1490,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "_jwt_token"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       typeDelim: ",",
       description: undefined,
@@ -1435,7 +1505,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "_types"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       typeDelim: ",",
       description: undefined,
@@ -1446,7 +1518,8 @@ const registry = makeRegistry({
     wrappedUrl: recordCodec({
       name: "wrappedUrl",
       identifier: sql.identifier("b", "wrapped_url"),
-      attributes: Object.assign(Object.create(null), {
+      attributes: {
+        __proto__: null,
         url: {
           description: undefined,
           codec: notNullUrlCodec,
@@ -1456,7 +1529,7 @@ const registry = makeRegistry({
             tags: {}
           }
         }
-      }),
+      },
       description: undefined,
       extensions: {
         isTableLike: false,
@@ -1465,12 +1538,15 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "wrapped_url"
         },
-        tags: Object.create(null)
+        tags: {
+          __proto__: null
+        }
       },
       executor: executor
     })
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     mult_1: {
       executor,
       name: "mult_1",
@@ -1642,9 +1718,10 @@ const registry = makeRegistry({
         attributes: ["x"],
         description: undefined,
         extensions: {
-          tags: Object.assign(Object.create(null), {
+          tags: {
+            __proto__: null,
             behavior: "-single -update -delete"
-          })
+          }
         }
       }],
       isVirtual: false,
@@ -2159,12 +2236,15 @@ const registry = makeRegistry({
       },
       description: undefined
     })
-  }),
-  pgRelations: Object.create(null)
+  },
+  pgRelations: {
+    __proto__: null
+  }
 });
 const pgResource_listsPgResource = registry.pgResources["lists"];
 const pgResource_typesPgResource = registry.pgResources["types"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
   Query: handler,
   List: {
     typeName: "List",
@@ -2204,7 +2284,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "types";
     }
   }
-});
+};
 const argDetailsSimple = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -5487,51 +5567,26 @@ export const plans = {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
     },
-    node: {
-      plan(_$root, args) {
-        return node(nodeIdHandlerByTypeName, args.get("nodeId"));
-      },
-      args: {
-        nodeId: undefined
-      }
+    node(_$root, args) {
+      return node(nodeIdHandlerByTypeName, args.get("nodeId"));
     },
-    listById: {
-      plan(_$root, args) {
-        return pgResource_listsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    listById(_$root, args) {
+      return pgResource_listsPgResource.get({
+        id: args.get("id")
+      });
     },
-    typeById: {
-      plan(_$root, args) {
-        return pgResource_typesPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    typeById(_$root, args) {
+      return pgResource_typesPgResource.get({
+        id: args.get("id")
+      });
     },
-    compoundTypeQuery: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs(args);
-        return resource_compound_type_queryPgResource.execute(selectArgs);
-      },
-      args: {
-        object: undefined
-      }
+    compoundTypeQuery($root, args, _info) {
+      const selectArgs = makeArgs(args);
+      return resource_compound_type_queryPgResource.execute(selectArgs);
     },
-    compoundTypeArrayQuery: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs2(args);
-        return resource_compound_type_array_queryPgResource.execute(selectArgs);
-      },
-      args: {
-        object: undefined
-      }
+    compoundTypeArrayQuery($root, args, _info) {
+      const selectArgs = makeArgs2(args);
+      return resource_compound_type_array_queryPgResource.execute(selectArgs);
     },
     typeFunctionConnection: {
       plan($parent, args, info) {
@@ -5545,67 +5600,67 @@ export const plans = {
       },
       args: {
         first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, arg) {
+              $connection.setFirst(arg.getRaw());
+            }
           }
         },
         last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setLast(val.getRaw());
+            }
           }
         },
         offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setOffset(val.getRaw());
+            }
           }
         },
         before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setBefore(val.getRaw());
+            }
           }
         },
         after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setAfter(val.getRaw());
+            }
           }
         }
       }
     },
-    typeFunction: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs4(args);
-        return resource_type_functionPgResource.execute(selectArgs);
-      },
-      args: {
-        id: undefined
-      }
+    typeFunction($root, args, _info) {
+      const selectArgs = makeArgs4(args);
+      return resource_type_functionPgResource.execute(selectArgs);
     },
     typeFunctionList($root, args, _info) {
       const selectArgs = makeArgs5(args);
       return resource_type_function_listPgResource.execute(selectArgs);
     },
-    list: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    list(_$parent, args) {
+      const $nodeId = args.get("nodeId");
+      return fetcher($nodeId);
     },
-    type: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher2($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    type(_$parent, args) {
+      const $nodeId = args.get("nodeId");
+      return fetcher2($nodeId);
     },
     allUpdatableViews: {
       plan() {
@@ -5613,49 +5668,70 @@ export const plans = {
       },
       args: {
         first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, arg) {
+              $connection.setFirst(arg.getRaw());
+            }
           }
         },
         last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setLast(val.getRaw());
+            }
           }
         },
         offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setOffset(val.getRaw());
+            }
           }
         },
         before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setBefore(val.getRaw());
+            }
           }
         },
         after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setAfter(val.getRaw());
+            }
           }
         },
         orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("UpdatableViewsOrderBy"));
-            return null;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val, info) {
+              const $value = val.getRaw();
+              const $select = $connection.getSubplan();
+              applyOrderToPlan($select, $value, info.schema.getType("UpdatableViewsOrderBy"));
+              return null;
+            }
           }
         },
         condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_condition, $connection) {
+              const $select = $connection.getSubplan();
+              return $select.wherePlan();
+            }
           }
         }
       }
@@ -5666,49 +5742,70 @@ export const plans = {
       },
       args: {
         first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, arg) {
+              $connection.setFirst(arg.getRaw());
+            }
           }
         },
         last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setLast(val.getRaw());
+            }
           }
         },
         offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setOffset(val.getRaw());
+            }
           }
         },
         before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setBefore(val.getRaw());
+            }
           }
         },
         after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setAfter(val.getRaw());
+            }
           }
         },
         orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
-            return null;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val, info) {
+              const $value = val.getRaw();
+              const $select = $connection.getSubplan();
+              applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
+              return null;
+            }
           }
         },
         condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_condition, $connection) {
+              const $select = $connection.getSubplan();
+              return $select.wherePlan();
+            }
           }
         }
       }
@@ -5719,49 +5816,70 @@ export const plans = {
       },
       args: {
         first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, arg) {
+              $connection.setFirst(arg.getRaw());
+            }
           }
         },
         last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setLast(val.getRaw());
+            }
           }
         },
         offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setOffset(val.getRaw());
+            }
           }
         },
         before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setBefore(val.getRaw());
+            }
           }
         },
         after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setAfter(val.getRaw());
+            }
           }
         },
         orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
-            return null;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val, info) {
+              const $value = val.getRaw();
+              const $select = $connection.getSubplan();
+              applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
+              return null;
+            }
           }
         },
         condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_condition, $connection) {
+              const $select = $connection.getSubplan();
+              return $select.wherePlan();
+            }
           }
         }
       }
@@ -6474,141 +6592,186 @@ export const plans = {
   },
   UpdatableViewsOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan() {}
+        }
+      }
     },
     X_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "x",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "x",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     X_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "x",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "x",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "name",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "name",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DESCRIPTION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "description",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "description",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DESCRIPTION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "description",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "description",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     CONSTANT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constant",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "constant",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     CONSTANT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constant",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "constant",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     }
@@ -6734,71 +6897,96 @@ export const plans = {
   },
   ListsOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan() {}
+        }
+      }
     },
     PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        listsUniques[0].attributes.forEach(attributeName => {
-          const attribute = listsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            listsUniques[0].attributes.forEach(attributeName => {
+              const attribute = listsCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "ASC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        listsUniques[0].attributes.forEach(attributeName => {
-          const attribute = listsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            listsUniques[0].attributes.forEach(attributeName => {
+              const attribute = listsCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "DESC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "id",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "id",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     }
@@ -7060,1295 +7248,1680 @@ export const plans = {
   },
   TypesOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan() {}
+        }
+      }
     },
     PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        typesUniques[0].attributes.forEach(attributeName => {
-          const attribute = typesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            typesUniques[0].attributes.forEach(attributeName => {
+              const attribute = typesCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "ASC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        typesUniques[0].attributes.forEach(attributeName => {
-          const attribute = typesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            typesUniques[0].attributes.forEach(attributeName => {
+              const attribute = typesCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "DESC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "id",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "id",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     SMALLINT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "smallint",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "smallint",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     SMALLINT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "smallint",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "smallint",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     BIGINT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "bigint",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "bigint",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     BIGINT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "bigint",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "bigint",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NUMERIC_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "numeric",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "numeric",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NUMERIC_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "numeric",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "numeric",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DECIMAL_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "decimal",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "decimal",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DECIMAL_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "decimal",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "decimal",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     BOOLEAN_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "boolean",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "boolean",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     BOOLEAN_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "boolean",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "boolean",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     VARCHAR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "varchar",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "varchar",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     VARCHAR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "varchar",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "varchar",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     ENUM_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "enum",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     ENUM_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "enum",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DOMAIN_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "domain",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "domain",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DOMAIN_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "domain",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "domain",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DOMAIN2_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "domain2",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "domain2",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DOMAIN2_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "domain2",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "domain2",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     JSON_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "json",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "json",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     JSON_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "json",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "json",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     JSONB_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "jsonb",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "jsonb",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     JSONB_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "jsonb",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "jsonb",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMESTAMP_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timestamp",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timestamp",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMESTAMP_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timestamp",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timestamp",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMESTAMPTZ_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timestamptz",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timestamptz",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMESTAMPTZ_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timestamptz",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timestamptz",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DATE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "date",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "date",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     DATE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "date",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "date",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "time",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "time",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "time",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "time",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMETZ_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timetz",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timetz",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     TIMETZ_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "timetz",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "timetz",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     INTERVAL_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "interval",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "interval",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     INTERVAL_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "interval",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "interval",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     MONEY_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "money",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "money",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     MONEY_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "money",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "money",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     COMPOUND_TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "compound_type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "compound_type",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     COMPOUND_TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "compound_type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "compound_type",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NESTED_COMPOUND_TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nested_compound_type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nested_compound_type",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NESTED_COMPOUND_TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nested_compound_type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nested_compound_type",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_COMPOUND_TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullable_compound_type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullable_compound_type",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_COMPOUND_TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullable_compound_type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullable_compound_type",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_NESTED_COMPOUND_TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullable_nested_compound_type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullable_nested_compound_type",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_NESTED_COMPOUND_TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullable_nested_compound_type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullable_nested_compound_type",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     POINT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "point",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "point",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     POINT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "point",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "point",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_POINT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullablePoint",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullablePoint",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     NULLABLE_POINT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "nullablePoint",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "nullablePoint",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     INET_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "inet",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "inet",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     INET_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "inet",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "inet",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     CIDR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cidr",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "cidr",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     CIDR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cidr",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "cidr",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     MACADDR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "macaddr",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "macaddr",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     MACADDR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "macaddr",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "macaddr",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGPROC_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regproc",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regproc",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGPROC_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regproc",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regproc",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGPROCEDURE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regprocedure",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regprocedure",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGPROCEDURE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regprocedure",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regprocedure",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGOPER_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regoper",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regoper",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGOPER_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regoper",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regoper",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGOPERATOR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regoperator",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regoperator",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGOPERATOR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regoperator",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regoperator",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGCLASS_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regclass",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regclass",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGCLASS_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regclass",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regclass",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGTYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regtype",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regtype",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGTYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regtype",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regtype",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGCONFIG_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regconfig",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regconfig",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGCONFIG_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regconfig",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regconfig",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGDICTIONARY_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regdictionary",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regdictionary",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     REGDICTIONARY_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "regdictionary",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "regdictionary",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     LTREE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "ltree",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "ltree",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     LTREE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "ltree",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "ltree",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     }
@@ -9502,9 +10075,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9519,9 +10095,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9536,9 +10115,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9553,9 +10135,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9570,9 +10155,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9587,9 +10175,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9604,9 +10195,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9621,9 +10215,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9638,9 +10235,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9655,9 +10255,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9672,9 +10275,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9689,9 +10295,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9706,9 +10315,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9723,9 +10335,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9740,9 +10355,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9757,9 +10375,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9774,9 +10395,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9791,9 +10415,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9808,9 +10435,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9825,8 +10455,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9843,8 +10476,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9859,8 +10495,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9877,8 +10516,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9893,8 +10535,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9911,8 +10556,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9927,8 +10575,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -9945,8 +10596,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -10318,36 +10972,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_typesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    typeEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_typesPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   TypeFunctionMutationInput: {
@@ -10450,36 +11099,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    listEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_listsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    listEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_listsPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateListInput: {
@@ -10604,36 +11248,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_typesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    typeEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_typesPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateTypeInput: {
@@ -11010,36 +11649,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    listEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_listsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    listEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_listsPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateListInput: {
@@ -11177,36 +11811,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_typesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    typeEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_typesPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateTypeInput: {
@@ -11601,36 +12230,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    listEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_listsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    listEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = listsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_listsPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("ListsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteListInput: {
@@ -11665,36 +12289,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_typesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    typeEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_typesPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TypesOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteTypeInput: {

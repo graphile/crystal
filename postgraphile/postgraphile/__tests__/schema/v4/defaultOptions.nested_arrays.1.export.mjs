@@ -48,7 +48,8 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
+const nodeIdCodecs = {
+  __proto__: null,
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
@@ -64,7 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -79,7 +80,8 @@ const tIdentifier = sql.identifier("nested_arrays", "t");
 const workHourPartsCodec = recordCodec({
   name: "workHourParts",
   identifier: sql.identifier("nested_arrays", "work_hour_parts"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     from_hours: {
       description: undefined,
       codec: TYPES.int2,
@@ -116,7 +118,7 @@ const workHourPartsCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -125,7 +127,9 @@ const workHourPartsCodec = recordCodec({
       schemaName: "nested_arrays",
       name: "work_hour_parts"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 });
@@ -137,7 +141,9 @@ const workHourCodec = domainOfCodec(workHourPartsCodec, "workHour", sql.identifi
       schemaName: "nested_arrays",
       name: "work_hour"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: true
 });
@@ -148,7 +154,9 @@ const workHourArrayCodec = listOfCodec(workHourCodec, {
       schemaName: "nested_arrays",
       name: "_work_hour"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -162,7 +170,9 @@ const workhoursCodec = domainOfCodec(workHourArrayCodec, "workhours", sql.identi
       schemaName: "nested_arrays",
       name: "workhours"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: true
 });
@@ -173,7 +183,9 @@ const workhoursArrayCodec = listOfCodec(workhoursCodec, {
       schemaName: "nested_arrays",
       name: "_workhours"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   typeDelim: ",",
   description: undefined,
@@ -187,14 +199,17 @@ const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql
       schemaName: "nested_arrays",
       name: "working_hours"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   notNull: false
 });
 const spec_t = {
   name: "t",
   identifier: tIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     k: {
       description: undefined,
       codec: TYPES.int,
@@ -213,7 +228,7 @@ const spec_t = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -222,7 +237,9 @@ const spec_t = {
       schemaName: "nested_arrays",
       name: "t"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
 };
@@ -233,14 +250,18 @@ const tUniques = [{
   attributes: ["k"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     bool: TYPES.boolean,
     t: tCodec,
     int4: TYPES.int,
@@ -254,8 +275,9 @@ const registry = makeRegistry({
     bpchar: TYPES.bpchar,
     workHourArray: workHourArrayCodec,
     workhoursArray: workhoursArrayCodec
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     check_work_hours: {
       executor,
       name: "check_work_hours",
@@ -306,11 +328,14 @@ const registry = makeRegistry({
         tags: {}
       }
     }
-  }),
-  pgRelations: Object.create(null)
+  },
+  pgRelations: {
+    __proto__: null
+  }
 });
 const pgResource_tPgResource = registry.pgResources["t"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
   Query: handler,
   T: {
     typeName: "T",
@@ -331,7 +356,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "ts";
     }
   }
-});
+};
 const argDetailsSimple = [{
   graphqlArgName: "wh",
   postgresArgName: "wh",
@@ -801,41 +826,21 @@ export const plans = {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
     },
-    node: {
-      plan(_$root, args) {
-        return node(nodeIdHandlerByTypeName, args.get("nodeId"));
-      },
-      args: {
-        nodeId: undefined
-      }
+    node(_$root, args) {
+      return node(nodeIdHandlerByTypeName, args.get("nodeId"));
     },
-    tByK: {
-      plan(_$root, args) {
-        return pgResource_tPgResource.get({
-          k: args.get("k")
-        });
-      },
-      args: {
-        k: undefined
-      }
+    tByK(_$root, args) {
+      return pgResource_tPgResource.get({
+        k: args.get("k")
+      });
     },
-    checkWorkHours: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs(args);
-        return resource_check_work_hoursPgResource.execute(selectArgs);
-      },
-      args: {
-        wh: undefined
-      }
+    checkWorkHours($root, args, _info) {
+      const selectArgs = makeArgs(args);
+      return resource_check_work_hoursPgResource.execute(selectArgs);
     },
-    t: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    t(_$parent, args) {
+      const $nodeId = args.get("nodeId");
+      return fetcher($nodeId);
     },
     allTs: {
       plan() {
@@ -843,49 +848,70 @@ export const plans = {
       },
       args: {
         first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, arg) {
+              $connection.setFirst(arg.getRaw());
+            }
           }
         },
         last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setLast(val.getRaw());
+            }
           }
         },
         offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setOffset(val.getRaw());
+            }
           }
         },
         before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setBefore(val.getRaw());
+            }
           }
         },
         after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val) {
+              $connection.setAfter(val.getRaw());
+            }
           }
         },
         orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
-            return null;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $connection, val, info) {
+              const $value = val.getRaw();
+              const $select = $connection.getSubplan();
+              applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+              return null;
+            }
           }
         },
         condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_condition, $connection) {
+              const $select = $connection.getSubplan();
+              return $select.wherePlan();
+            }
           }
         }
       }
@@ -1009,71 +1035,96 @@ export const plans = {
   },
   TsOrderBy: {
     NATURAL: {
-      applyPlan() {}
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan() {}
+        }
+      }
     },
     PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        tUniques[0].attributes.forEach(attributeName => {
-          const attribute = tCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            tUniques[0].attributes.forEach(attributeName => {
+              const attribute = tCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "ASC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        tUniques[0].attributes.forEach(attributeName => {
-          const attribute = tCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(step) {
+            tUniques[0].attributes.forEach(attributeName => {
+              const attribute = tCodec.attributes[attributeName];
+              step.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+                direction: "DESC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
+            });
+            step.setOrderIsUnique();
+          }
+        }
       }
     },
     K_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "k",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "k",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     },
     K_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "k",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
+      extensions: {
+        __proto__: null,
+        grafast: {
+          applyPlan(plan) {
+            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+            }
+            plan.orderBy({
+              attribute: "k",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              plan.setOrderIsUnique();
+            }
+          }
         }
       }
     }
@@ -1138,9 +1189,12 @@ export const plans = {
       },
       args: {
         input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            autoApplyAfterParentPlan: true,
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -1155,8 +1209,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -1173,8 +1230,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -1189,8 +1249,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -1207,8 +1270,11 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan(_, $object) {
-            return $object;
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object) {
+              return $object;
+            }
           }
         }
       }
@@ -1225,36 +1291,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_tPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    tEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_tPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateTInput: {
@@ -1302,36 +1363,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_tPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    tEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_tPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateTInput: {
@@ -1397,36 +1453,31 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_tPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    tEdge($mutation, args, info) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return pgResource_tPgResource.find(spec);
+        }
+      })();
+      // Perform ordering
+      const $value = args.getRaw("orderBy");
+      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteTInput: {
