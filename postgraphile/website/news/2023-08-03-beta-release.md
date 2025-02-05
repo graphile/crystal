@@ -28,7 +28,7 @@ It has taken us 3.5 years to get to this point and we’re pretty happy with the
 
 **Help us to ensure that the software addresses your needs.** We’ve spent three years building this system, but it’s only really been tested by other people in the last 6 months. Early signs are very positive, but we want to know: does it work for you? Does it do what you need it to?
 
-**Help us to ensure that the transition from V4 is as easy as possible.** We’ve spent a significant amount of time making the transition from V4 to V5 as easy as we can, building a preset that generates an almost identical schema, porting some of the V4 plugins to V5, and writing [detailed migration documentation](https://postgraphile.org/postgraphile/next/migrating-from-v4/). But we need your help: did migrating from V4 work well for you? Where were the rough edges, and how can we smooth them? Are you willing to help port community V4 plugin to V5?
+**Help us to ensure that the transition from V4 is as easy as possible.** We’ve spent a significant amount of time making the transition from V4 to V5 as easy as we can, building a preset that generates an almost identical schema, porting some of the V4 plugins to V5, and writing [detailed migration documentation](https://postgraphile.org/postgraphile/5/migrating-from-v4/). But we need your help: did migrating from V4 work well for you? Where were the rough edges, and how can we smooth them? Are you willing to help port community V4 plugin to V5?
 
 **Help us to test V5.** We have ported the V4 test suite over to V5 so we know that it works well for that, but there’s so many different combinations of options and plugins that you can do with PostGraphile that many have only been tested manually, and they really need automated tests to prevent regressions. We also need you to use V5 in your own applications and let us know how you get on — both negative and positive — to help us move towards the all-important 5.0.0 release.
 
@@ -68,7 +68,7 @@ There’s also the ongoing work to improve the tooling around our tooling, to ma
 
 If you’re a V4 user then now is an excellent time to take V5 for a spin and let us know how you get on! You don’t even have to commit to migrating (though we hope once you’ve had a go you’ll definitely want to!), just some quick experiments with the things that you use PostGraphile for could be very useful.
 
-You can read all about the new features in V5 in our new series [Intro to V5](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0) or if you prefer to just read the highlights, check out the migration guide’s [new feature summary](https://postgraphile.org/postgraphile/next/migrating-from-v4/v5-new-feature-summary) and be sure to expand the bullets that have more details!
+You can read all about the new features in V5 in our new series [Intro to V5](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0) or if you prefer to just read the highlights, check out the migration guide’s [new feature summary](https://postgraphile.org/postgraphile/5/migrating-from-v4/v5-new-feature-summary) and be sure to expand the bullets that have more details!
 
 All the packages are published under the `@beta` tag, so you'll need to ensure you include that when issuing install instructions (e.g. `yarn add postgraphile@beta`).
 
@@ -86,7 +86,7 @@ If you want to try PostGraphile V5 with a few plugins, one option is:
 2. Run `yarn` to install the dependencies
 3. Run `yarn postgraphile -c postgres:///my_db -s public` giving your database’s connection string and schema(s)
 
-Ideally, you’d follow [the migration guide](https://postgraphile.org/postgraphile/next/migrating-from-v4/) and start integrating V5 into your existing projects!
+Ideally, you’d follow [the migration guide](https://postgraphile.org/postgraphile/5/migrating-from-v4/) and start integrating V5 into your existing projects!
 
 ### Join our testing community
 
