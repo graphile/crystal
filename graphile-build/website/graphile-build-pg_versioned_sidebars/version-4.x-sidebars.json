@@ -1,0 +1,17 @@
+{
+  "docs": [
+    {
+      "type": "html",
+      "value": "<h4>ABOUT</h4>",
+      "defaultStyle": false
+    },
+    "index",
+    {
+      "type": "html",
+      "value": "<h4>USAGE</h4>",
+      "defaultStyle": false
+    },
+    "settings",
+    "security"
+  ]
+}

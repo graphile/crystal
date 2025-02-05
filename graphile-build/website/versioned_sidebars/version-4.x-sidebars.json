@@ -1,0 +1,32 @@
+{
+  "docs": [
+    {
+      "type": "html",
+      "value": "<h4>ABOUT</h4>",
+      "defaultStyle": false
+    },
+    "index",
+    "getting-started",
+    "plugins",
+    "hooks",
+    "look-ahead",
+    "omitting-plugins",
+    {
+      "type": "html",
+      "value": "<h4>USING THE LIBRARY</h4>",
+      "defaultStyle": false
+    },
+    "graphile-build",
+    "schema-builder",
+    "plugin-options",
+    "default-plugins",
+    {
+      "type": "html",
+      "value": "<h4>BUILDING A PLUGIN</h4>",
+      "defaultStyle": false
+    },
+    "all-hooks",
+    "build-object",
+    "context-object"
+  ]
+}
