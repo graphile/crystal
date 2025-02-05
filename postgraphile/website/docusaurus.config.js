@@ -44,11 +44,6 @@ const config = {
           routeBasePath: "postgraphile",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
-          versions: {
-            "4.x": {
-              path: "current",
-            },
-          },
           remarkPlugins: [
             [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
           ],
