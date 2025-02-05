@@ -28,7 +28,7 @@ new features. The following list is a summary of those new features but is by no
 
 <figure>
 
-[![A Grafast plan diagram for an AllPosts query](../../static/img/news/2023-04-26-mermaid-diagram.png)](../../static/img/news/2023-04-26-mermaid-diagram.png)
+[![A Grafast plan diagram for an AllPosts query](@site/static/img/news/2023-04-26-mermaid-diagram.png)](@site/static/img/news/2023-04-26-mermaid-diagram.png)
 
 <figcaption>
 
@@ -49,7 +49,7 @@ Massively improved SQL query generation: smaller, simpler, easier to understand,
 
 <figure>
 
-[![A GraphQL query for AllPosts](../../static/img/news/2023-04-26-v4-v5-comparison.png)](../../static/img/news/2023-04-26-v4-v5-comparison.png)
+[![A GraphQL query for AllPosts](@site/static/img/news/2023-04-26-v4-v5-comparison.png)](@site/static/img/news/2023-04-26-v4-v5-comparison.png)
 
 <figcaption>
 

@@ -380,7 +380,7 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 
 The `Channel` type used in the `typeDefs` above is the type that PostGraphile
 generated automatically for the `channels` table. See
-[Tables](/postgraphile/next/tables) for more on the artifacts generated for each
+[Tables](/postgraphile/5/tables) for more on the artifacts generated for each
 database table.
 
 :::
@@ -597,6 +597,41 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
           const $cents = $product.get("price_in_us_cents");
           // highlight-next-line
           return loadOne($cents, convertUsdToAud);
+        },
+      },
+    },
+  };
+});
+```
+
+## Returning a connection
+
+When returning a connection in `makeExtendSchemaPlugin`, you must be sure that your plan resolver yields a `connection(...)` step; failure to do this may result in errors such as `$connection.getSubplan is not a function`.
+
+For example, if you want to expose a related `ReviewConnection` from `Product`:
+
+```js
+import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { connection } from "postgraphile/grafast";
+
+export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
+  const { reviews } = build.input.pgRegistry.pgResources;
+
+  return {
+    typeDefs: gql`
+      extend type Product {
+        reviews: ReviewConnection
+      }
+    `,
+    plans: {
+      Product: {
+        reviews($product) {
+          const $productId = $product.get("id");
+          const $reviews = reviews.find();
+          $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+
+          // highlight-next-line
+          return connection($reviews);
         },
       },
     },

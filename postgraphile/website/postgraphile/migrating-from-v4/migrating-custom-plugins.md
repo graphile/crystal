@@ -306,7 +306,7 @@ Many of the types need to be converted, here's a few:
 Your test suite likely uses standard APIs, so will need to follow the regular
 [V4 migration guide](../migrating-from-v4).
 
-- [`createPostGraphileSchema`](https://postgraphile.org/postgraphile/next/migrating-from-v4/#schema-only-mode)
+- [`createPostGraphileSchema`](https://postgraphile.org/postgraphile/5/migrating-from-v4/#schema-only-mode)
 
 ## No look-ahead
 
