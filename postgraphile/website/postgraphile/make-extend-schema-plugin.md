@@ -606,8 +606,9 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-## Returning Connection
-When returning a connection in `makeExtendSchemaPlugin`, you must wrap the return value with `connection(...)`.  
+## Returning a connection
+
+When returning a connection in `makeExtendSchemaPlugin`, you must be sure that your plan resolver yields a `connection(...)` step; failure to do this may result in errors such as `$connection.getSubplan is not a function`.
 
 For example, if you want to expose a related `ReviewConnection` from `Product`:
 
@@ -626,9 +627,13 @@ export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
     `,
     plans: {
       Product: {
-        reviews() {
+        reviews($product) {
+          const $productId = $product.get('id');
+          const $reviews = reviews.find();
+          $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+
           // highlight-next-line
-          return connection(reviews.find());
+          return connection($reviews);
         },
       },
     },
