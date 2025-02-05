@@ -64,7 +64,7 @@ When work begins on a new major version of the software, create a new versioned 
 yarn docusaurus docs:version 6
 ```
 
-then update the banners, found in `docusaurus.config.js`, to one of 'none', 'unreleased', or 'unmaintained'.
+then update the banners, found in `docusaurus.config.js` config.presets[0].docs.versions, to one of 'none', 'unreleased', or 'unmaintained'.
 
 #### Release
 
