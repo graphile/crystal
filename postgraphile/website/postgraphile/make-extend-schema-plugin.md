@@ -14,7 +14,7 @@ never use that type, that will likely not cause a schema validation error. If
 you use a directive that does not exist (or pass the wrong arguments to a
 directive), that’s also unlikely to error. The SDL is just used as a convenient
 syntax, it is converted under the hood into [schema
-hooks](https://build.graphile.org/graphile-build/hooks) as if you had written
+hooks](https://build.graphile.org/graphile-build/next/hooks) as if you had written
 a Graphile Build plugin by hand.
 
 :::

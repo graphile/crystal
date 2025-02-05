@@ -155,7 +155,7 @@ intent clear, and also grants us access to
 function which we need to request the record id. The following example also uses
 an instance of [`queryBuilder.`](./make-extend-schema-plugin/#querybuilder)
 (Read more about the different hooks
-[in the Graphile Engine docs](https://build.graphile.org/graphile-build/all-hooks/).)
+[in the Graphile Engine docs](https://build.graphile.org/graphile-build/all-hooks).)
 
 ```js
 function performAnotherTask(linkId) {
