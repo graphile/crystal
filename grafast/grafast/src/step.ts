@@ -22,13 +22,12 @@ import type {
   AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
+  ExecutionResults,
   GrafastResultsList,
-  GrafastResultStreamList,
   JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
-  StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import {
@@ -373,7 +372,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
-    this._stepOptions = { stream: null };
+    this._stepOptions = { stream: null, walkIterable: false };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
 
@@ -397,8 +396,26 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return { step, acceptFlags, onReject };
   }
 
-  protected getDep(_depId: number): ExecutableStep {
+  protected getDep<T extends ExecutableStep = ExecutableStep>(
+    _depId: number,
+  ): T {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
+  }
+
+  protected maybeGetDep<T extends ExecutableStep = ExecutableStep>(
+    depId: number | null | undefined,
+  ): T | null {
+    return depId == null ? null : this.getDep<T>(depId);
+  }
+
+  protected getDepOrConstant<TData = any>(
+    _depId: number | null,
+    _fallback: TData,
+  ): ExecutableStep<TData> {
+    // This gets replaced when `constant` is loaded. Were we on ESM we could
     // just put the code here, but since we're not we have to avoid the
     // circular dependency.
     throw new Error(`Grafast failed to load correctly`);
@@ -448,10 +465,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
       }${this._isUnary ? "➊" : ""}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}]`,
+        this._stepOptions.stream != null ? "@s" : ""
+      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
+        this.id,
+        { colors: true },
+      )}]`,
     );
   }
 
@@ -573,9 +591,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   /* abstract */
-  execute(
-    details: ExecutionDetails,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  execute(details: ExecutionDetails): ExecutionResults<TData> {
     // ESLint/TS: ignore not used.
     details;
     throw new Error(`${this} has not implemented an 'execute' method`);
@@ -708,9 +724,13 @@ export abstract class UnbatchedExecutableStep<
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
+    const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {
-        const tuple = values.map((list) => list.at(i));
+        const tuple = [];
+        for (let j = 0; j < depCount; j++) {
+          tuple[j] = values[j].at(i);
+        }
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         return flagError(e);
@@ -785,18 +805,6 @@ export function isListLikeStep<
   TData extends [...ExecutableStep[]] = [...ExecutableStep[]],
 >(plan: ExecutableStep): plan is ListLikeStep<TData> {
   return "at" in plan && typeof (plan as any).at === "function";
-}
-
-export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  stream(
-    details: StreamDetails,
-  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
-};
-
-export function isStreamableStep<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
-): plan is StreamableStep<TData> {
-  return typeof (plan as StreamableStep<TData>).stream === "function";
 }
 
 export type PolymorphicStep = ExecutableStep & {

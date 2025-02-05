@@ -51,7 +51,7 @@ export function orderedApply<
     after: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
     callback: UnwrapCallback<TFunctionality[keyof TFunctionality]>;
   };
-  // Normalize all the hooks and gather them into collections
+  // Normalize all the plugin "functionalities" and gather them into collections
   const allFunctionalities: {
     [key in keyof TFunctionality]?: Array<FullFunctionalitySpec>;
   } = Object.create(null);

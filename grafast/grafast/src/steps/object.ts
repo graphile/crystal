@@ -324,7 +324,7 @@ ${inner}
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getDep(index) as TPlans[TKey];
+    return this.getDep<TPlans[TKey]>(index);
   }
 }
 

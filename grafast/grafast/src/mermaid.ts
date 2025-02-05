@@ -178,9 +178,11 @@ export function planToMermaid(
           ? ""
           : `\n${polyPaths}`;
 
-      const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}]${
-        plan.isUnary ? " ➊" : ""
-      }${meta ? `\n<${meta}>` : ""}${polyPathsIfDifferent}`;
+      const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}${
+        plan.stream ? "@s" : ""
+      }]${plan.isUnary ? " ➊" : ""}${
+        meta ? `\n<${meta}>` : ""
+      }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
         plan.stepClass === "__ItemStep"
           ? ["[/", "\\]"]

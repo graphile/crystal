@@ -8,8 +8,7 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
-  InputStep,
-  LambdaStep,
+  Maybe,
   PolymorphicStep,
 } from "grafast";
 import {
@@ -20,9 +19,8 @@ import {
   ExecutableStep,
   exportAs,
   first,
+  isDev,
   isPromiseLike,
-  lambda,
-  list,
   polymorphicWrap,
   reverseArray,
   SafeError,
@@ -40,9 +38,11 @@ import type {
   PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
+  PgSQLCallbackOrDirect,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
+import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
@@ -50,16 +50,28 @@ import type {
   PgWhereConditionSpec,
 } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
+import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
-import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
-import { toPg } from "./toPg.js";
-
-const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgUnionAll placeholder! */`;
+import type {
+  MutablePgStmtCommonQueryInfo,
+  PgStmtCommonQueryInfo,
+  PgStmtDeferredPlaceholder,
+  PgStmtDeferredSQL,
+  QueryValue,
+} from "./pgStmt.js";
+import {
+  applyCommonPaginationStuff,
+  calculateLimitAndOffsetSQLFromInfo,
+  getUnary,
+  makeValues,
+  PgStmtBaseStep,
+} from "./pgStmt.js";
+import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;
@@ -77,34 +89,13 @@ const digestSpecificExpressionFromAttributeName = (
 };
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({
+  hasMore: false,
+  items: [],
+} as PgUnionAllStepResult);
 
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
-
-function parseCursor(cursor: string | null) {
-  if (cursor == null) {
-    // This throw should never happen, so we can still be isSyncAndSafe.
-    // If it does throw, the entire lambda will throw, which is allowed.
-    throw new Error(
-      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-    );
-  }
-  try {
-    if (typeof cursor !== "string") {
-      throw new Error("Invalid cursor");
-    }
-    const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
-    if (!Array.isArray(decoded)) {
-      throw new Error("Expected array");
-    }
-    return decoded;
-  } catch (e) {
-    throw new SafeError(
-      "Invalid cursor, please enter a cursor from a previous request, or null.",
-    );
-  }
-}
-parseCursor.isSyncAndSafe = true; // Optimization
 
 function add([a, b]: readonly [a: number, b: number]): number {
   return a + b;
@@ -170,6 +161,17 @@ export interface PgUnionAllStepConfig<
   members?: PgUnionAllStepMember<TTypeNames>[];
   mode?: PgUnionAllMode;
   name?: string;
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  forceIdentity?: boolean;
+
+  /** @internal */
+  _internalCloneSymbol?: symbol | string;
+  /** @internal */
+  _internalCloneAlias?: SQL;
 }
 
 export interface PgUnionAllStepCondition<TAttributes extends string> {
@@ -181,29 +183,6 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
   attribute: TAttributes;
   direction: "ASC" | "DESC";
 }
-
-interface QueryValue {
-  dependencyIndex: number;
-  codec: PgCodec;
-  alreadyEncoded: boolean;
-}
-
-/**
- * Sometimes we want to refer to something that might change later - e.g. we
- * might have SQL that specifies a list of explicit values, or it might later
- * want to be replaced with a reference to an existing table value (e.g. when a
- * query is being inlined). PgSelectPlaceholder allows for this kind of
- * flexibility. It's really important to keep in mind that the same placeholder
- * might be used in multiple different SQL queries, and in the different
- * queries it might end up with different values - this is particularly
- * relevant when using `@stream`/`@defer`, for example.
- */
-type PgUnionAllPlaceholder = {
-  dependencyIndex: number;
-  codec: PgCodec;
-  symbol: symbol;
-  alreadyEncoded: boolean;
-};
 
 export class PgUnionAllSingleStep
   extends ExecutableStep
@@ -259,42 +238,41 @@ export class PgUnionAllSingleStep
   }
 
   /**
-   * @internal
-   * For use by PgCursorStep
-   */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
-    if (this.typeKey === null) {
-      throw new Error("Forbidden since parent isn't in normal mode");
-    }
-    const classPlan = this.getClassStep();
-    const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderByWithoutType().map((o, i) => {
-      return access(this, [classPlan.selectOrderValue(i)]);
-    });
-    // Add the type to the cursor
-    orders.push(access(this, [classPlan.selectType()]));
-    // Add the pk to the cursor
-    orders.push(access(this, [classPlan.selectPk()]));
-    const step = list(orders);
-    return [digest, step];
-  }
-
-  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
   public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(this);
+    const cursorPlan = new PgCursorStep<this>(
+      this,
+      this.getClassStep().getCursorDetails(),
+    );
     return cursorPlan;
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    return (this.getDep(0) as any).getDep(0);
+    // TODO: we should add validation of this!
+    const $item = this.getDep<any>(0);
+    const $rows = $item.getDep(0);
+    const $pgUnionAll = $rows.getDep(0);
+    return $pgUnionAll;
   }
 
   public node() {
     return this;
+  }
+
+  public scopedSQL = makeScopedSQL(this);
+
+  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder(
+    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    overrideCodec?: PgCodec,
+  ): SQL {
+    return overrideCodec
+      ? this.getClassStep().placeholder($step, overrideCodec)
+      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
   }
 
   /**
@@ -314,12 +292,12 @@ export class PgUnionAllSingleStep
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -328,7 +306,7 @@ export class PgUnionAllSingleStep
       codec,
       codec.notNull || guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   execute({
@@ -358,41 +336,71 @@ export class PgUnionAllSingleStep
 }
 
 interface MemberDigest<TTypeNames extends string> {
-  member: PgUnionAllStepMember<TTypeNames>;
-  finalResource: PgResource<
+  readonly member: PgUnionAllStepMember<TTypeNames>;
+  readonly finalResource: PgResource<
     any,
     any,
     ReadonlyArray<PgResourceUnique<any>>,
     any,
     any
   >;
-  sqlSource: SQL;
-  symbol: symbol;
-  alias: SQL;
-  conditions: SQL[];
-  orders: PgOrderSpec[];
+  readonly sqlSource: SQL;
+  readonly symbol: symbol;
+  readonly alias: SQL;
+  readonly conditions: readonly SQL[];
+  readonly orders: readonly PgOrderSpec[];
+}
+
+interface MutableMemberDigest<TTypeNames extends string>
+  extends MemberDigest<TTypeNames> {
+  readonly conditions: SQL[];
+  readonly orders: PgOrderSpec[];
 }
 
 export type PgUnionAllMode = "normal" | "aggregate";
 
-function cloneDigest<TTypeNames extends string = string>(
-  digest: MemberDigest<TTypeNames>,
-): MemberDigest<TTypeNames> {
-  return {
-    member: digest.member,
-    finalResource: digest.finalResource,
-    sqlSource: digest.sqlSource,
-    symbol: digest.symbol,
-    alias: digest.alias,
-    conditions: [...digest.conditions],
-    orders: [...digest.orders],
-  };
+/**
+ * When finalized, we build the SQL query, queryValues, and note where to feed in
+ * the relevant queryValues. This saves repeating this work at execution time.
+ */
+interface QueryBuildResult {
+  // The SQL query text
+  text: string;
+
+  // The values to feed into the query
+  rawSqlValues: SQLRawValue[];
+
+  // The `DECLARE ... CURSOR` query for @stream
+  textForDeclare?: string;
+
+  // The values to feed into the `DECLARE ... CURSOR` query
+  rawSqlValuesForDeclare?: SQLRawValue[];
+
+  // If streaming, what's the initialCount
+  streamInitialCount?: number;
+
+  // The attribute on the result that indicates which group the result belongs to
+  identifierIndex: number | null;
+
+  // If last but not first, reverse order.
+  shouldReverseOrder: boolean;
+
+  // For prepared queries
+  name?: string;
+
+  queryValues: Array<QueryValue>;
+
+  first: Maybe<number>;
+  last: Maybe<number>;
+
+  cursorDetails: PgCursorDetails | undefined;
 }
 
-function cloneDigests<TTypeNames extends string = string>(
-  digests: ReadonlyArray<MemberDigest<TTypeNames>>,
-): Array<MemberDigest<TTypeNames>> {
-  return digests.map(cloneDigest);
+interface PgUnionAllStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]>;
+  cursorDetails?: PgCursorDetails;
 }
 
 /**
@@ -403,7 +411,7 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >
-  extends ExecutableStep
+  extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
     ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
 {
@@ -417,7 +425,7 @@ export class PgUnionAllStep<
   public symbol: symbol;
   public alias: SQL;
 
-  private selects: PgUnionAllStepSelect<TAttributes>[];
+  private selects: PgUnionAllStepSelect<TAttributes>[] = [];
 
   private executor!: PgExecutor;
   private contextId!: number;
@@ -426,208 +434,129 @@ export class PgUnionAllStep<
   public readonly spec: PgUnionAllStepConfig<TAttributes, TTypeNames>;
 
   /** @internal */
-  public orders: Array<PgOrderFragmentSpec>;
-  /** The select index used to store the order value for the given order */
-  private orderSelectIndex: Array<number>;
-  /**
-   * `ordersForCursor` is the same as `orders`, but then with the type and
-   * primary key added. This ensures unique ordering, as required by cursor
-   * pagination.
-   *
-   * When the non-type, non-pk orders have the same values, then the entries
-   * will be in `type` and then `pk` order; so if we want the results "after" a
-   * particular `type`/`pk` then all identical types "before" (alphabetically)
-   * this type can be excluded; for exactly this `type` we should only include
-   * entries with `pk` higher than the given `pk`, and for all other `type`s we
-   * can include all records.
-   */
-  private ordersForCursor: Array<PgOrderFragmentSpec>;
-
-  /**
-   * Since this is effectively like a DataLoader it processes the data for many
-   * different resolvers at once. This list of (hopefully scalar) plans is used
-   * to represent queryValues the query will need such as identifiers for which
-   * records in the result set should be returned to which GraphQL resolvers,
-   * parameters for conditions or orders, etc.
-   */
-  private queryValues: Array<QueryValue>;
+  public orderSpecs: Array<PgUnionAllStepOrder<TAttributes>> = [];
 
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<PgUnionAllPlaceholder>;
-  private placeholderValues: Map<symbol, SQL>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
+  protected deferreds: Array<PgStmtDeferredSQL> = [];
 
   // GROUP BY
 
-  private groups: Array<PgGroupSpec>;
+  private groups: Array<PgGroupSpec> = [];
 
   // HAVING
 
-  private havingConditions: SQL[];
+  private havingConditions: SQL[] = [];
 
   // LIMIT
 
-  private first: number | null = null;
-  private last: number | null = null;
-  private fetchOneExtra = false;
+  protected firstStepId: number | null = null;
+  protected lastStepId: number | null = null;
+  protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  private lowerIndexStepId: number | null = null;
+  protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  private upperIndexStepId: number | null = null;
+  protected upperIndexStepId: number | null = null;
   /** When we calculate the limit/offset, we may be able to determine there cannot be a next page */
   private limitAndOffsetId: number | null = null;
 
   // OFFSET
 
-  private offset: number | null = null;
+  protected offsetStepId: number | null = null;
 
   // CURSORS
 
-  private beforeStepId: number | null = null;
-  private afterStepId: number | null = null;
+  protected beforeStepId: number | null = null;
+  protected afterStepId: number | null = null;
 
   // Connection
   private connectionDepId: number | null = null;
 
-  /**
-   * When finalized, we build the SQL query, queryValues, and note where to feed in
-   * the relevant queryValues. This saves repeating this work at execution time.
-   */
-  private finalizeResults: {
-    // The SQL query text
-    text: string;
-    textForSingle?: string;
-
-    // The values to feed into the query
-    rawSqlValues: SQLRawValue[];
-
-    // The `DECLARE ... CURSOR` query for @stream
-    textForDeclare?: string;
-
-    // The values to feed into the `DECLARE ... CURSOR` query
-    rawSqlValuesForDeclare?: SQLRawValue[];
-
-    // If streaming, what's the initialCount
-    streamInitialCount?: number;
-
-    // The attribute on the result that indicates which group the result belongs to
-    identifierIndex: number | null;
-
-    // If last but not first, reverse order.
-    shouldReverseOrder: boolean;
-
-    // For prepared queries
-    name?: string;
-    nameForSingle?: string;
-  } | null = null;
-
-  private limitAndOffsetSQL: SQL | null = null;
-  private innerLimitSQL: SQL | null = null;
-
   public readonly mode: PgUnionAllMode;
 
-  private locker: PgLocker<this> = new PgLocker(this);
+  protected locker: PgLocker<this> = new PgLocker(this);
 
-  private memberDigests: MemberDigest<TTypeNames>[];
+  private memberDigests: Readonly<MutableMemberDigest<TTypeNames>>[] = [];
   private _limitToTypes: string[] | undefined;
 
-  constructor(
-    cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
-    mode?: PgUnionAllMode,
-  );
-  constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>);
-  constructor(
-    specOrCloneFrom:
-      | PgUnionAllStepConfig<TAttributes, TTypeNames>
-      | PgUnionAllStep<TAttributes, TTypeNames>,
-    overrideMode?: PgUnionAllMode,
-  ) {
-    super();
-    if (specOrCloneFrom instanceof PgUnionAllStep) {
-      const cloneFrom = specOrCloneFrom;
-      this.symbol = cloneFrom.symbol;
-      this.alias = cloneFrom.alias;
-      this.mode = overrideMode ?? cloneFrom.mode ?? "normal";
-      const cloneFromMatchingMode =
-        cloneFrom.mode === this.mode ? cloneFrom : null;
-      this.spec = cloneFrom.spec;
-      this.memberDigests = cloneDigests(cloneFrom.memberDigests);
-      this._limitToTypes = cloneFrom._limitToTypes
-        ? [...cloneFrom._limitToTypes]
-        : undefined;
+  /**
+   * Set this true if your query includes any `VOLATILE` function (including
+   * seemingly innocuous things such as `random()`) otherwise we might only
+   * call the relevant function once and re-use the result.
+   */
+  public forceIdentity = false;
 
-      cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency({
-          ...cloneFrom.getDepOptions(idx),
-          skipDeduplication: true,
-        });
-        if (myIdx !== idx) {
-          throw new Error(
-            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
-          );
-        }
+  static clone<
+    TAttributes extends string = string,
+    TTypeNames extends string = string,
+  >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
+    const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
+    const $clone = new PgUnionAllStep({
+      ...cloneFrom.spec,
+      mode,
+      members: [], // This will be overwritten later
+      forceIdentity: cloneFrom.forceIdentity,
+
+      _internalCloneSymbol: cloneFrom.symbol,
+      _internalCloneAlias: cloneFrom.alias,
+    });
+
+    if ($clone.dependencies.length !== 0) {
+      throw new Error(
+        `Should not have any dependencies yet: ${$clone.dependencies}`,
+      );
+    }
+
+    cloneFrom.dependencies.forEach((planId, idx) => {
+      const myIdx = $clone.addDependency({
+        ...cloneFrom.getDepOptions(idx),
+        skipDeduplication: true,
       });
+      if (myIdx !== idx) {
+        throw new Error(
+          `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+        );
+      }
+    });
 
-      this.selects = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.selects]
-        : [];
-      this.placeholders = [...cloneFrom.placeholders];
-      this.queryValues = [...cloneFrom.queryValues];
-      this.placeholderValues = new Map(cloneFrom.placeholderValues);
-      this.groups = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.groups]
-        : [];
-      this.havingConditions = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.havingConditions]
-        : [];
-      this.orders = cloneFromMatchingMode
-        ? [...cloneFromMatchingMode.orders]
-        : [];
-      this.orderSelectIndex = [...cloneFrom.orderSelectIndex];
-      this.ordersForCursor = [...cloneFrom.ordersForCursor];
+    $clone.contextId = cloneFrom.contextId;
+    $clone.memberDigests = cloneFrom.memberDigests.map(cloneMemberDigest);
+    if (cloneFrom._limitToTypes) {
+      $clone._limitToTypes = [...cloneFrom._limitToTypes];
+    }
+    $clone.placeholders = [...cloneFrom.placeholders];
+    $clone.deferreds = [...cloneFrom.deferreds];
 
-      this.executor = cloneFrom.executor;
-      this.contextId = cloneFrom.contextId;
+    $clone.executor = cloneFrom.executor;
 
-      this.isSyncAndSafe = cloneFrom.isSyncAndSafe;
-      this.alias = cloneFrom.alias;
+    $clone.isSyncAndSafe = cloneFrom.isSyncAndSafe;
+    $clone.alias = cloneFrom.alias;
+    if (cloneFromMatchingMode) {
+      $clone.selects = [...cloneFromMatchingMode.selects];
+      $clone.groups = [...cloneFromMatchingMode.groups];
+      $clone.havingConditions = [...cloneFromMatchingMode.havingConditions];
+      $clone.orderSpecs = [...cloneFromMatchingMode.orderSpecs];
+      $clone.firstStepId = cloneFromMatchingMode.firstStepId;
+      $clone.lastStepId = cloneFromMatchingMode.lastStepId;
+      $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
+      $clone.beforeStepId = cloneFromMatchingMode.beforeStepId;
+      $clone.afterStepId = cloneFromMatchingMode.afterStepId;
+      $clone.lowerIndexStepId = cloneFromMatchingMode.lowerIndexStepId;
+      $clone.upperIndexStepId = cloneFromMatchingMode.upperIndexStepId;
+      $clone.limitAndOffsetId = cloneFromMatchingMode.limitAndOffsetId;
+    }
 
-      this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
-      this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
-      this.fetchOneExtra = cloneFromMatchingMode
-        ? cloneFromMatchingMode.fetchOneExtra
-        : false;
-      this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
-      this.limitAndOffsetSQL = cloneFromMatchingMode
-        ? cloneFromMatchingMode.limitAndOffsetSQL
-        : null;
-      this.innerLimitSQL = cloneFromMatchingMode
-        ? cloneFromMatchingMode.innerLimitSQL
-        : null;
-      this.beforeStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.beforeStepId != null
-          ? cloneFromMatchingMode.beforeStepId
-          : null;
-      this.afterStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.afterStepId != null
-          ? cloneFromMatchingMode.afterStepId
-          : null;
-      this.lowerIndexStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.lowerIndexStepId != null
-          ? cloneFromMatchingMode.lowerIndexStepId
-          : null;
-      this.upperIndexStepId =
-        cloneFromMatchingMode && cloneFromMatchingMode.upperIndexStepId != null
-          ? cloneFromMatchingMode.upperIndexStepId
-          : null;
-      this.limitAndOffsetId =
-        cloneFromMatchingMode && cloneFromMatchingMode.limitAndOffsetId != null
-          ? cloneFromMatchingMode.limitAndOffsetId
-          : null;
-    } else {
-      const spec = specOrCloneFrom;
-      this.mode = overrideMode ?? spec.mode ?? "normal";
+    return $clone;
+  }
+
+  constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
+    super();
+    {
+      this.mode = spec.mode ?? "normal";
+
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
@@ -654,17 +583,6 @@ export class PgUnionAllStep<
       this.symbol = Symbol(spec.name ?? "union");
       this.alias = sql.identifier(this.symbol);
 
-      this.selects = [];
-      this.placeholders = [];
-      this.queryValues = [];
-      this.placeholderValues = new Map();
-      this.groups = [];
-      this.havingConditions = [];
-      this.orders = [];
-      this.orderSelectIndex = [];
-      this.ordersForCursor = [];
-
-      this.memberDigests = [];
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
@@ -751,48 +669,13 @@ on (${sql.indent(
         });
       }
     }
-
-    this.locker.afterLock("orderBy", () => {
-      this.withMyLayerPlan(() => {
-        this.ordersForCursor = [
-          ...this.orders,
-          {
-            fragment: sql`${this.alias}.${sql.identifier(
-              String(this.selectType()),
-            )}`,
-            codec: TYPES.text,
-            direction: "ASC",
-          },
-          {
-            fragment: sql`${this.alias}.${sql.identifier(
-              String(this.selectPk()),
-            )}`,
-            codec: TYPES.json,
-            direction: "ASC",
-          },
-        ];
-
-        if (this.beforeStepId != null) {
-          this.applyConditionFromCursor(
-            "before",
-            this.getDep(this.beforeStepId) as any,
-          );
-        }
-        if (this.afterStepId != null) {
-          this.applyConditionFromCursor(
-            "after",
-            this.getDep(this.afterStepId) as any,
-          );
-        }
-      });
-    });
   }
 
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
-    const $plan = new PgUnionAllStep(this, mode);
+    const $plan = PgUnionAllStep.clone(this, mode);
     // In case any errors are raised
     $plan.connectionDepId = $plan.addDependency($connection);
     return $plan;
@@ -819,7 +702,8 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(fragment: SQL): number {
+  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
+    const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
@@ -845,7 +729,11 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression(expression: SQL, codec: PgCodec): number {
+  selectExpression(
+    rawExpression: PgSQLCallbackOrDirect<SQL>,
+    codec: PgCodec,
+  ): number {
+    const expression = this.scopedSQL(rawExpression);
     const existingIndex = this.selects.findIndex(
       (s) =>
         s.type === "expression" && sql.isEquivalent(s.expression, expression),
@@ -865,16 +753,6 @@ on (${sql.indent(
     }
     const index = this.selects.push({ type: "type" }) - 1;
     return index;
-  }
-
-  selectOrderValue(orderIndex: number): number {
-    const orders = this.getOrderByWithoutType();
-    const order = orders[orderIndex];
-    if (!order) {
-      throw new Error("OOB!");
-    }
-    // Order is already selected
-    return this.orderSelectIndex[orderIndex];
   }
 
   /**
@@ -898,6 +776,15 @@ on (${sql.indent(
     return new PgUnionAllSingleStep(this, $row);
   }
 
+  public items() {
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgUnionAllRowsStep(this),
+    );
+  }
+
   listItem(itemPlan: ExecutableStep) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
@@ -909,12 +796,15 @@ on (${sql.indent(
     return pgPageInfo($connectionPlan);
   }
 
-  where(whereSpec: PgWhereConditionSpec<TAttributes>): void {
+  where(
+    rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add conditions once plan is locked ('where')`,
       );
     }
+    const whereSpec = this.scopedSQL(rawWhereSpec);
     for (const digest of this.memberDigests) {
       const { alias: tableAlias, symbol } = digest;
       if (sql.isSQL(whereSpec)) {
@@ -941,12 +831,12 @@ on (${sql.indent(
     return new PgConditionStep(this);
   }
 
-  groupBy(group: PgGroupSpec): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
-    this.groups.push(group);
+    this.groups.push(this.scopedSQL(group));
   }
 
   havingPlan(): PgConditionStep<this> {
@@ -961,7 +851,9 @@ on (${sql.indent(
     return new PgConditionStep(this, true);
   }
 
-  having(condition: PgHavingConditionSpec<string>): void {
+  having(
+    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>>,
+  ): void {
     if (this.locker.locked) {
       throw new Error(
         `${this}: cannot add having conditions once plan is locked ('having')`,
@@ -970,6 +862,7 @@ on (${sql.indent(
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add having to a non-aggregate query`);
     }
+    const condition = this.scopedSQL(rawCondition);
     if (sql.isSQL(condition)) {
       this.havingConditions.push(condition);
     } else {
@@ -989,556 +882,19 @@ on (${sql.indent(
       );
     }
     this.locker.assertParameterUnlocked("orderBy");
-    for (const digest of this.memberDigests) {
-      const { alias: tableAlias } = digest;
-      const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
-        digest,
-        orderSpec.attribute,
-      )}`;
-      digest.orders.push({
-        fragment: ident,
-        direction: orderSpec.direction,
-        codec: this.spec.attributes[orderSpec.attribute].codec,
-      });
-    }
-    const selectedIndex = this.select(orderSpec.attribute);
-    const orderIndex =
-      this.orders.push({
-        fragment: sql.identifier(String(selectedIndex)),
-        direction: orderSpec.direction,
-        codec: this.spec.attributes[orderSpec.attribute].codec,
-      }) - 1;
-    this.orderSelectIndex[orderIndex] = selectedIndex;
+    this.orderSpecs.push(orderSpec);
   }
 
   setOrderIsUnique() {
     // TODO: should we do something here to match pgSelect?
   }
 
-  private assertCursorPaginationAllowed(): void {
+  protected assertCursorPaginationAllowed(): void {
     if (this.mode === "aggregate") {
       throw new Error(
         "Cannot use cursor pagination on an aggregate PgSelectStep",
       );
     }
-  }
-
-  /**
-   * Someone (probably pageInfo) wants to know if there's more records. To
-   * determine this we fetch one extra record and then throw it away.
-   */
-  public hasMore(): ExecutableStep<boolean> {
-    this.fetchOneExtra = true;
-    return access(this, "hasMore", false);
-  }
-
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder(
-    $step: ExecutableStep,
-    codec: PgCodec,
-    alreadyEncoded?: boolean,
-  ): SQL;
-  public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec,
-    alreadyEncoded = false,
-  ): SQL {
-    if (this.locker.locked) {
-      throw new Error(`${this}: cannot add placeholders once plan is locked`);
-    }
-    if (this.placeholders.length >= 100000) {
-      throw new Error(
-        `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
-      );
-    }
-
-    const codec = overrideCodec ?? ("pgCodec" in $step ? $step.pgCodec : null);
-    if (!codec) {
-      throw new Error(
-        `Step ${$step} does not contain pgCodec information, please wrap ` +
-          `it in \`pgCast\`. E.g. \`pgCast($step, TYPES.boolean)\``,
-      );
-    }
-
-    const dependencyIndex = this.addDependency($step);
-    const symbol = Symbol(`step-${$step.id}`);
-    const sqlPlaceholder = sql.placeholder(symbol, UNHANDLED_PLACEHOLDER);
-    const p: PgUnionAllPlaceholder = {
-      dependencyIndex,
-      codec,
-      symbol,
-      alreadyEncoded,
-    };
-    this.placeholders.push(p);
-    // This allows us to replace the SQL that will be compiled, for example
-    // when we're inlining this into a parent query.
-    return sqlPlaceholder;
-  }
-
-  private applyConditionFromCursor(
-    beforeOrAfter: "before" | "after",
-    $parsedCursorPlan: LambdaStep<any, any[] | null>,
-  ): void {
-    const digest = this.getOrderByDigest();
-    const orders = this.getOrderBy();
-    const orderCount = orders.length;
-
-    // Cursor validity check; if we get inlined then this will be passed up
-    // to the parent so we can trust it.
-    if (this.connectionDepId === null) {
-      this.addDependency(
-        pgValidateParsedCursor(
-          $parsedCursorPlan,
-          digest,
-          orderCount,
-          beforeOrAfter,
-        ),
-      );
-    } else {
-      // To make the error be thrown in the right place, we should also add this error to our parent connection
-      const $connection = this.getDep(this.connectionDepId) as ConnectionStep<
-        any,
-        any,
-        any
-      >;
-      $connection.addValidation(() => {
-        return pgValidateParsedCursor(
-          $parsedCursorPlan,
-          digest,
-          orderCount,
-          beforeOrAfter,
-        );
-      });
-    }
-
-    if (orderCount === 0) {
-      // Natural pagination `['natural', N]`
-      const $n = access($parsedCursorPlan, [1]);
-      if (beforeOrAfter === "before") {
-        this.upperIndexStepId = this.addDependency($n);
-      } else {
-        this.lowerIndexStepId = this.addDependency($n);
-      }
-      return;
-    }
-
-    const identifierPlaceholders: SQL[] = [];
-    for (let i = 0; i < orderCount; i++) {
-      const order = this.orders[i];
-      if (i === orderCount - 1) {
-        // PK (within that polymorphic type)
-
-        identifierPlaceholders[i] = this.placeholder(
-          access($parsedCursorPlan, [i + 1]),
-          TYPES.json,
-          // NOTE: this is a JSON-encoded string containing all the PK values. We
-          // don't want to parse it and then re-stringify it, so we'll just feed
-          // it in as text and tell the system it has already been encoded:
-          true,
-        );
-      } else if (i === orderCount - 2) {
-        // Polymorphic type
-        identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), TYPES.text),
-          TYPES.text,
-        );
-      } else if (this.memberDigests.length > 0) {
-        const memberCodecs = this.memberDigests.map(
-          (d) => d.finalResource.codec,
-        );
-        const [, codec] = getFragmentAndCodecFromOrder(
-          this.alias,
-          order,
-          memberCodecs,
-        );
-        identifierPlaceholders[i] = this.placeholder(
-          toPg(access($parsedCursorPlan, [i + 1]), codec),
-          codec as PgCodec,
-        );
-      } else {
-        // No implementations?!
-      }
-    }
-
-    for (const digest of this.memberDigests) {
-      const { finalResource } = digest;
-      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
-      if (!pk) {
-        throw new Error("No primary key; this should have been caught earlier");
-      }
-      const max = orderCount - 1 + pk.attributes.length;
-      const pkPlaceholder = identifierPlaceholders[orderCount - 1];
-      const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
-      const condition = (i = 0): SQL => {
-        const order = digest.orders[i];
-        const [
-          orderFragment,
-          sqlValue,
-          direction,
-          nullable = false,
-          nulls = null,
-        ] = (() => {
-          if (i >= orderCount - 1) {
-            // PK
-            const pkIndex = i - (orderCount - 1);
-            const pkCol = pk.attributes[pkIndex];
-            return [
-              sql`${digest.alias}.${sql.identifier(pkCol)}`,
-              sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
-                pkAttributes[pkCol].codec.sqlType
-              }`,
-              "ASC",
-              false,
-            ];
-          } else if (i === orderCount - 2) {
-            // Type
-            return [
-              sql.literal(digest.member.typeName),
-              identifierPlaceholders[i],
-              "ASC",
-              false,
-            ];
-          } else {
-            const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
-              this.alias,
-              order,
-              digest.finalResource.codec,
-            );
-            return [
-              frag,
-              identifierPlaceholders[i],
-              order.direction,
-              isNullable,
-              order.nulls,
-            ];
-          }
-        })();
-
-        // For the truth-table of this code, have a look at this spreadsheet:
-        // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
-
-        const gt =
-          (direction === "ASC" && beforeOrAfter === "after") ||
-          (direction === "DESC" && beforeOrAfter === "before");
-
-        const nullsFirst =
-          nulls === "FIRST"
-            ? true
-            : nulls === "LAST"
-            ? false
-            : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-              // ASC = NULLS LAST
-              direction === "DESC";
-
-        // Simple less than or greater than
-        let fragment = sql`${orderFragment} ${
-          gt ? sql`>` : sql`<`
-        } ${sqlValue}`;
-
-        // Nullable, so now handle if one is null but the other isn't
-        if (nullable) {
-          const useAIsNullAndBIsNotNull =
-            (nullsFirst && beforeOrAfter === "after") ||
-            (!nullsFirst && beforeOrAfter === "before");
-          const oneIsNull = useAIsNullAndBIsNotNull
-            ? sql`${orderFragment} is null and ${sqlValue} is not null`
-            : sql`${orderFragment} is not null and ${sqlValue} is null`;
-          fragment = sql`((${fragment}) or (${oneIsNull}))`;
-        }
-
-        // Finally handle if they're equal - recurse
-        if (i < max - 1) {
-          const equals = nullable ? sql`is not distinct from` : sql`=`;
-          const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
-          fragment = sql`(${fragment})
-or (
-${sql.indent`${aEqualsB}
-and ${condition(i + 1)}`}
-)`;
-        }
-
-        return sql.parens(sql.indent(fragment));
-      };
-
-      const finalCondition = condition();
-      digest.conditions.push(finalCondition);
-    }
-  }
-
-  parseCursor(
-    $cursorPlan: __InputStaticLeafStep<string>,
-  ): PgSelectParsedCursorStep | null {
-    if ($cursorPlan.evalIs(null)) {
-      return null;
-    } else if ($cursorPlan.evalIs(undefined)) {
-      return null;
-    }
-
-    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
-    return $parsedCursorPlan;
-  }
-
-  setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.afterStepId = this.addDependency($parsedCursorPlan);
-  }
-
-  setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
-    this.beforeStepId = this.addDependency($parsedCursorPlan);
-  }
-
-  /**
-   * If `last` is in use then we reverse the order from the database and then
-   * re-reverse it in JS-land.
-   */
-  private shouldReverseOrder() {
-    this.locker.lockParameter("first");
-    this.locker.lockParameter("last");
-    return (
-      this.first == null &&
-      this.last != null &&
-      this.lowerIndexStepId == null &&
-      this.upperIndexStepId == null
-    );
-  }
-
-  public setFirst(first: InputStep | number): this {
-    this.locker.assertParameterUnlocked("first");
-    // PERF: don't eval
-    this.first = typeof first === "number" ? first : first.eval() ?? null;
-    this.locker.lockParameter("first");
-    return this;
-  }
-
-  public setLast(last: InputStep | number): this {
-    this.assertCursorPaginationAllowed();
-    this.locker.assertParameterUnlocked("orderBy");
-    this.locker.assertParameterUnlocked("last");
-    this.last = typeof last === "number" ? last : last.eval() ?? null;
-    this.locker.lockParameter("last");
-    return this;
-  }
-
-  public setOffset(offset: InputStep | number): this {
-    this.locker.assertParameterUnlocked("offset");
-    this.offset = typeof offset === "number" ? offset : offset.eval() ?? null;
-    if (this.offset !== null) {
-      this.locker.lockParameter("last");
-      if (this.last != null) {
-        throw new SafeError("Cannot use 'offset' with 'last'");
-      }
-    }
-    this.locker.lockParameter("offset");
-    return this;
-  }
-
-  private planLimitAndOffset() {
-    if (this.lowerIndexStepId != null || this.upperIndexStepId != null) {
-      /*
-       * When using cursor-base pagination with 'natural' cursors, we are actually
-       * applying limit/offset under the hood (presumably because we're paginating
-       * something that has no explicit order, like a function).
-       *
-       * If you have:
-       * - first: 3
-       * - after: ['natural', 4]
-       *
-       * Then we want `limit 3 offset 4`.
-       * With `fetchOneExtra` it'd be `limit 4 offset 4`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 4`
-       * With `fetchOneExtra` it'd be `limit 3 offset 3`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 3]
-       *
-       * We want `limit 2`
-       * With `fetchOneExtra` it'd still be `limit 2`.
-       *
-       * For:
-       * - last: 2
-       * - before: ['natural', 4]
-       *
-       * We want `limit 2 offset 1`
-       * With `fetchOneExtra` it'd be `limit 3`.
-       *
-       * Using `offset` with `after`/`before` is forbidden, so we do not need to consider that.
-       *
-       * For:
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 4 offset 2`
-       * With `fetchOneExtra` it'd be `limit 4 offset 2` still.
-       *
-       * For:
-       * - first: 2
-       * - after: ['natural', 2]
-       * - before: ['natural', 6]
-       *
-       * We want `limit 2 offset 2`
-       * With `fetchOneExtra` it'd be `limit 3 offset 2` still.
-       */
-
-      const $lower =
-        this.lowerIndexStepId != null
-          ? (this.getDep(this.lowerIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
-      const $upper =
-        this.upperIndexStepId != null
-          ? (this.getDep(this.upperIndexStepId) as ExecutableStep<
-              number | null | undefined
-            >)
-          : constant(null);
-
-      const limitAndOffsetLambda = lambda(
-        [$lower, $upper],
-        ([cursorLower, cursorUpper]) => {
-          /** lower bound - exclusive (1-indexed) */
-          let lower = 0;
-          /** upper bound - exclusive (1-indexed) */
-          let upper = Infinity;
-
-          // Apply 'after', if present
-          if (cursorLower != null) {
-            lower = Math.max(0, cursorLower);
-          }
-
-          // Apply 'before', if present
-          if (cursorUpper != null) {
-            upper = cursorUpper;
-          }
-
-          // Cannot go beyond these bounds
-          const maxUpper = upper;
-
-          // Apply 'first', if present
-          if (this.first != null) {
-            upper = Math.min(upper, lower + this.first + 1);
-          }
-
-          // Apply 'last', if present
-          if (this.last != null) {
-            lower = Math.max(0, lower, upper - this.last - 1);
-          }
-
-          // Apply 'offset', if present
-          if (this.offset != null && this.offset > 0) {
-            lower = Math.min(lower + this.offset, maxUpper);
-            upper = Math.min(upper + this.offset, maxUpper);
-          }
-
-          // If 'fetch one extra', adjust:
-          if (this.fetchOneExtra) {
-            if (this.first != null) {
-              upper = upper + 1;
-            } else if (this.last != null) {
-              lower = Math.max(0, lower - 1);
-            }
-          }
-
-          /** lower, but 0-indexed and inclusive */
-          const lower0 = lower - 1 + 1;
-          /** upper, but 0-indexed and inclusive */
-          const upper0 = upper - 1 - 1;
-
-          // Calculate the final limit/offset
-          const limit = isFinite(upper0)
-            ? Math.max(0, upper0 - lower0 + 1)
-            : null;
-          const offset = lower0;
-
-          return [limit, offset];
-        },
-        true,
-      );
-      this.limitAndOffsetId = this.addDependency(limitAndOffsetLambda);
-      const $limitLambda = access<number>(limitAndOffsetLambda, [0]);
-      const $offsetLambda = access<number>(limitAndOffsetLambda, [1]);
-      const limitPlusOffsetLambda = lambda([$limitLambda, $offsetLambda], add);
-      this.limitAndOffsetSQL = sql`\nlimit ${this.placeholder(
-        $limitLambda,
-        TYPES.int,
-      )}\noffset ${this.placeholder($offsetLambda, TYPES.int)}`;
-      this.innerLimitSQL = sql`\nlimit ${this.placeholder(
-        limitPlusOffsetLambda,
-        TYPES.int,
-      )}`;
-    } else {
-      const limit =
-        this.first != null
-          ? sql`\nlimit ${sql.literal(
-              this.first + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : this.last != null
-          ? sql`\nlimit ${sql.literal(
-              this.last + (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-      const offset =
-        this.offset != null
-          ? sql`\noffset ${sql.literal(this.offset)}`
-          : sql.blank;
-      this.limitAndOffsetSQL = sql`${limit}${offset}`;
-      this.innerLimitSQL =
-        this.first != null || this.last != null
-          ? sql`\nlimit ${sql.literal(
-              (this.first ?? this.last ?? 0) +
-                (this.offset ?? 0) +
-                (this.fetchOneExtra ? 1 : 0),
-            )}`
-          : sql.blank;
-    }
-  }
-
-  /**
-   * So we can quickly detect if cursors are invalid we use this digest,
-   * passing this check does not mean that the cursor is valid but it at least
-   * catches common user errors.
-   */
-  public getOrderByDigest() {
-    this.locker.lockParameter("orderBy");
-    if (this.ordersForCursor.length === 0 || this.memberDigests.length === 0) {
-      return "natural";
-    }
-    // The security of this hash is unimportant; the main aim is to protect the
-    // user from themself. If they bypass this, that's their problem (it will
-    // not introduce a security issue).
-    const hash = createHash("sha256");
-    const memberCodecs = this.memberDigests.map(
-      (digest) => digest.finalResource.codec,
-    );
-    hash.update(
-      JSON.stringify(
-        this.ordersForCursor.map((o) => {
-          const [frag] = getFragmentAndCodecFromOrder(
-            this.alias,
-            o,
-            memberCodecs,
-          );
-          return sql.compile(frag, {
-            placeholderValues: this.placeholderValues,
-          }).text;
-        }),
-      ),
-    );
-    const digest = hash.digest("hex").slice(0, 10);
-    return digest;
-  }
-
-  public getOrderBy(): ReadonlyArray<PgOrderFragmentSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.ordersForCursor;
-  }
-  public getOrderByWithoutType(): ReadonlyArray<PgOrderFragmentSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.orders;
   }
 
   /** @experimental */
@@ -1558,10 +914,27 @@ and ${condition(i + 1)}`}
     }
     if (this.memberDigests.length === 0) {
       // We have no implementations, we'll never return anything
-      return constant([], false);
+      return constant(NO_ROWS, false);
     }
 
-    this.planLimitAndOffset();
+    // TODO: validate the parsed cursor and throw error in connection if it
+    // fails. I'm not sure, but perhaps we can add this step itself (or a
+    // derivative thereof) as a dependency of the connection - that way, if
+    // this step throws (e.g. due to invalid cursor) then so does the
+    // connection.
+    /*
+      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+        this.connectionDepId,
+      );
+      $connection.addValidation(() => {
+        return pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        );
+      });
+      */
 
     // We must lock here otherwise we might try and create cursor validation
     // plans during `finalize`
@@ -1570,112 +943,500 @@ and ${condition(i + 1)}`}
     return this;
   }
 
+  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+    this.needsCursor = true;
+    return access(this, "cursorDetails");
+  }
+
+  private typeIdx: number | null = null;
+  // private reverse: boolean | null = null;
   finalize() {
-    this.locker.lock();
+    // this.locker.lock();
+
     const normalMode = this.mode === "normal";
-    const typeIdx = normalMode ? this.selectType() : null;
-    const reverse = normalMode ? this.shouldReverseOrder() : null;
+    this.typeIdx = normalMode ? this.selectType() : null;
+    // this.reverse = normalMode ? this.shouldReverseOrder() : null;
 
-    const memberCodecs = this.memberDigests.map(
-      (digest) => digest.finalResource.codec,
+    super.finalize();
+  }
+
+  // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastValuesList<any>> {
+    const {
+      indexMap,
+      values,
+      extra: { eventEmitter },
+    } = executionDetails;
+    const { fetchOneExtra } = this;
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      shouldReverseOrder,
+      name,
+      queryValues,
+      first,
+      last,
+      cursorDetails,
+    } = buildTheQuery<TAttributes, TTypeNames>({
+      executionDetails,
+      placeholders: this.placeholders,
+      deferreds: this.deferreds,
+      firstStepId: this.firstStepId,
+      lastStepId: this.lastStepId,
+      offsetStepId: this.offsetStepId,
+      afterStepId: this.afterStepId,
+      beforeStepId: this.beforeStepId,
+      forceIdentity: this.forceIdentity,
+      havingConditions: this.havingConditions,
+      mode: this.mode,
+      alias: this.alias,
+      hasSideEffects: this.hasSideEffects,
+      groups: this.groups,
+      orderSpecs: this.orderSpecs,
+      selects: this.selects,
+      typeIdx: this.typeIdx,
+      attributes: this.spec.attributes,
+      memberDigests: this.memberDigests,
+      fetchOneExtra,
+      needsCursor: this.needsCursor,
+    });
+
+    if (first === 0 || last === 0) {
+      return indexMap(() => NO_ROWS);
+    }
+
+    const contextDep = values[this.contextId];
+    if (contextDep === undefined) {
+      throw new Error("We have no context dependency?");
+    }
+
+    const specs = indexMap<PgExecutorInput<any>>((i) => {
+      const context = contextDep.at(i);
+      return {
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? queryValues.map(({ dependencyIndex, codec, alreadyEncoded }) => {
+                const val = values[dependencyIndex].at(i);
+                return val == null
+                  ? null
+                  : alreadyEncoded
+                  ? val
+                  : codec.toPg(val);
+              })
+            : EMPTY_ARRAY,
+      };
+    });
+    const executeMethod =
+      this.operationPlan.operation.operation === "query"
+        ? "executeWithCache"
+        : "executeWithoutCache";
+    const executionResult = await this.executor[executeMethod](specs, {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      eventEmitter,
+      useTransaction: false,
+    });
+    // debugExecute("%s; result: %c", this, executionResult);
+
+    return executionResult.values.map((allVals) => {
+      if (isPromiseLike(allVals)) {
+        // Must be an error!
+        return allVals;
+      } else if (allVals == null) {
+        return NO_ROWS;
+      }
+      const limit = first ?? last;
+      const firstAndLast = first != null && last != null && last < first;
+      const hasMore = fetchOneExtra && limit != null && allVals.length > limit;
+      const trimFromStart =
+        !shouldReverseOrder && last != null && first == null;
+      const limitedRows = hasMore
+        ? trimFromStart
+          ? allVals.slice(Math.max(0, allVals.length - limit!))
+          : allVals.slice(0, limit!)
+        : allVals;
+      const slicedRows =
+        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+      const orderedRows = shouldReverseOrder
+        ? reverseArray(slicedRows)
+        : slicedRows;
+      return {
+        hasMore,
+        items: orderedRows,
+        cursorDetails,
+      };
+    });
+  }
+
+  [$$toSQL]() {
+    return this.alias;
+  }
+
+  // TODO: Delete these both from here and from pgStmt
+  protected shouldReverseOrderId: number | null = null;
+  protected limitAndOffsetSQL: SQL | null = null;
+}
+
+export class PgUnionAllRowsStep<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgUnionAllRowsStep",
+  };
+
+  constructor($pgUnionAll: PgUnionAllStep<TAttributes, TTypeNames>) {
+    super();
+    this.addDependency($pgUnionAll);
+  }
+  public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
+    return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    return this.getClassStep().listItem(itemPlan);
+  }
+
+  public deduplicate(_peers: readonly ExecutableStep[]) {
+    // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
+    return _peers;
+  }
+
+  optimize() {
+    return access(this.getClassStep(), "items");
+  }
+
+  execute(executionDetails: ExecutionDetails) {
+    const value = executionDetails.values[0];
+    return executionDetails.indexMap((i) => value.at(i).items);
+  }
+}
+
+export function pgUnionAll<
+  TAttributes extends string,
+  TTypeNames extends string,
+>(
+  spec: PgUnionAllStepConfig<TAttributes, TTypeNames>,
+): PgUnionAllStep<TAttributes, TTypeNames> {
+  return new PgUnionAllStep(spec);
+}
+exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");
+
+interface PgUnionAllQueryInfo<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends PgStmtCommonQueryInfo {
+  readonly mode: PgUnionAllMode;
+  readonly typeIdx: number | null;
+  readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;
+  readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
+
+  readonly selects: ReadonlyArray<PgUnionAllStepSelect<TAttributes>>;
+  readonly orderSpecs: ReadonlyArray<PgUnionAllStepOrder<TAttributes>>;
+}
+interface MutablePgUnionAllQueryInfo<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+> extends PgUnionAllQueryInfo<TAttributes, TTypeNames>,
+    MutablePgStmtCommonQueryInfo {
+  readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
+
+  readonly orders: Array<PgOrderFragmentSpec>;
+  cursorLower: Maybe<number>;
+  cursorUpper: Maybe<number>;
+  ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
+  typeIdx: number | null;
+}
+
+function buildTheQuery<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+>(rawInfo: PgUnionAllQueryInfo<TAttributes, TTypeNames>): QueryBuildResult {
+  const info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames> = {
+    ...rawInfo,
+
+    // Copy and make mutable
+    selects: [...rawInfo.selects],
+    orders: [],
+    groups: [...rawInfo.groups],
+    havingConditions: [...rawInfo.havingConditions],
+    memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
+
+    // Will be populated below
+    ordersForCursor: undefined as never,
+    cursorDigest: null,
+    cursorIndicies: rawInfo.needsCursor ? [] : null,
+
+    // Will be populated by applyConditionFromCursor
+    cursorLower: null,
+    cursorUpper: null,
+
+    // Will be populated by applyCommonPaginationStuff
+    first: null,
+    last: null,
+    offset: null,
+    shouldReverseOrder: false,
+  };
+  const { values, count } = info.executionDetails;
+
+  function selectAndReturnIndex(expression: SQL): number {
+    const existingIndex = info.selects.findIndex(
+      (s) =>
+        s.type === "outerExpression" &&
+        sql.isEquivalent(s.expression, expression),
     );
+    if (existingIndex >= 0) return existingIndex;
+    return info.selects.push({ type: "outerExpression", expression }) - 1;
+  }
+  function selectAttribute(key: TAttributes): number {
+    const existingIndex = info.selects.findIndex(
+      (s) => s.type === "attribute" && s.attribute === key,
+    );
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
+    const index =
+      info.selects.push({
+        type: "attribute",
+        attribute: key,
+      }) - 1;
+    return index;
+  }
+  function selectType() {
+    if (info.typeIdx != null) return info.typeIdx;
+    const existingIndex = info.selects.findIndex((s) => s.type === "type");
+    if (existingIndex >= 0) return existingIndex;
+    info.typeIdx = info.selects.push({ type: "type" }) - 1;
+    return info.typeIdx;
+  }
+  function selectPk(): number {
+    const existingIndex = info.selects.findIndex((s) => s.type === "pk");
+    if (existingIndex >= 0) return existingIndex;
+    return info.selects.push({ type: "pk" }) - 1;
+  }
 
-    const makeQuery = () => {
-      const tables: SQL[] = [];
+  // TODO: evaluate runtime orders, conditions, etc here
 
-      for (const digest of this.memberDigests) {
-        const {
-          sqlSource,
-          alias: tableAlias,
-          conditions,
-          orders,
-          finalResource,
-        } = digest;
+  for (const orderSpec of info.orderSpecs) {
+    if (!info.attributes) {
+      throw new Error(`Cannot order without attributes`);
+    }
+    for (const digest of info.memberDigests) {
+      const { alias: tableAlias } = digest;
+      const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+        digest,
+        orderSpec.attribute,
+      )}`;
+      digest.orders.push({
+        fragment: ident,
+        direction: orderSpec.direction,
+        codec: info.attributes[orderSpec.attribute].codec,
+      });
+    }
+    const selectedIndex = selectAttribute(orderSpec.attribute);
+    info.orders.push({
+      fragment: sql.identifier(String(selectedIndex)),
+      direction: orderSpec.direction,
+      codec: info.attributes[orderSpec.attribute].codec,
+    });
+    if (info.cursorIndicies != null) {
+      info.cursorIndicies.push({
+        index: selectedIndex,
+        codec: TYPES.text,
+      });
+    }
+  }
 
-        const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
-        if (!pk) {
-          throw new Error(
-            `No PK for ${digest.member.typeName} resource in ${this}`,
-          );
-        }
-        const midSelects: SQL[] = [];
-        const innerSelects = this.selects
-          .map((s, selectIndex) => {
-            const r = ((): [SQL, PgCodec] | null => {
-              switch (s.type) {
-                case "attribute": {
-                  if (!this.spec.attributes) {
-                    throw new Error(
-                      `${this}: cannot select an attribute when there's no shared attributes`,
-                    );
-                  }
-                  const attr = this.spec.attributes[s.attribute];
-                  return [
-                    sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
-                      digest,
-                      s.attribute,
-                    )}`,
-                    attr.codec,
-                  ];
-                }
-                case "type": {
-                  return [sql.literal(digest.member.typeName), TYPES.text];
-                }
-                case "pk": {
-                  return [
-                    sql`json_build_array(${sql.join(
-                      pk.attributes.map(
-                        (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
-                      ),
-                      ",",
-                    )})`,
-                    TYPES.json,
-                  ];
-                }
-                case "expression": {
-                  return [s.expression, s.codec];
-                }
-                case "outerExpression": {
-                  // Only applies on outside
-                  return null;
-                }
-                case "order": {
-                  const orders = this.getOrderByWithoutType();
-                  const orderSpec = orders[s.orderIndex];
-                  const [frag, codec] = getFragmentAndCodecFromOrder(
-                    this.alias,
-                    orderSpec,
-                    digest.finalResource.codec,
+  if (info.cursorIndicies != null) {
+    info.cursorIndicies.push({
+      index: selectType(),
+      codec: TYPES.text,
+    });
+    info.cursorIndicies.push({
+      index: selectPk(),
+      codec: TYPES.text,
+    });
+  }
+
+  if (isDev) Object.freeze(info.orders);
+
+  info.ordersForCursor = [
+    ...info.orders,
+    {
+      fragment: sql`${info.alias}.${sql.identifier(String(selectType()))}`,
+      codec: TYPES.text,
+      direction: "ASC",
+    },
+    {
+      fragment: sql`${info.alias}.${sql.identifier(String(selectPk()))}`,
+      codec: TYPES.json,
+      direction: "ASC",
+    },
+  ];
+  if (isDev) Object.freeze(info.ordersForCursor);
+
+  // afterLock("orderBy"): Now the runtime orders/etc have been performed,
+
+  const after = getUnary<any[] | null>(values, info.afterStepId);
+  const before = getUnary<any[] | null>(values, info.beforeStepId);
+  if (info.needsCursor || after != null || before != null) {
+    info.cursorDigest = getOrderByDigest(info);
+  }
+
+  // apply conditions from the cursor
+
+  applyConditionFromCursor(info, "after", after);
+  applyConditionFromCursor(info, "before", before);
+
+  applyCommonPaginationStuff(info);
+
+  if (isDev) {
+    info.memberDigests.forEach((d) => {
+      Object.freeze(d.conditions);
+      Object.freeze(d.orders);
+      Object.freeze(d);
+    });
+    Object.freeze(info.memberDigests);
+    // Object.freeze(info.selects);
+    Object.freeze(info.groups);
+    Object.freeze(info.havingConditions);
+  }
+
+  /****************************************
+   *                                      *
+   *      ALL MUTATION NOW COMPLETE       *
+   *                                      *
+   ****************************************/
+  // Except we still do selectAndReturnIndex() below, and maybe some other stuff?
+
+  const {
+    mode,
+    typeIdx,
+    alias,
+    attributes,
+    forceIdentity,
+    memberDigests,
+    selects,
+    orders,
+    groups,
+    havingConditions,
+    hasSideEffects,
+    ordersForCursor,
+    shouldReverseOrder,
+    cursorDigest,
+    cursorIndicies,
+  } = info;
+
+  const reverse = mode === "normal" ? shouldReverseOrder : null;
+
+  const memberCodecs = memberDigests.map(
+    (digest) => digest.finalResource.codec,
+  );
+  const makeQuery = () => {
+    const tables: SQL[] = [];
+
+    const [limitAndOffsetSQL, innerLimitSQL] =
+      calculateLimitAndOffsetSQLFromInfo(info);
+
+    for (const memberDigest of memberDigests) {
+      const {
+        sqlSource,
+        alias: tableAlias,
+        conditions,
+        orders,
+        finalResource,
+      } = memberDigest;
+
+      const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
+      if (!pk) {
+        throw new Error(`No PK for ${memberDigest.member.typeName} resource`);
+      }
+      const midSelects: SQL[] = [];
+      const innerSelects = selects
+        .map((s, selectIndex) => {
+          const r = ((): [SQL, PgCodec] | null => {
+            switch (s.type) {
+              case "attribute": {
+                if (!attributes) {
+                  throw new Error(
+                    `Cannot select an attribute when there's no shared attributes`,
                   );
-                  return [frag, codec];
                 }
-                default: {
-                  const never: never = s;
-                  throw new Error(`Couldn't match ${(never as any).type}`);
-                }
+                const attr = attributes[s.attribute];
+                return [
+                  sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+                    memberDigest,
+                    s.attribute,
+                  )}`,
+                  attr.codec,
+                ];
               }
-            })();
-            if (!r) {
-              return r;
+              case "type": {
+                return [sql.literal(memberDigest.member.typeName), TYPES.text];
+              }
+              case "pk": {
+                return [
+                  sql`json_build_array(${sql.join(
+                    pk.attributes.map(
+                      (c) => sql`(${tableAlias}.${sql.identifier(c)})::text`,
+                    ),
+                    ",",
+                  )})`,
+                  TYPES.json,
+                ];
+              }
+              case "expression": {
+                return [s.expression, s.codec];
+              }
+              case "outerExpression": {
+                // Only applies on outside
+                return null;
+              }
+              case "order": {
+                const orderSpec = orders[s.orderIndex];
+                const [frag, codec] = getFragmentAndCodecFromOrder(
+                  alias,
+                  orderSpec,
+                  memberDigest.finalResource.codec,
+                );
+                return [frag, codec];
+              }
+              default: {
+                const never: never = s;
+                throw new Error(`Couldn't match ${(never as any).type}`);
+              }
             }
-            const [frag, _codec] = r;
-            const alias = String(selectIndex);
-            const ident = sql.identifier(alias);
-            const fullIdent = sql`${tableAlias}.${ident}`;
-            midSelects.push(fullIdent);
-            return sql`${frag} as ${ident}`;
-          })
-          .filter(isNotNullish);
-        midSelects.push(rowNumberIdent);
+          })();
+          if (!r) {
+            return r;
+          }
+          const [frag, _codec] = r;
+          const identAlias = String(selectIndex);
+          const ident = sql.identifier(identAlias);
+          const fullIdent = sql`${tableAlias}.${ident}`;
+          midSelects.push(fullIdent);
+          return sql`${frag} as ${ident}`;
+        })
+        .filter(isNotNullish);
+      midSelects.push(rowNumberIdent);
 
-        const ascOrDesc = this.shouldReverseOrder() ? sql`desc` : sql`asc`;
-        const pkOrder = sql.join(
-          pk.attributes.map(
-            (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
-          ),
-          ",\n",
-        );
-        const orderBy = sql`order by
+      const ascOrDesc = reverse ? sql`desc` : sql`asc`;
+      const pkOrder = sql.join(
+        pk.attributes.map(
+          (c) => sql`${tableAlias}.${sql.identifier(c)} ${ascOrDesc}`,
+        ),
+        ",\n",
+      );
+      const orderBy = sql`order by
 ${sql.indent`${
   orders.length > 0
     ? sql`${sql.join(
@@ -1696,13 +1457,13 @@ ${sql.indent`${
     : sql.blank
 }${pkOrder}`}`;
 
-        innerSelects.push(
-          sql`row_number() over (${sql.indent(orderBy)}) as ${rowNumberIdent}`,
-        );
+      innerSelects.push(
+        sql`row_number() over (${sql.indent(orderBy)}) as ${rowNumberIdent}`,
+      );
 
-        // Can't order individual selects in a `union all` so we're using
-        // subqueries to do so.
-        const innerQuery = sql.indent`
+      // Can't order individual selects in a `union all` so we're using
+      // subqueries to do so.
+      const innerQuery = sql.indent`
 select
 ${sql.indent(sql.join(innerSelects, ",\n"))}
 from ${sqlSource}
@@ -1712,94 +1473,90 @@ ${
     : sql.blank
 }\
 ${orderBy}\
-${this.innerLimitSQL!}
+${innerLimitSQL}
 `;
 
-        // Relies on Postgres maintaining the order of the subquery
-        const query = sql.indent`\
+      // Relies on Postgres maintaining the order of the subquery
+      const query = sql.indent`\
 select
 ${sql.indent(sql.join(midSelects, ",\n"))}
 from (${innerQuery}) as ${tableAlias}\
 `;
-        tables.push(query);
-      }
+      tables.push(query);
+    }
 
-      const outerSelects = this.selects.map((select, i) => {
-        if (select.type === "outerExpression") {
-          return sql`${select.expression} as ${sql.identifier(String(i))}`;
-        } else if (this.mode === "normal") {
-          const sqlSrc = sql`${this.alias}.${sql.identifier(String(i))}`;
-          let codec: PgCodec;
-          let guaranteedNotNull: boolean | undefined;
-          switch (select.type) {
-            case "type": {
-              codec = TYPES.text;
-              break;
-            }
-            case "pk": {
-              codec = TYPES.json;
-              guaranteedNotNull = true;
-              break;
-            }
-            case "order": {
-              const order = this.getOrderBy()[select.orderIndex];
-              codec = getFragmentAndCodecFromOrder(
-                this.alias,
-                order,
-                memberCodecs,
-              )[1];
-              guaranteedNotNull = order.nullable === false;
-              break;
-            }
-            case "attribute": {
-              const attr = this.spec.attributes![select.attribute];
-              codec = attr.codec;
-              guaranteedNotNull = attr.notNull;
-              break;
-            }
-            default: {
-              codec = select.codec;
-            }
+    const outerSelects = selects.map((select, i) => {
+      if (select.type === "outerExpression") {
+        return sql`${select.expression} as ${sql.identifier(String(i))}`;
+      } else if (mode === "normal") {
+        const sqlSrc = sql`${alias}.${sql.identifier(String(i))}`;
+        let codec: PgCodec;
+        let guaranteedNotNull: boolean | undefined;
+        switch (select.type) {
+          case "type": {
+            codec = TYPES.text;
+            break;
           }
-          return sql`${
-            codec.castFromPg?.(sqlSrc, guaranteedNotNull || codec.notNull) ??
-            sql`${sqlSrc}::text`
-          } as ${sql.identifier(String(i))}`;
-        } else {
-          // PERF: eradicate this (aggregate mode) without breaking arrayMode
-          // tuple numbering
-          return sql`null as ${sql.identifier(String(i))}`;
+          case "pk": {
+            codec = TYPES.json;
+            guaranteedNotNull = true;
+            break;
+          }
+          case "order": {
+            const order = ordersForCursor[select.orderIndex];
+            codec = getFragmentAndCodecFromOrder(alias, order, memberCodecs)[1];
+            guaranteedNotNull = order.nullable === false;
+            break;
+          }
+          case "attribute": {
+            const attr = attributes![select.attribute];
+            codec = attr.codec;
+            guaranteedNotNull = attr.notNull;
+            break;
+          }
+          default: {
+            codec = select.codec;
+          }
         }
-      });
+        return sql`${
+          codec.castFromPg?.(sqlSrc, guaranteedNotNull || codec.notNull) ??
+          sql`${sqlSrc}::text`
+        } as ${sql.identifier(String(i))}`;
+      } else {
+        // PERF: eradicate this (aggregate mode) without breaking arrayMode
+        // tuple numbering
+        return sql`null as ${sql.identifier(String(i))}`;
+      }
+    });
 
-      const unionGroupBy =
-        this.mode === "aggregate" && this.groups.length > 0
-          ? sql`group by
+    const unionGroupBy =
+      mode === "aggregate" && groups.length > 0
+        ? sql`group by
 ${sql.indent(
   sql.join(
-    this.groups.map((g) => g.fragment),
+    groups.map((g) => g.fragment),
     ",\n",
   ),
 )}
 `
-          : sql.blank;
+        : sql.blank;
 
-      const unionHaving =
-        this.mode === "aggregate" && this.havingConditions.length > 0
-          ? sql`having
-${sql.indent(sql.join(this.havingConditions, ",\n"))}
+    const unionHaving =
+      mode === "aggregate" && havingConditions.length > 0
+        ? sql`having
+${sql.indent(sql.join(havingConditions, ",\n"))}
 `
-          : sql.blank;
+        : sql.blank;
 
-      const unionOrderBy =
-        this.mode === "aggregate"
-          ? sql.blank
-          : sql`\
+    const unionOrderBy =
+      mode === "aggregate"
+        ? sql.blank
+        : sql`\
 order by${sql.indent`
 ${
-  this.orders.length
+  orders.length
     ? sql`${sql.join(
-        this.orders.map((o) => {
+        orders.map((o) => {
           return sql`${o.fragment} ${
             Number(o.direction === "DESC") ^ Number(reverse)
               ? sql`desc`
@@ -1815,9 +1572,9 @@ ${rowNumberIdent} asc\
 `}
 `;
 
-      // Union must be ordered _before_ applying `::text`/etc transforms to
-      // select, so we wrap this with another select.
-      const unionQuery = sql.indent`
+    // Union must be ordered _before_ applying `::text`/etc transforms to
+    // select, so we wrap this with another select.
+    const unionQuery = sql.indent`
 ${sql.join(
   tables,
   `
@@ -1825,234 +1582,347 @@ union all
 `,
 )}
 ${unionOrderBy}\
-${this.limitAndOffsetSQL!}
+${limitAndOffsetSQL}
 `;
 
-      // Adds all the `::text`/etc casting
-      const innerQuery = sql`\
+    // Adds all the `::text`/etc casting
+    const innerQuery = sql`\
 select
 ${sql.indent(sql.join(outerSelects, ",\n"))}
-from (${unionQuery}) ${this.alias}
+from (${unionQuery}) ${alias}
 ${unionGroupBy}\
 ${unionHaving}\
 `;
-      return innerQuery;
-    };
+    return innerQuery;
+  };
 
-    const { text, rawSqlValues, identifierIndex } = ((): {
-      text: string;
-      rawSqlValues: SQLRawValue[];
-      textForSingle?: string;
-      identifierIndex: number | null;
-    } => {
-      if (this.queryValues.length > 0 || this.placeholders.length > 0) {
-        const wrapperSymbol = Symbol("union_result");
-        const wrapperAlias = sql.identifier(wrapperSymbol);
-        const identifiersSymbol = Symbol("union_identifiers");
-        const identifiersAlias = sql.identifier(identifiersSymbol);
-        this.placeholders.forEach((placeholder) => {
-          // NOTE: we're NOT adding to `this.identifierMatches`.
+  const { text, rawSqlValues, identifierIndex, queryValues } = ((): {
+    text: string;
+    rawSqlValues: SQLRawValue[];
+    identifierIndex: number | null;
+    queryValues: Array<QueryValue>;
+  } => {
+    const wrapperSymbol = Symbol("union_result");
+    const wrapperAlias = sql.identifier(wrapperSymbol);
 
-          // Fine a existing match for this dependency of this type
-          const existingIndex = this.queryValues.findIndex((v) => {
-            return (
-              v.dependencyIndex === placeholder.dependencyIndex &&
-              v.codec === placeholder.codec
-            );
-          });
+    const {
+      queryValues,
+      placeholderValues,
+      identifiersAlias,
+      identifiersSymbol,
+    } = makeValues(info, "union");
 
-          // If none exists, add one to our query values
-          const idx =
-            existingIndex >= 0
-              ? existingIndex
-              : this.queryValues.push({
-                  dependencyIndex: placeholder.dependencyIndex,
-                  codec: placeholder.codec,
-                  alreadyEncoded: placeholder.alreadyEncoded,
-                }) - 1;
+    if (
+      queryValues.length > 0 ||
+      (count !== 1 && (forceIdentity || hasSideEffects))
+    ) {
+      const identifierIndex = selectAndReturnIndex(
+        sql`${identifiersAlias}.idx`,
+      );
 
-          // Finally alias this symbol to a reference to this placeholder
-          this.placeholderValues.set(
-            placeholder.symbol,
-            sql`${identifiersAlias}.${sql.identifier(`id${idx}`)}`,
-          );
-        });
+      // IMPORTANT: this must come after the `selectExpression` call above.
+      const innerQuery = makeQuery();
 
-        const identifierIndex = this.selectAndReturnIndex(
-          sql`${identifiersAlias}.idx`,
-        );
+      const {
+        text: lateralText,
+        values: rawSqlValues,
+        [$$symbolToIdentifier]: symbolToIdentifier,
+      } = sql.compile(
+        sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
+        { placeholderValues },
+      );
+      const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
+      const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
 
-        // IMPORTANT: this must come after the `selectExpression` call above.
-        const innerQuery = makeQuery();
-
-        const {
-          text: lateralText,
-          values: rawSqlValues,
-          [$$symbolToIdentifier]: symbolToIdentifier,
-        } = sql.compile(
-          sql`lateral (${sql.indent(innerQuery)}) as ${wrapperAlias}`,
-          {
-            placeholderValues: this.placeholderValues,
-          },
-        );
-        const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
-        const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
-
-        let lastPlaceholder = rawSqlValues.length;
-        /*
-         * IMPORTANT: these wrapper queries are necessary so that queries
-         * that have a limit/offset get the limit/offset applied _per
-         * identifier group_; that's why this cannot just be another "from"
-         * clause.
-         */
-        const text = `\
+      /*
+       * IMPORTANT: these wrapper queries are necessary so that queries
+       * that have a limit/offset get the limit/offset applied _per
+       * identifier group_; that's why this cannot just be another "from"
+       * clause.
+       */
+      const text = `\
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx, ${this.queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(
-            ", ",
-          )} from json_array_elements($${++lastPlaceholder}::json) with ordinality as ids) as ${identifiersAliasText},
+from (select ids.ordinality - 1 as idx${
+        queryValues.length > 0
+          ? `, ${queryValues
+              .map(({ codec }, idx) => {
+                return `(ids.value->>${idx})::${
+                  sql.compile(codec.sqlType).text
+                } as "id${idx}"`;
+              })
+              .join(", ")}`
+          : ""
+      } from json_array_elements($${
+        rawSqlValues.length + 1
+      }::json) with ordinality as ids) as ${identifiersAliasText},
 ${lateralText};`;
 
-        lastPlaceholder = rawSqlValues.length;
-        /**
-         * This is an optimized query to use when there's only one value to
-         * feed in, PostgreSQL seems to be able to execute queries using this
-         * _significantly_ faster (up to 3x or 200ms faster).
-         */
-        const textForSingle = `\
-select ${wrapperAliasText}.*
-from (select 0 as idx, ${this.queryValues
-          .map(({ codec }, idx) => {
-            return `$${++lastPlaceholder}::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}) as ${identifiersAliasText},
-${lateralText};`;
-
-        return { text, textForSingle, rawSqlValues, identifierIndex };
-      } else {
-        const query = makeQuery();
-        const { text, values: rawSqlValues } = sql.compile(query, {
-          placeholderValues: this.placeholderValues,
-        });
-        return { text, rawSqlValues, identifierIndex: null };
-      }
-    })();
-
-    const shouldReverseOrder = this.shouldReverseOrder();
-
-    // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
-
-    const textForSingle = undefined;
-
-    this.finalizeResults = {
-      text,
-      textForSingle,
-      rawSqlValues,
-      identifierIndex,
-      shouldReverseOrder,
-      name: hash(text),
-      nameForSingle: textForSingle ? hash(textForSingle) : undefined,
-    };
-
-    super.finalize();
-  }
-
-  // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
-  async execute({
-    indexMap,
-    values,
-    extra: { eventEmitter },
-  }: ExecutionDetails): Promise<GrafastValuesList<any>> {
-    const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
-      this.finalizeResults!;
-
-    const contextDep = values[this.contextId];
-    if (contextDep === undefined) {
-      throw new Error("We have no context dependency?");
-    }
-
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
       return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? this.queryValues.map(
-                ({ dependencyIndex, codec, alreadyEncoded }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null
-                    ? null
-                    : alreadyEncoded
-                    ? val
-                    : codec.toPg(val);
-                },
-              )
-            : EMPTY_ARRAY,
+        text,
+        rawSqlValues,
+        identifierIndex,
+        queryValues,
       };
-    });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.executor[executeMethod](specs, {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      eventEmitter,
-      useTransaction: false,
-    });
-    // debugExecute("%s; result: %c", this, executionResult);
+    } else {
+      const query = makeQuery();
+      const { text, values: rawSqlValues } = sql.compile(query, {
+        placeholderValues,
+      });
+      return { text, rawSqlValues, identifierIndex: null, queryValues };
+    }
+  })();
 
-    return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
-        return allVals;
-      }
-      const limit = this.first ?? this.last;
-      const firstAndLast =
-        this.first != null && this.last != null && this.last < this.first;
-      const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
-      const trimFromStart =
-        !shouldReverseOrder && this.last != null && this.first == null;
-      const limitedRows = hasMore
-        ? trimFromStart
-          ? allVals.slice(Math.max(0, allVals.length - limit!))
-          : allVals.slice(0, limit!)
-        : allVals;
-      const slicedRows =
-        firstAndLast && this.last != null
-          ? limitedRows.slice(-this.last)
-          : limitedRows;
-      const orderedRows = shouldReverseOrder
-        ? reverseArray(slicedRows)
-        : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
-    });
-  }
+  // const shouldReverseOrder = this.shouldReverseOrder();
 
-  [$$toSQL]() {
-    return this.alias;
-  }
+  // **IMPORTANT**: if streaming we must not reverse order (`shouldReverseOrder` must be `false`)
+  const cursorDetails: PgCursorDetails | undefined =
+    cursorDigest != null && cursorIndicies != null
+      ? {
+          digest: cursorDigest,
+          indicies: cursorIndicies,
+        }
+      : undefined;
+
+  return {
+    text,
+    rawSqlValues,
+    identifierIndex,
+    shouldReverseOrder: info.shouldReverseOrder,
+    name: hash(text),
+    queryValues,
+    first: info.first,
+    last: info.last,
+    cursorDetails,
+  };
 }
 
-export function pgUnionAll<
-  TAttributes extends string,
-  TTypeNames extends string,
+function applyConditionFromCursor<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
 >(
-  spec: PgUnionAllStepConfig<TAttributes, TTypeNames>,
-): PgUnionAllStep<TAttributes, TTypeNames> {
-  return new PgUnionAllStep(spec);
+  info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames>,
+  beforeOrAfter: "before" | "after",
+  parsedCursor: Maybe<any[]>,
+): void {
+  if (parsedCursor == null) return;
+  const { alias, orders, ordersForCursor, memberDigests, cursorDigest } = info;
+  if (cursorDigest == null) {
+    throw new Error(`Cursor passed, but could not determine order digest.`);
+  }
+  const orderCount = ordersForCursor.length;
+
+  // Cursor validity check
+  validateParsedCursor(parsedCursor, cursorDigest, orderCount, beforeOrAfter);
+
+  if (orderCount === 0) {
+    // Natural pagination `['natural', N]`
+    // This will be used in upperIndex(before)/lowerIndex(after)
+    const n = parsedCursor[1];
+    if (beforeOrAfter === "after") {
+      info.cursorLower = n;
+    } else {
+      info.cursorUpper = n;
+    }
+    return;
+  }
+
+  const identifierPlaceholders: SQL[] = [];
+  for (let i = 0; i < orderCount; i++) {
+    const order = orders[i];
+    if (i === orderCount - 1) {
+      // PK (within that polymorphic type)
+
+      // TODO: rather than using JSON here and since we now run this at runtime
+      // rather than plan time, lets expand this to be each individual PK
+      // column rather than one JSON encoding of the same.
+
+      // NOTE: this is a JSON-encoded string containing all the PK values. We
+      // don't want to parse it and then re-stringify it, so we'll just feed
+      // it in as text and tell the system it has already been encoded:
+      identifierPlaceholders[i] = sql`${sql.value(
+        parsedCursor[i + 1],
+      )}::"json"`;
+    } else if (i === orderCount - 2) {
+      // Polymorphic type
+      identifierPlaceholders[i] = sql`${sql.value(
+        parsedCursor[i + 1],
+      )}::"text"`;
+    } else if (memberDigests.length > 0) {
+      const memberCodecs = memberDigests.map((d) => d.finalResource.codec);
+      const [, codec] = getFragmentAndCodecFromOrder(
+        alias,
+        order,
+        memberCodecs,
+      );
+      identifierPlaceholders[i] = sql`${sql.value(
+        codec.toPg(parsedCursor[i + 1]),
+      )}::${codec.sqlType}`;
+    } else {
+      // No implementations?!
+    }
+  }
+
+  for (const mutableMemberDigest of memberDigests) {
+    const { finalResource } = mutableMemberDigest;
+    const pk = finalResource.uniques?.find((u) => u.isPrimary === true);
+    if (!pk) {
+      throw new Error("No primary key; this should have been caught earlier");
+    }
+    const max = orderCount - 1 + pk.attributes.length;
+    const pkPlaceholder = identifierPlaceholders[orderCount - 1];
+    const pkAttributes = finalResource.codec.attributes as PgCodecAttributes;
+    const condition = (i = 0): SQL => {
+      const order = mutableMemberDigest.orders[i];
+      const [
+        orderFragment,
+        sqlValue,
+        direction,
+        nullable = false,
+        nulls = null,
+      ] = (() => {
+        if (i >= orderCount - 1) {
+          // PK
+          const pkIndex = i - (orderCount - 1);
+          const pkCol = pk.attributes[pkIndex];
+          return [
+            sql`${mutableMemberDigest.alias}.${sql.identifier(pkCol)}`,
+            sql`(${pkPlaceholder}->>${sql.literal(pkIndex)})::${
+              pkAttributes[pkCol].codec.sqlType
+            }`,
+            "ASC",
+            false,
+          ];
+        } else if (i === orderCount - 2) {
+          // Type
+          return [
+            sql.literal(mutableMemberDigest.member.typeName),
+            identifierPlaceholders[i],
+            "ASC",
+            false,
+          ];
+        } else {
+          const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
+            alias,
+            order,
+            mutableMemberDigest.finalResource.codec,
+          );
+          return [
+            frag,
+            identifierPlaceholders[i],
+            order.direction,
+            isNullable,
+            order.nulls,
+          ];
+        }
+      })();
+
+      // For the truth-table of this code, have a look at this spreadsheet:
+      // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
+      const gt =
+        (direction === "ASC" && beforeOrAfter === "after") ||
+        (direction === "DESC" && beforeOrAfter === "before");
+
+      const nullsFirst =
+        nulls === "FIRST"
+          ? true
+          : nulls === "LAST"
+          ? false
+          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+            // ASC = NULLS LAST
+            direction === "DESC";
+
+      // Simple less than or greater than
+      let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+
+      // Nullable, so now handle if one is null but the other isn't
+      if (nullable) {
+        const useAIsNullAndBIsNotNull =
+          (nullsFirst && beforeOrAfter === "after") ||
+          (!nullsFirst && beforeOrAfter === "before");
+        const oneIsNull = useAIsNullAndBIsNotNull
+          ? sql`${orderFragment} is null and ${sqlValue} is not null`
+          : sql`${orderFragment} is not null and ${sqlValue} is null`;
+        fragment = sql`((${fragment}) or (${oneIsNull}))`;
+      }
+
+      // Finally handle if they're equal - recurse
+      if (i < max - 1) {
+        const equals = nullable ? sql`is not distinct from` : sql`=`;
+        const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
+        fragment = sql`(${fragment})
+or (
+${sql.indent`${aEqualsB}
+and ${condition(i + 1)}`}
+)`;
+      }
+
+      return sql.parens(sql.indent(fragment));
+    };
+
+    const finalCondition = condition();
+    mutableMemberDigest.conditions.push(finalCondition);
+  }
 }
-exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");
+
+function getOrderByDigest<
+  TAttributes extends string = string,
+  TTypeNames extends string = string,
+>(info: MutablePgUnionAllQueryInfo<TAttributes, TTypeNames>) {
+  const {
+    memberDigests,
+    orderSpecs,
+    alias,
+    // TODO: satisfy placeholders and deferreds before we get this far!
+    placeholders,
+    deferreds,
+  } = info;
+  if (memberDigests.length === 0) {
+    return "natural";
+  }
+  // The security of this hash is unimportant; the main aim is to protect the
+  // user from themself. If they bypass this, that's their problem (it will
+  // not introduce a security issue).
+  const hash = createHash("sha256");
+  const memberCodecs = memberDigests.map(
+    (digest) => digest.finalResource.codec,
+  );
+  const tuple = [
+    ...orderSpecs.map((o) => {
+      const [frag] = getFragmentAndCodecFromOrder(alias, o, memberCodecs);
+      const placeholderValues = new Map<symbol, SQL>();
+      for (let i = 0; i < placeholders.length; i++) {
+        const { symbol } = placeholders[i];
+        placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+      }
+      for (let i = 0; i < deferreds.length; i++) {
+        const { symbol } = deferreds[i];
+        placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+      }
+      return sql.compile(frag, { placeholderValues }).text;
+    }),
+    "type",
+    "pk",
+  ];
+  const d = JSON.stringify(tuple);
+  hash.update(d);
+  const digest = hash.digest("hex").slice(0, 10);
+  return digest;
+}
+
+function cloneMemberDigest<TTypeNames extends string = string>(
+  memberDigest: MemberDigest<TTypeNames>,
+): MutableMemberDigest<TTypeNames> {
+  return {
+    // Unchanging parts
+    symbol: memberDigest.symbol,
+    alias: memberDigest.alias,
+    member: memberDigest.member,
+    sqlSource: memberDigest.sqlSource,
+    finalResource: memberDigest.finalResource,
+
+    // Mutable parts
+    orders: [...memberDigest.orders],
+    conditions: [...memberDigest.conditions],
+  };
+}

@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
+import type { CustomInspectFunction } from "util";
 import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
@@ -32,10 +33,42 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const nodeInspect: CustomInspectFunction = function (
+  this: SQLNode,
+  depth,
+  options,
+) {
+  if (this[$$type] === "VALUE") {
+    if (depth < 0) {
+      return `sql.value(...)`;
+    }
+    return `sql.value(${inspect(this.v, {
+      ...options,
+      depth: options.depth == null ? null : options.depth - 1,
+    })})`;
+  } else if (this[$$type] === "RAW") {
+    return `sql\`${this.t}\``;
+  } else if (this[$$type] === "IDENTIFIER") {
+    return `sql.identifier(${JSON.stringify(this.n)})`;
+  } else {
+    return `sql{${this[$$type]}}`;
+  }
+};
+
+interface PgSQL2Proto {
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
+}
+
+const pgSQL2Proto: PgSQL2Proto = Object.assign(Object.create(null), {
+  [inspect.custom]: nodeInspect,
+});
+
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
@@ -47,6 +80,7 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "IDENTIFIER";
   /** symbol @internal */
   readonly s: symbol;
@@ -70,6 +104,7 @@ export type SQLRawValue =
  * compiled SQL statement.
  */
 export interface SQLValueNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "VALUE";
   /** value @internal */
   readonly v: SQLRawValue;
@@ -201,6 +236,7 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
     );
   }
   const newNode: SQLRawNode = {
+    __proto__: pgSQL2Proto,
     [$$type]: "RAW" as const,
     t: text,
   };
@@ -219,6 +255,7 @@ function makeIdentifierNode(
   n = getSymbolName(s),
 ): SQLIdentifierNode {
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
@@ -228,9 +265,10 @@ function makeIdentifierNode(
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
-    [$$type]: "VALUE" as const,
+    __proto__: pgSQL2Proto,
+    [$$type]: "VALUE",
     v: rawValue,
-  });
+  } as SQLValueNode);
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
@@ -331,9 +369,19 @@ function isSQLable(value: any): value is SQLable {
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
 function enforceValidNode(node: SQLNode, where?: string): SQLNode;
 function enforceValidNode(node: SQL | SQLable, where?: string): SQL;
+function enforceValidNode(node: unknown, where?: string): SQL;
 function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
+  }
+  for (let i = _userTransformers.length - 1; i >= 0; i--) {
+    const transformer = _userTransformers[i];
+    const transformed = transformer(sql, node, where);
+    if (transformed !== node) {
+      return enforceValidNode(transformed);
+    } else {
+      // Continue onward; `node` is unchanged
+    }
   }
   if (isSQLable(node)) {
     return enforceValidNode(node[$$toSQL](), where);
@@ -343,7 +391,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
       where ? ` at ${where}` : ""
     } but received '${inspect(
       node,
-    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
+    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal. Alternatively, perhaps you forgot to call sql.withTransformer() when building your SQL?`,
   );
 }
 
@@ -353,7 +401,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
  */
 export function compile(
   sql: SQL,
-  options?: { placeholderValues?: Map<symbol, SQL> },
+  options?: { placeholderValues?: ReadonlyMap<symbol, SQL> },
 ): {
   text: string;
   values: SQLRawValue[];
@@ -412,7 +460,7 @@ export function compile(
     const sqlFragments: string[] = [];
 
     const trustedInput =
-      untrustedInput[$$type] !== undefined
+      untrustedInput?.[$$type] !== undefined
         ? untrustedInput
         : enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
@@ -424,7 +472,7 @@ export function compile(
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
       const itemAtIndex = items[itemIndex];
       const item =
-        itemAtIndex[$$type] !== undefined
+        itemAtIndex?.[$$type] !== undefined
           ? itemAtIndex
           : enforceValidNode(itemAtIndex as SQLNode, `item ${itemIndex}`);
       switch (item[$$type]) {
@@ -521,7 +569,10 @@ export function compile(
               "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
             );
           }
-          sqlFragments.push(print(resolvedPlaceholder, indent));
+          const resolved = print(resolvedPlaceholder, indent);
+          if (resolved !== "") {
+            sqlFragments.push(resolved);
+          }
           break;
         }
         default: {
@@ -589,7 +640,7 @@ const sqlBase = function sql(
     if (i < l - 1) {
       const rawVal = values[i];
       const valid: SQL =
-        rawVal[$$type] !== undefined
+        rawVal?.[$$type] !== undefined
           ? (rawVal as SQL)
           : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
@@ -755,7 +806,7 @@ export function literal(val: string | number | boolean | null): SQL {
  * dealing with lists of SQL items, for example a dynamic list of columns or
  * variadic SQL function arguments.
  */
-export function join(items: Array<SQL>, separator = ""): SQL {
+export function join(items: ReadonlyArray<SQL>, separator = ""): SQL {
   if (!Array.isArray(items)) {
     throw new Error(
       `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
@@ -777,7 +828,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
   } else if (items.length === 1) {
     const rawNode = items[0];
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${0}`);
     return node;
@@ -790,7 +841,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
@@ -1184,7 +1235,7 @@ export function replaceSymbol(
  */
 function getSubstitute(
   initialSymbol: symbol,
-  symbolSubstitutes?: Map<symbol, symbol>,
+  symbolSubstitutes?: ReadonlyMap<symbol, symbol>,
 ): symbol {
   const path: symbol[] = [];
   let symbol = initialSymbol;
@@ -1213,6 +1264,26 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
+export type Transformer<TNewEmbed> = <TValue>(
+  sql: PgSQL,
+  value: TNewEmbed | TValue,
+  where?: string,
+) => SQL | TValue;
+
+const _userTransformers: Transformer<any>[] = [];
+
+export function withTransformer<TNewEmbed, TResult = SQL>(
+  transformer: Transformer<TNewEmbed>,
+  callback: (sql: PgSQL<TNewEmbed>) => TResult,
+): TResult {
+  _userTransformers.push(transformer);
+  try {
+    return callback(sql as PgSQL<TNewEmbed>);
+  } finally {
+    _userTransformers.pop();
+  }
+}
+
 export const sql = sqlBase as PgSQL;
 export default sql;
 
@@ -1225,12 +1296,15 @@ export {
   trueNode as true,
 };
 
-export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL | SQLable>): SQL;
+export interface PgSQL<TEmbed = never> {
+  (
+    strings: TemplateStringsArray,
+    ...values: Array<SQL | SQLable | TEmbed>
+  ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
-  query: PgSQL;
+  query: PgSQL<TEmbed>;
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
@@ -1242,13 +1316,17 @@ export interface PgSQL {
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
-  fragment: PgSQL;
+  fragment: PgSQL<TEmbed>;
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
-  sql: PgSQL;
+  sql: PgSQL<TEmbed>;
+  withTransformer<TNewEmbed, TResult = SQL>(
+    transformer: Transformer<TNewEmbed>,
+    callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
+  ): TResult;
 }
 
 const attributes = {
@@ -1274,6 +1352,7 @@ const attributes = {
   null: nullNode,
   replaceSymbol,
   isSQL,
+  withTransformer,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {

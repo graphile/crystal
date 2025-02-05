@@ -98,7 +98,7 @@ export function makeWrapPlansPlugin<T>(
           const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
           const {
             EXPORTABLE,
-            grafast: { access, ExecutableStep, isExecutableStep },
+            grafast: { ExecutableStep, isExecutableStep, defaultPlanResolver },
           } = build;
           const filter = (build as any)[symbol]
             .filter as PlanWrapperFilter<T> | null;
@@ -141,15 +141,7 @@ export function makeWrapPlansPlugin<T>(
           if (!planWrapper) {
             return field;
           }
-          const {
-            plan: oldPlan = EXPORTABLE(
-              (access, fieldName) =>
-                // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-                ($obj: import("grafast").ExecutableStep) =>
-                  access($obj, fieldName),
-              [access, fieldName],
-            ),
-          } = field;
+          const { plan: oldPlan = defaultPlanResolver } = field;
           const typeName = Self.name;
           return {
             ...field,

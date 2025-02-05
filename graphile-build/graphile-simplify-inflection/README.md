@@ -157,7 +157,7 @@ export default {
      * `ById` (or similar) suffix; and the `nodeId` queries/mutations
      * to lose their `ByNodeId` suffix.
      */
-    // pgShortPk: true,
+    // pgShortPk: false,
   },
 };
 ```

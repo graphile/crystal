@@ -9,11 +9,11 @@ graph TD
 
 
     %% plan dependencies
-    List157{{"List[157∈0] ➊<br />ᐸ61,126,173,173,173,173,173,173ᐳ"}}:::plan
+    List157{{"List[157∈0] ➊<br />ᐸ61,126,174,174,174,174,174,174ᐳ"}}:::plan
     List61{{"List[61∈0] ➊<br />ᐸ36ᐳ"}}:::plan
     List126{{"List[126∈0] ➊<br />ᐸ71,101ᐳ"}}:::plan
-    Constant173{{"Constant[173∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    List61 & List126 & Constant173 & Constant173 & Constant173 & Constant173 & Constant173 & Constant173 --> List157
+    Constant174{{"Constant[174∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    List61 & List126 & Constant174 & Constant174 & Constant174 & Constant174 & Constant174 & Constant174 --> List157
     Object36{{"Object[36∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
     Access41{{"Access[41∈0] ➊<br />ᐸ0.input.tPatch.v.0.0.fromHoursᐳ"}}:::plan
     Access47{{"Access[47∈0] ➊<br />ᐸ0.input.tPatch.v.0.0.fromMinutesᐳ"}}:::plan
@@ -69,25 +69,27 @@ graph TD
     __Item162[/"__Item[162∈5]<br />ᐸ159ᐳ"\]:::itemplan
     Object13 & __Item162 --> PgSelect163
     PgClassExpression159 ==> __Item162
-    __Item167[/"__Item[167∈6]<br />ᐸ163ᐳ"\]:::itemplan
-    PgSelect163 ==> __Item167
-    PgSelectSingle168{{"PgSelectSingle[168∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item167 --> PgSelectSingle168
-    PgClassExpression169{{"PgClassExpression[169∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression169
-    PgClassExpression170{{"PgClassExpression[170∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression170
-    PgClassExpression171{{"PgClassExpression[171∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression171
-    PgClassExpression172{{"PgClassExpression[172∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression172
+    PgSelectRows167[["PgSelectRows[167∈5]"]]:::plan
+    PgSelect163 --> PgSelectRows167
+    __Item168[/"__Item[168∈6]<br />ᐸ167ᐳ"\]:::itemplan
+    PgSelectRows167 ==> __Item168
+    PgSelectSingle169{{"PgSelectSingle[169∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item168 --> PgSelectSingle169
+    PgClassExpression170{{"PgClassExpression[170∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression170
+    PgClassExpression171{{"PgClassExpression[171∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression171
+    PgClassExpression172{{"PgClassExpression[172∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression172
+    PgClassExpression173{{"PgClassExpression[173∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression173
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/nested_arrays.updateT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access8,Access11,Access12,Object13,Object36,Access41,Access47,Access53,Access59,List61,Object71,Access76,Access82,Access88,Access94,Object101,Access106,Access112,Access118,Access124,List126,List157,Constant173 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,Access8,Access11,Access12,Object13,Object36,Access41,Access47,Access53,Access59,List61,Object71,Access76,Access82,Access88,Access94,Object101,Access106,Access112,Access118,Access124,List126,List157,Constant174 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 8, 157<br /><br />1: PgUpdateSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle10,Object14 bucket1
@@ -97,12 +99,12 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 13<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;v)ᐳ[10]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression158,PgClassExpression159 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 13<br /><br />ROOT __Item{5}ᐸ159ᐳ[162]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 13<br /><br />ROOT __Item{5}ᐸ159ᐳ[162]<br />1: PgSelect[163]<br />2: PgSelectRows[167]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item162,PgSelect163 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ163ᐳ[167]"):::bucket
+    class Bucket5,__Item162,PgSelect163,PgSelectRows167 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ167ᐳ[168]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item167,PgSelectSingle168,PgClassExpression169,PgClassExpression170,PgClassExpression171,PgClassExpression172 bucket6
+    class Bucket6,__Item168,PgSelectSingle169,PgClassExpression170,PgClassExpression171,PgClassExpression172,PgClassExpression173 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

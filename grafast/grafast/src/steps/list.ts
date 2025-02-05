@@ -137,18 +137,18 @@ export class ListStep<
   /**
    * Get the original plan at the given index back again.
    */
-  public at<TIndex extends keyof TPlanTuple>(
+  public at<TIndex extends keyof TPlanTuple & number>(
     index: TIndex,
   ): TPlanTuple[TIndex] {
-    return this.getDep(index as number) as TPlanTuple[TIndex];
+    return this.getDep<TPlanTuple[TIndex]>(index as number);
   }
 
   public first() {
-    return this.getDep(0) as TPlanTuple[0];
+    return this.getDep<TPlanTuple[0]>(0);
   }
 
   public last() {
-    return this.getDep(this.dependencies.length - 1) as TPlanTuple[number];
+    return this.getDep<TPlanTuple[number]>(this.dependencies.length - 1);
   }
 }
 

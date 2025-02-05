@@ -20,7 +20,6 @@ import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
 import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
-  evalDirectiveArg,
   graphqlCollectFields,
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
@@ -49,7 +48,7 @@ import type {
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
   LocationDetails,
-  StepOptions,
+  Maybe,
   TrackedArguments,
 } from "../interfaces.js";
 import {
@@ -62,7 +61,7 @@ import {
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import type { PolymorphicStep } from "../step.js";
 import {
   $$noExec,
   assertExecutableStep,
@@ -72,7 +71,7 @@ import {
   isUnbatchedExecutableStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
-import { access } from "../steps/access.js";
+import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
@@ -81,6 +80,7 @@ import {
   assertNotAsync,
   assertNotPromise,
   defaultValueToValueNode,
+  directiveArgument,
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
@@ -91,12 +91,15 @@ import {
 import type {
   LayerPlanPhase,
   LayerPlanReason,
+  LayerPlanReasonListItemStream,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
+import { defaultPlanResolver } from "./lib/defaultPlanResolver.js";
 import {
   currentLayerPlan,
+  currentPolymorphicPaths,
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
@@ -799,9 +802,11 @@ export class OperationPlan {
             field,
           )
         : NO_ARGS;
+
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
+        fieldName,
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
@@ -811,14 +816,11 @@ export class OperationPlan {
         this.trackedRootValueStep,
         fieldSpec,
         trackedArguments,
+        true,
       );
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
-      const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
-      };
-      subscribeStep._stepOptions = stepOptions;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(
@@ -902,10 +904,8 @@ export class OperationPlan {
           );
         },
       );
-      const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
-      };
-      subscribeStep._stepOptions = stepOptions;
+      subscribeStep._stepOptions.stream = {};
+      subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
 
@@ -967,7 +967,8 @@ export class OperationPlan {
   private itemStepForListStep<TData>(
     parentLayerPlan: LayerPlan,
     listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
-    depth = 0,
+    depth: number,
+    stream: LayerPlanReasonListItemStream | undefined,
   ): __ItemStep<TData> {
     const itemStepId = this.itemStepIdByListStepId[listStep.id];
     if (itemStepId !== undefined) {
@@ -977,7 +978,7 @@ export class OperationPlan {
     const layerPlan = new LayerPlan(this, parentLayerPlan, {
       type: "listItem",
       parentStep: listStep,
-      stream: listStep._stepOptions.stream ?? undefined,
+      stream,
     });
     const itemPlan = withGlobalLayerPlan(
       layerPlan,
@@ -1089,8 +1090,7 @@ export class OperationPlan {
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
-          rawPlanResolver ??
-          (resolver ? undefined : makeDefaultPlan(fieldName));
+          rawPlanResolver ?? (resolver ? undefined : defaultPlanResolver);
 
         /*
          *  When considering resolvers on fields, there's three booleans to
@@ -1193,8 +1193,72 @@ export class OperationPlan {
               )
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
+        let streamDetails: StreamDetails | null = null;
+        const isList = isListType(getNullableType(fieldType));
+        if (isList) {
+          // read the @stream directive, if present
+          // TODO: Check SameStreamDirective still exists in @stream spec at release.
+          /*
+           * `SameStreamDirective`
+           * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+           * ensures that every field that has `@stream` must have the same
+           * `@stream` arguments; so we can just check the first node in the
+           * merged set to see our stream options. NOTE: if this changes before
+           * release then we may need to find the stream with the largest
+           * `initialCount` to figure what to do; something like:
+           *
+           *      const streamDirective = firstField.directives?.filter(
+           *        (d) => d.name.value === "stream",
+           *      ).sort(
+           *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+           *      )[0]
+           */
+
+          for (const n of fieldNodes) {
+            const streamDirective = n.directives?.find(
+              (d) => d.name.value === "stream",
+            );
+            if (streamDirective === undefined) {
+              // Undo any previous stream details; the non-@stream wins.
+              streamDetails = null;
+              break;
+            } else if (streamDetails !== null) {
+              // Validation promises the values are the same
+              continue;
+            } else {
+              // Create streamDetails
+              streamDetails = this.withRootLayerPlan(() => ({
+                initialCount: this.internalDependency(
+                  directiveArgument<number>(
+                    this,
+                    streamDirective,
+                    "initialCount",
+                    graphql.Kind.INT,
+                  ) ?? constant(0),
+                ),
+                if: this.internalDependency(
+                  directiveArgument<boolean>(
+                    this,
+                    streamDirective,
+                    "if",
+                    graphql.Kind.BOOLEAN,
+                  ) ?? constant(true),
+                ),
+                label: this.internalDependency(
+                  directiveArgument<Maybe<string>>(
+                    this,
+                    streamDirective,
+                    "label",
+                    graphql.Kind.STRING,
+                  ) ?? constant(undefined),
+                ),
+              }));
+            }
+          }
+        }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
+            fieldName,
             fieldLayerPlan,
             fieldPath,
             polymorphicPaths,
@@ -1204,6 +1268,7 @@ export class OperationPlan {
             parentStep,
             objectField,
             trackedArguments,
+            isList ? streamDetails ?? false : null,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
@@ -1272,6 +1337,8 @@ export class OperationPlan {
             step,
             locationDetails,
             resolverEmulation,
+            0,
+            streamDetails,
           );
         }
       } finally {
@@ -1376,6 +1443,13 @@ export class OperationPlan {
     if (this.loc !== null) this.loc.pop();
   }
 
+  private internalDependency<TStep extends ExecutableStep>(
+    $step: TStep,
+  ): TStep {
+    this.stepTracker.internalDependencies.add($step);
+    return $step;
+  }
+
   // Similar to the old 'planFieldReturnType'
   private planIntoOutputPlan(
     parentOutputPlan: OutputPlan,
@@ -1392,15 +1466,27 @@ export class OperationPlan {
     $step: ExecutableStep,
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
-    listDepth = 0,
+    listDepth: number,
+    streamDetails: StreamDetails | null,
   ) {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
+      const $list = withGlobalLayerPlan(
+        parentLayerPlan,
+        polymorphicPaths,
+        itemsOrStep,
+        null,
+        $step,
+      );
+      if ($list !== $step) {
+        $list._stepOptions.stream = $step._stepOptions.stream;
+      }
+      $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
-        $step,
+        $list,
         OUTPUT_PLAN_TYPE_ARRAY,
         locationDetails,
       );
@@ -1411,19 +1497,28 @@ export class OperationPlan {
         locationDetails,
       });
 
+      const stream: LayerPlanReasonListItemStream | undefined = streamDetails
+        ? {
+            // These are already marked as internal dependencies
+            initialCountStepId: streamDetails.initialCount.id,
+            ifStepId: streamDetails.if.id,
+            labelStepId: streamDetails.label.id,
+          }
+        : undefined;
       const $__item = this.itemStepForListStep(
         parentLayerPlan,
-        $step,
+        $list,
         listDepth,
+        stream,
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
-        const $item = isListCapableStep($step)
+        const $item = isListCapableStep($list)
           ? withGlobalLayerPlan(
               $__item.layerPlan,
               $__item.polymorphicPaths,
-              ($step as ListCapableStep<any>).listItem,
-              $step,
+              $list.listItem,
+              $list,
               $__item,
             )
           : $__item;
@@ -1441,6 +1536,7 @@ export class OperationPlan {
           locationDetails,
           resolverEmulation,
           listDepth + 1,
+          null,
         );
       } finally {
         $__item.layerPlan.latestSideEffectStep = $sideEffect;
@@ -1837,6 +1933,7 @@ export class OperationPlan {
   }
 
   private planField(
+    fieldName: string,
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
@@ -1846,6 +1943,11 @@ export class OperationPlan {
     rawParentStep: ExecutableStep,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
+    // If 'true' this is a subscription rather than a stream
+    // If 'false' this is a list but it will never stream
+    // If 'null' this is neither subscribe field nor list field
+    // Otherwise, it's a list field that has the `@stream` directive applied
+    streamDetails: StreamDetails | true | false | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
     // The step may have been de-duped whilst sibling steps were planned
@@ -1869,6 +1971,7 @@ export class OperationPlan {
         applyAfterMode,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
+            fieldName,
             field,
             schema: this.schema,
           }),
@@ -1890,44 +1993,20 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      // TODO: Check SameStreamDirective still exists in @stream spec at release.
-      /*
-       * `SameStreamDirective`
-       * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
-       * ensures that every field that has `@stream` must have the same
-       * `@stream` arguments; so we can just check the first node in the
-       * merged set to see our stream options. NOTE: if this changes before
-       * release then we may need to find the stream with the largest
-       * `initialCount` to figure what to do; something like:
-       *
-       *      const streamDirective = firstField.directives?.filter(
-       *        (d) => d.name.value === "stream",
-       *      ).sort(
-       *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
-       *      )[0]
-       */
-      const streamDirective = fieldNodes[0].directives?.find(
-        (d) => d.name.value === "stream",
-      );
-
-      const stepOptions: StepOptions = {
-        stream:
-          !haltTree && streamDirective
-            ? {
-                initialCount:
-                  Number(
-                    evalDirectiveArg<number | null>(
-                      fieldNodes[0],
-                      "stream",
-                      "initialCount",
-                      this.trackedVariableValuesStep,
-                      null,
-                    ),
-                  ) || 0,
-              }
-            : null,
-      };
-      step._stepOptions = stepOptions;
+      if (streamDetails === true) {
+        // subscription
+        step._stepOptions.stream = {};
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails === false) {
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails != null) {
+        step._stepOptions.stream = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+        step._stepOptions.walkIterable = true;
+      }
 
       if (deduplicate) {
         // Now that the field has been planned (including arguments, but NOT
@@ -2308,9 +2387,30 @@ export class OperationPlan {
    */
   private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
     if (step.hasSideEffects) {
+      // Plans with side effects have no peers.
       return EMPTY_ARRAY;
     }
 
+    // NOTE: Streams have no peers - we cannot reference the stream more than
+    // once (and we aim to not cache the stream because we want its entries to
+    // be garbage collected) - however if we're already fetching the list then
+    // we shouldn't fetch it again via stream... We should deduplicate a stream
+    // to return a non-stream.
+
+    if (step._stepOptions.stream != null) {
+      // TODO: remove this if block when we implement the new stream/defer -
+      // deduplicating a stream should be fine. (Not subscriptions though - may
+      // need a check for that!)
+
+      return EMPTY_ARRAY;
+    }
+
+    if (this.stepTracker.internalDependencies.has(step)) {
+      // PERF: we need to set up correct tracking, then internal deps can be deduped
+      return EMPTY_ARRAY;
+    }
+
+    const sstep = sudo(step);
     const {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
@@ -2318,7 +2418,8 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
-    } = sudo(step);
+    } = sstep;
+    // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
@@ -2332,7 +2433,9 @@ export class OperationPlan {
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
+          possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
+          // && possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2366,8 +2469,10 @@ export class OperationPlan {
           peerDependencyIndex !== 0 ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
+          // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
         ) {
           continue;
         }
@@ -2430,8 +2535,10 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
               rawPossiblyPeer.peerKey !== peerKey
+              // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
             ) {
               continue;
             }
@@ -2680,6 +2787,11 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return step;
     }
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+      // Don't push unary steps down
+      return step;
+    }
     switch (step.layerPlan.reason.type) {
       case "root":
       case "subscription":
@@ -2839,27 +2951,13 @@ export class OperationPlan {
   }
 
   private _deduplicateInnerLogic(step: ExecutableStep) {
-    if (step.hasSideEffects) {
-      // Never deduplicate plans with side effects.
-      return null;
-    }
-
     if (step instanceof __ItemStep) {
       // __ItemStep cannot be deduplicated
       return null;
     }
 
-    // OPTIMIZE: Past Benjie thought we might want to revisit this under the
-    // new Grafast system. No idea what he had in mind there though...
-    if (step._stepOptions.stream) {
-      // Never deduplicate streaming plans, we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      return null;
-    }
-
     const peers = this.getPeers(step);
-    // Even if there is just one peer, we must still deduplicate because
+    // Even if there are no peers, we must still deduplicate because
     // `deduplicate` is called to indicate that the field is done being
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
@@ -2923,6 +3021,11 @@ export class OperationPlan {
       winner.polymorphicPaths = polymorphicPaths;
     }
 
+    // Equivalent steps cannot be streaming; so we can no longer stream either.
+    if (equivalentSteps.length > 0) {
+      winner._stepOptions.stream = null;
+    }
+
     // Give the steps a chance to pass their responsibilities to the winner.
     if (winner !== step) {
       const wasLocked = isDev && unlock(step);
@@ -2930,6 +3033,7 @@ export class OperationPlan {
       if (wasLocked) lock(step);
       this.stepTracker.replaceStep(step, winner);
     }
+
     for (const target of equivalentSteps) {
       if (winner !== target) {
         const wasLocked = isDev && unlock(target);
@@ -3057,28 +3161,6 @@ export class OperationPlan {
     this.processSteps("pushDown", "dependents-first", false, this.pushDown);
   }
 
-  private getStepOptionsForStep(step: ExecutableStep): StepOptions {
-    return step._stepOptions;
-    /*
-    // NOTE: streams can only be merged if their parameters are compatible
-    // (namely they need to have equivalent `initialCount`)
-    const streamLayerPlan = step.childLayerPlans.find(
-      (lp) => lp.reason.type === "stream",
-    );
-
-    // PERF: if step isn't streamable, don't create a streamLayerPlan because
-    // there's no point (and then we can leverage better optimisations).
-
-    return {
-      stream:
-        streamLayerPlan && isStreamableStep(step)
-          ? // && streamLayerPlan.parentStep === step
-            { initialCount: streamLayerPlan.reason.initialCount }
-          : null,
-    };
-    */
-  }
-
   /**
    * Calls the 'optimize' method on a plan, which may cause the plan to
    * communicate with its (deep) dependencies, and even to replace itself with
@@ -3098,7 +3180,7 @@ export class OperationPlan {
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const stepOptions = this.getStepOptionsForStep(step);
+    // const stepOptions = step._stepOptions;
     let meta;
     if (step.optimizeMetaKey !== undefined) {
       meta = this.optimizeMeta.get(step.optimizeMetaKey);
@@ -3109,7 +3191,7 @@ export class OperationPlan {
     }
     const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
-      ...stepOptions,
+      // ...stepOptions,
       meta,
     });
     if (wasLocked) lock(step);
@@ -3524,6 +3606,27 @@ export class OperationPlan {
       if (layerPlan.reason.type === "listItem") {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+        const stream = layerPlan.reason.stream;
+        if (stream != null) {
+          if (stream.initialCountStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.initialCountStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
+          if (stream.ifStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.ifStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
+          if (stream.labelStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.labelStepId),
+              layerPlan.parentLayerPlan!,
+            );
+          }
+        }
       }
     }
 
@@ -3599,6 +3702,9 @@ export class OperationPlan {
         supportsUnbatched:
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
+        stream: step._stepOptions.stream
+          ? { initialCountStepId: step._stepOptions.stream.initialCountStepId }
+          : undefined,
         extra: step.planJSONExtra(),
       };
     }
@@ -3735,25 +3841,30 @@ export class OperationPlan {
 
   private _cacheStepStoreByLayerPlanAndActionKey: Record<
     string,
-    Record<symbol | string | number, any> | undefined
+    Map<any, any> | undefined
   > = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
    * need to regenerate it on future calls, significantly reducing the load on
    * deduplication later.
    *
+   * Note: automatically extends the cached step into other (relevant)
+   * polymorphic paths; if this shouldn't be the case then don't use cacheStep
+   * and instead rely on deduplication as usual.
+   *
    * @experimental
    */
   cacheStep<T extends ExecutableStep>(
     ownerStep: ExecutableStep,
     actionKey: string,
-    cacheKey: symbol | string | number,
+    cacheKey: symbol | string | number | boolean | null | undefined,
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
+    const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
       `${actionKey}|${layerPlan.id}|${ownerStep.id}`
-    ] ??= Object.create(null));
+    ] ??= new Map());
 
     const cacheIt = () => {
       const stepToCache = cb();
@@ -3764,17 +3875,30 @@ export class OperationPlan {
           )}`,
         );
       }
-      cache[cacheKey] = stepToCache.id;
+      cache.set(cacheKey, stepToCache.id);
       return stepToCache;
     };
 
-    if (!(cacheKey in cache)) {
+    if (!cache.has(cacheKey)) {
       return cacheIt();
     }
 
-    const cachedStepId = cache[cacheKey];
+    const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
-    return cachedStep ?? cacheIt();
+    if (cachedStep) {
+      // Fix poly paths
+      if (paths && cachedStep.polymorphicPaths) {
+        const polymorphicPaths = new Set<string>([
+          ...cachedStep.polymorphicPaths,
+          ...paths,
+        ]);
+        cachedStep.polymorphicPaths = polymorphicPaths;
+      }
+
+      return cachedStep;
+    } else {
+      return cacheIt();
+    }
   }
 
   /**
@@ -3784,15 +3908,10 @@ export class OperationPlan {
   public resetCache() {
     this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
   }
-}
 
-function makeDefaultPlan(fieldName: string) {
-  return (
-    $step: ExecutableStep & { get?: (field: string) => ExecutableStep },
-  ) =>
-    typeof $step.get === "function"
-      ? $step.get(fieldName)
-      : access($step, [fieldName]);
+  public withRootLayerPlan<T>(cb: () => T): T {
+    return withGlobalLayerPlan(this.rootLayerPlan, POLYMORPHIC_ROOT_PATHS, cb);
+  }
 }
 
 function makeMetaByMetaKeysFactory(
@@ -3963,3 +4082,9 @@ function throwNoNewStepsError(
       .join(", ")}`,
   );
 }
+
+type StreamDetails = {
+  if: ExecutableStep<boolean>;
+  initialCount: ExecutableStep<number>;
+  label: ExecutableStep<Maybe<string>>;
+};

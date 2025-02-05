@@ -86,8 +86,9 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    const db = values[this.dbDepId].value as sqlite3.Database;
-    const first = this.firstUDI != null ? values[this.firstUDI].value : null;
+    const db = values[this.dbDepId].unaryValue() as sqlite3.Database;
+    const first =
+      this.firstUDI != null ? values[this.firstUDI].unaryValue() : null;
 
     const identifierCols = Object.keys(this.depIdByIdentifier);
 
