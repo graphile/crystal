@@ -164,7 +164,18 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 ),
                 // ENHANCE: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
-                  (EdgeStep, PgDeleteSingleStep, connection, constant, extractEnumExtensionValue, first, pgSelectFromRecord, pkAttributes, resource) => function plan(
+                  (
+                    EdgeStep,
+                    PgDeleteSingleStep,
+                    connection,
+                    constant,
+                    extractEnumExtensionValue,
+                    first,
+                    pgSelectFromRecord,
+                    pkAttributes,
+                    resource,
+                  ) =>
+                    function plan(
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
@@ -213,7 +224,17 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       const $single = $select.row(first($select));
                       return new EdgeStep($connection, $single);
                     },
-                  [EdgeStep, PgDeleteSingleStep, connection, constant, extractEnumExtensionValue, first, pgSelectFromRecord, pkAttributes, resource],
+                  [
+                    EdgeStep,
+                    PgDeleteSingleStep,
+                    connection,
+                    constant,
+                    extractEnumExtensionValue,
+                    first,
+                    pgSelectFromRecord,
+                    pkAttributes,
+                    resource,
+                  ],
                 ),
               }),
             ),
