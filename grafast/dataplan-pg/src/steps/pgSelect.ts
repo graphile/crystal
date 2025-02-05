@@ -1,49 +1,38 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
-  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
-  GrafastResultStreamList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
-  StepOptimizeOptions,
-  StepStreamOptions,
-  StreamableStep,
 } from "grafast";
 import {
   __InputListStep,
   __InputObjectStep,
+  __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
   access,
   arrayOfLength,
-  constant,
+  ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
   isDev,
   isPromiseLike,
-  lambda,
-  list,
-  operationPlan,
-  remapKeys,
   reverseArray,
   SafeError,
-  stepAMayDependOnStepB,
-  stepsAreInSamePhase,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
-import { listOfCodec } from "../codecs.js";
+import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
-import type { PgExecutorInput } from "../executor.js";
+import type { PgExecutorContextPlans, PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -56,19 +45,31 @@ import type {
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import { PgClassExpressionStep } from "./pgClassExpression.js";
+import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
+import type { PgCursorDetails } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgStmtDeferredPlaceholder, PgStmtDeferredSQL } from "./pgStmt.js";
-import { PgStmtBaseStep } from "./pgStmt.js";
-import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
+import type {
+  MutablePgStmtCommonQueryInfo,
+  PgStmtCommonQueryInfo,
+  PgStmtDeferredPlaceholder,
+  PgStmtDeferredSQL,
+} from "./pgStmt.js";
+import {
+  applyCommonPaginationStuff,
+  calculateLimitAndOffsetSQLFromInfo,
+  getUnary,
+  makeValues,
+  PgStmtBaseStep,
+} from "./pgStmt.js";
+import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
 
@@ -83,6 +84,10 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const NO_ROWS = Object.freeze({
+  hasMore: false,
+  items: [],
+} as PgSelectStepResult);
 
 type PgSelectPlanJoin =
   | {
@@ -218,6 +223,13 @@ export interface PgSelectOptions<
    * If true and this turns into a join it should be a lateral join.
    */
   joinAsLateral?: boolean;
+
+  /** @internal @experimental */
+  context?: ExecutableStep<PgExecutorContextPlans<any>>;
+  /** @internal */
+  _internalCloneSymbol?: symbol | string;
+  /** @internal */
+  _internalCloneAlias?: SQL;
 }
 
 /**
@@ -250,6 +262,17 @@ interface QueryBuildResult {
   name?: string;
 
   queryValues: Array<QueryValue>;
+
+  first: Maybe<number>;
+  last: Maybe<number>;
+  cursorDetails: PgCursorDetails | undefined;
+}
+
+interface PgSelectStepResult {
+  hasMore?: boolean;
+  /** a tuple based on what is selected at runtime */
+  items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
+  cursorDetails?: PgCursorDetails;
 }
 
 /**
@@ -264,11 +287,8 @@ interface QueryBuildResult {
 export class PgSelectStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends PgStmtBaseStep<
-    ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
-  >
+  extends PgStmtBaseStep<PgSelectStepResult>
   implements
-    StreamableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -291,7 +311,7 @@ export class PgSelectStep<
    * This defaults to the name of the resource but you can override it. Aids
    * in debugging.
    */
-  private readonly name: string;
+  public readonly name: string;
   /**
    * To be used as the table alias, we always use a symbol unless the calling
    * code specifically indicates a string to use.
@@ -303,7 +323,7 @@ export class PgSelectStep<
    * symbols of the PgSelects that they were replaced with (which might also not
    * exist in future, but we follow the chain so it's fine).
    */
-  private readonly _symbolSubstitutes: Map<symbol, symbol>;
+  private readonly _symbolSubstitutes = new Map<symbol, symbol>();
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
@@ -315,44 +335,47 @@ export class PgSelectStep<
 
   // JOIN
 
-  private relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
-  private joins: Array<PgSelectPlanJoin>;
+  private relationJoins = new Map<
+    keyof GetPgResourceRelations<TResource>,
+    SQL
+  >();
+  private joins: Array<PgSelectPlanJoin> = [];
 
   // WHERE
 
-  private conditions: SQL[];
+  private conditions: SQL[] = [];
 
   // GROUP BY
 
-  private groups: Array<PgGroupSpec>;
+  private groups: Array<PgGroupSpec> = [];
 
   // HAVING
 
-  private havingConditions: SQL[];
+  private havingConditions: SQL[] = [];
 
   // ORDER BY
 
-  private orders: Array<PgOrderSpec>;
-  private isOrderUnique: boolean;
+  private orders: Array<PgOrderSpec> = [];
+  private isOrderUnique = false;
 
   // LIMIT
 
-  protected firstStepId: number | null;
-  protected lastStepId: number | null;
-  protected fetchOneExtra: boolean;
+  protected firstStepId: number | null = null;
+  protected lastStepId: number | null = null;
+  protected fetchOneExtra = false;
   /** When using natural pagination, this index is the lower bound (and should be excluded) */
-  protected lowerIndexStepId: number | null;
+  protected lowerIndexStepId: number | null = null;
   /** When using natural pagination, this index is the upper bound (and should be excluded) */
-  protected upperIndexStepId: number | null;
+  protected upperIndexStepId: number | null = null;
 
   // OFFSET
 
-  protected offsetStepId: number | null;
+  protected offsetStepId: number | null = null;
 
   // CURSORS
 
-  protected beforeStepId: number | null;
-  protected afterStepId: number | null;
+  protected beforeStepId: number | null = null;
+  protected afterStepId: number | null = null;
 
   // Connection
   private connectionDepId: number | null = null;
@@ -369,6 +392,7 @@ export class PgSelectStep<
     dependencyIndex: number;
     expression: SQL;
     codec: PgCodec;
+    _matches: PgSelectIdentifierSpec["matches"];
   }[];
 
   /**
@@ -383,27 +407,27 @@ export class PgSelectStep<
    */
   private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
-  protected placeholders: Array<PgStmtDeferredPlaceholder>;
-  protected deferreds: Array<PgStmtDeferredSQL>;
-  private fixedPlaceholderValues: Map<symbol, SQL>;
+  protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
+  protected deferreds: Array<PgStmtDeferredSQL> = [];
+  private fixedPlaceholderValues = new Map<symbol, SQL>();
 
   /**
    * If true, we don't need to add any of the security checks from the
    * resource; otherwise we must do so. Default false.
    */
-  private isTrusted: boolean;
+  private isTrusted = false;
 
   /**
    * If true, we know at most one result can be matched for each identifier, so
    * it's safe to do a `LEFT JOIN` without risk of returning duplicates. Default false.
    */
-  private isUnique: boolean;
+  private isUnique = false;
 
   /**
    * If true, we will not attempt to inline this into the parent query.
    * Default false.
    */
-  private isInliningForbidden: boolean;
+  private isInliningForbidden = false;
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -424,19 +448,12 @@ export class PgSelectStep<
   /**
    * The list of things we're selecting.
    */
-  private selects: Array<SQL>;
+  private selects: Array<SQL> = [];
 
   /**
    * The id for the PostgreSQL context plan.
    */
   private contextId: number;
-
-  /**
-   * If this plan going to stream, the options for the stream (e.g.
-   * initialCount). Set during the `optimize` call - do not trust it before
-   * then. If null then the plan is not expected to stream.
-   */
-  private streamOptions: StepStreamOptions | null = null;
 
   // --------------------
 
@@ -444,105 +461,156 @@ export class PgSelectStep<
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
-  constructor(options: PgSelectOptions<TResource>);
-  constructor(cloneFrom: PgSelectStep<TResource>, mode?: PgSelectMode);
-  constructor(
-    optionsOrCloneFrom: PgSelectStep<TResource> | PgSelectOptions<TResource>,
-    overrideMode?: PgSelectMode,
-  ) {
-    super();
-    const [
-      cloneFrom,
-      {
-        resource,
-        identifiers,
-        args: inArgs,
-        from: inFrom = null,
-        hasImplicitOrder: inHasImplicitOrder,
-        name: customName,
-        mode: inMode,
-        joinAsLateral: inJoinAsLateral = false,
-        forceIdentity: inForceIdentity = false,
-      },
-    ] =
-      optionsOrCloneFrom instanceof PgSelectStep
-        ? [
-            optionsOrCloneFrom,
-            {
-              resource: optionsOrCloneFrom.resource,
-              identifiers: null,
-              from: optionsOrCloneFrom.from,
-              hasImplicitOrder: optionsOrCloneFrom.hasImplicitOrder,
-              args: null,
-              name: optionsOrCloneFrom.name,
-              mode: undefined,
-              joinAsLateral: optionsOrCloneFrom.joinAsLateral,
-              forceIdentity: optionsOrCloneFrom.forceIdentity,
-            },
-          ]
-        : [null, optionsOrCloneFrom];
+  static clone<TResource extends PgResource<any, any, any, any, any>>(
+    cloneFrom: PgSelectStep<TResource>,
+    mode: PgSelectMode = cloneFrom.mode,
+  ): PgSelectStep<TResource> {
+    const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
+    const $clone = new PgSelectStep({
+      identifiers: [], //We'll overwrite teh result of this in a moment
+      args: undefined, // We'll overwrite the result of this in a moment
+      context: cloneFrom.getDep(cloneFrom.contextId),
 
-    this.mode = overrideMode ?? inMode ?? "normal";
-    const cloneFromMatchingMode =
-      cloneFrom?.mode === this.mode ? cloneFrom : null;
+      resource: cloneFrom.resource,
+      from: cloneFrom.from,
+      ...(cloneFrom.hasImplicitOrder === false
+        ? { hasImplicitOrder: cloneFrom.hasImplicitOrder }
+        : {}),
+      name: cloneFrom.name,
+      mode,
+      joinAsLateral: cloneFrom.joinAsLateral,
+      forceIdentity: cloneFrom.forceIdentity,
+
+      _internalCloneSymbol: cloneFrom.symbol,
+      _internalCloneAlias: cloneFrom.alias,
+    });
+
+    if ($clone.dependencies.length !== 1) {
+      throw new Error(
+        "Should not have any dependencies other than context yet",
+      );
+    }
+
+    cloneFrom.dependencies.forEach((planId, idx) => {
+      if (idx === 0) return;
+      const myIdx = $clone.addDependency({
+        ...cloneFrom.getDepOptions(idx),
+        skipDeduplication: true,
+      });
+      if (myIdx !== idx) {
+        throw new Error(
+          `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+        );
+      }
+    });
+
+    $clone.identifierMatches = [...cloneFrom.identifierMatches];
+    $clone.arguments = [...cloneFrom.arguments];
+    $clone.isTrusted = cloneFrom.isTrusted;
+    // TODO: should `isUnique` only be set if mode matches?
+    $clone.isUnique = cloneFrom.isUnique;
+    $clone.isInliningForbidden = cloneFrom.isInliningForbidden;
+
+    for (const [k, v] of cloneFrom._symbolSubstitutes) {
+      $clone._symbolSubstitutes.set(k, v);
+    }
+
+    for (const v of cloneFrom.placeholders) {
+      $clone.placeholders.push(v);
+    }
+    for (const v of cloneFrom.deferreds) {
+      $clone.deferreds.push(v);
+    }
+    for (const [k, v] of cloneFrom.fixedPlaceholderValues) {
+      $clone.fixedPlaceholderValues.set(k, v);
+    }
+    for (const [k, v] of cloneFrom.relationJoins) {
+      $clone.relationJoins.set(k, v);
+    }
+    for (const v of cloneFrom.joins) {
+      $clone.joins.push(v);
+    }
+    for (const v of cloneFrom.conditions) {
+      $clone.conditions.push(v);
+    }
+    if (cloneFromMatchingMode) {
+      for (const v of cloneFromMatchingMode.selects) {
+        $clone.selects.push(v);
+      }
+      for (const v of cloneFromMatchingMode.groups) {
+        $clone.groups.push(v);
+      }
+      for (const v of cloneFromMatchingMode.havingConditions) {
+        $clone.havingConditions.push(v);
+      }
+      for (const v of cloneFromMatchingMode.orders) {
+        $clone.orders.push(v);
+      }
+
+      $clone.isOrderUnique = cloneFromMatchingMode.isOrderUnique;
+      $clone.firstStepId = cloneFromMatchingMode.firstStepId;
+      $clone.lastStepId = cloneFromMatchingMode.lastStepId;
+      $clone.fetchOneExtra = cloneFromMatchingMode.fetchOneExtra;
+      $clone.offsetStepId = cloneFromMatchingMode.offsetStepId;
+
+      // dependencies were already added, so we can just copy the dependency references
+      $clone.beforeStepId = cloneFromMatchingMode.beforeStepId;
+      $clone.afterStepId = cloneFromMatchingMode.afterStepId;
+      $clone.lowerIndexStepId = cloneFromMatchingMode.lowerIndexStepId;
+      $clone.upperIndexStepId = cloneFromMatchingMode.upperIndexStepId;
+    }
+
+    return $clone;
+  }
+
+  constructor(options: PgSelectOptions<TResource>) {
+    super();
+    const {
+      resource,
+      identifiers,
+      args: inArgs,
+      from: inFrom = null,
+      hasImplicitOrder: inHasImplicitOrder,
+      name,
+      mode,
+      joinAsLateral: inJoinAsLateral = false,
+      forceIdentity: inForceIdentity = false,
+      context: inContext,
+
+      // Clone only details
+      _internalCloneSymbol,
+      _internalCloneAlias,
+    } = options;
+
+    this.mode = mode ?? "normal";
 
     this.hasSideEffects = this.mode === "mutation";
 
     this.resource = resource;
-    if (cloneFrom !== null) {
-      // Prevent any changes to our original to help avoid programming
-      // errors.
-      cloneFrom.lock();
 
-      if (this.dependencies.length !== 0) {
-        throw new Error("Should not have any dependencies yet");
-      }
-      cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency({
-          ...cloneFrom.getDepOptions(idx),
-          skipDeduplication: true,
-        });
-        if (myIdx !== idx) {
-          throw new Error(
-            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
-          );
-        }
-      });
-    } else {
-      // Since we're applying this to the original it doesn't make sense to
-      // also apply it to the clones.
+    // Since we're applying this to the original it doesn't make sense to
+    // also apply it to the clones.
+    if (_internalCloneSymbol === undefined) {
       if (this.mode === "aggregate") {
         this.locker.beforeLock("orderBy", () =>
           this.locker.lockParameter("groupBy"),
         );
-      } else {
-        this.locker.beforeLock("orderBy", ensureOrderIsUnique);
       }
     }
 
-    this.contextId = cloneFrom
-      ? cloneFrom.contextId
-      : this.addDependency(this.resource.executor.context());
+    this.contextId = this.addDependency(
+      inContext ?? resource.executor.context(),
+    );
 
-    this.name = customName ?? resource.name;
-    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
-    this._symbolSubstitutes = cloneFrom
-      ? new Map(cloneFrom._symbolSubstitutes)
-      : new Map();
-    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.name = name ?? resource.name;
+    this.symbol = _internalCloneSymbol ?? Symbol(this.name);
+    this.alias = _internalCloneAlias ?? sql.identifier(this.symbol);
     this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
-    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
-    this.deferreds = cloneFrom ? [...cloneFrom.deferreds] : [];
-    this.fixedPlaceholderValues = cloneFrom
-      ? new Map(cloneFrom.fixedPlaceholderValues)
-      : new Map();
     this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
     this.forceIdentity = inForceIdentity;
-    if (cloneFrom !== null) {
-      this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
-      this.arguments = Object.freeze(cloneFrom.arguments);
-    } else {
+
+    {
       if (!identifiers) {
         throw new Error("Invalid construction of PgSelectStep");
       }
@@ -550,6 +618,7 @@ export class PgSelectStep<
         dependencyIndex: number;
         expression: SQL;
         codec: PgCodec;
+        _matches: PgSelectIdentifierSpec["matches"];
       }[] = [];
       let args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
@@ -565,6 +634,7 @@ export class PgSelectStep<
           expression: matches(this.alias),
           dependencyIndex: this.addDependency(step),
           codec,
+          _matches: matches,
         });
       });
       if (inArgs != null) {
@@ -576,74 +646,10 @@ export class PgSelectStep<
       this.identifierMatches = identifierMatches;
       this.arguments = args;
     }
-    this.relationJoins = cloneFrom
-      ? new Map(cloneFrom.relationJoins)
-      : new Map();
-    this.joins = cloneFrom ? [...cloneFrom.joins] : [];
-    this.selects = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.selects]
-      : [];
-    this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
-    this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
-    this.isInliningForbidden = cloneFrom
-      ? cloneFrom.isInliningForbidden
-      : false;
-    this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
-    this.groups = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.groups]
-      : [];
-    this.havingConditions = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.havingConditions]
-      : [];
-    this.orders = cloneFromMatchingMode
-      ? [...cloneFromMatchingMode.orders]
-      : [];
-    this.isOrderUnique = cloneFromMatchingMode
-      ? cloneFromMatchingMode.isOrderUnique
-      : false;
-    this.firstStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.firstStepId
-      : null;
-    this.lastStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.lastStepId
-      : null;
-    this.fetchOneExtra = cloneFromMatchingMode
-      ? cloneFromMatchingMode.fetchOneExtra
-      : false;
-    this.offsetStepId = cloneFromMatchingMode
-      ? cloneFromMatchingMode.offsetStepId
-      : null;
-
-    // dependencies were already added, so we can just copy the dependency references
-    this.beforeStepId = cloneFromMatchingMode?.beforeStepId ?? null;
-    this.afterStepId = cloneFromMatchingMode?.afterStepId ?? null;
-    this.lowerIndexStepId = cloneFromMatchingMode?.lowerIndexStepId ?? null;
-    this.upperIndexStepId = cloneFromMatchingMode?.upperIndexStepId ?? null;
-
-    this.locker.afterLock("orderBy", () => {
-      if (this.beforeStepId != null) {
-        this.applyConditionFromCursor(
-          "before",
-          this.getDep<any>(this.beforeStepId),
-        );
-      }
-      if (this.afterStepId != null) {
-        this.applyConditionFromCursor(
-          "after",
-          this.getDep<any>(this.afterStepId),
-        );
-      }
-    });
 
     this.peerKey = this.resource.name;
 
-    debugPlanVerbose(
-      `%s (%s) constructor (%s; %s)`,
-      this,
-      this.name,
-      cloneFrom ? "clone" : "original",
-      this.mode,
-    );
+    debugPlanVerbose(`%s (%s) constructor (%s)`, this, this.name, this.mode);
 
     return this;
   }
@@ -815,7 +821,11 @@ export class PgSelectStep<
    * pagination, or grouping, aggregates, etc)
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
-    return new PgSelectStep(this, mode);
+    // Prevent any changes to our original to help avoid programming
+    // errors.
+    this.lock();
+
+    return PgSelectStep.clone(this, mode);
   }
 
   connectionClone(
@@ -879,11 +889,6 @@ export class PgSelectStep<
     this.groups.push(this.scopedSQL(group));
   }
 
-  getGroups(): readonly PgGroupSpec[] {
-    this.locker.lockParameter("groupBy");
-    return this.groups;
-  }
-
   havingPlan(): PgConditionStep<this> {
     if (this.locker.locked) {
       throw new Error(
@@ -924,10 +929,6 @@ export class PgSelectStep<
     this.orders.push(this.scopedSQL(order));
   }
 
-  orderIsUnique(): boolean {
-    return this.isOrderUnique;
-  }
-
   setOrderIsUnique(): void {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot set order unique once plan is locked`);
@@ -943,125 +944,13 @@ export class PgSelectStep<
     }
   }
 
-  private applyConditionFromCursor(
-    beforeOrAfter: "before" | "after",
-    $parsedCursorPlan: LambdaStep<any, any[] | null>,
-  ): void {
-    const digest = this.getOrderByDigest();
-    const orders = this.getOrderBy();
-    const orderCount = orders.length;
-
-    // Cursor validity check; if we get inlined then this will be passed up
-    // to the parent so we can trust it.
-    if (this.connectionDepId === null) {
-      const $validate = pgValidateParsedCursor(
-        $parsedCursorPlan,
-        digest,
-        orderCount,
-        beforeOrAfter,
-      );
-      this.addDependency($validate);
-    } else {
-      // To make the error be thrown in the right place, we should also add this error to our parent connection
-      const $connection = this.getDep<ConnectionStep<any, any, any>>(
-        this.connectionDepId,
-      );
-      $connection.addValidation(() => {
-        return pgValidateParsedCursor(
-          $parsedCursorPlan,
-          digest,
-          orderCount,
-          beforeOrAfter,
-        );
-      });
-    }
-
-    if (orderCount === 0) {
-      // Natural pagination `['natural', N]`
-      const $n = access($parsedCursorPlan, [1]);
-      if (beforeOrAfter === "before") {
-        this.upperIndexStepId = this.addUnaryDependency($n);
-      } else {
-        this.lowerIndexStepId = this.addUnaryDependency($n);
-      }
-      return;
-    }
-    if (!this.isOrderUnique) {
-      // ENHANCEMENT: make this smarter
-      throw new SafeError(
-        `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
-      );
-    }
-
-    const condition = (i = 0): SQL => {
-      const order = orders[i];
-      const [orderFragment, orderCodec, nullable] =
-        getFragmentAndCodecFromOrder(this.alias, order, this.resource.codec);
-      const { nulls, direction } = order;
-      const sqlValue = this.placeholder(
-        access($parsedCursorPlan, [i + 1]),
-        orderCodec,
-      );
-
-      // For the truth-table of this code, have a look at this spreadsheet:
-      // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
-
-      const gt =
-        (direction === "ASC" && beforeOrAfter === "after") ||
-        (direction === "DESC" && beforeOrAfter === "before");
-
-      const nullsFirst =
-        nulls === "FIRST"
-          ? true
-          : nulls === "LAST"
-          ? false
-          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-            // ASC = NULLS LAST
-            direction === "DESC";
-
-      // Simple less than or greater than
-      let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
-
-      // Nullable, so now handle if one is null but the other isn't
-      if (nullable) {
-        const useAIsNullAndBIsNotNull =
-          (nullsFirst && beforeOrAfter === "after") ||
-          (!nullsFirst && beforeOrAfter === "before");
-        const oneIsNull = useAIsNullAndBIsNotNull
-          ? sql`${orderFragment} is null and ${sqlValue} is not null`
-          : sql`${orderFragment} is not null and ${sqlValue} is null`;
-        fragment = sql`((${fragment}) or (${oneIsNull}))`;
-      }
-
-      // Finally handle if they're equal - recurse
-      if (i < orderCount - 1) {
-        const equals = nullable ? sql`is not distinct from` : sql`=`;
-        const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
-        fragment = sql`(${fragment})
-or (
-${sql.indent`${aEqualsB}
-and ${sql.indent(sql.parens(condition(i + 1)))}`}
-)`;
-      }
-
-      return fragment;
-    };
-
-    /*
-     * We used to allow the cursor to be null or string; but we now _only_ run
-     * this code when the `evalIs(null) || evalIs(undefined)` returns false. So
-     * we know that the cursor must exist, so therefore we don't need to add
-     * this extra condition.
-    // If the cursor is null then no condition is needed
-    const cursorIsNullPlaceholder = this.placeholder(
-      lambda($parsedCursorPlan, (cursor) => cursor == null),
-      TYPES.boolean
+  public items() {
+    return this.operationPlan.cacheStep(
+      this,
+      "items",
+      "" /* Digest of our arguments */,
+      () => new PgSelectRowsStep(this),
     );
-    const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
-    */
-    const finalCondition = condition();
-
-    this.where(finalCondition);
   }
 
   public pageInfo(
@@ -1070,6 +959,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.assertCursorPaginationAllowed();
     this.lock();
     return pgPageInfo($connectionPlan);
+  }
+
+  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+    this.needsCursor = true;
+    return access(this, "cursorDetails");
   }
 
   /**
@@ -1086,120 +980,65 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    */
   async execute(
     executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
-    const { first, last } = this.getExecutionCommon(executionDetails);
+  ): Promise<GrafastResultsList<PgSelectStepResult>> {
     const {
       indexMap,
       count,
       values,
       extra: { eventEmitter },
+      stream,
     } = executionDetails;
-    if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
-    }
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      queryValues,
-      shouldReverseOrder,
-    } = this.buildTheQuery(executionDetails);
-    const contextDep = values[this.contextId];
-
-    const specs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? null : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const executeMethod =
-      this.operationPlan.operation.operation === "query"
-        ? "executeWithCache"
-        : "executeWithoutCache";
-    const executionResult = await this.resource[executeMethod](specs, {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      name,
-      eventEmitter,
-      useTransaction: this.mode === "mutation",
-    });
-    // debugExecute("%s; result: %c", this, executionResult);
-
-    return executionResult.values.map((allVals) => {
-      if (allVals == null || isPromiseLike(allVals)) {
-        return allVals;
-      }
-      const limit = first ?? last;
-      const firstAndLast = first != null && last != null && last < first;
-      const hasMore =
-        this.fetchOneExtra && limit != null && allVals.length > limit;
-      const trimFromStart =
-        !shouldReverseOrder && last != null && first == null;
-      const limitedRows = hasMore
-        ? trimFromStart
-          ? allVals.slice(Math.max(0, allVals.length - limit!))
-          : allVals.slice(0, limit!)
-        : allVals;
-      const slicedRows =
-        firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-      const orderedRows = shouldReverseOrder
-        ? reverseArray(slicedRows)
-        : slicedRows;
-      if (hasMore) {
-        (orderedRows as any).hasMore = true;
-      }
-      return orderedRows;
-    });
-  }
-
-  /**
-   * Like `execute`, but stream the results via async iterables.
-   */
-  async stream(
-    executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultStreamList<unknown[]>> {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
-    const { first, last } = this.getExecutionCommon(executionDetails);
-    if (first === 0 || last === 0) {
-      return arrayOfLength(count, Object.freeze([]));
-    }
     const {
       text,
       rawSqlValues,
       textForDeclare,
       rawSqlValuesForDeclare,
       identifierIndex,
+      name,
       streamInitialCount,
       queryValues,
       shouldReverseOrder,
-    } = this.buildTheQuery(executionDetails);
-
-    if (shouldReverseOrder !== false) {
-      throw new Error("shouldReverseOrder must be false for stream");
+      first,
+      last,
+      cursorDetails,
+    } = buildTheQuery({
+      executionDetails,
+      placeholders: this.placeholders,
+      fixedPlaceholderValues: this.fixedPlaceholderValues,
+      deferreds: this.deferreds,
+      firstStepId: this.firstStepId,
+      lastStepId: this.lastStepId,
+      offsetStepId: this.offsetStepId,
+      afterStepId: this.afterStepId,
+      beforeStepId: this.beforeStepId,
+      forceIdentity: this.forceIdentity,
+      havingConditions: this.havingConditions,
+      mode: this.mode,
+      hasSideEffects: this.hasSideEffects,
+      name: this.name,
+      alias: this.alias,
+      resource: this.resource,
+      groups: this.groups,
+      orders: this.orders,
+      selects: this.selects,
+      fetchOneExtra: this.fetchOneExtra,
+      isOrderUnique: this.isOrderUnique,
+      isUnique: this.isUnique,
+      conditions: this.conditions,
+      identifierMatches: this.identifierMatches,
+      _symbolSubstitutes: this._symbolSubstitutes,
+      from: this.from,
+      joins: this.joins,
+      arguments: this.arguments,
+      needsCursor: this.needsCursor,
+    });
+    if (first === 0 || last === 0) {
+      return arrayOfLength(count, NO_ROWS);
     }
-    if (!rawSqlValuesForDeclare || !textForDeclare) {
-      throw new Error("declare query must exist for stream");
-    }
-
     const contextDep = values[this.contextId];
-    let specs: readonly PgExecutorInput<any>[] | null = null;
-    if (text) {
-      specs = indexMap((i) => {
+
+    if (stream == null) {
+      const specs = indexMap<PgExecutorInput<any>>((i) => {
         const context = contextDep.at(i);
         return {
           // The context is how we'd handle different connections with different claims
@@ -1213,51 +1052,125 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
               : EMPTY_ARRAY,
         };
       });
-    }
-    const initialFetchResult = specs
-      ? (
-          await this.resource.executeWithoutCache(specs, {
-            text,
-            rawSqlValues,
-            identifierIndex,
-            eventEmitter,
-          })
-        ).values
-      : null;
-
-    const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
-
-      return {
-        // The context is how we'd handle different connections with different claims
-        context,
-        queryValues:
-          identifierIndex != null
-            ? queryValues.map(({ dependencyIndex, codec }) => {
-                const val = values[dependencyIndex].at(i);
-                return val == null ? val : codec.toPg(val);
-              })
-            : EMPTY_ARRAY,
-      };
-    });
-    const streams = (
-      await this.resource.executeStream(streamSpecs, {
-        text: textForDeclare,
-        rawSqlValues: rawSqlValuesForDeclare,
+      const executeMethod =
+        this.operationPlan.operation.operation === "query"
+          ? "executeWithCache"
+          : "executeWithoutCache";
+      const executionResult = await this.resource[executeMethod](specs, {
+        text,
+        rawSqlValues,
         identifierIndex,
+        name,
         eventEmitter,
-      })
-    ).streams;
+        useTransaction: this.mode === "mutation",
+      });
+      // debugExecute("%s; result: %c", this, executionResult);
 
-    if (initialFetchResult) {
-      // Munge the initialCount records into the streams
+      return executionResult.values.map((allVals) => {
+        if (isPromiseLike(allVals)) {
+          // Must be an error
+          return allVals as never;
+        }
+        if (allVals == null) {
+          return allVals;
+        }
+        const limit = first ?? last;
+        const firstAndLast = first != null && last != null && last < first;
+        const hasMore =
+          this.fetchOneExtra && limit != null && allVals.length > limit;
+        const trimFromStart =
+          !shouldReverseOrder && last != null && first == null;
+        const limitedRows = hasMore
+          ? trimFromStart
+            ? allVals.slice(Math.max(0, allVals.length - limit!))
+            : allVals.slice(0, limit!)
+          : allVals;
+        const slicedRows =
+          firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+        const orderedRows = shouldReverseOrder
+          ? reverseArray(slicedRows)
+          : slicedRows;
+        return {
+          items: orderedRows,
+          hasMore,
+          cursorDetails,
+        };
+      });
+    } else {
+      if (shouldReverseOrder !== false) {
+        throw new Error("shouldReverseOrder must be false for stream");
+      }
+      if (!rawSqlValuesForDeclare || !textForDeclare) {
+        throw new Error("declare query must exist for stream");
+      }
 
-      return streams.map((stream, idx) => {
-        if (!isAsyncIterable(stream)) {
-          return stream;
+      let specs: readonly PgExecutorInput<any>[] | null = null;
+      if (text) {
+        specs = indexMap((i) => {
+          const context = contextDep.at(i);
+          return {
+            // The context is how we'd handle different connections with different claims
+            context,
+            queryValues:
+              identifierIndex != null
+                ? queryValues.map(({ dependencyIndex, codec }) => {
+                    const val = values[dependencyIndex].at(i);
+                    return val == null ? null : codec.toPg(val);
+                  })
+                : EMPTY_ARRAY,
+          };
+        });
+      }
+      const initialFetchResult = specs
+        ? (
+            await this.resource.executeWithoutCache(specs, {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              eventEmitter,
+            })
+          ).values
+        : null;
+
+      const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
+        const context = contextDep.at(i);
+
+        return {
+          // The context is how we'd handle different connections with different claims
+          context,
+          queryValues:
+            identifierIndex != null
+              ? queryValues.map(({ dependencyIndex, codec }) => {
+                  const val = values[dependencyIndex].at(i);
+                  return val == null ? val : codec.toPg(val);
+                })
+              : EMPTY_ARRAY,
+        };
+      });
+      const streams = (
+        await this.resource.executeStream(streamSpecs, {
+          text: textForDeclare,
+          rawSqlValues: rawSqlValuesForDeclare,
+          identifierIndex,
+          eventEmitter,
+        })
+      ).streams;
+
+      return streams.map((iterable, idx) => {
+        if (!isAsyncIterable(iterable)) {
+          // Must be an error
+          return iterable;
+        }
+        if (!initialFetchResult) {
+          return {
+            items: iterable,
+            hasMore: false,
+            cursorDetails,
+          };
         }
 
-        const innerIterator = stream[Symbol.asyncIterator]();
+        // Munge the initialCount records into the streams
+        const innerIterator = iterable[Symbol.asyncIterator]();
 
         let i = 0;
         let done = false;
@@ -1297,277 +1210,13 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             return this;
           },
         };
-        return mergedGenerator;
+        return {
+          items: mergedGenerator,
+          hasMore: false,
+          cursorDetails,
+        };
       });
-    } else {
-      return streams;
     }
-  }
-
-  private buildSelect(
-    options: {
-      extraSelects?: readonly SQL[];
-    } = Object.create(null),
-  ) {
-    const { extraSelects = EMPTY_ARRAY } = options;
-    const selects = [...this.selects, ...extraSelects];
-    const l = this.selects.length;
-    const extraSelectIndexes = extraSelects.map((_, i) => i + l);
-
-    const fragmentsWithAliases = selects.map(
-      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-    );
-
-    const sqlAliases: SQL[] = [];
-    for (const [a, b] of this._symbolSubstitutes.entries()) {
-      sqlAliases.push(sql.symbolAlias(a, b));
-    }
-    const aliases = sql.join(sqlAliases, "");
-
-    const selection =
-      fragmentsWithAliases.length > 0
-        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-        : sql` /* NOTHING?! */`;
-
-    return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-  }
-
-  private fromExpression(): SQL {
-    const from =
-      typeof this.from === "function"
-        ? this.from(...this.arguments)
-        : this.from;
-    return from;
-  }
-
-  private buildFrom() {
-    return {
-      sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}${
-        this.resource.codec.attributes ? sql.blank : sql`(v)`
-      }`,
-    };
-  }
-
-  private buildJoin() {
-    const joins: SQL[] = this.joins.map((j) => {
-      const conditions: SQL =
-        j.type === "cross"
-          ? sql.blank
-          : j.conditions.length === 0
-          ? sql.true
-          : j.conditions.length === 1
-          ? j.conditions[0]
-          : sql.join(
-              j.conditions.map((c) => sql.parens(sql.indent(c))),
-              " and ",
-            );
-      const joinCondition =
-        j.type !== "cross"
-          ? sql`\non ${sql.parens(
-              sql.indentIf(j.conditions.length > 1, conditions),
-            )}`
-          : sql.blank;
-      const join: SQL =
-        j.type === "inner"
-          ? sql`inner join`
-          : j.type === "left"
-          ? sql`left outer join`
-          : j.type === "right"
-          ? sql`right outer join`
-          : j.type === "full"
-          ? sql`full outer join`
-          : j.type === "cross"
-          ? sql`cross join`
-          : (sql.blank as never);
-
-      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
-        j.alias
-      }${j.attributeNames ?? sql.blank}${joinCondition}`;
-    });
-
-    return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
-  }
-
-  private buildWhereOrHaving(
-    whereOrHaving: SQL,
-    baseConditions: SQL[],
-    options: { extraWheres?: SQL[] } = Object.create(null),
-  ) {
-    const allConditions = options.extraWheres
-      ? [...baseConditions, ...options.extraWheres]
-      : baseConditions;
-    const sqlConditions = sql.join(
-      allConditions.map((c) => sql.parens(sql.indent(c))),
-      " and ",
-    );
-    return {
-      sql:
-        allConditions.length === 0
-          ? sql.blank
-          : allConditions.length === 1
-          ? sql`\n${whereOrHaving} ${sqlConditions}`
-          : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`,
-    };
-  }
-
-  /**
-   * So we can quickly detect if cursors are invalid we use this digest,
-   * passing this check does not mean that the cursor is valid but it at least
-   * catches common user errors.
-   */
-  public getOrderByDigest() {
-    this.locker.lockParameter("orderBy");
-    if (this.orders.length === 0) {
-      return "natural";
-    }
-    // The security of this hash is unimportant; the main aim is to protect the
-    // user from themself. If they bypass this, that's their problem (it will
-    // not introduce a security issue).
-    const hash = createHash("sha256");
-    hash.update(
-      JSON.stringify(
-        this.orders.map((o) => {
-          const [frag] = getFragmentAndCodecFromOrder(
-            this.alias,
-            o,
-            this.resource.codec,
-          );
-          const placeholderValues = new Map<symbol, SQL>(
-            this.fixedPlaceholderValues,
-          );
-          for (let i = 0; i < this.placeholders.length; i++) {
-            const { symbol } = this.placeholders[i];
-            placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
-          }
-          for (let i = 0; i < this.deferreds.length; i++) {
-            const { symbol } = this.deferreds[i];
-            placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
-          }
-          return sql.compile(frag, { placeholderValues }).text;
-        }),
-      ),
-    );
-    const digest = hash.digest("hex").slice(0, 10);
-    return digest;
-  }
-
-  public getOrderBy(): ReadonlyArray<PgOrderSpec> {
-    this.locker.lockParameter("orderBy");
-    return this.orders;
-  }
-
-  private buildGroupBy() {
-    this.locker.lockParameter("groupBy");
-    const groups = this.groups;
-    return {
-      sql:
-        groups.length > 0
-          ? sql`\ngroup by ${sql.join(
-              groups.map((o) => o.fragment),
-              ", ",
-            )}`
-          : sql.blank,
-    };
-  }
-
-  /**
-   * This is the `ORDER BY` SQL to be used in the SQL statement; it may be
-   * reversed (see this.shouldReverseOrderId) compared to what the user
-   * requested.
-   */
-  private orderBySQL: SQL | null = null;
-  /**
-   * This is the "true" order (non-reversed) `ORDER BY` SQL to be used in
-   * things like `row_number() over (order by ...)`.
-   */
-  private trueOrderBySQL: SQL | null = null;
-
-  private buildOrderBy(forceTrueOrder = false) {
-    if (forceTrueOrder) {
-      if (!this.trueOrderBySQL) {
-        throw new Error(
-          "trueOrderBySQL was not built - did we not get optimized?",
-        );
-      }
-      return { sql: this.trueOrderBySQL };
-    } else {
-      if (!this.orderBySQL) {
-        throw new Error("orderBySQL was not built - did we not get optimized?");
-      }
-      return { sql: this.orderBySQL };
-    }
-  }
-
-  private planOrderBy($shouldReverseOrder: ExecutableStep<boolean> | null) {
-    this.locker.lockParameter("orderBy");
-    return operationPlan().withRootLayerPlan(() =>
-      lambda(
-        {
-          reverse: $shouldReverseOrder ?? constant(false, false),
-          orders: constant(this.orders, false),
-          alias: constant(this.alias, false),
-          codec: constant(this.resource.codec, false),
-        },
-        calculateOrderBySQL,
-        true,
-      ),
-    );
-  }
-
-  protected shouldReverseOrderId: number | null = null;
-  protected limitAndOffsetSQL: SQL | null = null;
-  private buildLimitAndOffset() {
-    // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
-    // Connections Specification first is applied first, then last is applied.
-    // For us this means that if first is present we set the limit to this and
-    // then we do the last artificially later.
-    // https://relay.dev/graphql/connections.htm#EdgesToReturn()
-
-    if (!this.limitAndOffsetSQL) {
-      throw new Error(
-        "limitAndOffsetSQL was not built - did we not get optimized?",
-      );
-    }
-    return {
-      sql: this.limitAndOffsetSQL,
-    };
-  }
-
-  private buildQuery(
-    options: {
-      asJsonAgg?: boolean;
-      withIdentifiers?: boolean;
-      extraSelects?: SQL[];
-      extraWheres?: SQL[];
-      forceOrder?: boolean;
-    } = Object.create(null),
-  ): {
-    sql: SQL;
-    extraSelectIndexes: number[];
-  } {
-    const { sql: select, extraSelectIndexes } = this.buildSelect(options);
-    const { sql: from } = this.buildFrom();
-    const { sql: join } = this.buildJoin();
-    const { sql: where } = this.buildWhereOrHaving(
-      sql`where`,
-      this.conditions,
-      options,
-    );
-    const { sql: groupBy } = this.buildGroupBy();
-    const { sql: having } = this.buildWhereOrHaving(
-      sql`having`,
-      this.havingConditions,
-    );
-    const { sql: orderBy } = this.buildOrderBy(options.forceOrder);
-    const { sql: limitAndOffset } = this.buildLimitAndOffset();
-
-    const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
-    const query = options.asJsonAgg
-      ? // 's' for 'subquery'
-        sql`select json_agg(s) from (${sql.indent(baseQuery)}) s`
-      : baseQuery;
-
-    return { sql: query, extraSelectIndexes };
   }
 
   public finalize(): void {
@@ -1581,314 +1230,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.locker.locked = true;
 
     super.finalize();
-  }
-
-  private buildTheQuery(executionDetails: ExecutionDetails): QueryBuildResult {
-    const { count } = executionDetails;
-    const { shouldReverseOrder } = this.getExecutionCommon(executionDetails);
-
-    const extraWheres: SQL[] = [];
-
-    const {
-      queryValues,
-      placeholderValues,
-      handlePlaceholder,
-      identifiersSymbol,
-      identifiersAlias,
-    } = this.makeValues(executionDetails, this.name);
-
-    // Handle fixed placeholder values
-    for (const [key, value] of this.fixedPlaceholderValues.entries()) {
-      placeholderValues.set(key, value);
-    }
-
-    // Handle identifiers
-    for (const identifierMatch of this.identifierMatches) {
-      const { expression, dependencyIndex } = identifierMatch;
-      const symbol = Symbol(`dep-${dependencyIndex}`);
-      extraWheres.push(sql`${expression} = ${sql.placeholder(symbol)}`);
-      const alreadyEncoded = false;
-      // Now it's essentially a placeholder:
-      handlePlaceholder({ ...identifierMatch, symbol, alreadyEncoded });
-    }
-
-    const makeQuery = ({
-      limit,
-      offset,
-      options,
-    }: {
-      limit?: number;
-      offset?: number;
-      options?: Parameters<typeof sql.compile>[1];
-    } = {}): {
-      text: string;
-      rawSqlValues: SQLRawValue[];
-      identifierIndex: number | null;
-    } => {
-      const forceOrder = (this.streamOptions && shouldReverseOrder) || false;
-      if (
-        queryValues.length > 0 ||
-        (count !== 1 && (this.forceIdentity || this.hasSideEffects))
-      ) {
-        const extraSelects: SQL[] = [];
-
-        const identifierIndexOffset =
-          extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
-        const rowNumberIndexOffset =
-          forceOrder || limit != null || offset != null
-            ? extraSelects.push(
-                sql`row_number() over (${sql.indent(
-                  this.buildOrderBy(true).sql,
-                )})`,
-              ) - 1
-            : -1;
-
-        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
-          extraSelects,
-          extraWheres,
-          forceOrder,
-        });
-        const identifierIndex = extraSelectIndexes[identifierIndexOffset];
-
-        const rowNumberIndex =
-          rowNumberIndexOffset >= 0
-            ? extraSelectIndexes[rowNumberIndexOffset]
-            : null;
-        const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-
-        /*
-         * This wrapper around the inner query is for @stream:
-         *
-         * - stream must be in the correct order, so if we have
-         *   `shouldReverseOrder` then we must reverse the order
-         *   ourselves here;
-         * - stream can have an `initialCount` - we want to satisfy all
-         *   `initialCount` records from _each identifier group_ before we then
-         *   resolve the remaining records.
-         *
-         * NOTE: if neither of the above cases apply then we can skip this,
-         * even for @stream.
-         */
-        const wrappedInnerQuery =
-          rowNumberIndex != null ||
-          limit != null ||
-          (offset != null && offset > 0)
-            ? sql`select *\nfrom (${sql.indent(
-                baseQuery,
-              )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-                String(rowNumberIndex),
-              )}${
-                limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-              }${
-                offset != null && offset > 0
-                  ? sql`\noffset ${sql.literal(offset)}`
-                  : sql.blank
-              }`
-            : baseQuery;
-
-        // PERF: if the query does not have a limit/offset; should we use an
-        // `inner join` in a flattened query instead of a wrapped query with
-        // `lateral`?
-
-        const wrapperSymbol = Symbol(this.name + "_result");
-        const wrapperAlias = sql.identifier(wrapperSymbol);
-
-        const {
-          text: lateralText,
-          values: rawSqlValues,
-          [$$symbolToIdentifier]: symbolToIdentifier,
-        } = sql.compile(
-          sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
-          options,
-        );
-
-        const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
-        const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
-
-        /*
-         * IMPORTANT: these wrapper queries are necessary so that queries
-         * that have a limit/offset get the limit/offset applied _per
-         * identifier group_; that's why this cannot just be another "from"
-         * clause.
-         */
-        const text = `\
-select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-          queryValues.length > 0
-            ? `, ${queryValues
-                .map(({ codec }, idx) => {
-                  return `(ids.value->>${idx})::${
-                    sql.compile(codec.sqlType).text
-                  } as "id${idx}"`;
-                })
-                .join(", ")}`
-            : ""
-        } from json_array_elements($${
-          rawSqlValues.length + 1
-        }::json) with ordinality as ids) as ${identifiersAliasText},
-${lateralText};`;
-
-        return { text, rawSqlValues, identifierIndex };
-      } else if (
-        (limit != null && limit >= 0) ||
-        (offset != null && offset > 0)
-      ) {
-        // ENHANCEMENT: make this nicer; combine with the `if` branch above?
-
-        const extraSelects: SQL[] = [];
-        const rowNumberIndexOffset =
-          forceOrder || limit != null || offset != null
-            ? extraSelects.push(
-                sql`row_number() over (${sql.indent(
-                  this.buildOrderBy(true).sql,
-                )})`,
-              ) - 1
-            : -1;
-
-        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
-          extraSelects,
-          extraWheres,
-        });
-        const rowNumberIndex =
-          rowNumberIndexOffset >= 0
-            ? extraSelectIndexes[rowNumberIndexOffset]
-            : null;
-        const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
-        /*
-         * This wrapper around the inner query is for @stream:
-         *
-         * - stream must be in the correct order, so if we have
-         *   `shouldReverseOrder` then we must reverse the order
-         *   ourselves here;
-         * - stream can have an `initialCount` - we want to satisfy all
-         *   `initialCount` records from _each identifier group_ before we then
-         *   resolve the remaining records.
-         *
-         * NOTE: if neither of the above cases apply then we can skip this,
-         * even for @stream.
-         */
-        const wrappedInnerQuery =
-          rowNumberIndex != null ||
-          limit != null ||
-          (offset != null && offset > 0)
-            ? sql`select *\nfrom (${sql.indent(
-                baseQuery,
-              )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
-                String(rowNumberIndex),
-              )}${
-                limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
-              }${
-                offset != null && offset > 0
-                  ? sql`\noffset ${sql.literal(offset)}`
-                  : sql.blank
-              };`
-            : sql`${baseQuery};`;
-        const { text, values: rawSqlValues } = sql.compile(
-          wrappedInnerQuery,
-          options,
-        );
-        return { text, rawSqlValues, identifierIndex: null };
-      } else {
-        const { sql: query } = this.buildQuery({
-          extraWheres,
-        });
-        const { text, values: rawSqlValues } = sql.compile(
-          sql`${query};`,
-          options,
-        );
-        return { text, rawSqlValues, identifierIndex: null };
-      }
-    };
-
-    if (this.streamOptions) {
-      // PERF: should use the queryForSingle optimization in here too
-
-      // When streaming we can't reverse order in JS - we must do it in the DB.
-      if (this.streamOptions.initialCount > 0) {
-        /*
-         * Here our stream is constructed of two parts - an
-         * `initialFetchQuery` to satisfy the `initialCount` and then a
-         * `streamQuery` to build the PostgreSQL cursor for fetching the
-         * remaining results across all groups.
-         */
-        const {
-          text,
-          rawSqlValues,
-          identifierIndex: initialFetchIdentifierIndex,
-        } = makeQuery({
-          limit: this.streamOptions.initialCount,
-          options: { placeholderValues },
-        });
-        const {
-          text: textForDeclare,
-          rawSqlValues: rawSqlValuesForDeclare,
-          identifierIndex: streamIdentifierIndex,
-        } = makeQuery({
-          offset: this.streamOptions.initialCount,
-          options: { placeholderValues },
-        });
-        if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
-          throw new Error(
-            `GrafastInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
-          );
-        }
-        const identifierIndex = initialFetchIdentifierIndex;
-        return {
-          text,
-          rawSqlValues,
-          textForDeclare,
-          rawSqlValuesForDeclare,
-          identifierIndex,
-          shouldReverseOrder: false,
-          streamInitialCount: this.streamOptions.initialCount,
-          queryValues,
-        };
-      } else {
-        /*
-         * Unlike the above case, here we have an `initialCount` of zero so
-         * we can skip the `initialFetchQuery` and jump straight to the
-         * `streamQuery`.
-         */
-        const {
-          text: textForDeclare,
-          rawSqlValues: rawSqlValuesForDeclare,
-          identifierIndex: streamIdentifierIndex,
-        } = makeQuery({
-          offset: 0,
-          options: {
-            placeholderValues,
-          },
-        });
-        return {
-          // This is a hack since this is the _only_ place we don't want
-          // `text`; loosening the types would risk us forgetting in more
-          // places (and cause us to do excessive type safety checks) so we
-          // use an explicit empty string to mark this.
-          text: "",
-          rawSqlValues: [],
-          textForDeclare,
-          rawSqlValuesForDeclare,
-          identifierIndex: streamIdentifierIndex,
-          shouldReverseOrder: false,
-          streamInitialCount: 0,
-          queryValues,
-        };
-      }
-    } else {
-      const { text, rawSqlValues, identifierIndex } = makeQuery({
-        options: {
-          placeholderValues,
-        },
-      });
-      return {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        shouldReverseOrder,
-        name: hash(text),
-        queryValues,
-      };
-    }
   }
 
   deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TResource>[] {
@@ -2086,413 +1427,44 @@ ${lateralText};`;
     if (this.fetchOneExtra) {
       replacement.fetchOneExtra = true;
     }
-  }
-
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<PgResource>>(
-    otherPlan: TOtherStep,
-  ): {
-    [desiredIndex: string]: string;
-  } {
-    if (otherPlan.mode !== this.mode) {
-      throw new Error(
-        "GrafastInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectStep in a different mode",
-      );
-    }
-    const actualKeyByDesiredKey = Object.create(null);
-    //console.log(`Other ${otherPlan} selects:`);
-    //console.dir(otherPlan.selects, { depth: 8 });
-    //console.log(`My ${this} selects:`);
-    //console.dir(this.selects, { depth: 8 });
-    this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
-    });
-    //console.dir(actualKeyByDesiredKey);
-    //console.log(`Other ${otherPlan} selects now:`);
-    //console.dir(otherPlan.selects, { depth: 8 });
-    return actualKeyByDesiredKey;
-  }
-
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResource>>(
-    otherPlan: TOtherStep,
-  ): void {
-    for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
-      const dep = this.getDep(dependencyIndex);
-      /*
-       * We have dependency `dep`. We're attempting to merge ourself into
-       * `otherPlan`. We have two situations we need to handle:
-       *
-       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
-       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
-       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
-       *    result of selecting an expression in the `otherPlan`), in which
-       *    case we should turn it into an SQL expression and inline that.
-       */
-
-      // PERF: we know dep can't depend on otherPlan if
-      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
-      // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB(otherPlan, dep)) {
-        // Either dep is a static input plan (which isn't dependent on anything
-        // else) or otherPlan is deeper than dep; either way we can use the dep
-        // directly within otherPlan.
-        const newPlanIndex = otherPlan.addDependency(dep);
-        otherPlan.placeholders.push({
-          dependencyIndex: newPlanIndex,
-          codec,
-          symbol,
-          alreadyEncoded,
-        });
-      } else if (dep instanceof PgClassExpressionStep) {
-        // Replace with a reference.
-        otherPlan.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
-      } else {
-        throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
-        );
-      }
-    }
-    for (const deferred of this.deferreds) {
-      const { dependencyIndex, symbol } = deferred;
-      const dep = this.getDep(dependencyIndex);
-      /*
-       * We have dependency `dep`. We're attempting to merge ourself into
-       * `otherPlan`. We have two situations we need to handle:
-       *
-       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
-       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
-       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
-       *    result of selecting an expression in the `otherPlan`), in which
-       *    case we should turn it into an SQL expression and inline that.
-       */
-
-      // PERF: we know dep can't depend on otherPlan if
-      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
-      // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB(otherPlan, dep)) {
-        // Either dep is a static input plan (which isn't dependent on anything
-        // else) or otherPlan is deeper than dep; either way we can use the dep
-        // directly within otherPlan.
-        const newPlanIndex = otherPlan.addDependency(dep);
-        otherPlan.deferreds.push({
-          symbol,
-          dependencyIndex: newPlanIndex,
-        });
-      } else {
-        throw new Error(`Could not merge deferred: ${dep}`);
-      }
-    }
-    for (const [
-      sqlPlaceholder,
-      placeholderValue,
-    ] of this.fixedPlaceholderValues.entries()) {
-      if (
-        otherPlan.fixedPlaceholderValues.has(sqlPlaceholder) &&
-        otherPlan.fixedPlaceholderValues.get(sqlPlaceholder) !==
-          placeholderValue
-      ) {
-        throw new Error(
-          `${otherPlan} already has an identical placeholder with a different value when trying to mergePlaceholdersInto it from ${this}`,
-        );
-      }
-      otherPlan.fixedPlaceholderValues.set(sqlPlaceholder, placeholderValue);
+    if (this.needsCursor) {
+      replacement.needsCursor = true;
     }
   }
 
-  optimize({ stream }: StepOptimizeOptions): ExecutableStep {
-    this.streamOptions = stream;
-
+  optimize(): ExecutableStep {
     // In case we have any lock actions in future:
     this.lock();
-
-    // Now we need to be able to mess with ourself, but be sure to lock again
-    // at the end.
-    this.locker.locked = false;
-    const $shouldReverseOrder = this.shouldReverseOrder();
-    this.shouldReverseOrderId = this.addUnaryDependency($shouldReverseOrder);
-    // This cannot be done in deduplicate because setting fetchOneExtra comes later.
-    operationPlan().withRootLayerPlan(() => {
-      const $limitAndOffsets = this.planLimitAndOffsets();
-      this.limitAndOffsetSQL = this.deferredSQL(access($limitAndOffsets, 0));
-      this.orderBySQL = this.deferredSQL(this.planOrderBy($shouldReverseOrder));
-      this.trueOrderBySQL = this.deferredSQL(this.planOrderBy(null));
-    });
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
-    const otherDeps: ExecutableStep[] = [];
-
-    if (
-      !this.isInliningForbidden &&
-      !this.hasSideEffects &&
-      !stream &&
-      !this.joins.some((j) => j.type !== "left")
-    ) {
-      // Inline ourself into our parent if we can.
-      let t: Maybe<PgSelectStep<PgResource>> = undefined;
-      let p: ExecutableStep | undefined = undefined;
-      // Scan through the dependencies to find a suitable ancestor step to merge with
-      for (
-        let dependencyIndex = 0, l = this.dependencies.length;
-        dependencyIndex < l;
-        dependencyIndex++
-      ) {
-        if (dependencyIndex === this.contextId) {
-          // We check myContext vs tsContext below; so lets assume it's fine
-          // for now.
-          continue;
-        }
-        const dep = this.getDep(dependencyIndex);
-        if (dep instanceof PgClassExpressionStep) {
-          const t2Parent = dep.getParentStep();
-          if (!(t2Parent instanceof PgSelectSingleStep)) {
-            continue;
-          }
-          const t2 = t2Parent.getClassStep();
-          if (t2 === this) {
-            throw new Error(
-              `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
-            );
-          }
-
-          if (t2.hasSideEffects) {
-            // It's a mutation; don't merge
-            continue;
-          }
-
-          // Don't allow merging across a stream/defer/subscription boundary
-          if (!stepsAreInSamePhase(t2, this)) {
-            continue;
-          }
-
-          // Don't want to make this a join as it can result in the order being
-          // messed up
-          if (t2.hasImplicitOrder && !this.joinAsLateral && this.isUnique) {
-            continue;
-          }
-
-          /*
-          if (!planGroupsOverlap(this, t2)) {
-            // We're not in the same group (i.e. there's probably a @defer or
-            // @stream between us) - do not merge.
-            continue;
-          }
-          */
-
-          if (t === undefined && p === undefined) {
-            p = t2Parent;
-            t = t2;
-          } else if (t2 !== t) {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
-              this,
-              dep,
-              t2,
-              t,
-            );
-            t = null;
-            break;
-          } else if (t2Parent !== p) {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
-              this,
-              t2Parent,
-              p,
-            );
-            t = null;
-            break;
-          }
-        } else {
-          otherDeps.push(dep);
-        }
-      }
-      // Check the contexts are the same
-      if (t != null && p != null) {
-        const myContext = this.getDep(this.contextId);
-        const tsContext = t.getDep(t.contextId);
-        if (myContext != tsContext) {
-          debugPlanVerbose(
-            "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
-            this,
-            myContext,
-            tsContext,
-            t.dependencies[t.contextId],
-            t,
-          );
-          t = null;
-        }
-      }
-      // Check the dependencies can be moved across to `t`
-      if (t != null && p != null) {
-        for (const dep of otherDeps) {
-          if (t.canAddDependency(dep)) {
-            // All good; just move the dependency over
-          } else {
-            debugPlanVerbose(
-              "Refusing to optimise %c due to dependency %c which cannot be added as a dependency of %c",
-              this,
-              dep,
-              t,
-            );
-            t = null;
-            break;
-          }
-        }
-      }
-      if (t != null && p != null) {
-        // Looks feasible.
-
-        const table = t;
-        const parent = p;
-
-        if ((table as PgSelectStep<any>) === this) {
-          throw new Error(
-            `Something's gone catastrophically wrong - ${this} is trying to merge with itself!`,
-          );
-        }
-
-        const tableWasLocked = table.locker.locked;
-        table.locker.locked = false;
-
-        if (
-          this.isUnique &&
-          // TODO: this was previously first==null,last==null,offset==null which isn't the same thing.
-          this.firstStepId == null &&
-          this.lastStepId == null &&
-          this.offsetStepId == null &&
-          // End TODO
-          this.mode !== "aggregate" &&
-          table.mode !== "aggregate" &&
-          // For uniques these should all pass anyway, but pays to be cautious..
-          this.groups.length === 0 &&
-          this.havingConditions.length === 0 &&
-          this.orders.length === 0 &&
-          !this.fetchOneExtra
-        ) {
-          if (this.selects.length > 0) {
-            debugPlanVerbose(
-              "Merging %c into %c (via %c)",
-              this,
-              table,
-              parent,
-            );
-            const { sql: where } = this.buildWhereOrHaving(
-              sql`/* WHERE becoming ON */`,
-              this.conditions,
-            );
-            const conditions = [
-              ...this.identifierMatches.map((identifierMatch) => {
-                const { dependencyIndex, codec, expression } = identifierMatch;
-                const step = this.getDep(dependencyIndex);
-                if (step instanceof PgClassExpressionStep) {
-                  return sql`${step.toSQL()}::${codec.sqlType} = ${expression}`;
-                } else {
-                  return sql`${this.placeholder(step, codec)} = ${expression}`;
-                }
-              }),
-              // Note the WHERE is now part of the JOIN condition (since
-              // it's a LEFT JOIN).
-              ...(where !== sql.blank ? [where] : []),
-            ];
-            this.mergePlaceholdersInto(table);
-            for (const [a, b] of this._symbolSubstitutes.entries()) {
-              if (isDev) {
-                if (
-                  table._symbolSubstitutes.has(a) &&
-                  table._symbolSubstitutes.get(a) !== b
-                ) {
-                  throw new Error(
-                    `Conflict when setting a substitute whilst merging ${this} into ${table}; symbol already has a substitute, and it's different.`,
-                  );
-                }
-              }
-              table._symbolSubstitutes.set(a, b);
-            }
-            table.joins.push(
-              {
-                type: "left",
-                from: this.fromExpression(),
-                alias: this.alias,
-                attributeNames: this.resource.codec.attributes
-                  ? sql.blank
-                  : sql`(v)`,
-                conditions,
-                lateral: this.joinAsLateral,
-              },
-              ...this.joins,
-            );
-            const actualKeyByDesiredKey = this.mergeSelectsWith(table);
-            // We return a list here because our children are going to use a
-            // `first` plan on us.
-            // NOTE: we don't need to reverse the list for relay pagination
-            // because it only contains one entry.
-            return list([remapKeys(parent, actualKeyByDesiredKey)]);
-          } else {
-            debugPlanVerbose(
-              "Skipping merging %c into %c (via %c) due to no attributes being selected",
-              this,
-              table,
-              parent,
-            );
-            // We return a list here because our children are going to use a
-            // `first` plan on us.
-            return list([parent]);
-          }
-        } else if (
-          parent instanceof PgSelectSingleStep &&
-          parent.getClassStep().mode !== "aggregate"
-        ) {
-          const parent2 = parent.getItemStep();
-          this.identifierMatches.forEach((identifierMatch) => {
-            const { dependencyIndex, codec, expression } = identifierMatch;
-            const step = this.getDep(dependencyIndex);
-            if (step instanceof PgClassExpressionStep) {
-              return this.where(
-                sql`${step.toSQL()}::${codec.sqlType} = ${expression}`,
-              );
-            } else {
-              return this.where(
-                sql`${this.placeholder(step, codec)} = ${expression}`,
-              );
-            }
-          });
-          this.mergePlaceholdersInto(table);
-          const { sql: query } = this.buildQuery({
-            // No need to do arrays; the json_agg handles this for us - we can
-            // return objects with numeric keys just fine and JS will be fine
-            // with it.
-            asJsonAgg: true,
-          });
-          const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
-          debugPlanVerbose(
-            "Optimising %c (via %c and %c)",
-            this,
-            table,
-            parent2,
-          );
-          const $first = this.getDepOrConstant(this.firstStepId, null);
-          const $last = this.getDepOrConstant(this.lastStepId, null);
-          const rowsPlan = access<any[]>(parent2, [selfIndex], []);
-          return lambda(
-            {
-              rows: rowsPlan,
-              first: $first,
-              last: $last,
-              shouldReverseOrder: $shouldReverseOrder,
-              fetchOneExtra: constant(this.fetchOneExtra, false),
-            },
-            reverseIfNecessary,
-            true,
-          );
-        }
-
-        table.locker.locked = tableWasLocked;
-      }
+    // TODO: have connection validate cursor
+    /*
+    if (this.connectionDepId === null) {
+      const $validate = pgValidateParsedCursor(
+        $parsedCursorPlan,
+        digest,
+        orderCount,
+        beforeOrAfter,
+      );
+      this.addDependency($validate);
+    } else {
+      // To make the error be thrown in the right place, we should also add this error to our parent connection
+      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+        this.connectionDepId,
+      );
+      $connection.addValidation(() => {
+        return pgValidateParsedCursor(
+          $parsedCursorPlan,
+          digest,
+          orderCount,
+          beforeOrAfter,
+        );
+      });
     }
-
-    this.locker.locked = true;
+    */
 
     return this;
   }
@@ -2589,8 +1561,46 @@ ${lateralText};`;
   [$$toSQL]() {
     return this.alias;
   }
+}
 
-  // --------------------
+export class PgSelectRowsStep<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends ExecutableStep {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectRowsStep",
+  };
+
+  public isSyncAndSafe = false;
+
+  constructor($pgSelect: PgSelectStep<TResource>) {
+    super();
+    this.addDependency($pgSelect);
+  }
+
+  public getClassStep(): PgSelectStep<TResource> {
+    return this.getDep<PgSelectStep<TResource>>(0);
+  }
+
+  listItem(itemPlan: ExecutableStep) {
+    return this.getClassStep().listItem(itemPlan);
+  }
+
+  public deduplicate(_peers: readonly ExecutableStep[]) {
+    // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
+    return _peers;
+  }
+
+  // optimize() {
+  //   const $access = access(this.getClassStep(), "items");
+  //   $access.isSyncAndSafe = false;
+  //   return $access;
+  // }
+
+  execute(executionDetails: ExecutionDetails) {
+    const pgSelect = executionDetails.values[0];
+    return executionDetails.indexMap((i) => pgSelect.at(i).items);
+  }
 }
 
 function joinMatches(
@@ -2629,23 +1639,32 @@ function joinMatches(
 /**
  * Apply a default order in case our default is not unique.
  */
-function ensureOrderIsUnique(step: PgSelectStep<any>) {
+function makeOrderUniqueIfPossible<
+  TResource extends PgResource<any, any, any, any, any>,
+>(info: MutablePgSelectQueryInfo<TResource>): void {
+  // If we're already uniquely ordered, no need to order
+  if (info.isOrderUnique) return;
   // No need to order a unique record
-  if (step.unique()) return;
-  const unique = (step.resource.uniques as PgResourceUnique[])[0];
-  if (unique !== undefined) {
-    const ordersIsUnique = step.orderIsUnique();
-    if (!ordersIsUnique) {
-      unique.attributes.forEach((c) => {
-        step.orderBy({
-          fragment: sql`${step.alias}.${sql.identifier(c as string)}`,
-          codec: step.resource.codec.attributes![c].codec,
-          direction: "ASC",
-        });
-      });
-      step.setOrderIsUnique();
-    }
+  if (info.isUnique) return;
+  const {
+    alias,
+    resource: {
+      uniques,
+      codec: { attributes },
+    },
+  } = info;
+  const unique = (uniques as PgResourceUnique[])[0];
+  // Nothing unique to order by
+  if (unique == null) return;
+
+  for (const c of unique.attributes) {
+    info.orders.push({
+      fragment: sql`${alias}.${sql.identifier(c as string)}`,
+      codec: attributes![c].codec,
+      direction: "ASC",
+    });
   }
+  info.isOrderUnique = true;
 }
 
 export function pgSelect<TResource extends PgResource<any, any, any, any, any>>(
@@ -2776,36 +1795,6 @@ export function getFragmentAndCodecFromOrder(
   }
 }
 
-function reverseIfNecessary(params: {
-  rows: any[];
-  shouldReverseOrder: boolean;
-  first: Maybe<number>;
-  last: Maybe<number>;
-  fetchOneExtra: boolean;
-}) {
-  const { rows, shouldReverseOrder, first, last, fetchOneExtra } = params;
-  const limit = first ?? last;
-  const firstAndLast = first != null && last != null && last < first;
-  if ((fetchOneExtra || firstAndLast) && limit != null) {
-    if (!rows) {
-      return rows;
-    }
-    const hasMore = rows.length > limit;
-    const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-    const slicedRows =
-      firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-    const orderedRows = shouldReverseOrder
-      ? reverseArray(slicedRows)
-      : slicedRows;
-    if (hasMore) {
-      (orderedRows as any).hasMore = true;
-    }
-    return orderedRows;
-  } else {
-    return shouldReverseOrder ? reverseArray(rows) : rows;
-  }
-}
-
 function calculateOrderBySQL(params: {
   reverse: boolean;
   orders: PgOrderSpec[];
@@ -2842,4 +1831,804 @@ function calculateOrderBySQL(params: {
         ", ",
       )}`
     : sql.blank;
+}
+
+interface PgSelectQueryInfo<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends PgStmtCommonQueryInfo {
+  readonly name: string;
+  readonly resource: TResource;
+  readonly mode: PgSelectMode;
+  /** Are we fetching just one record? */
+  readonly isUnique: boolean;
+  /** Is the order that was established at planning time unique? */
+  readonly isOrderUnique: boolean;
+  readonly fixedPlaceholderValues: ReadonlyMap<symbol, SQL>;
+  readonly identifierMatches: readonly {
+    readonly dependencyIndex: number;
+    readonly expression: SQL;
+    readonly codec: PgCodec;
+  }[];
+  readonly _symbolSubstitutes: ReadonlyMap<symbol, symbol>;
+
+  readonly selects: ReadonlyArray<SQL>;
+  readonly from: SQL | ((...args: Array<PgSelectArgumentDigest>) => SQL);
+  readonly arguments: ReadonlyArray<PgSelectArgumentDigest>;
+  readonly joins: ReadonlyArray<PgSelectPlanJoin>;
+  readonly conditions: ReadonlyArray<SQL>;
+  readonly orders: ReadonlyArray<PgOrderSpec>;
+}
+interface MutablePgSelectQueryInfo<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends PgSelectQueryInfo<TResource>,
+    MutablePgStmtCommonQueryInfo {
+  readonly selects: Array<SQL>;
+  readonly conditions: Array<SQL>;
+  readonly orders: Array<PgOrderSpec>;
+  readonly groups: Array<PgGroupSpec>;
+  readonly havingConditions: Array<SQL>;
+  isOrderUnique: boolean;
+}
+
+function buildTheQuery<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+>(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
+  const info: MutablePgSelectQueryInfo<TResource> = {
+    ...rawInfo,
+
+    // Make mutable:
+    selects: [...rawInfo.selects],
+    conditions: [...rawInfo.conditions],
+    orders: [...rawInfo.orders],
+    groups: [...rawInfo.groups],
+    havingConditions: [...rawInfo.havingConditions],
+
+    // Will be populated by applyConditionFromCursor
+    cursorLower: null,
+    cursorUpper: null,
+    cursorDigest: null,
+    cursorIndicies: rawInfo.needsCursor ? [] : null,
+
+    // Will be populated by applyCommonPaginationStuff
+    first: null,
+    last: null,
+    offset: null,
+    shouldReverseOrder: false,
+  };
+
+  function selectAndReturnIndex(expression: SQL): number {
+    const existingIndex = info.selects.findIndex((s) =>
+      sql.isEquivalent(s, expression),
+    );
+    if (existingIndex >= 0) return existingIndex;
+    return info.selects.push(expression) - 1;
+  }
+
+  // TODO: evaluate runtime orders, conditions, etc here
+
+  // beforeLock("orderBy"): Now the runtime orders/etc have been added, mutate `orders` to be unique
+  makeOrderUniqueIfPossible(info);
+
+  // afterLock("orderBy"): Now the runtime orders/etc have been performed,
+
+  const { count, stream, values } = info.executionDetails;
+  const after = getUnary<any[] | null>(values, info.afterStepId);
+  const before = getUnary<any[] | null>(values, info.beforeStepId);
+
+  if (info.needsCursor || after != null || before != null) {
+    info.cursorDigest = getOrderByDigest(info);
+  }
+  // PERF: only calculate this if needed
+  const { sql: trueOrderBySQL } = buildOrderBy(info, false);
+  if (info.cursorIndicies) {
+    // PERF: calculate cursorDigest here instead?
+    if (info.orders.length > 0) {
+      for (const o of info.orders) {
+        const [frag, codec] = getFragmentAndCodecFromOrder(
+          info.alias,
+          o,
+          info.resource.codec,
+        );
+        info.cursorIndicies.push({
+          index: selectAndReturnIndex(
+            codec.castFromPg
+              ? codec.castFromPg(frag, o.nullable === false)
+              : sql`${frag}::text`,
+          ),
+          codec,
+        });
+      }
+    } else {
+      // No ordering; so use row number
+      info.cursorIndicies.push({
+        index: selectAndReturnIndex(
+          sql`(row_number() over (partition by 1))::text`,
+        ),
+        codec: TYPES.int,
+      });
+    }
+  }
+
+  // apply conditions from the cursor
+  applyConditionFromCursor(info, "after", after);
+  applyConditionFromCursor(info, "before", before);
+
+  applyCommonPaginationStuff(info);
+
+  /****************************************
+   *                                      *
+   *      ALL MUTATION NOW COMPLETE       *
+   *                                      *
+   ****************************************/
+
+  const {
+    name,
+    hasSideEffects,
+    forceIdentity,
+    fixedPlaceholderValues,
+    identifierMatches,
+
+    first,
+    last,
+    shouldReverseOrder,
+    cursorDigest,
+    cursorIndicies,
+  } = info;
+
+  const extraWheres: SQL[] = [];
+
+  const {
+    queryValues,
+    placeholderValues,
+    handlePlaceholder,
+    identifiersSymbol,
+    identifiersAlias,
+  } = makeValues(info, name);
+
+  // Handle fixed placeholder values
+  for (const [key, value] of fixedPlaceholderValues) {
+    placeholderValues.set(key, value);
+  }
+
+  // Handle identifiers
+  for (const identifierMatch of identifierMatches) {
+    const { expression, dependencyIndex } = identifierMatch;
+    const symbol = Symbol(`dep-${dependencyIndex}`);
+    extraWheres.push(sql`${expression} = ${sql.placeholder(symbol)}`);
+    const alreadyEncoded = false;
+    // Now it's essentially a placeholder:
+    handlePlaceholder({ ...identifierMatch, symbol, alreadyEncoded });
+  }
+
+  const makeQuery = ({
+    limit,
+    offset,
+    options,
+  }: {
+    limit?: number;
+    offset?: number;
+    options?: Parameters<typeof sql.compile>[1];
+  } = {}): {
+    text: string;
+    rawSqlValues: SQLRawValue[];
+    identifierIndex: number | null;
+  } => {
+    const forceOrder = (stream && info.shouldReverseOrder) || false;
+    if (
+      queryValues.length > 0 ||
+      (count !== 1 && (forceIdentity || hasSideEffects))
+    ) {
+      const extraSelects: SQL[] = [];
+
+      const identifierIndexOffset =
+        extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
+      // PERF: try and re-use existing trueOrderBySQL selection?
+      const rowNumberIndexOffset =
+        forceOrder || limit != null || offset != null
+          ? extraSelects.push(
+              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
+            ) - 1
+          : -1;
+
+      const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
+        extraSelects,
+        extraWheres,
+        forceOrder,
+      });
+      const identifierIndex = extraSelectIndexes[identifierIndexOffset];
+
+      const rowNumberIndex =
+        rowNumberIndexOffset >= 0
+          ? extraSelectIndexes[rowNumberIndexOffset]
+          : null;
+      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
+
+      /*
+       * This wrapper around the inner query is for @stream:
+       *
+       * - stream must be in the correct order, so if we have
+       *   `shouldReverseOrder` then we must reverse the order
+       *   ourselves here;
+       * - stream can have an `initialCount` - we want to satisfy all
+       *   `initialCount` records from _each identifier group_ before we then
+       *   resolve the remaining records.
+       *
+       * NOTE: if neither of the above cases apply then we can skip this,
+       * even for @stream.
+       */
+      const wrappedInnerQuery =
+        rowNumberIndex != null ||
+        limit != null ||
+        (offset != null && offset > 0)
+          ? sql`select *\nfrom (${sql.indent(
+              baseQuery,
+            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
+              String(rowNumberIndex),
+            )}${
+              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
+            }${
+              offset != null && offset > 0
+                ? sql`\noffset ${sql.literal(offset)}`
+                : sql.blank
+            }`
+          : baseQuery;
+
+      // PERF: if the query does not have a limit/offset; should we use an
+      // `inner join` in a flattened query instead of a wrapped query with
+      // `lateral`?
+
+      const wrapperSymbol = Symbol(name + "_result");
+      const wrapperAlias = sql.identifier(wrapperSymbol);
+
+      const {
+        text: lateralText,
+        values: rawSqlValues,
+        [$$symbolToIdentifier]: symbolToIdentifier,
+      } = sql.compile(
+        sql`lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`,
+        options,
+      );
+
+      const identifiersAliasText = symbolToIdentifier.get(identifiersSymbol);
+      const wrapperAliasText = symbolToIdentifier.get(wrapperSymbol);
+
+      /*
+       * IMPORTANT: these wrapper queries are necessary so that queries
+       * that have a limit/offset get the limit/offset applied _per
+       * identifier group_; that's why this cannot just be another "from"
+       * clause.
+       */
+      const text = `\
+select ${wrapperAliasText}.*
+from (select ids.ordinality - 1 as idx${
+        queryValues.length > 0
+          ? `, ${queryValues
+              .map(({ codec }, idx) => {
+                return `(ids.value->>${idx})::${
+                  sql.compile(codec.sqlType).text
+                } as "id${idx}"`;
+              })
+              .join(", ")}`
+          : ""
+      } from json_array_elements($${
+        rawSqlValues.length + 1
+      }::json) with ordinality as ids) as ${identifiersAliasText},
+${lateralText};`;
+
+      return { text, rawSqlValues, identifierIndex };
+    } else if (
+      (limit != null && limit >= 0) ||
+      (offset != null && offset > 0)
+    ) {
+      // ENHANCEMENT: make this nicer; combine with the `if` branch above?
+
+      const extraSelects: SQL[] = [];
+      const rowNumberIndexOffset =
+        forceOrder || limit != null || offset != null
+          ? extraSelects.push(
+              sql`row_number() over (${sql.indent(trueOrderBySQL)})`,
+            ) - 1
+          : -1;
+
+      const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
+        extraSelects,
+        extraWheres,
+      });
+      const rowNumberIndex =
+        rowNumberIndexOffset >= 0
+          ? extraSelectIndexes[rowNumberIndexOffset]
+          : null;
+      const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
+      /*
+       * This wrapper around the inner query is for @stream:
+       *
+       * - stream must be in the correct order, so if we have
+       *   `shouldReverseOrder` then we must reverse the order
+       *   ourselves here;
+       * - stream can have an `initialCount` - we want to satisfy all
+       *   `initialCount` records from _each identifier group_ before we then
+       *   resolve the remaining records.
+       *
+       * NOTE: if neither of the above cases apply then we can skip this,
+       * even for @stream.
+       */
+      const wrappedInnerQuery =
+        rowNumberIndex != null ||
+        limit != null ||
+        (offset != null && offset > 0)
+          ? sql`select *\nfrom (${sql.indent(
+              baseQuery,
+            )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
+              String(rowNumberIndex),
+            )}${
+              limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
+            }${
+              offset != null && offset > 0
+                ? sql`\noffset ${sql.literal(offset)}`
+                : sql.blank
+            };`
+          : sql`${baseQuery};`;
+      const { text, values: rawSqlValues } = sql.compile(
+        wrappedInnerQuery,
+        options,
+      );
+      return { text, rawSqlValues, identifierIndex: null };
+    } else {
+      const { sql: query } = buildQuery(info, {
+        extraWheres,
+      });
+      const { text, values: rawSqlValues } = sql.compile(
+        sql`${query};`,
+        options,
+      );
+      return { text, rawSqlValues, identifierIndex: null };
+    }
+  };
+
+  const cursorDetails: PgCursorDetails | undefined =
+    cursorDigest != null && cursorIndicies != null
+      ? {
+          digest: cursorDigest,
+          indicies: cursorIndicies,
+        }
+      : undefined;
+
+  if (stream) {
+    // PERF: should use the queryForSingle optimization in here too
+
+    // When streaming we can't reverse order in JS - we must do it in the DB.
+    if (stream.initialCount > 0) {
+      /*
+       * Here our stream is constructed of two parts - an
+       * `initialFetchQuery` to satisfy the `initialCount` and then a
+       * `streamQuery` to build the PostgreSQL cursor for fetching the
+       * remaining results across all groups.
+       */
+      const {
+        text,
+        rawSqlValues,
+        identifierIndex: initialFetchIdentifierIndex,
+      } = makeQuery({
+        limit: stream.initialCount,
+        options: { placeholderValues },
+      });
+      const {
+        text: textForDeclare,
+        rawSqlValues: rawSqlValuesForDeclare,
+        identifierIndex: streamIdentifierIndex,
+      } = makeQuery({
+        offset: stream.initialCount,
+        options: { placeholderValues },
+      });
+      if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
+        throw new Error(
+          `GrafastInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
+        );
+      }
+      const identifierIndex = initialFetchIdentifierIndex;
+      return {
+        text,
+        rawSqlValues,
+        textForDeclare,
+        rawSqlValuesForDeclare,
+        identifierIndex,
+        shouldReverseOrder: false,
+        streamInitialCount: stream.initialCount,
+        queryValues,
+        first,
+        last,
+        cursorDetails,
+      };
+    } else {
+      /*
+       * Unlike the above case, here we have an `initialCount` of zero so
+       * we can skip the `initialFetchQuery` and jump straight to the
+       * `streamQuery`.
+       */
+      const {
+        text: textForDeclare,
+        rawSqlValues: rawSqlValuesForDeclare,
+        identifierIndex: streamIdentifierIndex,
+      } = makeQuery({
+        offset: 0,
+        options: {
+          placeholderValues,
+        },
+      });
+      return {
+        // This is a hack since this is the _only_ place we don't want
+        // `text`; loosening the types would risk us forgetting in more
+        // places (and cause us to do excessive type safety checks) so we
+        // use an explicit empty string to mark this.
+        text: "",
+        rawSqlValues: [],
+        textForDeclare,
+        rawSqlValuesForDeclare,
+        identifierIndex: streamIdentifierIndex,
+        shouldReverseOrder: false,
+        streamInitialCount: 0,
+        queryValues,
+        first,
+        last,
+        cursorDetails,
+      };
+    }
+  } else {
+    const { text, rawSqlValues, identifierIndex } = makeQuery({
+      options: {
+        placeholderValues,
+      },
+    });
+    return {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      shouldReverseOrder,
+      name: hash(text),
+      queryValues,
+      first,
+      last,
+      cursorDetails,
+    };
+  }
+}
+
+function applyConditionFromCursor<
+  TResource extends PgResource<any, any, any, any, any>,
+>(
+  info: MutablePgSelectQueryInfo<TResource>,
+  beforeOrAfter: "before" | "after",
+  parsedCursor: Maybe<any[]>,
+): void {
+  if (parsedCursor == null) return;
+  const { orders, isOrderUnique, alias, resource, cursorDigest } = info;
+  if (cursorDigest == null) {
+    throw new Error(`Cursor passed, but could not determine order digest.`);
+  }
+  const orderCount = orders.length;
+
+  // Cursor validity check
+  validateParsedCursor(parsedCursor, cursorDigest, orderCount, beforeOrAfter);
+
+  if (orderCount === 0) {
+    // Natural pagination `['natural', N]`
+    const n = parsedCursor[1];
+    if (beforeOrAfter === "after") {
+      info.cursorLower = n;
+    } else {
+      info.cursorUpper = n;
+    }
+    return;
+  }
+  if (!isOrderUnique) {
+    // ENHANCEMENT: make this smarter
+    throw new SafeError(
+      `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
+    );
+  }
+
+  const condition = (i = 0): SQL => {
+    const order = orders[i];
+    const [orderFragment, orderCodec, nullable] = getFragmentAndCodecFromOrder(
+      alias,
+      order,
+      resource.codec,
+    );
+    const { nulls, direction } = order;
+    const sqlValue = sql`${sql.value(parsedCursor[i + 1])}::${
+      orderCodec.sqlType
+    }`;
+
+    // For the truth-table of this code, have a look at this spreadsheet:
+    // https://docs.google.com/spreadsheets/d/1m5H-4IRAjhx_Z8v7nd2wMTbmx1dOBof9IroW3WUYE7s/edit?usp=sharing
+
+    const gt =
+      (direction === "ASC" && beforeOrAfter === "after") ||
+      (direction === "DESC" && beforeOrAfter === "before");
+
+    const nullsFirst =
+      nulls === "FIRST"
+        ? true
+        : nulls === "LAST"
+        ? false
+        : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+          // ASC = NULLS LAST
+          direction === "DESC";
+
+    // Simple less than or greater than
+    let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+
+    // Nullable, so now handle if one is null but the other isn't
+    if (nullable) {
+      const useAIsNullAndBIsNotNull =
+        (nullsFirst && beforeOrAfter === "after") ||
+        (!nullsFirst && beforeOrAfter === "before");
+      const oneIsNull = useAIsNullAndBIsNotNull
+        ? sql`${orderFragment} is null and ${sqlValue} is not null`
+        : sql`${orderFragment} is not null and ${sqlValue} is null`;
+      fragment = sql`((${fragment}) or (${oneIsNull}))`;
+    }
+
+    // Finally handle if they're equal - recurse
+    if (i < orderCount - 1) {
+      const equals = nullable ? sql`is not distinct from` : sql`=`;
+      const aEqualsB = sql`${orderFragment} ${equals} ${sqlValue}`;
+      fragment = sql`(${fragment})
+or (
+${sql.indent`${aEqualsB}
+and ${sql.indent(sql.parens(condition(i + 1)))}`}
+)`;
+    }
+
+    return fragment;
+  };
+
+  /*
+     * We used to allow the cursor to be null or string; but we now _only_ run
+     * this code when the `evalIs(null) || evalIs(undefined)` returns false. So
+     * we know that the cursor must exist, so therefore we don't need to add
+     * this extra condition.
+    // If the cursor is null then no condition is needed
+    const cursorIsNullPlaceholder = this.placeholder(
+      lambda($parsedCursorPlan, (cursor) => cursor == null),
+      TYPES.boolean
+    );
+    const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
+    */
+  const finalCondition = condition();
+  info.conditions.push(finalCondition);
+}
+
+/**
+ * So we can quickly detect if cursors are invalid we use this digest,
+ * passing this check does not mean that the cursor is valid but it at least
+ * catches common user errors.
+ */
+function getOrderByDigest<
+  TResource extends PgResource<any, any, any, any, any>,
+>(info: MutablePgSelectQueryInfo<TResource>) {
+  const {
+    placeholders,
+    deferreds,
+    alias,
+    resource,
+    fixedPlaceholderValues,
+    orders,
+  } = info;
+  if (orders.length === 0) {
+    return "natural";
+  }
+  // The security of this hash is unimportant; the main aim is to protect the
+  // user from themself. If they bypass this, that's their problem (it will
+  // not introduce a security issue).
+  const hash = createHash("sha256");
+  hash.update(
+    JSON.stringify(
+      orders.map((o) => {
+        const [frag] = getFragmentAndCodecFromOrder(alias, o, resource.codec);
+        const placeholderValues = new Map<symbol, SQL>(fixedPlaceholderValues);
+        for (let i = 0; i < placeholders.length; i++) {
+          const { symbol } = placeholders[i];
+          placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
+        }
+        for (let i = 0; i < deferreds.length; i++) {
+          const { symbol } = deferreds[i];
+          placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
+        }
+        return sql.compile(frag, { placeholderValues }).text;
+      }),
+    ),
+  );
+  const digest = hash.digest("hex").slice(0, 10);
+  return digest;
+}
+
+function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
+  info: MutablePgSelectQueryInfo<TResource>,
+  options: {
+    asJsonAgg?: boolean;
+    withIdentifiers?: boolean;
+    extraSelects?: SQL[];
+    extraWheres?: SQL[];
+    forceOrder?: boolean;
+  } = Object.create(null),
+): {
+  sql: SQL;
+  extraSelectIndexes: number[];
+} {
+  const { alias, resource, selects: baseSelects, _symbolSubstitutes } = info;
+  function buildSelect(
+    options: {
+      extraSelects?: readonly SQL[];
+    } = Object.create(null),
+  ) {
+    const { extraSelects = EMPTY_ARRAY } = options;
+    const selects = [...baseSelects, ...extraSelects];
+    const l = baseSelects.length;
+    const extraSelectIndexes = extraSelects.map((_, i) => i + l);
+
+    const fragmentsWithAliases = selects.map(
+      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+    );
+
+    const sqlAliases: SQL[] = [];
+    for (const [a, b] of _symbolSubstitutes.entries()) {
+      sqlAliases.push(sql.symbolAlias(a, b));
+    }
+    const aliases = sql.join(sqlAliases, "");
+
+    const selection =
+      fragmentsWithAliases.length > 0
+        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+        : sql` /* NOTHING?! */`;
+
+    return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
+  }
+
+  function buildFrom() {
+    const fromSql =
+      typeof info.from === "function"
+        ? info.from(...info.arguments)
+        : info.from;
+    return {
+      sql: sql`\nfrom ${fromSql} as ${alias}${
+        resource.codec.attributes ? sql.blank : sql`(v)`
+      }`,
+    };
+  }
+
+  function buildJoin() {
+    const joins: SQL[] = info.joins.map((j) => {
+      const conditions: SQL =
+        j.type === "cross"
+          ? sql.blank
+          : j.conditions.length === 0
+          ? sql.true
+          : j.conditions.length === 1
+          ? j.conditions[0]
+          : sql.join(
+              j.conditions.map((c) => sql.parens(sql.indent(c))),
+              " and ",
+            );
+      const joinCondition =
+        j.type !== "cross"
+          ? sql`\non ${sql.parens(
+              sql.indentIf(j.conditions.length > 1, conditions),
+            )}`
+          : sql.blank;
+      const join: SQL =
+        j.type === "inner"
+          ? sql`inner join`
+          : j.type === "left"
+          ? sql`left outer join`
+          : j.type === "right"
+          ? sql`right outer join`
+          : j.type === "full"
+          ? sql`full outer join`
+          : j.type === "cross"
+          ? sql`cross join`
+          : (sql.blank as never);
+
+      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
+        j.alias
+      }${j.attributeNames ?? sql.blank}${joinCondition}`;
+    });
+
+    return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
+  }
+
+  function buildWhereOrHaving(
+    whereOrHaving: SQL,
+    baseConditions: SQL[],
+    options: { extraWheres?: SQL[] } = Object.create(null),
+  ) {
+    const allConditions = options.extraWheres
+      ? [...baseConditions, ...options.extraWheres]
+      : baseConditions;
+    const sqlConditions = sql.join(
+      allConditions.map((c) => sql.parens(sql.indent(c))),
+      " and ",
+    );
+    return {
+      sql:
+        allConditions.length === 0
+          ? sql.blank
+          : allConditions.length === 1
+          ? sql`\n${whereOrHaving} ${sqlConditions}`
+          : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`,
+    };
+  }
+
+  function buildGroupBy() {
+    const groups = info.groups;
+    return {
+      sql:
+        groups.length > 0
+          ? sql`\ngroup by ${sql.join(
+              groups.map((o) => o.fragment),
+              ", ",
+            )}`
+          : sql.blank,
+    };
+  }
+
+  // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
+  // Connections Specification first is applied first, then last is applied.
+  // For us this means that if first is present we set the limit to this and
+  // then we do the last artificially later.
+  // https://relay.dev/graphql/connections.htm#EdgesToReturn()
+
+  const [limitAndOffsetSQL] = calculateLimitAndOffsetSQLFromInfo(info);
+
+  function buildLimitAndOffset() {
+    return {
+      sql: limitAndOffsetSQL,
+    };
+  }
+
+  const { sql: select, extraSelectIndexes } = buildSelect(options);
+  const { sql: from } = buildFrom();
+  const { sql: join } = buildJoin();
+  const { sql: where } = buildWhereOrHaving(
+    sql`where`,
+    info.conditions,
+    options,
+  );
+  const { sql: groupBy } = buildGroupBy();
+  const { sql: having } = buildWhereOrHaving(
+    sql`having`,
+    info.havingConditions,
+  );
+  const { sql: orderBy } = buildOrderBy(
+    info,
+    options.forceOrder ? false : info.shouldReverseOrder,
+  );
+  const { sql: limitAndOffset } = buildLimitAndOffset();
+
+  const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
+  const query = options.asJsonAgg
+    ? // 's' for 'subquery'
+      sql`select json_agg(s) from (${sql.indent(baseQuery)}) s`
+    : baseQuery;
+
+  return { sql: query, extraSelectIndexes };
+}
+
+function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
+  info: MutablePgSelectQueryInfo<TResource>,
+  reverse: boolean,
+) {
+  const {
+    orders,
+    alias,
+    resource: { codec },
+  } = info;
+  return {
+    sql: calculateOrderBySQL({
+      reverse,
+      orders,
+      alias,
+      codec,
+    }),
+  };
 }

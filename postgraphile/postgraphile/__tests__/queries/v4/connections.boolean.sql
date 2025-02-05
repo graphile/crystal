@@ -1,7 +1,7 @@
 select
-  __compound_key__."extra"::text as "0",
-  __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2"
+  __compound_key__."person_id_2"::text as "0",
+  __compound_key__."extra"::text as "1",
+  __compound_key__."person_id_1"::text as "2"
 from "c"."compound_key" as __compound_key__
 order by __compound_key__."extra" asc, __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 limit 2;
@@ -11,9 +11,9 @@ select
 from "c"."compound_key" as __compound_key__;
 
 select
-  __compound_key__."extra"::text as "0",
-  __compound_key__."person_id_1"::text as "1",
-  __compound_key__."person_id_2"::text as "2"
+  __compound_key__."person_id_2"::text as "0",
+  __compound_key__."extra"::text as "1",
+  __compound_key__."person_id_1"::text as "2"
 from "c"."compound_key" as __compound_key__
 where (
   (((__compound_key__."extra" > $1::"bool") or (__compound_key__."extra" is not null and $1::"bool" is null)))

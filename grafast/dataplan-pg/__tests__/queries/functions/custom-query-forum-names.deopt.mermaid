@@ -9,49 +9,33 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸforum_namesᐳ"]]:::plan
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda15{{"Lambda[15∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Access19{{"Access[19∈0] ➊<br />ᐸ18.0ᐳ"}}:::plan
-    Lambda24{{"Lambda[24∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Lambda29{{"Lambda[29∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object9 & Lambda15 & Access19 & Lambda24 & Lambda29 --> PgSelect6
-    Object23{{"Object[23∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸsql.identifier(”forum_names”)ᐳ"}}:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸCodec(text)ᐳ"}}:::plan
-    Lambda15 & Constant20 & Constant21 & Constant22 --> Object23
     Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸforum_namesᐳ"]]:::plan
+    Object9 --> PgSelect6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant30 --> Lambda15
-    Lambda18{{"Lambda[18∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant31 --> Lambda18
-    Lambda18 --> Access19
-    Object23 --> Lambda24
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”forum_ᐳ"}}:::plan
-    Constant32 --> Lambda29
+    PgSelectRows10[["PgSelectRows[10∈0] ➊"]]:::plan
+    PgSelect6 --> PgSelectRows10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    __Item10[/"__Item[10∈1]<br />ᐸ6ᐳ"\]:::itemplan
-    PgSelect6 ==> __Item10
-    PgSelectSingle11{{"PgSelectSingle[11∈1]<br />ᐸtextᐳ"}}:::plan
-    __Item10 --> PgSelectSingle11
-    PgClassExpression12{{"PgClassExpression[12∈1]<br />ᐸ__forum_names__.vᐳ"}}:::plan
-    PgSelectSingle11 --> PgClassExpression12
+    __Item11[/"__Item[11∈1]<br />ᐸ10ᐳ"\]:::itemplan
+    PgSelectRows10 ==> __Item11
+    PgSelectSingle12{{"PgSelectSingle[12∈1]<br />ᐸtextᐳ"}}:::plan
+    __Item11 --> PgSelectSingle12
+    PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__forum_names__.vᐳ"}}:::plan
+    PgSelectSingle12 --> PgClassExpression13
 
     %% define steps
 
     subgraph "Buckets for queries/functions/custom-query-forum-names"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 20, 21, 22, 30, 31, 32, 9, 15, 18, 19, 23, 24, 29<br />2: PgSelect[6]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,Lambda15,Lambda18,Access19,Constant20,Constant21,Constant22,Object23,Lambda24,Lambda29,Constant30,Constant31,Constant32 bucket0
-    Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ6ᐳ[10]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,PgSelectRows10 bucket0
+    Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item10,PgSelectSingle11,PgClassExpression12 bucket1
+    class Bucket1,__Item11,PgSelectSingle12,PgClassExpression13 bucket1
     Bucket0 --> Bucket1
     end

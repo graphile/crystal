@@ -15,22 +15,11 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __users__."username" as "1",
-    __users__."gravatar_url" as "2",
+    __messages__."author_id" as "1",
     row_number() over (
       order by __messages__."id" asc
-    ) as "3"
+    ) as "2"
   from app_public.messages as __messages__
-  left outer join app_public.users as __users__
-  on (
-    (
-      __messages__."author_id"::"uuid" = __users__."id"
-    ) and (
-      /* WHERE becoming ON */ (
-        true /* authorization checks */
-      )
-    )
-  )
   where
     (
       (__messages__.archived_at is null) = ($1::"timestamptz" is null)
@@ -40,7 +29,7 @@ from (
   order by __messages__."id" desc
   limit 2
 ) __stream_wrapped__
-order by __stream_wrapped__."3"
+order by __stream_wrapped__."2"
 limit 1;
 
 begin; /*fake*/
@@ -50,22 +39,11 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __users__."username" as "1",
-    __users__."gravatar_url" as "2",
+    __messages__."author_id" as "1",
     row_number() over (
       order by __messages__."id" asc
-    ) as "3"
+    ) as "2"
   from app_public.messages as __messages__
-  left outer join app_public.users as __users__
-  on (
-    (
-      __messages__."author_id"::"uuid" = __users__."id"
-    ) and (
-      /* WHERE becoming ON */ (
-        true /* authorization checks */
-      )
-    )
-  )
   where
     (
       (__messages__.archived_at is null) = ($1::"timestamptz" is null)
@@ -75,7 +53,7 @@ from (
   order by __messages__."id" desc
   limit 2
 ) __stream_wrapped__
-order by __stream_wrapped__."3"
+order by __stream_wrapped__."2"
 offset 1;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
@@ -83,3 +61,25 @@ fetch forward 100 from __SNAPSHOT_CURSOR_0__
 close __SNAPSHOT_CURSOR_0__
 
 commit; /*fake*/
+
+select
+  __users__."username" as "0",
+  __users__."gravatar_url" as "1"
+from app_public.users as __users__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __users__."id" = $1::"uuid"
+  );
+
+select
+  __users__."username" as "0",
+  __users__."gravatar_url" as "1"
+from app_public.users as __users__
+where
+  (
+    true /* authorization checks */
+  ) and (
+    __users__."id" = $1::"uuid"
+  );

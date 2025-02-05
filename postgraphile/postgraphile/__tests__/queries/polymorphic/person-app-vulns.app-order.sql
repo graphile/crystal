@@ -9,9 +9,9 @@ select __union_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
 lateral (
   select
-    to_char(__applications__."0", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+    __applications__."0" as "0",
     __applications__."1"::text as "1",
-    __applications__."2" as "2",
+    to_char(__applications__."2", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2",
     __applications__."3"::text as "3",
     __union_identifiers__.idx as "4"
   from (
@@ -23,10 +23,10 @@ lateral (
         "n"
       from (
         select
-          __aws_applications__."last_deployed" as "0",
-          __aws_applications__."id" as "1",
-          'AwsApplication' as "2",
-          json_build_array((__aws_applications__."id")::text) as "3",
+          'AwsApplication' as "0",
+          json_build_array((__aws_applications__."id")::text) as "1",
+          __aws_applications__."last_deployed" as "2",
+          __aws_applications__."id" as "3",
           row_number() over (
             order by
               __aws_applications__."last_deployed" desc,
@@ -49,10 +49,10 @@ lateral (
         "n"
       from (
         select
-          __gcp_applications__."last_deployed" as "0",
-          __gcp_applications__."id" as "1",
-          'GcpApplication' as "2",
-          json_build_array((__gcp_applications__."id")::text) as "3",
+          'GcpApplication' as "0",
+          json_build_array((__gcp_applications__."id")::text) as "1",
+          __gcp_applications__."last_deployed" as "2",
+          __gcp_applications__."id" as "3",
           row_number() over (
             order by
               __gcp_applications__."last_deployed" desc,
@@ -67,9 +67,9 @@ lateral (
           __gcp_applications__."id" asc
       ) as __gcp_applications__
     order by
-      "0" desc,
-      "1" desc,
-      "2" asc,
+      "2" desc,
+      "3" desc,
+      "0" asc,
       "n" asc
   ) __applications__
 ) as __union_result__;

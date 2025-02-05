@@ -9,11 +9,11 @@ graph TD
 
 
     %% plan dependencies
-    List157{{"List[157∈0] ➊<br />ᐸ61,126,190,190,190,190,190,190ᐳ"}}:::plan
+    List157{{"List[157∈0] ➊<br />ᐸ61,126,174,174,174,174,174,174ᐳ"}}:::plan
     List61{{"List[61∈0] ➊<br />ᐸ36ᐳ"}}:::plan
     List126{{"List[126∈0] ➊<br />ᐸ71,101ᐳ"}}:::plan
-    Constant190{{"Constant[190∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    List61 & List126 & Constant190 & Constant190 & Constant190 & Constant190 & Constant190 & Constant190 --> List157
+    Constant174{{"Constant[174∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    List61 & List126 & Constant174 & Constant174 & Constant174 & Constant174 & Constant174 & Constant174 --> List157
     Object36{{"Object[36∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
     Access41{{"Access[41∈0] ➊<br />ᐸ0.input.tPatch.v.0.0.fromHoursᐳ"}}:::plan
     Access47{{"Access[47∈0] ➊<br />ᐸ0.input.tPatch.v.0.0.fromMinutesᐳ"}}:::plan
@@ -32,12 +32,6 @@ graph TD
     Access118{{"Access[118∈0] ➊<br />ᐸ0.input.tPatch.v.1.1.toHoursᐳ"}}:::plan
     Access124{{"Access[124∈0] ➊<br />ᐸ0.input.tPatch.v.1.1.toMinutesᐳ"}}:::plan
     Access106 & Access112 & Access118 & Access124 --> Object101
-    Object183{{"Object[183∈0] ➊<br />ᐸ{reverse,orders,alias,codec}ᐳ"}}:::plan
-    Lambda175{{"Lambda[175∈0] ➊<br />ᐸcalculateShouldReverseOrderᐳ"}}:::plan
-    Constant180{{"Constant[180∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant181{{"Constant[181∈0] ➊<br />ᐸsql.identifier(”frmcdc_work_hour”)ᐳ"}}:::plan
-    Constant182{{"Constant[182∈0] ➊<br />ᐸDomainCodecᐸworkHourPartsᐳ(workHour)ᐳ"}}:::plan
-    Lambda175 & Constant180 & Constant181 & Constant182 --> Object183
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -62,18 +56,6 @@ graph TD
     __Value0 --> Access112
     __Value0 --> Access118
     __Value0 --> Access124
-    Constant191{{"Constant[191∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant191 --> Lambda175
-    Lambda178{{"Lambda[178∈0] ➊<br />ᐸcalculateLimitAndOffsetSQLᐳ"}}:::plan
-    Constant192{{"Constant[192∈0] ➊<br />ᐸ§{ first: null, last: null, cursorLower: null, cursorUpper: ᐳ"}}:::plan
-    Constant192 --> Lambda178
-    Access179{{"Access[179∈0] ➊<br />ᐸ178.0ᐳ"}}:::plan
-    Lambda178 --> Access179
-    Lambda184{{"Lambda[184∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Object183 --> Lambda184
-    Lambda189{{"Lambda[189∈0] ➊<br />ᐸcalculateOrderBySQLᐳ"}}:::plan
-    Constant193{{"Constant[193∈0] ➊<br />ᐸ§{ reverse: false, orders: [], alias: sql.identifier(”frmcdcᐳ"}}:::plan
-    Constant193 --> Lambda189
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgUpdateSingle10[["PgUpdateSingle[10∈1] ➊<br />ᐸt(k;v)ᐳ"]]:::sideeffectplan
     Object13 & Access8 & List157 --> PgUpdateSingle10
@@ -85,42 +67,44 @@ graph TD
     PgUpdateSingle10 --> PgClassExpression159
     PgSelect163[["PgSelect[163∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
     __Item162[/"__Item[162∈5]<br />ᐸ159ᐳ"\]:::itemplan
-    Object13 & __Item162 & Lambda175 & Access179 & Lambda184 & Lambda189 --> PgSelect163
+    Object13 & __Item162 --> PgSelect163
     PgClassExpression159 ==> __Item162
-    __Item167[/"__Item[167∈6]<br />ᐸ163ᐳ"\]:::itemplan
-    PgSelect163 ==> __Item167
-    PgSelectSingle168{{"PgSelectSingle[168∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item167 --> PgSelectSingle168
-    PgClassExpression169{{"PgClassExpression[169∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression169
-    PgClassExpression170{{"PgClassExpression[170∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression170
-    PgClassExpression171{{"PgClassExpression[171∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression171
-    PgClassExpression172{{"PgClassExpression[172∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression172
+    PgSelectRows167[["PgSelectRows[167∈5]"]]:::plan
+    PgSelect163 --> PgSelectRows167
+    __Item168[/"__Item[168∈6]<br />ᐸ167ᐳ"\]:::itemplan
+    PgSelectRows167 ==> __Item168
+    PgSelectSingle169{{"PgSelectSingle[169∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item168 --> PgSelectSingle169
+    PgClassExpression170{{"PgClassExpression[170∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression170
+    PgClassExpression171{{"PgClassExpression[171∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression171
+    PgClassExpression172{{"PgClassExpression[172∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression172
+    PgClassExpression173{{"PgClassExpression[173∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression173
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/nested_arrays.updateT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access8,Access11,Access12,Object13,Object36,Access41,Access47,Access53,Access59,List61,Object71,Access76,Access82,Access88,Access94,Object101,Access106,Access112,Access118,Access124,List126,List157,Lambda175,Lambda178,Access179,Constant180,Constant181,Constant182,Object183,Lambda184,Lambda189,Constant190,Constant191,Constant192,Constant193 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 8, 157, 175, 179, 184, 189<br /><br />1: PgUpdateSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,Access8,Access11,Access12,Object13,Object36,Access41,Access47,Access53,Access59,List61,Object71,Access76,Access82,Access88,Access94,Object101,Access106,Access112,Access118,Access124,List126,List157,Constant174 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 8, 157<br /><br />1: PgUpdateSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle10,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10, 13, 175, 179, 184, 189<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10, 13<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 13, 175, 179, 184, 189<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;v)ᐳ[10]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 13<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;v)ᐳ[10]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression158,PgClassExpression159 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 13, 175, 179, 184, 189<br /><br />ROOT __Item{5}ᐸ159ᐳ[162]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 13<br /><br />ROOT __Item{5}ᐸ159ᐳ[162]<br />1: PgSelect[163]<br />2: PgSelectRows[167]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item162,PgSelect163 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ163ᐳ[167]"):::bucket
+    class Bucket5,__Item162,PgSelect163,PgSelectRows167 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ167ᐳ[168]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item167,PgSelectSingle168,PgClassExpression169,PgClassExpression170,PgClassExpression171,PgClassExpression172 bucket6
+    class Bucket6,__Item168,PgSelectSingle169,PgClassExpression170,PgClassExpression171,PgClassExpression172,PgClassExpression173 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

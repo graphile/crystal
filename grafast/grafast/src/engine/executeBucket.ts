@@ -9,19 +9,17 @@ import type {
   BatchExecutionValue,
   ExecuteStepEvent,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEntryFlags,
   ExecutionExtra,
+  ExecutionResults,
   ExecutionValue,
   ForcedValues,
   GrafastInternalResultsOrStream,
-  GrafastResultsList,
-  GrafastResultStreamList,
   IndexForEach,
   IndexMap,
   PromiseOrDirect,
-  StreamDetails,
   StreamMaybeMoreableArray,
-  StreamStepEvent,
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
@@ -36,7 +34,6 @@ import {
   NO_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
-import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -298,15 +295,13 @@ export function executeBucket(
 
         let valueIsAsyncIterable;
         if (
-          // Are we streaming this? If so, we need an iterable or async
-          // iterable.
-          finishedStep._stepOptions.stream &&
+          finishedStep._stepOptions.walkIterable &&
+          // PERF: do we want to handle arrays differently?
           ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
         ) {
-          const streamOptions = finishedStep._stepOptions.stream;
-          const initialCount: number = streamOptions
-            ? streamOptions.initialCount
-            : Infinity;
+          // PERF: we've already calculated this once; can we reference that again here?
+          const stream = evaluateStream(bucket, finishedStep);
+          const initialCount = stream?.initialCount ?? Infinity;
 
           const iterator = valueIsAsyncIterable
             ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
@@ -491,6 +486,7 @@ export function executeBucket(
           stopTime,
           meta,
           eventEmitter,
+          stream: evaluateStream(bucket, step),
           _bucket: bucket,
           _requestContext: requestContext,
         };
@@ -701,58 +697,33 @@ export function executeBucket(
     step: ExecutableStep,
     values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+  ): ExecutionResults<any> {
     if (isDev && step._isUnary && count !== 1) {
       throw new Error(
         `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
       );
     }
-    const streamOptions = step._stepOptions.stream;
-    if (streamOptions && isStreamableStep(step)) {
-      if (step.stream.length > 1) {
-        throw new Error(
-          `${step} is using a legacy form of 'stream' which accepts multiple arguments, please see https://err.red/gev2`,
-        );
-      }
-      const streamDetails: StreamDetails<readonly any[]> = {
-        indexMap: makeIndexMap(count),
-        indexForEach: makeIndexForEach(count),
-        count,
-        values,
-        extra,
-        streamOptions,
-      };
-      if (!step.isSyncAndSafe && middleware != null) {
-        return middleware.run(
-          "streamStep",
-          { args, step, streamDetails },
-          streamStepFromEvent,
-        );
-      } else {
-        return step.stream(streamDetails);
-      }
+    if (step.execute.length > 1) {
+      throw new Error(
+        `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
+      );
+    }
+    const executeDetails: ExecutionDetails<readonly any[]> = {
+      indexMap: makeIndexMap(count),
+      indexForEach: makeIndexForEach(count),
+      count,
+      values,
+      extra,
+      stream: evaluateStream(bucket, step),
+    };
+    if (!step.isSyncAndSafe && middleware != null) {
+      return middleware.run(
+        "executeStep",
+        { args, step, executeDetails },
+        executeStepFromEvent,
+      );
     } else {
-      if (step.execute.length > 1) {
-        throw new Error(
-          `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
-        );
-      }
-      const executeDetails: ExecutionDetails<readonly any[]> = {
-        indexMap: makeIndexMap(count),
-        indexForEach: makeIndexForEach(count),
-        count,
-        values,
-        extra,
-      };
-      if (!step.isSyncAndSafe && middleware != null) {
-        return middleware.run(
-          "executeStep",
-          { args, step, executeDetails },
-          executeStepFromEvent,
-        );
-      } else {
-        return step.execute(executeDetails);
-      }
+      return step.execute(executeDetails);
     }
   }
 
@@ -944,6 +915,7 @@ export function executeBucket(
         stopTime,
         meta,
         eventEmitter,
+        stream: evaluateStream(bucket, step),
         _bucket: bucket,
         _requestContext: requestContext,
       };
@@ -1388,11 +1360,27 @@ function makeIndexForEach(count: number) {
   }
   return result;
 }
-
-function streamStepFromEvent(event: StreamStepEvent) {
-  return event.step.stream(event.streamDetails);
-}
-
 function executeStepFromEvent(event: ExecuteStepEvent) {
   return event.step.execute(event.executeDetails);
+}
+
+function evaluateStream(
+  bucket: Bucket,
+  step: ExecutableStep,
+): ExecutionDetailsStream | null {
+  const stream = step._stepOptions.stream;
+  if (!stream) return null;
+
+  const shouldStream =
+    stream.ifStepId == null
+      ? true
+      : bucket.store.get(stream.ifStepId)?.unaryValue() ?? true;
+  if (!shouldStream) return null;
+
+  const initialCount =
+    stream.initialCountStepId == null
+      ? 0
+      : bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0;
+
+  return { initialCount };
 }

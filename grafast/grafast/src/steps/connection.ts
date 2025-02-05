@@ -52,9 +52,7 @@ export function assertPageInfoCapableStep(
 export interface ConnectionCapableStep<
   TItemStep extends ExecutableStep,
   TCursorStep extends ExecutableStep,
-> extends ExecutableStep<
-    ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
-  > {
+> extends ExecutableStep {
   /**
    * Clone the plan; it's recommended that you add `$connection` as a
    * dependency so that you can abort execution early in the case of errors
@@ -79,6 +77,10 @@ export interface ConnectionCapableStep<
   parseCursor($cursor: ExecutableStep<Maybe<string>>): Maybe<TCursorStep>;
   setBefore($before: TCursorStep): void;
   setAfter($after: TCursorStep): void;
+
+  items(): ExecutableStep<
+    ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
+  >;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -572,4 +574,16 @@ export function connection<
     });
   }
   return new ConnectionStep(step, config);
+}
+
+export type ItemsStep<
+  T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
+> = T extends ConnectionCapableStep<any, any> ? ReturnType<T["items"]> : T;
+
+export function itemsOrStep<
+  T extends ExecutableStep<readonly any[]> | ConnectionCapableStep<any, any>,
+>($step: T): ExecutableStep<readonly any[]> {
+  return "items" in $step && typeof $step.items === "function"
+    ? $step.items()
+    : $step;
 }
