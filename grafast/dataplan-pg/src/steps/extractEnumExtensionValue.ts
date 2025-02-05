@@ -1,7 +1,7 @@
 import type { ExecutableStep, InputStep, Maybe } from "grafast";
 import { getEnumValueConfigs, lambda } from "grafast";
-import type { GraphQLEnumType, GraphQLInputType } from "graphql";
-import { getNamedType, getNullableType, isEnumType } from "graphql";
+import type { GraphQLEnumType, GraphQLInputType } from "grafast/graphql";
+import { getNamedType, getNullableType, isEnumType } from "grafast/graphql";
 
 import type { ReadonlyArrayOrDirect } from "../interfaces.js";
 
