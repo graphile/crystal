@@ -3,7 +3,11 @@ import chalk from "chalk";
 import type { ExecutableStep, ListCapableStep } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
-import type { ConnectionCapableStep, ConnectionStep } from "./connection.js";
+import type {
+  ConnectionCapableStep,
+  ConnectionStep,
+  ItemsStep,
+} from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
 
@@ -37,14 +41,16 @@ const eachCallbackForListPlan = (
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
 export function each<
-  TListStep extends ExecutableStep<readonly any[]> &
-    Partial<ConnectionCapableStep<any, any>>,
+  TListStep extends
+    | (ExecutableStep<readonly any[]> &
+        Partial<ConnectionCapableStep<any, any>>)
+    | ConnectionCapableStep<any, any>,
   TResultItemStep extends ExecutableStep,
 >(
   listStep: TListStep,
   mapper: (
-    itemPlan: TListStep extends ListCapableStep<any, any>
-      ? ReturnType<TListStep["listItem"]>
+    itemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
+      ? ReturnType<ItemsStep<TListStep>["listItem"]>
       : __ItemStep<any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {

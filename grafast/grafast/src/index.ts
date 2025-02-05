@@ -33,6 +33,7 @@ debugFactory.formatters.c = grafastPrint;
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
@@ -42,17 +43,19 @@ import type {
   $$cacheByOperation,
   $$hooked,
   $$queryCache,
+  BatchExecutionValue,
   CacheByOperationEntry,
   DataFromStep,
   EstablishOperationPlanEvent,
   ExecuteEvent,
   ExecuteStepEvent,
+  ExecutionValue,
   GrafastExecutionArgs,
   GrafastTimeouts,
   ParseAndValidateEvent,
   PrepareArgsEvent,
   ScalarInputPlanResolver,
-  StreamStepEvent,
+  UnaryExecutionValue,
   ValidateSchemaEvent,
 } from "./interfaces.js";
 import {
@@ -71,9 +74,12 @@ import {
   EventCallback,
   EventMapKey,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -120,13 +126,11 @@ import {
   isListLikeStep,
   isModifierStep,
   isObjectLikeStep,
-  isStreamableStep,
   ListCapableStep,
   ListLikeStep,
   ModifierStep,
   ObjectLikeStep,
   PolymorphicStep,
-  StreamableStep,
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
@@ -292,6 +296,7 @@ export {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BaseStep,
+  BatchExecutionValue,
   condition,
   ConditionStep,
   connection,
@@ -303,6 +308,7 @@ export {
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
+  defaultPlanResolver,
   defer,
   Deferred,
   each,
@@ -317,9 +323,13 @@ export {
   ExecutableStep,
   execute,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
+  ExecutionValue,
   exportAs,
   exportAsMany,
   FieldArgs,
@@ -375,7 +385,6 @@ export {
   isObjectLikeStep,
   isPromiseLike,
   isSafeError,
-  isStreamableStep,
   isUnaryStep,
   JSONArray,
   JSONObject,
@@ -462,7 +471,6 @@ export {
   StepOptimizeOptions,
   stepsAreInSamePhase,
   StepStreamOptions,
-  StreamableStep,
   stringifyPayload,
   stripAnsi,
   subscribe,
@@ -473,6 +481,7 @@ export {
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
   TypedEventEmitter,
+  UnaryExecutionValue,
   UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
   UnwrapMultistep,
@@ -502,7 +511,6 @@ exportAsMany("grafast", {
   isModifierStep,
   isObjectLikeStep,
   isListLikeStep,
-  isStreamableStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
@@ -602,6 +610,7 @@ exportAsMany("grafast", {
   flagError,
   SafeError,
   isUnaryStep,
+  defaultPlanResolver,
   multistep,
 });
 
@@ -774,9 +783,6 @@ declare global {
       executeStep(
         event: ExecuteStepEvent,
       ): PromiseOrDirect<GrafastResultsList<any>>;
-      streamStep(
-        event: StreamStepEvent,
-      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {

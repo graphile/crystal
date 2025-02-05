@@ -147,6 +147,7 @@ import {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectRowsStep,
   PgSelectStep,
   sqlFromArgDigests,
 } from "./steps/pgSelect.js";
@@ -163,6 +164,7 @@ import {
 import { PgTempTableStep } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
+  PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
   PgUnionAllStepCondition,
@@ -308,6 +310,7 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectRowsStep,
   pgSelectSingleFromRecord,
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
@@ -317,6 +320,7 @@ export {
   PgTempTableStep,
   PgTypedExecutableStep,
   pgUnionAll,
+  PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
   PgUnionAllStepCondition,
@@ -384,6 +388,7 @@ exportAsMany("@dataplan/pg", {
   digestsFromArgumentSpecs,
   pgSelectFromRecords,
   PgSelectStep,
+  PgSelectRowsStep,
   sqlFromArgDigests,
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
@@ -391,6 +396,7 @@ exportAsMany("@dataplan/pg", {
   pgSingleTablePolymorphic,
   pgUnionAll,
   PgUnionAllSingleStep,
+  PgUnionAllRowsStep,
   PgUnionAllStep,
   PgSingleTablePolymorphicStep,
   pgUpdateSingle,

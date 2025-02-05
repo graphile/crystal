@@ -4,7 +4,11 @@ import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type {
+  ExecutionDetails,
+  ExecutionResults,
+  PromiseOrDirect,
+} from "../dist/index.js";
 import {
   constant,
   ExecutableStep,
@@ -13,7 +17,6 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
-import type { StreamDetails } from "../dist/interfaces.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -36,27 +39,31 @@ class SyncListCallbackStep<
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
-    return indexMap((i) => this.callback(values0.at(i)));
-  }
-  async stream({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
-    await sleep(0);
-    const { callback, setStreaming } = this;
-    return indexMap((i) => {
-      const entry = values0.at(i);
-      setStreaming(true);
+    stream,
+  }: ExecutionDetails<[TIn]>): ExecutionResults<TOut> {
+    if (!stream) {
+      return indexMap((i) => this.callback(values0.at(i)));
+    } else {
+      return (async () => {
+        await sleep(0);
+        const { callback, setStreaming } = this;
+        return indexMap((i) => {
+          const entry = values0.at(i);
+          setStreaming(true);
 
-      return (async function* () {
-        try {
-          const data = await callback(entry);
-          for (const item of data) {
-            yield item;
-          }
-        } finally {
-          setStreaming(false);
-        }
+          return (async function* () {
+            try {
+              const data = await callback(entry);
+              for (const item of data) {
+                yield item;
+              }
+            } finally {
+              setStreaming(false);
+            }
+          })();
+        });
       })();
-    });
+    }
   }
 }
 

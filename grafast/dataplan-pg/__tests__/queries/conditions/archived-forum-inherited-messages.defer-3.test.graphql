@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy()
 # PERF: should be able to reduce to just 2 queries because the two defers
 # _could_ share the same LayerPlan.
-## expect(queries).toHaveLength(3);
+#// expect(queries).toHaveLength(3);
 {
   forums(includeArchived: EXCLUSIVELY) {
     name

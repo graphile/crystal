@@ -20,18 +20,13 @@ from "c"."table_set_query"() as __table_set_query__
 limit 2
 offset 2;
 
-select __int_set_query_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __int_set_query_identifiers__,
-lateral (
-  select
-    __int_set_query__.v::text as "0",
-    __int_set_query_identifiers__.idx as "1"
-  from "c"."int_set_query"(
-    __int_set_query_identifiers__."id0",
-    __int_set_query_identifiers__."id1",
-    __int_set_query_identifiers__."id2"
-  ) as __int_set_query__(v)
-) as __int_set_query_result__;
+select
+  __int_set_query__.v::text as "0"
+from "c"."int_set_query"(
+  $1::"int4",
+  $2::"int4",
+  $3::"int4"
+) as __int_set_query__(v);
 
 select
   __static_big_integer__.v::text as "0"
@@ -43,11 +38,14 @@ from "a"."query_interval_set"() as __query_interval_set__(v);
 
 select
   __post__."id"::text as "0",
-  (select json_agg(s) from (
-    select
-      to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
-    from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  ) s) as "1"
+  case when (__post__) is not distinct from null then null::text else json_build_array((((__post__)."id"))::text, ((__post__)."headline"), ((__post__)."body"), (((__post__)."author_id"))::text, (((__post__)."enums"))::text, (case when (((__post__)."comptypes")) is not distinct from null then null::text else array(
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
+    from unnest(((__post__)."comptypes")) __comptype__
+  )::text end))::text end as "1"
 from "a"."post" as __post__
 order by __post__."id" asc
 limit 1;
+
+select
+  to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
+from "a"."post_computed_interval_set"($1::"a"."post") as __post_computed_interval_set__(v);

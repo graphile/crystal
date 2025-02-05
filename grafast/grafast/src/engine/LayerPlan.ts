@@ -52,6 +52,11 @@ export interface LayerPlanReasonNullableField {
    */
   parentStep: ExecutableStep;
 }
+export interface LayerPlanReasonListItemStream {
+  initialCountStepId?: number;
+  ifStepId?: number;
+  labelStepId?: number;
+}
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
   type: "listItem";
@@ -64,11 +69,10 @@ export interface LayerPlanReasonListItem {
    */
   parentStep: ExecutableStep;
 
-  /** If this listItem is to be streamed, the configuration for that streaming */
-  stream?: {
-    initialCount: number;
-    label?: string;
-  };
+  /**
+   * If this listItem is to be streamed, the configuration for that streaming.
+   */
+  stream?: LayerPlanReasonListItemStream;
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
@@ -82,6 +86,8 @@ export interface LayerPlanReasonMutationField {
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
+  // TODO: change to labelStepId, also add ifStepId. See listItem.stream for
+  // examples.
   label?: string;
 }
 /** Branching, non-deferred */
@@ -102,19 +108,19 @@ export interface LayerPlanReasonSubroutine {
   parentStep: ExecutableStep;
 }
 
-export function isBranchingLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
   return layerPlan.reason.type === "polymorphic";
 }
-export function isDeferredLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return (
-    t === "stream" ||
+    (t === "listItem" && layerPlan.reason.stream != null) ||
     t === "subscription" ||
     t === "mutationField" ||
     t === "defer"
   );
 }
-export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isPolymorphicLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return t === "polymorphic";
 }
@@ -222,7 +228,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * - root: the `operationPlan.rootValue`
    * - listItem: the `__ItemStep`
-   * - stream: also the `__ItemStep`
    * - subscription: also the `__ItemStep`
    * - mutationField: the result plan of the mutation field
    * - defer: the parent layer's rootStep (defer always results in an object, unless an error occurs)

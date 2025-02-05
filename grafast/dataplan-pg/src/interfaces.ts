@@ -1,5 +1,6 @@
 import type { ExecutableStep, ModifierStep } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import type { CustomInspectFunction, inspect } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
@@ -261,6 +262,9 @@ export interface PgCodec<
    * type of an attribute itself.
    */
   executor: PgExecutor | null;
+
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 export type PgCodecWithAttributes<
@@ -322,36 +326,36 @@ export interface PgTypedExecutableStep<TCodec extends PgCodec>
 }
 
 type PgOrderCommonSpec = {
-  direction: "ASC" | "DESC";
+  readonly direction: "ASC" | "DESC";
   /** `NULLS FIRST` or `NULLS LAST` or nothing */
-  nulls?: "FIRST" | "LAST" | null;
+  readonly nulls?: "FIRST" | "LAST" | null;
 };
 
 export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
-  fragment: SQL;
+  readonly fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-  codec: PgCodec<string, any, any, any, any, any, any>;
+  readonly codec: PgCodec<string, any, any, any, any, any, any>;
 
-  attribute?: never;
-  callback?: never;
+  readonly attribute?: never;
+  readonly callback?: never;
 
-  nullable?: boolean;
+  readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
 export type PgOrderAttributeSpec = {
   /** The attribute you're using for ordering */
-  attribute: string;
+  readonly attribute: string;
   /** An optional expression to wrap this attribute with, and the type that expression returns */
-  callback?: (
+  readonly callback?: (
     attributeExpression: SQL,
     attributeCodec: PgCodec,
     nullable: boolean,
   ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
 
-  fragment?: never;
-  codec?: never;
-  nullable?: boolean;
+  readonly fragment?: never;
+  readonly codec?: never;
+  readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
 /**
@@ -728,3 +732,8 @@ export type GetPgResourceRelations<
 export type GetPgResourceUniques<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["uniques"];
+
+export type PgSQLCallback<TResult> = (
+  sql: PgSQL<PgTypedExecutableStep<PgCodec>>,
+) => TResult;
+export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;

@@ -42,7 +42,6 @@ To return a list of forums which match a list of primary keys:
 import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
 import { TYPES, listOfCodec } from "postgraphile/@dataplan/pg";
 
-/* TODO: test this plugin works! */
 export default makeAddPgTableConditionPlugin(
   { schemaName: "app_public", tableName: "forums" },
   "idIn",

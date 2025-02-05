@@ -195,25 +195,13 @@ execute method then returns the same number of results in the same order: `[3,
 
 ### stream
 
-_This method is optional._
+:::warning REMOVED!
 
-```ts
-stream(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
-```
+`stream` is no longer its own method; it has been merged with `execute`.
 
-```ts
-interface StreamDetails extends ExecutionDetails {
-  streamOptions: {
-    initialCount: number;
-  };
-}
+Use `executionDetails.stream` to determine whether you should stream or not.
 
-type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null>
->;
-```
-
-TODO: document stream. (It's like execute, except it returns a list of async iterators.)
+:::
 
 ### deduplicate
 
@@ -433,6 +421,40 @@ class MyObjectStep extends ExecutableStep {
 
 If your step implements `.get()`, make sure it meets the expectations:
 i.e. it correctly accepts a single argument of a string.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
+### items
+
+Implement `.items()` if your step represents a collection and you want to give
+users an easy way of accessing the items of your collection (as opposed to
+metadata you may also wish to make available, such as pagination info). It
+should accept no arguments (later <!-- Benjie: see commit
+8f5ccf8592d80b0addc942951e96659292763c4d --> we might support options related
+to streaming, so do not implement arguments!) and it should expect to be called
+zero or more times.
+
+```ts
+import { access } from "grafast";
+
+class MyCollectionStep extends ExecutableStep /* implements ConnectionCapableStep */ {
+  // ...
+
+  items() {
+    // Update this to access the correct property needed for the items in your
+    // collection; you may also choose to track that this was requested and
+    // thus ensure that fetches only go ahead when necessary.
+    return access(this, "items");
+  }
+}
+```
+
+:::caution
+
+If your step implements `.items()`, make sure it meets the expectations:
+i.e. it does not require any arguments.
 &ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 

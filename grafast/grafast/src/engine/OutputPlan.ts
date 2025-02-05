@@ -645,7 +645,7 @@ export function coerceError(
     }
   } else {
     return new GraphQLError(
-      error.message,
+      error?.message ?? String(error),
       locationDetails.node,
       null,
       null,
@@ -888,6 +888,13 @@ function makeExecutor<
         }
       }
     }
+    if (bucketRootFlags & FLAG_ERROR) {
+      throw coerceError(
+        rawBucketRootValue,
+        this.locationDetails,
+        mutablePath.slice(1),
+      );
+    }
     const bucketRootValue =
       this.processRoot !== null
         ? this.processRoot(rawBucketRootValue, bucketRootFlags)
@@ -898,13 +905,6 @@ function makeExecutor<
     );
     if (earlyReturn !== undefined) {
       return earlyReturn as any;
-    }
-    if (bucketRootFlags & FLAG_ERROR) {
-      throw coerceError(
-        bucketRootValue,
-        this.locationDetails,
-        mutablePath.slice(1),
-      );
     }
     if (!skipNullHandling) {
       if (bucketRootValue == null)
@@ -1359,15 +1359,19 @@ function makeArrayExecutor<TAsString extends boolean>(
           | AsyncIterableIterator<any>
           | undefined;
         if (stream !== undefined) {
+          const labelStepId = (
+            childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
+          ).reason.stream?.labelStepId;
           root.streams.push({
             root,
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
             outputPlan: childOutputPlan,
-            label: (
-              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
-            ).reason.stream?.label,
+            label:
+              labelStepId != null
+                ? bucket.store.get(labelStepId)?.unaryValue()
+                : undefined,
             stream,
             startIndex: bucketRootValue.length,
           });

@@ -20,13 +20,15 @@ graph TD
     PgSelect8[["PgSelect[8∈1] ➊<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
     Object11 --> PgSelect8
     First12{{"First[12∈1] ➊"}}:::plan
-    PgSelect8 --> First12
-    PgSelectSingle13{{"PgSelectSingle[13∈1] ➊<br />ᐸauthenticate_failᐳ"}}:::plan
-    First12 --> PgSelectSingle13
-    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle13 --> Object14
-    PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression15
+    PgSelectRows13[["PgSelectRows[13∈1] ➊"]]:::plan
+    PgSelectRows13 --> First12
+    PgSelect8 --> PgSelectRows13
+    PgSelectSingle14{{"PgSelectSingle[14∈1] ➊<br />ᐸauthenticate_failᐳ"}}:::plan
+    First12 --> PgSelectSingle14
+    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle14 --> Object15
+    PgClassExpression16{{"PgClassExpression[16∈2] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
+    PgSelectSingle14 --> PgClassExpression16
 
     %% define steps
 
@@ -34,12 +36,12 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11<br /><br />1: PgSelect[8]<br />2: <br />ᐳ: 12, 13, 14"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect8,First12,PgSelectSingle13,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression15 bucket2
+    class Bucket2,PgClassExpression16 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

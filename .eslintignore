@@ -24,6 +24,7 @@ _LOCAL
 .yarn
 .pnp.*
 /grafast/grafast/vendor
+/postgraphile/postgraphile/.tests_tmp/
 
 .docusaurus
 /*/website/build

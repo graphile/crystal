@@ -83,13 +83,11 @@ export class PgPolymorphicStep<
   }
 
   itemPlan(): TItemStep {
-    const plan = this.getDep(this.itemStepId);
-    return plan as any;
+    return this.getDep<any>(this.itemStepId);
   }
 
   typeSpecifierPlan(): TTypeSpecifierStep {
-    const plan = this.getDep(this.typeSpecifierStepId) as TTypeSpecifierStep;
-    return plan;
+    return this.getDep<TTypeSpecifierStep>(this.typeSpecifierStepId);
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {

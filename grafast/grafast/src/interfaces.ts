@@ -27,14 +27,10 @@ import type {
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
-import type {
-  ExecutableStep,
-  ListCapableStep,
-  ModifierStep,
-  StreamableStep,
-} from "./step.js";
+import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,
@@ -188,17 +184,36 @@ export interface IndexByListItemStepId {
 }
 
 // These values are just to make reading the code a little clearer
-export type GrafastValuesList<T> = ReadonlyArray<T>;
+export type GrafastValuesList<TData> = ReadonlyArray<TData>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type GrafastResultsList<T> = ReadonlyArray<
-  PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+export type ExecutionResultValue<T> =
+  | T
+  | FlaggedValue<Error>
+  | FlaggedValue<null>;
+export type GrafastResultsList<TData> = ReadonlyArray<
+  PromiseOrDirect<ExecutionResultValue<TData>>
 >;
-export type GrafastResultStreamList<T> = ReadonlyArray<
-  | PromiseOrDirect<AsyncIterable<
-      PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
-    > | null>
+export type GrafastResultStreamList<TStreamItem> = ReadonlyArray<
+  | PromiseOrDirect<
+      AsyncIterable<PromiseOrDirect<ExecutionResultValue<TStreamItem>>>
+    >
   | PromiseLike<never>
 >;
+export type AwaitedExecutionResults<TData> = ReadonlyArray<
+  PromiseOrDirect<
+    | ExecutionResultValue<TData>
+    | AsyncIterable<
+        PromiseOrDirect<
+          ExecutionResultValue<
+            TData extends ReadonlyArray<infer UStreamItem> ? UStreamItem : never
+          >
+        >
+      >
+  >
+>;
+export type ExecutionResults<TData> =
+  | PromiseOrDirect<AwaitedExecutionResults<TData>>
+  | PromiseLike<never>;
 
 /** @internal */
 export type ForcedValues = {
@@ -213,7 +228,7 @@ export type ForcedValues = {
 /** @internal */
 export type GrafastInternalResultsOrStream<T> = {
   flags: ReadonlyArray<ExecutionEntryFlags>;
-  results: GrafastResultsList<T> | GrafastResultStreamList<T>;
+  results: AwaitedExecutionResults<T>;
 };
 
 export type BaseGraphQLRootValue = any;
@@ -283,6 +298,7 @@ export type AnyInputStepDollars = {
 };
 
 export interface FieldInfo {
+  fieldName: string;
   field: GraphQLField<any, any, any>;
   schema: GraphQLSchema;
 }
@@ -307,12 +323,8 @@ export interface FieldInfo {
 export type FieldPlanResolver<
   _TArgs extends BaseGraphQLArguments,
   TParentStep extends ExecutableStep | null,
-  TResultStep extends ExecutableStep,
-> = (
-  $parentPlan: TParentStep,
-  args: FieldArgs,
-  info: FieldInfo,
-) => TResultStep | null;
+  TResultStep extends ExecutableStep | null,
+> = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
 // TYPES: review _TContext
 /**
@@ -640,9 +652,7 @@ export type TrackedArguments<
 /**
  * `@stream` directive meta.
  */
-export interface StepStreamOptions {
-  initialCount: number;
-}
+export interface StepStreamOptions extends LayerPlanReasonListItemStream {}
 /**
  * Additional details about the planning for a field; currently only relates to
  * the `@stream` directive.
@@ -652,13 +662,18 @@ export interface StepOptions {
    * Details for the `@stream` directive.
    */
   stream: StepStreamOptions | null;
+  /**
+   * Should we walk an iterable if presented. This is important because we
+   * don't want to walk things like Map/Set except if we're doing it as part of
+   * a list step.
+   */
+  walkIterable: boolean;
 }
 
 /**
  * Options passed to the `optimize` method of a plan to give more context.
  */
 export interface StepOptimizeOptions {
-  stream: StepStreamOptions | null;
   meta: Record<string, unknown> | undefined;
 }
 
@@ -799,9 +814,18 @@ export interface ExecutionExtraBase {
   _bucket: Bucket;
   /** @internal */
   _requestContext: RequestTools;
+  /**
+   * @internal
+   *
+   * @remarks We populate it here, but users should only access it from
+   * UnbatchedExecutionExtra or directly from ExecutionDetails.
+   */
+  stream: ExecutionDetailsStream | null;
 }
 export interface ExecutionExtra extends ExecutionExtraBase {}
-export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+export interface UnbatchedExecutionExtra extends ExecutionExtraBase {
+  stream: ExecutionDetailsStream | null;
+}
 
 /**
  * A bitwise number representing a number of flags:
@@ -849,6 +873,8 @@ export type ExecutionValue<TData = any> =
 interface ExecutionValueBase<TData = any> {
   at(i: number): TData;
   isBatch: boolean;
+  /** Returns this.value for a unary execution value; throws if non-unary */
+  unaryValue(): TData;
   /** @internal */
   _flagsAt(i: number): ExecutionEntryFlags;
   /** bitwise OR of all the entry states @internal */
@@ -866,7 +892,8 @@ export interface BatchExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: true;
   entries: ReadonlyArray<TData>;
-  value?: never;
+  /** Always throws, since this should only be called on unary execution values */
+  unaryValue(): never;
   /** @internal */
   readonly _flags: Array<ExecutionEntryFlags>;
 }
@@ -874,13 +901,19 @@ export interface UnaryExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
   isBatch: false;
   value: TData;
-  entries?: never;
+  /** Same as getting .value */
+  unaryValue(): TData;
   /** @internal */
   _entryFlags: ExecutionEntryFlags;
 }
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
+
+export interface ExecutionDetailsStream {
+  // TODO: subscribe: boolean;
+  initialCount: number;
+}
 
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
@@ -895,11 +928,7 @@ export interface ExecutionDetails<
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
   };
   extra: ExecutionExtra;
-}
-export interface StreamDetails<
-  TDeps extends readonly [...any[]] = readonly [...any[]],
-> extends ExecutionDetails<TDeps> {
-  streamOptions: StepStreamOptions;
+  stream: ExecutionDetailsStream | null;
 }
 
 export interface LocationDetails {
@@ -941,6 +970,10 @@ export interface AddDependencyOptions {
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: null | Error | undefined;
+  nonUnaryMessage?: (
+    $dependent: ExecutableStep,
+    $dependency: ExecutableStep,
+  ) => string;
 }
 /**
  * @internal
@@ -989,9 +1022,4 @@ export interface ExecuteStepEvent {
   args: GrafastExecutionArgs;
   step: ExecutableStep;
   executeDetails: ExecutionDetails;
-}
-export interface StreamStepEvent {
-  args: GrafastExecutionArgs;
-  step: StreamableStep<unknown>;
-  streamDetails: StreamDetails;
 }

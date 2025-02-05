@@ -28,6 +28,7 @@ import {
   validateSchema,
 } from "grafast/graphql";
 import { planToMermaid } from "grafast/mermaid";
+import { resolvePreset } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";
@@ -132,6 +133,11 @@ export async function runTestQuery(
     variableValues?: { [key: string]: any };
     directPg?: boolean;
     checkErrorSnapshots?: boolean;
+    /**
+     * To run a query multiple times, set this to the number of times. Useful
+     * to ensure the plan reuse doesn't break the query.
+     */
+    runTimes?: number;
   },
   options: {
     callback?: (
@@ -153,7 +159,7 @@ export async function runTestQuery(
   queries: PgClientQuery[];
   extensions?: any;
 }> {
-  const { variableValues, checkErrorSnapshots } = config;
+  const { variableValues, checkErrorSnapshots, runTimes = 1 } = config;
   const { path, outputDataAsString, deoptimize } = options;
   await resetSequences();
 
@@ -197,33 +203,35 @@ export async function runTestQuery(
 
         const execute = grafastExecute;
         const subscribe = grafastSubscribe;
-        const preset: GraphileConfig.ResolvedPreset = {
+        const resolvedPreset = resolvePreset({
           grafast: {
             explain: ["plan"],
           },
-        };
-        const result =
-          operationType === "subscription"
-            ? await subscribe(
-                {
+        });
+        let result!: Awaited<
+          ReturnType<typeof subscribe> | ReturnType<typeof execute>
+        >;
+        for (let i = 0; i < Math.max(1, runTimes); i++) {
+          queries.splice(0, queries.length);
+          result =
+            operationType === "subscription"
+              ? await subscribe({
                   schema,
                   document,
                   variableValues,
                   contextValue,
-                },
-                preset,
-                outputDataAsString,
-              )
-            : await execute(
-                {
+                  resolvedPreset,
+                  outputDataAsString,
+                })
+              : await execute({
                   schema,
                   document,
                   variableValues,
                   contextValue,
-                },
-                preset,
-                outputDataAsString,
-              );
+                  resolvedPreset,
+                  outputDataAsString,
+                });
+        }
 
         if (isAsyncIterable(result)) {
           let errors: GraphQLError[] | undefined = undefined;
@@ -352,7 +360,9 @@ export async function runTestQuery(
             stringifyPayload(result as any, outputDataAsString),
           );
           if (!checkErrorSnapshots && errors) {
-            console.error(errors[0].originalError || errors[0]);
+            const originalError = result.errors?.[0]?.originalError;
+            console.error(originalError || errors[0]);
+            console.error("Occurred at", errors[0].path);
           }
           if (options.callback) {
             throw new Error(
@@ -540,10 +550,13 @@ export const assertSnapshotsMatch = async (
     const planOp = extensions?.explain?.operations?.find(
       (op) => op.type === "plan",
     );
+    if (!planOp) {
+      throw new Error("No plan was emitted for this test!");
+    }
     const graphString = planToMermaid(planOp.plan);
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
-      throw new Error("No plan was emitted for this test!");
+      throw new Error("Was unable to generate plan diagram for this test!");
     }
     const lines = graphString.split("\n");
     const relativePath = relative(__dirname, basePath);

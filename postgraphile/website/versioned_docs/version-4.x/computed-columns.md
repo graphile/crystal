@@ -52,6 +52,55 @@ queried like this:
 }
 ```
 
+PostgreSQL's documentation on [function
+calls](https://www.postgresql.org/docs/17/sql-expressions.html#SQL-EXPRESSIONS-FUNCTION-CALLS)
+notes:
+
+> A function that takes a single argument of composite type can optionally be
+> called using field-selection syntax, and conversely field selection can be
+> written in functional style. That is, **the notations `col(table)` and `table.col`
+> are interchangeable**. This behavior is not SQL-standard but is provided in
+> PostgreSQL because it allows use of functions to emulate “computed fields”.
+>
+> -- https://www.postgresql.org/docs/17/sql-expressions.html, emphasis added.
+
+Thus to query this computed column yourself outside of PostGraphile you could
+execute:
+
+```sql {3,5}
+select
+  person.id,
+  person.person_full_name as full_name
+  -- or, equivalently:
+  -- person_full_name(person) as full_name
+from person
+where id = $1;
+```
+
+This `person.person_full_name` syntax makes the function `person_full_name`
+appear as if it were a column of `person` even though no such column exists,
+hence our name for it: computed column function.
+
+:::note Computed columns can also return sets
+
+If your function, for example `person_favorite_posts(person)`, returns a set
+then PostGraphile will automatically wrap this selection in a subquery
+aggregation for you to prevent the parent query from yielding more rows than
+expected; if you wanted to query it yourself it might look something like:
+
+```sql {3-6}
+select
+  person.id,
+  array(
+    select posts.*
+    from person_favorite_posts(person) posts
+  ) as favorite_posts
+from person
+where id = $1;
+```
+
+:::
+
 ### Example
 
 This example creates two computed columns, one returning a simple varchar and

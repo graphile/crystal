@@ -46,6 +46,8 @@ export class StepTracker {
   >();
 
   /** @internal */
+  public internalDependencies = new Set<ExecutableStep>();
+  /** @internal */
   public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
   /** @internal */
   public layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
@@ -372,9 +374,8 @@ export class StepTracker {
   ): number {
     const $dependency = options.step;
     if (!$dependency._isUnary) {
-      throw new Error(
-        `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
-      );
+      const { nonUnaryMessage = defaultNonUnaryMessage } = options;
+      throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
     return this.addStepDependency($dependent, options);
@@ -581,6 +582,9 @@ export class StepTracker {
   private isNotNeeded($step: ExecutableStep): boolean {
     if ($step.dependents.length !== 0) return false;
     if ($step.hasSideEffects) return false;
+    if (this.internalDependencies.has($step)) {
+      return false;
+    }
     const s1 = this.outputPlansByRootStep.get($step);
     if (s1 && s1.size !== 0) return false;
     const s2 = this.layerPlansByRootStep.get($step);
@@ -748,4 +752,11 @@ export class StepTracker {
     }
     this.lockedStepCount = this.stepCount;
   }
+}
+
+function defaultNonUnaryMessage(
+  $dependent: ExecutableStep,
+  $dependency: ExecutableStep,
+) {
+  return `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. See https://err.red/gud`;
 }

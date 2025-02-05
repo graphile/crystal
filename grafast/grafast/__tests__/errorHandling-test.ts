@@ -4,7 +4,11 @@ import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type {
+  ExecutionDetails,
+  ExecutionResults,
+  PromiseOrDirect,
+} from "../dist/index.js";
 import {
   constant,
   context,
@@ -43,19 +47,23 @@ class SyncListCallbackStep<
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
-    return indexMap((i) => this.callback(values0.at(i)));
-  }
-  async stream({ indexMap, values: [values0] }: ExecutionDetails<[TIn]>) {
-    await sleep(0);
-    const { callback } = this;
-    return indexMap((i) => {
-      const entry = values0.at(i);
-      return (async function* () {
-        const data = await callback(entry);
-        yield* data;
+    stream,
+  }: ExecutionDetails<[TIn]>): ExecutionResults<TOut> {
+    if (!stream) {
+      return indexMap((i) => this.callback(values0.at(i)));
+    } else {
+      return (async () => {
+        await sleep(0);
+        const { callback } = this;
+        return indexMap((i) => {
+          const entry = values0.at(i);
+          return (async function* () {
+            const data = await callback(entry);
+            yield* data;
+          })();
+        });
       })();
-    });
+    }
   }
 }
 
