@@ -614,7 +614,7 @@ For example, if you want to expose a related `ReviewConnection` from `Product`:
 
 ```js
 import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
-import { connection } from 'postgraphile/grafast';
+import { connection } from "postgraphile/grafast";
 
 export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
   const { reviews } = build.input.pgRegistry.pgResources;
@@ -628,7 +628,7 @@ export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
     plans: {
       Product: {
         reviews($product) {
-          const $productId = $product.get('id');
+          const $productId = $product.get("id");
           const $reviews = reviews.find();
           $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
 
