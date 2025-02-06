@@ -32,11 +32,11 @@ the `before`/`after` for either their plugins or the individual hooks.
 ### Stages of the build process
 
 The `hookName` that you register the function for must match
-[one of the supported hooks](/graphile-build/all-hooks).
+[one of the supported hooks](./all-hooks).
 
 The general flow is:
 
-1.  A new [Build object](/graphile-build/build-object) with the basic
+1.  A new [Build object](./build-object) with the basic
     functionality is created
 2.  The `build` hook allows plugins to add new utility methods to the `build`
     object itself, or overwrite previously declared ones.
@@ -69,7 +69,7 @@ Hook callback functions will be called with 3 arguments:
 
 #### Build object (`Build`)
 
-The [Build Object](/graphile-build/build-object) contains a number of helpers
+The [Build Object](./build-object) contains a number of helpers
 and sources of information relevant to the current build of the GraphQL API. If
 you're in watch mode then every time a new schema is generated a new build
 object will be used.
@@ -86,11 +86,11 @@ The most commonly used methods are:
   version clashes do not occur
 - `build.inflection` - carries all the inflector functions for names
 
-See [Build Object](/graphile-build/build-object) for more.
+See [Build Object](./build-object) for more.
 
 #### Context object (`Context`)
 
-The [Context Object](/graphile-build/context-object) contains the information
+The [Context Object](./context-object) contains the information
 relevant to the current hook. Most importantly it contains the `scope` (an
 object based on the third argument passed to `newWithHooks`) but it also
 contains a number of other useful things. Here's some of the more commonly used

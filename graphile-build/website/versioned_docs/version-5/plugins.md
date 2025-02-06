@@ -222,9 +222,9 @@ options:
 
 - input object, `fields`, which is basically a
   [`GraphQLFieldConfigMap` from graphql-js](http://graphql.org/graphql-js/type/#graphqlobjecttype).
-- [`Build` object](/graphile-build/build-object) (from which we're using
+- [`Build` object](./build-object) (from which we're using
   `extend` and `graphql.GraphQLInt`
-- [`Context` object](/graphile-build/context-object) which it is ignoring; but
+- [`Context` object](./context-object) which it is ignoring; but
   if we wanted to filter which objects get the `random` field added this would
   be what we'd use
 

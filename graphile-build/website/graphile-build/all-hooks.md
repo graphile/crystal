@@ -84,7 +84,7 @@ currently). More specifically, the types for each hook are:
 
 - inflection - a plain object with some core inflection methods, built in
   [`makeNewBuild`](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build/src/makeNewBuild.js#L929-L997)
-- build - a [`Build` object](/graphile-build/build-object)
+- build - a [`Build` object](./build-object)
 - init - an opaque object, please just return it verbatim
 
 - GraphQLSchema -

@@ -67,7 +67,7 @@ methods in the source code.
     log it out) before it is returned.
 
 During the `init` hook, the
-[hooks for the respective GraphQL types](/graphile-build/all-hooks/) are applied
+[hooks for the respective GraphQL types](./all-hooks) are applied
 [in the `newWithHooks` function](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build/src/makeNewBuild.js#L329),
 which may cause them to run in a nested fashion.
 

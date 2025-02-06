@@ -19,7 +19,7 @@ The following options apply to the default plugins:
   non-introspection fields that begin with `__`)
 
 Plugins may expect further options if they wish, for example see
-[those of `graphile-build-pg`](../graphile-build-pg/settings/). To prevent
+[those of `graphile-build-pg`](/graphile-build-pg/4/settings/). To prevent
 collisions between the property names, the plugins should follow some
 namespacing conventions.
 

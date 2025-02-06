@@ -50,7 +50,7 @@ type Person {
 
 Say Goodbye to the N+1 problem; fewer round-trips means higher performance.
 
-By using our [look-ahead feature](/graphile-build/look-ahead) your code can
+By using our [look-ahead feature](/graphile-build/4/look-ahead) your code can
 know what's coming and make sure it requests the correct fields ahead of time,
 leading to fewer round-trips and higher performance.
 
@@ -66,7 +66,7 @@ introspect your datastore you can automatically build your GraphQL objects and
 eliminate the development work required to keep your codebase and database
 schema in sync.
 
-[`graphile-build-pg`](../graphile-build-pg) is a collection of plugins which adds extensive support for
+[`graphile-build-pg`](/graphile-build-pg) is a collection of plugins which adds extensive support for
 the popular PostgreSQL database system by performing introspection of your
 database schema and **automatically** building the relevant GraphQL objects and
 fields based on the tables, columns, functions, relations that it finds. This is
