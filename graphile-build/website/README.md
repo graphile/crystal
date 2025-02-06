@@ -64,7 +64,10 @@ For the graphile-build-pg docs:
 yarn run docusaurus docs:version:graphile-build-pg 6
 ```
 
-then update the banners, found in `docusaurus.config.js` config.presets[0].docs.versions (graphile-build) or `docusaurus.config.js` plugins."@docusaurus/plugin-content-docs"[0].versions (graphile-build-pg) , to one of 'none', 'unreleased', or 'unmaintained'.
+then update the banners to one of 'none', 'unreleased', or 'unmaintained' in:
+
+- graphile-build: `docusaurus.config.js` config.presets[0].docs.versions
+- graphile-build-pg: `docusaurus.config.js` plugins."@docusaurus/plugin-content-docs"[0].versions
 
 #### Release
 
