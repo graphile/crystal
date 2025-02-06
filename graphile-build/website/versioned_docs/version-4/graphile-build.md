@@ -40,7 +40,7 @@ main();
 
 Loads all the plugins and returns an instance of `SchemaBuilder`. This is useful
 if you want to use watch mode; see
-[`SchemaBuilder`](/graphile-build/schema-builder/) for more information.
+[`SchemaBuilder`](./schema-builder) for more information.
 
 ```js
 const { getBuilder, defaultPlugins } = require("graphile-build");
