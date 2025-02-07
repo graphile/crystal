@@ -130,8 +130,10 @@ POSTGRES_PASSWORD=change_me
 ```
 
 :::note
+
 A better way to manager the database password would be to use
 [Docker Secrets](https://docs.docker.com/engine/reference/commandline/secret/).
+
 :::
 
 ### Create Database Initialization Files
