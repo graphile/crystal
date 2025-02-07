@@ -43,6 +43,11 @@ rather than using a generic filtering plugin like this. Not heeding this
 advice may lead to very significant performance issues down the line that are
 very hard for you to dig your way out of.
 
+That said, it's your schema and you know its audience and how it's going to be
+used better than this documentation does. There are definitely valid use cases
+for using generic filtering. Make sure you think about it carefully and don't
+just enable it on a whim.
+
 :::
 
 A very popular plugin is Matt Bretl’s connection-filter plugin, located at
