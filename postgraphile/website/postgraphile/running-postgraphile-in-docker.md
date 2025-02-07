@@ -30,8 +30,10 @@ If you are new to Docker and need to install it, you can refer to their
 - [Install Docker on Windows Home](#install-docker-on-windows-home)
 
 :::note
+
 If you use Docker Desktop for Windows, it comes automatically with
 Docker Compose.
+
 :::
 
 ### Install Docker and Docker Compose on Linux
