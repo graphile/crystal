@@ -414,8 +414,10 @@ Each container can be accessed at the following addresses:
 | PostgreSQL Database       | host: `localhost`, port: `5432`  | host: `your_docker_machine_ip`, port: `5432`  |
 
 :::note
+
 If you run Docker Toolbox on Windows Home, you can get your Docker
 machine IP address with the command `$ docker-machine ip default`.
+
 :::
 
 ### Re-initialize The Database
