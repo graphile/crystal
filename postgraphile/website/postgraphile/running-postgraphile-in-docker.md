@@ -384,9 +384,11 @@ You can run the Docker containers by executing the following command from the
 root of the repository.
 
 :::note
+
 When running the database container for the first time, Docker will
 automatically create a Docker Volume to persist the data from the database.
 The Docker Volume is automatically named as `<your_repository_name>_db`.
+
 :::
 
 ```
