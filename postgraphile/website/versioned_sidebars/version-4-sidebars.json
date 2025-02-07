@@ -92,7 +92,7 @@
     "debugging",
     {
       "type": "html",
-      "value": "<h4>CUSTOMISING</h4>",
+      "value": "<h4>CUSTOMIZING</h4>",
       "defaultStyle": false
     },
     {
@@ -122,7 +122,6 @@
         "make-pg-smart-tags-plugin",
         "make-plugin-by-combining-plugins",
         "extending-raw",
-        "community-plugins",
         {
           "type": "category",
           "label": "Plugin Gallery",
@@ -137,7 +136,8 @@
             "plugin-gallery/customisation",
             "plugin-gallery/other"
           ]
-        }
+        },
+        "community-plugins"
       ]
     },
     "plugins",

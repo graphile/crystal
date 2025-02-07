@@ -1,12 +1,14 @@
 ---
-layout: page
-path: /postgraphile/make-add-pg-table-condition-plugin/
-title: makeAddPgTableConditionPlugin (graphile-utils v4.4.5+)
+title: makeAddPgTableConditionPlugin
 ---
 
-**WARNING**: _this plugin generator doesn't currently have any tests, so it's
+# makeAddPgTableConditionPlugin (graphile-utils v4.4.5+)
+
+:::warning warning
+This plugin generator doesn't currently have any tests, so its
 status is **experimental**. If you can spare the time to write some tests (or
-sponsor me to do so) then we can promote it to stable._
+[sponsor me to do so](https://graphile.org/sponsor)) then we can promote it to stable.
+:::
 
 PostGraphile adds `condition` arguments to various of the table collection
 fields it builds so that you can filter the result set down to just the records
@@ -133,19 +135,23 @@ query ForumsContainingPostsByUser1 {
 }
 ```
 
-NOTE: `sqlTableAlias` represents the `app_public.forums` table in the example
+:::note
+`sqlTableAlias` represents the `app_public.forums` table in the example
 above (i.e. the schemaName.tableName table); if you don't use it in your
 implementation then there's a good chance your plugin is incorrect.
+:::
 
-NOTE: for more complex values, you may need to invoke
+:::note
+For more complex values, you may need to invoke
 `build.gql2pg(value, databaseType)` instead of `sql.value(value)` in order to
 convert the GraphQL value to the equivalent SQL value. If you should need this,
 reach out on [our Discord chat](https://discord.gg/graphile) for advice.
+:::
 
 ## Example with ordering
 
 It's also possible for condition plugins to change the order of results by using
-[QueryBuilder](./make-extend-schema-plugin/#querybuilder)'s `orderBy` method.
+[QueryBuilder](./make-extend-schema-plugin#querybuilder)'s `orderBy` method.
 The following example both limits the list of quizzes returned to only those
 with a certain number of entries, _and_ orders the results such that the quizzes
 with the most entries are listed first.
@@ -154,9 +160,11 @@ This example if quite contrived, but this functionality can be useful for a
 number of purposes: filtering and ordering by full text search results,
 filtering and ordering by proximity, etc.
 
-Note: prior to `graphile-utils` v4.9.1 (unreleased at time of writing), a plugin
+:::note
+Prior to `graphile-utils` v4.9.1 (unreleased at time of writing), a plugin
 like this should be loaded via `--prepend-plugins` (or `prependPlugins` in the
 library mode) because otherwise the default ordering plugin dominates the order.
+:::
 
 ```js
 const { makeAddPgTableConditionPlugin } = require("graphile-utils");

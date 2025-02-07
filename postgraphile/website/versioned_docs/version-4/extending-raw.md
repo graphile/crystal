@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/extending-raw/
-title: Schema Plugins - Graphile Engine
+title: Graphile Engine
 ---
+
+# Schema Plugins — Graphile Engine
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Engine plugins. The core PG-related plugins can be found here:
@@ -151,11 +151,11 @@ Previously we used `GraphQLObjectType:fields` to add a field, as that
 manipulates the list of fields. This time we are manipulating an individual
 field, so we will use the `GraphQLObjectType:fields:field` hook. This makes our
 intent clear, and also grants us access to
-[the `addArgDataGenerator`](https://graphile.org/graphile-build/look-ahead/#when-processing-arguments-addargdatagenerator)
+[the `addArgDataGenerator`](https://build.graphile.org/graphile-build/look-ahead#when-processing-arguments-addargdatagenerator)
 function which we need to request the record id. The following example also uses
 an instance of [`queryBuilder.`](./make-extend-schema-plugin/#querybuilder)
 (Read more about the different hooks
-[in the Graphile Engine docs](https://graphile.org/graphile-build/all-hooks/).)
+[in the Graphile Engine docs](https://build.graphile.org/graphile-build/all-hooks).)
 
 ```js
 function performAnotherTask(linkId) {
@@ -238,14 +238,18 @@ module.exports = function CreateLinkWrapPlugin(builder) {
 
 ### Removing things from the schema
 
-**WARNING**: removing things from your GraphQL schema this way may have
+:::warning warning
+Removing things from your GraphQL schema this way may have
 unintended consequences - especially if you add back a field or type with the
 same name as that which you removed. It's advised that rather than removing
 things, you instead avoid them being generated in the first place.
+:::
 
+:::tip
 **If you're looking for an easy way to prevent certain tables, fields, functions
 or relations being added to your GraphQL schema, check out
 [smart comments](./smart-comments).**
+:::
 
 If you want to remove a class of things from the schema then you can remove the
 plugin that adds them; for example if you no longer wanted to allow ordering by

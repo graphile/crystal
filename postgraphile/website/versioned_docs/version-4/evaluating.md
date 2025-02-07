@@ -1,9 +1,8 @@
 ---
-layout: page
-path: /postgraphile/evaluating/
-title: Evaluating
-fullTitle: Evaluating PostGraphile For Your Project
+title: Evaluating PostGraphile
 ---
+
+# Evaluating PostGraphile For Your Project
 
 Hopefully you’ve been convinced that PostGraphile serves an awesome GraphQL API,
 but now let’s take a more critical look at whether or not you should adopt

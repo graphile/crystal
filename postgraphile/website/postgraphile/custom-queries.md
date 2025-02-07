@@ -1,18 +1,16 @@
 ---
-layout: page
-path: /postgraphile/custom-queries/
 title: Custom Queries
 ---
 
-You can add root-level `Query` fields to your GraphQL schema using "Custom
-Queries". These are PostgreSQL functions, similar to
+You can add root-level `Query` fields to your GraphQL schema using “Custom
+Queries”. These are PostgreSQL functions, similar to
 [computed columns](./computed-columns), that can return scalars, records, lists
 or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
 [connections](./connections) or lists (depending on your behavior configuration). The arguments to these functions will be exposed
-via GraphQL - named arguments are preferred, if your arguments are not named we
+via GraphQL — named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
-To create a function that PostGraphile will recognise as a custom query, it must
+To create a function that PostGraphile will recognize as a custom query, it must
 obey the following rules:
 
 - adhere to
@@ -102,13 +100,13 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-:::tip
+:::tip Performance Note
 
 This function will have poor performance because `ILIKE`
-specifications of this form (beginning and ending with `%`) do not utilise
-indexes. If you're doing this in a real application then it's highly recommended
+specifications of this form (beginning and ending with `%`) do not utilize
+indexes. If you’re doing this in a real application then it’s highly recommended
 that you look into
-[PostgreSQL's Full Text Search](http://rachbelaid.com/postgres-full-text-search-is-good-enough/)
+[PostgreSQL’s Full Text Search](http://rachbelaid.com/postgres-full-text-search-is-good-enough/)
 capabilities which can be exposed by a similar function. You may want to
 [check out `websearch_to_tsquery` in PG11](https://www.postgresql.org/docs/11/static/functions-textsearch.html)
 as part of this.
@@ -136,22 +134,26 @@ Stripe](https://medium.com/@sastraxi/authenticated-and-stitched-schemas-with-pos
 
 ### Advice
 
-Though it may be tempting to expose huge collections via a function, it's
+Though it may be tempting to expose huge collections via a function, it’s
 important to be aware that, when paginating across a function, only
 `LIMIT/OFFSET` pagination can be used. (For convenience and consistency we
 expose cursor pagination over functions, but internally this is just mapped to
 `LIMIT`/`OFFSET` pagination.) Because of this, and because functions are seen as
-a "black box" by PostgreSQL, if you try and paginate to, say, the 100,000th
+a “black box” by PostgreSQL, if you try and paginate to, say, the 100,000th
 record then PostgreSQL will literally have to execute the function until all
 100,000 records have been generated, and this is often expensive.
 
 One way to solve this is to have your function apply its own internal limits and
-filters which can be exposed as GraphQL field arguments - if you reduce the
+filters which can be exposed as GraphQL field arguments — if you reduce the
 amount of data that the function can produce (e.g. to 100 rows) then it reduces
 the potential cost of having this function in your schema.
 
-**Disclaimer**: the information in this advice section is not 100% true, for
-example PostgreSQL can "see through" some `SQL` functions and has a highly
-intelligent query planner. If you're an expert on PostgreSQL then you should
-ignore this advice and go with your own understanding, it's only intended to
+:::caution Disclaimer
+
+The information in this advice section is not 100% true, for
+example PostgreSQL can “see through” some `SQL` functions and has a highly
+intelligent query planner. If you’re an expert on PostgreSQL then you should
+ignore this advice and go with your own understanding, it’s only intended to
 help beginners from shooting themselves in the foot performance-wise.
+
+:::

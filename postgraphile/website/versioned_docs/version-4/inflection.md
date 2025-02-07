@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/inflection/
 title: Inflection
 ---
 
@@ -19,14 +17,17 @@ in GraphQL whilst attempting to avoid naming conflicts. For example:
 ### Overriding Naming - One-off
 
 If you want to rename just one field or type, your best bet is to use a
-[smart comment](./smart-comments); e.g. for a table you might do:
+[smart comment](./smart-tags); e.g. for a table you might do:
 
 ```sql
 COMMENT ON TABLE post IS E'@name message';
 ```
 
-NOTE: this still uses the inflectors, but it pretends that the tables name is
+:::note
+
+This still uses the inflectors, but it pretends that the tables name is
 different, so the input to the inflectors differs.
+:::
 
 ### Overriding Inflection - General
 
@@ -47,8 +48,8 @@ module.exports = makeAddInflectorsPlugin(
 );
 ```
 
-See there also for
-[which inflectors to overwrite](./make-add-inflectors-plugin/#where-are-the-default-inflectors-defined).
+See also:
+[which inflectors to overwrite](./make-add-inflectors-plugin#where-are-the-default-inflectors-defined).
 
 ### Advice
 

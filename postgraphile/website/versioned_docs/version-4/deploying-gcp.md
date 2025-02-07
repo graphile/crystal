@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-gcp/
 title: Deploying to GCP
 ---
 
@@ -9,7 +7,7 @@ _aka Google Cloud Platform (App Engine)_
 _This post is a work in progress. Please see
 [#161](https://github.com/graphile/graphile.github.io/issues/161) for notes._
 
-### PostGraphile CLI and CloudSQL
+## PostGraphile CLI and CloudSQL
 
 _Section author: @redaikidoka_
 
@@ -113,7 +111,7 @@ Regarding the `start` command, the flags are:
   `/graphql` as is the default)
 - `--cors` circumvents annoying CORS nonsense
 
-#### Deploying
+### Deploying
 
 I deployed the project with `gcloud`.
 
@@ -121,7 +119,7 @@ I used `gcloud init` to setup my connection to my Google Cloud project.
 
 Then I used `gcloud app deploy` in this directory to push it up.
 
-### Deploying an express app
+## Deploying an express app
 
 _Section author: @garcianavalon_
 
@@ -146,7 +144,7 @@ beta_settings:
    `standard` environment and save some bucks. In that case, remove the
    `beta_settings` section
 1. This requires using postgraphile as a library. Minimum setup would be
-   something like
+   something like:
 
 ```
 /project
@@ -155,7 +153,7 @@ beta_settings:
    |--index.js
 ```
 
-in package.json
+in package.json:
 
 ```json
 {
@@ -165,7 +163,7 @@ in package.json
 }
 ```
 
-In index.js
+in index.js:
 
 ```js
 const express = require("express");
@@ -193,7 +191,7 @@ app.use(postgraphile(pgConfig, "public", postgraphileOptions));
 app.listen(8080);
 ```
 
-### PostgreSQL authorization with Google Cloud SQL
+## PostgreSQL authorization with Google Cloud SQL
 
 The `postgres` user on Google Cloud SQL is not a `superuser`, unlike the
 Postgres user account you've likely been using in development. As such, if you
@@ -206,7 +204,7 @@ database, and you want the `postgres` role to be able to perform
 GRANT anonymous TO postgres;
 ```
 
-### Helpful resources
+## Helpful resources
 
 See
 https://github.com/GoogleCloudPlatform/nodejs-docs-samples/tree/master/appengine/hello-world/flexible

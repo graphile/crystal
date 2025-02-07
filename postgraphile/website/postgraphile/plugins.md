@@ -1,13 +1,15 @@
 ---
-layout: page
-path: /postgraphile/plugins/
-title: Server plugins
+title: Server Plugins
 ---
 
-_NOTE: This page relates to changing how the PostGraphile HTTP server
+:::note
+
+This page relates to changing how the PostGraphile HTTP server
 (Grafserv) and other non-schema concerns work. If you're instead looking to
 change the generated GraphQL schema (e.g. to add fields or types), see [Schema
-Plugins](./extending)._
+Plugins](./extending).
+
+:::
 
 In addition to the [Graphile Build plugin system](./extending) which builds
 the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for

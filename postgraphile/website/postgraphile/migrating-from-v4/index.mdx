@@ -50,14 +50,14 @@ Let's get started.
 PostGraphile V5 requires a "preset" to be specified; this allows users to start
 with the best settings for their intended use case without having to read pages
 of documentation first. It also allows us to evolve the defaults over time
-without breaking existing users schemas - ultimately meaning we no longer need a
+without breaking existing users schemas — ultimately meaning we no longer need a
 "recommended options" section in the docs.
 
 To achieve this, we've introduced a new module: [`graphile-config`](https://star.graphile.org/graphile-config/). This module
 takes care of the common concerns relating to configuration, in particular:
 presets, plugins and options. You store your config into a `graphile.config.js`
 (or `.ts`, `.mjs`, `.mts`) file and this can then be used from the command
-line, library mode, or even schema-only mode - they all share the same
+line, library mode, or even schema-only mode — they all share the same
 configuration.
 
 ### makeV4Preset
@@ -161,7 +161,7 @@ export default preset;
 ```
 
 Note that the `appendPlugins`/`prependPlugins`/`skipPlugins` options require
-V5-compatible plugins, and `pluginHook` is no longer supported - please use the
+V5-compatible plugins, and `pluginHook` is no longer supported — please use the
 `plugins` configuration key instead.
 
 Note also that `PgNodeAliasPostGraphile` (plugin) no longer exists, so instead
@@ -181,7 +181,7 @@ const preset = {
 
 Not all of the community's V4 plugins have been ported to V5 at time of
 writing, but with your help hopefully we can fix that! See the [community
-plugins page](../community-plugins.md) for details of which plugins have been
+plugins page](../community-plugins) for details of which plugins have been
 ported.
 
 :::
@@ -194,7 +194,7 @@ You can provide this to `makeV4Preset({ additionalGraphQLContextFromRequest })`,
 
 If you want to do this the V5 way then the replacement is the
 'grafast.context' option; please see [configuration -
-context](../config.mdx#grafast-options).
+context](../config#grafast-options).
 
 ```ts
 const preset = {
@@ -220,7 +220,7 @@ You can provide this to `makeV4Preset({ pgSettings })`, so no specific action is
 If you want to do this the V5 way then the replacement is to
 return a `pgSettings` key from the GraphQL context returned from your
 'grafast.context' configuration, for more details see [configuration -
-context](../config.mdx#grafast-options).
+context](../config#grafast-options).
 
 ```ts
 const preset = {
@@ -278,9 +278,9 @@ API how you need, but we suggest that if possible you accept these new changes.
 - The `bytea` type is now natively supported, exposed as `Base64EncodedBinary`
 
 Many of the above issues will not cause any problems for the vast majority of
-your operations - an engineer from our sponsor Netflix reported all 4,000
+your operations — an engineer from our sponsor Netflix reported all 4,000
 unique queries that their very large and complex V4 internal schema received in
-Feb 2023 validated successfully against their V5 schema - zero breakage!
+Feb 2023 validated successfully against their V5 schema — zero breakage!
 Despite the query compatibility, you may still need to migrate some types on
 the client side.
 
@@ -313,7 +313,7 @@ Other changes:
 ## Smart tag changes
 
 Despite the following changes, if you're using `makeV4Preset` then you should
-not need to take any action - the established V4 behavior should be
+not need to take any action — the established V4 behavior should be
 automatically emulated.
 
 - The `@uniqueKey` smart tag is no more; the V4 preset converts it to
@@ -342,7 +342,7 @@ powerful.
 You can run V5 with the `postgraphile` (or `pgl`) command. This command
 automatically reads the `graphile.config.js` file; you should use that for
 advanced configuration of the PostGraphile CLI rather than sending loads of CLI
-flags - this enables us to keep the documentation tighter (documenting just one
+flags — this enables us to keep the documentation tighter (documenting just one
 set of options rather than 4), gives you auto-complete (if your editor supports
 it) on the options, allows you to easily add comments on why the various
 options are enabled, and makes it easier to transition between CLI, library and
@@ -481,8 +481,8 @@ Please see the [Grafserv][] documentation for details.
 ### Schema only mode
 
 `createPostGraphileSchema` is now just `makeSchema` (and can be imported from
-`postgraphile` or `graphile-build` - your choice). It only accepts one argument
-now - the preset that you'd load from your `graphile.config.js` (or similar)
+`postgraphile` or `graphile-build` — your choice). It only accepts one argument
+now — the preset that you'd load from your `graphile.config.js` (or similar)
 file:
 
 ```ts
@@ -527,7 +527,7 @@ console.dir(result);
 Alternatively, you can use the `hookArgs` method to hook the execution args and
 attach all the relevant context data to it based on your preset and its
 plugins. This is somewhat more involved, please see the [schema only
-usage](../usage-schema.md) documentation for that.
+usage](../usage-schema) documentation for that.
 
 ## Server
 
@@ -673,13 +673,13 @@ There is no introspection cache any more, so no `--read-cache`, `--write-cache`,
 `readCache` or `writeCache`. Instead you can build the GraphQL schema and then
 [export it as executable code](../exporting-schema.md) using
 `graphile-export`. In production you simply run this exported
-code - there's no need for database introspection, schema building plugins,
-etc - and you instantly get your schema without the complexities (or
+code — there's no need for database introspection, schema building plugins,
+etc — and you instantly get your schema without the complexities (or
 dependencies!) required in building it dynamically.
 
 ## `buildSchema`
 
-`buildSchema` is now synchronous - you need to run the asynchronous gather phase
+`buildSchema` is now synchronous — you need to run the asynchronous gather phase
 first. The arguments have also changed: first is the preset (this encompasses
 the list of plugins which was previously the first argument, and any settings
 which were previously the second argument), second comes the result of gather

@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/make-pg-smart-tags-plugin/
-title: makePgSmartTagsPlugin (graphile-utils v4.5.0+)
+title: makePgSmartTagsPlugin
 ---
+
+# makePgSmartTagsPlugin (graphile-utils v4.5.0+)
 
 Smart Tags enable you to customize how (or if) your PostgreSQL resources are
 represented in your PostGraphile GraphQL schema. Before reading this page, you

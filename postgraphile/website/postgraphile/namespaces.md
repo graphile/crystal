@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/namespaces/
-title: Database schemas
+title: Database Schemas
 ---
 
 In PostgreSQL, each database consists of a number of "schemas" (also known as
@@ -54,20 +52,20 @@ Using this pattern is **not required** and in fact you can just use the default
 `public` schema if you so chose. By default, PostGraphile will automatically
 ignore resources installed by extensions, so you don't need to omit these
 manually. Other tables and functions can be omitted using the
-[smart comments](./smart-comments) functionality.
+[smart comments](./smart-tags) functionality.
 
 ### Other schemas
 
 Here's some other schemas you might see (but should not modify):
 
 - `graphile_worker` - a schema used and managed by
-  https://github.com/graphile/worker
+  [Graphile Worker](https://worker.graphile.org)
 - `graphile_migrate` - a schema used and managed by
-  https://github.com/graphile/migrate
+  [Graphile Migrate](https://github.com/graphile/migrate)
 - `postgraphile_watch` - if you're using PostGraphile in watch mode
   PostGraphile will attempt to install this schema to create [PostgreSQL Event
   Triggers](https://www.postgresql.org/docs/current/sql-createeventtrigger.html)
-  to enable watch mode.
+  to enable watch mode
 - `information_schema` - a SQL standard schema for reflection over the database:
   https://www.postgresql.org/docs/current/information-schema.html
 - `pg_catalog` - the

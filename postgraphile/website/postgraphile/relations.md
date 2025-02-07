@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/relations/
 title: Relations
 ---
 

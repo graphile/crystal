@@ -1,27 +1,25 @@
 ---
-layout: page
-path: /postgraphile/make-extend-schema-plugin/
 title: makeExtendSchemaPlugin
 ---
 
-`makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It's
-the "bread and butter" of customizing your PostGraphile schema, enabling you to
+`makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It’s
+the “bread and butter” of customizing your PostGraphile schema, enabling you to
 add new fields and types to your GraphQL schema in a convenient and concise
-familiar syntax - GraphQL SDL.
+familiar syntax — GraphQL SDL.
 
-:::info
+:::info The SDL is not validated
 
-Though the SDL syntax is used, it is not validated - if you define a type but
+Though the SDL syntax is used, it is not validated — if you define a type but
 never use that type, that will likely not cause a schema validation error. If
 you use a directive that does not exist (or pass the wrong arguments to a
-directive), that's also unlikely to error. The SDL is just used as a convenient
+directive), that’s also unlikely to error. The SDL is just used as a convenient
 syntax, it is converted under the hood into [schema
 hooks](https://build.graphile.org/graphile-build/hooks) as if you had written
 a Graphile Build plugin by hand.
 
 :::
 
-If you're already familiar with the `typeDefs`/`resolvers` pattern used by
+If you’re already familiar with the `typeDefs`/`resolvers` pattern used by
 systems such as `graphql-tools` then using `makeExtendSchemaPlugin` should feel
 familiar for you.
 
@@ -44,15 +42,15 @@ The callback should return an object with the following keys:
 - `typeDefs`: a GraphQL AST generated with the `gql` helper from
   `postgraphile/utils` (note this is NOT from the `graphql-tag` library, ours
   works in a slightly different way).
-- `plans` (optional, recommended): an object keyed by GraphQL type name that you're adding
+- `plans` (optional, recommended): an object keyed by GraphQL type name that you’re adding
   or extending in `typeDefs`, the values of which are objects keyed by the
-  fieldName you've added, and the value of which is typically a plan resolver
+  fieldName you’ve added, and the value of which is typically a plan resolver
   function (although it can be an object that defines both this and other
   details)
 - `resolvers` (optional, not recommended): like `plans`, except the functions are
   a traditional resolver functions rather than plan resolver functions
 
-:::info
+:::info Use Plans, not Resolvers
 
 Unlike in PostGraphile v4, the fourth argument to the resolver functions in
 `resolvers` does _not_ contain Graphile Build-related helpers. Since the
@@ -108,7 +106,7 @@ The `gql` helper is responsible for turning the human-readable GraphQL schema
 language you write into an abstract syntax tree (AST) that the application can
 understand. Our `gql` help differs slightly from the one you may be familiar
 with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
-is designed to work with PostGraphile's [inflection system](./inflection), so
+is designed to work with PostGraphile’s [inflection system](./inflection), so
 you can embed strings directly. You may also embed other gql tags directly. For
 example:
 
@@ -158,7 +156,7 @@ const typeDefs = gql`
 
 -->
 
-## "Special" fields
+## “Special” fields
 
 In GraphQL, it is forbidden to name any fields beginning with `__` (two
 underscores) since that is reserved for introspection. We therefore use this
@@ -173,17 +171,17 @@ step](https://grafast.org/grafast/plan-resolvers#asserting-an-object-types-step)
 or one of a set of steps; this can help to catch bugs early. For example, in
 PostGraphile a database table resource should be represented by a
 `pgSelectSingle` or similar class; representing it with `object({id: 1})` or
-similar would mean the step doesn't have the expected helper methods and
+similar would mean the step doesn’t have the expected helper methods and
 downstream fields may fail to plan because their expectations are broken.
 
-Object types' `plans` entries may define an `__assertStep` property to indicate
-the type of step the object type's fields' resolvers will be expecting; this is
+Object types’ `plans` entries may define an `__assertStep` property to indicate
+the type of step the object type’s fields’ resolvers will be expecting; this is
 equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
-type programatically.
+type programmatically.
 
 The value for `__assertStep` can either be a step class itself (e.g.
 `PgSelectSingleStep`) or
-it can be an "assertion function" that throws an error if the passed step is
+it can be an “assertion function” that throws an error if the passed step is
 not of the right type, e.g.:
 
 ```ts
@@ -216,15 +214,15 @@ const schema = makeExtendSchemaPlugin({
 
 ### Type and field scopes
 
-Graphile Build plugins use the "scope" that a type/field/argument/etc is
+Graphile Build plugins use the “scope” that a type/field/argument/etc is
 defined with in order to determine whether or not to hook that entity and
 augment it. For example, the builtin `PgFirstLastBeforeAfterArgsPlugin` will
 automatically add `first`, `last`, `before` and `after` arguments to fields
 that are scoped as `isPgFieldConnection: true` and have an associated and
 suitable `pgFieldResource` scope set.
 
-You can add to/overwrite the Graphile Build "scope" of a type by adding the
-`__scope` property to the object's `plans` object.
+You can add to/overwrite the Graphile Build “scope” of a type by adding the
+`__scope` property to the object’s `plans` object.
 
 You can add to/overwrite the Graphile Build scope of a field by making the
 field definition an object (if it was previously a function, move the function
@@ -267,7 +265,7 @@ const schema = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note
+:::note It is possible to unset or overwrite automatic scopes
 
 `makeExtendSchemaPlugin` might try and guess the scopes to use to be helpful;
 if it gets them wrong then be sure to overwrite them using the instructions
@@ -278,11 +276,11 @@ above. To unset scopes, set them to `undefined`.
 ## Querying the database
 
 You should read [the Gra*fast* introduction](https://grafast.org/grafast/) and
-the [page on "plan resolvers"](https://grafast.org/grafast/plan-resolvers)
+the [page on “plan resolvers”](https://grafast.org/grafast/plan-resolvers)
 before reading further here.
 
-Gra*fast* operate based on "steps", instances of step classes, returned from
-"plan resolvers". Though there are many different step classes, most will
+Gra*fast* operate based on “steps”, instances of step classes, returned from
+“plan resolvers”. Though there are many different step classes, most will
 accept as input any other step, no matter the class.
 
 However, the plan resolvers attached to the fields on a GraphQL type will
@@ -294,21 +292,21 @@ may do things like `$row.get('avatar_url')` and have that access the relevant
 column in the database.
 
 Thus, what you do inside your plan resolver and what you return from your plan
-resolver are two different concerns. It's essential that you return the right
+resolver are two different concerns. It’s essential that you return the right
 class of step from your plan resolver, to be compatible with what the schema is
 expecting, but you have a lot of freedom within your plan resolver as to how to
 achieve that.
 
 One common desire is to access the data in the GraphQL context. You can access
 this in Gra*fast* using the `context()` step; for example, you may have stored
-the current user's ID on the GraphQL context via the `userId` property, to
+the current user’s ID on the GraphQL context via the `userId` property, to
 retrieve these you might do this in your plan resolver function:
 
 ```ts
 const $userId = context().get("userId");
 ```
 
-Data from the database can be retrieved using "resources." Resources can be
+Data from the database can be retrieved using “resources.” Resources can be
 found on `build.input.pgRegistry.pgResources`, keyed by their name. For
 example, if you have `organizations`, `users` and `channels` tables, you can
 get the resources for them via:
@@ -378,7 +376,7 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note
+:::note Automatic type generation
 
 The `Channel` type used in the `typeDefs` above is the type that PostGraphile
 generated automatically for the `channels` table. See
@@ -387,7 +385,7 @@ database table.
 
 :::
 
-:::info
+:::info Gra*fast* will optimize the requests
 
 Though you might be thinking that this would result in multiple requests being
 issued to the database, thanks to the magic of Gra*fast* and `@dataplan/pg`,
@@ -416,16 +414,16 @@ a `PgSelectStep` representing a set of rows.
 
 One way to issue arbitrary SQL queries against the database is to use the
 `withPgClient` step, or its cousin `withPgClientTransaction`. These both accept
-an "executor" as the first argument, a step representing arbitrary data as the
+an “executor” as the first argument, a step representing arbitrary data as the
 second argument, and an asynchronous callback as the third argument. The callback
 will be called with a `PgClient` instance and the resolved data from the step
 in the second argument.
 
-:::info
+:::info `PgClient` is an abstraction
 
 The `PgClient` instance is an abstraction provided by `@dataplan/pg`, it
 contains common functionality but also any helpers that the specific Postgres
-adaptor you're using wishes to expose. [Read more about Postgres adaptors in
+adaptor you’re using wishes to expose. [Read more about Postgres adaptors in
 the @dataplan/pg
 documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 
@@ -435,9 +433,9 @@ documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 
 **What is an executor?**
 
-It's the thing that tells Gra*fast* (or, more
+It’s the thing that tells Gra*fast* (or, more
 specifically, `@dataplan/pg`) how to communicate with the database. Normally
-it's embedded directly into the resources, but since we're doing arbitrary SQL
+it’s embedded directly into the resources, but since we’re doing arbitrary SQL
 no resource is involved.
 
 **Why is it explicit rather than implicit?**
@@ -448,7 +446,7 @@ database.
 
 **How do I get an executor?**
 
-Executors are available in the registry; by default there's one executor called
+Executors are available in the registry; by default there’s one executor called
 `main` which you can access like this:
 
 ```ts
@@ -456,7 +454,7 @@ const executor = build.input.pgRegistry.pgExecutors.main;
 ```
 
 However, PostGraphile can handle multiple sources, or custom source/executor
-names, via `preset.pgServices`. If you don't know the name of the executor but
+names, via `preset.pgServices`. If you don’t know the name of the executor but
 you do have a resource representing the target database, you can extract the
 executor for that DB from the resource, for example:
 
@@ -466,7 +464,7 @@ const executor = channels.executor;
 
 ### Example
 
-Here's the previous example again, this time rewritten to use `withPgClient` to
+Here’s the previous example again, this time rewritten to use `withPgClient` to
 retrieve the `organization_id` rather than the user resource:
 
 ```ts
@@ -529,16 +527,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 
 ## Reading database column values
 
-When extending a schema, it's often because you want to expose data from Node.js
+When extending a schema, it’s often because you want to expose data from Node.js
 that would be too difficult (or impossible) to access from PostgreSQL. When
-defining a field on an existing table-backed type defined by PostGraphile, it's
+defining a field on an existing table-backed type defined by PostGraphile, it’s
 useful to access data from the underlying table in the plan resolver.
 
 To do this you can use the `$row.get(columnName)` method, where `$row` is the
 first parameter passed to your plan resolver function (representing the current
 record).
 
-Here's an example to illustrate.
+Here’s an example to illustrate:
 
 In the database you have a `product` table (imagine an online store), that
 PostGraphile will include in the GraphQL schema by creating a type `Product`
@@ -562,13 +560,13 @@ type Product {
 }
 ```
 
-However imagine you're selling internationally, and you want to expose the price
+However, imagine you’re selling internationally, and you want to expose the price
 in other currencies directly from the `Product` type itself. This kind of
 functionality is well suited to being performed in Node.js (e.g. by making a
 REST call to a foreign exchange service over the internet) but might be a
 struggle from with PostgreSQL.
 
-We'll retrieve the `price_in_us_cents` value from the database, and then use
+We’ll retrieve the `price_in_us_cents` value from the database, and then use
 the [`loadOne`
 step](https://grafast.org/grafast/step-library/standard-steps/loadOne) to
 batch-convert these values from USD to AUD:
@@ -739,11 +737,11 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 
 ## Mutation Example with Node ID
 
-In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to
-soft-delete an entry from our `app_public.items` table. We're also going to
+In this example we’ll use a GraphQL Global Object Identifier (aka Node ID) to
+soft-delete an entry from our `app_public.items` table. We’re also going to
 check that the user performing the soft-delete is the owner of the record.
 
-**Aside**: if you're interested in soft-deletes, check out
+**Aside**: if you’re interested in soft-deletes, check out
 [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived)
 
 ```ts
@@ -997,10 +995,10 @@ async function sendEmail(email: string, message: string) {
 
 ## Plugin SQL Privileges
 
-Plugins access the database with the same privileges as everything else - they
+Plugins access the database with the same privileges as everything else — they
 are subject to RLS/RBAC/etc. If your database user does not have privileges to
 perform the action your plugin is attempting to achieve then you may need to
 create a companion database function that is marked as `SECURITY DEFINER` in
 order to perform the action with elevated privileges; alternatively you could
-use this database function directly - see [Custom
+use this database function directly — see [Custom
 Mutations](./custom-mutations) for more details.

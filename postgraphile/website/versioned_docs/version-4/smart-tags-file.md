@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/smart-tags-file/
 title: The postgraphile.tags.json5 file
 ---
 

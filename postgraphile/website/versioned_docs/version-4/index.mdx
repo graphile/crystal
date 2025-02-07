@@ -1,15 +1,17 @@
 ---
-layout: page
-path: /postgraphile/
 title: Introduction
 ---
 
+import styles from "@site/src/css/common.module.css";
+
 # PostGraphile Introduction
 
-<p class='intro'>
+<p className={styles.intro}>
+
 PostGraphile (formerly PostGraphQL) builds a powerful, extensible and
 performant GraphQL API from a PostgreSQL schema in seconds; saving you
 weeks if not months of development time.
+
 </p>
 
 If you already use PostgreSQL then you understand the value that a strongly
@@ -29,8 +31,8 @@ By combining powerful features such as PostgreSQL's
 and
 [row-level security policies](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
 with Graphile Engine's advanced
-[GraphQL look-ahead](https://graphile.org/graphile-build/look-ahead/) and
-[plugin expansion](https://graphile.org/graphile-build/plugins/) technologies,
+[GraphQL look-ahead](https://build.graphile.org/graphile-build/look-ahead) and
+[plugin expansion](https://build.graphile.org/graphile-build/plugins) technologies,
 PostGraphile ensures your generated schema is secure, performant and extensible.
 
 Some of the features we offer:

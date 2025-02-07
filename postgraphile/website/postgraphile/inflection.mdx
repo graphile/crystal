@@ -1,18 +1,18 @@
 ---
-layout: page
-path: /postgraphile/inflection/
 title: Inflection
 ---
 
+import Spon from "@site/src/components/Spon";
+
 Inflection governs how things are named whilst building your PostGraphile
-schema. "Inflection" is the system of naming things; it's composed of a large
+schema. “Inflection” is the system of naming things; it’s composed of a large
 set of named functions, and we call each of these inflection functions an
-"inflector."
+“inflector.”
 
 The inflectors that you have available will depend on the plugins and presets
-you're using. To get a list of the inflectors available to you, you can use
-TypeScript autocompletion, or if you're a sponsor you can install the
-`graphile` package and run `yarn graphile inflection list` (or equivalent for
+you’re using. To get a list of the inflectors available to you, you can use
+TypeScript autocompletion, or if you’re a sponsor you can install the <Spon />`graphile`
+package and run `yarn graphile inflection list` (or equivalent for
 other package managers).
 
 In GraphQL, types typically use singular `UpperCamelCase` (`PascalCase`);
@@ -26,12 +26,12 @@ avoiding naming conflicts. For example:
   `PendingUser`
 - Column names are changed to camelCase: `created_at` → `createdAt`
 - Relations reference the target type and the referencing columns:
-  `postsByAuthorId` (see "advice" below about making this shorter!)
+  `postsByAuthorId` (see “advice” below about making this shorter!)
 
-But if you don't want this (or it's doing something wrong), then you can fix it
+But if you don’t want this (or it’s doing something wrong), then you can fix it
 by overriding inflectors!
 
-### Overriding Naming - One-off
+### Overriding Naming — One-off
 
 If you want to rename just one field or type, your best bet is to use a
 [smart tag](./smart-tags.md); e.g. for a table you might do:
@@ -69,10 +69,10 @@ export default {
 ```
 
 In this example, `previous` is the previous inflector (in case you only want to
-override in certain circumstances) - you would call it using the same
-arguments, just dropping the first two - so in this case: `previous(typeName)`.
+override in certain circumstances) — you would call it using the same
+arguments, just dropping the first two — so in this case: `previous(typeName)`.
 
-:::tip
+:::tip TypeScript works with inflectors
 
 TypeScript is your friend when replacing inflectors, it should know what
 inflectors are available, their documentation, and the types of all their
@@ -106,9 +106,9 @@ const preset = {
 
 Our maintainer, Benjie, prefers to use this plugin in all his projects.
 
-## Listing available inflectors
+## <Spon />Listing available inflectors
 
-We've built a command into our sponsors-only `graphile` development assistant
+We’ve built a command into our sponsors-only `graphile` development assistant
 to help you determine all the inflectors available to you:
 
 ```bash npm2yarn

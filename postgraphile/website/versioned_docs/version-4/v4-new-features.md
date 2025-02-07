@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/v4-new-features/
 title: v4 Feature Guide
 ---
 
@@ -322,7 +320,9 @@ nor with some computed columns. We do not recommend using column-level SELECT
 grants - instead split your concerns into multiple tables and use the one-to-one
 relationship feature to link them.
 
-### pg@7.x and duck-typed pg
+<!--> <span></span> prevents autolinking <-->
+
+### pg@7<span></span>.x and duck-typed pg
 
 In v3 it was quite common to have conflicts with `pg` - where you had your own
 version installed, and PostGraphile installed it's own version, and when you

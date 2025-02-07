@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/default-role/
-title: Default Role
+title: The Default Role
 ---
+
+# Default Role
 
 PostGraphile makes full use of PostgreSQL roles, so in this article we will
 explain briefly how PostgreSQL roles and users work and how that relates to how

@@ -1,10 +1,8 @@
 ---
-layout: page
-path: /postgraphile/make-process-schema-plugin/
 title: makeProcessSchemaPlugin
 ---
 
-This plugin enables a way of processing the schema after it's built.
+This plugin enables a way of processing the schema after it’s built.
 
 Use cases include:
 
@@ -27,10 +25,10 @@ function makeProcessSchemaPlugin(
 
 The plugin accepts one argument: a schema processing function which will be
 called with the generated schema and must either return the same schema (e.g. if
-you're doing a read-only operation, or mutating the schema directly) or return
+you’re doing a read-only operation, or mutating the schema directly) or return
 an alternative schema (typically a derivative).
 
-:::info
+:::info How to do this asynchronously
 
 The callback to this plugin operates synchronously. If you need to do
 asynchronous work then be sure to handle any errors that may occur, and note
@@ -39,7 +37,7 @@ this plugin (and thus the schema being used by your server).
 
 :::
 
-:::warning
+:::warning Compatibility with third parties
 
 Because PostGraphile schemas use Gra*fast* plan resolvers, third party tooling
 that manipulate traditional resolvers are likely to break the schema, and not

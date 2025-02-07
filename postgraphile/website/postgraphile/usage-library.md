@@ -12,7 +12,7 @@ Usage](./usage-schema).
 
 ## PostGraphile instance
 
-Library mode is configured using a preset (see [Configuration](./config.mdx) for
+Library mode is configured using a preset (see [Configuration](./config) for
 the options) and returns a PostGraphile instance `pgl` which has various
 methods you can use depending on what you're trying to do.
 
@@ -101,7 +101,7 @@ documentation][grafserv].
 
 ### `pgl.getSchemaResult()`
 
-Returns a promise to the schema result - an object containing:
+Returns a promise to the schema result — an object containing:
 
 - `schema` - the GraphQL schema
 - `resolvedPreset` - the resolved preset
@@ -110,7 +110,7 @@ Note that this may change over time, e.g. in watch mode.
 
 ### `pgl.getSchema()`
 
-Shortcut to `(await pgl.getSchemaResult()).schema` - a promise to the GraphQL
+Shortcut to `(await pgl.getSchemaResult()).schema` — a promise to the GraphQL
 schema the instance represents (may change due to watch mode).
 
 ### `pgl.getResolvedPreset()`

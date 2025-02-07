@@ -85,7 +85,7 @@ rather than once-per-value as with `lambda`.
 
 ## `@pgField`
 
-This directive was always a workaround and is no longer meaningful in V5 - just
+This directive was always a workaround and is no longer meaningful in V5 — just
 make sure you add the right plans to the right fields and everything should work
 how you desire, and in a much more efficient and straightforward way than many
 patterns (particularly around mutation payloads) in V4.
@@ -183,7 +183,7 @@ problem. Many users found it confusing, and would often try and use it to
 retrieve data for themselves to use inside a resolver, which did not align with
 its intent at all.
 
-In Version 5 there is no need for this helper any more - every plan step is
+In Version 5 there is no need for this helper any more — every plan step is
 opted into the planning system without any ceremony, and the N+1 problem is
 automatically solved by Gra*fast*. The method to retrieve the data to use in
 the plan, and the method to populate the data are now the same so there's no

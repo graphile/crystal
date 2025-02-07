@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/node-id/
-title: Globally Unique Object Identification ("id" / "nodeId")
+title: nodeID / id
 ---
+
+# Globally Unique Object Identification ("id" / "nodeId")
 
 The [GraphQL Global Object Identification
 Specification](https://facebook.github.io/relay/graphql/objectidentification.htm)
@@ -111,16 +111,20 @@ export default {
 Ensure that you have a good way of generating cache identifiers for your GraphQL
 client though!
 
-(Note: the GraphQL Global Object Identification Specification was previously
+:::note
+
+The GraphQL Global Object Identification Specification was previously
 known as the Relay Global Object Identification Specification, but it is not
-specific to Relay and is a general best practice for GraphQL APIs.)
+specific to Relay and is a general best practice for GraphQL APIs.
+
+:::
 
 ### More On the Relay Preset
 
 If having both `id: ID!` and `rowId: Int!` in your schema bothers you (as it
 should!), you should consider using the `postgraphile/presets/relay` preset.
 This preset will hide raw primary keys from most of the schema, and will use
-global object identifiers instead - not just in the query schema but also in
+global object identifiers instead — not just in the query schema but also in
 mutations and filtering (and, with a little guidance, in function inputs).
 
 ```js title="graphile.config.mjs"

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/views/
 title: Views
 ---
 
@@ -92,7 +90,7 @@ query After {
 
 :::note
 
-You can use [smart tags](./smart-tags) to change the GraphQL
+You can use [smart tags](./smart-tags#name) to change the GraphQL
 field name.
 
 :::
@@ -128,7 +126,7 @@ CREATE VIEW personal_data_view
 ### API Layer
 
 Using views, one can create an access layer that will remain consistent even
-while making changes to the underlying tables - for example when splitting
+while making changes to the underlying tables — for example when splitting
 tables or combining them. Note that simple name changes can be solved using
 smart tags without the need for views. Much of what can be achieved with views
 can also be achieved with functions or plugins, so consider those options too.
