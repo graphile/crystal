@@ -1685,32 +1685,18 @@ function exportSchemaTypeDefs({
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions?.grafast?.inputPlan) {
-        typeProperties.push(
-          t.objectProperty(
-            identifierOrLiteral("__inputPlan"),
-            convertToIdentifierViaAST(
-              file,
-              type.extensions?.grafast.inputPlan,
-              `${type.name}.inputPlan`,
-              `${type.name}.extensions.grafast.inputPlan`,
-            ),
-          ),
-        );
-      }
-
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
-        typeProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(fieldName),
-            convertToIdentifierViaAST(
-              file,
-              field.extensions?.grafast,
-              `${type.name}.${fieldName}`,
-              `${type.name}.fields[${fieldName}].extensions.grafast`,
-            ),
-          ),
+        const ext = extensions(
+          file,
+          field.extensions,
+          `${type.name}.${fieldName}`,
+          `${type.name}.fields[${fieldName}].extensions`,
         );
+        if (ext) {
+          typeProperties.push(
+            t.objectProperty(identifierOrLiteral(fieldName), ext),
+          );
+        }
       }
 
       plansProperties.push(

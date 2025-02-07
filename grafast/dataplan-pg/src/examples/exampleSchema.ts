@@ -2246,23 +2246,25 @@ export function makeExampleSchema(
     fields: {
       featured: {
         type: GraphQLBoolean,
-        applyPlan: EXPORTABLE(
-          (TYPES, sql) =>
-            function plan($condition: PgConditionStep<any>, val) {
-              const $value = val.getRaw();
-              if ($value.evalIs(null)) {
-                $condition.where(sql`${$condition}.featured is null`);
-              } else {
-                $condition.where(
-                  sql`${$condition}.featured = ${$condition.placeholder(
-                    $value,
-                    TYPES.boolean,
-                  )}`,
-                );
-              }
-            },
-          [TYPES, sql],
-        ),
+        extensions: {
+          apply: EXPORTABLE(
+            (TYPES, sql) =>
+              function plan($condition: PgConditionStep<any>, val) {
+                const $value = val.getRaw();
+                if ($value.evalIs(null)) {
+                  $condition.where(sql`${$condition}.featured is null`);
+                } else {
+                  $condition.where(
+                    sql`${$condition}.featured = ${$condition.placeholder(
+                      $value,
+                      TYPES.boolean,
+                    )}`,
+                  );
+                }
+              },
+            [TYPES, sql],
+          ),
+        },
       },
     },
   });

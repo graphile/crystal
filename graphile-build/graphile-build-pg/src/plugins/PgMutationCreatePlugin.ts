@@ -1,10 +1,17 @@
 import "graphile-config";
 
-import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
+import type {
+  PgInsertSingleQueryBuilder,
+  PgInsertSingleStep,
+  PgResource,
+} from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
-import { assertExecutableStep, constant, object } from "grafast";
-import type { GraphQLOutputType } from "grafast/graphql";
+import { applyInput, assertExecutableStep, constant, object } from "grafast";
+import type {
+  GraphQLInputObjectType,
+  GraphQLOutputType,
+} from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
 import { tagToString } from "../utils.js";
@@ -292,7 +299,11 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             const payloadType = build.getOutputTypeByName(payloadTypeName);
             const mutationInputType = build.getInputTypeByName(
               inflection.createInputType(resource),
-            );
+            ) as GraphQLInputObjectType;
+            const tableFieldName = inflection.tableFieldName(resource);
+            const tableInputField =
+              mutationInputType.getFields()[tableFieldName];
+            const tableInputType = tableInputField.type;
 
             return build.extend(
               memo,
@@ -329,18 +340,49 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                       resource.extensions?.tags?.deprecated,
                     ),
                     plan: EXPORTABLE(
-                      (object, pgInsertSingle, resource) =>
+                      (
+                        applyInput,
+                        object,
+                        pgInsertSingle,
+                        resource,
+                        tableFieldName,
+                        tableInputType,
+                      ) =>
                         function plan(_: any, args: FieldArgs) {
+                          const $insert = pgInsertSingle(
+                            resource,
+                            Object.create(null),
+                          );
                           const plan = object({
-                            result: pgInsertSingle(
-                              resource,
-                              Object.create(null),
-                            ),
+                            result: $insert,
                           });
+
+                          const $cb = applyInput<PgInsertSingleQueryBuilder>(
+                            tableInputType,
+                            args.getRaw(["input", tableFieldName]),
+                          );
+                          $insert.apply($cb);
+
+                          /*
+                          for (const arg of field.args) {
+                            const $cb = inputArgsApply(
+                              arg.type,
+                              args.getRaw(arg.name),
+                            );
+                            plan.apply($cb);
+                          }
+                          */
                           args.apply(plan);
                           return plan;
                         },
-                      [object, pgInsertSingle, resource],
+                      [
+                        applyInput,
+                        object,
+                        pgInsertSingle,
+                        resource,
+                        tableFieldName,
+                        tableInputType,
+                      ],
                     ),
                   },
                 ),

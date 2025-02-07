@@ -13,7 +13,6 @@ import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
-import type { SetterCapableStep } from "./setter.js";
 
 const DEFAULT_CACHE_SIZE = 100;
 
@@ -50,13 +49,10 @@ interface ObjectStepCacheConfig {
  * the results of the associated plans.
  */
 export class ObjectStep<
-    TPlans extends { [key: string]: ExecutableStep } = {
-      [key: string]: ExecutableStep;
-    },
-  >
-  extends UnbatchedExecutableStep<DataFromObjectSteps<TPlans>>
-  implements SetterCapableStep<TPlans>
-{
+  TPlans extends { [key: string]: ExecutableStep } = {
+    [key: string]: ExecutableStep;
+  },
+> extends UnbatchedExecutableStep<DataFromObjectSteps<TPlans>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ObjectStep",

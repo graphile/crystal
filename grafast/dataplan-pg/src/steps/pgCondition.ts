@@ -1,10 +1,8 @@
-import type { BaseStep, ExecutableStep } from "grafast";
-import { ModifierStep } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
 import { TYPES } from "../index.js";
-import type { PgCodec } from "../interfaces.js";
+import type { PgCodec, PgQueryBuilder } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
@@ -22,40 +20,38 @@ export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 /** @deprecated Use DataplanPg.PgConditionStepExtensions instead */
 export type PgConditionStepExtensions = DataplanPg.PgConditionStepExtensions;
 
-export interface PgConditionCapableParentStep extends BaseStep {
-  alias: SQL;
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+export interface PgConditionCapableParentQueryBuilder extends PgQueryBuilder {
   where(condition: PgWhereConditionSpec<any>): void;
   having?(condition: PgHavingConditionSpec<any>): void;
 }
 
-type PgConditionStepModeExists = {
+type PgConditionModeExists = {
   mode: "EXISTS";
   tableExpression: SQL;
   alias?: string;
-  $equals?: ExecutableStep;
+  equals?: boolean;
 };
 
-export type PgConditionStepResolvedMode =
+export type PgConditionResolvedMode =
   | { mode: "PASS_THRU" }
   | { mode: "AND" }
   | { mode: "OR" }
   | { mode: "NOT" }
-  | PgConditionStepModeExists;
+  | PgConditionModeExists;
 
 export type PgConditionStepMode =
   | "PASS_THRU"
   | "AND"
   | "OR"
   | "NOT"
-  | PgConditionStepResolvedMode;
+  | PgConditionResolvedMode;
 
-export class PgConditionStep<
-    TParentStep extends
-      PgConditionCapableParentStep = PgConditionCapableParentStep,
+export class PgConditionQueryBuilder<
+    TParentQueryBuilder extends
+      PgConditionCapableParentQueryBuilder = PgConditionCapableParentQueryBuilder,
   >
-  extends ModifierStep<TParentStep>
-  implements PgConditionCapableParentStep, SQLable
+  extends Modifier<TParentQueryBuilder>
+  implements PgConditionCapableParentQueryBuilder, SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -68,10 +64,10 @@ export class PgConditionStep<
   public readonly alias: SQL;
 
   public extensions: PgConditionStepExtensions = Object.create(null);
-  private mode: PgConditionStepResolvedMode;
+  private mode: PgConditionResolvedMode;
 
   constructor(
-    $parent: TParentStep,
+    $parent: TParentQueryBuilder,
     private isHaving = false,
     mode: PgConditionStepMode = "PASS_THRU",
   ) {
@@ -112,7 +108,7 @@ export class PgConditionStep<
     return new PgConditionStep(this, this.isHaving, "NOT");
   }
 
-  existsPlan(options: Omit<PgConditionStepModeExists, "mode">) {
+  existsPlan(options: Omit<PgConditionModeExists, "mode">) {
     if (this.isHaving) {
       // Is this true?
       throw new Error(`EXISTS inside having is currently unsupported`);

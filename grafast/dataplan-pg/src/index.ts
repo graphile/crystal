@@ -135,7 +135,11 @@ import {
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+import {
+  pgInsertSingle,
+  PgInsertSingleStep,
+  PgInsertSingleQueryBuilder,
+} from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
   pgPolymorphic,
@@ -280,6 +284,7 @@ export {
   PgHavingConditionSpec,
   PgHStore,
   pgInsertSingle,
+  PgInsertSingleQueryBuilder,
   PgInsertSingleStep,
   PgInterval,
   PgLine,

@@ -35,7 +35,7 @@ import type {
   InputStep,
   OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutableStep, ModifierStep } from "./step.js";
+import type { ExecutableStep } from "./step.js";
 import { constant } from "./steps/constant.js";
 
 const {
@@ -458,34 +458,8 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const {
-          inputPlan,
-          applyPlan,
-          autoApplyAfterParentPlan,
-          autoApplyAfterParentSubscribePlan,
-          ...argSpec
-        } = args[argName];
-        assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
-        assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
-        memo[argName] = {
-          ...argSpec,
-          ...(inputPlan || applyPlan
-            ? {
-                extensions: {
-                  grafast: {
-                    ...(inputPlan ? { inputPlan } : null),
-                    ...(autoApplyAfterParentPlan
-                      ? { autoApplyAfterParentPlan }
-                      : null),
-                    ...(applyPlan ? { applyPlan } : null),
-                    ...(autoApplyAfterParentSubscribePlan
-                      ? { autoApplyAfterParentSubscribePlan }
-                      : null),
-                  },
-                },
-              }
-            : null),
-        };
+        const argSpec = args[argName];
+        memo[argName] = argSpec;
         return memo;
       }, Object.create(null))
     : {};
@@ -526,33 +500,17 @@ export function newGrafastFieldConfigBuilder<
   return (config) => config;
 }
 
-export type GrafastInputFieldConfigMap<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-> = {
-  [key: string]: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParentStep,
-    any,
-    any
-  >;
+export type GrafastInputFieldConfigMap = {
+  [key: string]: GrafastInputFieldConfig<GraphQLInputType>;
 };
 
-export type InputObjectTypeSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-  fields: TFields | (() => TFields);
-};
+export type InputObjectTypeSpec<TFields extends GrafastInputFieldConfigMap> =
+  Omit<GraphQLInputObjectTypeConfig, "fields"> & {
+    fields: TFields | (() => TFields);
+  };
 
-function inputObjectSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
->(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
+function inputObjectSpec<TFields extends GrafastInputFieldConfigMap>(
+  spec: InputObjectTypeSpec<TFields>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -560,10 +518,7 @@ function inputObjectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec<TContext, TParentStep>(
-          fields[key],
-          `${spec.name}.${key}`,
-        );
+        o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
         return o;
       }, {} as GraphQLInputFieldConfigMap);
       return modifiedFields;
@@ -574,72 +529,29 @@ function inputObjectSpec<
 
 export type GrafastInputObjectType<
   TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
+  TFields extends GrafastInputFieldConfigMap,
 > = graphql.GraphQLInputObjectType & {
   TContext: TContext;
-  TParentStep: TParentStep;
   TFields: TFields;
 };
 
-export function newInputObjectTypeBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
->(): <TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>>(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
-) => GrafastInputObjectType<TContext, TParentStep, TFields> {
+export function newInputObjectTypeBuilder<TContext extends Grafast.Context>(): <
+  TFields extends GrafastInputFieldConfigMap,
+>(
+  spec: InputObjectTypeSpec<TFields>,
+) => GrafastInputObjectType<TContext, TFields> {
   return (spec) =>
     new GraphQLInputObjectType(inputObjectSpec(spec)) as GrafastInputObjectType<
       TContext,
-      TParentStep,
       any
     >;
 }
 
-/**
- * Saves us having to write `extensions: {grafast: {...}}` everywhere.
- */
-export function inputObjectFieldSpec<
-  TContext extends Grafast.Context,
-  TParent extends ModifierStep<any>,
-  TResult extends ModifierStep<TParent> = ModifierStep<TParent>,
-  TInput extends InputStep = InputStep,
->(
-  grafastSpec: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParent,
-    TResult,
-    TInput
-  >,
-  path: string,
+export function inputObjectFieldSpec(
+  grafastSpec: GrafastInputFieldConfig<GraphQLInputType>,
+  _path: string,
 ): GraphQLInputFieldConfig {
-  const {
-    inputPlan,
-    applyPlan,
-    autoApplyAfterParentInputPlan,
-    autoApplyAfterParentApplyPlan,
-    ...spec
-  } = grafastSpec;
-  assertNotAsync(inputPlan, `${path ?? "?"}.inputPlan`);
-  assertNotAsync(applyPlan, `${path ?? "?"}.applyPlan`);
-  return inputPlan || applyPlan
-    ? {
-        ...spec,
-        extensions: {
-          grafast: {
-            ...(inputPlan ? { inputPlan } : null),
-            ...(applyPlan ? { applyPlan } : null),
-            ...(autoApplyAfterParentInputPlan
-              ? { autoApplyAfterParentInputPlan }
-              : null),
-            ...(autoApplyAfterParentApplyPlan
-              ? { autoApplyAfterParentApplyPlan }
-              : null),
-          },
-        },
-      }
-    : spec;
+  return grafastSpec;
 }
 
 declare module "graphql" {

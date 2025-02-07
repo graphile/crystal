@@ -1,6 +1,7 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   PromiseOrDirect,
   SetterCapableStep,
   SetterStep,
@@ -16,7 +17,9 @@ import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
   PgCodec,
+  PgQueryBuilder,
   PgTypedExecutableStep,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -275,6 +278,15 @@ export class PgInsertSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  private applyDepIds: number[] = [];
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgInsertSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -296,6 +308,18 @@ export class PgInsertSingleStep<
     }
     const { text, rawSqlValues, queryValueDetailsBySymbol } =
       this.finalizeResults;
+
+    // TODO:
+    /*
+    for (const applyDepId of this.applyDepIds) {
+      const val = values[applyDepId].unaryValue();
+      if (Array.isArray(val)) {
+        val.forEach((v) => v?.(queryBuilder));
+      } else {
+        val?.(queryBuilder);
+      }
+    }
+    */
 
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
@@ -431,3 +455,16 @@ export function pgInsertSingle<
   return new PgInsertSingleStep(resource, attributes);
 }
 exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");
+
+export interface PgInsertSingleQueryBuilder<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends PgQueryBuilder {
+  set<TKey extends keyof GetPgResourceAttributes<TResource>>(
+    name: TKey,
+    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+  ): void;
+}
+
+export type PgInsertSingleQueryBuilderCallback = (
+  queryBuilder: PgInsertSingleQueryBuilder,
+) => void;
