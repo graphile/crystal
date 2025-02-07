@@ -8,7 +8,7 @@ and other resources in your PostgreSQL database.
 
 ## About
 
-Thanks to Graphile Engine's advanced [query look-ahead](../graphile-build/look-ahead) features, the plugins in this package do not exhibit the N+1 query problem common in many database-based GraphQL APIs. For all but the flattest GraphQL queries, these plugins typically outperform `DataLoader`-based solutions.
+Thanks to Graphile Engine's advanced [query look-ahead](/graphile-build/4/look-ahead) features, the plugins in this package do not exhibit the N+1 query problem common in many database-based GraphQL APIs. For all but the flattest GraphQL queries, these plugins typically outperform `DataLoader`-based solutions.
 
 An example of an application built on `graphile-build-pg` is [PostGraphile](http://postgraphile.org) which with one command connects to your PostgreSQL database and provides a full highly performant standards-compliant GraphQL API.
 

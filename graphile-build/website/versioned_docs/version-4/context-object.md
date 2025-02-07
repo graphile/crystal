@@ -91,6 +91,6 @@ builder.hook("GraphQLInputObjectType:fields",
 ```
 
 See also:
-[Look ahead](/graphile-build/look-ahead/#when-creating-an-individual-field).
+[Look ahead](/graphile-build/4/look-ahead/#when-creating-an-individual-field).
 
 <!-- TODO: add more context properties -->
