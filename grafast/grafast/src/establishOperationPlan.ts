@@ -10,7 +10,6 @@ import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   EstablishOperationPlanResult,
-  EstablishOperationPlanResultSuccess,
   Fragments,
   LinkedList,
 } from "./interfaces.js";
