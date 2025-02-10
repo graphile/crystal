@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
+
 import type { Compiler, Configuration, Resolver } from "webpack";
 import webpack from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
@@ -49,18 +50,21 @@ class TsResolvePlugin {
   }
 }
 
+function backtickEscape(string: string) {
+  return string.replace(/[`$\\]/g, `\\$&`);
+}
+
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
-    compiler.hooks.done.tap("OutputDataToSrcPlugin", () => {
-      const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null);
+    compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
+      //const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null);
+      const code = compilation.assets["ruru.min.js"].source();
       writeFileSync(
         `${__dirname}/src/bundleData.ts`,
         `\
-export const graphiQLContent: string =
-  Buffer.from(
-    "${code.toString("base64")}",
-    "base64"
-  ).toString("utf8");
+export const graphiQLContent: string = \`\\
+${backtickEscape(code.toString("utf8").trim())}
+\`;
 `,
       );
     });
