@@ -239,7 +239,7 @@ export class OperationPlan {
   private maxValidatedStepId = -1;
 
   /** Constraints based on evaluating variables. @internal */
-  public readonly variableValuesConstraints: Constraint[] = [];
+  public readonly variableValuesConstraints: Constraint[];
   /** Stores the actual variableValues. @internal */
   public readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
   /** A step for accessing variableValues in a tracked manner (allowing eval). @internal */
@@ -248,14 +248,14 @@ export class OperationPlan {
   }>;
 
   /** Constraints based on evaluating context. @internal */
-  public readonly contextConstraints: Constraint[] = [];
+  public readonly contextConstraints: Constraint[];
   /** Stores the actual value of the context. @internal */
   public readonly contextStep: __ValueStep<Grafast.Context>;
   /** Allows accessing context in a tracked manner (allowing eval). @internal */
   public readonly trackedContextStep: __TrackedValueStep<Grafast.Context>;
 
   /** Constraints based on evaluating rootValue. @internal */
-  public readonly rootValueConstraints: Constraint[] = [];
+  public readonly rootValueConstraints: Constraint[];
   /** Stores the actual value of rootValue. @internal */
   public readonly rootValueStep: __ValueStep<any>;
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
@@ -297,11 +297,17 @@ export class OperationPlan {
     public readonly fragments: {
       [fragmentName: string]: FragmentDefinitionNode;
     },
+    variableValuesConstraints: Constraint[],
     public readonly variableValues: { [key: string]: any },
+    contextConstraints: Constraint[],
     public readonly context: { [key: string]: any },
+    rootValueConstraints: Constraint[],
     public readonly rootValue: any,
     private readonly planningTimeout: number | null,
   ) {
+    this.variableValuesConstraints = variableValuesConstraints;
+    this.contextConstraints = contextConstraints;
+    this.rootValueConstraints = rootValueConstraints;
     this.scalarPlanInfo = { schema: this.schema };
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
@@ -2388,6 +2394,16 @@ export class OperationPlan {
   private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
     if (step.hasSideEffects) {
       // Plans with side effects have no peers.
+      return EMPTY_ARRAY;
+    }
+
+    if (step._stepOptions.stream) {
+      // Streams have no peers - we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      //
+      // HOWEVER! There may be lifecycle parts that need to be called... So
+      // call the function with an empty array; ignore the result.
       return EMPTY_ARRAY;
     }
 

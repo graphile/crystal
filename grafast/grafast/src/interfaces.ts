@@ -27,6 +27,7 @@ import type {
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type { Constraint } from "./constraints.js";
 import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
@@ -79,14 +80,30 @@ export const $$cacheByOperation = Symbol("cacheByOperation");
 export type Fragments = {
   [key: string]: FragmentDefinitionNode;
 };
-export type OperationPlanOrError =
-  | OperationPlan
-  | Error
-  | SafeError<
-      | { [$$timeout]: number; [$$ts]: number }
-      | { [$$timeout]?: undefined; [$$ts]?: undefined }
-      | undefined
-    >;
+export interface IEstablishOperationPlanResult {
+  variableValuesConstraints: Constraint[];
+  contextConstraints: Constraint[];
+  rootValueConstraints: Constraint[];
+}
+export interface EstablishOperationPlanResultSuccess
+  extends IEstablishOperationPlanResult {
+  error?: never;
+  operationPlan: OperationPlan;
+}
+export interface EstablishOperationPlanResultError
+  extends IEstablishOperationPlanResult {
+  error:
+    | Error
+    | SafeError<
+        | { [$$timeout]: number; [$$ts]: number }
+        | { [$$timeout]?: undefined; [$$ts]?: undefined }
+        | undefined
+      >;
+  operationPlan?: never;
+}
+export type EstablishOperationPlanResult =
+  | EstablishOperationPlanResultSuccess
+  | EstablishOperationPlanResultError;
 
 /**
  * This represents the list of possible operationPlans for a specific document.
@@ -102,7 +119,7 @@ export interface CacheByOperationEntry {
    * list, and if the list grows beyond a maximum size we can drop the last
    * element.
    */
-  possibleOperationPlans: LinkedList<OperationPlanOrError> | null;
+  possibleOperationPlans: LinkedList<EstablishOperationPlanResult> | null;
   fragments: Fragments;
 }
 

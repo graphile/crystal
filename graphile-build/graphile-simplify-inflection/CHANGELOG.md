@@ -1,5 +1,14 @@
 # v8.0.0
 
+## 8.0.0-beta.6
+
+### Patch Changes
+
+- [#2366](https://github.com/graphile/crystal/pull/2366)
+  [`ce8b32d44`](https://github.com/graphile/crystal/commit/ce8b32d4408b40ddb8a9c5ee20de4a62d6edee5b)
+  Thanks [@benjie](https://github.com/benjie)! - Correct the `pgShortPk` comment
+  in the README.
+
 ## 8.0.0-beta.5
 
 ### Patch Changes
