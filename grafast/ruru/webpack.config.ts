@@ -51,15 +51,18 @@ class TsResolvePlugin {
 
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
-    compiler.hooks.done.tap('OutputDataToSrcPlugin', () => {
-      const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null)
-      writeFileSync(`${__dirname}/src/bundleData.ts`, `\
-export const graphiQLContent =
+    compiler.hooks.done.tap("OutputDataToSrcPlugin", () => {
+      const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null);
+      writeFileSync(
+        `${__dirname}/src/bundleData.ts`,
+        `\
+export const graphiQLContent: string =
   Buffer.from(
-    "${code.toString('base64')}",
+    "${code.toString("base64")}",
     "base64"
   ).toString("utf8");
-`);
+`,
+      );
     });
   }
 }
