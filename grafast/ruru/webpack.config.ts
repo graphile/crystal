@@ -62,6 +62,7 @@ class OutputDataToSrcPlugin {
       writeFileSync(
         `${__dirname}/src/bundleData.ts`,
         `\
+/* eslint-disable */
 export const graphiQLContent: string = \`\\
 ${backtickEscape(code.toString("utf8").trim())}
 \`;
