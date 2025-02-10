@@ -1,5 +1,32 @@
 # grafast
 
+## 0.1.1-beta.20
+
+### Patch Changes
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`fc9d64eb8`](https://github.com/graphile/crystal/commit/fc9d64eb8002d3b72625bc505ed76c07f4296d68)
+  Thanks [@benjie](https://github.com/benjie)! - Internal inspect method used in
+  bundles now correctly stringifies `undefined`
+
+- [#2366](https://github.com/graphile/crystal/pull/2366)
+  [`a2dbad945`](https://github.com/graphile/crystal/commit/a2dbad9457195bec797d72e4e6d45f45278f9f69)
+  Thanks [@benjie](https://github.com/benjie)! - Use Map for `cacheStep`'s
+  cache; don't want key `1` and key `"1"` to be treated as equivalent.
+
+- [#2366](https://github.com/graphile/crystal/pull/2366)
+  [`31078842a`](https://github.com/graphile/crystal/commit/31078842ad0eeaa7111491fa9eb5e3bd026fb38a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where `deduplicate()`
+  lifecycle method wasn't called on some steps (e.g. those with side effects, or
+  those streamed). Instead, the method is still called now but it is passed an
+  empty array.
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`5a0ec31de`](https://github.com/graphile/crystal/commit/5a0ec31deae91f1dd17a77a4bb7c1a911a27e26a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in operation plan
+  caching where planning errors will result in all future usages of the same
+  document resulting in the same error until server restart.
+
 ## 0.1.1-beta.19
 
 ### Patch Changes
