@@ -14,7 +14,7 @@ try {
       !obj ||
       Object.getPrototypeOf(obj) === null ||
       Object.getPrototypeOf(obj) === Object.prototype
-      ? JSON.stringify(obj)
+      ? String(JSON.stringify(obj))
       : String(obj);
   };
 }

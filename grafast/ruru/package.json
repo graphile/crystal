@@ -20,12 +20,13 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
-    }
+    },
+    "./bundle": "./bundle/ruru.min.js"
   },
   "scripts": {
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && yarn webpack --mode=production && chmod +x dist/cli-run.js"
+    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js"
   },
   "repository": {
     "type": "git",
