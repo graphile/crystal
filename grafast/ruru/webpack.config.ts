@@ -1,4 +1,5 @@
-import type { Configuration, Resolver } from "webpack";
+import { readFileSync, writeFileSync } from "node:fs";
+import type { Compiler, Configuration, Resolver } from "webpack";
 import webpack from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
@@ -48,6 +49,21 @@ class TsResolvePlugin {
   }
 }
 
+class OutputDataToSrcPlugin {
+  apply(compiler: Compiler) {
+    compiler.hooks.done.tap('OutputDataToSrcPlugin', () => {
+      const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null)
+      writeFileSync(`${__dirname}/src/bundleData.ts`, `\
+export const graphiQLContent =
+  Buffer.from(
+    "${code.toString('base64')}",
+    "base64"
+  ).toString("utf8");
+`);
+    });
+  }
+}
+
 const config: Configuration = {
   entry: "./src/bundle.mtsx",
   output: {
@@ -89,6 +105,7 @@ const config: Configuration = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
+    new OutputDataToSrcPlugin(),
   ],
   //stats: "detailed",
 };
