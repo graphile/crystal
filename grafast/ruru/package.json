@@ -20,7 +20,8 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
-    }
+    },
+    "./bundle": "./bundle/ruru.min.js"
   },
   "scripts": {
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
