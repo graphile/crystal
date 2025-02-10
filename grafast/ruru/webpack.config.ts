@@ -51,7 +51,7 @@ class TsResolvePlugin {
 }
 
 function backtickEscape(string: string) {
-  return string.replace(/[`$\\]/g, `\\$&`);
+  return string.replace(/([`\\]|\$\{)/g, `\\$&`);
 }
 
 class OutputDataToSrcPlugin {
