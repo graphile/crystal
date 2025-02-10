@@ -2,15 +2,17 @@ import LRU from "@graphile/lru";
 import debugFactory from "debug";
 import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
+import type { Constraint } from "./constraints.js";
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
 import { OperationPlan, SafeError } from "./index.js";
 import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
+  EstablishOperationPlanResult,
+  EstablishOperationPlanResultSuccess,
   Fragments,
   LinkedList,
-  OperationPlanOrError,
 } from "./interfaces.js";
 import { $$cacheByOperation, $$timeout, $$ts } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
@@ -68,16 +70,16 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
  * @remarks Due to the optimisation in `establishOperationPlan`, the schema, document
  * and operationName checks have already been performed.
  */
-function isOperationPlanCompatible<
+function isOperationPlanResultCompatible<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends Grafast.Context = Grafast.Context,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
-  operationPlan: OperationPlan,
+  operationPlan: EstablishOperationPlanResult,
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-): operationPlan is OperationPlan {
+): boolean {
   const {
     variableValuesConstraints,
     contextConstraints,
@@ -122,60 +124,70 @@ export function establishOperationPlan<
 
   // These two variables to make it easy to trim the linked list later.
   let count = 0;
-  let lastButOneItem: LinkedList<OperationPlanOrError> | null = null;
+  let lastButOneItem: LinkedList<EstablishOperationPlanResult> | null = null;
 
   if (cache !== undefined) {
     // Dev-only validation
     assertFragmentsMatch(cache.fragments, fragments);
 
-    let previousItem: LinkedList<OperationPlanOrError> | null = null;
-    let linkedItem: LinkedList<OperationPlanOrError> | null =
+    let previousItem: LinkedList<EstablishOperationPlanResult> | null = null;
+    let linkedItem: LinkedList<EstablishOperationPlanResult> | null =
       cache.possibleOperationPlans;
     while (linkedItem) {
       const value = linkedItem.value;
-      if (value instanceof SafeError) {
-        if (value.extensions?.[$$timeout] != null) {
-          if (value.extensions[$$ts] < timeSource.now() - TIMEOUT_TIMEOUT) {
-            // Remove this out of date timeout
-            linkedItem = linkedItem.next;
-            if (previousItem !== null) {
-              previousItem.next = linkedItem;
+      if (
+        isOperationPlanResultCompatible(
+          value,
+          variableValues,
+          context,
+          rootValue,
+        )
+      ) {
+        const { error, operationPlan } = value;
+        if (error != null) {
+          if (error instanceof SafeError) {
+            if (error.extensions?.[$$timeout] != null) {
+              if (error.extensions[$$ts] < timeSource.now() - TIMEOUT_TIMEOUT) {
+                // Remove this out of date timeout
+                linkedItem = linkedItem.next;
+                if (previousItem !== null) {
+                  previousItem.next = linkedItem;
+                } else {
+                  cache.possibleOperationPlans = linkedItem;
+                }
+                continue;
+              }
+              if (
+                planningTimeout !== null &&
+                error.extensions[$$timeout] >= planningTimeout
+              ) {
+                // It was a timeout error - do not retry
+                throw error;
+              } else {
+                // That's Not My Timeout, let's try again.
+              }
             } else {
-              cache.possibleOperationPlans = linkedItem;
+              // Not a timeout error - this will always fail in the same way?
+              throw error;
             }
-            continue;
-          }
-          if (
-            planningTimeout !== null &&
-            value.extensions[$$timeout] >= planningTimeout
-          ) {
-            // It was a timeout error - do not retry
-            throw value;
           } else {
-            // That's Not My Timeout, let's try again.
+            // Not a timeout error - this will always fail in the same way?
+            throw error;
           }
         } else {
-          // Not a timeout error - this will always fail in the same way?
-          throw value;
-        }
-      } else if (value instanceof Error) {
-        // Not a timeout error - this will always fail in the same way?
-        throw value;
-      } else if (
-        isOperationPlanCompatible(value, variableValues, context, rootValue)
-      ) {
-        // Hoist to top of linked list
-        if (previousItem !== null) {
-          // Remove linkedItem from existing chain
-          previousItem.next = linkedItem.next;
-          // Add rest of chain after linkedItem
-          linkedItem.next = cache.possibleOperationPlans;
-          // linkedItem is now head of chain
-          cache.possibleOperationPlans = linkedItem;
-        }
+          // Hoist to top of linked list
+          if (previousItem !== null) {
+            // Remove linkedItem from existing chain
+            previousItem.next = linkedItem.next;
+            // Add rest of chain after linkedItem
+            linkedItem.next = cache.possibleOperationPlans;
+            // linkedItem is now head of chain
+            cache.possibleOperationPlans = linkedItem;
+          }
 
-        // We found a suitable OperationPlan - use that!
-        return value;
+          // We found a suitable OperationPlan - use that!
+          return operationPlan;
+        }
       }
 
       count++;
@@ -187,14 +199,20 @@ export function establishOperationPlan<
 
   // No suitable OperationPlan found, time to make one.
   let operationPlan: OperationPlan | undefined;
-  let error: Exclude<OperationPlanOrError, OperationPlan> | undefined;
+  let error: EstablishOperationPlanResult["error"] | undefined;
+  const variableValuesConstraints: Constraint[] = [];
+  const contextConstraints: Constraint[] = [];
+  const rootValueConstraints: Constraint[] = [];
   try {
     operationPlan = new OperationPlan(
       schema,
       operation,
       fragments,
+      variableValuesConstraints,
       variableValues,
+      contextConstraints,
       context,
+      rootValueConstraints,
       rootValue,
       planningTimeout,
     );
@@ -212,11 +230,19 @@ export function establishOperationPlan<
     });
     schema.extensions.grafast![$$cacheByOperation] = cacheByOperation;
   }
-  const operationPlanOrError = operationPlan ?? error!;
+  const establishOperationPlanResult: EstablishOperationPlanResult = {
+    variableValuesConstraints,
+    contextConstraints,
+    rootValueConstraints,
+    ...(operationPlan ? { operationPlan } : { error: error! }),
+  };
   if (!cache) {
     cache = {
       fragments,
-      possibleOperationPlans: { value: operationPlanOrError, next: null },
+      possibleOperationPlans: {
+        value: establishOperationPlanResult,
+        next: null,
+      },
     };
     cacheByOperation.set(operation, cache);
   } else {
@@ -231,7 +257,7 @@ export function establishOperationPlan<
 
     // Add new operationPlan to top of the linked list.
     cache.possibleOperationPlans = {
-      value: operationPlanOrError,
+      value: establishOperationPlanResult,
       next: cache.possibleOperationPlans,
     };
   }
