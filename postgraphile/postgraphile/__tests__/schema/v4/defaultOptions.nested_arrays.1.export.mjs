@@ -1,8 +1,7 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, domainOfCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, each, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, extractEnumExtensionValue, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, each, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
@@ -435,26 +434,18 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.T);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
-};
+function Query_allTs_plan() {
+  return connection(pgResource_tPgResource.find());
+}
+const Query_allTs_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
 const resource_frmcdc_workHourPgResource = registry.pgResources["frmcdc_workHour"];
 function CursorSerialize(value) {
   return "" + value;
@@ -843,8 +834,12 @@ export const plans = {
       return fetcher($nodeId);
     },
     allTs: {
-      plan() {
-        return connection(pgResource_tPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allTs_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allTs_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -889,18 +884,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
-              return null;
             }
           }
         },
@@ -1034,31 +1017,21 @@ export const plans = {
     }
   },
   TsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             tUniques[0].attributes.forEach(attributeName => {
-              const attribute = tCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -1067,19 +1040,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             tUniques[0].attributes.forEach(attributeName => {
-              const attribute = tCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -1088,11 +1059,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "k",
               direction: "ASC",
               ...(undefined != null ? {
@@ -1100,7 +1068,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -1110,11 +1078,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "k",
               direction: "DESC",
               ...(undefined != null ? {
@@ -1122,7 +1087,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -1291,7 +1256,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge($mutation, args, info) {
+    tEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -1308,8 +1277,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -1363,7 +1332,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge($mutation, args, info) {
+    tEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -1380,8 +1353,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -1453,7 +1426,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    tEdge($mutation, args, info) {
+    tEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -1470,8 +1447,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("TsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and

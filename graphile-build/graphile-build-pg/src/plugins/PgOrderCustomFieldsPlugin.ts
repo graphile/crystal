@@ -4,7 +4,8 @@ import "graphile-config";
 import type {
   PgResource,
   PgResourceParameter,
-  PgSelectStep,
+  PgSelectQueryBuilder,
+  PgSelectQueryBuilderCallback,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
@@ -121,25 +122,25 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                   [valueName]: {
                     extensions: {
                       grafast: {
-                        applyPlan: EXPORTABLE(
+                        apply: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (step: PgSelectStep) => {
+                            ((queryBuilder: PgSelectQueryBuilder) => {
                               if (typeof pgFieldSource.from !== "function") {
                                 throw new Error(
                                   "Invalid computed attribute 'from'",
                                 );
                               }
                               const expression = sql`${pgFieldSource.from({
-                                placeholder: step.alias,
+                                placeholder: queryBuilder.alias,
                               })}`;
-                              step.orderBy({
+                              queryBuilder.orderBy({
                                 codec: pgFieldSource.codec,
                                 fragment: expression,
                                 direction: ascDesc.toUpperCase() as
                                   | "ASC"
                                   | "DESC",
                               });
-                            },
+                            }) as PgSelectQueryBuilderCallback,
                           [ascDesc, pgFieldSource, sql],
                         ),
                       },

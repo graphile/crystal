@@ -65,6 +65,10 @@ import { PgBooleanFilterStep } from "./filters/pgBooleanFilter.js";
 import { PgClassFilterStep } from "./filters/pgClassFilter.js";
 import { PgManyFilterStep } from "./filters/pgManyFilter.js";
 import { PgOrFilterStep } from "./filters/pgOrFilter.js";
+import type {
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
+} from "./interfaces.js";
 import {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
@@ -116,6 +120,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "./pgServices.js";
 import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
+import { extractEnumExtensionValue } from "./steps/extractEnumExtensionValue.js";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -147,6 +152,7 @@ import {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
   PgSelectRowsStep,
   PgSelectStep,
   sqlFromArgDigests,
@@ -164,6 +170,7 @@ import {
 import { PgTempTableStep } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
+  PgUnionAllQueryBuilder,
   PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
@@ -192,6 +199,7 @@ export {
   digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
+  extractEnumExtensionValue,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   GetPgCodecAttributes,
@@ -310,6 +318,8 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
+  PgSelectQueryBuilderCallback,
   PgSelectRowsStep,
   pgSelectSingleFromRecord,
   PgSelectSinglePlanOptions,
@@ -320,6 +330,8 @@ export {
   PgTempTableStep,
   PgTypedExecutableStep,
   pgUnionAll,
+  PgUnionAllQueryBuilder,
+  PgUnionAllQueryBuilderCallback,
   PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
@@ -371,6 +383,7 @@ exportAsMany("@dataplan/pg", {
   PgClassFilterStep,
   PgManyFilterStep,
   PgOrFilterStep,
+  extractEnumExtensionValue,
   pgClassExpression,
   PgClassExpressionStep,
   PgConditionStep,

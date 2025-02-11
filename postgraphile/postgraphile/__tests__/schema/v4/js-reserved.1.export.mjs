@@ -1,8 +1,7 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
 const handler_codec_base64JSON = {
   name: "base64JSON",
   encode: (() => {
@@ -1684,32 +1683,58 @@ const specFromRecord = $record => {
     return memo;
   }, Object.create(null));
 };
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
-};
+function Building_machinesByConstructor_plan($record) {
+  return connection(otherSource_machinePgResource.find(specFromRecord($record)));
+}
+const Building_machinesByConstructor_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Building_machinesByConstructorList_plan($record) {
+  return otherSource_machinePgResource.find(specFromRecord($record));
+}
+const Building_machinesByConstructorList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
 const specFromRecord2 = $record => {
   return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
     memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
     return memo;
   }, Object.create(null));
 };
+function Building_relationalItemsByConstructor_plan($record) {
+  return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
+}
+const Building_relationalItemsByConstructor_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Building_relationalItemsByConstructorList_plan($record) {
+  return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
+}
+const Building_relationalItemsByConstructorList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
 const handler3 = {
   typeName: "Machine",
   codec: handler_codec_base64JSON,
@@ -2293,6 +2318,305 @@ const fetcher12 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Reserved);
+function Query_allRelationalTopicsList_plan() {
+  return pgResource_relational_topicsPgResource.find();
+}
+const Query_allRelationalTopicsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allRelationalTopics_plan() {
+  return connection(pgResource_relational_topicsPgResource.find());
+}
+const Query_allRelationalTopics_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allProtoSList_plan() {
+  return pgResource___proto__PgResource.find();
+}
+const Query_allProtoSList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allProtoS_plan() {
+  return connection(pgResource___proto__PgResource.find());
+}
+const Query_allProtoS_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allBuildingsList_plan() {
+  return building_buildingPgResource.find();
+}
+const Query_allBuildingsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allBuildings_plan() {
+  return connection(building_buildingPgResource.find());
+}
+const Query_allBuildings_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allConstructorsList_plan() {
+  return pgResource_constructorPgResource.find();
+}
+const Query_allConstructorsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allConstructors_plan() {
+  return connection(pgResource_constructorPgResource.find());
+}
+const Query_allConstructors_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allCropsList_plan() {
+  return pgResource_cropPgResource.find();
+}
+const Query_allCropsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allCrops_plan() {
+  return connection(pgResource_cropPgResource.find());
+}
+const Query_allCrops_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allMachinesList_plan() {
+  return otherSource_machinePgResource.find();
+}
+const Query_allMachinesList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allMachines_plan() {
+  return connection(otherSource_machinePgResource.find());
+}
+const Query_allMachines_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allMaterialsList_plan() {
+  return pgResource_materialPgResource.find();
+}
+const Query_allMaterialsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allMaterials_plan() {
+  return connection(pgResource_materialPgResource.find());
+}
+const Query_allMaterials_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allNullsList_plan() {
+  return pgResource_nullPgResource.find();
+}
+const Query_allNullsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allNulls_plan() {
+  return connection(pgResource_nullPgResource.find());
+}
+const Query_allNulls_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allProjectsList_plan() {
+  return pgResource_projectPgResource.find();
+}
+const Query_allProjectsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allProjects_plan() {
+  return connection(pgResource_projectPgResource.find());
+}
+const Query_allProjects_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allRelationalStatusesList_plan() {
+  return pgResource_relational_statusPgResource.find();
+}
+const Query_allRelationalStatusesList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allRelationalStatuses_plan() {
+  return connection(pgResource_relational_statusPgResource.find());
+}
+const Query_allRelationalStatuses_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allYieldsList_plan() {
+  return pgResource_yieldPgResource.find();
+}
+const Query_allYieldsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allYields_plan() {
+  return connection(pgResource_yieldPgResource.find());
+}
+const Query_allYields_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allReservedsList_plan() {
+  return pgResource_reservedPgResource.find();
+}
+const Query_allReservedsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allReserveds_plan() {
+  return connection(pgResource_reservedPgResource.find());
+}
+const Query_allReserveds_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
+function Query_allRelationalItemsList_plan() {
+  return relational_items_relational_itemsPgResource.find();
+}
+const Query_allRelationalItemsList_postPlanResolvers = [($select, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $select;
+}];
+function Query_allRelationalItems_plan() {
+  return connection(relational_items_relational_itemsPgResource.find());
+}
+const Query_allRelationalItems_postPlanResolvers = [($connection, $parent, fieldArgs, {
+  field
+}) => {
+  const $orderBy = fieldArgs.getRaw("orderBy");
+  const $select = $connection.getSubplan();
+  const orderByArg = field.args.find(a => a.name === "orderBy");
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+  return $connection;
+}];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -6885,8 +7209,12 @@ export const plans = {
       return $record.get("constructor");
     },
     machinesByConstructor: {
-      plan($record) {
-        return connection(otherSource_machinePgResource.find(specFromRecord($record)));
+      plan($parent, fieldArgs, info) {
+        let $result = Building_machinesByConstructor_plan($parent, fieldArgs, info);
+        for (const ppr of Building_machinesByConstructor_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -6931,18 +7259,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-              return null;
             }
           }
         },
@@ -6959,8 +7275,12 @@ export const plans = {
       }
     },
     machinesByConstructorList: {
-      plan($record) {
-        return otherSource_machinePgResource.find(specFromRecord($record));
+      plan($parent, fieldArgs, info) {
+        let $result = Building_machinesByConstructorList_plan($parent, fieldArgs, info);
+        for (const ppr of Building_machinesByConstructorList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -6981,17 +7301,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -7004,8 +7313,12 @@ export const plans = {
       }
     },
     relationalItemsByConstructor: {
-      plan($record) {
-        return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
+      plan($parent, fieldArgs, info) {
+        let $result = Building_relationalItemsByConstructor_plan($parent, fieldArgs, info);
+        for (const ppr of Building_relationalItemsByConstructor_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -7053,18 +7366,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -7078,8 +7379,12 @@ export const plans = {
       }
     },
     relationalItemsByConstructorList: {
-      plan($record) {
-        return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
+      plan($parent, fieldArgs, info) {
+        let $result = Building_relationalItemsByConstructorList_plan($parent, fieldArgs, info);
+        for (const ppr of Building_relationalItemsByConstructorList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -7097,17 +7402,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-              return null;
             }
           }
         },
@@ -7193,31 +7487,21 @@ export const plans = {
     }
   },
   MachinesOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             machineUniques[0].attributes.forEach(attributeName => {
-              const attribute = machineCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -7226,19 +7510,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             machineUniques[0].attributes.forEach(attributeName => {
-              const attribute = machineCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -7247,11 +7529,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7259,7 +7538,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7269,11 +7548,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7281,7 +7557,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7291,11 +7567,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "input",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7303,7 +7576,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7313,11 +7586,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "input",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7325,7 +7595,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7335,11 +7605,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7347,7 +7614,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7357,11 +7624,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7369,7 +7633,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7473,31 +7737,21 @@ export const plans = {
     }
   },
   RelationalItemsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_itemsUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalItemsCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -7506,19 +7760,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_itemsUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalItemsCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -7527,11 +7779,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7539,7 +7788,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7549,11 +7798,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7561,7 +7807,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7571,11 +7817,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7583,7 +7826,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7593,11 +7836,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7605,7 +7845,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7615,11 +7855,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "ASC",
               ...(undefined != null ? {
@@ -7627,7 +7864,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7637,11 +7874,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "DESC",
               ...(undefined != null ? {
@@ -7649,7 +7883,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -7976,8 +8210,12 @@ export const plans = {
       return fetcher12($nodeId);
     },
     allRelationalTopicsList: {
-      plan() {
-        return pgResource_relational_topicsPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalTopicsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalTopicsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -7998,17 +8236,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalTopicsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8021,8 +8248,12 @@ export const plans = {
       }
     },
     allRelationalTopics: {
-      plan() {
-        return connection(pgResource_relational_topicsPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalTopics_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalTopics_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8067,18 +8298,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalTopicsOrderBy"));
-              return null;
             }
           }
         },
@@ -8095,8 +8314,12 @@ export const plans = {
       }
     },
     allProtoSList: {
-      plan() {
-        return pgResource___proto__PgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allProtoSList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allProtoSList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8117,17 +8340,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("_ProtoSOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8140,8 +8352,12 @@ export const plans = {
       }
     },
     allProtoS: {
-      plan() {
-        return connection(pgResource___proto__PgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allProtoS_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allProtoS_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8186,18 +8402,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("_ProtoSOrderBy"));
-              return null;
             }
           }
         },
@@ -8214,8 +8418,12 @@ export const plans = {
       }
     },
     allBuildingsList: {
-      plan() {
-        return building_buildingPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allBuildingsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allBuildingsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8236,17 +8444,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("BuildingsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8259,8 +8456,12 @@ export const plans = {
       }
     },
     allBuildings: {
-      plan() {
-        return connection(building_buildingPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allBuildings_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allBuildings_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8305,18 +8506,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("BuildingsOrderBy"));
-              return null;
             }
           }
         },
@@ -8333,8 +8522,12 @@ export const plans = {
       }
     },
     allConstructorsList: {
-      plan() {
-        return pgResource_constructorPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allConstructorsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allConstructorsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8355,17 +8548,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("ConstructorsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8378,8 +8560,12 @@ export const plans = {
       }
     },
     allConstructors: {
-      plan() {
-        return connection(pgResource_constructorPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allConstructors_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allConstructors_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8424,18 +8610,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("ConstructorsOrderBy"));
-              return null;
             }
           }
         },
@@ -8452,8 +8626,12 @@ export const plans = {
       }
     },
     allCropsList: {
-      plan() {
-        return pgResource_cropPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allCropsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allCropsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8474,17 +8652,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("CropsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8497,8 +8664,12 @@ export const plans = {
       }
     },
     allCrops: {
-      plan() {
-        return connection(pgResource_cropPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allCrops_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allCrops_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8543,18 +8714,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("CropsOrderBy"));
-              return null;
             }
           }
         },
@@ -8571,8 +8730,12 @@ export const plans = {
       }
     },
     allMachinesList: {
-      plan() {
-        return otherSource_machinePgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allMachinesList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMachinesList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8593,17 +8756,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8616,8 +8768,12 @@ export const plans = {
       }
     },
     allMachines: {
-      plan() {
-        return connection(otherSource_machinePgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allMachines_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMachines_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8662,18 +8818,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-              return null;
             }
           }
         },
@@ -8690,8 +8834,12 @@ export const plans = {
       }
     },
     allMaterialsList: {
-      plan() {
-        return pgResource_materialPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allMaterialsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMaterialsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8712,17 +8860,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("MaterialsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8735,8 +8872,12 @@ export const plans = {
       }
     },
     allMaterials: {
-      plan() {
-        return connection(pgResource_materialPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allMaterials_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allMaterials_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8781,18 +8922,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("MaterialsOrderBy"));
-              return null;
             }
           }
         },
@@ -8809,8 +8938,12 @@ export const plans = {
       }
     },
     allNullsList: {
-      plan() {
-        return pgResource_nullPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allNullsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allNullsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8831,17 +8964,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("NullsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8854,8 +8976,12 @@ export const plans = {
       }
     },
     allNulls: {
-      plan() {
-        return connection(pgResource_nullPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allNulls_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allNulls_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8900,18 +9026,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("NullsOrderBy"));
-              return null;
             }
           }
         },
@@ -8928,8 +9042,12 @@ export const plans = {
       }
     },
     allProjectsList: {
-      plan() {
-        return pgResource_projectPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allProjectsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allProjectsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -8950,17 +9068,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("ProjectsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -8973,8 +9080,12 @@ export const plans = {
       }
     },
     allProjects: {
-      plan() {
-        return connection(pgResource_projectPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allProjects_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allProjects_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9019,18 +9130,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("ProjectsOrderBy"));
-              return null;
             }
           }
         },
@@ -9047,8 +9146,12 @@ export const plans = {
       }
     },
     allRelationalStatusesList: {
-      plan() {
-        return pgResource_relational_statusPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalStatusesList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalStatusesList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9069,17 +9172,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalStatusesOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -9092,8 +9184,12 @@ export const plans = {
       }
     },
     allRelationalStatuses: {
-      plan() {
-        return connection(pgResource_relational_statusPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalStatuses_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalStatuses_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9138,18 +9234,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalStatusesOrderBy"));
-              return null;
             }
           }
         },
@@ -9166,8 +9250,12 @@ export const plans = {
       }
     },
     allYieldsList: {
-      plan() {
-        return pgResource_yieldPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allYieldsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allYieldsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9188,17 +9276,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("YieldsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -9211,8 +9288,12 @@ export const plans = {
       }
     },
     allYields: {
-      plan() {
-        return connection(pgResource_yieldPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allYields_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allYields_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9257,18 +9338,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("YieldsOrderBy"));
-              return null;
             }
           }
         },
@@ -9285,8 +9354,12 @@ export const plans = {
       }
     },
     allReservedsList: {
-      plan() {
-        return pgResource_reservedPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allReservedsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allReservedsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9307,17 +9380,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("ReservedsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -9330,8 +9392,12 @@ export const plans = {
       }
     },
     allReserveds: {
-      plan() {
-        return connection(pgResource_reservedPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allReserveds_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allReserveds_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9376,18 +9442,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("ReservedsOrderBy"));
-              return null;
             }
           }
         },
@@ -9404,8 +9458,12 @@ export const plans = {
       }
     },
     allRelationalItemsList: {
-      plan() {
-        return relational_items_relational_itemsPgResource.find();
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalItemsList_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalItemsList_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9426,17 +9484,6 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $select, val, info) {
-              const $value = val.getRaw();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-              return null;
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
@@ -9449,8 +9496,12 @@ export const plans = {
       }
     },
     allRelationalItems: {
-      plan() {
-        return connection(relational_items_relational_itemsPgResource.find());
+      plan($parent, fieldArgs, info) {
+        let $result = Query_allRelationalItems_plan($parent, fieldArgs, info);
+        for (const ppr of Query_allRelationalItems_postPlanResolvers) {
+          $result = ppr($result, $parent, fieldArgs, info);
+        }
+        return $result;
       },
       args: {
         first: {
@@ -9495,18 +9546,6 @@ export const plans = {
             autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
-            }
-          }
-        },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $connection, val, info) {
-              const $value = val.getRaw();
-              const $select = $connection.getSubplan();
-              applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-              return null;
             }
           }
         },
@@ -9699,31 +9738,21 @@ export const plans = {
     }
   },
   RelationalTopicsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_topicsUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalTopicsCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -9732,19 +9761,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_topicsUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalTopicsCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -9753,11 +9780,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -9765,7 +9789,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9775,11 +9799,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -9787,7 +9808,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9797,11 +9818,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "title",
               direction: "ASC",
               ...(undefined != null ? {
@@ -9809,7 +9827,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9819,11 +9837,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "title",
               direction: "DESC",
               ...(undefined != null ? {
@@ -9831,7 +9846,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9841,11 +9856,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "ASC",
               ...(undefined != null ? {
@@ -9853,7 +9865,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9863,11 +9875,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "DESC",
               ...(undefined != null ? {
@@ -9875,7 +9884,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9885,11 +9894,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "ASC",
               ...(undefined != null ? {
@@ -9897,7 +9903,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -9907,11 +9913,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "DESC",
               ...(undefined != null ? {
@@ -9919,7 +9922,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10046,31 +10049,21 @@ export const plans = {
     }
   },
   _ProtoSOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             __proto__Uniques[0].attributes.forEach(attributeName => {
-              const attribute = __proto__Codec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10079,19 +10072,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             __proto__Uniques[0].attributes.forEach(attributeName => {
-              const attribute = __proto__Codec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10100,11 +10091,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10112,7 +10100,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10122,11 +10110,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10134,7 +10119,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10144,11 +10129,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10156,7 +10138,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10166,11 +10148,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10178,7 +10157,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10188,11 +10167,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "brand",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10200,7 +10176,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10210,11 +10186,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "brand",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10222,7 +10195,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10326,31 +10299,21 @@ export const plans = {
     }
   },
   BuildingsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             buildingUniques[0].attributes.forEach(attributeName => {
-              const attribute = buildingCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10359,19 +10322,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             buildingUniques[0].attributes.forEach(attributeName => {
-              const attribute = buildingCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10380,11 +10341,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10392,7 +10350,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10402,11 +10360,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10414,7 +10369,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10424,11 +10379,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10436,7 +10388,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10446,11 +10398,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10458,7 +10407,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10468,11 +10417,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10480,7 +10426,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10490,11 +10436,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10502,7 +10445,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10606,31 +10549,21 @@ export const plans = {
     }
   },
   ConstructorsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             constructorUniques[0].attributes.forEach(attributeName => {
-              const attribute = constructorCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10639,19 +10572,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             constructorUniques[0].attributes.forEach(attributeName => {
-              const attribute = constructorCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10660,11 +10591,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10672,7 +10600,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10682,11 +10610,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10694,7 +10619,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10704,11 +10629,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10716,7 +10638,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10726,11 +10648,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10738,7 +10657,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10748,11 +10667,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "export",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10760,7 +10676,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10770,11 +10686,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "export",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10782,7 +10695,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10886,31 +10799,21 @@ export const plans = {
     }
   },
   CropsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             cropUniques[0].attributes.forEach(attributeName => {
-              const attribute = cropCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10919,19 +10822,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             cropUniques[0].attributes.forEach(attributeName => {
-              const attribute = cropCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -10940,11 +10841,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10952,7 +10850,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10962,11 +10860,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -10974,7 +10869,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -10984,11 +10879,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "yield",
               direction: "ASC",
               ...(undefined != null ? {
@@ -10996,7 +10888,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11006,11 +10898,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "yield",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11018,7 +10907,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11028,11 +10917,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "amount",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11040,7 +10926,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11050,11 +10936,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "amount",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11062,7 +10945,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11166,31 +11049,21 @@ export const plans = {
     }
   },
   MaterialsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             materialUniques[0].attributes.forEach(attributeName => {
-              const attribute = materialCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11199,19 +11072,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             materialUniques[0].attributes.forEach(attributeName => {
-              const attribute = materialCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11220,11 +11091,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11232,7 +11100,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11242,11 +11110,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11254,7 +11119,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11264,11 +11129,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "class",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11276,7 +11138,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11286,11 +11148,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "class",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11298,7 +11157,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11308,11 +11167,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "valueOf",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11320,7 +11176,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11330,11 +11186,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "valueOf",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11342,7 +11195,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11446,31 +11299,21 @@ export const plans = {
     }
   },
   NullsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             nullUniques[0].attributes.forEach(attributeName => {
-              const attribute = nullCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11479,19 +11322,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             nullUniques[0].attributes.forEach(attributeName => {
-              const attribute = nullCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11500,11 +11341,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11512,7 +11350,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11522,11 +11360,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11534,7 +11369,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11544,11 +11379,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "hasOwnProperty",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11556,7 +11388,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11566,11 +11398,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "hasOwnProperty",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11578,7 +11407,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11588,11 +11417,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "break",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11600,7 +11426,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11610,11 +11436,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "break",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11622,7 +11445,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11726,31 +11549,21 @@ export const plans = {
     }
   },
   ProjectsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             projectUniques[0].attributes.forEach(attributeName => {
-              const attribute = projectCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11759,19 +11572,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             projectUniques[0].attributes.forEach(attributeName => {
-              const attribute = projectCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -11780,11 +11591,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11792,7 +11600,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11802,11 +11610,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11814,7 +11619,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11824,11 +11629,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "brand",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11836,7 +11638,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11846,11 +11648,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "brand",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11858,7 +11657,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11868,11 +11667,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "__proto__",
               direction: "ASC",
               ...(undefined != null ? {
@@ -11880,7 +11676,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -11890,11 +11686,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "__proto__",
               direction: "DESC",
               ...(undefined != null ? {
@@ -11902,7 +11695,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12006,31 +11799,21 @@ export const plans = {
     }
   },
   RelationalStatusesOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_statusUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalStatusCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12039,19 +11822,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             relational_statusUniques[0].attributes.forEach(attributeName => {
-              const attribute = relationalStatusCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12060,11 +11841,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12072,7 +11850,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12082,11 +11860,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12094,7 +11869,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12104,11 +11879,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "description",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12116,7 +11888,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12126,11 +11898,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "description",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12138,7 +11907,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12148,11 +11917,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "note",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12160,7 +11926,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12170,11 +11936,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "note",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12182,7 +11945,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12192,11 +11955,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12204,7 +11964,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12214,11 +11974,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "type",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12226,7 +11983,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12236,11 +11993,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12248,7 +12002,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12258,11 +12012,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "constructor",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12270,7 +12021,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12420,31 +12171,21 @@ export const plans = {
     }
   },
   YieldsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             yieldUniques[0].attributes.forEach(attributeName => {
-              const attribute = yieldCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12453,19 +12194,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             yieldUniques[0].attributes.forEach(attributeName => {
-              const attribute = yieldCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12474,11 +12213,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12486,7 +12222,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12496,11 +12232,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12508,7 +12241,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12518,11 +12251,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "crop",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12530,7 +12260,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12540,11 +12270,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "crop",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12552,7 +12279,7 @@ export const plans = {
               } : null)
             });
             if (false) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12562,11 +12289,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "export",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12574,7 +12298,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12584,11 +12308,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "export",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12596,7 +12317,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12700,31 +12421,21 @@ export const plans = {
     }
   },
   ReservedsOrderBy: {
-    NATURAL: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          applyPlan() {}
-        }
-      }
-    },
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             reservedUniques[0].attributes.forEach(attributeName => {
-              const attribute = reservedCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12733,19 +12444,17 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(step) {
+          apply(queryBuilder) {
             reservedUniques[0].attributes.forEach(attributeName => {
-              const attribute = reservedCodec.attributes[attributeName];
-              step.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${step}.${sql.identifier(attributeName)}`,
+              queryBuilder.orderBy({
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
                 } : null)
               });
             });
-            step.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
           }
         }
       }
@@ -12754,11 +12463,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12766,7 +12472,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12776,11 +12482,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12788,7 +12491,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12798,11 +12501,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "null",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12810,7 +12510,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12820,11 +12520,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "null",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12832,7 +12529,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12842,11 +12539,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "case",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12854,7 +12548,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12864,11 +12558,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "case",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12876,7 +12567,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12886,11 +12577,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "do",
               direction: "ASC",
               ...(undefined != null ? {
@@ -12898,7 +12586,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -12908,11 +12596,8 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          applyPlan(plan) {
-            if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-              throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-            }
-            plan.orderBy({
+          apply(queryBuilder) {
+            queryBuilder.orderBy({
               attribute: "do",
               direction: "DESC",
               ...(undefined != null ? {
@@ -12920,7 +12605,7 @@ export const plans = {
               } : null)
             });
             if (true) {
-              plan.setOrderIsUnique();
+              queryBuilder.setOrderIsUnique();
             }
           }
         }
@@ -14632,7 +14317,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, args, info) {
+    _protoEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14649,8 +14338,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("_ProtoSOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14711,7 +14400,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, args, info) {
+    buildingEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14728,8 +14421,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("BuildingsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14790,7 +14483,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, args, info) {
+    constructorEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14807,8 +14504,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ConstructorsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14869,7 +14566,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, args, info) {
+    cropEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14886,8 +14587,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("CropsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14948,7 +14649,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, args, info) {
+    machineEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14965,8 +14670,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15031,7 +14736,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, args, info) {
+    materialEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15048,8 +14757,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MaterialsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15110,7 +14819,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, args, info) {
+    nullEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15127,8 +14840,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("NullsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15189,7 +14902,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, args, info) {
+    projectEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15206,8 +14923,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ProjectsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15268,7 +14985,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, args, info) {
+    yieldEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15285,8 +15006,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("YieldsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15347,7 +15068,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, args, info) {
+    reservedEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15364,8 +15089,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ReservedsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15433,7 +15158,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, args, info) {
+    _protoEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15450,8 +15179,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("_ProtoSOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15539,7 +15268,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, args, info) {
+    buildingEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15556,8 +15289,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("BuildingsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15645,7 +15378,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, args, info) {
+    constructorEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15662,8 +15399,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ConstructorsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15765,7 +15502,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, args, info) {
+    cropEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15782,8 +15523,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("CropsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15871,7 +15612,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, args, info) {
+    machineEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15888,8 +15633,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15967,7 +15712,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, args, info) {
+    materialEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15984,8 +15733,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MaterialsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16087,7 +15836,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, args, info) {
+    nullEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16104,8 +15857,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("NullsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16207,7 +15960,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, args, info) {
+    projectEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16224,8 +15981,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ProjectsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16313,7 +16070,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, args, info) {
+    yieldEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16330,8 +16091,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("YieldsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16419,7 +16180,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, args, info) {
+    reservedEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16436,8 +16201,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ReservedsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16565,7 +16330,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, args, info) {
+    _protoEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16582,8 +16351,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("_ProtoSOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16632,7 +16401,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, args, info) {
+    buildingEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16649,8 +16422,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("BuildingsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16699,7 +16472,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, args, info) {
+    constructorEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16716,8 +16493,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ConstructorsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16774,7 +16551,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, args, info) {
+    cropEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16791,8 +16572,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("CropsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16841,7 +16622,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, args, info) {
+    machineEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16858,8 +16643,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16904,7 +16689,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, args, info) {
+    materialEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16921,8 +16710,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("MaterialsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16979,7 +16768,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, args, info) {
+    nullEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16996,8 +16789,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("NullsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -17054,7 +16847,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, args, info) {
+    projectEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -17071,8 +16868,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ProjectsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -17121,7 +16918,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, args, info) {
+    yieldEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -17138,8 +16939,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("YieldsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -17188,7 +16989,11 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, args, info) {
+    reservedEdge($mutation, {
+      $orderBy
+    }, {
+      field
+    }) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -17205,8 +17010,8 @@ export const plans = {
         }
       })();
       // Perform ordering
-      const $value = args.getRaw("orderBy");
-      applyOrderToPlan($select, $value, info.schema.getType("ReservedsOrderBy"));
+      const orderByArg = field.args.find(a => a.name === "orderBy");
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
