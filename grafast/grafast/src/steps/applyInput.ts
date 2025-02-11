@@ -14,9 +14,9 @@ import { UnbatchedExecutableStep } from "../step.js";
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
 
-export class ApplyInputStep<TArg = any> extends UnbatchedExecutableStep<
-  (arg: TArg) => void
-> {
+export class ApplyInputStep<
+  TArg extends object = any,
+> extends UnbatchedExecutableStep<(arg: TArg) => void> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ApplyInputStep",
@@ -37,9 +37,9 @@ export class ApplyInputStep<TArg = any> extends UnbatchedExecutableStep<
   }
 }
 
-export function inputArgsApply<TArg>(
+export function inputArgsApply<TArg extends object>(
   inputType: GraphQLInputType,
-  target: TArg,
+  target: TArg | (() => TArg),
   inputValue: unknown,
 ): void {
   if (currentModifiers.length !== 0 || applyingModifiers) {
@@ -47,7 +47,7 @@ export function inputArgsApply<TArg>(
   }
   applyingModifiers = true;
   try {
-    _inputArgsApply(inputType, target, inputValue);
+    _inputArgsApply<TArg>(inputType, target, inputValue);
     const l = currentModifiers.length;
     for (let i = l - 1; i >= 0; i--) {
       currentModifiers[i].apply();
@@ -58,7 +58,7 @@ export function inputArgsApply<TArg>(
   }
 }
 
-export function applyInput<TArg = any>(
+export function applyInput<TArg extends object = any>(
   inputType: GraphQLInputType,
   $value: AnyInputStep,
 ) {

@@ -525,7 +525,6 @@ export type GrafastArgumentConfig<
   _TParentStep extends ExecutableStep | null = ExecutableStep | null,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
-  inputPlan?: ArgumentInputPlanResolver<any>;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
   autoApplyAfterParentPlan?: boolean;
   autoApplyAfterParentSubscribePlan?: boolean;

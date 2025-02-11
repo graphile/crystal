@@ -1685,15 +1685,15 @@ function exportSchemaTypeDefs({
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions?.grafast?.inputPlan) {
+      if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            identifierOrLiteral("__inputPlan"),
+            identifierOrLiteral("__baked"),
             convertToIdentifierViaAST(
               file,
-              type.extensions?.grafast.inputPlan,
+              type.extensions?.grafast.baked,
               `${type.name}.inputPlan`,
-              `${type.name}.extensions.grafast.inputPlan`,
+              `${type.name}.extensions.grafast.baked`,
             ),
           ),
         );
