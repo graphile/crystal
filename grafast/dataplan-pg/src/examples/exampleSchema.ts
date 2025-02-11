@@ -1986,60 +1986,68 @@ export function makeExampleSchema(
     values: {
       BODY_ASC: {
         extensions: {
-          pgSelectApply: EXPORTABLE(
-            (TYPES, sql) => (qb) => {
-              qb.orderBy({
-                codec: TYPES.text,
-                fragment: sql`${qb}.body`,
-                direction: "ASC",
-              });
-            },
-            [TYPES, sql],
-          ),
+          grafast: {
+            pgSelectApply: EXPORTABLE(
+              (TYPES, sql) => (qb) => {
+                qb.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${qb}.body`,
+                  direction: "ASC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       BODY_DESC: {
         extensions: {
-          pgSelectApply: EXPORTABLE(
-            (TYPES, sql) => (qb) => {
-              qb.orderBy({
-                codec: TYPES.text,
-                fragment: sql`${qb}.body`,
-                direction: "DESC",
-              });
-            },
-            [TYPES, sql],
-          ),
+          grafast: {
+            pgSelectApply: EXPORTABLE(
+              (TYPES, sql) => (qb) => {
+                qb.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${qb}.body`,
+                  direction: "DESC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       AUTHOR_USERNAME_ASC: {
         extensions: {
-          pgSelectApply: EXPORTABLE(
-            (TYPES, sql) => (qb) => {
-              const authorAlias = qb.singleRelation("author");
-              qb.orderBy({
-                codec: TYPES.text,
-                fragment: sql`${authorAlias}.username`,
-                direction: "ASC",
-              });
-            },
-            [TYPES, sql],
-          ),
+          grafast: {
+            pgSelectApply: EXPORTABLE(
+              (TYPES, sql) => (qb) => {
+                const authorAlias = qb.singleRelation("author");
+                qb.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "ASC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       AUTHOR_USERNAME_DESC: {
         extensions: {
-          pgSelectApply: EXPORTABLE(
-            (TYPES, sql) => (qb) => {
-              const authorAlias = qb.singleRelation("author");
-              qb.orderBy({
-                codec: TYPES.text,
-                fragment: sql`${authorAlias}.username`,
-                direction: "DESC",
-              });
-            },
-            [TYPES, sql],
-          ),
+          grafast: {
+            pgSelectApply: EXPORTABLE(
+              (TYPES, sql) => (qb) => {
+                const authorAlias = qb.singleRelation("author");
+                qb.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "DESC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
     },
@@ -3680,28 +3688,32 @@ export function makeExampleSchema(
     values: {
       CVSS_SCORE_ASC: {
         extensions: {
-          pgUnionAllApply: EXPORTABLE(
-            () => (qb) => {
-              qb.orderBy({
-                attribute: "cvss_score",
-                direction: "ASC",
-              });
-            },
-            [],
-          ),
+          grafast: {
+            pgUnionAllApply: EXPORTABLE(
+              () => (qb) => {
+                qb.orderBy({
+                  attribute: "cvss_score",
+                  direction: "ASC",
+                });
+              },
+              [],
+            ),
+          },
         },
       },
       CVSS_SCORE_DESC: {
         extensions: {
-          pgUnionAllApply: EXPORTABLE(
-            () => (qb) => {
-              qb.orderBy({
-                attribute: "cvss_score",
-                direction: "DESC",
-              });
-            },
-            [],
-          ),
+          grafast: {
+            pgUnionAllApply: EXPORTABLE(
+              () => (qb) => {
+                qb.orderBy({
+                  attribute: "cvss_score",
+                  direction: "DESC",
+                });
+              },
+              [],
+            ),
+          },
         },
       },
     },
@@ -3943,7 +3955,7 @@ export function makeExampleSchema(
               $messages.apply(
                 extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                   orderByArg!.type,
-                  "pgSelectApply",
+                  ["grafast", "pgSelectApply"],
                   $orderBy,
                 ),
               );
@@ -4671,7 +4683,7 @@ export function makeExampleSchema(
               $vulnerabilities.apply(
                 extractEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
                   orderByArg!.type,
-                  "pgUnionAllApply",
+                  ["grafast", "pgUnionAllApply"],
                   $orderBy,
                 ),
               );

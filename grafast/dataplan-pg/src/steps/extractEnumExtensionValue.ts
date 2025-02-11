@@ -20,36 +20,44 @@ declare module "graphql" {
 const $$extensionsByValue = Symbol("extensionsByValue");
 function getEnumExtensionPropertyValueLookups(
   enumType: GraphQLEnumType,
-  extensionsProperty: string,
+  path: string[],
 ) {
   const enumValueConfigs = getEnumValueConfigs(enumType);
   if (enumType[$$extensionsByValue] === undefined) {
     enumType[$$extensionsByValue] = Object.create(null);
   }
-  if (enumType[$$extensionsByValue]![extensionsProperty] === undefined) {
+  const serializedPath = JSON.stringify(path);
+  if (enumType[$$extensionsByValue]![serializedPath] === undefined) {
+    const pathLength = path.length;
     const lookup = Object.entries(enumValueConfigs).reduce(
       (memo, [value, config]) => {
-        memo[value] = config?.extensions?.[extensionsProperty];
+        let valueAtPath: any = config?.extensions;
+        for (let pathIndex = 0; pathIndex < pathLength; pathIndex++) {
+          if (valueAtPath == null) break;
+          valueAtPath = valueAtPath?.[path[pathIndex]];
+        }
+        memo[value] = valueAtPath;
         return memo;
       },
       Object.create(null),
     );
     const lookupValues = <T>(values: any) =>
       values?.map((v: any) => lookup[v] as T | undefined);
-    lookupValues.displayName = `extractList_${extensionsProperty}`;
+    const functionNameSuffix = path.join("_");
+    lookupValues.displayName = `extractList_${functionNameSuffix}`;
     const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
-    lookupValue.displayName = `extract_${extensionsProperty}`;
-    enumType[$$extensionsByValue]![extensionsProperty] = {
+    lookupValue.displayName = `extract_${functionNameSuffix}`;
+    enumType[$$extensionsByValue]![serializedPath] = {
       lookupValues,
       lookupValue,
     };
   }
-  return enumType[$$extensionsByValue]![extensionsProperty]!;
+  return enumType[$$extensionsByValue]![serializedPath]!;
 }
 
 export function extractEnumExtensionValue<T>(
   type: GraphQLInputType,
-  extensionsProperty: string,
+  path: string[],
   $step: InputStep,
 ): ExecutableStep<ReadonlyArrayOrDirect<Maybe<T>>> {
   const nullableType = getNullableType(type);
@@ -59,7 +67,7 @@ export function extractEnumExtensionValue<T>(
   }
   const { lookupValues, lookupValue } = getEnumExtensionPropertyValueLookups(
     enumType,
-    extensionsProperty,
+    path,
   );
   if (
     // Quicker than but equivalent to isListType(nullableType):

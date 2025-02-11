@@ -547,11 +547,14 @@ declare global {
     interface PgRefDefinitionExtensions {}
     interface PgCodecRelationExtensions {}
   }
-}
-
-declare module "graphql" {
-  interface GraphQLEnumValueExtensions {
-    pgSelectApply?: PgSelectQueryBuilderCallback;
-    pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
+  namespace Grafast {
+    interface EnumValueExtensions {
+      pgSelectApply?: PgSelectQueryBuilderCallback;
+      pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
+    }
+    interface ArgumentExtensions {
+      pgSelectApply?: PgSelectQueryBuilderCallback;
+      pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
+    }
   }
 }

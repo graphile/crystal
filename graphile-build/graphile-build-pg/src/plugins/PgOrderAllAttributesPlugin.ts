@@ -122,26 +122,28 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 {
                   [ascFieldName]: {
                     extensions: {
-                      pgSelectApply: EXPORTABLE(
-                        (attributeName, isUnique, pgOrderByNullsLast) =>
-                          ((queryBuilder): void => {
-                            queryBuilder.orderBy({
-                              attribute: attributeName,
-                              direction: "ASC",
-                              ...(pgOrderByNullsLast != null
-                                ? {
-                                    nulls: pgOrderByNullsLast
-                                      ? "LAST"
-                                      : "FIRST",
-                                  }
-                                : null),
-                            });
-                            if (isUnique) {
-                              queryBuilder.setOrderIsUnique();
-                            }
-                          }) as PgSelectQueryBuilderCallback,
-                        [attributeName, isUnique, pgOrderByNullsLast],
-                      ),
+                      grafast: {
+                        pgSelectApply: EXPORTABLE(
+                          (attributeName, isUnique, pgOrderByNullsLast) =>
+                            ((queryBuilder): void => {
+                              queryBuilder.orderBy({
+                                attribute: attributeName,
+                                direction: "ASC",
+                                ...(pgOrderByNullsLast != null
+                                  ? {
+                                      nulls: pgOrderByNullsLast
+                                        ? "LAST"
+                                        : "FIRST",
+                                    }
+                                  : null),
+                              });
+                              if (isUnique) {
+                                queryBuilder.setOrderIsUnique();
+                              }
+                            }) as PgSelectQueryBuilderCallback,
+                          [attributeName, isUnique, pgOrderByNullsLast],
+                        ),
+                      },
                     },
                   },
                 },
@@ -159,26 +161,28 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 {
                   [descFieldName]: {
                     extensions: {
-                      pgSelectApply: EXPORTABLE(
-                        (attributeName, isUnique, pgOrderByNullsLast) =>
-                          ((queryBuilder): void => {
-                            queryBuilder.orderBy({
-                              attribute: attributeName,
-                              direction: "DESC",
-                              ...(pgOrderByNullsLast != null
-                                ? {
-                                    nulls: pgOrderByNullsLast
-                                      ? "LAST"
-                                      : "FIRST",
-                                  }
-                                : null),
-                            });
-                            if (isUnique) {
-                              queryBuilder.setOrderIsUnique();
-                            }
-                          }) as PgSelectQueryBuilderCallback,
-                        [attributeName, isUnique, pgOrderByNullsLast],
-                      ),
+                      grafast: {
+                        pgSelectApply: EXPORTABLE(
+                          (attributeName, isUnique, pgOrderByNullsLast) =>
+                            ((queryBuilder): void => {
+                              queryBuilder.orderBy({
+                                attribute: attributeName,
+                                direction: "DESC",
+                                ...(pgOrderByNullsLast != null
+                                  ? {
+                                      nulls: pgOrderByNullsLast
+                                        ? "LAST"
+                                        : "FIRST",
+                                    }
+                                  : null),
+                              });
+                              if (isUnique) {
+                                queryBuilder.setOrderIsUnique();
+                              }
+                            }) as PgSelectQueryBuilderCallback,
+                          [attributeName, isUnique, pgOrderByNullsLast],
+                        ),
+                      },
                     },
                   },
                 },

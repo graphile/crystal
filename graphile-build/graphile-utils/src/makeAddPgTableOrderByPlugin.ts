@@ -3,6 +3,7 @@ import type {
   PgSelectQueryBuilder,
   PgSelectQueryBuilderCallback,
 } from "@dataplan/pg";
+import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.js";
 
@@ -12,11 +13,7 @@ type OrderBySpecIdentity =
   | ((queryBuilder: PgSelectQueryBuilder) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
-  [orderByEnumValue: string]: {
-    extensions: {
-      pgSelectApply: PgSelectQueryBuilderCallback;
-    };
-  };
+  [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
 const counterByName = new Map<string, number>();
@@ -238,12 +235,16 @@ export function orderByAscDesc(
   const orders: MakeAddPgTableOrderByPluginOrders = {
     [`${baseName}_ASC`]: {
       extensions: {
-        pgSelectApply: ascendingCb,
+        grafast: {
+          pgSelectApply: ascendingCb,
+        },
       },
     },
     [`${baseName}_DESC`]: {
       extensions: {
-        pgSelectApply: descendingCb,
+        grafast: {
+          pgSelectApply: descendingCb,
+        },
       },
     },
   };
