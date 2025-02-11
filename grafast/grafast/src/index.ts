@@ -44,7 +44,6 @@ import type {
   $$hooked,
   $$queryCache,
   ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   BatchExecutionValue,
   CacheByOperationEntry,
   DataFromStep,
@@ -670,10 +669,8 @@ declare global {
 
     interface ArgumentExtensions {
       // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-      inputPlan?: ArgumentInputPlanResolver;
       applyPlan?: ArgumentApplyPlanResolver;
-      autoApplyAfterParentPlan?: boolean;
-      autoApplyAfterParentSubscribePlan?: boolean;
+      applySubscribePlan?: ArgumentApplyPlanResolver;
     }
 
     interface InputObjectTypeExtensions {
