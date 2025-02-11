@@ -1155,7 +1155,7 @@ const Query_allLetterDescriptions_postPlanResolvers = [($connection, $parent, fi
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
   return $connection;
 }];
 function Query_allReferencingTables_plan() {
@@ -1167,7 +1167,7 @@ const Query_allReferencingTables_postPlanResolvers = [($connection, $parent, fie
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
   return $connection;
 }];
 function CursorSerialize(value) {
@@ -2450,54 +2450,60 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-            const attribute = letterDescriptionsCodec.attributes[attributeName];
-            queryBuilder.orderBy({
-              codec: attribute.codec,
-              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+              const attribute = letterDescriptionsCodec.attributes[attributeName];
+              queryBuilder.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                direction: "ASC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
             });
-          });
-          queryBuilder.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
+          }
         }
       }
     },
     PRIMARY_KEY_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-            const attribute = letterDescriptionsCodec.attributes[attributeName];
-            queryBuilder.orderBy({
-              codec: attribute.codec,
-              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+              const attribute = letterDescriptionsCodec.attributes[attributeName];
+              queryBuilder.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                direction: "DESC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
             });
-          });
-          queryBuilder.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
+          }
         }
       }
     },
     ID_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "id",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "id",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2505,16 +2511,18 @@ export const plans = {
     ID_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "id",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "id",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2522,16 +2530,18 @@ export const plans = {
     LETTER_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "letter",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "letter",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2539,16 +2549,18 @@ export const plans = {
     LETTER_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "letter",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "letter",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2556,16 +2568,18 @@ export const plans = {
     LETTER_VIA_VIEW_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "letter_via_view",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "letter_via_view",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2573,16 +2587,18 @@ export const plans = {
     LETTER_VIA_VIEW_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "letter_via_view",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "letter_via_view",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2590,16 +2606,18 @@ export const plans = {
     DESCRIPTION_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "description",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "description",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2607,16 +2625,18 @@ export const plans = {
     DESCRIPTION_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "description",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "description",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2745,54 +2765,60 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          referencing_tableUniques[0].attributes.forEach(attributeName => {
-            const attribute = referencingTableCodec.attributes[attributeName];
-            queryBuilder.orderBy({
-              codec: attribute.codec,
-              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            referencing_tableUniques[0].attributes.forEach(attributeName => {
+              const attribute = referencingTableCodec.attributes[attributeName];
+              queryBuilder.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                direction: "ASC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
             });
-          });
-          queryBuilder.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
+          }
         }
       }
     },
     PRIMARY_KEY_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          referencing_tableUniques[0].attributes.forEach(attributeName => {
-            const attribute = referencingTableCodec.attributes[attributeName];
-            queryBuilder.orderBy({
-              codec: attribute.codec,
-              fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            referencing_tableUniques[0].attributes.forEach(attributeName => {
+              const attribute = referencingTableCodec.attributes[attributeName];
+              queryBuilder.orderBy({
+                codec: attribute.codec,
+                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                direction: "DESC",
+                ...(undefined != null ? {
+                  nulls: undefined ? "LAST" : "FIRST"
+                } : null)
+              });
             });
-          });
-          queryBuilder.setOrderIsUnique();
+            queryBuilder.setOrderIsUnique();
+          }
         }
       }
     },
     ID_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "id",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "id",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2800,16 +2826,18 @@ export const plans = {
     ID_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "id",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (true) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "id",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (true) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2817,16 +2845,18 @@ export const plans = {
     ENUM_1_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_1",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_1",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2834,16 +2864,18 @@ export const plans = {
     ENUM_1_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_1",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_1",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2851,16 +2883,18 @@ export const plans = {
     ENUM_2_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_2",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_2",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2868,16 +2902,18 @@ export const plans = {
     ENUM_2_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_2",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_2",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2885,16 +2921,18 @@ export const plans = {
     ENUM_3_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_3",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_3",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2902,16 +2940,18 @@ export const plans = {
     ENUM_3_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "enum_3",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "enum_3",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2919,16 +2959,18 @@ export const plans = {
     SIMPLE_ENUM_ASC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "simple_enum",
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "simple_enum",
+              direction: "ASC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -2936,16 +2978,18 @@ export const plans = {
     SIMPLE_ENUM_DESC: {
       extensions: {
         __proto__: null,
-        pgSelectApply(queryBuilder) {
-          queryBuilder.orderBy({
-            attribute: "simple_enum",
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-          if (false) {
-            queryBuilder.setOrderIsUnique();
+        grafast: {
+          pgSelectApply(queryBuilder) {
+            queryBuilder.orderBy({
+              attribute: "simple_enum",
+              direction: "DESC",
+              ...(undefined != null ? {
+                nulls: undefined ? "LAST" : "FIRST"
+              } : null)
+            });
+            if (false) {
+              queryBuilder.setOrderIsUnique();
+            }
           }
         }
       }
@@ -3469,7 +3513,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -3559,7 +3603,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -3616,7 +3660,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -3747,7 +3791,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -3862,7 +3906,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -3941,7 +3985,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, "pgSelectApply", $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
