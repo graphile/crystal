@@ -41,12 +41,12 @@ function getEnumExtensionPropertyValueLookups(
       },
       Object.create(null),
     );
-    const lookupValues = <T>(values: any) =>
-      values?.map((v: any) => lookup[v] as T | undefined);
     const functionNameSuffix = path.join("_");
-    lookupValues.displayName = `extractList_${functionNameSuffix}`;
     const lookupValue = <T>(value: any) => lookup[value] as T | undefined;
     lookupValue.displayName = `extract_${functionNameSuffix}`;
+    const lookupValues = <T>(values: Maybe<any[]>) =>
+      values?.map(lookupValue<T>);
+    lookupValues.displayName = `extractList_${functionNameSuffix}`;
     enumType[$$extensionsByValue]![serializedPath] = {
       lookupValues,
       lookupValue,
