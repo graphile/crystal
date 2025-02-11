@@ -196,6 +196,7 @@ type FirstPartyVulnerability implements Vulnerability {
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
   cvssScore: Float!
+  cvssScoreInt: Int
   id: Int!
   name: String!
 
@@ -4424,6 +4425,7 @@ type ThirdPartyVulnerability implements Vulnerability {
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
   cvssScore: Float!
+  cvssScoreInt: Int
   id: Int!
   name: String!
 
