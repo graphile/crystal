@@ -1,51 +1,38 @@
-import type { BaseStep, ExecutableStep } from "../step.js";
-import { ModifierStep } from "../step.js";
+import { Modifier } from "./applyInput.js";
 
-export interface SetterCapableStep<
-  TPlans extends {
-    [key: string]: ExecutableStep;
-  },
-> extends BaseStep {
-  set<TKey extends keyof TPlans>(key: TKey, value: TPlans[TKey]): void;
+export interface SetterCapable<TObj extends Record<string, any>> {
+  set<TKey extends keyof TObj>(key: TKey, value: TObj[TKey]): void;
 }
 
-export class SetterStep<
-  TPlans extends {
-    [key: string]: ExecutableStep;
-  } = {
-    [key: string]: ExecutableStep;
-  },
-  TParentStep extends SetterCapableStep<TPlans> = SetterCapableStep<TPlans>,
-> extends ModifierStep<TParentStep> {
+export class Setter<
+  TObj extends Record<string, any> = Record<string, any>,
+  TParent extends SetterCapable<TObj> = SetterCapable<TObj>,
+> extends Modifier<TParent> {
   static $$export = {
     moduleName: "grafast",
-    exportName: "SetterStep",
+    exportName: "Setter",
   };
 
-  private setters = new Map<keyof TPlans, TPlans[keyof TPlans]>();
+  private setters = new Map<keyof TObj, TObj[keyof TObj]>();
 
-  constructor($parent: TParentStep) {
-    super($parent);
+  constructor(parent: TParent) {
+    super(parent);
   }
 
-  set<TKey extends keyof TPlans>(key: TKey, valuePlan: TPlans[TKey]): void {
+  set<TKey extends keyof TObj>(key: TKey, valuePlan: TObj[TKey]): void {
     this.setters.set(key, valuePlan);
   }
 
   apply(): void {
     for (const [key, valuePlan] of this.setters.entries()) {
-      this.$parent.set(key, valuePlan);
+      this.parent.set(key, valuePlan);
     }
   }
 }
 
 export function setter<
-  TPlans extends {
-    [key: string]: ExecutableStep;
-  } = {
-    [key: string]: ExecutableStep;
-  },
-  TParentStep extends SetterCapableStep<TPlans> = SetterCapableStep<TPlans>,
->($parent: TParentStep) {
-  return new SetterStep<TPlans, TParentStep>($parent);
+  TObj extends Record<string, any> = Record<string, any>,
+  TParent extends SetterCapable<TObj> = SetterCapable<TObj>,
+>(parent: TParent) {
+  return new Setter<TObj, TParent>(parent);
 }
