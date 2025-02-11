@@ -436,25 +436,22 @@ export function objectFieldSpec<
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
         const {
-          inputPlan,
           applyPlan,
           autoApplyAfterParentPlan,
           autoApplyAfterParentSubscribePlan,
           ...argSpec
         } = args[argName];
-        assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
         assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
         memo[argName] = {
           ...argSpec,
-          ...(inputPlan || applyPlan
+          ...(applyPlan
             ? {
                 extensions: {
                   grafast: {
-                    ...(inputPlan ? { inputPlan } : null),
                     ...(autoApplyAfterParentPlan
                       ? { autoApplyAfterParentPlan }
                       : null),
-                    ...(applyPlan ? { applyPlan } : null),
+                    applyPlan,
                     ...(autoApplyAfterParentSubscribePlan
                       ? { autoApplyAfterParentSubscribePlan }
                       : null),
