@@ -665,6 +665,7 @@ declare global {
       applyPlan?: ArgumentApplyPlanResolver;
       autoApplyAfterParentPlan?: boolean;
       autoApplyAfterParentSubscribePlan?: boolean;
+      apply?: (target: any) => void;
     }
 
     interface InputObjectTypeExtensions {
@@ -695,6 +696,7 @@ declare global {
        * @experimental
        */
       applyPlan?: EnumValueApplyPlanResolver<any>;
+      apply?: (target: any) => void;
     }
 
     interface ScalarTypeExtensions {
