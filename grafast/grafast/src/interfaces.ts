@@ -259,8 +259,8 @@ export interface BaseGraphQLArguments {
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
 export type FieldArgs = {
-  /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
-  get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
+  /** @deprecated Use bakedInput() step instead. */
+  get?: never;
   /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
   /** This also works (without path) to apply each list entry against $target */
