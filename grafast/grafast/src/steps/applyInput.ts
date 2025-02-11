@@ -12,6 +12,7 @@ import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
 let currentModifiers: Modifier<any>[] = [];
+let applyingModifiers = false;
 
 export class ApplyInputStep<TArg = any> extends UnbatchedExecutableStep<
   (arg: TArg) => void
@@ -41,16 +42,19 @@ export function inputArgsApply<TArg>(
   target: TArg,
   inputValue: unknown,
 ): void {
-  if (currentModifiers.length !== 0) {
+  if (currentModifiers.length !== 0 || applyingModifiers) {
     throw new Error("Previous modifiers weren't cleaned up!");
   }
+  applyingModifiers = true;
   try {
     _inputArgsApply(inputType, target, inputValue);
-    for (let i = currentModifiers.length - 1; i >= 0; i--) {
+    const l = currentModifiers.length;
+    for (let i = l - 1; i >= 0; i--) {
       currentModifiers[i].apply();
     }
   } finally {
     currentModifiers = [];
+    applyingModifiers = false;
   }
 }
 
@@ -116,6 +120,11 @@ export abstract class Modifier<TParent> {
   static $$export: any;
 
   constructor(protected readonly parent: TParent) {
+    if (applyingModifiers) {
+      throw new Error(
+        `Must not create new modifier whilst modifiers are being applied!`,
+      );
+    }
     currentModifiers.push(this);
   }
 
