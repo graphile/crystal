@@ -131,6 +131,15 @@ Here's an example for `homebrew`:
 brew install diffutils
 ```
 
+### Update test snapshots
+
+If you're contributing to our test suite, make sure you update (and then check!)
+the test snapshots:
+
+```shell
+UPDATE_SNAPSHOTS=1 yarn jest __tests__/test.file.graphql
+```
+
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected
