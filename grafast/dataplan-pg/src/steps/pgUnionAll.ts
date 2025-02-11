@@ -1171,6 +1171,7 @@ interface MutablePgUnionAllQueryInfo<
   cursorUpper: Maybe<number>;
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
   typeIdx: number | null;
+  isOrderUnique: boolean;
 }
 
 function buildTheQuery<
@@ -1184,6 +1185,7 @@ function buildTheQuery<
     selects: [...rawInfo.selects],
     orderSpecs: [...rawInfo.orderSpecs],
     orders: [],
+    isOrderUnique: false,
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
     memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
@@ -1252,6 +1254,9 @@ function buildTheQuery<
       if (info.mode !== "aggregate") {
         info.orderSpecs.push(spec);
       }
+    },
+    setOrderIsUnique() {
+      info.isOrderUnique = true;
     },
   };
 
@@ -1972,4 +1977,6 @@ export interface PgUnionAllQueryBuilder<
 > extends PgQueryBuilder {
   /** Instruct to add another order */
   orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
+  /** Inform that the resulting order is now unique */
+  setOrderIsUnique(): void;
 }

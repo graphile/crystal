@@ -5,6 +5,7 @@ import type {
   PgCodecWithAttributes,
   PgResourceUnique,
   PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
 } from "@dataplan/pg";
 import {
   extractEnumExtensionValue,
@@ -210,11 +211,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                         (a) => a.name === "orderBy",
                       );
                       $select.apply(
-                        extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
-                          orderByArg!.type,
-                          ["grafast", "pgSelectApply"],
-                          $orderBy,
-                        ),
+                        extractEnumExtensionValue<
+                          | PgSelectQueryBuilderCallback
+                          | PgUnionAllQueryBuilderCallback
+                        >(orderByArg!.type, ["grafast", "apply"], $orderBy),
                       );
 
                       const $connection = connection($select) as any;

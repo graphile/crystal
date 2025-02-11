@@ -113,9 +113,15 @@ import type {
 import { extractEnumExtensionValue } from "../steps/extractEnumExtensionValue.js";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
-import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
+import type {
+  PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
+} from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
-import type { PgUnionAllStep } from "../steps/pgUnionAll.js";
+import type {
+  PgUnionAllQueryBuilder,
+  PgUnionAllStep,
+} from "../steps/pgUnionAll.js";
 import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
@@ -1987,8 +1993,8 @@ export function makeExampleSchema(
       BODY_ASC: {
         extensions: {
           grafast: {
-            pgSelectApply: EXPORTABLE(
-              (TYPES, sql) => (qb) => {
+            apply: EXPORTABLE(
+              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
                 qb.orderBy({
                   codec: TYPES.text,
                   fragment: sql`${qb}.body`,
@@ -2003,8 +2009,8 @@ export function makeExampleSchema(
       BODY_DESC: {
         extensions: {
           grafast: {
-            pgSelectApply: EXPORTABLE(
-              (TYPES, sql) => (qb) => {
+            apply: EXPORTABLE(
+              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
                 qb.orderBy({
                   codec: TYPES.text,
                   fragment: sql`${qb}.body`,
@@ -2019,8 +2025,8 @@ export function makeExampleSchema(
       AUTHOR_USERNAME_ASC: {
         extensions: {
           grafast: {
-            pgSelectApply: EXPORTABLE(
-              (TYPES, sql) => (qb) => {
+            apply: EXPORTABLE(
+              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
                 const authorAlias = qb.singleRelation("author");
                 qb.orderBy({
                   codec: TYPES.text,
@@ -2036,8 +2042,8 @@ export function makeExampleSchema(
       AUTHOR_USERNAME_DESC: {
         extensions: {
           grafast: {
-            pgSelectApply: EXPORTABLE(
-              (TYPES, sql) => (qb) => {
+            apply: EXPORTABLE(
+              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
                 const authorAlias = qb.singleRelation("author");
                 qb.orderBy({
                   codec: TYPES.text,
@@ -3689,8 +3695,8 @@ export function makeExampleSchema(
       CVSS_SCORE_ASC: {
         extensions: {
           grafast: {
-            pgUnionAllApply: EXPORTABLE(
-              () => (qb) => {
+            apply: EXPORTABLE(
+              () => (qb: PgUnionAllQueryBuilder) => {
                 qb.orderBy({
                   attribute: "cvss_score",
                   direction: "ASC",
@@ -3704,8 +3710,8 @@ export function makeExampleSchema(
       CVSS_SCORE_DESC: {
         extensions: {
           grafast: {
-            pgUnionAllApply: EXPORTABLE(
-              () => (qb) => {
+            apply: EXPORTABLE(
+              () => (qb: PgUnionAllQueryBuilder) => {
                 qb.orderBy({
                   attribute: "cvss_score",
                   direction: "DESC",
@@ -3955,7 +3961,7 @@ export function makeExampleSchema(
               $messages.apply(
                 extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                   orderByArg!.type,
-                  ["grafast", "pgSelectApply"],
+                  ["grafast", "apply"],
                   $orderBy,
                 ),
               );
@@ -4683,7 +4689,7 @@ export function makeExampleSchema(
               $vulnerabilities.apply(
                 extractEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
                   orderByArg!.type,
-                  ["grafast", "pgUnionAllApply"],
+                  ["grafast", "apply"],
                   $orderBy,
                 ),
               );
