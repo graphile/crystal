@@ -320,10 +320,6 @@ export function makeGrafastSchema(details: {
                         argSpec.grafast?.applyPlan,
                         `${typeName}_${fieldName}_${argName}_applyPlan`,
                       );
-                      exportNameHint(
-                        argSpec.grafast?.inputPlan,
-                        `${typeName}_${fieldName}_${argName}_inputPlan`,
-                      );
                       Object.assign(arg.extensions!, argSpec);
                     }
                   }
