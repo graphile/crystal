@@ -355,26 +355,6 @@ export type InputObjectTypeBakedResolver = (
   },
 ) => any;
 
-// TYPES: review _TContext
-/**
- * Arguments can have plans; the plan resolver is passed the parent plan (the
- * plan that represents the _parent_ field of the field the arg is defined on),
- * the field plan (the plan that represents the field the arg is defined on)
- * and an input plan that represents the value the user will pass to this
- * argument. The resolver must return either a ModifierStep or null.
- */
-export type ArgumentInputPlanResolver<
-  TParentStep extends ExecutableStep = ExecutableStep,
-  TResultStep extends ExecutableStep = ExecutableStep,
-> = (
-  $parentPlan: TParentStep,
-  input: FieldArgs,
-  info: {
-    schema: GraphQLSchema;
-    entity: GraphQLArgument;
-  },
-) => TResultStep;
-
 export type ArgumentApplyPlanResolver<
   TParentStep extends ExecutableStep = ExecutableStep,
   TFieldStep extends ExecutableStep = ExecutableStep,
@@ -384,7 +364,7 @@ export type ArgumentApplyPlanResolver<
   input: FieldArgs,
   info: {
     schema: GraphQLSchema;
-    entity: GraphQLArgument;
+    arg: GraphQLArgument;
   },
 ) => void;
 
