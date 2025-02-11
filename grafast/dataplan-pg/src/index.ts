@@ -547,14 +547,4 @@ declare global {
     interface PgRefDefinitionExtensions {}
     interface PgCodecRelationExtensions {}
   }
-  namespace Grafast {
-    interface EnumValueExtensions {
-      pgSelectApply?: PgSelectQueryBuilderCallback;
-      pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
-    }
-    interface ArgumentExtensions {
-      pgSelectApply?: PgSelectQueryBuilderCallback;
-      pgUnionAllApply?: PgUnionAllQueryBuilderCallback;
-    }
-  }
 }

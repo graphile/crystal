@@ -3,7 +3,9 @@ import "graphile-config";
 
 import type {
   PgCodecWithAttributes,
+  PgSelectQueryBuilder,
   PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilder,
 } from "@dataplan/pg";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -123,9 +125,13 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                   [ascFieldName]: {
                     extensions: {
                       grafast: {
-                        pgSelectApply: EXPORTABLE(
+                        apply: EXPORTABLE(
                           (attributeName, isUnique, pgOrderByNullsLast) =>
-                            ((queryBuilder): void => {
+                            ((
+                              queryBuilder:
+                                | PgSelectQueryBuilder
+                                | PgUnionAllQueryBuilder,
+                            ): void => {
                               queryBuilder.orderBy({
                                 attribute: attributeName,
                                 direction: "ASC",
@@ -162,9 +168,13 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                   [descFieldName]: {
                     extensions: {
                       grafast: {
-                        pgSelectApply: EXPORTABLE(
+                        apply: EXPORTABLE(
                           (attributeName, isUnique, pgOrderByNullsLast) =>
-                            ((queryBuilder): void => {
+                            ((
+                              queryBuilder:
+                                | PgSelectQueryBuilder
+                                | PgUnionAllQueryBuilder,
+                            ): void => {
                               queryBuilder.orderBy({
                                 attribute: attributeName,
                                 direction: "DESC",
