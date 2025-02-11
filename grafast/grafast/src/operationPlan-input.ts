@@ -38,6 +38,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
   operationPlan: OperationPlan,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
+  $parent: ExecutableStep,
   applyAfterMode: ApplyAfterModeArg,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null> | null {
@@ -164,7 +165,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
   assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied && result != null) {
-    processAfter(fieldArgs, result, args, applyAfterMode);
+    processAfter($parent, fieldArgs, result, args, applyAfterMode);
   }
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
@@ -173,21 +174,38 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
 }
 
 function processAfter(
+  $parent: ExecutableStep,
   rootFieldArgs: FieldArgs,
   $result: ExecutableStep,
   args: Record<string, GraphQLArgument>,
   applyAfterMode: ApplyAfterModeArg,
 ) {
+  const schema = $parent.operationPlan.schema;
   if (!isApplyableStep($result)) return;
   for (const [argName, arg] of Object.entries(args)) {
     const autoApply =
       applyAfterMode === "autoApplyAfterParentPlan"
-        ? arg.extensions.grafast?.autoApplyAfterParentPlan
+        ? arg.extensions.grafast?.applyPlan
         : applyAfterMode === "autoApplyAfterParentSubscribePlan"
-        ? arg.extensions.grafast?.autoApplyAfterParentSubscribePlan
+        ? arg.extensions.grafast?.applySubscribePlan
         : null;
     if (autoApply) {
-      rootFieldArgs.apply($result, [argName]);
+      // TODO: should this have dollars on it for accessing subkeys?
+      const input: FieldArgs = {
+        getRaw(path) {
+          return rootFieldArgs.getRaw(concatPath(argName, path));
+        },
+        get(path) {
+          return rootFieldArgs.get(concatPath(argName, path));
+        },
+        apply($target, path) {
+          return rootFieldArgs.apply($target, concatPath(argName, path));
+        },
+      };
+      autoApply($parent, $result, input, {
+        schema,
+        arg,
+      });
     }
   }
 }
@@ -225,4 +243,13 @@ function getNullableInputTypeAtPath(
     }
   }
   return type;
+}
+
+function concatPath(
+  argName: string,
+  subpath: ReadonlyArray<string | number> | string | undefined,
+) {
+  if (subpath == null) return [argName];
+  const localPath = Array.isArray(subpath) ? subpath : [subpath];
+  return [argName, ...localPath];
 }

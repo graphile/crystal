@@ -791,7 +791,6 @@ export class OperationPlan {
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
-        fields,
         subscriptionPlanResolver,
         "autoApplyAfterParentSubscribePlan",
         this.trackedRootValueStep,
@@ -1243,7 +1242,6 @@ export class OperationPlan {
             fieldLayerPlan,
             fieldPath,
             polymorphicPaths,
-            fieldNodes,
             planResolver,
             "autoApplyAfterParentPlan",
             parentStep,
@@ -1918,7 +1916,6 @@ export class OperationPlan {
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
-    fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
     applyAfterMode: ApplyAfterModeArg,
     rawParentStep: ExecutableStep,
@@ -1948,6 +1945,7 @@ export class OperationPlan {
         this,
         trackedArguments,
         field,
+        parentStep,
         applyAfterMode,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
