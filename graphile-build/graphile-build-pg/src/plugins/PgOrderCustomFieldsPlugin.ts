@@ -120,27 +120,29 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                 {
                   [valueName]: {
                     extensions: {
-                      pgSelectApply: EXPORTABLE(
-                        (ascDesc, pgFieldSource, sql) =>
-                          ((queryBuilder) => {
-                            if (typeof pgFieldSource.from !== "function") {
-                              throw new Error(
-                                "Invalid computed attribute 'from'",
-                              );
-                            }
-                            const expression = sql`${pgFieldSource.from({
-                              placeholder: queryBuilder.alias,
-                            })}`;
-                            queryBuilder.orderBy({
-                              codec: pgFieldSource.codec,
-                              fragment: expression,
-                              direction: ascDesc.toUpperCase() as
-                                | "ASC"
-                                | "DESC",
-                            });
-                          }) as PgSelectQueryBuilderCallback,
-                        [ascDesc, pgFieldSource, sql],
-                      ),
+                      grafast: {
+                        pgSelectApply: EXPORTABLE(
+                          (ascDesc, pgFieldSource, sql) =>
+                            ((queryBuilder) => {
+                              if (typeof pgFieldSource.from !== "function") {
+                                throw new Error(
+                                  "Invalid computed attribute 'from'",
+                                );
+                              }
+                              const expression = sql`${pgFieldSource.from({
+                                placeholder: queryBuilder.alias,
+                              })}`;
+                              queryBuilder.orderBy({
+                                codec: pgFieldSource.codec,
+                                fragment: expression,
+                                direction: ascDesc.toUpperCase() as
+                                  | "ASC"
+                                  | "DESC",
+                              });
+                            }) as PgSelectQueryBuilderCallback,
+                          [ascDesc, pgFieldSource, sql],
+                        ),
+                      },
                     },
                   },
                 },

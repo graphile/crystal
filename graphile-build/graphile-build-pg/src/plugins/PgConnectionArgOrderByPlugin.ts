@@ -202,7 +202,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                   $select.apply(
                     extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                       orderByArg!.type,
-                      "pgSelectApply",
+                      ["grafast", "pgSelectApply"],
                       $orderBy,
                     ),
                   );
@@ -221,7 +221,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                   $select.apply(
                     extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
                       orderByArg!.type,
-                      "pgSelectApply",
+                      ["grafast", "pgSelectApply"],
                       $orderBy,
                     ),
                   );

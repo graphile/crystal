@@ -67,54 +67,58 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           {
             [inflection.builtin("PRIMARY_KEY_ASC")]: {
               extensions: {
-                pgSelectApply: EXPORTABLE(
-                  (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                    ((queryBuilder) => {
-                      primaryKeyAttributes.forEach((attributeName) => {
-                        const attribute = pgCodec.attributes[attributeName];
-                        queryBuilder.orderBy({
-                          codec: attribute.codec,
-                          fragment: sql`${queryBuilder}.${sql.identifier(
-                            attributeName,
-                          )}`,
-                          direction: "ASC",
-                          ...(pgOrderByNullsLast != null
-                            ? {
-                                nulls: pgOrderByNullsLast ? "LAST" : "FIRST",
-                              }
-                            : null),
+                grafast: {
+                  pgSelectApply: EXPORTABLE(
+                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
+                      ((queryBuilder) => {
+                        primaryKeyAttributes.forEach((attributeName) => {
+                          const attribute = pgCodec.attributes[attributeName];
+                          queryBuilder.orderBy({
+                            codec: attribute.codec,
+                            fragment: sql`${queryBuilder}.${sql.identifier(
+                              attributeName,
+                            )}`,
+                            direction: "ASC",
+                            ...(pgOrderByNullsLast != null
+                              ? {
+                                  nulls: pgOrderByNullsLast ? "LAST" : "FIRST",
+                                }
+                              : null),
+                          });
                         });
-                      });
-                      queryBuilder.setOrderIsUnique();
-                    }) as PgSelectQueryBuilderCallback,
-                  [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
-                ),
+                        queryBuilder.setOrderIsUnique();
+                      }) as PgSelectQueryBuilderCallback,
+                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
+                  ),
+                },
               },
             },
             [inflection.builtin("PRIMARY_KEY_DESC")]: {
               extensions: {
-                pgSelectApply: EXPORTABLE(
-                  (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                    ((queryBuilder) => {
-                      primaryKeyAttributes.forEach((attributeName) => {
-                        const attribute = pgCodec.attributes[attributeName];
-                        queryBuilder.orderBy({
-                          codec: attribute.codec,
-                          fragment: sql`${queryBuilder}.${sql.identifier(
-                            attributeName,
-                          )}`,
-                          direction: "DESC",
-                          ...(pgOrderByNullsLast != null
-                            ? {
-                                nulls: pgOrderByNullsLast ? "LAST" : "FIRST",
-                              }
-                            : null),
+                grafast: {
+                  pgSelectApply: EXPORTABLE(
+                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
+                      ((queryBuilder) => {
+                        primaryKeyAttributes.forEach((attributeName) => {
+                          const attribute = pgCodec.attributes[attributeName];
+                          queryBuilder.orderBy({
+                            codec: attribute.codec,
+                            fragment: sql`${queryBuilder}.${sql.identifier(
+                              attributeName,
+                            )}`,
+                            direction: "DESC",
+                            ...(pgOrderByNullsLast != null
+                              ? {
+                                  nulls: pgOrderByNullsLast ? "LAST" : "FIRST",
+                                }
+                              : null),
+                          });
                         });
-                      });
-                      queryBuilder.setOrderIsUnique();
-                    }) as PgSelectQueryBuilderCallback,
-                  [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
-                ),
+                        queryBuilder.setOrderIsUnique();
+                      }) as PgSelectQueryBuilderCallback,
+                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
+                  ),
+                },
               },
             },
           },
