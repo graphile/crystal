@@ -14,11 +14,7 @@ import {
   NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
-import type {
-  ExecutableStep,
-  ModifierStep,
-  UnbatchedExecutableStep,
-} from "../step";
+import type { ExecutableStep, UnbatchedExecutableStep } from "../step";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -397,11 +393,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public _addStep(step: ExecutableStep): number {
     return this.operationPlan._addStep(step);
-  }
-
-  /** @internal */
-  public _addModifierStep(step: ModifierStep<any>): string {
-    return this.operationPlan._addModifierStep(step);
   }
 
   public finalize(): void {

@@ -818,62 +818,6 @@ export function isPolymorphicStep(s: ExecutableStep): s is PolymorphicStep {
   );
 }
 
-/**
- * Modifier plans modify their parent plan (which may be another ModifierStep
- * or an ExecutableStep). First they gather all the requirements from their
- * children (if any) being applied to them, then they apply themselves to their
- * parent plan. This application is done through the `apply()` method.
- *
- * Modifier plans do not use dependencies.
- */
-export abstract class ModifierStep<
-  TParentStep extends BaseStep = BaseStep,
-> extends BaseStep {
-  // Explicitly we do not add $$export here because we want children to set it
-  static $$export: any;
-
-  public readonly id: string;
-  constructor(protected readonly $parent: TParentStep) {
-    super();
-    this.id = this.layerPlan._addModifierStep(this);
-  }
-
-  public toString(): string {
-    const meta = this.toStringMeta();
-    return chalk.bold.blue(
-      `${this.constructor.name.replace(/Step$/, "")}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}]`,
-    );
-  }
-
-  /**
-   * In this method, you should apply the changes to your `this.$parent` plan
-   */
-  abstract apply(): void;
-}
-
-export function isModifierStep<
-  TParentStep extends ExecutableStep | ModifierStep<any>,
->(plan: BaseStep): plan is ModifierStep<TParentStep> {
-  return "apply" in plan && typeof (plan as any).apply === "function";
-}
-
-export function assertModifierStep<
-  TParentStep extends ExecutableStep | ModifierStep<any>,
->(
-  plan: BaseStep,
-  pathDescription: string,
-): asserts plan is ModifierStep<TParentStep> {
-  if (!isModifierStep(plan)) {
-    throw new Error(
-      `The plan returned from '${pathDescription}' should be a modifier plan, but it does not implement the 'apply' method.`,
-    );
-  }
-}
-
 export interface ListCapableStep<
   TOutputData,
   TItemStep extends ExecutableStep<TOutputData> = ExecutableStep<TOutputData>,
