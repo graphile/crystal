@@ -7,17 +7,11 @@ import type {
 import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import {
-  __InputObjectStep,
-  __TrackedValueStep,
-  applyInput,
-  bakedInput,
-} from "./index.js";
+import { __InputObjectStep, __TrackedValueStep, applyInput } from "./index.js";
 import type { FieldArgs, TrackedArguments } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { isApplyableStep } from "./steps/applyInput.js";
-import { object } from "./steps/object.js";
 import { assertNotPromise } from "./utils.js";
 
 const { getNullableType, isInputObjectType, isListType } = graphql;
@@ -52,8 +46,6 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
     args[arg.name] = arg;
   }
 
-  // TODO: replace `got` with `cacheStep()`?
-  const got = new Map<string, ExecutableStep>();
   const applied = new Map<string, ExecutableStep>();
   let explicitlyApplied = false;
 
@@ -82,41 +74,6 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
         return $entry;
       } else {
         throw new Error(`Invalid path`);
-      }
-    },
-    get(inPath) {
-      assertNotRuntime(operationPlan, `fieldArgs.get()`);
-      const path = Array.isArray(inPath)
-        ? (inPath as ReadonlyArray<string | number>)
-        : inPath
-        ? [inPath as string]
-        : [];
-      const pathString = path.join(".");
-      const $existing = got.get(pathString);
-      if ($existing) {
-        return $existing;
-      }
-      if (path.length === 0) {
-        // Turn all of the args into a single object
-        const values = Object.create(null);
-        for (const argName of Object.keys(args)) {
-          values[argName] = fieldArgs.get([argName]);
-        }
-        return object(values);
-      } else {
-        const [argName, ...rest] = path;
-        if (typeof argName !== "string") {
-          throw new Error(
-            `Invalid path; argument '${argName}' is an invalid argument name`,
-          );
-        }
-        const arg = args[argName];
-        if (!arg) {
-          throw new Error(`Invalid path; argument '${argName}' does not exist`);
-        }
-        const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
-        const $valueAtPath = fieldArgs.getRaw(inPath);
-        return bakedInput(typeAtPath, $valueAtPath);
       }
     },
     apply($target, inPath) {
@@ -194,9 +151,6 @@ function processAfter(
       const input: FieldArgs = {
         getRaw(path) {
           return rootFieldArgs.getRaw(concatPath(argName, path));
-        },
-        get(path) {
-          return rootFieldArgs.get(concatPath(argName, path));
         },
         apply($target, path) {
           return rootFieldArgs.apply($target, concatPath(argName, path));
