@@ -131,6 +131,24 @@ Here's an example for `homebrew`:
 brew install diffutils
 ```
 
+### Update test snapshots
+
+If you're contributing to our test suite, make sure you update (and then check!)
+the test snapshots:
+
+```shell
+UPDATE_SNAPSHOTS=1 yarn test
+```
+
+If you're iterating you may want to test just a single file; to do so change
+into the relevant folder and then run that single file with `jest` with
+`UPDATE_SNAPSHOTS` enabled:
+
+```shell
+cd postgraphile/postgraphile
+UPDATE_SNAPSHOTS=1 yarn jest __tests__/path/to/test.file.graphql
+```
+
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected

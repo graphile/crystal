@@ -1560,6 +1560,18 @@ create table polymorphic.third_party_vulnerabilities (
   vendor_name text
 );
 
+create function polymorphic.first_party_vulnerabilities_cvss_score_int (
+  r polymorphic.first_party_vulnerabilities
+) returns int as $$
+select (r.cvss_score * 100)::int;
+$$ language sql stable;
+
+create function polymorphic.third_party_vulnerabilities_cvss_score_int (
+  r polymorphic.third_party_vulnerabilities
+) returns int as $$
+select (r.cvss_score * 100)::int;
+$$ language sql stable;
+
 create table polymorphic.aws_application_first_party_vulnerabilities (
   aws_application_id int not null references polymorphic.aws_applications,
   first_party_vulnerability_id int not null references polymorphic.first_party_vulnerabilities,
