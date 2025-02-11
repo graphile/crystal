@@ -77,11 +77,13 @@ const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver 
   };
 */
 
-function _inputArgsApply<TArg>(
+function _inputArgsApply<TArg extends object>(
   inputType: GraphQLInputType,
-  target: TArg,
+  target: TArg | (() => TArg),
   inputValue: unknown,
 ): void {
+  // PERF: we should have the plan generate a digest of `inputType` so that we
+  // can jump right to the relevant parts without too much traversal cost.
   if (inputValue === undefined) {
     return;
   }
@@ -95,12 +97,45 @@ function _inputArgsApply<TArg>(
     if (!Array.isArray(inputValue)) {
       throw new Error(`Expected list in list position`);
     }
-    for (const val of inputValue) {
-      _inputArgsApply(inputType.ofType, target, val);
+    for (const item of inputValue) {
+      const itemTarget = typeof target === "function" ? target() : target;
+      _inputArgsApply(inputType.ofType, itemTarget, item);
     }
+  } else if (typeof target === "function") {
+    throw new Error(
+      "Functions may only be used as the target for list types (the function is called once per list item)",
+    );
   } else if (isInputObjectType(inputType)) {
+    if (inputValue === null) {
+      return;
+    }
+    const fields = inputType.getFields();
+    for (const [fieldName, spec] of Object.entries(fields)) {
+      const val = (inputValue as any)[fieldName];
+      if (val === undefined) continue;
+      if (spec.extensions.grafast?.apply) {
+        const newTarget = spec.extensions.grafast.apply(target, val);
+        if (newTarget != null) {
+          _inputArgsApply(spec.type, newTarget, val);
+        }
+      }
+    }
   } else if (isScalarType(inputType)) {
+    // if (inputType.extensions.grafast?.apply) {
+    // }
   } else if (isEnumType(inputType)) {
+    if (inputValue === null) {
+      return;
+    }
+    const values = inputType.getValues();
+    const value = values.find((v) => v.value === inputValue);
+    if (value) {
+      if (value.extensions.grafast?.apply) {
+        value.extensions.grafast.apply(target);
+      }
+    } else {
+      throw new Error(`Couldn't find value in ${inputType} for ${inputValue}`);
+    }
   } else {
     const never: never = inputType;
     throw new Error(`Input type expected, but found ${never}`);
@@ -191,7 +226,7 @@ export type InputObjectFieldBakedResolver<TParent = any> = (
 export type InputObjectFieldApplyResolver<TParent = any> = (
   parent: TParent,
   val: unknown,
-) => void;
+) => any;
 export type InputObjectTypeInputResolver = (val: unknown) => any;
 
 export type ApplyableExecutableStep<
