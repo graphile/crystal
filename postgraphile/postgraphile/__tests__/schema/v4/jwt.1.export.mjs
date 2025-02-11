@@ -2580,7 +2580,7 @@ const Query_allUpdatableViews_postPlanResolvers = [($connection, $parent, fieldA
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function Query_allLists_plan() {
@@ -2592,7 +2592,7 @@ const Query_allLists_postPlanResolvers = [($connection, $parent, fieldArgs, {
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function Query_allTypes_plan() {
@@ -2604,7 +2604,7 @@ const Query_allTypes_postPlanResolvers = [($connection, $parent, fieldArgs, {
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
@@ -6586,7 +6586,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "x",
               direction: "ASC",
@@ -6605,7 +6605,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "x",
               direction: "DESC",
@@ -6624,7 +6624,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
@@ -6643,7 +6643,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
@@ -6662,7 +6662,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "description",
               direction: "ASC",
@@ -6681,7 +6681,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "description",
               direction: "DESC",
@@ -6700,7 +6700,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "constant",
               direction: "ASC",
@@ -6719,7 +6719,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "constant",
               direction: "DESC",
@@ -6859,12 +6859,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             listsUniques[0].attributes.forEach(attributeName => {
-              const attribute = listsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -6880,12 +6878,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             listsUniques[0].attributes.forEach(attributeName => {
-              const attribute = listsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -6901,7 +6897,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
@@ -6920,7 +6916,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
@@ -7196,12 +7192,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             typesUniques[0].attributes.forEach(attributeName => {
-              const attribute = typesCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -7217,12 +7211,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             typesUniques[0].attributes.forEach(attributeName => {
-              const attribute = typesCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -7238,7 +7230,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
@@ -7257,7 +7249,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
@@ -7276,7 +7268,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "smallint",
               direction: "ASC",
@@ -7295,7 +7287,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "smallint",
               direction: "DESC",
@@ -7314,7 +7306,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "bigint",
               direction: "ASC",
@@ -7333,7 +7325,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "bigint",
               direction: "DESC",
@@ -7352,7 +7344,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "numeric",
               direction: "ASC",
@@ -7371,7 +7363,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "numeric",
               direction: "DESC",
@@ -7390,7 +7382,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "decimal",
               direction: "ASC",
@@ -7409,7 +7401,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "decimal",
               direction: "DESC",
@@ -7428,7 +7420,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "boolean",
               direction: "ASC",
@@ -7447,7 +7439,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "boolean",
               direction: "DESC",
@@ -7466,7 +7458,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "varchar",
               direction: "ASC",
@@ -7485,7 +7477,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "varchar",
               direction: "DESC",
@@ -7504,7 +7496,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "enum",
               direction: "ASC",
@@ -7523,7 +7515,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "enum",
               direction: "DESC",
@@ -7542,7 +7534,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "domain",
               direction: "ASC",
@@ -7561,7 +7553,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "domain",
               direction: "DESC",
@@ -7580,7 +7572,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "domain2",
               direction: "ASC",
@@ -7599,7 +7591,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "domain2",
               direction: "DESC",
@@ -7618,7 +7610,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "json",
               direction: "ASC",
@@ -7637,7 +7629,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "json",
               direction: "DESC",
@@ -7656,7 +7648,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "jsonb",
               direction: "ASC",
@@ -7675,7 +7667,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "jsonb",
               direction: "DESC",
@@ -7694,7 +7686,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamp",
               direction: "ASC",
@@ -7713,7 +7705,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamp",
               direction: "DESC",
@@ -7732,7 +7724,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamptz",
               direction: "ASC",
@@ -7751,7 +7743,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamptz",
               direction: "DESC",
@@ -7770,7 +7762,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "date",
               direction: "ASC",
@@ -7789,7 +7781,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "date",
               direction: "DESC",
@@ -7808,7 +7800,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "time",
               direction: "ASC",
@@ -7827,7 +7819,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "time",
               direction: "DESC",
@@ -7846,7 +7838,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timetz",
               direction: "ASC",
@@ -7865,7 +7857,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timetz",
               direction: "DESC",
@@ -7884,7 +7876,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "interval",
               direction: "ASC",
@@ -7903,7 +7895,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "interval",
               direction: "DESC",
@@ -7922,7 +7914,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "money",
               direction: "ASC",
@@ -7941,7 +7933,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "money",
               direction: "DESC",
@@ -7960,7 +7952,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "compound_type",
               direction: "ASC",
@@ -7979,7 +7971,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "compound_type",
               direction: "DESC",
@@ -7998,7 +7990,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nested_compound_type",
               direction: "ASC",
@@ -8017,7 +8009,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nested_compound_type",
               direction: "DESC",
@@ -8036,7 +8028,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullable_compound_type",
               direction: "ASC",
@@ -8055,7 +8047,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullable_compound_type",
               direction: "DESC",
@@ -8074,7 +8066,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullable_nested_compound_type",
               direction: "ASC",
@@ -8093,7 +8085,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullable_nested_compound_type",
               direction: "DESC",
@@ -8112,7 +8104,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "point",
               direction: "ASC",
@@ -8131,7 +8123,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "point",
               direction: "DESC",
@@ -8150,7 +8142,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullablePoint",
               direction: "ASC",
@@ -8169,7 +8161,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "nullablePoint",
               direction: "DESC",
@@ -8188,7 +8180,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "inet",
               direction: "ASC",
@@ -8207,7 +8199,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "inet",
               direction: "DESC",
@@ -8226,7 +8218,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "cidr",
               direction: "ASC",
@@ -8245,7 +8237,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "cidr",
               direction: "DESC",
@@ -8264,7 +8256,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "macaddr",
               direction: "ASC",
@@ -8283,7 +8275,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "macaddr",
               direction: "DESC",
@@ -8302,7 +8294,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regproc",
               direction: "ASC",
@@ -8321,7 +8313,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regproc",
               direction: "DESC",
@@ -8340,7 +8332,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regprocedure",
               direction: "ASC",
@@ -8359,7 +8351,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regprocedure",
               direction: "DESC",
@@ -8378,7 +8370,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regoper",
               direction: "ASC",
@@ -8397,7 +8389,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regoper",
               direction: "DESC",
@@ -8416,7 +8408,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regoperator",
               direction: "ASC",
@@ -8435,7 +8427,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regoperator",
               direction: "DESC",
@@ -8454,7 +8446,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regclass",
               direction: "ASC",
@@ -8473,7 +8465,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regclass",
               direction: "DESC",
@@ -8492,7 +8484,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regtype",
               direction: "ASC",
@@ -8511,7 +8503,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regtype",
               direction: "DESC",
@@ -8530,7 +8522,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regconfig",
               direction: "ASC",
@@ -8549,7 +8541,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regconfig",
               direction: "DESC",
@@ -8568,7 +8560,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regdictionary",
               direction: "ASC",
@@ -8587,7 +8579,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "regdictionary",
               direction: "DESC",
@@ -8606,7 +8598,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "ltree",
               direction: "ASC",
@@ -8625,7 +8617,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "ltree",
               direction: "DESC",
@@ -10709,7 +10701,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -10840,7 +10832,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -10993,7 +10985,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -11398,7 +11390,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -11564,7 +11556,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -11987,7 +11979,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -12050,7 +12042,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and

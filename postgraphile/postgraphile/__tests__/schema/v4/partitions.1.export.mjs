@@ -386,7 +386,7 @@ const Query_allUsers_postPlanResolvers = [($connection, $parent, fieldArgs, {
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function Query_allMeasurements_plan() {
@@ -398,7 +398,7 @@ const Query_allMeasurements_postPlanResolvers = [($connection, $parent, fieldArg
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 const User_measurementsByUserId_plan = $record => {
@@ -413,7 +413,7 @@ const User_measurementsByUserId_postPlanResolvers = [($connection, $parent, fiel
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function DatetimeSerialize(value) {
@@ -1469,12 +1469,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             measurementsUniques[0].attributes.forEach(attributeName => {
-              const attribute = measurementsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1490,12 +1488,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             measurementsUniques[0].attributes.forEach(attributeName => {
-              const attribute = measurementsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1511,7 +1507,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamp",
               direction: "ASC",
@@ -1530,7 +1526,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "timestamp",
               direction: "DESC",
@@ -1549,7 +1545,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "key",
               direction: "ASC",
@@ -1568,7 +1564,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "key",
               direction: "DESC",
@@ -1587,7 +1583,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "value",
               direction: "ASC",
@@ -1606,7 +1602,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "value",
               direction: "DESC",
@@ -1625,7 +1621,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "user_id",
               direction: "ASC",
@@ -1644,7 +1640,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "user_id",
               direction: "DESC",
@@ -1784,12 +1780,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             usersUniques[0].attributes.forEach(attributeName => {
-              const attribute = usersCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1805,12 +1799,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             usersUniques[0].attributes.forEach(attributeName => {
-              const attribute = usersCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1826,7 +1818,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
@@ -1845,7 +1837,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
@@ -1864,7 +1856,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
@@ -1883,7 +1875,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
@@ -2185,7 +2177,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -2261,7 +2253,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -2356,7 +2348,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -2445,7 +2437,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -2559,7 +2551,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -2622,7 +2614,7 @@ export const plans = {
       })();
       // Perform ordering
       const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and

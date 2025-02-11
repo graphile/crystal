@@ -387,7 +387,7 @@ const Query_allPeople_postPlanResolvers = [($connection, $parent, fieldArgs, {
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function Query_allPosts_plan() {
@@ -399,7 +399,7 @@ const Query_allPosts_postPlanResolvers = [($connection, $parent, fieldArgs, {
   const $orderBy = fieldArgs.getRaw("orderBy");
   const $select = $connection.getSubplan();
   const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "pgSelectApply"], $orderBy));
+  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
 function CursorSerialize(value) {
@@ -886,12 +886,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             peopleUniques[0].attributes.forEach(attributeName => {
-              const attribute = peopleCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -907,12 +905,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             peopleUniques[0].attributes.forEach(attributeName => {
-              const attribute = peopleCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -928,7 +924,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
@@ -947,7 +943,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
@@ -966,7 +962,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "ASC",
@@ -985,7 +981,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "name",
               direction: "DESC",
@@ -1079,12 +1075,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             postsUniques[0].attributes.forEach(attributeName => {
-              const attribute = postsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "ASC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1100,12 +1094,10 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             postsUniques[0].attributes.forEach(attributeName => {
-              const attribute = postsCodec.attributes[attributeName];
               queryBuilder.orderBy({
-                codec: attribute.codec,
-                fragment: sql`${queryBuilder}.${sql.identifier(attributeName)}`,
+                attribute: attributeName,
                 direction: "DESC",
                 ...(undefined != null ? {
                   nulls: undefined ? "LAST" : "FIRST"
@@ -1121,7 +1113,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "ASC",
@@ -1140,7 +1132,7 @@ export const plans = {
       extensions: {
         __proto__: null,
         grafast: {
-          pgSelectApply(queryBuilder) {
+          apply(queryBuilder) {
             queryBuilder.orderBy({
               attribute: "id",
               direction: "DESC",
