@@ -1,30 +1,22 @@
-import type { ExecutableStep } from "grafast";
-import { ModifierStep } from "grafast";
+import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
-import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
+import type { PgConditionLike } from "../interfaces.js";
 
-export class PgOrFilterStep
-  extends ModifierStep<PgConditionLikeStep>
-  implements SQLable
-{
+export class PgOrFilter extends Modifier<PgConditionLike> implements SQLable {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgOrFilterStep",
+    exportName: "PgOrFilter",
   };
 
   private conditions: SQL[] = [];
   private havingConditions: SQL[] = [];
   public alias: SQL;
 
-  constructor($classFilterPlan: PgConditionLikeStep) {
+  constructor($classFilterPlan: PgConditionLike) {
     super($classFilterPlan);
     this.alias = $classFilterPlan.alias;
-  }
-
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
-    return this.$parent.placeholder($step, codec);
   }
 
   where(condition: SQL) {
@@ -37,7 +29,7 @@ export class PgOrFilterStep
 
   apply() {
     if (this.conditions.length > 0) {
-      this.$parent.where(
+      this.parent.where(
         sql`(${sql.join(
           this.conditions.map((frag) => sql.indent(sql.parens(frag))),
           "\nOR\n",
@@ -45,7 +37,7 @@ export class PgOrFilterStep
       );
     }
     if (this.havingConditions.length > 0) {
-      this.$parent.having(
+      this.parent.having(
         sql`(${sql.join(
           this.havingConditions.map((frag) => sql.indent(sql.parens(frag))),
           "\nOR\n",

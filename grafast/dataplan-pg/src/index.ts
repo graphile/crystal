@@ -61,10 +61,10 @@ import {
   PgExecutorOptions,
   WithPgClient,
 } from "./executor.js";
-import { PgBooleanFilterStep } from "./filters/pgBooleanFilter.js";
-import { PgClassFilterStep } from "./filters/pgClassFilter.js";
-import { PgManyFilterStep } from "./filters/pgManyFilter.js";
-import { PgOrFilterStep } from "./filters/pgOrFilter.js";
+import { PgBooleanFilter } from "./filters/pgBooleanFilter.js";
+import { PgClassFilter } from "./filters/pgClassFilter.js";
+import { PgManyFilter } from "./filters/pgManyFilter.js";
+import { PgOrFilter } from "./filters/pgOrFilter.js";
 import type {
   PgSelectQueryBuilderCallback,
   PgUnionAllQueryBuilderCallback,
@@ -97,7 +97,7 @@ import {
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   PgCodecWithAttributes,
-  PgConditionLikeStep,
+  PgConditionLike,
   PgDecode,
   PgEncode,
   PgEnumCodec,
@@ -126,9 +126,8 @@ import {
   PgClassExpressionStep,
 } from "./steps/pgClassExpression.js";
 import {
-  PgConditionCapableParentStep,
-  PgConditionStep,
-  PgConditionStepExtensions,
+  PgCondition,
+  PgConditionCapableParent,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
   pgWhereConditionSpecListToSQL,
@@ -167,7 +166,7 @@ import {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
 } from "./steps/pgSingleTablePolymorphic.js";
-import { PgTempTableStep } from "./steps/pgTempTable.js";
+import { PgTempTable } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
   PgUnionAllQueryBuilder,
@@ -221,12 +220,12 @@ export {
   makeRegistryBuilder,
   ObjectFromPgCodecAttributes,
   PgAdaptor,
-  PgBooleanFilterStep,
+  PgBooleanFilter,
   PgBox,
   PgCircle,
   pgClassExpression,
   PgClassExpressionStep,
-  PgClassFilterStep,
+  PgClassFilter,
   PgClassSingleStep,
   PgClient,
   PgClientQuery,
@@ -256,10 +255,9 @@ export {
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   PgCodecWithAttributes,
-  PgConditionCapableParentStep,
-  PgConditionLikeStep,
-  PgConditionStep,
-  PgConditionStepExtensions,
+  PgCondition,
+  PgConditionCapableParent,
+  PgConditionLike,
   PgContextPlugin,
   PgCursorStep,
   PgDecode,
@@ -286,9 +284,9 @@ export {
   PgLockableParameter,
   PgLockCallback,
   PgLseg,
-  PgManyFilterStep,
+  PgManyFilter,
   PgOrderSpec,
-  PgOrFilterStep,
+  PgOrFilter,
   pgPageInfo,
   PgPageInfoStep,
   PgPath,
@@ -327,7 +325,7 @@ export {
   PgSelectStep,
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
-  PgTempTableStep,
+  PgTempTable,
   PgTypedExecutableStep,
   pgUnionAll,
   PgUnionAllQueryBuilder,
@@ -379,14 +377,14 @@ exportAsMany("@dataplan/pg", {
   TYPES,
   PgResource,
   PgExecutor,
-  PgBooleanFilterStep,
-  PgClassFilterStep,
-  PgManyFilterStep,
-  PgOrFilterStep,
+  PgBooleanFilter,
+  PgClassFilter,
+  PgManyFilter,
+  PgOrFilter,
   extractEnumExtensionValue,
   pgClassExpression,
   PgClassExpressionStep,
-  PgConditionStep,
+  PgCondition,
   pgWhereConditionSpecListToSQL,
   PgCursorStep,
   pgDeleteSingle,
@@ -416,7 +414,7 @@ exportAsMany("@dataplan/pg", {
   PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
-  PgTempTableStep,
+  PgTempTable,
   toPg,
   ToPgStep,
   withPgClient,
@@ -427,19 +425,6 @@ exportAsMany("@dataplan/pg", {
   withSuperuserPgClientFromPgService,
   PgContextPlugin,
 });
-
-export {
-  /** @deprecated Use Pg prefix */
-  PgBooleanFilterStep as BooleanFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgClassFilterStep as ClassFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgManyFilterStep as ManyFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgOrFilterStep as OrFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgTempTableStep as TempTableStep,
-};
 
 export { version } from "./version.js";
 
@@ -518,7 +503,7 @@ declare global {
     }
   }
   namespace DataplanPg {
-    interface PgConditionStepExtensions {}
+    interface PgConditionExtensions {}
     /**
      * Custom metadata for a codec
      */

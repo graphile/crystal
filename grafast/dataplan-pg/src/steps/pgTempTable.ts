@@ -1,50 +1,39 @@
-import type { ExecutableStep } from "grafast";
-import { BaseStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
-import type { PgClassFilterStep } from "../filters/pgClassFilter.js";
-import type { PgCodec } from "../interfaces.js";
-import type { PgConditionCapableParentStep } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
+import type { PgClassFilter } from "../filters/pgClassFilter.js";
+import type { PgConditionCapableParent } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 
-export class PgTempTableStep<
-    TResource extends PgResource<any, any, any, any, any>,
-  >
-  extends BaseStep
-  implements PgConditionCapableParentStep
+export class PgTempTable<TResource extends PgResource<any, any, any, any, any>>
+  implements PgConditionCapableParent
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgTempTableStep",
+    exportName: "PgTempTable",
   };
 
   public readonly alias: SQL;
   public readonly conditions: SQL[] = [];
   constructor(
-    public readonly $parent: PgClassFilterStep,
+    public readonly parent: PgClassFilter,
     public readonly resource: TResource,
   ) {
-    super();
     this.alias = sql.identifier(Symbol(`${resource.name}_filter`));
-  }
-
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
-    return this.$parent.placeholder($step, codec);
   }
 
   where(condition: SQL): void {
     this.conditions.push(condition);
   }
   wherePlan() {
-    return new PgConditionStep(this);
+    return new PgCondition(this);
   }
 
   fromExpression() {
     const from = this.resource.from;
     if (typeof from === "function") {
-      throw new Error("PgTempTableStep doesn't support function sources yet.");
+      throw new Error("PgTempTable doesn't support function sources yet.");
     } else {
       return from;
     }

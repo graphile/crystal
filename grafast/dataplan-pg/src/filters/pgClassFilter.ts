@@ -1,30 +1,27 @@
-import type { ExecutableStep } from "grafast";
-import { ModifierStep } from "grafast";
+import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
-import type { PgCodec } from "../interfaces.js";
 import type {
-  PgConditionCapableParentStep,
-  PgConditionStep,
+  PgCondition,
+  PgConditionCapableParent,
 } from "../steps/pgCondition.js";
 
-export class PgClassFilterStep<
-    TParentStep extends
-      PgConditionCapableParentStep = PgConditionCapableParentStep,
+export class PgClassFilter<
+    TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
-  extends ModifierStep<PgConditionStep<TParentStep>>
+  extends Modifier<PgCondition<TParent>>
   implements SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgClassFilterStep",
+    exportName: "PgClassFilter",
   };
 
   private conditions: SQL[] = [];
 
   constructor(
-    parent: PgConditionStep<TParentStep>,
+    parent: PgCondition<TParent>,
     public readonly alias: SQL,
   ) {
     super(parent);
@@ -34,12 +31,8 @@ export class PgClassFilterStep<
     this.conditions.push(condition);
   }
 
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
-    return this.$parent.placeholder($step, codec);
-  }
-
   apply() {
-    this.conditions.forEach((condition) => this.$parent.where(condition));
+    this.conditions.forEach((condition) => this.parent.where(condition));
   }
 
   [$$toSQL]() {
