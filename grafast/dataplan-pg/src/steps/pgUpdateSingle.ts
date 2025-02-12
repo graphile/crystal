@@ -1,4 +1,4 @@
-import type { ExecutionDetails, GrafastResultsList, SetterStep } from "grafast";
+import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -199,21 +199,6 @@ export class PgUpdateSingleStep<
     )[name];
     const depId = this.addDependency(value);
     this.attributes.push({ name, depId, pgCodec });
-  }
-
-  setPlan(): SetterStep<
-    {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
-    },
-    this
-  > {
-    if (this.locked) {
-      throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`,
-      );
-    }
-    return setter(this);
   }
 
   /**

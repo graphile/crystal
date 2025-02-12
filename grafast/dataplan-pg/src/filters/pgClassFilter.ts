@@ -20,6 +20,7 @@ export class PgClassFilter<
   };
 
   private conditions: SQL[] = [];
+  private havingConditions: SQL[] = [];
 
   constructor(
     parent: PgCondition<TParent>,
@@ -32,8 +33,13 @@ export class PgClassFilter<
     this.conditions.push(condition);
   }
 
+  having(condition: SQL) {
+    this.havingConditions.push(condition);
+  }
+
   apply() {
     this.conditions.forEach((condition) => this.parent.where(condition));
+    this.havingConditions.forEach((condition) => this.parent.having(condition));
   }
 
   [$$toSQL]() {
