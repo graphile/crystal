@@ -15,8 +15,9 @@ let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
 
 export class ApplyInputStep<
-  TArg extends object = any,
-> extends UnbatchedExecutableStep<(arg: TArg) => void> {
+  TParent extends object = any,
+  TTarget extends object = TParent,
+> extends UnbatchedExecutableStep<(arg: TParent) => void> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ApplyInputStep",
@@ -26,14 +27,24 @@ export class ApplyInputStep<
   constructor(
     private inputType: GraphQLInputType,
     $value: AnyInputStep,
+    private getTargetFromParent:
+      | ((parent: TParent) => TTarget | (() => TTarget))
+      | undefined,
   ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
   }
 
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
-    return (parentThing: TArg) =>
-      inputArgsApply(this.inputType, parentThing, value);
+    const { getTargetFromParent } = this;
+    if (typeof getTargetFromParent === "function") {
+      return (parentThing: TParent) =>
+        inputArgsApply(this.inputType, getTargetFromParent(parentThing), value);
+    } else {
+      // TTarget = TParent
+      return (parentThing: TParent) =>
+        inputArgsApply(this.inputType, parentThing, value);
+    }
   }
 }
 
@@ -58,11 +69,19 @@ export function inputArgsApply<TArg extends object>(
   }
 }
 
-export function applyInput<TArg extends object = any>(
+export function applyInput<
+  TParent extends object = any,
+  TTarget extends object = TParent,
+>(
   inputType: GraphQLInputType,
   $value: AnyInputStep,
+  getTargetFromParent?: (parent: TParent) => TTarget,
 ) {
-  return new ApplyInputStep<TArg>(inputType, $value);
+  return new ApplyInputStep<TParent, TTarget>(
+    inputType,
+    $value,
+    getTargetFromParent,
+  );
 }
 
 /*
@@ -228,13 +247,13 @@ export type InputObjectFieldApplyResolver<TParent = any> = (
 export type InputObjectTypeInputResolver = (val: unknown) => any;
 
 export type ApplyableExecutableStep<
-  TArg = any,
+  TArg extends object = any,
   TData = any,
 > = ExecutableStep<TData> & {
   apply($apply: ExecutableStep<(arg: TArg) => void>): void;
 };
 
-export function isApplyableStep<TArg = any, TData = any>(
+export function isApplyableStep<TArg extends object = any, TData = any>(
   s: ExecutableStep<TData>,
 ): s is ApplyableExecutableStep<TArg, TData> {
   return typeof (s as any).apply === "function";
