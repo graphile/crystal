@@ -56,14 +56,16 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
-                    return lambda(
-                      args.get("sides"),
-                      (sides = myDefaultMax) =>
-                        Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
-                        myDefaultMin,
-                    );
-                  },
+                  (lambda, myDefaultMax, myDefaultMin) =>
+                    (_$parent, { $sides }) => {
+                      return lambda(
+                        $sides,
+                        (sides = myDefaultMax) =>
+                          Math.floor(
+                            Math.random() * (sides + 1 - myDefaultMin),
+                          ) + myDefaultMin,
+                      );
+                    },
                   [lambda, myDefaultMax, myDefaultMin],
                 ),
               })),

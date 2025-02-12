@@ -540,8 +540,8 @@ export type GrafastArgumentConfig<
  * Basically GraphQLInputFieldConfig but allowing for the field to have a plan.
  */
 export type GrafastInputFieldConfig<
-  TParent,
-  TInputType extends GraphQLInputType,
+  TParent = any,
+  TInputType extends GraphQLInputType = GraphQLInputType,
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
   apply?: InputObjectFieldApplyResolver<TParent>;

@@ -1013,21 +1013,21 @@ declare global {
           >;
           GraphQLObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
-              GrafastFieldConfig<any, any, any, any, any>,
+              GrafastFieldConfig<any, any, any, any>,
               GraphileBuild.ContextObjectFieldsField,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_fields_field_args?: PluginHook<
             GraphileBuild.Hook<
-              GrafastFieldConfigArgumentMap<any, any, any, any>,
+              GrafastFieldConfigArgumentMap,
               GraphileBuild.ContextObjectFieldsFieldArgs,
               GraphileBuild.Build
             >
           >;
           GraphQLObjectType_fields_field_args_arg?: PluginHook<
             GraphileBuild.Hook<
-              GrafastArgumentConfig<any, any, any, any, any, any>,
+              GrafastArgumentConfig<any, any, any>,
               GraphileBuild.ContextObjectFieldsFieldArgsArg,
               GraphileBuild.Build
             >
