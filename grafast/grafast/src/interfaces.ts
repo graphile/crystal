@@ -526,8 +526,7 @@ export type GrafastArgumentConfig<
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
-  autoApplyAfterParentPlan?: boolean;
-  autoApplyAfterParentSubscribePlan?: boolean;
+  applySubscribePlan?: ArgumentApplyPlanResolver<any, any>;
 };
 
 /**
@@ -538,8 +537,6 @@ export type GrafastInputFieldConfig<TInputType extends GraphQLInputType> = Omit<
   "type"
 > & {
   type: TInputType;
-  autoApplyAfterParentInputPlan?: boolean;
-  autoApplyAfterParentApplyPlan?: boolean;
   apply?: InputObjectFieldApplyResolver;
 };
 

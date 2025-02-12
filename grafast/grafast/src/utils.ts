@@ -435,26 +435,22 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const {
-          applyPlan,
-          autoApplyAfterParentPlan,
-          autoApplyAfterParentSubscribePlan,
-          ...argSpec
-        } = args[argName];
+        const { applyPlan, applySubscribePlan, ...argSpec } = args[argName];
         assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
+        assertNotAsync(
+          applySubscribePlan,
+          `${path ?? "?"}(${argName}:).applySubscribePlan`,
+        );
         memo[argName] = {
           ...argSpec,
-          ...(applyPlan
+          ...(applyPlan || applySubscribePlan
             ? {
                 extensions: {
+                  ...argSpec.extensions,
                   grafast: {
-                    ...(autoApplyAfterParentPlan
-                      ? { autoApplyAfterParentPlan }
-                      : null),
-                    applyPlan,
-                    ...(autoApplyAfterParentSubscribePlan
-                      ? { autoApplyAfterParentSubscribePlan }
-                      : null),
+                    ...argSpec.extensions?.grafast,
+                    ...(applyPlan ? { applyPlan } : null),
+                    ...(applySubscribePlan ? { applySubscribePlan } : null),
                   },
                 },
               }
@@ -549,25 +545,16 @@ export function inputObjectFieldSpec(
   grafastSpec: GrafastInputFieldConfig<GraphQLInputType>,
   path: string,
 ): GraphQLInputFieldConfig {
-  const {
-    apply,
-    autoApplyAfterParentInputPlan,
-    autoApplyAfterParentApplyPlan,
-    ...spec
-  } = grafastSpec;
+  const { apply, ...spec } = grafastSpec;
   assertNotAsync(apply, `${path ?? "?"}.apply`);
   return apply
     ? {
         ...spec,
         extensions: {
+          ...spec.extensions,
           grafast: {
+            ...spec.extensions?.grafast,
             apply,
-            ...(autoApplyAfterParentInputPlan
-              ? { autoApplyAfterParentInputPlan }
-              : null),
-            ...(autoApplyAfterParentApplyPlan
-              ? { autoApplyAfterParentApplyPlan }
-              : null),
           } as Grafast.InputFieldExtensions,
         },
       }
