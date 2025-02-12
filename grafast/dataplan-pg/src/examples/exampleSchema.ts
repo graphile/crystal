@@ -2482,11 +2482,11 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, messageResource) =>
-            function plan($forum, { $messageId }) {
+            function plan($forum, { $id }) {
               const $forumId = $forum.get("id");
               const $message = messageResource.get({
                 forum_id: $forumId,
-                id: $messageId as ExecutableStep<string>,
+                id: $id as ExecutableStep<string>,
               });
               deoptimizeIfAppropriate($message);
               return $message;
