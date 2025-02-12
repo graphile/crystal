@@ -2,6 +2,7 @@ import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
+import type { PgConditionLike } from "../index.js";
 import type {
   PgCondition,
   PgConditionCapableParent,
@@ -11,7 +12,7 @@ export class PgClassFilter<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
   extends Modifier<PgCondition<TParent>>
-  implements SQLable
+  implements SQLable, PgConditionLike
 {
   static $$export = {
     moduleName: "@dataplan/pg",
