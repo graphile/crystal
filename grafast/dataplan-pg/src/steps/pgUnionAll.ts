@@ -49,11 +49,10 @@ import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
-  PgCondition,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
@@ -837,33 +836,12 @@ on (${sql.indent(
     }
   }
 
-  wherePlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
-      );
-    }
-    return new PgConditionStep(this);
-  }
-
   groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(this.scopedSQL(group));
-  }
-
-  havingPlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
-      );
-    }
-    if (this.mode !== "aggregate") {
-      throw new SafeError(`Cannot add having to a non-aggregate query`);
-    }
-    return new PgConditionStep(this, true);
   }
 
   having(
@@ -1008,6 +986,7 @@ on (${sql.indent(
       havingConditions: this.havingConditions,
       mode: this.mode,
       alias: this.alias,
+      symbol: this.symbol,
       hasSideEffects: this.hasSideEffects,
       groups: this.groups,
       orderSpecs: this.orderSpecs,
@@ -1173,6 +1152,7 @@ interface MutablePgUnionAllQueryInfo<
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
   typeIdx: number | null;
   isOrderUnique: boolean;
+  readonly havingConditions: Array<SQL>;
 }
 
 function buildTheQuery<
@@ -1258,6 +1238,44 @@ function buildTheQuery<
     },
     setOrderIsUnique() {
       info.isOrderUnique = true;
+    },
+    where(whereSpec) {
+      for (const digest of info.memberDigests) {
+        const { alias: tableAlias, symbol } = digest;
+        if (sql.isSQL(whereSpec)) {
+          // Merge the global where into this sub-where.
+          digest.conditions.push(
+            // TODO: do we require that info.symbol is a symbol?
+            typeof info.symbol === "symbol"
+              ? sql.replaceSymbol(whereSpec, info.symbol, symbol)
+              : whereSpec,
+          );
+        } else {
+          const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+            digest,
+            whereSpec.attribute,
+          )}`;
+          digest.conditions.push(whereSpec.callback(ident));
+        }
+      }
+    },
+    having(condition) {
+      if (info.mode !== "aggregate") {
+        throw new SafeError(`Cannot add having to a non-aggregate query`);
+      }
+      if (sql.isSQL(condition)) {
+        info.havingConditions.push(condition);
+      } else {
+        const never: never = condition;
+        console.error("Unsupported condition: ", never);
+        throw new Error(`Unsupported condition`);
+      }
+    },
+    whereBuilder() {
+      return new PgCondition(this);
+    },
+    havingBuilder() {
+      return new PgCondition(this, true);
     },
   };
 
@@ -1972,6 +1990,7 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     conditions: [...memberDigest.conditions],
   };
 }
+
 export interface PgUnionAllQueryBuilder<
   TAttributes extends string = string,
   _TTypeNames extends string = string,
@@ -1980,6 +1999,8 @@ export interface PgUnionAllQueryBuilder<
   orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
-  where(rawWhereSpec: PgWhereConditionSpec<TAttributes>): void;
+  where(whereSpec: PgWhereConditionSpec<TAttributes>): void;
   whereBuilder(): PgCondition<this>;
+  having(rawCondition: PgHavingConditionSpec<string>): void;
+  havingBuilder(): PgCondition<this>;
 }

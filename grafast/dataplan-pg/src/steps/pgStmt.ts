@@ -444,6 +444,7 @@ export function calculateLimitAndOffsetSQL(params: {
 }
 
 export interface PgStmtCommonQueryInfo {
+  readonly symbol: symbol | string;
   readonly alias: SQL;
   readonly hasSideEffects: boolean;
 
