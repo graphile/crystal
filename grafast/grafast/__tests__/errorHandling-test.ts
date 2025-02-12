@@ -90,7 +90,7 @@ const schema = makeGrafastSchema({
       sideEffectListCheck(_, fieldArgs) {
         const $mol = context().get("mol");
         sideEffect($mol, () => {});
-        const $count = lambda(fieldArgs.get("arr"), (arr) => {
+        const $count = lambda(fieldArgs.getRaw("arr"), (arr) => {
           return arr.length;
         });
         $count.hasSideEffects = true;
