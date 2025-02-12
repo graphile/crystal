@@ -414,7 +414,7 @@ export type PlanByUniques<
 export type PgConditionLike = Modifier<any> & {
   alias: SQL;
   where(condition: SQL): void;
-  having?(condition: SQL): void;
+  having(condition: SQL): void;
 };
 
 export type KeysOfType<TObject, TValueType> = {

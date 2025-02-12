@@ -30,15 +30,12 @@ export class PgBooleanFilter
   }
 
   having(condition: SQL) {
-    if (!this.parent.having) {
-      throw new Error("Cannot add having conditions here");
-    }
     this.havingConditions.push(condition);
   }
 
   apply() {
     this.conditions.forEach((condition) => this.parent.where(condition));
-    this.havingConditions.forEach((condition) => this.parent.having!(condition));
+    this.havingConditions.forEach((condition) => this.parent.having(condition));
   }
 
   [$$toSQL]() {
