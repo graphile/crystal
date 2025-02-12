@@ -680,8 +680,6 @@ declare global {
     interface InputFieldExtensions {
       baked?: InputObjectFieldBakedResolver;
       apply?: InputObjectFieldApplyResolver;
-      autoApplyAfterParentBaked?: boolean;
-      autoApplyAfterParentApply?: boolean;
     }
 
     interface ObjectTypeExtensions {
