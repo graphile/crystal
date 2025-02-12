@@ -339,7 +339,7 @@ export type FieldPlanResolver<
 
 export type InputObjectFieldApplyResolver<TParent> = (
   target: TParent,
-  input: Record<string, any>,
+  input: unknown,
   info: {
     schema: GraphQLSchema;
     fieldName: string;
