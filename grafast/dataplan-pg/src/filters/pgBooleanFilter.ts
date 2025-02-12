@@ -1,17 +1,16 @@
-import type { ExecutableStep } from "grafast";
-import { ModifierStep } from "grafast";
+import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
-import type { PgCodec, PgConditionLikeStep } from "../interfaces.js";
+import type { PgConditionLikeStep } from "../interfaces.js";
 
-export class PgBooleanFilterStep
-  extends ModifierStep<PgConditionLikeStep>
+export class PgBooleanFilter
+  extends Modifier<PgConditionLikeStep>
   implements SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgBooleanFilterStep",
+    exportName: "PgBooleanFilter",
   };
 
   private conditions: SQL[] = [];
@@ -19,15 +18,11 @@ export class PgBooleanFilterStep
   public alias: SQL;
 
   constructor(
-    $classFilterPlan: PgConditionLikeStep,
+    classFilter: PgConditionLikeStep,
     public readonly expression: SQL,
   ) {
-    super($classFilterPlan);
-    this.alias = $classFilterPlan.alias;
-  }
-
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
-    return this.$parent.placeholder($step, codec);
+    super(classFilter);
+    this.alias = classFilter.alias;
   }
 
   where(condition: SQL) {
@@ -39,10 +34,8 @@ export class PgBooleanFilterStep
   }
 
   apply() {
-    this.conditions.forEach((condition) => this.$parent.where(condition));
-    this.havingConditions.forEach((condition) =>
-      this.$parent.having(condition),
-    );
+    this.conditions.forEach((condition) => this.parent.where(condition));
+    this.havingConditions.forEach((condition) => this.parent.having(condition));
   }
   [$$toSQL]() {
     return this.alias;
