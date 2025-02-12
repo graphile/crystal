@@ -1277,7 +1277,7 @@ export function getInnerCodec<
 }
 exportAs("@dataplan/pg", getInnerCodec, "getInnerCodec");
 
-export function sqlCodecValue(codec: PgCodec, value: unknown) {
+export function sqlValueWithCodec(value: unknown, codec: PgCodec) {
   return sql`${sql.value(value == null ? null : codec.toPg(value))}::${
     codec.sqlType
   }`;
