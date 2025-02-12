@@ -143,12 +143,10 @@ function _inputArgsApply<TArg extends object>(
 }
 
 /**
- * Modifier plans modify their parent plan (which may be another ModifierStep
- * or an ExecutableStep). First they gather all the requirements from their
- * children (if any) being applied to them, then they apply themselves to their
- * parent plan. This application is done through the `apply()` method.
- *
- * Modifier plans do not use dependencies.
+ * Modifiers modify their parent (which may be another modifier or anything
+ * else). First they gather all the requirements from their children (if any)
+ * being applied to them, then they apply themselves to their parent. This
+ * application is done through the `apply()` method.
  */
 export abstract class Modifier<TParent> {
   // Explicitly we do not add $$export here because we want children to set it

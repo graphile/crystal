@@ -80,20 +80,10 @@ function reallyAssertFinalized(plan: BaseStep): void {
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
+// TODO: get rid of BaseStep; incorporate directly into ExecutableStep.
 /**
  * The base abstract plan type; you should not extend this directly - instead
- * use an ExecutableStep (for use when planning output fields) or a
- * ModifierStep (for use when planning arguments/input fields).
- *
- * @remarks
- *
- * Though it might seem that ModifierStep should be used for all inputs
- * (arguments, input objects), this is not the case. When planning an output
- * field, all inputs to it (including arguments, parent plan, context, etc)
- * should be other executable plans. The only time that ModifierStep is used is
- * when writing specific plans as part of the argument or input field
- * definitions themself; even in these cases the inputs to these plan resolvers
- * will be ExecutablePlans.
+ * use an ExecutableStep (for use when planning output fields).
  */
 export abstract class BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
