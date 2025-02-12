@@ -1,10 +1,6 @@
-import type { BaseStep, ExecutableStep } from "grafast";
-import { ModifierStep } from "grafast";
+import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
-
-import { TYPES } from "../index.js";
-import type { PgCodec } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
@@ -19,47 +15,42 @@ export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
 export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 // | ...
 
-/** @deprecated Use DataplanPg.PgConditionStepExtensions instead */
-export type PgConditionStepExtensions = DataplanPg.PgConditionStepExtensions;
-
-export interface PgConditionCapableParentStep extends BaseStep {
+export interface PgConditionCapableParent {
   alias: SQL;
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   where(condition: PgWhereConditionSpec<any>): void;
   having?(condition: PgHavingConditionSpec<any>): void;
 }
 
-type PgConditionStepModeExists = {
+type PgConditionModeExists = {
   mode: "EXISTS";
   tableExpression: SQL;
   alias?: string;
-  $equals?: ExecutableStep;
+  equals?: boolean;
 };
 
-export type PgConditionStepResolvedMode =
+export type PgConditionResolvedMode =
   | { mode: "PASS_THRU" }
   | { mode: "AND" }
   | { mode: "OR" }
   | { mode: "NOT" }
-  | PgConditionStepModeExists;
+  | PgConditionModeExists;
 
-export type PgConditionStepMode =
+export type PgConditionMode =
   | "PASS_THRU"
   | "AND"
   | "OR"
   | "NOT"
-  | PgConditionStepResolvedMode;
+  | PgConditionResolvedMode;
 
-export class PgConditionStep<
-    TParentStep extends
-      PgConditionCapableParentStep = PgConditionCapableParentStep,
+export class PgCondition<
+    TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
-  extends ModifierStep<TParentStep>
-  implements PgConditionCapableParentStep, SQLable
+  extends Modifier<TParent>
+  implements PgConditionCapableParent, SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "PgConditionStep",
+    exportName: "PgCondition",
   };
 
   private conditions: PgWhereConditionSpec<any>[] = [];
@@ -67,15 +58,15 @@ export class PgConditionStep<
 
   public readonly alias: SQL;
 
-  public extensions: PgConditionStepExtensions = Object.create(null);
-  private mode: PgConditionStepResolvedMode;
+  public extensions: DataplanPg.PgConditionExtensions = Object.create(null);
+  private mode: PgConditionResolvedMode;
 
   constructor(
-    $parent: TParentStep,
+    parent: TParent,
     private isHaving = false,
-    mode: PgConditionStepMode = "PASS_THRU",
+    mode: PgConditionMode = "PASS_THRU",
   ) {
-    super($parent);
+    super(parent);
     if (typeof mode === "string") {
       this.mode = { mode };
     } else {
@@ -86,7 +77,7 @@ export class PgConditionStep<
       case "AND":
       case "OR":
       case "NOT": {
-        this.alias = $parent.alias;
+        this.alias = parent.alias;
         break;
       }
       case "EXISTS": {
@@ -97,27 +88,27 @@ export class PgConditionStep<
   }
 
   public toStringMeta(): string {
-    return `${(this.$parent as any).id}/${this.mode.mode}`;
+    return `${(this.parent as any).id}/${this.mode.mode}`;
   }
 
   orPlan() {
-    return new PgConditionStep(this, this.isHaving, "OR");
+    return new PgCondition(this, this.isHaving, "OR");
   }
 
   andPlan() {
-    return new PgConditionStep(this, this.isHaving, "AND");
+    return new PgCondition(this, this.isHaving, "AND");
   }
 
   notPlan() {
-    return new PgConditionStep(this, this.isHaving, "NOT");
+    return new PgCondition(this, this.isHaving, "NOT");
   }
 
-  existsPlan(options: Omit<PgConditionStepModeExists, "mode">) {
+  existsPlan(options: Omit<PgConditionModeExists, "mode">) {
     if (this.isHaving) {
       // Is this true?
       throw new Error(`EXISTS inside having is currently unsupported`);
     }
-    return new PgConditionStep(this, this.isHaving, {
+    return new PgCondition(this, this.isHaving, {
       ...options,
       mode: "EXISTS",
     });
@@ -135,10 +126,6 @@ export class PgConditionStep<
       throw new Error(`cannot call .having() on a 'where' condition`);
     }
     this.havingConditions.push(condition);
-  }
-
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
-    return this.$parent.placeholder($step, codec);
   }
 
   private transform(conditions: PgWhereConditionSpec<any>[]): SQL | null {
@@ -168,11 +155,8 @@ export class PgConditionStep<
 select 1
 from ${this.mode.tableExpression} as ${this.alias}
 where ${sqlCondition}`})`;
-        if (this.mode.$equals) {
-          return sql`${sqlExists} = ${this.placeholder(
-            this.mode.$equals,
-            TYPES.boolean,
-          )}`;
+        if (this.mode.equals != null) {
+          return sql`${sqlExists} = ${this.mode.equals ? sql.true : sql.false}`;
         } else {
           // Assume true
           return sqlExists;
@@ -187,28 +171,28 @@ where ${sqlCondition}`})`;
 
   apply(): void {
     if (this.isHaving) {
-      if (!this.$parent.having) {
-        throw new Error(`${this.$parent} doesn't support 'having'`);
+      if (!this.parent.having) {
+        throw new Error(`${this.parent} doesn't support 'having'`);
       }
       if (this.mode.mode === "PASS_THRU") {
         this.havingConditions.forEach((condition) => {
-          this.$parent.having!(condition);
+          this.parent.having!(condition);
         });
       } else {
         const frag = this.transform(this.havingConditions);
         if (frag) {
-          this.$parent.having!(frag);
+          this.parent.having!(frag);
         }
       }
     } else {
       if (this.mode.mode === "PASS_THRU") {
         this.conditions.forEach((condition) => {
-          this.$parent.where(condition);
+          this.parent.where(condition);
         });
       } else {
         const frag = this.transform(this.conditions);
         if (frag) {
-          this.$parent.where(frag);
+          this.parent.where(frag);
         }
       }
     }
