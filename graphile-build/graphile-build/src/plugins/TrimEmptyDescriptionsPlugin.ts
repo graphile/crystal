@@ -53,9 +53,9 @@ function rmEmptyFieldDescription<
  * for cleaning up the schema as printing a schema with a lot of empty string
  * descriptions is u.g.l.y.
  */
-function rmEmptyArgDescriptions<
-  T extends GrafastArgumentConfig<any, any, any, any, any, any>,
->(arg: T): T {
+function rmEmptyArgDescriptions<T extends GrafastArgumentConfig<any, any, any>>(
+  arg: T,
+): T {
   if (arg.description === "") {
     arg.description = null;
   }

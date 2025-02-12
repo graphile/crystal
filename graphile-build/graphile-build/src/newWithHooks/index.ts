@@ -188,13 +188,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GrafastFieldConfig<
-                any,
-                any,
-                any,
-                any,
-                any
-              >[] = [];
+              const processedFields: GrafastFieldConfig<any, any, any, any>[] =
+                [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
                 TContext extends Grafast.Context,
@@ -204,29 +199,16 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
                 fieldSpec:
-                  | GrafastFieldConfig<
-                      TType,
-                      TContext,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >
+                  | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
                   | ((
                       context: GraphileBuild.ContextObjectFieldsField,
                     ) => GrafastFieldConfig<
                       TType,
-                      TContext,
                       TParentStep,
                       TFieldStep,
                       TArgs
                     >),
-              ): GrafastFieldConfig<
-                TType,
-                TContext,
-                TParentStep,
-                TFieldStep,
-                TArgs
-              > => {
+              ): GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs> => {
                 if (!isString(fieldScope.fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",

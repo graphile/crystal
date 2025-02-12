@@ -217,13 +217,7 @@ declare global {
       TParentStep extends ExecutableStep | null,
       TContext extends Grafast.Context,
     > = {
-      [fieldName: string]: GrafastFieldConfig<
-        any,
-        TContext,
-        TParentStep,
-        any,
-        any
-      >;
+      [fieldName: string]: GrafastFieldConfig<any, TParentStep, any, any>;
     };
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
@@ -253,10 +247,10 @@ declare global {
     interface GrafastInputObjectTypeConfig
       extends Omit<GraphQLInputObjectTypeConfig, "fields"> {
       fields?:
-        | GrafastInputFieldConfigMap<any, any>
+        | GrafastInputFieldConfigMap<any>
         | ((
             context: ContextInputObjectFields,
-          ) => GrafastInputFieldConfigMap<any, any>);
+          ) => GrafastInputFieldConfigMap<any>);
     }
 
     /** Our take on GraphQLUnionTypeConfig that allows for plans */
@@ -839,24 +833,17 @@ declare global {
      */
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
-      TContext extends Grafast.Context,
       TParentStep extends ExecutableStep,
       TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,
     >(
       fieldScope: ScopeObjectFieldsField,
       spec:
-        | GrafastFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>
+        | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
         | ((
             context: ContextObjectFieldsField,
-          ) => GrafastFieldConfig<
-            TType,
-            TContext,
-            TParentStep,
-            TFieldStep,
-            TArgs
-          >),
-    ) => GrafastFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>;
+          ) => GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>),
+    ) => GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>;
 
     type InterfaceFieldWithHooksFunction = (
       fieldScope: ScopeInterfaceFieldsField,
@@ -870,11 +857,9 @@ declare global {
     type InputFieldWithHooksFunction = (
       fieldScope: ScopeInputObjectFieldsField,
       spec:
-        | GrafastInputFieldConfig<any, any, any, any, any>
-        | ((
-            context: ContextInputObjectFieldsField,
-          ) => GrafastInputFieldConfig<any, any, any, any, any>),
-    ) => GrafastInputFieldConfig<any, any, any, any, any>;
+        | GrafastInputFieldConfig
+        | ((context: ContextInputObjectFieldsField) => GrafastInputFieldConfig),
+    ) => GrafastInputFieldConfig;
 
     // type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
 
@@ -965,17 +950,17 @@ declare global {
         TBuild
       >[];
       GraphQLObjectType_fields_field: GraphileBuild.Hook<
-        GrafastFieldConfig<any, any, any, any, any>,
+        GrafastFieldConfig<any, any, any, any>,
         GraphileBuild.ContextObjectFieldsField,
         TBuild
       >[];
       GraphQLObjectType_fields_field_args: GraphileBuild.Hook<
-        GrafastFieldConfigArgumentMap<any, any, any, any>,
+        GrafastFieldConfigArgumentMap,
         GraphileBuild.ContextObjectFieldsFieldArgs,
         TBuild
       >[];
       GraphQLObjectType_fields_field_args_arg: GraphileBuild.Hook<
-        GrafastArgumentConfig<any, any, any, any, any, any>,
+        GrafastArgumentConfig<any, any, any>,
         GraphileBuild.ContextObjectFieldsFieldArgsArg,
         TBuild
       >[];
@@ -1000,7 +985,7 @@ declare global {
         TBuild
       >[];
       GraphQLInputObjectType_fields_field: GraphileBuild.Hook<
-        GrafastInputFieldConfig<any, any, any, any, any>,
+        GrafastInputFieldConfig,
         GraphileBuild.ContextInputObjectFieldsField,
         TBuild
       >[];
