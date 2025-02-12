@@ -10,9 +10,11 @@ import {
 import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { operationPlan } from "./index.js";
 
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
+let inputArgsApplyMutex = false;
 
 export class ApplyInputStep<
   TParent extends object = any,
@@ -22,6 +24,7 @@ export class ApplyInputStep<
     moduleName: "grafast",
     exportName: "ApplyInputStep",
   };
+  public isSyncAndSafe = true;
 
   valueDepId: 0;
   constructor(
@@ -33,39 +36,55 @@ export class ApplyInputStep<
   ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
+    if (!this._isUnary) {
+      throw new Error(`applyInput() must be unary`);
+    }
+    this._isUnaryLocked = true;
   }
 
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
     const { getTargetFromParent } = this;
-    if (typeof getTargetFromParent === "function") {
-      return (parentThing: TParent) =>
-        inputArgsApply(this.inputType, getTargetFromParent(parentThing), value);
-    } else {
-      // TTarget = TParent
-      return (parentThing: TParent) =>
-        inputArgsApply(this.inputType, parentThing, value);
-    }
+    return (parentThing: TParent) =>
+      inputArgsApply(this.inputType, parentThing, value, getTargetFromParent);
   }
 }
 
-export function inputArgsApply<TArg extends object>(
+export function inputArgsApply<
+  TArg extends object,
+  TTarget extends object = TArg,
+>(
   inputType: GraphQLInputType,
-  target: TArg | (() => TArg),
+  parent: TArg,
   inputValue: unknown,
+  getTargetFromParent:
+    | ((parent: TArg) => TTarget | (() => TTarget))
+    | undefined,
 ): void {
-  if (currentModifiers.length !== 0 || applyingModifiers) {
+  if (inputArgsApplyMutex) {
+    throw new Error(
+      "There's already an inputArgsApply running; we can't run another!",
+    );
+  }
+  if (currentModifiers.length !== 0) {
     throw new Error("Previous modifiers weren't cleaned up!");
   }
-  applyingModifiers = true;
   try {
-    _inputArgsApply<TArg>(inputType, target, inputValue);
+    inputArgsApplyMutex = true;
+    const target = getTargetFromParent
+      ? getTargetFromParent(parent)
+      : (parent as unknown as TTarget);
+
+    _inputArgsApply<TTarget>(inputType, target, inputValue);
+
+    applyingModifiers = true;
     const l = currentModifiers.length;
     for (let i = l - 1; i >= 0; i--) {
       currentModifiers[i].apply();
     }
   } finally {
-    currentModifiers = [];
     applyingModifiers = false;
+    currentModifiers = [];
+    inputArgsApplyMutex = false;
   }
 }
 
@@ -77,10 +96,13 @@ export function applyInput<
   $value: AnyInputStep,
   getTargetFromParent?: (parent: TParent) => TTarget,
 ) {
-  return new ApplyInputStep<TParent, TTarget>(
-    inputType,
-    $value,
-    getTargetFromParent,
+  return operationPlan().withRootLayerPlan(
+    () =>
+      new ApplyInputStep<TParent, TTarget>(
+        inputType,
+        $value,
+        getTargetFromParent,
+      ),
   );
 }
 
