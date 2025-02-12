@@ -39,6 +39,7 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
+  PgConditionLike,
   PgGroupSpec,
   PgOrderSpec,
   PgQueryBuilder,
@@ -50,10 +51,10 @@ import type {
 import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
-  PgCondition,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -1010,6 +1011,7 @@ export class PgSelectStep<
       hasSideEffects: this.hasSideEffects,
       name: this.name,
       alias: this.alias,
+      symbol: this.symbol,
       resource: this.resource,
       groups: this.groups,
       orders: this.orders,
@@ -1973,6 +1975,45 @@ function buildTheQuery<
       return alias;
     },
     // TODO: where, whereBuilder, having, havingBuilder
+    where(condition) {
+      if (sql.isSQL(condition)) {
+        info.conditions.push(condition);
+      } else {
+        switch (condition.type) {
+          case "attribute": {
+            info.conditions.push(
+              condition.callback(
+                sql`${info.alias}.${sql.identifier(condition.attribute)}`,
+              ),
+            );
+            break;
+          }
+          default: {
+            const never: never = condition.type;
+            console.error("Unsupported condition: ", never);
+            throw new Error(`Unsupported condition`);
+          }
+        }
+      }
+    },
+    having(condition) {
+      if (info.mode !== "aggregate") {
+        throw new SafeError(`Cannot add having to a non-aggregate query`);
+      }
+      if (sql.isSQL(condition)) {
+        info.havingConditions.push(condition);
+      } else {
+        const never: never = condition;
+        console.error("Unsupported condition: ", never);
+        throw new Error(`Unsupported condition`);
+      }
+    },
+    whereBuilder() {
+      return new PgCondition(this);
+    },
+    havingBuilder() {
+      return new PgCondition(this, true);
+    },
   };
 
   const { count, stream, values } = info.executionDetails;
@@ -2726,14 +2767,15 @@ export interface PgSelectQueryBuilder<
     relationIdentifier: TRelationName,
   ): SQL;
   where(
-    rawCondition: PgWhereConditionSpec<
+    condition: PgWhereConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
     >,
   ): void;
   whereBuilder(): PgCondition<this>;
   having(
-    rawCondition: PgHavingConditionSpec<
+    condition: PgHavingConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
     >,
   ): void;
+  havingBuilder(): PgCondition<this>;
 }

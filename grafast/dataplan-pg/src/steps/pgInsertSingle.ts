@@ -2,8 +2,8 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   PromiseOrDirect,
-  SetterCapableStep,
-  SetterStep,
+  Setter,
+  SetterCapable,
 } from "grafast";
 import { ExecutableStep, exportAs, isDev, setter } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
@@ -49,7 +49,7 @@ export class PgInsertSingleStep<
     unknown[] // tuple depending on what's selected
   >
   implements
-    SetterCapableStep<{
+    SetterCapable<{
       [key in keyof GetPgResourceAttributes<TResource> &
         string]: ExecutableStep;
     }>,
@@ -172,21 +172,6 @@ export class PgInsertSingleStep<
     const { codec: pgCodec } = attribute;
     const depId = this.addDependency(value);
     this.attributes.push({ name, depId, pgCodec });
-  }
-
-  setPlan(): SetterStep<
-    {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
-    },
-    this
-  > {
-    if (this.locked) {
-      throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`,
-      );
-    }
-    return setter(this);
   }
 
   /**
