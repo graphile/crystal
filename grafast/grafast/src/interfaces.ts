@@ -264,9 +264,16 @@ export type FieldArgs = {
   /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
   /** This also works (without path) to apply each list entry against $target */
-  apply(
-    $target: ApplyableExecutableStep,
+  apply<TArg extends object>(
+    $target: ApplyableExecutableStep<TArg>,
     path?: string | ReadonlyArray<string | number>,
+    getTargetFromParent?: (parent: TArg) => object,
+  ): void;
+  apply<TArg extends object>(
+    $target: ApplyableExecutableStep<TArg>,
+    getTargetFromParent: (parent: TArg) => object,
+    // TYPES: Really not sure why TypeScript requires this here?
+    justTargetFromParent?: never,
   ): void;
 } & AnyInputStepDollars;
 

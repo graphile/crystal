@@ -76,7 +76,15 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
         throw new Error(`Invalid path`);
       }
     },
-    apply($target, inPath) {
+    apply($target, inPathOrGetTargetFromParent, maybeGetTargetFromParent) {
+      const inPath =
+        typeof inPathOrGetTargetFromParent === "function"
+          ? undefined
+          : inPathOrGetTargetFromParent;
+      const getTargetFromParent =
+        typeof inPathOrGetTargetFromParent === "function"
+          ? inPathOrGetTargetFromParent
+          : maybeGetTargetFromParent;
       assertNotRuntime(operationPlan, `fieldArgs.apply()`);
       const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
       const pathString = path.join(".");
@@ -105,7 +113,9 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
         }
         const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
         const $valueAtPath = fieldArgs.getRaw(inPath);
-        $target.apply(applyInput(typeAtPath, $valueAtPath));
+        $target.apply(
+          applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
+        );
       }
     },
   };
@@ -152,8 +162,16 @@ function processAfter(
         getRaw(path) {
           return rootFieldArgs.getRaw(concatPath(argName, path));
         },
-        apply($target, path) {
-          return rootFieldArgs.apply($target, concatPath(argName, path));
+        apply($target, pathOrTargetGetter, maybeTargetGetter) {
+          if (typeof pathOrTargetGetter === "function") {
+            return rootFieldArgs.apply($target, [argName], pathOrTargetGetter);
+          } else {
+            return rootFieldArgs.apply(
+              $target,
+              concatPath(argName, pathOrTargetGetter),
+              maybeTargetGetter,
+            );
+          }
         },
       };
       autoApply($parent, $result, input, {
