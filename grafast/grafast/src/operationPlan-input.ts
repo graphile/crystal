@@ -11,7 +11,6 @@ import { __InputObjectStep, __TrackedValueStep, applyInput } from "./index.js";
 import type { FieldArgs, TrackedArguments } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
-import { isApplyableStep } from "./steps/applyInput.js";
 import { assertNotPromise } from "./utils.js";
 
 const { getNullableType, isInputObjectType, isListType } = graphql;
@@ -148,7 +147,6 @@ function processAfter(
   applyAfterMode: ApplyAfterModeArg,
 ) {
   const schema = $parent.operationPlan.schema;
-  if (!isApplyableStep($result)) return;
   for (const [argName, arg] of Object.entries(args)) {
     const autoApply =
       applyAfterMode === "autoApplyAfterParentPlan"
