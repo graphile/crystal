@@ -1,4 +1,4 @@
-import type { ExecutableStep, ModifierStep } from "grafast";
+import type { ExecutableStep, Modifier } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";
@@ -411,9 +411,8 @@ export type PlanByUniques<
     >[number]
   : undefined;
 
-export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
+export type PgConditionLike = Modifier<any> & {
   alias: SQL;
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
