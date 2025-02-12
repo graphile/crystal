@@ -2,10 +2,10 @@ import { Modifier } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
-import type { PgConditionLikeStep } from "../interfaces.js";
+import type { PgConditionLike } from "../interfaces.js";
 
 export class PgBooleanFilter
-  extends Modifier<PgConditionLikeStep>
+  extends Modifier<PgConditionLike>
   implements SQLable
 {
   static $$export = {
@@ -18,7 +18,7 @@ export class PgBooleanFilter
   public alias: SQL;
 
   constructor(
-    classFilter: PgConditionLikeStep,
+    classFilter: PgConditionLike,
     public readonly expression: SQL,
   ) {
     super(classFilter);
@@ -30,13 +30,17 @@ export class PgBooleanFilter
   }
 
   having(condition: SQL) {
+    if (!this.parent.having) {
+      throw new Error("Cannot add having conditions here");
+    }
     this.havingConditions.push(condition);
   }
 
   apply() {
     this.conditions.forEach((condition) => this.parent.where(condition));
-    this.havingConditions.forEach((condition) => this.parent.having(condition));
+    this.havingConditions.forEach((condition) => this.parent.having!(condition));
   }
+
   [$$toSQL]() {
     return this.alias;
   }
