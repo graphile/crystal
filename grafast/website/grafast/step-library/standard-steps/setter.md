@@ -1,12 +1,12 @@
 # setter
 
-A ModifierStep for setting given values onto a parent step.
+A Modifier for setting given values onto a parent.
 
 Usage:
 
 ```ts
-const $update = pgUpdateSingle(...);
-return setter($update);
+const object = {};
+return setter(object);
 ```
 
 TODO: actually document this!
