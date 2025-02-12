@@ -4,7 +4,11 @@ import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import { sqlValueWithCodec } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../index.js";
+import type {
+  PgCodecAttribute,
+  PgResource,
+  PgResourceUnique,
+} from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
