@@ -1,9 +1,9 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
-import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
+import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
+import { sqlValueWithCodec } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
@@ -22,11 +22,9 @@ type QueryValueDetailsBySymbol = Map<
 >;
 
 interface PgUpdatePlanFinalizeResults {
-  /** The SQL query text */
-  text: string;
-
-  /** The values to feed into the query */
-  rawSqlValues: ReadonlyArray<SQLRawValue>;
+  table: SQL;
+  returning: SQL;
+  sqlWhere: SQL;
 
   /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
@@ -299,15 +297,56 @@ export class PgUpdateSingleStep<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { text, rawSqlValues, queryValueDetailsBySymbol } =
+    const { table, returning, sqlWhere, queryValueDetailsBySymbol } =
       this.finalizeResults;
     const contextDep = values[this.contextId];
 
+    /*
+     * NOTE: Though we'd like to do bulk updates, there's no way of us
+     * reliably linking the data back up again given users might have
+     * triggers manipulating the data so we can't match it back up even using
+     * the same getBy specs.
+     *
+     * Currently it seems that the order returned from `update ...
+     * from (select ... order by ...) returning ...` is the same order as the
+     * `order by` was, however this is not guaranteed in the documentation
+     * and as such cannot be relied upon. Further the pgsql-hackers list
+     * explicitly declined guaranteeing this behavior:
+     *
+     * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
+     *
+     * So we have to make do with single updates, alas.
+     */
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
     return indexMap(async (i) => {
       const context = contextDep.at(i);
+
+      const sqlSets: SQL[] = [];
+      for (const { depId, name, pgCodec } of this.attributes) {
+        const attVal = values[depId].at(i);
+        // `null` is kept, `undefined` is skipped
+        if (attVal !== undefined) {
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+        }
+      }
+
+      if (sqlSets.length === 0) {
+        // No attributes to update?! This isn't allowed.
+        throw new SafeError(
+          "Attempted to update a record, but no new values were specified.",
+        );
+      }
+
+      const query = sql`update ${table} set ${sql.join(
+        sqlSets,
+        ", ",
+      )} where ${sqlWhere}${returning};`;
+      const { text, values: rawSqlValues } = sql.compile(query);
+
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -354,83 +393,37 @@ export class PgUpdateSingleStep<
             )}`
           : sql.blank;
 
-      /*
-       * NOTE: Though we'd like to do bulk updates, there's no way of us
-       * reliably linking the data back up again given users might have
-       * triggers manipulating the data so we can't match it back up even using
-       * the same getBy specs.
-       *
-       * Currently it seems that the order returned from `update ...
-       * from (select ... order by ...) returning ...` is the same order as the
-       * `order by` was, however this is not guaranteed in the documentation
-       * and as such cannot be relied upon. Further the pgsql-hackers list
-       * explicitly declined guaranteeing this behavior:
-       *
-       * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
-       *
-       * So we have to make do with single updates, alas.
-       */
       const getByAttributesCount = this.getBys.length;
-      const attributesCount = this.attributes.length;
-      if (attributesCount === 0) {
-        // No attributes to update?! This isn't allowed.
-        throw new SafeError(
-          "Attempted to update a record, but no new values were specified.",
-        );
-      } else if (getByAttributesCount === 0) {
+      if (getByAttributesCount === 0) {
         // No attributes specified to find the row?! This is forbidden.
         throw new SafeError(
           "Attempted to update a record, but no information on uniquely determining the record was specified.",
         );
-      } else {
-        // This is our common path
-        const sqlWhereClauses: SQL[] = [];
-        const sqlSets: SQL[] = [];
-        const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
-
-        for (let i = 0; i < getByAttributesCount; i++) {
-          const { name, depId, pgCodec } = this.getBys[i];
-          const symbol = Symbol(name as string);
-          sqlWhereClauses[i] = sql.parens(
-            sql`${sql.identifier(this.symbol, name as string)} = ${sql.value(
-              // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-              // a value before executing the query.
-              symbol as any,
-            )}::${pgCodec.sqlType}`,
-          );
-          queryValueDetailsBySymbol.set(symbol, {
-            depId,
-            processor: pgCodec.toPg,
-          });
-        }
-
-        for (let i = 0; i < attributesCount; i++) {
-          const { name, depId, pgCodec } = this.attributes[i];
-          const symbol = Symbol(name as string);
-          sqlSets[i] = sql`${sql.identifier(name as string)} = ${sql.value(
+      }
+      const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
+      const sqlWhereClauses: SQL[] = [];
+      for (let i = 0; i < getByAttributesCount; i++) {
+        const { name, depId, pgCodec } = this.getBys[i];
+        const symbol = Symbol(name as string);
+        sqlWhereClauses[i] = sql.parens(
+          sql`${sql.identifier(this.symbol, name as string)} = ${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
             // a value before executing the query.
             symbol as any,
-          )}::${pgCodec.sqlType}`;
-          queryValueDetailsBySymbol.set(symbol, {
-            depId,
-            processor: pgCodec.toPg,
-          });
-        }
-
-        const set = sql` set ${sql.join(sqlSets, ", ")}`;
-        const where = sql` where ${sql.parens(
-          sql.join(sqlWhereClauses, " and "),
-        )}`;
-        const query = sql`update ${table}${set}${where}${returning};`;
-        const { text, values: rawSqlValues } = sql.compile(query);
-
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          queryValueDetailsBySymbol,
-        };
+          )}::${pgCodec.sqlType}`,
+        );
+        queryValueDetailsBySymbol.set(symbol, {
+          depId,
+          processor: pgCodec.toPg,
+        });
       }
+
+      this.finalizeResults = {
+        table,
+        returning,
+        sqlWhere: sql.parens(sql.join(sqlWhereClauses, " and ")),
+        queryValueDetailsBySymbol,
+      };
     }
 
     super.finalize();
