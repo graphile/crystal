@@ -33,7 +33,7 @@ export class BakedInputStep<
       value as Record<string, any>,
       this.extra,
     );
-    inputArgsApply(this.extra.type, bakedObj, value);
+    inputArgsApply(this.extra.type, bakedObj, value, undefined);
     return bakedObj;
   }
 }
