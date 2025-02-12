@@ -217,7 +217,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                     function plan(_$root, args) {
                       return node(
                         nodeIdHandlerByTypeName!,
-                        args.get(nodeIdFieldName),
+                        args.getRaw(nodeIdFieldName),
                       );
                     },
                   [node, nodeIdFieldName, nodeIdHandlerByTypeName],
