@@ -216,6 +216,8 @@ type what the step actually is, you can use `__assertStep: ExecutableStep` or
 
 ## Argument and input field plan resolvers
 
+**THIS CONTENT IS WRONG!** TODO: update this to reflect the beta2 changes.
+
 :::tip
 
 This section is very advanced and rarely used, so feel free to skip to the next
