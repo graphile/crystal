@@ -111,6 +111,7 @@ import {
 import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";
+import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -352,6 +353,7 @@ export {
   getEnumValueConfig,
   getEnumValueConfigs,
   getGrafastMiddleware,
+  getNullableInputTypeAtPath,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -501,6 +503,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getNullableInputTypeAtPath,
   getGrafastMiddleware,
   grafast,
   grafastSync,

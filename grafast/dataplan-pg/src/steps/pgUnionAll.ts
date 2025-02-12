@@ -49,6 +49,7 @@ import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
+  PgCondition,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
@@ -1979,4 +1980,6 @@ export interface PgUnionAllQueryBuilder<
   orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
+  where(rawWhereSpec: PgWhereConditionSpec<TAttributes>): void;
+  whereBuilder(): PgCondition<this>;
 }

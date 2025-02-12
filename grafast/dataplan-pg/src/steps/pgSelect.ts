@@ -50,10 +50,10 @@ import type {
 import { PgLocker } from "../pgLocker.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
+  PgCondition,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -878,33 +878,12 @@ export class PgSelectStep<
     }
   }
 
-  wherePlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
-      );
-    }
-    return new PgConditionStep(this);
-  }
-
   groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(this.scopedSQL(group));
-  }
-
-  havingPlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
-      );
-    }
-    if (this.mode !== "aggregate") {
-      throw new SafeError(`Cannot add having to a non-aggregate query`);
-    }
-    return new PgConditionStep(this, true);
   }
 
   having(
@@ -1993,6 +1972,7 @@ function buildTheQuery<
       info.relationJoins.set(relationIdentifier, alias);
       return alias;
     },
+    // TODO: where, whereBuilder, having, havingBuilder
   };
 
   const { count, stream, values } = info.executionDetails;
@@ -2745,4 +2725,15 @@ export interface PgSelectQueryBuilder<
   >(
     relationIdentifier: TRelationName,
   ): SQL;
+  where(
+    rawCondition: PgWhereConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string
+    >,
+  ): void;
+  whereBuilder(): PgCondition<this>;
+  having(
+    rawCondition: PgHavingConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string
+    >,
+  ): void;
 }

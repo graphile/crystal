@@ -182,7 +182,7 @@ function processAfter(
   }
 }
 
-function getNullableInputTypeAtPath(
+export function getNullableInputTypeAtPath(
   startType: GraphQLInputType,
   path: ReadonlyArray<string | number>,
 ): GraphQLInputType & GraphQLNullableType {
