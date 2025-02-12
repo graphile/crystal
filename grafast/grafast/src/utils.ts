@@ -32,7 +32,6 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
-  InputStep,
   OutputPlanForType,
 } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
@@ -495,17 +494,21 @@ export function newGrafastFieldConfigBuilder<
   return (config) => config;
 }
 
-export type GrafastInputFieldConfigMap = {
-  [key: string]: GrafastInputFieldConfig<GraphQLInputType>;
+export type GrafastInputFieldConfigMap<TParent> = {
+  [key: string]: GrafastInputFieldConfig<TParent, GraphQLInputType>;
 };
 
-export type InputObjectTypeSpec<TFields extends GrafastInputFieldConfigMap> =
-  Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-    fields: TFields | (() => TFields);
-  };
+export type InputObjectTypeSpec<TParent> = Omit<
+  GraphQLInputObjectTypeConfig,
+  "fields"
+> & {
+  fields:
+    | GrafastInputFieldConfigMap<TParent>
+    | (() => GrafastInputFieldConfigMap<TParent>);
+};
 
-function inputObjectSpec<TFields extends GrafastInputFieldConfigMap>(
-  spec: InputObjectTypeSpec<TFields>,
+function inputObjectSpec<TParent>(
+  spec: InputObjectTypeSpec<TParent>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -522,27 +525,24 @@ function inputObjectSpec<TFields extends GrafastInputFieldConfigMap>(
   return modifiedSpec;
 }
 
-export type GrafastInputObjectType<TFields extends GrafastInputFieldConfigMap> =
-  graphql.GraphQLInputObjectType & {
-    TFields: TFields;
-  };
+export type GrafastInputObjectType<TParent> = graphql.GraphQLInputObjectType & {
+  TParent: TParent;
+};
 
-export function newInputObjectTypeBuilder(): <
-  TFields extends GrafastInputFieldConfigMap,
->(
-  spec: InputObjectTypeSpec<TFields>,
-) => GrafastInputObjectType<TFields> {
+export function newInputObjectTypeBuilder<TParent = any>(): (
+  spec: InputObjectTypeSpec<TParent>,
+) => GrafastInputObjectType<TParent> {
   return (spec) =>
     new GraphQLInputObjectType(
       inputObjectSpec(spec),
-    ) as GrafastInputObjectType<any>;
+    ) as GrafastInputObjectType<TParent>;
 }
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
-export function inputObjectFieldSpec(
-  grafastSpec: GrafastInputFieldConfig<GraphQLInputType>,
+export function inputObjectFieldSpec<TParent>(
+  grafastSpec: GrafastInputFieldConfig<TParent, GraphQLInputType>,
   path: string,
 ): GraphQLInputFieldConfig {
   const { apply, ...spec } = grafastSpec;
