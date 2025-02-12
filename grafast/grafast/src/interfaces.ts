@@ -337,8 +337,8 @@ export type FieldPlanResolver<
   TResultStep extends ExecutableStep | null,
 > = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
-export type InputObjectFieldApplyResolver = (
-  target: any,
+export type InputObjectFieldApplyResolver<TParent> = (
+  target: TParent,
   input: Record<string, any>,
   info: {
     schema: GraphQLSchema;
@@ -532,12 +532,12 @@ export type GrafastArgumentConfig<
 /**
  * Basically GraphQLInputFieldConfig but allowing for the field to have a plan.
  */
-export type GrafastInputFieldConfig<TInputType extends GraphQLInputType> = Omit<
-  GraphQLInputFieldConfig,
-  "type"
-> & {
+export type GrafastInputFieldConfig<
+  TParent,
+  TInputType extends GraphQLInputType,
+> = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
-  apply?: InputObjectFieldApplyResolver;
+  apply?: InputObjectFieldApplyResolver<TParent>;
 };
 
 /**
