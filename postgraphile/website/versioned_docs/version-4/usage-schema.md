@@ -1,5 +1,5 @@
 ---
-title: Schema-only Usage
+title: Schema-only usage
 ---
 
 # Usage - Schema Only

@@ -124,7 +124,7 @@
         "extending-raw",
         {
           "type": "category",
-          "label": "Plugin Gallery",
+          "label": "Plugin gallery",
           "link": {
             "type": "doc",
             "id": "plugin-gallery/index"

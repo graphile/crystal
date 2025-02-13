@@ -1,5 +1,5 @@
 ---
-title: CRUD Mutations
+title: CRUD mutations
 ---
 
 CRUD, or "Create, Read, Update, Delete", is a common paradigm in data
