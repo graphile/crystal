@@ -1,5 +1,5 @@
 ---
-title: Custom Mutations
+title: Custom mutations
 ---
 
 PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
