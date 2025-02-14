@@ -1,5 +1,5 @@
 ---
-title: Database Schemas
+title: Database schemas
 ---
 
 In PostgreSQL, each database consists of a number of "schemas" (also known as

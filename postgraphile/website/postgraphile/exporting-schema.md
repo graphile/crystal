@@ -1,4 +1,4 @@
-# Exporting Your Schema
+# Exporting your schema
 
 One of the major new features of PostGraphile V5 is the ability to export your
 schema as executable code. You might use this as a way to “eject” your schema so

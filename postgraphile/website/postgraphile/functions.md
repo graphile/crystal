@@ -1,5 +1,5 @@
 ---
-title: Database Functions
+title: Database functions
 ---
 
 One of the easiest ways to add more capabilities to your PostGraphile schema is

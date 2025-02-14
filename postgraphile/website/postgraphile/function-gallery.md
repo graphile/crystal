@@ -1,5 +1,5 @@
 ---
-title: Function Gallery
+title: Function gallery
 ---
 
 # Database Function Gallery

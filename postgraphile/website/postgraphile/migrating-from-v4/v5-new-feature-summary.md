@@ -1,5 +1,5 @@
 ---
-title: "V5 New Feature Summary"
+title: "V5 new feature summary"
 ---
 
 # Version 5 New Feature Summary

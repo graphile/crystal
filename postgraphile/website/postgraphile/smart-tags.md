@@ -1,5 +1,5 @@
 ---
-title: Smart Tags
+title: Smart tags
 ---
 
 You can customize your PostGraphile GraphQL schema by tagging tables, columns,

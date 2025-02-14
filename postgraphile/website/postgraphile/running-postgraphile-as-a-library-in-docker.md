@@ -1,5 +1,5 @@
 ---
-title: Running PostGraphile as a Library in Docker
+title: Running PostGraphile as a library in Docker
 ---
 
 :::caution

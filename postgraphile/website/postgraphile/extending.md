@@ -1,5 +1,5 @@
 ---
-title: GraphQL Schema Plugins
+title: GraphQL schema plugins
 ---
 
 PostGraphile’s schema generator is built from a number of

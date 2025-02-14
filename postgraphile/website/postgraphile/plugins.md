@@ -1,5 +1,5 @@
 ---
-title: Server Plugins
+title: Server plugins
 ---
 
 :::note

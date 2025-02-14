@@ -1,5 +1,5 @@
 ---
-title: JWK Verification (e.g. Auth0)
+title: JWK verification (e.g. Auth0)
 ---
 
 # PostGraphile JWT/JWK Verification Quickstart
