@@ -25,7 +25,7 @@ automatically converts between these for you.
   generated twice and cause issues.
 
 There are other potential conflicts too, if you discover more conflicts then
-please consider using the "Edit this page" link above to suggest some changes!
+please consider using the "Edit this page" link below to suggest some changes!
 
 ### Non-unique table names
 

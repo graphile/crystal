@@ -151,11 +151,11 @@ Previously we used `GraphQLObjectType:fields` to add a field, as that
 manipulates the list of fields. This time we are manipulating an individual
 field, so we will use the `GraphQLObjectType:fields:field` hook. This makes our
 intent clear, and also grants us access to
-[the `addArgDataGenerator`](https://build.graphile.org/graphile-build/look-ahead#when-processing-arguments-addargdatagenerator)
+[the `addArgDataGenerator`](https://build.graphile.org/graphile-build/4/look-ahead#when-processing-arguments-addargdatagenerator)
 function which we need to request the record id. The following example also uses
 an instance of [`queryBuilder.`](./make-extend-schema-plugin/#querybuilder)
 (Read more about the different hooks
-[in the Graphile Engine docs](https://build.graphile.org/graphile-build/all-hooks).)
+[in the Graphile Engine docs](https://build.graphile.org/graphile-build/4/all-hooks).)
 
 ```js
 function performAnotherTask(linkId) {
