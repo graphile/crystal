@@ -12,13 +12,14 @@ import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
 import { sqlValueWithCodec } from "../codecs.js";
-import type { PgCodecWithAttributes, PgResource } from "../index.js";
+import type { PgResource } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
   ObjectForResource,
   PgCodec,
+  PgCodecWithAttributes,
   PgQueryBuilder,
   PgTypedExecutableStep,
   ReadonlyArrayOrDirect,
@@ -282,10 +283,10 @@ export class PgInsertSingleStep<
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
+    const { resource, contextId, finalizeResults, alias } = this;
+    if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { resource, contextId, finalizeResults, alias } = this;
     const { table, returning } = finalizeResults;
     const contextDep = values[contextId];
 
@@ -377,7 +378,7 @@ export class PgInsertSingleStep<
         text,
         values: stmtValues,
       });
-      return { __proto__: null, m: meta, t: rows[0] };
+      return { __proto__: null, m: meta, t: rows[0] ?? [] };
     });
   }
 

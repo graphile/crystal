@@ -1,21 +1,28 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   PromiseOrDirect,
 } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import sql from "pg-sql2";
+import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../index.js";
+import type {
+  PgCodecWithAttributes,
+  PgResource,
+  PgResourceUnique,
+} from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
   PgCodec,
+  PgQueryBuilder,
   PlanByUniques,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -100,6 +107,8 @@ export class PgDeleteSingleStep<
    * The list of things we're selecting.
    */
   private selects: Array<SQL> = [];
+
+  private applyDepIds: number[] = [];
 
   constructor(
     resource: TResource,
@@ -237,6 +246,14 @@ export class PgDeleteSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgDeleteSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -253,18 +270,39 @@ export class PgDeleteSingleStep<
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
+    const { alias, contextId, finalizeResults } = this;
+    if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { text, rawSqlValues, queryValueDetailsBySymbol } =
-      this.finalizeResults;
+    const { text, rawSqlValues, queryValueDetailsBySymbol } = finalizeResults;
 
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    const contextDep = values[this.contextId];
+    const contextDep = values[contextId];
     return indexMap<PromiseOrDirect<any>>(async (i) => {
       const context = contextDep.at(i);
+
+      const meta = Object.create(null);
+      const queryBuilder: PgDeleteSingleQueryBuilder = {
+        alias,
+        [$$toSQL]() {
+          return alias;
+        },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
+      };
+
+      for (const applyDepId of this.applyDepIds) {
+        const val = values[applyDepId].unaryValue();
+        if (Array.isArray(val)) {
+          val.forEach((v) => v?.(queryBuilder));
+        } else {
+          val?.(queryBuilder);
+        }
+      }
+
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -284,16 +322,14 @@ export class PgDeleteSingleStep<
         text,
         values: sqlValues,
       });
-      return (
-        rows[0] ??
-        (rowCount === 0
-          ? Promise.reject(
-              new Error(
-                `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
-              ),
-            )
-          : Object.create(null))
-      );
+      if (rowCount === 0) {
+        return Promise.reject(
+          new Error(
+            `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
+          ),
+        );
+      }
+      return { __proto__: null, m: meta, t: rows[0] ?? [] };
     });
   }
 
@@ -394,3 +430,19 @@ export function pgDeleteSingle<
   return new PgDeleteSingleStep(resource, getBy);
 }
 exportAs("@dataplan/pg", pgDeleteSingle, "pgDeleteSingle");
+
+export interface PgDeleteSingleQueryBuilder<
+  TResource extends PgResource<
+    any,
+    PgCodecWithAttributes,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
+> extends PgQueryBuilder {
+  setMeta(key: string, value: any): void;
+}
+
+type PgDeleteSingleQueryBuilderCallback = (
+  qb: PgDeleteSingleQueryBuilder,
+) => void;
