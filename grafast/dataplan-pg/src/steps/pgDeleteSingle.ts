@@ -4,7 +4,7 @@ import type {
   Maybe,
   PromiseOrDirect,
 } from "grafast";
-import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
+import { access, ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -211,6 +211,10 @@ export class PgDeleteSingleStep<
       ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
+  }
+
+  public getMeta(key: string) {
+    return access(this, ["meta", key]);
   }
 
   public record(): PgClassExpressionStep<
