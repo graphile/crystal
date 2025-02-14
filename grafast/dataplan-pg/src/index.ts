@@ -18,8 +18,8 @@ import {
   PgRecordTypeCodecSpec,
   rangeOfCodec,
   recordCodec,
-  TYPES,
   sqlValueWithCodec,
+  TYPES,
 } from "./codecs.js";
 import {
   PgBox,
@@ -134,7 +134,11 @@ import {
   pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
-import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
+import {
+  pgDeleteSingle,
+  PgDeleteSingleQueryBuilder,
+  PgDeleteSingleStep,
+} from "./steps/pgDeleteSingle.js";
 import {
   pgInsertSingle,
   PgInsertSingleQueryBuilder,
@@ -184,7 +188,11 @@ import {
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
 } from "./steps/pgUnionAll.js";
-import { pgUpdateSingle, PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+import {
+  pgUpdateSingle,
+  PgUpdateSingleQueryBuilder,
+  PgUpdateSingleStep,
+} from "./steps/pgUpdateSingle.js";
 import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
@@ -267,6 +275,7 @@ export {
   PgCursorStep,
   PgDecode,
   pgDeleteSingle,
+  PgDeleteSingleQueryBuilder,
   PgDeleteSingleStep,
   PgEncode,
   PgEnumCodec,
@@ -283,8 +292,8 @@ export {
   PgHavingConditionSpec,
   PgHStore,
   pgInsertSingle,
-  PgInsertSingleStep,
   PgInsertSingleQueryBuilder,
+  PgInsertSingleStep,
   PgInterval,
   PgLine,
   PgLockableParameter,
@@ -345,6 +354,7 @@ export {
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
   pgUpdateSingle,
+  PgUpdateSingleQueryBuilder,
   PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
@@ -353,8 +363,8 @@ export {
   PlanByUniques,
   rangeOfCodec,
   recordCodec,
-  sqlValueWithCodec,
   sqlFromArgDigests,
+  sqlValueWithCodec,
   toPg,
   ToPgStep,
   TuplePlanMap,
