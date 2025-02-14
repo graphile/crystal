@@ -1,5 +1,5 @@
 ---
-title: Why is it Nullable?
+title: Why is it nullable?
 ---
 
 It's common for people, particularly those using strongly typed GraphQL

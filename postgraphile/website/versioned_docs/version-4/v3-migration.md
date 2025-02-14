@@ -1,5 +1,5 @@
 ---
-title: v3 → v4 Migration Guide
+title: V3 → V4 migration guide
 ---
 
 # Migrating from PostGraphQL v3

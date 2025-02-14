@@ -1,5 +1,5 @@
 ---
-title: Required Knowledge
+title: Required knowledge
 ---
 
 **WORK IN PROGRESS**: PR's welcome!

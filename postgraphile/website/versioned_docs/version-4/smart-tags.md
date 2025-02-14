@@ -1,5 +1,5 @@
 ---
-title: Smart Tags
+title: Smart tags
 toc_max_heading_level: 4
 ---
 

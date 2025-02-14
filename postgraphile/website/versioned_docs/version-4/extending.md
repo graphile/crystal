@@ -1,5 +1,5 @@
 ---
-title: Schema Plugins
+title: Schema plugins
 ---
 
 # GraphQL Schema Plugins

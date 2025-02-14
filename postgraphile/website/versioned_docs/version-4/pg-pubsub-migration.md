@@ -1,5 +1,5 @@
 ---
-title: "@graphile/pg-pubsub Migration Guide"
+title: "@graphile/pg-pubsub migration guide"
 ---
 
 # Migrating from the Supporter Plugin to @graphile/pg-pubsub

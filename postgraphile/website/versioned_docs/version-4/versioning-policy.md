@@ -1,5 +1,5 @@
 ---
-title: Versioning Policy?
+title: Versioning policy?
 ---
 
 # Versioning Policy
