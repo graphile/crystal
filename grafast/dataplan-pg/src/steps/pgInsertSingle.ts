@@ -1,22 +1,27 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   PromiseOrDirect,
+  Setter,
   SetterCapable,
 } from "grafast";
-import { ExecutableStep, exportAs, isDev } from "grafast";
+import { access, ExecutableStep, exportAs, isDev, setter } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
 import { sqlValueWithCodec } from "../codecs.js";
-import type { PgResource } from "../index.js";
+import type { PgCodecWithAttributes, PgResource } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
+  ObjectForResource,
   PgCodec,
+  PgQueryBuilder,
   PgTypedExecutableStep,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -100,6 +105,8 @@ export class PgInsertSingleStep<
    * The list of things we're selecting.
    */
   private selects: Array<SQL> = [];
+
+  private applyDepIds: number[] = [];
 
   constructor(
     resource: TResource,
@@ -214,6 +221,10 @@ export class PgInsertSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return access(this, ["meta", key]);
+  }
+
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
     TResource
@@ -247,6 +258,14 @@ export class PgInsertSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgInsertSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -266,8 +285,9 @@ export class PgInsertSingleStep<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { table, returning } = this.finalizeResults;
-    const contextDep = values[this.contextId];
+    const { resource, contextId, finalizeResults, alias } = this;
+    const { table, returning } = finalizeResults;
+    const contextDep = values[contextId];
 
     /*
      * NOTE: Though we'd like to do bulk inserts, there's no way of us
@@ -305,6 +325,39 @@ export class PgInsertSingleStep<
         }
       }
 
+      const meta = Object.create(null);
+      const queryBuilder: PgInsertSingleQueryBuilder = {
+        alias,
+        [$$toSQL]() {
+          return alias;
+        },
+        set(name, attVal) {
+          const pgCodec = resource.codec.attributes[name]?.codec;
+          if (!pgCodec) {
+            throw new Error(`Attribute ${name} not recognized on ${resource}`);
+          }
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlAttributes.push(sqlIdent);
+          sqlValues.push(sqlVal);
+        },
+        setBuilder() {
+          return setter(this);
+        },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
+      };
+
+      for (const applyDepId of this.applyDepIds) {
+        const val = values[applyDepId].unaryValue();
+        if (Array.isArray(val)) {
+          val.forEach((v) => v?.(queryBuilder));
+        } else {
+          val?.(queryBuilder);
+        }
+      }
+
       let compileResult: ReturnType<typeof sql.compile>;
       if (sqlAttributes.length > 0) {
         // This is our common path
@@ -324,7 +377,7 @@ export class PgInsertSingleStep<
         text,
         values: stmtValues,
       });
-      return rows[0] ?? Object.create(null);
+      return { __proto__: null, m: meta, t: rows[0] };
     });
   }
 
@@ -379,3 +432,25 @@ export function pgInsertSingle<
   return new PgInsertSingleStep(resource, attributes);
 }
 exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");
+
+export interface PgInsertSingleQueryBuilder<
+  TResource extends PgResource<
+    any,
+    PgCodecWithAttributes,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
+> extends PgQueryBuilder,
+    SetterCapable<ObjectForResource<TResource>> {
+  set<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+    value: ObjectForResource<TResource>[TAttributeName],
+  ): void;
+  setBuilder(): Setter<ObjectForResource<TResource>, this>;
+  setMeta(key: string, value: any): void;
+}
+
+type PgInsertSingleQueryBuilderCallback = (
+  qb: PgInsertSingleQueryBuilder,
+) => void;
