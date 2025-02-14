@@ -1,4 +1,4 @@
-import type { UnbatchedExecutionExtra } from "grafast";
+import type { AccessStep, UnbatchedExecutionExtra } from "grafast";
 import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -58,6 +58,7 @@ export class PgClassExpressionStep<
   public readonly expression: SQL;
 
   private needsPolymorphicUnwrap: boolean;
+  private needsTupleAccess: boolean;
 
   constructor(
     $table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
@@ -70,7 +71,9 @@ export class PgClassExpressionStep<
     this.needsPolymorphicUnwrap =
       $table instanceof PgUnionAllSingleStep &&
       $table.getClassStep().mode === "normal";
-    this.rowDependencyId = this.addDependency($table);
+    this.needsTupleAccess = $table instanceof PgInsertSingleStep;
+    const $row = this.needsTupleAccess ? access($table, "t") : $table;
+    this.rowDependencyId = this.addDependency($row);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
         `Invalid call to PgClassExpressionStep; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgClassExpression.`,
@@ -219,7 +222,10 @@ export class PgClassExpressionStep<
   }
 
   public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
-    const step = this.getDep(this.rowDependencyId);
+    const $row = this.getDep(this.rowDependencyId);
+    const step = this.needsTupleAccess
+      ? ($row as AccessStep<any>).getParentStep()
+      : $row;
     if (
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertSingleStep) &&

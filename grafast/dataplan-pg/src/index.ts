@@ -19,6 +19,7 @@ import {
   rangeOfCodec,
   recordCodec,
   TYPES,
+  sqlValueWithCodec,
 } from "./codecs.js";
 import {
   PgBox,
@@ -134,7 +135,11 @@ import {
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
 import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+import {
+  pgInsertSingle,
+  PgInsertSingleQueryBuilder,
+  PgInsertSingleStep,
+} from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
   pgPolymorphic,
@@ -279,6 +284,7 @@ export {
   PgHStore,
   pgInsertSingle,
   PgInsertSingleStep,
+  PgInsertSingleQueryBuilder,
   PgInterval,
   PgLine,
   PgLockableParameter,
@@ -347,6 +353,7 @@ export {
   PlanByUniques,
   rangeOfCodec,
   recordCodec,
+  sqlValueWithCodec,
   sqlFromArgDigests,
   toPg,
   ToPgStep,
@@ -371,6 +378,7 @@ exportAsMany("@dataplan/pg", {
   listOfCodec,
   rangeOfCodec,
   recordCodec,
+  sqlValueWithCodec,
   makeRegistryBuilder,
   makeRegistry,
   makePgResourceOptions,
