@@ -17,41 +17,45 @@ graph TD
     __Value2 --> Access9
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
+    Constant22{{"Constant[22∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object11 & Constant20 --> PgDeleteSingle8
+    Object11 & Constant22 --> PgDeleteSingle8
     PgClassExpression12{{"PgClassExpression[12∈2] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgDeleteSingle8 --> PgClassExpression12
-    PgDeleteSingle15[["PgDeleteSingle[15∈3] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object18{{"Object[18∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object18 & Constant21 --> PgDeleteSingle15
-    Access16{{"Access[16∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access16 & Access17 --> Object18
-    __Value2 --> Access16
+    Access13{{"Access[13∈2] ➊<br />ᐸ8.tᐳ"}}:::plan
+    Access13 --> PgClassExpression12
+    PgDeleteSingle8 --> Access13
+    PgDeleteSingle16[["PgDeleteSingle[16∈3] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
+    Object19{{"Object[19∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object19 & Constant23 --> PgDeleteSingle16
+    Access17{{"Access[17∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access17 & Access18 --> Object19
     __Value2 --> Access17
-    PgClassExpression19{{"PgClassExpression[19∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgDeleteSingle15 --> PgClassExpression19
+    __Value2 --> Access18
+    PgClassExpression20{{"PgClassExpression[20∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    Access21{{"Access[21∈4] ➊<br />ᐸ16.tᐳ"}}:::plan
+    Access21 --> PgClassExpression20
+    PgDeleteSingle16 --> Access21
 
     %% define steps
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant20,Constant21 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 20"):::bucket
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant22,Constant23 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 22"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle8 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 8<br /><br />ROOT PgDeleteSingle{1}ᐸrelational_posts(id)ᐳ[8]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression12 bucket2
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 21, 2<br /><br />1: Access[16]<br />2: Access[17]<br />3: Object[18]<br />4: PgDeleteSingle[15]"):::bucket
+    class Bucket2,PgClassExpression12,Access13 bucket2
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 23, 2<br /><br />1: Access[17]<br />2: Access[18]<br />3: Object[19]<br />4: PgDeleteSingle[16]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgDeleteSingle15,Access16,Access17,Object18 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgDeleteSingle{3}ᐸrelational_posts(id)ᐳ[15]"):::bucket
+    class Bucket3,PgDeleteSingle16,Access17,Access18,Object19 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgDeleteSingle{3}ᐸrelational_posts(id)ᐳ[16]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression19 bucket4
+    class Bucket4,PgClassExpression20,Access21 bucket4
     Bucket0 --> Bucket1 & Bucket3
     Bucket1 --> Bucket2
     Bucket3 --> Bucket4
