@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-heroku/
 title: Deploying to Heroku
 ---
 

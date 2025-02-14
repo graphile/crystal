@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/extending-raw/
-title: Schema Plugins - Graphile Build
+title: Schema plugins - Graphile Build
 ---
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile

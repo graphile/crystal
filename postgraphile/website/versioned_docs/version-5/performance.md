@@ -1,8 +1,5 @@
 ---
-layout: page
-path: /postgraphile/performance/
 title: Performance
-draft: true
 ---
 
 :::caution

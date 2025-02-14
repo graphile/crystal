@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/jwt-guide/
 title: PostGraphile JWT guide
 ---
 

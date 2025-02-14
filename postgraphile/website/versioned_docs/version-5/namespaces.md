@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/namespaces/
 title: Database schemas
 ---
 

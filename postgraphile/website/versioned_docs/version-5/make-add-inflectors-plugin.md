@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-add-inflectors-plugin/
 title: Adding and replacing inflectors
 ---
 

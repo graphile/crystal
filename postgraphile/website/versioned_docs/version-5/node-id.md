@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/node-id/
-title: Globally Unique Object Identification ("id" / "nodeId")
+title: Globally unique object identification ("id" / "nodeId")
 ---
 
 The [GraphQL Global Object Identification

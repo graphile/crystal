@@ -1,8 +1,5 @@
 ---
-layout: page
-path: /postgraphile/live-queries/
-title: Live Queries
-draft: true
+title: Live queries
 ---
 
 import Pro from "@site/src/components/Pro";

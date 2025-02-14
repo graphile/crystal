@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/smart-comments/
-title: Smart Comments
+title: Smart comments
 ---
 
 _Ensure you've read the [Smart Tags](./smart-tags) page before referring here._

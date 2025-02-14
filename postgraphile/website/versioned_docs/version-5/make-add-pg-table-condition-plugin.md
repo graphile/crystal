@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-add-pg-table-condition-plugin/
 title: makeAddPgTableConditionPlugin
 ---
 

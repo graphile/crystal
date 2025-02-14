@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/usage-schema/
 title: Direct schema usage
 ---
 

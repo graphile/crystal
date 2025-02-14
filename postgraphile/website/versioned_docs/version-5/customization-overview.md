@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/customization-overview/
 title: Customization overview
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-gcp/
 title: Deploying to GCP
 ---
 

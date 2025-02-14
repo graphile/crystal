@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/custom-queries/
-title: Custom Queries
+title: Custom queries
 ---
 
 You can add root-level `Query` fields to your GraphQL schema using "Custom

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-process-schema-plugin/
 title: makeProcessSchemaPlugin
 ---
 

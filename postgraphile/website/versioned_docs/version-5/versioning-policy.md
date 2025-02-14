@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/versioning-policy/
-title: Versioning Policy
+title: Versioning policy
 ---
 
 TL;DR: breaking changes to the GraphQL schema require a major version update.
