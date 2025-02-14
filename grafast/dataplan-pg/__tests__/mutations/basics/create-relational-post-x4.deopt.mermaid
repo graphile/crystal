@@ -19,183 +19,199 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
     Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant118{{"Constant[118∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
-    Constant119{{"Constant[119∈0] ➊<br />ᐸ'A post, innit?'ᐳ"}}:::plan
-    Constant120{{"Constant[120∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
-    Constant121{{"Constant[121∈0] ➊<br />ᐸ'My Relational Post 2'ᐳ"}}:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸ'A post, innit? 2'ᐳ"}}:::plan
-    Constant123{{"Constant[123∈0] ➊<br />ᐸ'Such a great post. 2'ᐳ"}}:::plan
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ'My Relational Post 3'ᐳ"}}:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ'A post, innit? 3'ᐳ"}}:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ'Such a great post. 3'ᐳ"}}:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ'My Relational Post 4'ᐳ"}}:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ'A post, innit? 4'ᐳ"}}:::plan
-    Constant129{{"Constant[129∈0] ➊<br />ᐸ'Such a great post. 4'ᐳ"}}:::plan
-    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    Constant130{{"Constant[130∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
+    Constant131{{"Constant[131∈0] ➊<br />ᐸ'A post, innit?'ᐳ"}}:::plan
+    Constant132{{"Constant[132∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
+    Constant133{{"Constant[133∈0] ➊<br />ᐸ'My Relational Post 2'ᐳ"}}:::plan
+    Constant134{{"Constant[134∈0] ➊<br />ᐸ'A post, innit? 2'ᐳ"}}:::plan
+    Constant135{{"Constant[135∈0] ➊<br />ᐸ'Such a great post. 2'ᐳ"}}:::plan
+    Constant136{{"Constant[136∈0] ➊<br />ᐸ'My Relational Post 3'ᐳ"}}:::plan
+    Constant137{{"Constant[137∈0] ➊<br />ᐸ'A post, innit? 3'ᐳ"}}:::plan
+    Constant138{{"Constant[138∈0] ➊<br />ᐸ'Such a great post. 3'ᐳ"}}:::plan
+    Constant139{{"Constant[139∈0] ➊<br />ᐸ'My Relational Post 4'ᐳ"}}:::plan
+    Constant140{{"Constant[140∈0] ➊<br />ᐸ'A post, innit? 4'ᐳ"}}:::plan
+    Constant141{{"Constant[141∈0] ➊<br />ᐸ'Such a great post. 4'ᐳ"}}:::plan
+    PgInsertSingle18[["PgInsertSingle[18∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression16 & Constant118 & Constant119 & Constant120 --> PgInsertSingle17
+    Object15 & PgClassExpression16 & Constant130 & Constant131 & Constant132 --> PgInsertSingle18
     PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object15 & Constant10 & Constant11 --> PgInsertSingle12
-    PgInsertSingle12 --> PgClassExpression16
-    PgClassExpression21{{"PgClassExpression[21∈1] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression21
-    PgSelect23[["PgSelect[23∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression22{{"PgClassExpression[22∈2] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression22 --> PgSelect23
-    PgInsertSingle17 --> PgClassExpression22
-    First27{{"First[27∈2] ➊"}}:::plan
-    PgSelectRows28[["PgSelectRows[28∈2] ➊"]]:::plan
-    PgSelectRows28 --> First27
-    PgSelect23 --> PgSelectRows28
-    PgSelectSingle29{{"PgSelectSingle[29∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First27 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression33
-    PgInsertSingle45[["PgInsertSingle[45∈4] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
-    Object43{{"Object[43∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgClassExpression44{{"PgClassExpression[44∈4] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object43 & PgClassExpression44 & Constant121 & Constant122 & Constant123 --> PgInsertSingle45
-    PgInsertSingle40[["PgInsertSingle[40∈4] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object43 & Constant10 & Constant11 --> PgInsertSingle40
-    Access41{{"Access[41∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access42{{"Access[42∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access41 & Access42 --> Object43
-    __Value2 --> Access41
-    __Value2 --> Access42
-    PgInsertSingle40 --> PgClassExpression44
-    PgClassExpression49{{"PgClassExpression[49∈4] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    PgInsertSingle45 --> PgClassExpression49
-    PgSelect51[["PgSelect[51∈5] ➊<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression50{{"PgClassExpression[50∈5] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Object43 & PgClassExpression50 --> PgSelect51
-    PgInsertSingle45 --> PgClassExpression50
-    First55{{"First[55∈5] ➊"}}:::plan
-    PgSelectRows56[["PgSelectRows[56∈5] ➊"]]:::plan
-    PgSelectRows56 --> First55
-    PgSelect51 --> PgSelectRows56
-    PgSelectSingle57{{"PgSelectSingle[57∈5] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First55 --> PgSelectSingle57
-    PgClassExpression58{{"PgClassExpression[58∈6] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression58
-    PgClassExpression59{{"PgClassExpression[59∈6] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression59
-    PgClassExpression60{{"PgClassExpression[60∈6] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression60
-    PgClassExpression61{{"PgClassExpression[61∈6] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression61
-    PgInsertSingle73[["PgInsertSingle[73∈7] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
-    Object71{{"Object[71∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgClassExpression72{{"PgClassExpression[72∈7] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object71 & PgClassExpression72 & Constant124 & Constant125 & Constant126 --> PgInsertSingle73
-    PgInsertSingle68[["PgInsertSingle[68∈7] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object71 & Constant10 & Constant11 --> PgInsertSingle68
-    Access69{{"Access[69∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access70{{"Access[70∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access69 & Access70 --> Object71
-    __Value2 --> Access69
-    __Value2 --> Access70
-    PgInsertSingle68 --> PgClassExpression72
-    PgClassExpression77{{"PgClassExpression[77∈7] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    PgInsertSingle73 --> PgClassExpression77
-    PgSelect79[["PgSelect[79∈8] ➊<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression78{{"PgClassExpression[78∈8] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Object71 & PgClassExpression78 --> PgSelect79
-    PgInsertSingle73 --> PgClassExpression78
-    First83{{"First[83∈8] ➊"}}:::plan
-    PgSelectRows84[["PgSelectRows[84∈8] ➊"]]:::plan
-    PgSelectRows84 --> First83
-    PgSelect79 --> PgSelectRows84
-    PgSelectSingle85{{"PgSelectSingle[85∈8] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First83 --> PgSelectSingle85
-    PgClassExpression86{{"PgClassExpression[86∈9] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle85 --> PgClassExpression86
-    PgClassExpression87{{"PgClassExpression[87∈9] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle85 --> PgClassExpression87
-    PgClassExpression88{{"PgClassExpression[88∈9] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle85 --> PgClassExpression88
-    PgClassExpression89{{"PgClassExpression[89∈9] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle85 --> PgClassExpression89
-    PgInsertSingle101[["PgInsertSingle[101∈10] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
-    Object99{{"Object[99∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgClassExpression100{{"PgClassExpression[100∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object99 & PgClassExpression100 & Constant127 & Constant128 & Constant129 --> PgInsertSingle101
-    PgInsertSingle96[["PgInsertSingle[96∈10] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object99 & Constant10 & Constant11 --> PgInsertSingle96
-    Access97{{"Access[97∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access98{{"Access[98∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access97 & Access98 --> Object99
-    __Value2 --> Access97
-    __Value2 --> Access98
-    PgInsertSingle96 --> PgClassExpression100
-    PgClassExpression105{{"PgClassExpression[105∈10] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    PgInsertSingle101 --> PgClassExpression105
-    PgSelect107[["PgSelect[107∈11] ➊<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression106{{"PgClassExpression[106∈11] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
-    Object99 & PgClassExpression106 --> PgSelect107
-    PgInsertSingle101 --> PgClassExpression106
-    First111{{"First[111∈11] ➊"}}:::plan
-    PgSelectRows112[["PgSelectRows[112∈11] ➊"]]:::plan
-    PgSelectRows112 --> First111
-    PgSelect107 --> PgSelectRows112
-    PgSelectSingle113{{"PgSelectSingle[113∈11] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First111 --> PgSelectSingle113
-    PgClassExpression114{{"PgClassExpression[114∈12] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle113 --> PgClassExpression114
-    PgClassExpression115{{"PgClassExpression[115∈12] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle113 --> PgClassExpression115
-    PgClassExpression116{{"PgClassExpression[116∈12] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle113 --> PgClassExpression116
-    PgClassExpression117{{"PgClassExpression[117∈12] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle113 --> PgClassExpression117
+    Access17{{"Access[17∈1] ➊<br />ᐸ12.tᐳ"}}:::plan
+    Access17 --> PgClassExpression16
+    PgInsertSingle12 --> Access17
+    PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access23{{"Access[23∈1] ➊<br />ᐸ18.tᐳ"}}:::plan
+    Access23 --> PgClassExpression22
+    PgInsertSingle18 --> Access23
+    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression24{{"PgClassExpression[24∈2] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
+    Object15 & PgClassExpression24 --> PgSelect26
+    Access23 --> PgClassExpression24
+    First30{{"First[30∈2] ➊"}}:::plan
+    PgSelectRows31[["PgSelectRows[31∈2] ➊"]]:::plan
+    PgSelectRows31 --> First30
+    PgSelect26 --> PgSelectRows31
+    PgSelectSingle32{{"PgSelectSingle[32∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First30 --> PgSelectSingle32
+    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression36
+    PgInsertSingle49[["PgInsertSingle[49∈4] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    Object46{{"Object[46∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgClassExpression47{{"PgClassExpression[47∈4] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    Object46 & PgClassExpression47 & Constant133 & Constant134 & Constant135 --> PgInsertSingle49
+    PgInsertSingle43[["PgInsertSingle[43∈4] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
+    Object46 & Constant10 & Constant11 --> PgInsertSingle43
+    Access44{{"Access[44∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access45{{"Access[45∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access44 & Access45 --> Object46
+    __Value2 --> Access44
+    __Value2 --> Access45
+    Access48{{"Access[48∈4] ➊<br />ᐸ43.tᐳ"}}:::plan
+    Access48 --> PgClassExpression47
+    PgInsertSingle43 --> Access48
+    PgClassExpression53{{"PgClassExpression[53∈4] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access54{{"Access[54∈4] ➊<br />ᐸ49.tᐳ"}}:::plan
+    Access54 --> PgClassExpression53
+    PgInsertSingle49 --> Access54
+    PgSelect57[["PgSelect[57∈5] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression55{{"PgClassExpression[55∈5] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
+    Object46 & PgClassExpression55 --> PgSelect57
+    Access54 --> PgClassExpression55
+    First61{{"First[61∈5] ➊"}}:::plan
+    PgSelectRows62[["PgSelectRows[62∈5] ➊"]]:::plan
+    PgSelectRows62 --> First61
+    PgSelect57 --> PgSelectRows62
+    PgSelectSingle63{{"PgSelectSingle[63∈5] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First61 --> PgSelectSingle63
+    PgClassExpression64{{"PgClassExpression[64∈6] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression64
+    PgClassExpression65{{"PgClassExpression[65∈6] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression65
+    PgClassExpression66{{"PgClassExpression[66∈6] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression66
+    PgClassExpression67{{"PgClassExpression[67∈6] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression67
+    PgInsertSingle80[["PgInsertSingle[80∈7] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    Object77{{"Object[77∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgClassExpression78{{"PgClassExpression[78∈7] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    Object77 & PgClassExpression78 & Constant136 & Constant137 & Constant138 --> PgInsertSingle80
+    PgInsertSingle74[["PgInsertSingle[74∈7] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
+    Object77 & Constant10 & Constant11 --> PgInsertSingle74
+    Access75{{"Access[75∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access76{{"Access[76∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access75 & Access76 --> Object77
+    __Value2 --> Access75
+    __Value2 --> Access76
+    Access79{{"Access[79∈7] ➊<br />ᐸ74.tᐳ"}}:::plan
+    Access79 --> PgClassExpression78
+    PgInsertSingle74 --> Access79
+    PgClassExpression84{{"PgClassExpression[84∈7] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access85{{"Access[85∈7] ➊<br />ᐸ80.tᐳ"}}:::plan
+    Access85 --> PgClassExpression84
+    PgInsertSingle80 --> Access85
+    PgSelect88[["PgSelect[88∈8] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression86{{"PgClassExpression[86∈8] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
+    Object77 & PgClassExpression86 --> PgSelect88
+    Access85 --> PgClassExpression86
+    First92{{"First[92∈8] ➊"}}:::plan
+    PgSelectRows93[["PgSelectRows[93∈8] ➊"]]:::plan
+    PgSelectRows93 --> First92
+    PgSelect88 --> PgSelectRows93
+    PgSelectSingle94{{"PgSelectSingle[94∈8] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First92 --> PgSelectSingle94
+    PgClassExpression95{{"PgClassExpression[95∈9] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle94 --> PgClassExpression95
+    PgClassExpression96{{"PgClassExpression[96∈9] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle94 --> PgClassExpression96
+    PgClassExpression97{{"PgClassExpression[97∈9] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle94 --> PgClassExpression97
+    PgClassExpression98{{"PgClassExpression[98∈9] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle94 --> PgClassExpression98
+    PgInsertSingle111[["PgInsertSingle[111∈10] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    Object108{{"Object[108∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgClassExpression109{{"PgClassExpression[109∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    Object108 & PgClassExpression109 & Constant139 & Constant140 & Constant141 --> PgInsertSingle111
+    PgInsertSingle105[["PgInsertSingle[105∈10] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
+    Object108 & Constant10 & Constant11 --> PgInsertSingle105
+    Access106{{"Access[106∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access107{{"Access[107∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access106 & Access107 --> Object108
+    __Value2 --> Access106
+    __Value2 --> Access107
+    Access110{{"Access[110∈10] ➊<br />ᐸ105.tᐳ"}}:::plan
+    Access110 --> PgClassExpression109
+    PgInsertSingle105 --> Access110
+    PgClassExpression115{{"PgClassExpression[115∈10] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access116{{"Access[116∈10] ➊<br />ᐸ111.tᐳ"}}:::plan
+    Access116 --> PgClassExpression115
+    PgInsertSingle111 --> Access116
+    PgSelect119[["PgSelect[119∈11] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression117{{"PgClassExpression[117∈11] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
+    Object108 & PgClassExpression117 --> PgSelect119
+    Access116 --> PgClassExpression117
+    First123{{"First[123∈11] ➊"}}:::plan
+    PgSelectRows124[["PgSelectRows[124∈11] ➊"]]:::plan
+    PgSelectRows124 --> First123
+    PgSelect119 --> PgSelectRows124
+    PgSelectSingle125{{"PgSelectSingle[125∈11] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First123 --> PgSelectSingle125
+    PgClassExpression126{{"PgClassExpression[126∈12] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle125 --> PgClassExpression126
+    PgClassExpression127{{"PgClassExpression[127∈12] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle125 --> PgClassExpression127
+    PgClassExpression128{{"PgClassExpression[128∈12] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle125 --> PgClassExpression128
+    PgClassExpression129{{"PgClassExpression[129∈12] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle125 --> PgClassExpression129
 
     %% define steps
 
     subgraph "Buckets for mutations/basics/create-relational-post-x4"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant118,Constant119,Constant120,Constant121,Constant122,Constant123,Constant124,Constant125,Constant126,Constant127,Constant128,Constant129 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 118, 119, 120<br /><br />1: PgInsertSingle[12]<br />2: PgClassExpression[16]<br />3: PgInsertSingle[17]<br />4: <br />ᐳ: PgClassExpression[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant130,Constant131,Constant132,Constant133,Constant134,Constant135,Constant136,Constant137,Constant138,Constant139,Constant140,Constant141 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 130, 131, 132<br /><br />1: PgInsertSingle[12]<br />2: Access[17]<br />3: PgClassExpression[16]<br />4: PgInsertSingle[18]<br />5: <br />ᐳ: Access[23], PgClassExpression[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle12,PgClassExpression16,PgInsertSingle17,PgClassExpression21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 15, 21<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[21]<br />1: <br />ᐳ: PgClassExpression[22]<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
+    class Bucket1,PgInsertSingle12,PgClassExpression16,Access17,PgInsertSingle18,PgClassExpression22,Access23 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 15, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: <br />ᐳ: PgClassExpression[24]<br />2: PgSelect[26]<br />3: PgSelectRows[31]<br />ᐳ: First[30], PgSelectSingle[32]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[29]"):::bucket
+    class Bucket2,PgClassExpression24,PgSelect26,First30,PgSelectRows31,PgSelectSingle32 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[32]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 10, 11, 2, 121, 122, 123<br /><br />1: Access[41]<br />2: Access[42]<br />3: Object[43]<br />4: PgInsertSingle[40]<br />5: PgClassExpression[44]<br />6: PgInsertSingle[45]<br />7: <br />ᐳ: PgClassExpression[49]"):::bucket
+    class Bucket3,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket3
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 10, 11, 2, 133, 134, 135<br /><br />1: Access[44]<br />2: Access[45]<br />3: Object[46]<br />4: PgInsertSingle[43]<br />5: Access[48]<br />6: PgClassExpression[47]<br />7: PgInsertSingle[49]<br />8: <br />ᐳ: Access[54], PgClassExpression[53]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgInsertSingle40,Access41,Access42,Object43,PgClassExpression44,PgInsertSingle45,PgClassExpression49 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 45, 43, 49<br /><br />ROOT PgClassExpression{4}ᐸ__relational_posts__ᐳ[49]<br />1: <br />ᐳ: PgClassExpression[50]<br />2: PgSelect[51]<br />3: PgSelectRows[56]<br />ᐳ: First[55], PgSelectSingle[57]"):::bucket
+    class Bucket4,PgInsertSingle43,Access44,Access45,Object46,PgClassExpression47,Access48,PgInsertSingle49,PgClassExpression53,Access54 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 54, 46, 53<br /><br />ROOT PgClassExpression{4}ᐸ__relational_posts__ᐳ[53]<br />1: <br />ᐳ: PgClassExpression[55]<br />2: PgSelect[57]<br />3: PgSelectRows[62]<br />ᐳ: First[61], PgSelectSingle[63]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression50,PgSelect51,First55,PgSelectRows56,PgSelectSingle57 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 57<br /><br />ROOT PgSelectSingle{5}ᐸrelational_postsᐳ[57]"):::bucket
+    class Bucket5,PgClassExpression55,PgSelect57,First61,PgSelectRows62,PgSelectSingle63 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 63<br /><br />ROOT PgSelectSingle{5}ᐸrelational_postsᐳ[63]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression58,PgClassExpression59,PgClassExpression60,PgClassExpression61 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 10, 11, 2, 124, 125, 126<br /><br />1: Access[69]<br />2: Access[70]<br />3: Object[71]<br />4: PgInsertSingle[68]<br />5: PgClassExpression[72]<br />6: PgInsertSingle[73]<br />7: <br />ᐳ: PgClassExpression[77]"):::bucket
+    class Bucket6,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgClassExpression67 bucket6
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 10, 11, 2, 136, 137, 138<br /><br />1: Access[75]<br />2: Access[76]<br />3: Object[77]<br />4: PgInsertSingle[74]<br />5: Access[79]<br />6: PgClassExpression[78]<br />7: PgInsertSingle[80]<br />8: <br />ᐳ: Access[85], PgClassExpression[84]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgInsertSingle68,Access69,Access70,Object71,PgClassExpression72,PgInsertSingle73,PgClassExpression77 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 73, 71, 77<br /><br />ROOT PgClassExpression{7}ᐸ__relational_posts__ᐳ[77]<br />1: <br />ᐳ: PgClassExpression[78]<br />2: PgSelect[79]<br />3: PgSelectRows[84]<br />ᐳ: First[83], PgSelectSingle[85]"):::bucket
+    class Bucket7,PgInsertSingle74,Access75,Access76,Object77,PgClassExpression78,Access79,PgInsertSingle80,PgClassExpression84,Access85 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 85, 77, 84<br /><br />ROOT PgClassExpression{7}ᐸ__relational_posts__ᐳ[84]<br />1: <br />ᐳ: PgClassExpression[86]<br />2: PgSelect[88]<br />3: PgSelectRows[93]<br />ᐳ: First[92], PgSelectSingle[94]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression78,PgSelect79,First83,PgSelectRows84,PgSelectSingle85 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 85<br /><br />ROOT PgSelectSingle{8}ᐸrelational_postsᐳ[85]"):::bucket
+    class Bucket8,PgClassExpression86,PgSelect88,First92,PgSelectRows93,PgSelectSingle94 bucket8
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 94<br /><br />ROOT PgSelectSingle{8}ᐸrelational_postsᐳ[94]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgClassExpression86,PgClassExpression87,PgClassExpression88,PgClassExpression89 bucket9
-    Bucket10("Bucket 10 (mutationField)<br />Deps: 10, 11, 2, 127, 128, 129<br /><br />1: Access[97]<br />2: Access[98]<br />3: Object[99]<br />4: PgInsertSingle[96]<br />5: PgClassExpression[100]<br />6: PgInsertSingle[101]<br />7: <br />ᐳ: PgClassExpression[105]"):::bucket
+    class Bucket9,PgClassExpression95,PgClassExpression96,PgClassExpression97,PgClassExpression98 bucket9
+    Bucket10("Bucket 10 (mutationField)<br />Deps: 10, 11, 2, 139, 140, 141<br /><br />1: Access[106]<br />2: Access[107]<br />3: Object[108]<br />4: PgInsertSingle[105]<br />5: Access[110]<br />6: PgClassExpression[109]<br />7: PgInsertSingle[111]<br />8: <br />ᐳ: Access[116], PgClassExpression[115]"):::bucket
     classDef bucket10 stroke:#ffff00
-    class Bucket10,PgInsertSingle96,Access97,Access98,Object99,PgClassExpression100,PgInsertSingle101,PgClassExpression105 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 101, 99, 105<br /><br />ROOT PgClassExpression{10}ᐸ__relational_posts__ᐳ[105]<br />1: <br />ᐳ: PgClassExpression[106]<br />2: PgSelect[107]<br />3: PgSelectRows[112]<br />ᐳ: First[111], PgSelectSingle[113]"):::bucket
+    class Bucket10,PgInsertSingle105,Access106,Access107,Object108,PgClassExpression109,Access110,PgInsertSingle111,PgClassExpression115,Access116 bucket10
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 116, 108, 115<br /><br />ROOT PgClassExpression{10}ᐸ__relational_posts__ᐳ[115]<br />1: <br />ᐳ: PgClassExpression[117]<br />2: PgSelect[119]<br />3: PgSelectRows[124]<br />ᐳ: First[123], PgSelectSingle[125]"):::bucket
     classDef bucket11 stroke:#00ffff
-    class Bucket11,PgClassExpression106,PgSelect107,First111,PgSelectRows112,PgSelectSingle113 bucket11
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 113<br /><br />ROOT PgSelectSingle{11}ᐸrelational_postsᐳ[113]"):::bucket
+    class Bucket11,PgClassExpression117,PgSelect119,First123,PgSelectRows124,PgSelectSingle125 bucket11
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 125<br /><br />ROOT PgSelectSingle{11}ᐸrelational_postsᐳ[125]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,PgClassExpression114,PgClassExpression115,PgClassExpression116,PgClassExpression117 bucket12
+    class Bucket12,PgClassExpression126,PgClassExpression127,PgClassExpression128,PgClassExpression129 bucket12
     Bucket0 --> Bucket1 & Bucket4 & Bucket7 & Bucket10
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
