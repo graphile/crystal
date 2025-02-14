@@ -1,21 +1,28 @@
-import type { ExecutionDetails, GrafastResultsList } from "grafast";
-import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  Maybe,
+  Setter,
+  SetterCapable,
+} from "grafast";
+import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
+import type { PgCodecAttribute } from "../codecs.js";
 import { sqlValueWithCodec } from "../codecs.js";
-import type {
-  PgCodecAttribute,
-  PgResource,
-  PgResourceUnique,
-} from "../index.js";
+import type { PgResource, PgResourceUnique } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
+  ObjectForResource,
   PgCodec,
+  PgCodecWithAttributes,
+  PgQueryBuilder,
   PlanByUniques,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -108,6 +115,8 @@ export class PgUpdateSingleStep<
    * The list of things we're selecting.
    */
   private selects: Array<SQL> = [];
+
+  private applyDepIds: number[] = [];
 
   constructor(
     resource: TResource,
@@ -282,6 +291,14 @@ export class PgUpdateSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgUpdateSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -298,12 +315,13 @@ export class PgUpdateSingleStep<
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
+    const { alias, contextId, finalizeResults, resource } = this;
+    if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
     const { table, returning, sqlWhere, queryValueDetailsBySymbol } =
-      this.finalizeResults;
-    const contextDep = values[this.contextId];
+      finalizeResults;
+    const contextDep = values[contextId];
 
     /*
      * NOTE: Though we'd like to do bulk updates, there's no way of us
@@ -335,6 +353,38 @@ export class PgUpdateSingleStep<
           const sqlIdent = sql.identifier(name as string);
           const sqlVal = sqlValueWithCodec(attVal, pgCodec);
           sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+        }
+      }
+
+      const meta = Object.create(null);
+      const queryBuilder: PgUpdateSingleQueryBuilder = {
+        alias,
+        [$$toSQL]() {
+          return alias;
+        },
+        set(name, attVal) {
+          const pgCodec = resource.codec.attributes[name]?.codec;
+          if (!pgCodec) {
+            throw new Error(`Attribute ${name} not recognized on ${resource}`);
+          }
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+        },
+        setBuilder() {
+          return setter(this);
+        },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
+      };
+
+      for (const applyDepId of this.applyDepIds) {
+        const val = values[applyDepId].unaryValue();
+        if (Array.isArray(val)) {
+          val.forEach((v) => v?.(queryBuilder));
+        } else {
+          val?.(queryBuilder);
         }
       }
 
@@ -370,7 +420,15 @@ export class PgUpdateSingleStep<
         text,
         values: sqlValues,
       });
-      return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
+      if (rowCount === 0) {
+        // TODO: should we throw?
+        return null;
+      }
+      return {
+        __proto__: null,
+        m: meta,
+        t: rows[0] ?? [],
+      };
     });
   }
 
@@ -455,3 +513,25 @@ export function pgUpdateSingle<
   return new PgUpdateSingleStep(resource, getBy, attributes);
 }
 exportAs("@dataplan/pg", pgUpdateSingle, "pgUpdateSingle");
+
+export interface PgUpdateSingleQueryBuilder<
+  TResource extends PgResource<
+    any,
+    PgCodecWithAttributes,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
+> extends PgQueryBuilder,
+    SetterCapable<ObjectForResource<TResource>> {
+  set<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+    value: ObjectForResource<TResource>[TAttributeName],
+  ): void;
+  setBuilder(): Setter<ObjectForResource<TResource>, this>;
+  setMeta(key: string, value: any): void;
+}
+
+type PgUpdateSingleQueryBuilderCallback = (
+  qb: PgUpdateSingleQueryBuilder,
+) => void;
