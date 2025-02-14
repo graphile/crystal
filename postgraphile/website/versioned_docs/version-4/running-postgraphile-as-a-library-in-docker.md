@@ -1,5 +1,5 @@
 ---
-title: Running PostGraphile as a Library in Docker
+title: Running PostGraphile as a library in Docker
 ---
 
 The following guide describes how to run a network of Docker containers on a

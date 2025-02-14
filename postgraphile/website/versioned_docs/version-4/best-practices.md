@@ -1,5 +1,5 @@
 ---
-title: Best Practices
+title: Best practices
 ---
 
 # PostGraphile Best Practices

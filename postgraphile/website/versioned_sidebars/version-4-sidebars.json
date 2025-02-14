@@ -8,7 +8,7 @@
     "index",
     {
       "type": "category",
-      "label": "Example Gallery",
+      "label": "Example gallery",
       "link": {
         "type": "doc",
         "id": "examples/index"
@@ -97,7 +97,7 @@
     },
     {
       "type": "category",
-      "label": "Smart Tags",
+      "label": "Smart tags",
       "link": {
         "type": "doc",
         "id": "smart-tags"
@@ -106,7 +106,7 @@
     },
     {
       "type": "category",
-      "label": "Schema Plugins",
+      "label": "Schema plugins",
       "link": {
         "type": "doc",
         "id": "extending"

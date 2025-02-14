@@ -1,5 +1,5 @@
 ---
-title: Quick start guide
+title: Quick-start guide
 ---
 
 This quick start guide will walk you through spinning up your first PostGraphile

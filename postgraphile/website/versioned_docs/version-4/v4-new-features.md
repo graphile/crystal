@@ -1,5 +1,5 @@
 ---
-title: v4 Feature Guide
+title: V4 feature guide
 ---
 
 Though the entry point to v4 is almost identical to v3 (with a few additional
