@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/tables/
-title: PostgreSQL Tables
+title: PostgreSQL tables
 ---
 
 PostGraphile automatically adds a number of elements to the generated GraphQL

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/plugins/
 title: Server plugins
 ---
 

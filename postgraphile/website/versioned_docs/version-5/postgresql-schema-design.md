@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/postgresql-schema-design/
 title: PostgreSQL schema design
 ---
 

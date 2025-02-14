@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-docker/
 title: Deploying with Docker
 ---
 

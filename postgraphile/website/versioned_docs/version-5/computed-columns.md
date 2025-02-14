@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/computed-columns/
-title: Computed Columns
+title: Computed columns
 ---
 
 "Computed columns" add what appears to be an extra column (field) to the GraphQL

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-add-pg-table-order-by-plugin/
 title: makeAddPgTableOrderByPlugin
 ---
 

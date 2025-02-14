@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/postgresql-indexes/
 title: PostgreSQL indexes
 ---
 

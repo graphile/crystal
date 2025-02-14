@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/subscriptions/
-title: GraphQL Subscriptions
+title: GraphQL subscriptions
 ---
 
 Subscriptions notify you when an event occurs on the server side. PostGraphile

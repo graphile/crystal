@@ -1,8 +1,5 @@
 ---
-layout: page
-path: /postgraphile/evaluating/
 title: Evaluating PostGraphile
-fullTitle: Evaluating PostGraphile For Your Project
 ---
 
 # Does PostGraphile Fit Your Project?

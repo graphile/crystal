@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/realtime/
-title: PostGraphile Realtime
+title: PostGraphile realtime
 ---
 
 Every application is different, and no more so than when it comes to their

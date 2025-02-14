@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/background-tasks/
-title: Background Tasks in PostGraphile
+title: Background tasks
 ---
+
+# Background Tasks in PostGraphile
 
 In your GraphQL server typically most processing will be done in the
 "foreground", as part of the request-response cycle. However, since clients

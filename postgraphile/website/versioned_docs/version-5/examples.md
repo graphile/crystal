@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/examples/
 title: Example queries and mutations
 showExamples: queries
 ---

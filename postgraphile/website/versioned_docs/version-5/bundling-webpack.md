@@ -1,7 +1,5 @@
 ---
-layout: page
-path: /postgraphile/bundling-webpack/
-title: Bundling PostGraphile with Webpack
+title: Bundling PostGraphile with webpack
 ---
 
 In V5, we recommend that you export your schema with `graphile-export`

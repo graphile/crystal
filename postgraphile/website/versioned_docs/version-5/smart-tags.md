@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/smart-tags/
 title: Smart tags
 ---
 

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/quick-start-guide/
 title: Quick start guide
 ---
 
