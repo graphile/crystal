@@ -3,9 +3,11 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
+  PgDeleteSingleQueryBuilder,
   PgDeleteSingleStep,
   PgResource,
   PgResourceUnique,
+  PgUpdateSingleQueryBuilder,
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import { pgDeleteSingle, pgUpdateSingle } from "@dataplan/pg";
@@ -358,16 +360,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                       ),
                       type: GraphQLString,
                       plan: EXPORTABLE(
-                        (constant) =>
-                          function plan($mutation: ObjectStep<any>) {
-                            return (
-                              $mutation.getStepForKey(
-                                "clientMutationId",
-                                true,
-                              ) ?? constant(null)
-                            );
+                        () =>
+                          function plan(
+                            $mutation: ObjectStep<{
+                              result: PgUpdateSingleStep | PgDeleteSingleStep;
+                            }>,
+                          ) {
+                            const $result = $mutation.getStepForKey("result");
+                            return $result.getMeta("clientMutationId");
                           },
-                        [constant],
+                        [],
                       ),
                     },
                     ...(TableType &&
@@ -528,13 +530,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               "field",
                             ),
                             type: GraphQLString,
-                            applyPlan: EXPORTABLE(
+                            apply: EXPORTABLE(
                               () =>
-                                function plan(
-                                  $input: ObjectStep<any>,
-                                  val: FieldArgs,
+                                function apply(
+                                  qb:
+                                    | PgUpdateSingleQueryBuilder
+                                    | PgDeleteSingleQueryBuilder,
+                                  val: string | null,
                                 ) {
-                                  $input.set("clientMutationId", val.get());
+                                  qb.setMeta("clientMutationId", val);
                                 },
                               [],
                             ),
@@ -582,16 +586,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   "field",
                                 ),
                                 type: new GraphQLNonNull(TablePatch!),
-                                applyPlan: EXPORTABLE(
+                                apply: EXPORTABLE(
                                   () =>
                                     function plan(
-                                      $object: ObjectStep<{
-                                        result: PgUpdateSingleStep;
-                                      }>,
+                                      qb: PgUpdateSingleQueryBuilder,
+                                      arg: any,
                                     ) {
-                                      const $record =
-                                        $object.getStepForKey("result");
-                                      return $record.setPlan();
+                                      if (arg != null) {
+                                        return qb.setBuilder();
+                                      }
                                     },
                                   [],
                                 ),
@@ -781,7 +784,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         (uniqueAttributes) => (args: FieldArgs) => {
                           return uniqueAttributes.reduce(
                             (memo, [attributeName, fieldName]) => {
-                              memo[attributeName] = args.get([
+                              memo[attributeName] = args.getRaw([
                                 "input",
                                 fieldName,
                               ]);
@@ -795,7 +798,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     : EXPORTABLE(
                         (handler, nodeIdFieldName, specFromNodeId) =>
                           (args: FieldArgs) => {
-                            const $nodeId = args.get([
+                            const $nodeId = args.getRaw([
                               "input",
                               nodeIdFieldName,
                             ]);
@@ -850,9 +853,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   te.run`\
 return function(object, pgUpdateSingle, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgUpdateSingle(resource, ${specFromArgsString}) });
-  args.apply(plan);
-  return plan;
+  const $update = pgUpdateSingle(resource, ${specFromArgsString});
+  args.apply($update);
+  return object({ result: $update });
 }
 }` as any,
                                   [object, pgUpdateSingle, resource],
@@ -868,14 +871,14 @@ return (_$root, args) => {
                                       _$root: ExecutableStep,
                                       args: FieldArgs,
                                     ) {
-                                      const plan = object({
-                                        result: pgUpdateSingle(
-                                          resource,
-                                          specFromArgs(args),
-                                        ),
+                                      const $update = pgUpdateSingle(
+                                        resource,
+                                        specFromArgs(args),
+                                      );
+                                      args.apply($update);
+                                      return object({
+                                        result: $update,
                                       });
-                                      args.apply(plan);
-                                      return plan;
                                     },
                                   [
                                     object,
@@ -890,9 +893,9 @@ return (_$root, args) => {
                                 te.run`\
 return function (object, pgDeleteSingle, resource) {
 return (_$root, args) => {
-  const plan = object({ result: pgDeleteSingle(resource, ${specFromArgsString}) });
-  args.apply(plan);
-  return plan;
+  const $delete = pgDeleteSingle(resource, ${specFromArgsString});
+  args.apply($delete);
+  return object({ result: $delete });
 }
 }` as any,
                                 [object, pgDeleteSingle, resource],
@@ -908,14 +911,14 @@ return (_$root, args) => {
                                     _$root: ExecutableStep,
                                     args: FieldArgs,
                                   ) {
-                                    const plan = object({
-                                      result: pgDeleteSingle(
-                                        resource,
-                                        specFromArgs(args),
-                                      ),
+                                    const $delete = pgDeleteSingle(
+                                      resource,
+                                      specFromArgs(args),
+                                    );
+                                    args.apply($delete);
+                                    return object({
+                                      result: $delete,
                                     });
-                                    args.apply(plan);
-                                    return plan;
                                   },
                                 [
                                   object,
