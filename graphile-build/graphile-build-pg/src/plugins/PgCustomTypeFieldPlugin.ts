@@ -37,6 +37,7 @@ import type {
 } from "grafast";
 import {
   __ListTransformStep,
+  bakedInput,
   connection,
   constant,
   object,
@@ -569,6 +570,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               (
                 argDetailsLength,
                 argDetailsSimple,
+                bakedInput,
                 constant,
                 indexAfterWhichAllArgsAreNamed,
               ) =>
@@ -584,7 +586,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       required,
                       fetcher,
                     } = argDetailsSimple[i];
-                    const $raw = args.getRaw([...path, graphqlArgName]);
+                    const fullPath = [...path, graphqlArgName];
+                    const $raw = args.getRaw(fullPath);
                     let step: ExecutableStep;
                     if ($raw.evalIs(undefined)) {
                       if (
@@ -599,11 +602,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     } else if (fetcher) {
                       step = (
                         fetcher(
-                          args.get([...path, graphqlArgName]),
+                          $raw as ExecutableStep<string>,
                         ) as PgSelectSingleStep
                       ).record();
                     } else {
-                      step = args.get([...path, graphqlArgName]);
+                      step = bakedInput(args.typeAt(fullPath), $raw);
                     }
 
                     if (skipped) {
@@ -631,6 +634,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               [
                 argDetailsLength,
                 argDetailsSimple,
+                bakedInput,
                 constant,
                 indexAfterWhichAllArgsAreNamed,
               ],

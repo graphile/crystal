@@ -436,7 +436,7 @@ const preset: GraphileConfig.Preset = {
           // Test via SQL: `NOTIFY test, '{"a":40}';`
           sub: EXPORTABLE(
             (context, jsonParse, listen, object) => (_$root, args) => {
-              const $topic = args.get("topic");
+              const $topic = args.getRaw("topic");
               const $pgSubscriber = context().get("pgSubscriber");
               return listen($pgSubscriber, $topic, ($payload) =>
                 object({ sub: jsonParse($payload).get("a" as never) }),
