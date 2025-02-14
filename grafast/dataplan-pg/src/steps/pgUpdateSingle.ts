@@ -5,7 +5,14 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
+import {
+  access,
+  ExecutableStep,
+  exportAs,
+  isDev,
+  SafeError,
+  setter,
+} from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -256,6 +263,10 @@ export class PgUpdateSingleStep<
       ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
     return colPlan as any;
+  }
+
+  public getMeta(key: string) {
+    return access(this, ["meta", key]);
   }
 
   public record(): PgClassExpressionStep<
