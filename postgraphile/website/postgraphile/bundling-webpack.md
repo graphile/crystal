@@ -1,5 +1,5 @@
 ---
-title: Bundling with Webpack
+title: Bundling with webpack
 ---
 
 # Bundling PostGraphile with Webpack

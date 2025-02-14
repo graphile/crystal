@@ -1,5 +1,5 @@
 ---
-title: Multiple GraphQL Schemas
+title: Multiple GraphQL schemas
 ---
 
 # Multiple GraphQL Schemas with PostGraphile

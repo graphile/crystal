@@ -1,5 +1,5 @@
 ---
-title: Community Plugins
+title: Community plugins
 ---
 
 # PostGraphile Community Plugins

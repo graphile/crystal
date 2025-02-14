@@ -1,5 +1,5 @@
 ---
-title: Reserved Keywords
+title: Reserved keywords
 ---
 
 # Reserved Keywords and Table Names

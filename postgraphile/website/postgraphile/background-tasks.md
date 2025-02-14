@@ -1,5 +1,5 @@
 ---
-title: Background Tasks
+title: Background tasks
 ---
 
 # Background Tasks in PostGraphile

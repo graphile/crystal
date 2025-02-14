@@ -1,5 +1,5 @@
 ---
-title: Plugin Gallery
+title: Plugin gallery
 ---
 
 # PostGraphile Plugin Gallery

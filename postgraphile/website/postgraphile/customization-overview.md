@@ -1,5 +1,5 @@
 ---
-title: Customization Overview
+title: Customization overview
 ---
 
 PostGraphile offers a variety of options, in both JavaScript and SQL, for

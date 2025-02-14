@@ -1,5 +1,5 @@
 ---
-title: Function Restrictions
+title: Function restrictions
 ---
 
 # Database Function Restrictions

@@ -1,5 +1,5 @@
 ---
-title: Direct Schema Usage
+title: Direct schema usage
 ---
 
 # PostGraphile Schema-Only Usage
