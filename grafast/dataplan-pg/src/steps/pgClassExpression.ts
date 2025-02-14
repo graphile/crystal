@@ -71,7 +71,10 @@ export class PgClassExpressionStep<
     this.needsPolymorphicUnwrap =
       $table instanceof PgUnionAllSingleStep &&
       $table.getClassStep().mode === "normal";
-    this.needsTupleAccess = $table instanceof PgInsertSingleStep;
+    this.needsTupleAccess =
+      $table instanceof PgInsertSingleStep ||
+      $table instanceof PgUpdateSingleStep ||
+      $table instanceof PgDeleteSingleStep;
     const $row = this.needsTupleAccess ? access($table, "t") : $table;
     this.rowDependencyId = this.addDependency($row);
     if (strings.length !== dependencies.length + 1) {
