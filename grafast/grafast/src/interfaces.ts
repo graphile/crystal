@@ -263,6 +263,7 @@ export type FieldArgs = {
   get?: never;
   /** Gets the value *without* calling any `inputPlan`s */
   getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
+  typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,

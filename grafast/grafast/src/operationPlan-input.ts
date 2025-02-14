@@ -49,6 +49,58 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
   let explicitlyApplied = false;
 
   const fieldArgs: FieldArgs = {
+    typeAt(path) {
+      if (typeof path === "string") {
+        return args[path].type;
+      } else {
+        if (path.length === 0) {
+          throw new Error(
+            `typeAt can only be used with a non-empty path since arguments themselves don't belong to a type but a field.`,
+          );
+        }
+        const argName = path[0];
+        let type = args[argName]?.type;
+        if (!type) {
+          throw new Error(`Argument ${argName} does not exist`);
+        }
+        for (let i = 1, l = path.length; i < l; i++) {
+          const segment = path[i];
+          type = graphql.isNonNullType(type) ? type.ofType : type;
+          if (typeof segment === "number") {
+            if (!isListType(type)) {
+              throw new Error(
+                `Invalid path ${path.slice(
+                  1,
+                )} within argument ${argName}; expected a list at path index ${
+                  i - 1
+                }`,
+              );
+            }
+            type = type.ofType;
+          } else {
+            if (!isInputObjectType(type)) {
+              throw new Error(
+                `Invalid path ${path.slice(
+                  1,
+                )} within argument ${argName}; expected an object at path index ${
+                  i - 1
+                }`,
+              );
+            }
+            const arg = type.getFields()[segment];
+            if (!arg) {
+              throw new Error(
+                `Invalid path ${path.slice(
+                  1,
+                )} within argument ${argName}; ${type} does not have a field '${segment}'`,
+              );
+            }
+            type = arg.type;
+          }
+        }
+        return type;
+      }
+    },
     getRaw(path) {
       assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
       if (typeof path === "string") {
@@ -157,6 +209,9 @@ function processAfter(
     if (autoApply) {
       // TODO: should this have dollars on it for accessing subkeys?
       const input: FieldArgs = {
+        typeAt(path) {
+          return rootFieldArgs.typeAt(concatPath(argName, path));
+        },
         getRaw(path) {
           return rootFieldArgs.getRaw(concatPath(argName, path));
         },
