@@ -724,7 +724,7 @@ export type GetPgResourceCodec<
 > = TResource["codec"];
 
 export type GetPgResourceAttributes<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
 > = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
@@ -751,3 +751,9 @@ export type PgUnionAllQueryBuilderCallback = (
   qb: PgUnionAllQueryBuilder,
 ) => void;
 export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
+
+export type ObjectForResource<
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
+> = {
+  [key in keyof GetPgResourceAttributes<TResource> & string]?: any; // TYPES: we should be able to make this stronger using the attribute codec
+};
