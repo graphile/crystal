@@ -120,3 +120,7 @@ figure figcaption {
   padding-left: 30px;
   list-style-type: none;
 }
+
+h4.anchor {
+  font-size: 1.25rem;
+}
