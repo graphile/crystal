@@ -25,7 +25,7 @@ description (`@enumDescription`) of PostgreSQL enums.
 e.g.:
 
 ```sql
-COMMENT ON TYPE animal_type IS E'@enum\n@enumName TypeOfAnimal';
+comment on type animal_type is E'@enum\n@enumName TypeOfAnimal';
 ```
 
 Sometimes people prefer not to use PostgreSQL enums due to their technical
