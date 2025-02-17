@@ -49,8 +49,19 @@ import {
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
  * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
  * we'll do the default behaviour of comparing to existing snapshots.
+ *
+ * Set UPDATE_SNAPSHOTS=1 to update all snapshots. Alternatively, set it to a
+ * comma separated list of snapshot types to update.
  */
-export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
+const { UPDATE_SNAPSHOTS } = process.env;
+const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",");
+function shouldUpdateSnapshot(filePath: string) {
+  // Never update snapshots in CI
+  if (process.env.CI) return false;
+  if (UPDATE_SNAPSHOTS === "1") return true;
+  if (!updateSnapshotExtensions) return false;
+  return updateSnapshotExtensions.some((e) => filePath.endsWith(e));
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -391,7 +402,7 @@ async function snapshot(actual: string, filePath: string) {
   } catch (e) {
     /* noop */
   }
-  if (expected == null || UPDATE_SNAPSHOTS) {
+  if (expected == null || shouldUpdateSnapshot(filePath)) {
     if (expected !== actual) {
       console.warn(`Updated snapshot in '${filePath}'`);
       await fsp.writeFile(filePath, actual);
