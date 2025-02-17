@@ -9,19 +9,19 @@ use the "Suggest improvements to this page" link above to submit them, or
 discuss them in #documentation on
 [the PostGraphile Discord chat](http://discord.gg/graphile).
 
-### Foreign Key Indexes
+### Foreign key indexes
 
 PostgreSQL does _NOT_ add indexes to foreign keys by default. This isn't an
 issue for the forward relation (`user_id` → user), but for the reverse relation
 (user → things by `user_id`) it can make the lookup very expensive. Always add
 indexes to your foreign keys.
 
-### Row Level Security
+### Row-level security
 
 If you're using RLS, it's best to enable it on every table in your database. You
 should at least enable it on every table in your exposed schemas.
 
-### Use Table GRANT for SELECT/DELETE and Column GRANT for INSERT/UPDATE
+### Use table GRANT for SELECT/DELETE and column GRANT for INSERT/UPDATE
 
 The following are fine:
 
@@ -58,7 +58,7 @@ Column-level SELECT grants
 Table-level INSERT/UPDATE grants are not advisable because they lack the
 explicitness that should come from such operations.
 
-### Simplify Your GraphQL Field Names
+### Simplify your GraphQL field names
 
 You can get a leg up on this
 [using `@graphile-contrib/pg-simplify-inflector`](https://github.com/graphile-contrib/pg-simplify-inflector).
@@ -67,24 +67,24 @@ naming conflicts when they run PostGraphile for the first time. Once you're more
 comfortable you should move to using shorter names as it's a GraphQL best
 practice.
 
-### Enable the PostGraphile Recommended Options
+### Enable the PostGraphile recommended options
 
 (Scan the docs for `[RECOMMENDED]`, but take a moment to understand why they're
 recommended and yet not enabled by default - they often require greater
 knowledge of PostGraphile and your database.)
 
-### Protect Your API
+### Protect your API
 
 See [Production Considerations](./production).
 
-### Use `LANGUAGE sql` Over `LANGUAGE plpgsql` Where Possible
+### Use `LANGUAGE sql` over `LANGUAGE plpgsql` where possible
 
 Performance reasons. Specifically, under many circumstances, functions in `SQL`
 (but not `plpgsql`) can be inlined into the call-site and are thereby
 transparent to the query planner. The PostgreSQL docs
 [have a lot more details](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions).
 
-### Name Triggers With A Numeric Prefix
+### Name triggers with a numeric prefix
 
 e.g. `_200_do_a_thing` / `_800_do_something_else`
 
