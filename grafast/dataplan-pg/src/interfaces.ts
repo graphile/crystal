@@ -744,6 +744,7 @@ export interface PgQueryBuilder {
   /** The alias of the current table */
   alias: SQL;
   [$$toSQL](): SQL;
+  setMeta(key: string, value: unknown): void;
 }
 
 export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;

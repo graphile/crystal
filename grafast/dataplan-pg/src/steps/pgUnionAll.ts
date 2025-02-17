@@ -93,6 +93,7 @@ const digestSpecificExpressionFromAttributeName = (
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
+  m: Object.create(null),
   hasMore: false,
   items: [],
 } as PgUnionAllStepResult);
@@ -367,6 +368,8 @@ export type PgUnionAllMode = "normal" | "aggregate";
  * the relevant queryValues. This saves repeating this work at execution time.
  */
 interface QueryBuildResult {
+  meta: Record<string, unknown>;
+
   // The SQL query text
   text: string;
 
@@ -400,6 +403,7 @@ interface QueryBuildResult {
 }
 
 interface PgUnionAllStepResult {
+  m: Record<string, unknown>;
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
@@ -964,6 +968,7 @@ on (${sql.indent(
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
+      meta,
       text,
       rawSqlValues,
       identifierIndex,
@@ -1063,6 +1068,7 @@ on (${sql.indent(
         ? reverseArray(slicedRows)
         : slicedRows;
       return {
+        m: meta,
         hasMore,
         items: orderedRows,
         cursorDetails,
@@ -1224,12 +1230,14 @@ function buildTheQuery<
     return info.selects.push({ type: "pk" }) - 1;
   }
 
-  // TODO: evaluate runtime orders, conditions, etc here
-
+  const meta = Object.create(null);
   const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
+    },
+    setMeta(key, value) {
+      meta[key] = value;
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
@@ -1748,6 +1756,7 @@ ${lateralText};`;
       : undefined;
 
   return {
+    meta,
     text,
     rawSqlValues,
     identifierIndex,
