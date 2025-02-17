@@ -17,12 +17,17 @@ export class BakedInputStep<
     moduleName: "grafast",
     exportName: "BakedInputStep",
   };
+  public isSyncAndSafe = true;
 
   valueDepId: 0;
   extra: { type: GraphQLInputObjectType; schema: GraphQLSchema };
   constructor(type: GraphQLInputObjectType, $value: AnyInputStep) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
+    if (!this._isUnary) {
+      throw new Error(`bakedInput() must be unary`);
+    }
+    this._isUnaryLocked = true;
     const { schema } = this.operationPlan;
     this.extra = { type, schema };
   }
