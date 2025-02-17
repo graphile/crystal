@@ -2,7 +2,7 @@
 title: Evaluating PostGraphile
 ---
 
-# Does PostGraphile Fit Your Project?
+# Does PostGraphile fit your project?
 
 Hopefully you’ve been convinced that PostGraphile serves an awesome GraphQL API,
 but now let’s take a more critical look at whether or not you should adopt
@@ -19,7 +19,7 @@ optimizing your database. Scaling a database is well-understood - and you can
 combine techniques - scaling vertically with larger database servers (more RAM,
 faster storage), or horizontally with read replicas.
 
-### No Lock-In
+### No lock-in
 
 PostGraphile does not lock you into using PostGraphile forever - in fact most of
 the work you do implementing a PostGraphile API is in your database, which you
@@ -47,7 +47,7 @@ simple exit path even years into the business. We welcome your contributions to
 help PostGraphile scale and meet your needs, and are very open to sponsored
 improvements to the software.
 
-### Schema Driven APIs
+### Schema-driven APIs
 
 If you fundamentally disagree with "one-to-one mapping of a SQL schema to an
 API" (GraphQL or otherwise) this section is for you.
@@ -61,15 +61,14 @@ exclude things from your schema, we have a powerful [behavior
 system](./behavior) you can use to accomplish that using global preferences and
 local overrides, or you can simply [remove things from the
 schema](./extending-raw#removing-things-from-the-schema). If you want a custom
-manually written API there is a simple transition path (read [no lock
-in](#no-lock-in)).
+manually written API there is a simple transition path (read [no lock-in](#no-lock-in)).
 
 If you still can’t get over the auto-generated nature of PostGraphile consider
 the following arguments why putting your business logic in PostgreSQL is a good
 idea:
 
 1.  PostgreSQL already has a powerful [user management system][user-management]
-    with fine grained [row level security][row-level-security]. A custom API
+    with fine grained [row-level security][row-level-security]. A custom API
     would mean you have to build your own user management and security, and
     having to guarantee that every possible route to your database data is
     vetted by the same permissions logic (which PostgreSQL RLS does for you).
@@ -99,7 +98,7 @@ idea:
     serialization/deserialization and data transfer costs are eliminated since
     no data is transferred to remote clients.
 
-Still worried about a certain aspect of a schema driven API? Open an issue,
+Still worried about a certain aspect of a schema-driven API? Open an issue,
 we're confident we can convince you otherwise 😉
 
 [^1]:

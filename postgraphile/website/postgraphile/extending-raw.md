@@ -2,7 +2,7 @@
 title: Graphile Build
 ---
 
-# Schema Plugins — Graphile Build
+# Schema plugins — Graphile Build
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Build plugins. The core PG-related plugins can be found here:

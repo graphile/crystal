@@ -2,7 +2,7 @@
 title: Function gallery
 ---
 
-# Database Function Gallery
+# Database function gallery
 
 Below you'll find some examples of various PostgreSQL functions, and their
 effects on PostGraphile.
@@ -13,7 +13,7 @@ be tidying it up! If you want to help with this, please pop into our
 
 _All these diffs are automatically produced using the functions as written._
 
-## Custom Queries
+## Custom queries
 
 ### Logged in user field
 
@@ -46,7 +46,7 @@ $$ language sql stable set search_path from current;
    forumByNodeId(
 ```
 
-## Computed Columns
+## Computed columns
 
 ### User primary email
 
@@ -82,7 +82,7 @@ $$ language sql stable set search_path from current;
  """
 ```
 
-## Custom Mutations
+## Custom mutations
 
 ### Insert multiple records
 
