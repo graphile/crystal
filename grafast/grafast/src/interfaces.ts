@@ -614,6 +614,7 @@ export interface NodeIdCodec<T = any> {
  * encoding the NodeID for that type.
  */
 export type NodeIdHandler<
+  TIdentifiers extends readonly any[] = readonly any[],
   TCodec extends NodeIdCodec<any> = NodeIdCodec<any>,
   TNodeStep extends ExecutableStep = ExecutableStep,
   TSpec = any,
@@ -622,6 +623,9 @@ export type NodeIdHandler<
    * The name of the object type this handler is for.
    */
   typeName: string;
+
+  // /* * How many identifiers does this NodeId represent? */
+  // identifierCount: number;
 
   /**
    * Which codec are we using to encode/decode the NodeID string?
@@ -632,6 +636,14 @@ export type NodeIdHandler<
    * Returns true if the given decoded Node ID value represents this type.
    */
   match(specifier: TCodec extends NodeIdCodec<infer U> ? U : any): boolean;
+
+  /**
+   * Returns the underlying identifiers extracted from the decoded NodeID
+   * value.
+   */
+  getIdentifiers(
+    value: TCodec extends NodeIdCodec<infer U> ? U : any,
+  ): TIdentifiers;
 
   /**
    * Returns a plan that returns the value ready to be encoded. When the result
