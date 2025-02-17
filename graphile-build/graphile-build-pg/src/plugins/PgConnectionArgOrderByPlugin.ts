@@ -242,7 +242,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
             },
-          } as GrafastFieldConfigArgumentMap<any, any, any, any>,
+          } as GrafastFieldConfigArgumentMap,
           `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
         );
       },

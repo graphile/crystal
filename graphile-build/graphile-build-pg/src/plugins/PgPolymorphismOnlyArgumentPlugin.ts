@@ -10,7 +10,7 @@ import type {
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphileConfig } from "graphile-config";
-import type { GraphQLFieldConfigArgumentMap } from "graphql";
+import type { GraphQLEnumType, GraphQLFieldConfigArgumentMap } from "graphql";
 
 import { version } from "../version.js";
 
@@ -158,9 +158,7 @@ export const PgPolymorphismOnlyArgumentPlugin: GraphileConfig.Plugin = {
 };
 function makeFieldsHook(isInterface: boolean) {
   return (
-    args:
-      | GrafastFieldConfigArgumentMap<any, any, any, any>
-      | GraphQLFieldConfigArgumentMap,
+    args: GrafastFieldConfigArgumentMap | GraphQLFieldConfigArgumentMap,
 
     build: GraphileBuild.Build,
     context:
@@ -188,7 +186,7 @@ function makeFieldsHook(isInterface: boolean) {
       return args;
     }
     const enumTypeName = inflection.pgPolymorphismEnumType(codec);
-    const enumType = getTypeByName(enumTypeName);
+    const enumType = getTypeByName(enumTypeName) as GraphQLEnumType;
     if (!enumType) {
       return args;
     }
@@ -204,7 +202,6 @@ function makeFieldsHook(isInterface: boolean) {
             ...(isInterface
               ? null
               : {
-                  autoApplyAfterParentPlan: true,
                   applyPlan: isPgFieldConnection
                     ? EXPORTABLE(
                         () =>

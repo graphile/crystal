@@ -6,7 +6,11 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
+import type {
+  ConnectionStep,
+  FieldArgs,
+  GrafastFieldConfigArgumentMap,
+} from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -49,7 +53,7 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
 };
 
 function commonFn(
-  args: GrafastFieldConfigArgumentMap<any, any, any, any>,
+  args: GrafastFieldConfigArgumentMap,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFieldsFieldArgs
@@ -104,7 +108,6 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -129,7 +132,6 @@ function commonFn(
                 "arg",
               ),
               type: GraphQLInt,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -156,7 +158,6 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -181,7 +182,6 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -208,7 +208,6 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -227,7 +226,7 @@ function commonFn(
             },
           }
         : null),
-    } as GrafastFieldConfigArgumentMap<any, any, any, any>,
+    } as GrafastFieldConfigArgumentMap,
     isPgFieldConnection
       ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
       : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`,
