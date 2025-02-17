@@ -56,19 +56,19 @@ PL/pgSQL.
 A simple function written with `LANGUAGE sql` looks like this:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   select a + b;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+$$ language sql immutable strict;
 ```
 
 The same function with `LANGUAGE plpgsql` could look like this:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
-BEGIN
-  RETURN a + b;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+create function add(a int, b int) returns int as $$
+begin
+  return a + b;
+end;
+$$ language plpgsql immutable strict;
 ```
 
 If you don’t want to use PL/pgSQL or SQL, many popular scripting languages can
@@ -82,18 +82,18 @@ For example, a function defined using JavaScript could look like:
 
 ```sql
 -- This does look the exact same as the PL/pgSQL example…
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   return a + b;
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$$ language plv8 immutable strict;
 
 -- Here’s a better example from the plv8 repo…
-CREATE FUNCTION plv8_test(keys text[], vals text[]) RETURNS text AS $$
+create function plv8_test(keys text[], vals text[]) returns text as $$
   var object = {}
   for (var i = 0; i < keys.length; i++) {
     object[keys[i]] = vals[i]
   }
   return JSON.stringify(object)
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$$ language plv8 immutable strict;
 ```
 
 [pl/pgsql]: http://www.postgresql.org/docs/current/static/plpgsql.html
@@ -108,17 +108,17 @@ name an argument, PostGraphile will give it a name like `arg1`, `arg2`, `arg3`,
 and so on. An example of a function with unnamed arguments is as follows:
 
 ```sql
-CREATE FUNCTION add(int, int) RETURNS int AS $$
-  SELECT $1 + $2;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+create function add(int, int) returns int as $$
+  select $1 + $2;
+$$ language sql immutable strict;
 ```
 
 Whereas named arguments look like:
 
 ```sql
-CREATE FUNCTION add(a int, b int) RETURNS int AS $$
+create function add(a int, b int) returns int as $$
   select a + b;
-$$ LANGUAGE sql IMMUTABLE STRICT;
+$$ language sql immutable strict;
 ```
 
 ### Solving naming conflicts
@@ -190,13 +190,17 @@ for
 By default, a function is “volatile”. For example, a function defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql;
 ```
 
-Is equivalent to a function defined as:
+is equivalent to a function defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql VOLATILE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql volatile;
 ```
 
 From the PostgreSQL docs:
@@ -230,15 +234,21 @@ it multiple times for the same inputs during the same statement.
 Here's examples of defining functions as STABLE/IMMUTABLE:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql stable;
 
 -- or…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql IMMUTABLE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql immutable;
 
 -- or if you wanted to return a row from a table…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS my_table AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns my_table as $$
+  …
+$$ language sql stable;
 ```
 
 From the PostgreSQL docs:
@@ -278,7 +288,9 @@ To create a function that returns a connection, you could use SQL such as this:
 
 ```sql
 -- Assuming we already have a table named `person`…
-CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns setof person as $$
+  …
+$$ language sql stable;
 ```
 
 This function would be recognised as a [custom query](./custom-queries), and
