@@ -287,15 +287,12 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                               localAttributes,
                               typeName,
                             ) =>
-                              function plan(
-                                record: Record<string, unknown>,
-                                nodeId: unknown,
-                              ) {
+                              function plan(record: Setter, nodeId: unknown) {
                                 if (nodeId === undefined) {
                                   return;
                                 } else if (nodeId === null) {
                                   for (const localName of localAttributes) {
-                                    record[localName] = null;
+                                    record.set(localName, null);
                                   }
                                 } else if (typeof nodeId !== "string") {
                                   throw new Error(
@@ -310,7 +307,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 }
                                 for (let i = 0; i < attributeCount; i++) {
                                   const localName = localAttributes[i];
-                                  record[localName] = identifiers[i];
+                                  record.set(localName, identifiers[i]);
                                 }
                               },
                             [

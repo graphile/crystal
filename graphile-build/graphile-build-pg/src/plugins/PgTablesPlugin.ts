@@ -6,7 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
-import { object } from "grafast";
+import { createObjectAndApplyChildren, object, setter } from "grafast";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
@@ -712,13 +712,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
                     grafast: {
-                      baked: EXPORTABLE(
-                        () =>
-                          function baked() {
-                            return Object.create(null);
-                          },
-                        [],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),
@@ -745,13 +739,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
                     grafast: {
-                      baked: EXPORTABLE(
-                        () =>
-                          function baked() {
-                            return Object.create(null);
-                          },
-                        [],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),
@@ -774,13 +762,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
                   extensions: {
                     grafast: {
-                      baked: EXPORTABLE(
-                        () =>
-                          function baked() {
-                            return Object.create(null);
-                          },
-                        [],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),

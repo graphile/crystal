@@ -92,7 +92,12 @@ export {
   RemapKeysStep,
 } from "./remapKeys.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
-export { Setter, setter, SetterCapable } from "./setter.js";
+export {
+  Setter,
+  setter,
+  SetterCapable,
+  createObjectAndApplyChildren,
+} from "./setter.js";
 export { sideEffect, SideEffectStep } from "./sideEffect.js";
 
 // Internal plans
