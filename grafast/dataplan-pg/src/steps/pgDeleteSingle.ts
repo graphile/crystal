@@ -443,9 +443,7 @@ export interface PgDeleteSingleQueryBuilder<
     any,
     any
   > = PgResource<any, PgCodecWithAttributes, any, any, any>,
-> extends PgQueryBuilder {
-  setMeta(key: string, value: any): void;
-}
+> extends PgQueryBuilder {}
 
 type PgDeleteSingleQueryBuilderCallback = (
   qb: PgDeleteSingleQueryBuilder,

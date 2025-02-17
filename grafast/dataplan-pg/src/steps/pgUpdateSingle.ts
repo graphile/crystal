@@ -373,6 +373,9 @@ export class PgUpdateSingleStep<
         [$$toSQL]() {
           return alias;
         },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
         set(name, attVal) {
           const pgCodec = resource.codec.attributes[name]?.codec;
           if (!pgCodec) {
@@ -384,9 +387,6 @@ export class PgUpdateSingleStep<
         },
         setBuilder() {
           return setter(this);
-        },
-        setMeta(key, value) {
-          meta[key] = value;
         },
       };
 
@@ -540,7 +540,6 @@ export interface PgUpdateSingleQueryBuilder<
     value: ObjectForResource<TResource>[TAttributeName],
   ): void;
   setBuilder(): Setter<ObjectForResource<TResource>, this>;
-  setMeta(key: string, value: any): void;
 }
 
 type PgUpdateSingleQueryBuilderCallback = (

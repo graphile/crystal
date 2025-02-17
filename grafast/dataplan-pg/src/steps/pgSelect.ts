@@ -89,6 +89,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
+  m: Object.create(null),
   hasMore: false,
   items: [],
 } as PgSelectStepResult);
@@ -241,6 +242,8 @@ export interface PgSelectOptions<
  * the relevant queryValues. This saves repeating this work at execution time.
  */
 interface QueryBuildResult {
+  meta: Record<string, unknown>;
+
   // The SQL query text
   text: string;
 
@@ -277,6 +280,7 @@ interface PgSelectStepResult {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails?: PgCursorDetails;
+  m: Record<string, unknown>;
 }
 
 /**
@@ -983,6 +987,7 @@ export class PgSelectStep<
       stream,
     } = executionDetails;
     const {
+      meta,
       text,
       rawSqlValues,
       textForDeclare,
@@ -1088,6 +1093,7 @@ export class PgSelectStep<
           ? reverseArray(slicedRows)
           : slicedRows;
         return {
+          m: meta,
           items: orderedRows,
           hasMore,
           cursorDetails,
@@ -1160,6 +1166,7 @@ export class PgSelectStep<
         }
         if (!initialFetchResult) {
           return {
+            m: meta,
             items: iterable,
             hasMore: false,
             cursorDetails,
@@ -1208,6 +1215,7 @@ export class PgSelectStep<
           },
         };
         return {
+          m: meta,
           items: mergedGenerator,
           hasMore: false,
           cursorDetails,
@@ -1909,11 +1917,14 @@ function buildTheQuery<
     return info.selects.push(expression) - 1;
   }
 
-  // TODO: evaluate runtime orders, conditions, etc here
+  const meta = Object.create(null);
   const queryBuilder: PgSelectQueryBuilder = {
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
+    },
+    setMeta(key, value) {
+      meta[key] = value;
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
@@ -2347,6 +2358,7 @@ ${lateralText};`;
       }
       const identifierIndex = initialFetchIdentifierIndex;
       return {
+        meta,
         text,
         rawSqlValues,
         textForDeclare,
@@ -2376,6 +2388,7 @@ ${lateralText};`;
         },
       });
       return {
+        meta,
         // This is a hack since this is the _only_ place we don't want
         // `text`; loosening the types would risk us forgetting in more
         // places (and cause us to do excessive type safety checks) so we
@@ -2400,6 +2413,7 @@ ${lateralText};`;
       },
     });
     return {
+      meta,
       text,
       rawSqlValues,
       identifierIndex,
