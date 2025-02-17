@@ -25,8 +25,13 @@ obey the following rules:
 For example the functions:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE sql IMMUTABLE;
-CREATE FUNCTION my_other_function(a int, b int) RETURNS my_table AS $$ … $$ LANGUAGE sql STABLE;
+create function my_function(a int, b int) returns int as $$
+  …
+$$ language sql immutable;
+
+create function my_other_function(a int, b int) returns my_table as $$
+  …
+$$ language sql stable;
 ```
 
 could be queried in GraphQL like this:
