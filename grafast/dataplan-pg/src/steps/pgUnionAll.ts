@@ -262,6 +262,10 @@ export class PgUnionAllSingleStep
     return $pgUnionAll;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   public node() {
     return this;
   }
@@ -763,6 +767,10 @@ on (${sql.indent(
     }
     const index = this.selects.push({ type: "type" }) - 1;
     return index;
+  }
+
+  public getMeta(key: string) {
+    return access(this, ["meta", key]);
   }
 
   /**

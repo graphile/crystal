@@ -775,6 +775,10 @@ export class PgSelectStep<
     this.joins.push(this.scopedSQL(spec));
   }
 
+  public getMeta(key: string) {
+    return access(this, ["meta", key]);
+  }
+
   /**
    * Select an SQL fragment, returning the index the result will have.
    *
