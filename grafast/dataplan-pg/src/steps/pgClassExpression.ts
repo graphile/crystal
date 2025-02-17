@@ -242,6 +242,9 @@ export class PgClassExpressionStep<
     }
     return step;
   }
+  public getMeta(key: string) {
+    return this.getParentStep().getMeta(key);
+  }
 
   public optimize(): this {
     this.attrIndex = this.getParentStep().selectAndReturnIndex(
