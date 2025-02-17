@@ -2,7 +2,7 @@
 title: Background tasks
 ---
 
-# Background Tasks in PostGraphile
+# Background tasks in PostGraphile
 
 In your GraphQL server typically most processing will be done in the
 "foreground", as part of the request-response cycle. However, since clients
@@ -41,7 +41,7 @@ database or expose a Node.js-friendly API.
 - [RabbitMQ](https://www.rabbitmq.com/)
 - [pg-boss](https://www.npmjs.com/package/pg-boss)
 
-#### Choosing your Task Queue
+#### Choosing your task queue
 
 An important topic you will need to consider is how tasks are created in your
 queue.
