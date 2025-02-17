@@ -2,7 +2,7 @@
 title: Introduction
 ---
 
-# PostGraphile Introduction
+# PostGraphile introduction
 
 :::caution
 
