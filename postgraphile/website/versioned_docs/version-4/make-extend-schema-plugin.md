@@ -353,7 +353,7 @@ subquery so that we can add conditions to it's `WHERE` clause.
 In most cases you're only dealing with one or two tables so you won't need this
 level of complexity.
 
-### Query Example
+### Query example
 
 The below is a simple example which would have been better served by
 [Custom Query SQL Procedures](./custom-queries#custom-query-sql-procedures);
@@ -439,7 +439,7 @@ app.use(
 app.listen(3030);
 ```
 
-### Mutation Example
+### Mutation example
 
 For example, you might want to add a custom `registerUser` mutation which
 inserts the new user into the database and also sends them an email:
@@ -602,7 +602,7 @@ resolvers: {
 }
 ```
 
-## Mutation Example with Node ID
+## Mutation example with Node ID
 
 In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to
 soft-delete an entry from our `app_public.items` table. We're also going to
@@ -794,7 +794,7 @@ Notes:
 You can see more examples of these use cases
 [in the tests](https://github.com/graphile/graphile-engine/blob/49259c291d651ab8b70d1f1785cf273bdd97fcf1/packages/graphile-utils/__tests__/ExtendSchemaPlugin-pg.test.js#L713-L832).
 
-## Plugin SQL Privileges
+## Plugin SQL privileges
 
 Plugins access the database with the same privileges as everything else - they
 are subject to RLS/RBAC/etc. If your user does not have privileges to perform
