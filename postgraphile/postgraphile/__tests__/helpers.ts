@@ -559,7 +559,7 @@ export async function runTestQuery(
               JSON.stringify(result),
             );
             if (errors) {
-              console.error(errors[0].originalError || errors[0]);
+              console.error(result.errors?.[0].originalError || errors[0]);
             }
             if (options.callback) {
               throw new Error(
