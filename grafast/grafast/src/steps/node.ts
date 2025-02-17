@@ -131,7 +131,7 @@ export function nodeIdFromNode(
   return lambda(specifier, handler.codec.encode);
 }
 
-export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
+export function makeDecodeNodeIdRuntime(handlers: readonly NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
   function decodeNodeIdWithCodecs(raw: string | null | undefined) {
@@ -151,6 +151,11 @@ export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
     );
   }
   decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
+  return decodeNodeIdWithCodecs;
+}
+
+export function makeDecodeNodeId(handlers: readonly NodeIdHandler[]) {
+  const decodeNodeIdWithCodecs = makeDecodeNodeIdRuntime(handlers);
   return ($id: ExecutableStep<string | null | undefined>) =>
     lambda($id, decodeNodeIdWithCodecs);
 }

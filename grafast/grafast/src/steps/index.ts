@@ -78,6 +78,7 @@ export {
 } from "./listTransform.js";
 export {
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   node,
   nodeIdFromNode,
   NodeStep,
