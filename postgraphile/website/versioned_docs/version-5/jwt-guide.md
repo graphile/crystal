@@ -75,7 +75,7 @@ set local jwt.claims.role to 'user';
 set local jwt.claims.user_id to 2;
 ```
 
-### A Note on `local`
+### A note on `local`
 
 Using `local` for [`SET`][set] and [`SET ROLE`][set-role] is not required,
 however it is recommended. This is so that every transaction block (beginning
@@ -92,7 +92,7 @@ commit;
 -- Does not have access to `jwt.claims.user_id`
 ```
 
-### Retrieving Claims in PostgreSQL
+### Retrieving claims in PostgreSQL
 
 In order to retrieve a claim set by the serialization of a JSON Web Token as
 defined in this spec, either the `current_setting` function or the

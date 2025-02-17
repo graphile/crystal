@@ -2,7 +2,7 @@
 title: Multiple GraphQL schemas
 ---
 
-# Multiple GraphQL Schemas with PostGraphile
+# Multiple GraphQL schemas with PostGraphile
 
 Each PostGraphile instance only creates a single GraphQL schema — you don't get
 one schema per user based on permissions, for example. Typically, in GraphQL, a

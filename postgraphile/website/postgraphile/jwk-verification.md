@@ -11,11 +11,13 @@ This documentation is copied from Version 4 and has not been updated to Version
 
 :::
 
-This guide is an adaption of the official quickstart tutorial for Node (Express)
+# PostGraphile JWT/JWK verification quick-start
+
+This guide is an adaption of the official quick-start tutorial for Node (Express)
 provided by
 [Auth0](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization). The
 code illustrates how to intercept and verify a
-[JWT Access Token](https://auth0.com/docs/tokens/concepts/jwts) via a
+[JWT access token](https://auth0.com/docs/tokens/concepts/jwts) via a
 [JWKS (JSON Web Key Set)](https://auth0.com/docs/jwks) using
 [Auth0](https://auth0.com/).
 
@@ -28,7 +30,7 @@ This guide uses the [`express`](https://www.npmjs.com/package/express) HTTP
 framework and supporting Node packages authored and maintained by Auth0:
 
 - [`express-jwt`](https://github.com/auth0/express-jwt) - _Middleware that
-  validates a JWT and copies its contents to `req.user`_
+  validates a JWT and copies its contents to `req.auth`_
 - [`jwks-rsa`](https://github.com/auth0/node-jwks-rsa) - _A library to retrieve
   RSA public keys from a JWKS (JSON Web Key Set) endpoint_
 
@@ -38,21 +40,21 @@ yarn add express express-jwt jwks-rsa
 npm install --save express express-jwt jwks-rsa
 ```
 
-### Prior Knowledge & Context
+### Prior knowledge & context
 
 As a developer, the three essential aspects of Auth0 are:
 
 - [_APIs_](https://auth0.com/docs/apis) and
-  [_Applications_](https://auth0.com/docs/applications)
-- [_JWT types_](https://auth0.com/docs/tokens) (e.g. _ID Token_ vs. _Access
-  Token_)
-- Authentication and Authorization [_Flows_](https://auth0.com/docs/flows)
+  [_applications_](https://auth0.com/docs/applications)
+- [_JWT types_](https://auth0.com/docs/tokens) (e.g. _ID token_ vs. _access
+  token_)
+- [Authentication and Authorization Flows](https://auth0.com/docs/flows)
 
 To keep it simple, in this guide we will be dealing with an
-[Access Token](https://auth0.com/docs/tokens/overview-access-tokens) granted by
+[access token](https://auth0.com/docs/tokens/overview-access-tokens) granted by
 an API which we will need to verify.
 
-## Getting Started
+## Getting started
 
 You will need two values from your Auth0 configuration: The Auth0 _tenant domain
 name_, and the API _identifier._
@@ -64,10 +66,10 @@ const jwksRsa = require("jwks-rsa");
 // ...
 
 // Authentication middleware. When used, the
-// Access Token must exist and be verified against
+// access token must exist and be verified against
 // the Auth0 JSON Web Key Set.
 // On successful verification, the payload of the
-// decrypted Access Token is appended to the
+// decrypted access token is appended to the
 // request (`req`) as a `user` parameter.
 const checkJwt = jwt({
   // Dynamically provide a signing key
@@ -88,14 +90,15 @@ const checkJwt = jwt({
 ```
 
 (note: if we were processing an
-[ID Token](https://auth0.com/docs/tokens/id-token) instead of an Access Token,
+[ID token](https://auth0.com/docs/tokens/id-token) instead of an access token,
 the _audience_ would be the _Client ID_ instead)
 
 Remember that a JWT has
 [three _period-separated_ sections](https://jwt.io/introduction/): header,
 payload, and signature. On successful verification, the payload will be
 available for us to save inside the PostGraphile request via the
-[`pgSettings`](./config#pgsettings) function.
+[`pgSettings`](./usage-library#exposing-http-request-data-to-postgresql)
+function.
 
 Let's look at an example payload:
 
@@ -161,13 +164,13 @@ app.use(
 ```
 
 PostGraphile applies everything returned by
-[`pgSettings`](./config#pgsettings) to the
+[pgSettings](./usage-library#pgsettings-function) to the
 [current session](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET)
 with `set_config($key, $value, true)`. So inside Postgres we can read the
 current value of `user.permissions` by
 `select current_setting('user.permissions', true)::text;`.
 
-## Basic Error Handling
+## Basic error handling
 
 By default, if there is an error in the JWT verification process, the
 `express-jwt` package will send a 401 status with an HTML-formatted error
