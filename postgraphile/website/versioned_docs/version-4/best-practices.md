@@ -27,24 +27,24 @@ The following are fine:
 
 ```sql
 -- ✅ Fine
-GRANT SELECT ON users TO graphql_role;
+grant select on users to graphql_role;
 -- ✅ Fine
-GRANT INSERT (column_1, column_2, ...) ON users TO graphql_role;
+grant insert (column_1, column_2, ...) on users to graphql_role;
 -- ✅ Fine
-GRANT UPDATE (column_a, column_b, ...) ON users TO graphql_role;
+grant update (column_a, column_b, ...) on users to graphql_role;
 -- ✅ Fine
-GRANT DELETE ON users TO graphql_role;
+grant delete on users to graphql_role;
 ```
 
 The following should be avoided:
 
 ```sql
--- 🛑 DO NOT USE
-GRANT SELECT (column_a, column_b) ON users TO graphql_role;
--- 🛑 DO NOT USE
-GRANT INSERT ON users TO graphql_role;
--- 🛑 DO NOT USE
-GRANT UPDATE ON users TO graphql_role;
+-- 🛑 Do not use
+grant select (column_a, column_b) on users to graphql_role;
+-- 🛑 Do not use
+grant insert on users to graphql_role;
+-- 🛑 Do not use
+grant update on users to graphql_role;
 ```
 
 Column-level SELECT grants
