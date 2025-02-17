@@ -2,14 +2,14 @@
 title: Best practices
 ---
 
-# PostGraphile Best Practices
+# PostGraphile best practices
 
 This guide is a work in progress. If you have ideas for best practices, please
 use the “Suggest improvements to this page” link to submit them, or
 discuss them in #documentation on
 [the Graphile Discord chat](http://discord.gg/graphile).
 
-### Foreign Key Indexes
+### Foreign key indexes
 
 PostgreSQL does _NOT_ add indexes to foreign keys by default. This isn’t an
 issue for the forward relation (getting the record that your record belongs
@@ -29,7 +29,7 @@ appear in your GraphQL schema. You can force it to appear by giving the
 foreign key constraint the `+select` behavior, or you can disable this behavior
 by adding `disablePlugins: ['PgIndexBehaviorsPlugin']` to your configuration.
 
-### Row Level Security
+### Row-level security
 
 If you’re using RLS, it’s best to enable it on every table in your database.
 You should at least enable it on every table in your exposed schemas. It’s
@@ -39,7 +39,7 @@ when you enable RLS you’re being explicit about what access is allowed, wherea
 if you don’t you’re just implicitly allowing all access, which could have been
 an oversight.
 
-### Use Table GRANT for SELECT/DELETE and Column GRANT for INSERT/UPDATE
+### Use table GRANT for SELECT/DELETE and column GRANT for INSERT/UPDATE
 
 The following are fine:
 
@@ -76,7 +76,7 @@ not just for PostGraphile:
 Table-level INSERT/UPDATE grants are not advisable because they lack the
 explicitness that should come from such operations.
 
-### Simplify Your GraphQL Field Names
+### Simplify your GraphQL field names
 
 You can get a leg up on this
 [using `@graphile/simplify-inflection`](https://npmjs.com/package/@graphile/simplify-inflection).
@@ -85,7 +85,7 @@ naming conflicts when they run PostGraphile for the first time. Once you’re mo
 comfortable you should move to using shorter names as it’s a GraphQL best
 practice.
 
-### Protect Your API
+### Protect your API
 
 See [Production Considerations](./production).
 
@@ -96,7 +96,7 @@ Performance reasons. Specifically, under many circumstances, functions in `SQL`
 transparent to the query planner. The PostgreSQL docs
 [have a lot more details](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions).
 
-### Name Triggers With A Numeric Prefix
+### Name triggers with a numeric prefix
 
 e.g. `_200_do_a_thing` / `_800_do_something_else`
 
