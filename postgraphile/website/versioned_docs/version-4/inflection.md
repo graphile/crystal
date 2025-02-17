@@ -8,7 +8,7 @@ PostgreSQL are named in the generated GraphQL schema.
 The default inflections in PostGraphile attempts to map things to natural names
 in GraphQL whilst attempting to avoid naming conflicts. For example:
 
-- Table names are singularised and changed to UpperCamelCase: `pending_users` →
+- Table names are singularized and changed to UpperCamelCase: `pending_users` →
   `PendingUser`
 - Column names are changed to camelCase: `created_at` → `createdAt`
 - Relations reference the target type and the referencing columns:
@@ -20,7 +20,7 @@ If you want to rename just one field or type, your best bet is to use a
 [smart comment](./smart-tags); e.g. for a table you might do:
 
 ```sql
-COMMENT ON TABLE post IS E'@name message';
+comment on table post is E'@name message';
 ```
 
 :::note

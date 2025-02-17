@@ -35,7 +35,7 @@ If you want to rename just one field or type, your best bet is to use a
 [smart tag](./smart-tags.md); e.g. for a table you might do:
 
 ```sql
-COMMENT ON TABLE post IS E'@name message';
+comment on table post is E'@name message';
 ```
 
 :::note
