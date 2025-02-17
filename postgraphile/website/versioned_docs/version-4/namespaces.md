@@ -16,18 +16,18 @@ other schemas too, whatever makes sense for your application.
 To create a schema in PostgreSQL:
 
 ```sql
-CREATE SCHEMA app_public;
+create schema app_public;
 ```
 
 To create or reference something in that schema, just prepend the name of the
 thing with the schema name, e.g:
 
 ```sql
-CREATE TABLE app_public.users ( ... );
-CREATE FUNCTION app_public.best_user() ...;
+create table app_public.users ( ... );
+create function app_public.best_user() ...;
 
-SELECT * FROM app_public.users;
-SELECT * FROM app_public.best_user();
+select * from app_public.users;
+select * from app_public.best_user();
 ```
 
 ### Advice
