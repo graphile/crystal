@@ -770,7 +770,7 @@ on (${sql.indent(
   }
 
   public getMeta(key: string) {
-    return access(this, ["meta", key]);
+    return access(this, ["m", key]);
   }
 
   /**

@@ -214,7 +214,7 @@ export class PgDeleteSingleStep<
   }
 
   public getMeta(key: string) {
-    return access(this, ["meta", key]);
+    return access(this, ["m", key]);
   }
 
   public record(): PgClassExpressionStep<
