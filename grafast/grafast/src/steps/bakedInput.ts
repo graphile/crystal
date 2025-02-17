@@ -99,11 +99,18 @@ export function bakedInputRuntime(
     return value;
   } else {
     // Ooo, we're fancy! Do the thing!
+    let applied = false;
     const bakedObj = baked!(value as Record<string, any>, {
       type: nullableInputType as GraphQLInputObjectType,
       schema,
+      applyChildren(parent) {
+        applied = true;
+        inputArgsApply(schema, nullableInputType, parent, value, undefined);
+      },
     });
-    inputArgsApply(schema, inputType, bakedObj, value, undefined);
+    if (!applied) {
+      inputArgsApply(schema, nullableInputType, bakedObj, value, undefined);
+    }
     return bakedObj;
   }
 }

@@ -355,12 +355,14 @@ export type InputObjectFieldApplyResolver<TParent> = (
   },
 ) => any;
 
+export type InputObjectTypeBakedInfo = {
+  schema: GraphQLSchema;
+  type: GraphQLInputObjectType;
+  applyChildren(val: any): void;
+};
 export type InputObjectTypeBakedResolver = (
   input: Record<string, any>,
-  info: {
-    schema: GraphQLSchema;
-    type: GraphQLInputObjectType;
-  },
+  info: InputObjectTypeBakedInfo,
 ) => any;
 
 export type ArgumentApplyPlanResolver<
