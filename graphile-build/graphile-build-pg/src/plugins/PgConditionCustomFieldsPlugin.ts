@@ -1,12 +1,14 @@
 import "graphile-config";
 
-import type {
-  PgConditionStep,
-  PgResource,
-  PgResourceParameter,
-  PgSelectStep,
+import {
+  type PgCondition,
+  type PgResource,
+  type PgResourceParameter,
+  type PgSelectStep,
+  sqlValueWithCodec,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
+import type { GraphQLInputType } from "graphql";
 
 import { version } from "../version.js";
 
@@ -114,7 +116,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
             const type = build.getGraphQLTypeByPgCodec(
               pgFieldSource.codec,
               "input",
-            );
+            ) as GraphQLInputType;
             if (!type) return memo;
             memo = build.extend(
               memo,
@@ -132,12 +134,9 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                       "field",
                     ),
                     type,
-                    applyPlan: EXPORTABLE(
-                      (pgFieldSource, sql) =>
-                        function plan(
-                          $condition: PgConditionStep<PgSelectStep<any>>,
-                          val,
-                        ) {
+                    apply: EXPORTABLE(
+                      (pgFieldSource, sql, sqlValueWithCodec) => function plan($condition: PgCondition, val: unknown) {
+                          if (val === undefined) return;
                           if (typeof pgFieldSource.from !== "function") {
                             throw new Error(
                               "Invalid computed attribute 'from'",
@@ -146,18 +145,18 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           const expression = sql`${pgFieldSource.from({
                             placeholder: $condition.alias,
                           })}`;
-                          if (val.getRaw().evalIs(null)) {
+                          if (val === null) {
                             $condition.where(sql`${expression} is null`);
                           } else {
                             $condition.where(
-                              sql`${expression} = ${$condition.placeholder(
-                                val.get(),
+                              sql`${expression} = ${sqlValueWithCodec(
+                                val,
                                 pgFieldSource.codec,
                               )}`,
                             );
                           }
                         },
-                      [pgFieldSource, sql],
+                      [pgFieldSource, sql, sqlValueWithCodec],
                     ),
                   },
                 ),

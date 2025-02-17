@@ -181,12 +181,13 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                       PgSelectParsedCursorStep,
                       PgSelectStep
                     >,
+                    arg,
                   ) => {
                     const $select = $connection.getSubplan();
-                    return $select.wherePlan();
+                    arg.apply($select, (qb) => qb.whereBuilder());
                   }
-                : (_condition, $select: PgSelectStep) => {
-                    return $select.wherePlan();
+                : (_condition, $select: PgSelectStep, arg) => {
+                    arg.apply($select, (qb) => qb.whereBuilder());
                   },
             },
           },

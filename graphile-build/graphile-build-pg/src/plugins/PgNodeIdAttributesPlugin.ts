@@ -4,12 +4,11 @@ import "graphile-config";
 import type {
   PgCodecRelation,
   PgCodecWithAttributes,
-  PgConditionStep,
+  PgCondition,
   PgRegistry,
-  PgSelectStep,
 } from "@dataplan/pg";
-import type { SetterStep } from "grafast";
-import { assertNotNull, condition, trap, TRAP_INHIBITED } from "grafast";
+import { sqlValueWithCodec } from "@dataplan/pg";
+import type { Setter } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -145,12 +144,13 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               if (typeName === build.inflection.builtin("Query")) {
                 return memo;
               }
-              const getSpec = build.nodeIdSpecForCodec?.(
-                relation.remoteResource.codec,
-              );
-              if (!getSpec) {
+              const helpers = (
+                build as GraphileBuild.Build
+              ).nodeIdHelpersForCodec(relation.remoteResource.codec);
+              if (!helpers) {
                 return memo;
               }
+              const { getIdentifiers } = helpers;
               const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
@@ -181,6 +181,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 (attr) => attr.notNull || attr.extensions?.tags?.notNull,
               );
               const { localAttributes, remoteAttributes } = relation;
+              const attributeCount = localAttributes.length;
               const localAttributeCodecs = localAttributes.map(
                 (name) => pgCodec.attributes[name].codec,
               );
@@ -201,132 +202,118 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                           !anAttributeIsNotNull,
                         GraphQLID,
                       ),
-                      autoApplyAfterParentInputPlan: true,
-                      autoApplyAfterParentApplyPlan: true,
                       // ENHANCE: if the remote columns are the primary keys
                       // then there's no need to actually fetch the record
                       // (unless we want to check it exists).
                       // ENHANCE: we know nodeId will always be unary, so we
                       // could optimize this SQL at execution time when we know
                       // if it is null or not.
-                      applyPlan: isPgCondition
+                      apply: isPgCondition
                         ? EXPORTABLE(
                             (
-                              TRAP_INHIBITED,
-                              assertNotNull,
-                              condition,
-                              getSpec,
+                              attributeCount,
+                              getIdentifiers,
                               localAttributeCodecs,
                               localAttributes,
-                              remoteAttributes,
                               sql,
-                              trap,
+                              sqlValueWithCodec,
                               typeName,
                             ) =>
-                              function plan(
-                                $condition: PgConditionStep<PgSelectStep<any>>,
-                                val,
+                              function apply(
+                                condition: PgCondition,
+                                nodeId: unknown,
                               ) {
-                                const $nodeId = val.get();
-                                const $nodeIdExists = condition(
-                                  "exists",
-                                  $nodeId,
-                                );
-                                const spec = getSpec($nodeId);
-                                for (
-                                  let i = 0, l = localAttributes.length;
-                                  i < l;
-                                  i++
-                                ) {
-                                  const localName = localAttributes[i];
-                                  const codec = localAttributeCodecs[i];
-                                  const remoteName = remoteAttributes[i];
-                                  // Set `null` if invalid
-                                  const $rawValue = trap(
-                                    spec[remoteName],
-                                    TRAP_INHIBITED,
+                                if (nodeId === undefined) {
+                                  return;
+                                } else if (nodeId === null) {
+                                  for (const localName of localAttributes) {
+                                    condition.where({
+                                      type: "attribute",
+                                      attribute: localName,
+                                      callback: (expression) =>
+                                        sql`${expression} is null`,
+                                    });
+                                  }
+                                } else if (typeof nodeId !== "string") {
+                                  throw new Error(
+                                    `Invalid node identifier for '${typeName}'; expected string`,
                                   );
-                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
-                                  const $value = assertNotNull(
-                                    $rawValue,
+                                }
+                                const identifiers = getIdentifiers(nodeId);
+                                if (identifiers == null) {
+                                  throw new Error(
                                     `Invalid node identifier for '${typeName}'`,
-                                    { if: $nodeIdExists },
                                   );
-                                  const sqlRemoteValue = $condition.placeholder(
-                                    $value,
-                                    codec,
-                                  );
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: localName,
-                                    callback: (expression) =>
-                                      sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`,
-                                  });
+                                }
+                                for (let i = 0; i < attributeCount; i++) {
+                                  const localName = localAttributes[i];
+                                  const value = identifiers[i];
+                                  if (value == null) {
+                                    condition.where({
+                                      type: "attribute",
+                                      attribute: localName,
+                                      callback: (expression) =>
+                                        sql`${expression} is null`,
+                                    });
+                                  } else {
+                                    const codec = localAttributeCodecs[i];
+                                    const sqlRemoteValue = sqlValueWithCodec(
+                                      value,
+                                      codec,
+                                    );
+                                    condition.where({
+                                      type: "attribute",
+                                      attribute: localName,
+                                      callback: (expression) =>
+                                        sql`${expression} = ${sqlRemoteValue}`,
+                                    });
+                                  }
                                 }
                               },
                             [
-                              TRAP_INHIBITED,
-                              assertNotNull,
-                              condition,
-                              getSpec,
+                              attributeCount,
+                              getIdentifiers,
                               localAttributeCodecs,
                               localAttributes,
-                              remoteAttributes,
                               sql,
-                              trap,
+                              sqlValueWithCodec,
                               typeName,
                             ],
                           )
                         : EXPORTABLE(
                             (
-                              TRAP_INHIBITED,
-                              assertNotNull,
-                              condition,
-                              getSpec,
+                              attributeCount,
+                              getIdentifiers,
                               localAttributes,
-                              remoteAttributes,
-                              trap,
                               typeName,
                             ) =>
-                              function plan(
-                                $insert: SetterStep<any, any>,
-                                val,
-                              ) {
-                                const $nodeId = val.get();
-                                const $nodeIdExists = condition(
-                                  "exists",
-                                  $nodeId,
-                                );
-                                const spec = getSpec($nodeId);
-                                for (
-                                  let i = 0, l = localAttributes.length;
-                                  i < l;
-                                  i++
-                                ) {
-                                  const localName = localAttributes[i];
-                                  const remoteName = remoteAttributes[i];
-                                  // Set `null` if invalid
-                                  const $rawValue = trap(
-                                    spec[remoteName],
-                                    TRAP_INHIBITED,
+                              function plan($insert: Setter, nodeId: unknown) {
+                                if (nodeId === undefined) {
+                                  return;
+                                } else if (nodeId === null) {
+                                  for (const localName of localAttributes) {
+                                    $insert.set(localName, null);
+                                  }
+                                } else if (typeof nodeId !== "string") {
+                                  throw new Error(
+                                    `Invalid node identifier for '${typeName}'; expected string`,
                                   );
-                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
-                                  const $value = assertNotNull(
-                                    $rawValue,
+                                }
+                                const identifiers = getIdentifiers(nodeId);
+                                if (identifiers == null) {
+                                  throw new Error(
                                     `Invalid node identifier for '${typeName}'`,
-                                    { if: $nodeIdExists },
                                   );
-                                  $insert.set(localName, $value);
+                                }
+                                for (let i = 0; i < attributeCount; i++) {
+                                  const localName = localAttributes[i];
+                                  $insert.set(localName, identifiers[i]);
                                 }
                               },
                             [
-                              TRAP_INHIBITED,
-                              assertNotNull,
-                              condition,
-                              getSpec,
+                              attributeCount,
+                              getIdentifiers,
                               localAttributes,
-                              remoteAttributes,
-                              trap,
                               typeName,
                             ],
                           ),
