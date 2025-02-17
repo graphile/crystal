@@ -36,6 +36,7 @@
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@hono/node-ws": "^1.0.5",
     "@knodes/typedoc-plugin-monorepo-readmes": "^0.23.1",
     "@knodes/typedoc-plugin-pages": "^0.23.4",
     "@localrepo/prettier2-for-jest": "npm:prettier@^2",
@@ -44,6 +45,7 @@
     "@types/mock-fs": "4.13.1",
     "@types/node": "^20.5.7",
     "@types/rimraf": "^4.0.5",
+    "@types/ws": "^8",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "@typescript-eslint/typescript-estree": "^6.5.0",
@@ -63,6 +65,7 @@
     "eslint_d": "^12.2.1",
     "glob": "^10.3.4",
     "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql-ws": "^5.16.0",
     "jest": "^29.6.4",
     "mock-fs": "^5.2.0",
     "pg": "^8.11.3",
@@ -72,6 +75,7 @@
     "typedoc-monorepo-link-types": "^0.0.4",
     "typescript": "^5.2.2",
     "webpack": "^5.94.0",
+    "ws": "^8.18.0",
     "zx": "^7.2.3"
   },
   "workspaces": [
