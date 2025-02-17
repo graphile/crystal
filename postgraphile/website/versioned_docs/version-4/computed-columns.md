@@ -161,4 +161,4 @@ which can be queried like:
 
 ### Advice
 
-See the advice in [the Custom Queries article](./custom-queries/#advice).
+See the advice in [the custom queries article](./custom-queries/#advice).

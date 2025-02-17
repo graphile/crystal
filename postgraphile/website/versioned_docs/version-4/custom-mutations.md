@@ -2,7 +2,7 @@
 title: Custom mutations
 ---
 
-PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
+PostGraphile automatically generates [CRUD mutations](./crud-mutations) for
 you; but it's rare that these will cover all your needs - and many people just
 disable them outright. Custom mutations enable you to write exactly the business
 logic you need with access to all of your data all wrapped up in a PostgreSQL
@@ -98,7 +98,7 @@ app.use(
 To use it with the CLI you need to do similar using the `.postgraphilerc.js`
 file.
 
-### Bulk Insert Example
+### Bulk insert example
 
 Here's an example of a custom mutation that performs a "bulk insert" - inserting
 and returning a set of records:

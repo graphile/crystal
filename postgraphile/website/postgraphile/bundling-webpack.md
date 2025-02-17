@@ -2,7 +2,7 @@
 title: Bundling with webpack
 ---
 
-# Bundling PostGraphile with Webpack
+# Bundling PostGraphile with webpack
 
 In V5, we recommend that you export your schema with `graphile-export`
 (assuming all your plugins support it, which they may not) and then bundle the
