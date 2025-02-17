@@ -62,7 +62,7 @@ export function bakedInput<TArg = any>(
   if (
     isListType(nullableInputType) ||
     (isInputObjectType(nullableInputType) &&
-      typeof nullableInputType.extensions?.grafast?.baked !== "function")
+      typeof nullableInputType.extensions?.grafast?.baked === "function")
   ) {
     // Ooo, we're fancy! Do the thing!
     return new BakedInputStep<TArg>(nullableInputType, $value);
