@@ -29,7 +29,7 @@ avoiding naming conflicts. For example:
 But if you don't want this (or it's doing something wrong), then you can fix it
 by overriding inflectors!
 
-### Overriding Naming - One-off
+### Overriding naming - once
 
 If you want to rename just one field or type, your best bet is to use a
 [smart tag](./smart-tags.md); e.g. for a table you might do:
@@ -45,7 +45,7 @@ honouring them.
 
 :::
 
-### Overriding Inflection
+### Overriding inflection
 
 You can easily write a plugin to override an individual inflector, it just
 needs to add the new inflector under the `inflection.replace` object; an
