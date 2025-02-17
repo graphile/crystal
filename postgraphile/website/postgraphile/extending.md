@@ -34,7 +34,7 @@ const FullNameToNamePlugin = {
 };
 ```
 
-### Writing Plugins
+### Writing plugins
 
 We’ve created a number of plugin helpers for common tasks:
 
@@ -56,7 +56,7 @@ Do look over our [plugin gallery](./plugin-gallery) for examples of plugins.
 These are generally suitable for copying/pasting into your app and then
 customizing to your needs.
 
-### Loading Plugins
+### Loading plugins
 
 Once you’ve written (or installed) a plugin, you can load it via your preset:
 

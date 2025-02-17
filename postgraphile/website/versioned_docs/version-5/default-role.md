@@ -1,5 +1,5 @@
 ---
-title: Default role
+title: The default_role
 ---
 
 PostGraphile V5 doesn't have a "default role" any more, but you can indicate a

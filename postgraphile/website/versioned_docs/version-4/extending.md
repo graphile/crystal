@@ -2,7 +2,7 @@
 title: Schema plugins
 ---
 
-# GraphQL Schema Plugins
+# GraphQL schema plugins
 
 PostGraphile's schema generator is built from a number of
 [Graphile Engine plugins](https://build.graphile.org/graphile-build/4/plugins). You can
@@ -12,7 +12,7 @@ or using the raw plugin interface available from Graphile Engine.
 _If you're looking for an easy way to remove/rename things, check out
 [smart comments](./smart-comments)._
 
-### Writing Plugins
+### Writing plugins
 
 We've created a number of plugin helpers for common tasks:
 

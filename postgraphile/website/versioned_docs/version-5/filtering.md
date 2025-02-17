@@ -28,7 +28,7 @@ To add a condition to an existing condition another option is the
 can also augment PostGraphile's existing connections using custom [Graphile
 Engine plugins](./extending-raw), such as the following:
 
-#### Filter Plugin
+#### The filter plugin
 
 > 🚨**BEWARE**🚨: adding powerful generic filtering capabilities to your GraphQL
 > API is strongly discouraged, not just by Benjie (the maintainer of

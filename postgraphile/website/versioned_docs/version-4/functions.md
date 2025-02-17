@@ -2,22 +2,22 @@
 title: Functions
 ---
 
-# Database Functions
+# Database functions
 
 One of the easiest ways to add more capabilities to your PostGraphile schema is
 with PostgreSQL functions. The three main methods are:
 
-- [Computed Columns](./computed-columns) enable you to add a computed field to
+- [Computed columns](./computed-columns) enable you to add a computed field to
   a table type
-- [Custom Queries](./custom-queries) enable you to add a root level Query field
+- [Custom queries](./custom-queries) enable you to add a root level Query field
   which can return a scalar, list, custom type, table row or even a table
   connection
-- [Custom Mutations](./custom-mutations) enable you to add a root level
+- [Custom mutations](./custom-mutations) enable you to add a root level
   Mutation field which can cause modifications to your database and return
   nothing (`void`), a scalar, list, custom type, table row or list of table rows
   (but not a connection, since you cannot paginate over a mutation)
 
-### Understanding Functions
+### Understanding functions
 
 In order to make the most powerful PostGraphile server you can, it's very
 important to understand PostgreSQL functions. Functions allow you to define
@@ -30,7 +30,7 @@ For some function examples, you can refer to the [forum example SQL schema][].
 
 [forum example sql schema]: https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
 
-### Recommended Reading
+### Recommended reading
 
 - PostgreSQL [`CREATE FUNCTION`][] documentation for actually creating
   functions.
@@ -41,7 +41,7 @@ For some function examples, you can refer to the [forum example SQL schema][].
 [`create trigger`]: http://www.postgresql.org/docs/current/static/sql-createtrigger.html
 [computed columns in postgresql]: http://stackoverflow.com/a/11166268/1568890
 
-### Procedural Languages
+### Procedural languages
 
 Functions in PostgreSQL require you to use either SQL or a procedural language.
 The most common procedural language in PostgreSQL is [PL/pgSQL][pl/pgsql]. SQL
@@ -100,7 +100,7 @@ $$ LANGUAGE plv8 IMMUTABLE STRICT;
 [javascript (plv8)]: https://github.com/plv8/plv8
 [ruby (plruby)]: https://github.com/knu/postgresql-plruby
 
-### Named Arguments
+### Named arguments
 
 PostgreSQL allows you to mix named and positional (unnamed) arguments in your
 functions. However, GraphQL will _only_ allow named arguments. So if you don’t
@@ -185,7 +185,7 @@ To better understand these conflicts and solutions, refer to the PostgreSQL docs
 for
 [variable substitution](https://www.postgresql.org/docs/current/plpgsql-implementation.html#PLPGSQL-VAR-SUBST).
 
-### VOLATILE (Mutation) Functions
+### VOLATILE (mutation) functions
 
 By default, a function is “volatile”. For example, a function defined as:
 
@@ -216,7 +216,7 @@ methods like `POST`, `PUT`, `PATCH`, and `DELETE`.
 Certain VOLATILE functions will be exposed by PostGraphile as
 [custom mutations](./custom-mutations).
 
-### STABLE/IMMUTABLE (Query) Functions
+### STABLE/IMMUTABLE (query) functions
 
 If your function does not modify any data or state, you should declare it as
 `STABLE`. (If your function depends only on its arguments and does not fetch
@@ -265,7 +265,7 @@ HTTP methods like `GET` and `HEAD`.
 Certain STABLE/IMMUTABLE functions will be exposed by PostGraphile as
 [custom queries](./custom-queries) or [computed columns](./computed-columns).
 
-### SETOF Functions - Connections
+### SETOF functions - connections
 
 As well as scalars, compound types, and arrays of these, PostgreSQL functions
 can also return sets. Sets emulate tables, and so it's natural for PostGraphile

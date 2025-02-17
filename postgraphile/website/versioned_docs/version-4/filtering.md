@@ -24,7 +24,7 @@ adding fields using [custom queries](./custom-queries),
 You can also augment PostGraphile's existing connections using custom
 [Graphile Engine plugins](./extending-raw), such as the following:
 
-### Filter Plugin
+### The filter plugin
 
 :::warning BEWARE
 

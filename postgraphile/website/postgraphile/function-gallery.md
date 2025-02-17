@@ -2,7 +2,7 @@
 title: Function gallery
 ---
 
-# Database Function Gallery
+# Database function gallery
 
 :::caution
 
@@ -18,7 +18,7 @@ _This page is a WIP — sorry that it's hard to read right now, we will definite
 be tidying it up! If you want to help with this, please pop into our
 [discord chat](http://discord.gg/graphile) and volunteer!_
 
-## Custom Queries
+## Custom queries
 
 ### Logged in user field
 
@@ -51,7 +51,7 @@ $$ language sql stable set search_path from current;
    forumByNodeId(
 ```
 
-## Computed Columns
+## Computed columns
 
 ### User primary email
 
@@ -87,7 +87,7 @@ $$ language sql stable set search_path from current;
  """
 ```
 
-## Custom Mutations
+## Custom mutations
 
 ### Insert multiple records
 

@@ -2,7 +2,7 @@
 title: Graphile Engine
 ---
 
-# Schema Plugins — Graphile Engine
+# Schema plugins — Graphile Engine
 
 The PostGraphile GraphQL schema is constructed out of a number of Graphile
 Engine plugins. The core PG-related plugins can be found here:

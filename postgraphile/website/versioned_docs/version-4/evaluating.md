@@ -2,7 +2,7 @@
 title: Evaluating PostGraphile
 ---
 
-# Evaluating PostGraphile For Your Project
+# Evaluating PostGraphile for your project
 
 Hopefully you’ve been convinced that PostGraphile serves an awesome GraphQL API,
 but now let’s take a more critical look at whether or not you should adopt
@@ -19,7 +19,7 @@ optimizing your database. Scaling a database is well-understood - and you can
 combine techniques - scaling vertically with larger database servers (more RAM,
 faster storage), or horizontally with read replicas.
 
-### No Lock-In
+### No lock-in
 
 PostGraphile does not lock you into using PostGraphile forever - in fact most of
 the work you do implementing a PostGraphile API is in your database, which you
@@ -44,7 +44,7 @@ exit path even years into the business. We welcome your contributions to help
 PostGraphile scale and meet your needs, and are very open to sponsored
 improvements to the software.
 
-### Schema Driven APIs
+### Schema-driven APIs
 
 If you fundamentally disagree with a one-to-one mapping of a SQL schema to an
 API (GraphQL or otherwise) this section is for you.
@@ -54,12 +54,12 @@ of your API. PostGraphile was created to allow you to focus on your product and
 not the API. If you need to integrate external systems, there are plugin
 interfaces to help you do that, and they're getting easier to use all the time.
 If you want a custom API there is a simple transition path (read
-[no lock in](#no-lock-in)). If you still can’t get over the one-to-one nature of
+[no lock-in](#no-lock-in)). If you still can’t get over the one-to-one nature of
 PostGraphile consider the following arguments why putting your business logic in
 PostgreSQL is a good idea:
 
 1.  PostgreSQL already has a powerful [user management system][user-management]
-    with fine grained [row level security][row-level-security]. A custom API
+    with fine grained [row-level security][row-level-security]. A custom API
     would mean you have to build your own user management and security, and
     having to guarantee that every possible route to your database data is
     vetted by the same permissions logic (which PostgreSQL RLS does for you).
@@ -79,7 +79,7 @@ PostgreSQL is a good idea:
     transactions and event reporting), implement a job queue, or add a Graphile
     Engine plugin to wrap or replace a PostGraphile resolver.
 
-Still worried about a certain aspect of a schema driven API? Open an issue,
+Still worried about a certain aspect of a schema-driven API? Open an issue,
 we're confident we can convince you otherwise 😉
 
 [user-management]: http://www.postgresql.org/docs/current/static/user-manag.html
