@@ -14,7 +14,7 @@ import { operationPlan } from "./index.js";
 
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
-let inputArgsApplyMutex = false;
+let inputArgsApplyDepth = 0;
 
 export class ApplyInputStep<
   TParent extends object = any,
@@ -67,31 +67,27 @@ export function inputArgsApply<
     | ((parent: TArg) => TTarget | (() => TTarget))
     | undefined,
 ): void {
-  if (inputArgsApplyMutex) {
-    throw new Error(
-      "There's already an inputArgsApply running; we can't run another!",
-    );
-  }
-  if (currentModifiers.length !== 0) {
-    throw new Error("Previous modifiers weren't cleaned up!");
-  }
   try {
-    inputArgsApplyMutex = true;
+    inputArgsApplyDepth++;
     const target = getTargetFromParent
       ? getTargetFromParent(parent)
       : (parent as unknown as TTarget);
 
     _inputArgsApply<TTarget>(schema, inputType, target, inputValue);
-
-    applyingModifiers = true;
-    const l = currentModifiers.length;
-    for (let i = l - 1; i >= 0; i--) {
-      currentModifiers[i].apply();
-    }
   } finally {
-    applyingModifiers = false;
-    currentModifiers = [];
-    inputArgsApplyMutex = false;
+    inputArgsApplyDepth--;
+  }
+  let l: number;
+  if (inputArgsApplyDepth === 0 && (l = currentModifiers.length) > 0) {
+    applyingModifiers = true;
+    try {
+      for (let i = l - 1; i >= 0; i--) {
+        currentModifiers[i].apply();
+      }
+    } finally {
+      applyingModifiers = false;
+      currentModifiers = [];
+    }
   }
 }
 

@@ -1,10 +1,11 @@
 import type {
   GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLList,
   GraphQLNullableType,
   GraphQLSchema,
 } from "graphql";
-import { isInputObjectType } from "graphql";
+import { getNullableType, isInputObjectType, isListType } from "graphql";
 
 import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -20,8 +21,14 @@ export class BakedInputStep<
   public isSyncAndSafe = true;
 
   valueDepId: 0;
-  extra: { type: GraphQLInputObjectType; schema: GraphQLSchema };
-  constructor(type: GraphQLInputObjectType, $value: AnyInputStep) {
+  extra: {
+    type: GraphQLInputObjectType | GraphQLList<any>;
+    schema: GraphQLSchema;
+  };
+  constructor(
+    type: GraphQLInputObjectType | GraphQLList<any>,
+    $value: AnyInputStep,
+  ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
     if (!this._isUnary) {
@@ -33,19 +40,12 @@ export class BakedInputStep<
   }
 
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
-    if (value == null) return value;
-    const bakedObj = this.extra.type.extensions!.grafast!.baked!(
-      value as Record<string, any>,
-      this.extra,
-    );
-    inputArgsApply(
-      this.operationPlan.schema,
+    if (value == null) return value as TData;
+    return bakedInputRuntime(
+      this.extra.schema,
       this.extra.type,
-      bakedObj,
       value,
-      undefined,
-    );
-    return bakedObj;
+    ) as TData;
   }
 }
 
@@ -54,41 +54,55 @@ export class BakedInputStep<
  * that type to the internal representation (if any).
  */
 export function bakedInput<TArg = any>(
-  inputType: GraphQLInputType & GraphQLNullableType,
+  inputType: GraphQLInputType,
   $value: AnyInputStep,
 ) {
+  const nullableInputType = getNullableType(inputType);
   // Could have done this in `optimize()` but faster to do it here.
   if (
-    !isInputObjectType(inputType) ||
-    typeof inputType.extensions?.grafast?.baked !== "function"
+    isListType(nullableInputType) ||
+    (isInputObjectType(nullableInputType) &&
+      typeof nullableInputType.extensions?.grafast?.baked !== "function")
   ) {
+    // Ooo, we're fancy! Do the thing!
+    return new BakedInputStep<TArg>(nullableInputType, $value);
+  } else {
     // Nothing special, we just return the input.
     return $value;
-  } else {
-    // Ooo, we're fancy! Do the thing!
-    return new BakedInputStep<TArg>(inputType, $value);
   }
 }
 
 export function bakedInputRuntime(
   schema: GraphQLSchema,
-  inputType: GraphQLInputType & GraphQLNullableType,
+  inputType: GraphQLInputType,
   value: unknown,
-) {
+): unknown {
   if (value == null) return value;
+  const nullableInputType = getNullableType(inputType);
+  if (isListType(nullableInputType)) {
+    if (Array.isArray(value)) {
+      return value.map((v) =>
+        bakedInputRuntime(schema, nullableInputType.ofType, v),
+      );
+    } else {
+      throw new Error(
+        `Failed to process input for type ${inputType} - expected array`,
+      );
+    }
+  }
   // Could have done this in `optimize()` but faster to do it here.
-  if (
-    !isInputObjectType(inputType) ||
-    typeof inputType.extensions?.grafast?.baked !== "function"
-  ) {
+  const baked = isInputObjectType(nullableInputType)
+    ? nullableInputType.extensions?.grafast?.baked
+    : null;
+  if (typeof baked !== "function") {
     // Nothing special, we just return the input.
     return value;
   } else {
     // Ooo, we're fancy! Do the thing!
-    const bakedObj = inputType.extensions!.grafast!.baked!(
-      value as Record<string, any>,
-      { type: inputType, schema },
-    );
+    const bakedObj = baked!(value as Record<string, any>, {
+      type: nullableInputType as GraphQLInputObjectType,
+      schema,
+    });
     inputArgsApply(schema, inputType, bakedObj, value, undefined);
     return bakedObj;
   }
