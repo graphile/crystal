@@ -2,7 +2,7 @@
 title: Best practices
 ---
 
-# PostGraphile Best Practices
+# PostGraphile best practices
 
 This guide is a work in progress. If you have ideas for best practices, please
 use the "Suggest improvements to this page" link above to submit them, or

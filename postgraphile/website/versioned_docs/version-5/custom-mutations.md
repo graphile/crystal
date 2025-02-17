@@ -2,7 +2,7 @@
 title: Custom mutations
 ---
 
-PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
+PostGraphile automatically generates [CRUD mutations](./crud-mutations) for
 you; but it's rare that these will cover all your needs - and many people just
 disable them outright. Custom mutations enable you to write exactly the business
 logic you need with access to all of your data all wrapped up in a PostgreSQL
@@ -99,7 +99,7 @@ default value will be optional. For example: `CREATE FUNCTION foo(a int, b int,
 c int = 0, d int = null)...` would give a mutation `foo(a: Int!, b: Int!, c:
 Int, d: Int)`.
 
-### Bulk Insert Example
+### Bulk insert example
 
 Here's an example of a custom mutation that performs a "bulk insert" - inserting
 and returning a set of records:
