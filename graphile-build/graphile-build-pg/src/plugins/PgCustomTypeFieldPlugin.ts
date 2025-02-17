@@ -608,7 +608,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         ) as PgSelectSingleStep
                       ).record();
                     } else {
-                      step = bakedInput(args.typeAt(fullPath), $raw);
+                      const type = args.typeAt(fullPath);
+                      step = bakedInput(type, $raw);
                     }
 
                     if (skipped) {

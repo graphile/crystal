@@ -38,7 +38,13 @@ export class BakedInputStep<
       value as Record<string, any>,
       this.extra,
     );
-    inputArgsApply(this.extra.type, bakedObj, value, undefined);
+    inputArgsApply(
+      this.operationPlan.schema,
+      this.extra.type,
+      bakedObj,
+      value,
+      undefined,
+    );
     return bakedObj;
   }
 }
@@ -61,5 +67,29 @@ export function bakedInput<TArg = any>(
   } else {
     // Ooo, we're fancy! Do the thing!
     return new BakedInputStep<TArg>(inputType, $value);
+  }
+}
+
+export function bakedInputRuntime(
+  schema: GraphQLSchema,
+  inputType: GraphQLInputType & GraphQLNullableType,
+  value: unknown,
+) {
+  if (value == null) return value;
+  // Could have done this in `optimize()` but faster to do it here.
+  if (
+    !isInputObjectType(inputType) ||
+    typeof inputType.extensions?.grafast?.baked !== "function"
+  ) {
+    // Nothing special, we just return the input.
+    return value;
+  } else {
+    // Ooo, we're fancy! Do the thing!
+    const bakedObj = inputType.extensions!.grafast!.baked!(
+      value as Record<string, any>,
+      { type: inputType, schema },
+    );
+    inputArgsApply(schema, inputType, bakedObj, value, undefined);
+    return bakedObj;
   }
 }

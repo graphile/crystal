@@ -1,4 +1,4 @@
-import type { GraphQLInputType } from "graphql";
+import type { GraphQLInputType, GraphQLSchema } from "graphql";
 import {
   isEnumType,
   isInputObjectType,
@@ -45,7 +45,13 @@ export class ApplyInputStep<
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
     const { getTargetFromParent } = this;
     return (parentThing: TParent) =>
-      inputArgsApply(this.inputType, parentThing, value, getTargetFromParent);
+      inputArgsApply(
+        this.operationPlan.schema,
+        this.inputType,
+        parentThing,
+        value,
+        getTargetFromParent,
+      );
   }
 }
 
@@ -53,6 +59,7 @@ export function inputArgsApply<
   TArg extends object,
   TTarget extends object = TArg,
 >(
+  schema: GraphQLSchema,
   inputType: GraphQLInputType,
   parent: TArg,
   inputValue: unknown,
@@ -74,7 +81,7 @@ export function inputArgsApply<
       ? getTargetFromParent(parent)
       : (parent as unknown as TTarget);
 
-    _inputArgsApply<TTarget>(inputType, target, inputValue);
+    _inputArgsApply<TTarget>(schema, inputType, target, inputValue);
 
     applyingModifiers = true;
     const l = currentModifiers.length;
@@ -119,6 +126,7 @@ const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver 
 */
 
 function _inputArgsApply<TArg extends object>(
+  schema: GraphQLSchema,
   inputType: GraphQLInputType,
   target: TArg | (() => TArg),
   inputValue: unknown,
@@ -132,7 +140,7 @@ function _inputArgsApply<TArg extends object>(
     if (inputValue === null) {
       throw new Error(`null value found in non-null position`);
     }
-    _inputArgsApply(inputType.ofType, target, inputValue);
+    _inputArgsApply(schema, inputType.ofType, target, inputValue);
   } else if (isListType(inputType)) {
     if (inputValue == null) return;
     if (!Array.isArray(inputValue)) {
@@ -140,7 +148,7 @@ function _inputArgsApply<TArg extends object>(
     }
     for (const item of inputValue) {
       const itemTarget = typeof target === "function" ? target() : target;
-      _inputArgsApply(inputType.ofType, itemTarget, item);
+      _inputArgsApply(schema, inputType.ofType, itemTarget, item);
     }
   } else if (typeof target === "function") {
     throw new Error(
@@ -151,13 +159,17 @@ function _inputArgsApply<TArg extends object>(
       return;
     }
     const fields = inputType.getFields();
-    for (const [fieldName, spec] of Object.entries(fields)) {
+    for (const [fieldName, field] of Object.entries(fields)) {
       const val = (inputValue as any)[fieldName];
       if (val === undefined) continue;
-      if (spec.extensions.grafast?.apply) {
-        const newTarget = spec.extensions.grafast.apply(target, val);
+      if (field.extensions.grafast?.apply) {
+        const newTarget = field.extensions.grafast.apply(target, val, {
+          schema,
+          field,
+          fieldName,
+        });
         if (newTarget != null) {
-          _inputArgsApply(spec.type, newTarget, val);
+          _inputArgsApply(schema, field.type, newTarget, val);
         }
       }
     }
@@ -257,16 +269,6 @@ function processAfter(
   }
 }
 */
-
-export type InputObjectFieldBakedResolver<TParent = any> = (
-  parent: TParent,
-  val: unknown,
-) => any;
-export type InputObjectFieldApplyResolver<TParent = any> = (
-  parent: TParent,
-  val: unknown,
-) => any;
-export type InputObjectTypeInputResolver = (val: unknown) => any;
 
 export type ApplyableExecutableStep<
   TArg extends object = any,

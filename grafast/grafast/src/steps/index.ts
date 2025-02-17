@@ -116,7 +116,7 @@ export {
   Modifier,
 } from "./applyInput.js";
 export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
-export { bakedInput, BakedInputStep } from "./bakedInput.js";
+export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
 export { condition, ConditionStep } from "./condition.js";
 export {
   GraphQLItemHandler,

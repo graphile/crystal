@@ -354,6 +354,12 @@ export function makeGrafastSchema(details: {
                 fieldSpec as InputObjectTypeBakedResolver;
               continue;
             }
+            if (config.extensions?.grafast?.baked) {
+              exportNameHint(
+                config.extensions.grafast.baked,
+                `${typeName}__baked`,
+              );
+            }
             const field = rawConfig.fields[fieldName];
             if (!field) {
               console.warn(
@@ -382,7 +388,6 @@ export function makeGrafastSchema(details: {
             };
             fields[fieldName] = fieldConfig;
             if (fieldSpec) {
-              exportNameHint(fieldSpec.baked, `${typeName}_${fieldName}_baked`);
               exportNameHint(fieldSpec.apply, `${typeName}_${fieldName}_apply`);
             }
             // it's a spec

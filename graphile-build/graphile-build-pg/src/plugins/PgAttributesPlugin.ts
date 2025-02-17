@@ -18,7 +18,7 @@ import {
   sqlValueWithCodec,
 } from "@dataplan/pg";
 import type { GrafastFieldConfig, Setter } from "grafast";
-import { each } from "grafast";
+import { bakedInput, bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -650,14 +650,19 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                             ],
                           )
                         : EXPORTABLE(
-                            (attributeName) =>
+                            (attributeName, bakedInputRuntime) =>
                               function plan(
-                                $insert: Setter<any, any>,
+                                obj: Record<string, unknown>,
                                 val: unknown,
+                                { field, schema },
                               ) {
-                                $insert.set(attributeName, val);
+                                obj[attributeName] = bakedInputRuntime(
+                                  schema,
+                                  field.type,
+                                  val,
+                                );
                               },
-                            [attributeName],
+                            [attributeName, bakedInputRuntime],
                           ),
                     },
                   ),
