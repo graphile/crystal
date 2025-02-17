@@ -54,6 +54,7 @@ import type {
   ExecutionValue,
   GrafastExecutionArgs,
   GrafastTimeouts,
+  InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
   ParseAndValidateEvent,
   PrepareArgsEvent,
@@ -128,11 +129,6 @@ import {
   PolymorphicStep,
   UnbatchedExecutableStep,
 } from "./step.js";
-import type {
-  InputObjectFieldApplyResolver,
-  InputObjectFieldBakedResolver,
-  InputObjectTypeInputResolver,
-} from "./steps/applyInput.js";
 import {
   __FlagStep,
   __InputListStep,
@@ -156,6 +152,7 @@ import {
   assertNotNull,
   assertPageInfoCapableStep,
   bakedInput,
+  bakedInputRuntime,
   BakedInputStep,
   condition,
   ConditionStep,
@@ -301,6 +298,7 @@ export {
   assertNotNull,
   assertPageInfoCapableStep,
   bakedInput,
+  bakedInputRuntime,
   BakedInputStep,
   BaseEventMap,
   BaseGraphQLArguments,
@@ -531,6 +529,7 @@ exportAsMany("grafast", {
   applyInput,
   ApplyInputStep,
   bakedInput,
+  bakedInputRuntime,
   BakedInputStep,
   operationPlan,
   connection,
@@ -684,8 +683,7 @@ declare global {
     }
 
     interface InputFieldExtensions {
-      baked?: InputObjectFieldBakedResolver;
-      apply?: InputObjectFieldApplyResolver;
+      apply?: InputObjectFieldApplyResolver<any>;
     }
 
     interface ObjectTypeExtensions {
