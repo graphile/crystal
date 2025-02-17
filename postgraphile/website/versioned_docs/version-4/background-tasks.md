@@ -55,7 +55,7 @@ Other important considerations when choosing a task queue would be:
 - Complexity
 - Throughput requirements
 - DevOps complexity
-- Tracability
+- Traceability
 - Privacy
 
 ### Graphile Worker
