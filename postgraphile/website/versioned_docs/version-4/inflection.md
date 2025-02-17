@@ -14,7 +14,7 @@ in GraphQL whilst attempting to avoid naming conflicts. For example:
 - Relations reference the target type and the referencing columns:
   `postsByAuthorId` (see "advice" below about making this shorter!)
 
-### Overriding Naming - One-off
+### Overriding naming - once
 
 If you want to rename just one field or type, your best bet is to use a
 [smart comment](./smart-tags); e.g. for a table you might do:
@@ -29,7 +29,7 @@ This still uses the inflectors, but it pretends that the tables name is
 different, so the input to the inflectors differs.
 :::
 
-### Overriding Inflection - General
+### Overriding inflection - general
 
 It's possible to override individual inflectors with a plugin. Doing so is
 documented in the
