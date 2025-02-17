@@ -604,7 +604,7 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-## Mutation Example
+## Mutation example
 
 You might want to add a custom `registerUser` mutation which inserts the new
 user into the database and also sends them an email:
@@ -700,7 +700,7 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-## Mutation Example with Node ID
+## Mutation example with Node ID
 
 In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to
 soft-delete an entry from our `app_public.items` table. We're also going to
@@ -958,7 +958,7 @@ async function sendEmail(email: string, message: string) {
 }
 ```
 
-## Plugin SQL Privileges
+## Plugin SQL privileges
 
 Plugins access the database with the same privileges as everything else - they
 are subject to RLS/RBAC/etc. If your database user does not have privileges to

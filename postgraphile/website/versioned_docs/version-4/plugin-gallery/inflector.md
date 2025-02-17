@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Inflector Plugins
+# Inflector plugins
 
 Below you'll find some small plugins that people have written. Larger plugins likely have their own dedicated repositories, these are typically just examples of how to achieve a small goal.
 
