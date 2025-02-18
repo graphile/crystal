@@ -17,6 +17,7 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  ConstantStep,
   ExecutableStep,
   exportAs,
   first,
@@ -301,6 +302,11 @@ export class PgSelectStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
     >,
+    /**
+     * @internal PgSelectStep might not always implement PgSelectQueryBuilder;
+     * we only use it for internal optimizations (specifically around
+     * `.apply(...)`).
+     */
     PgSelectQueryBuilder
 {
   static $$export = {
@@ -938,7 +944,11 @@ export class PgSelectStep<
       ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>
     >,
   ) {
-    this.applyDepIds.push(this.addUnaryDependency($step));
+    if ($step instanceof ConstantStep) {
+      ($step.data as PgSelectQueryBuilderCallback)(this);
+    } else {
+      this.applyDepIds.push(this.addUnaryDependency($step));
+    }
   }
 
   protected assertCursorPaginationAllowed(): void {
