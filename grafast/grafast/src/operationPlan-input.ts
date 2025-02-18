@@ -12,6 +12,7 @@ import {
   __InputObjectStep,
   __TrackedValueStep,
   applyInput,
+  ConstantStep,
   object,
 } from "./index.js";
 import { inspect } from "./inspect.js";
@@ -186,9 +187,16 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
         }
         const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
         const $valueAtPath = fieldArgs.getRaw(inPath) as AnyInputStep;
-        $target.apply(
-          applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
-        );
+        if (
+          $valueAtPath instanceof ConstantStep &&
+          $valueAtPath.data === undefined
+        ) {
+          // Skip applying!
+        } else {
+          $target.apply(
+            applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
+          );
+        }
       }
     },
   };
