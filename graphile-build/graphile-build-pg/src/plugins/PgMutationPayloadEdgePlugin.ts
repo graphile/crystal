@@ -212,8 +212,9 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       );
                       $select.apply(
                         extractEnumExtensionValue<
-                          | PgSelectQueryBuilderCallback
-                          | PgUnionAllQueryBuilderCallback
+                          // Only the methods valid on both types
+                          PgSelectQueryBuilderCallback &
+                            PgUnionAllQueryBuilderCallback
                         >(orderByArg!.type, ["grafast", "apply"], $orderBy),
                       );
 

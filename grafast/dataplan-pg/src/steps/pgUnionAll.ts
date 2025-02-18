@@ -912,16 +912,6 @@ on (${sql.indent(
   }
 
   optimize() {
-    if (this._limitToTypes) {
-      this.memberDigests = this.memberDigests.filter((d) =>
-        this._limitToTypes!.includes(d.member.typeName),
-      );
-    }
-    if (this.memberDigests.length === 0) {
-      // We have no implementations, we'll never return anything
-      return constant(NO_ROWS, false);
-    }
-
     // TODO: validate the parsed cursor and throw error in connection if it
     // fails. I'm not sure, but perhaps we can add this step itself (or a
     // derivative thereof) as a dependency of the connection - that way, if
@@ -1007,6 +997,7 @@ on (${sql.indent(
       typeIdx: this.typeIdx,
       attributes: this.spec.attributes,
       memberDigests: this.memberDigests,
+      limitToTypes: this._limitToTypes,
       fetchOneExtra,
       needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
@@ -1146,6 +1137,7 @@ interface PgUnionAllQueryInfo<
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
   readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;
+  readonly limitToTypes: ReadonlyArray<string> | undefined;
   readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
 
   readonly selects: ReadonlyArray<PgUnionAllStepSelect<TAttributes>>;
@@ -1156,7 +1148,8 @@ interface MutablePgUnionAllQueryInfo<
   TTypeNames extends string = string,
 > extends PgUnionAllQueryInfo<TAttributes, TTypeNames>,
     MutablePgStmtCommonQueryInfo {
-  readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  limitToTypes: Array<string> | undefined;
   readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
 
   readonly orderSpecs: Array<PgUnionAllStepOrder<TAttributes>>;
@@ -1184,6 +1177,7 @@ function buildTheQuery<
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
     memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
+    limitToTypes: rawInfo.limitToTypes?.slice(),
 
     // Will be populated below
     ordersForCursor: undefined as never,
@@ -1200,6 +1194,7 @@ function buildTheQuery<
     offset: null,
     shouldReverseOrder: false,
   };
+
   const { values, count } = info.executionDetails;
 
   function selectAndReturnIndex(expression: SQL): number {
@@ -1293,6 +1288,13 @@ function buildTheQuery<
     havingBuilder() {
       return new PgCondition(this, true);
     },
+    limitToTypes(types) {
+      if (!info.limitToTypes) {
+        info.limitToTypes = [...types];
+      } else {
+        info.limitToTypes = info.limitToTypes.filter((t) => types.includes(t));
+      }
+    },
   };
 
   for (const applyDepId of info.applyDepIds) {
@@ -1304,7 +1306,28 @@ function buildTheQuery<
     }
   }
 
+  // Apply type limits
+  if (info.limitToTypes) {
+    info.memberDigests = info.memberDigests.filter((d) =>
+      info.limitToTypes!.includes(d.member.typeName),
+    );
+  }
+
   // Now turn order specs into orders
+  if (info.memberDigests.length === 0) {
+    // We have no implementations, we'll never return anything
+    return {
+      meta,
+      text: `select null;`,
+      rawSqlValues: [],
+      identifierIndex: null,
+      first: 0,
+      last: 0,
+      queryValues: [],
+      cursorDetails: undefined,
+      shouldReverseOrder: false,
+    };
+  }
 
   for (const orderSpec of info.orderSpecs) {
     if (!info.attributes) {
@@ -2020,4 +2043,6 @@ export interface PgUnionAllQueryBuilder<
   whereBuilder(): PgCondition<this>;
   having(rawCondition: PgHavingConditionSpec<string>): void;
   havingBuilder(): PgCondition<this>;
+  /** Only return values of the given types */
+  limitToTypes(types: readonly string[]): void;
 }
