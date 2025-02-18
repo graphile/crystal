@@ -2,12 +2,11 @@ import type {
   GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLList,
-  GraphQLNullableType,
   GraphQLSchema,
 } from "graphql";
 import { getNullableType, isInputObjectType, isListType } from "graphql";
 
-import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { inputArgsApply } from "./applyInput.js";
@@ -22,12 +21,8 @@ export class BakedInputStep<
   public isSyncAndSafe = true;
 
   valueDepId: 0;
-  extra: {
-    type: GraphQLInputObjectType | GraphQLList<any>;
-    schema: GraphQLSchema;
-  };
   constructor(
-    type: GraphQLInputObjectType | GraphQLList<any>,
+    private inputType: GraphQLInputObjectType | GraphQLList<any>,
     $value: ExecutableStep,
   ) {
     super();
@@ -36,15 +31,17 @@ export class BakedInputStep<
       throw new Error(`bakedInput() must be unary`);
     }
     this._isUnaryLocked = true;
-    const { schema } = this.operationPlan;
-    this.extra = { type, schema };
+  }
+
+  public deduplicate(peers: readonly BakedInputStep[]) {
+    return peers.filter((p) => p.inputType === this.inputType);
   }
 
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
     if (value == null) return value as TData;
     return bakedInputRuntime(
-      this.extra.schema,
-      this.extra.type,
+      this.operationPlan.schema,
+      this.inputType,
       value,
     ) as TData;
   }

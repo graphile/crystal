@@ -42,6 +42,14 @@ export class ApplyInputStep<
     this._isUnaryLocked = true;
   }
 
+  public deduplicate(peers: readonly ApplyInputStep[]) {
+    return peers.filter(
+      (p) =>
+        p.inputType === this.inputType &&
+        p.getTargetFromParent === this.getTargetFromParent,
+    );
+  }
+
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
     const { getTargetFromParent } = this;
     return (parentThing: TParent) =>
