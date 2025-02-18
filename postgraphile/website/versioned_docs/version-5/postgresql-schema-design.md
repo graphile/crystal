@@ -2,6 +2,11 @@
 title: PostgreSQL schema design
 ---
 
+import TOCInline from "@theme/TOCInline";
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
 leverage the features in Postgres to completely express their application
@@ -28,30 +33,15 @@ should be useful for anyone designing a Postgres schema.
 If you haven't installed PostGraphile already, you can follow our
 [Quick Start Guide](./quick-start-guide) to get PostGraphile up and running.
 
-### Table of Contents
+</p>
 
-- [The Basics](#the-basics)
-  - [Setting Up Your Schemas](#setting-up-your-schemas)
-  - [The Person Table](#the-person-table)
-  - [Table Documentation](#table-documentation)
-  - [The Post Table](#the-post-table)
-- [Database Functions](#database-functions)
-  - [Set Returning Functions](#set-returning-functions)
-  - [Triggers](#triggers)
-- [Authentication and Authorization](#authentication-and-authorization)
-  - [Storing Emails and Passwords](#storing-emails-and-passwords)
-  - [Registering Users](#registering-users)
-  - [Postgres Roles](#postgres-roles)
-  - [JSON Web Tokens](#json-web-tokens)
-  - [Logging In](#logging-in)
-  - [Using the Authorized User](#using-the-authorized-user)
-  - [Grants](#grants)
-  - [Row Level Security](#row-level-security)
-- [Conclusion](#conclusion)
+# Table of Contents
 
-### The Basics
+<TOCInline toc={toc} />
 
-#### Setting Up Your Schemas
+## The Basics
+
+### Setting Up Your Schemas
 
 All of our database objects will go into one or two custom Postgres schemas. A
 schema is essentially a namespace, it allows you to create tables with the same
@@ -77,20 +67,24 @@ structure your database. We decided to create two schemas. One of which,
 
 Theoretically we want a user to be able to log in directly to our Postgres
 database, and only be able to create, read, update, and delete data for their
-user all within SQL. This is a mindshift from how we traditionally use a SQL
+user all within SQL. This is a mind-shift from how we traditionally use a SQL
 database. Normally, we assume whoever is querying the database has full
 visibility into the system as the only one with database access is our
 application. In this tutorial, we want to restrict access at the database level.
 Don’t worry though! Postgres is very secure about this, users will have no more
 permissions than that which you explicitly grant.
 
-> **Note:** When starting PostGraphile, you will want to use the name of the
-> schema you created with the `--schema` option, like so:
-> `postgraphile --schema forum_example`. Also, don’t forget to add the `--watch`
-> flag, with watch mode enabled PostGraphile will update your API as we add
-> tables and types throughout this tutorial.
+:::note
 
-#### The Person Table
+When starting PostGraphile, you will want to use the name of the
+schema you created with the `--schema` option, like so:
+`postgraphile --schema forum_example`. Also, don’t forget to add the `--watch`
+flag, with watch mode enabled PostGraphile will update your API as we add
+tables and types throughout this tutorial.
+
+:::
+
+### The Person Table
 
 Now we are going to create the tables in our database which will correspond to
 our users. We will do this by running the Postgres
@@ -145,42 +139,50 @@ The syntax and features of the Postgres
 command are fairly easy to learn and understand. Creating tables is the easiest,
 but also the most fundamental part of your schema design.
 
-> **Note:** We prefer singular identifers like `forum_example.person` over
-> `forum_example.people` because when you create a table, it is like you are
-> creating a class in an object-oriented language. Classes have singular names
-> like “Person” while collections will often have plural names like “People.”
-> Table as a class is a better analogy than table as a collection because
-> Postgres itself will internally call tables “classes.”
+:::note
 
-> **Note:** In case you don’t like serial id of our table above, an alternative
-> to the `serial` primary key is UUIDs. To use UUIDs you would just need to add
-> the popular UUID extension, `uuid-ossp`, in your database setup, and specify a
-> default in your table creation. Like so:
->
-> ```sql
-> create extension if not exists "uuid-ossp";
->
-> create table forum_example.person (
->   id uuid primary key default uuid_generate_v1mc(),
->   ...
-> );
-> ```
->
-> Alternatively you could use fully random UUIDs:
->
-> ```sql
-> create extension if not exists "pgcrypto";
->
-> create table forum_example.person (
->   id uuid primary key default gen_random_uuid(),
->   ...
-> );
-> ```
->
-> There are pros and cons to both approaches, choose what works best for your
-> application!
+We prefer singular identifiers like `forum_example.person` over
+`forum_example.people` because when you create a table, it is like you are
+creating a class in an object-oriented language. Classes have singular names
+like “Person” while collections will often have plural names like “People.”
+Table as a class is a better analogy than table as a collection because
+Postgres itself will internally call tables “classes.”
 
-#### Table Documentation
+:::
+
+:::note
+
+In case you don’t like serial id of our table above, an alternative
+to the `serial` primary key is UUIDs. To use UUIDs you would just need to add
+the popular UUID extension, `uuid-ossp`, in your database setup, and specify a
+default in your table creation. Like so:
+
+```sql
+create extension if not exists "uuid-ossp";
+
+create table forum_example.person (
+  id uuid primary key default uuid_generate_v1mc(),
+  ...
+);
+```
+
+Alternatively you could use fully random UUIDs:
+
+```sql
+create extension if not exists "pgcrypto";
+
+create table forum_example.person (
+  id uuid primary key default gen_random_uuid(),
+  ...
+);
+```
+
+There are pros and cons to both approaches, choose what works best for your
+application!
+
+:::
+
+### Table Documentation
 
 Now that we have created our table, we want to document it within the Postgres
 database. By adding comments to our table and its columns using the Postgres
@@ -201,14 +203,18 @@ comment on column forum_example.person.created_at is 'The time this person was c
 
 Incredibly simple, yet also incredibly powerful.
 
-> **Note:** Feel free to write your comments in Markdown! Most tools, including
-> GraphiQL which PostGraphile uses, will render your comments with the
-> appropriate styles.
+:::note
+
+Feel free to write your comments in Markdown! Most tools, including
+GraphiQL which PostGraphile uses, will render your comments with the
+appropriate styles.
+
+:::
 
 With this we have completed our person table, now let’s create a table for our
 forum posts.
 
-#### The Post Table
+### The Post Table
 
 The users of our forum will want to be able to create posts. That’s the entire
 reason we have a forum after all. To create the post table we go through a very
@@ -240,37 +246,41 @@ that make up the enum in any column of the enum’s type. Having this type is
 useful for us, because we want our forum posts to have one, or none, topics so
 user’s may easily see what a post is about.
 
-> **Note:** PostGraphile implements custom handling for user-defined types. An
-> enum type like that defined above will be turned into a GraphQL enum that
-> looks like:
->
-> ```graphql
-> enum PostTopic {
->   DISCUSSION
->   INSPIRATION
->   HELP
->   SHOWCASE
-> }
-> ```
->
-> You can also create custom composite types which will turn into GraphQL object
-> types with PostGraphile.
->
-> ```sql
-> create type my_schema.my_type as (
->   foo integer,
->   bar integer
-> );
-> ```
->
-> Would become the following GraphQL type:
->
-> ```graphql
-> type MyType {
->   foo: Int
->   bar: Int
-> }
-> ```
+:::note
+
+PostGraphile implements custom handling for user-defined types. An
+enum type like that defined above will be turned into a GraphQL enum that
+looks like:
+
+```graphql
+enum PostTopic {
+  DISCUSSION
+  INSPIRATION
+  HELP
+  SHOWCASE
+}
+```
+
+You can also create custom composite types which will turn into GraphQL object
+types with PostGraphile.
+
+```sql
+create type my_schema.my_type as (
+  foo integer,
+  bar integer
+);
+```
+
+Would become the following GraphQL type:
+
+```graphql
+type MyType {
+  foo: Int
+  bar: Int
+}
+```
+
+:::
 
 Now it is time to actually create our post table:
 
@@ -300,7 +310,7 @@ write `integer` as the column type. We also made sure to include comments.
 Now that we have gone over the basics, let’s explore Postgres functions and see
 how we can use them to extend the functionality of our database.
 
-### Database Functions
+## Database Functions
 
 The Postgres
 [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/sql-createfunction.html)
@@ -323,13 +333,17 @@ _does not_ mutate the database. By default Postgres assumes all functions will
 mutate the database, you must mark your function with `stable` for Postgres, and
 PostGraphile, to know your function is a query and not a mutation.
 
-> **Note:** If you are interested in running JavaScript or Ruby in Postgres,
-> check out [PL/V8](https://blog.heroku.com/javascript_in_your_postgres) and
-> [PL/ruby](https://github.com/knu/postgresql-plruby) respectively. It is
-> recommended that you use SQL and PL/pgSQL (which comes native with Postgres)
-> whenever you can (even if they are a pain). There is plenty of documentation
-> and StackOverflow answers on both SQL and PL/pgSQL. However, there are
-> alternatives if you so choose.
+:::note
+
+If you are interested in running JavaScript or Ruby in Postgres,
+check out [PL/V8](https://blog.heroku.com/javascript_in_your_postgres) and
+[PL/ruby](https://github.com/knu/postgresql-plruby) respectively. It is
+recommended that you use SQL and PL/pgSQL (which comes native with Postgres)
+whenever you can (even if they are a pain). There is plenty of documentation
+and StackOverflow answers on both SQL and PL/pgSQL. However, there are
+alternatives if you so choose.
+
+:::
 
 That function above isn’t so useful for us in our schema, so let’s write some
 functions which will be useful. We will define three.
@@ -384,30 +398,34 @@ added comments to our functions with the
 [`COMMENT`](https://www.postgresql.org/docs/current/static/sql-comment.html)
 command, just like we add comments to our tables.
 
-> **Note:** Any function which meets the following conditions will be treated as
-> a computed field by PostGraphile:
->
-> 1.  The function has a table row as the first argument.
-> 2.  The function is in the same schema as the table of the first argument.
-> 3.  The function’s name is prefixed by the table’s name.
-> 4.  The function is marked as `stable` or `immutable` which makes it a query
->     and not a mutation.
->
-> All three of the above functions meet these conditions and as such will be
-> computed fields. In GraphQL this ends up looking like:
->
-> ```graphql
-> type Person {
->   id: Int!
->   firstName: String!
->   lastName: String
->   ...
->   fullName: String
->   latestPost: Post
-> }
-> ```
+:::note
 
-#### Set Returning Functions
+Any function which meets the following conditions will be treated as
+a computed field by PostGraphile:
+
+1.  The function has a table row as the first argument.
+2.  The function is in the same schema as the table of the first argument.
+3.  The function’s name is prefixed by the table’s name.
+4.  The function is marked as `stable` or `immutable` which makes it a query
+    and not a mutation.
+
+All three of the above functions meet these conditions and as such will be
+computed fields. In GraphQL this ends up looking like:
+
+```graphql
+type Person {
+  id: Int!
+  firstName: String!
+  lastName: String
+  ...
+  fullName: String
+  latestPost: Post
+}
+```
+
+:::
+
+### Set Returning Functions
 
 Sometimes it is useful to not just return single values from your function, but
 perhaps entire tables. What returning a table from a function could mean is you
@@ -429,38 +447,50 @@ The difference with this function and the ones before is the return signature
 reads `returns setof forum_example.post`. This function will therefore return
 all of the posts that match our search condition and not just one.
 
-> **Note:** PostGraphile will treat set returning functions as connections. This
-> is what makes them so powerful for PostGraphile users. The function above
-> would be queryable like so:
->
-> ```graphql
-> {
->   searchPosts(search: "Hello, world!", first: 5) {
->     edges {
->       cursor
->       node {
->         headline
->         body
->       }
->     }
->   }
-> }
-> ```
+:::note
 
-> **Note:** Postgres has awesome text searching capabilities - if you want high
-> quality full text searching you don’t need to look outside Postgres. Instead
-> look into the Postgres
-> [Full Text Search](https://www.postgresql.org/docs/current/static/textsearch.html)
-> functionality. It is a great feature, but a bit much for our simple example,
-> so we just used a simple string position function instead.
+PostGraphile will treat set returning functions as connections. This
+is what makes them so powerful for PostGraphile users. The function above
+would be queryable like so:
 
-> **Note:** Returning an array (`returns post[]`), and returning a set
-> (`returns setof post`) are two very different things. When you return an
-> array, every single value in the array will always be returned. However, when
-> you return a set it is like returning a table. Users can paginate through a
-> set using `limit` and `offset`, but not an array.
+```graphql
+{
+  searchPosts(search: "Hello, world!", first: 5) {
+    edges {
+      cursor
+      node {
+        headline
+        body
+      }
+    }
+  }
+}
+```
 
-#### Triggers
+:::
+
+:::note
+
+Postgres has awesome text searching capabilities — if you want high
+quality full text searching you don’t need to look outside Postgres. Instead
+look into the Postgres
+[Full Text Search](https://www.postgresql.org/docs/current/static/textsearch.html)
+functionality. It is a great feature, but a bit much for our simple example,
+so we just used a simple string position function instead.
+
+:::
+
+:::note
+
+Returning an array (`returns post[]`), and returning a set
+(`returns setof post`) are two very different things. When you return an
+array, every single value in the array will always be returned. However, when
+you return a set it is like returning a table. Users can paginate through a
+set using `limit` and `offset`, but not an array.
+
+:::
+
+### Triggers
 
 You can also use Postgres functions to define triggers. Triggers in Postgres
 allow you to hook into events that are happening on your tables such as inserts,
@@ -518,19 +548,21 @@ command. The triggers will run before a row is updated by the
 [`UPDATE`](https://www.postgresql.org/docs/current/static/sql-update.html)
 command and will execute the function on every row being updated.
 
-> **Note:** If you find yourself wanting to do CPU intensive work in triggers,
-> instead consider using Postgres’ pub/sub functionality
-> ([`LISTEN`](https://www.postgresql.org/docs/current/static/sql-listen.html) /
-> [`NOTIFY`](https://www.postgresql.org/docs/current/static/sql-notify.html)) to
-> send the work to a "worker service" to be executed asynchronously.
-> [Graphile Worker](https://github.com/graphile/worker) uses this pattern in a
-> fail-safe way; allowing you to run jobs "in the background" so that your HTTP
-> response/application code is not held up. We recommend using Graphile Worker
-> with any Node.js based PostgreSQL database that needs to queue actions such as
-> sending emails, push notifications, generating PDF reports and other such
-> asynchronous tasks.
+:::note
 
----
+If you find yourself wanting to do CPU intensive work in triggers,
+instead consider using Postgres’ pub/sub functionality
+([`LISTEN`](https://www.postgresql.org/docs/current/static/sql-listen.html) /
+[`NOTIFY`](https://www.postgresql.org/docs/current/static/sql-notify.html)) to
+send the work to a "worker service" to be executed asynchronously.
+[Graphile Worker](https://worker.graphile.org) uses this pattern in a
+fail-safe way; allowing you to run jobs "in the background" so that your HTTP
+response/application code is not held up. We recommend using Graphile Worker
+with any Node.js based PostgreSQL database that needs to queue actions such as
+sending emails, push notifications, generating PDF reports and other such
+asynchronous tasks.
+
+:::
 
 That’s about it as far as Postgres functions go! They are a fun, interesting,
 and useful topic to understand when it comes to good Postgres schema design.
@@ -544,7 +576,7 @@ your reference are as follows:
 
 Next up, we are going to learn about auth in Postgres and PostGraphile!
 
-### Authentication and Authorization
+## Authentication and Authorization
 
 Authentication and authorization is incredibly important whenever you build an
 application. You want your users to be able to login and out of your service,
@@ -558,7 +590,7 @@ some pretty important data in our schema. How are users supposed to even login?
 Not by guessing their first and last name one would hope, so we will define
 another table which will store user emails and passwords.
 
-#### Storing Emails and Passwords
+### Storing Emails and Passwords
 
 To store user emails and passwords we will create another table in the
 `forum_example_private` schema.
@@ -576,39 +608,51 @@ comment on column forum_example_private.person_account.email is 'The email addre
 comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
-> **Warning:** Never store passwords in plaintext! The `password_hash` column
-> will contain the user’s password _after_ it has gone through a secure hashing
-> algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/).
-> Later in this tutorial we will show you how to securely hash a password in
-> Postgres.
+:::warning
+
+Never store passwords in plaintext! The `password_hash` column
+will contain the user’s password _after_ it has gone through a secure hashing
+algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/).
+Later in this tutorial we will show you how to securely hash a password in
+Postgres.
+
+:::
 
 Why would we choose to create a new table in the `forum_example_private` schema
 instead of just adding columns to `forum_example.person`? There are a couple of
 answers to this question. The first and most fundamental is separation of
 concerns. By moving `email` and `password_hash` to a second table we make it
-much harder to accidently select those values when reading
+much harder to accidentally select those values when reading
 `forum_example.person`. Also, users will not have the permission to directly
 query data from `forum_example_private` (as we will see) making this approach
 more secure. This approach is also good for PostGraphile as the
 `forum_example_private` schema is never exposed in PostGraphile, so you will
-never accidently expose password hashes in GraphQL.
+never accidentally expose password hashes in GraphQL.
 
 Besides those arguments, moving the person’s account to a separate table is also
 good database design in general. Say you have multiple types of users. Perhaps
 normal person users, and then ’brand‘ or ‘organization’ users. This pattern
 could easily allow you to go in that direction.
 
-> **Note:** The `forum_example_private.person_account` shares its primary key
-> with `forum_example.person`. This way there can only be one
-> `forum_example_private.person_account` for every `forum_example.person`, a
-> one-to-one relationship.
+:::note
 
-> **Note:** For an example of a much richer user profile/account/login schema,
-> use
-> [Membership.db](https://github.com/membership/membership.db/tree/master/postgres)
-> as a reference.
+The `forum_example_private.person_account` shares its primary key
+with `forum_example.person`. This way there can only be one
+`forum_example_private.person_account` for every `forum_example.person`, a
+one-to-one relationship.
 
-#### Registering Users
+:::
+
+:::note
+
+For an example of a much richer user profile/account/login schema,
+use
+[Membership.db](https://github.com/membership/membership.db/tree/master/postgres)
+as a reference.
+
+:::
+
+### Registering Users
 
 Before a user can log in, they need to have an account in our database. To
 register a user we are going to implement a Postgres function in PL/pgSQL which
@@ -673,16 +717,20 @@ we aren’t storing the password in plaintext. Read the documentation for
 [Password Hashing Functions](https://www.postgresql.org/docs/current/static/pgcrypto.html#AEN178870)
 to learn more about these functions and their characteristics.
 
-> **Warning:** Be very careful with logging, while we encrypt our passwords here
-> it may be possible that in a query or server log the password will be recorded
-> in plain text! Be careful to configure your Postgres logs so this isn’t the
-> case. PostGraphile will never log the value of any variables the client gives
-> it. Being careful with your logs and passwords is true in any system, but
-> especially this one.
->
-> For an overview of passwords in Postgres past the `pgcrypto` documentation,
-> see the answer to the StackOverflow question
-> “[How can I hash passwords in Postgres?](http://stackoverflow.com/a/18687445/1568890)”
+:::warning
+
+Be very careful with logging, while we encrypt our passwords here
+it may be possible that in a query or server log the password will be recorded
+in plain text! Be careful to configure your Postgres logs so this isn’t the
+case. PostGraphile will never log the value of any variables the client gives
+it. Being careful with your logs and passwords is true in any system, but
+especially this one.
+
+For an overview of passwords in Postgres past the `pgcrypto` documentation,
+see the answer to the StackOverflow question
+“[How can I hash passwords in Postgres?](http://stackoverflow.com/a/18687445/1568890)”
+
+:::
 
 At the end of the implementation you will see
 `language plpgsql strict security definer`. `language plpgsql` we already
@@ -697,10 +745,14 @@ we said users would never be able to insert into
 `forum_example_private.person_account` because it uses the privileges of the
 definer.
 
-> **Warning:** Make sure that when you create a function with `security definer`
-> there are no ‘holes’ a user could use to see or mutate more data than they are
-> not allowed to. Since the above is a simple function, we are fine. If you
-> don’t need `security definer`, try not to use it.
+:::warning exercise caution when using security definer
+
+Make sure that when you create a function with `security definer`
+there are no ‘holes’ a user could use to see or mutate more data than they are
+not allowed to. Since the above is a simple function, we are fine. If you
+don’t need `security definer`, try not to use it.
+
+:::
 
 This function will create a user and their account, but how will we log the user
 in? Before we define a function which allows users to login, sign-in,
@@ -710,7 +762,7 @@ PostGraphile agnostic, the next two sections will be specific to PostGraphile,
 but useful to anyone wanting to learn just a little bit more about Postgres and
 JSON Web Tokens (JWTs).
 
-#### Postgres Roles
+### Postgres Roles
 
 When a user logs in, we want them to make their queries using a specific
 PostGraphile role. Using that role we can define rules that restrict what data
@@ -802,12 +854,16 @@ create role forum_example_person;
 grant forum_example_person to forum_example_postgraphile;
 ```
 
-> **Warning:** The `forum_example_postgraphile` role will have all of the
-> permissions of the roles granted to it. So it can do everything
-> `forum_example_anonymous` can do and everything `forum_example_person` can do.
-> This is why having a default role is important. We would not want an anonymous
-> user to have admin access level because we have granted an admin role to
-> `forum_example_postgraphile`.
+:::caution warning
+
+The `forum_example_postgraphile` role will have all of the
+permissions of the roles granted to it. So it can do everything
+`forum_example_anonymous` can do and everything `forum_example_person` can do.
+This is why having a default role is important. We would not want an anonymous
+user to have admin access level because we have granted an admin role to
+`forum_example_postgraphile`.
+
+:::
 
 Ok, so now we have three roles. `forum_example_postgraphile`,
 `forum_example_anonymous`, and `forum_example_person`. We know how
@@ -815,7 +871,7 @@ Ok, so now we have three roles. `forum_example_postgraphile`,
 we know when a user is logged in and should be using `forum_example_person`? The
 answer is JSON Web Tokens.
 
-#### JSON Web Tokens
+### JSON Web Tokens
 
 PostGraphile uses [JSON Web Tokens (JWTs)](https://jwt.io/) for authorization. A
 JWT is just a JSON object that has been hashed and cryptographically signed to
@@ -835,10 +891,14 @@ Would turn into a token that looks like:
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoxLCJiIjoyLCJjIjozfQ.hxhGCCCmGV9nT1slief1WgEsOsfdnlVizNrODxfh1M8
 ```
 
-> **Warning:** The information in a JWT can be read by anyone, so do not put
-> private information in a JWT. What makes JWTs secure is that unless they were
-> signed by our secret, we can not accept the information inside the JWT as
-> truth.
+:::warning JWTs are public
+
+The information in a JWT can be read by anyone, so do not put
+private information in a JWT. What makes JWTs secure is that unless they were
+signed by our secret, we can not accept the information inside the JWT as
+truth.
+
+:::
 
 This allows PostGraphile to securely make claims about who a user is. Attackers
 would not be able to fake a claim unless they had access to the private ‘secret’
@@ -881,23 +941,27 @@ set local jwt.claims.role to 'forum_example_person';
 Now, the user would have the permissions of the `forum_example_person` role as
 they execute their query.
 
-> **Warning:** Unless explicitly set, JWTs never expire. Once they have been
-> issued they may never be invalidated. This is both good and bad, good in that
-> JWTs are fast in not requiring a database lookup. Bad in that if an attacker
-> gets their hands on a JWT you can’t stop them from using it until the token
-> expires. If you do not override `exp` then **PostGraphile's defaults set JWTs
-> to expire after one day**.
->
-> A solution to this is to use very short expiration times on your tokens and/or
-> to use refresh tokens. A refresh token you would use whenever your JWT expires
-> to get a new JWT without prompting the user for their password again. Refresh
-> tokens would be stored in the database so you could easily invalidate refresh
-> tokens.
+:::warning Check JWT expiration behavior
+
+Unless explicitly set, JWTs never expire. Once they have been
+issued they may never be invalidated. This is both good and bad, good in that
+JWTs are fast in not requiring a database lookup. Bad in that if an attacker
+gets their hands on a JWT you can’t stop them from using it until the token
+expires. If you do not override `exp` then **PostGraphile's defaults set JWTs
+to expire after one day**.
+
+A solution to this is to use very short expiration times on your tokens and/or
+to use refresh tokens. A refresh token you would use whenever your JWT expires
+to get a new JWT without prompting the user for their password again. Refresh
+tokens would be stored in the database so you could easily invalidate refresh
+tokens.
+
+:::
 
 We now know how PostGraphile uses JWTs to authorize the user, but how does
 PostGraphile create a JWT? Stay tuned.
 
-#### Logging In
+### Logging In
 
 You can specify `preset.gather.pgJwtTypes` in your configuration which is the
 names (schema name and type name) of composite types in your database. When
@@ -1005,7 +1069,7 @@ This code will select a single account from
 here is just another way to write the `email` argument. If we had wrote
 `email = email` or even `a.email = email`, Postgres would not have known which
 email we were referring to, so instead we just used a substitute for the `email`
-argument which depends on its placement in the identifer `$1`. If we
+argument which depends on its placement in the identifier `$1`. If we
 successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
@@ -1040,11 +1104,15 @@ they were originally defined. Since we defined `role`, `person_id` and `exp`,
 this JWT will have a `role` of `forum_example_person`, a `person_id` of
 `account.person_id`, and an `exp` that is two days from now.
 
-> **Warning:** Be careful about logging around this function too.
+:::warning
+
+Be careful about logging around this function too.
+
+:::
 
 Now that we know how to get JWTs for our users, let’s use the JWTs.
 
-#### Using the Authorized User
+### Using the Authorized User
 
 Before we define permissions for our user, let’s utilize the fact that they are
 logged in by defining a quick Postgres function.
@@ -1072,7 +1140,7 @@ that data type.
 
 Now, let’s use the JWT to define permissions.
 
-#### Grants
+### Grants
 
 The highest level of permission that can be given to roles using the Postgres
 are access privileges assigned using the
@@ -1149,14 +1217,14 @@ give them. Let’s walk through the grants:
 
 This provides basic permissions for all of our Postgres objects, but as we
 mentioned before users can update and delete all and any persons or posts. For
-obvious reasons we don’t want this, so let’s define row level security next.
+obvious reasons we don’t want this, so let’s define row-level security next.
 
-#### Row Level Security
+### Row Level Security
 
 In Postgres 9.5 (released January 2016)
-[Row Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
+[Row-Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
 was introduced. RLS allows us to specify access to the data in our Postgres
-databases on a row level instead of a table level. In order to enable row level
+databases on a row level instead of a table level. In order to enable row-level
 security on our tables we first need to run the following:
 
 ```sql
@@ -1167,7 +1235,7 @@ alter table forum_example.post enable row level security;
 Before running these commands, the `forum_example_person` and
 `forum_example_anonymous` roles could see every row in the table with a
 `select * from forum_example.person` query. After running these two commands
-those same roles can’t. By enabling row level security, our roles don’t have any
+those same roles can’t. By enabling row-level security, our roles don’t have any
 access to read or write to a table that you don’t explicitly give, so to
 re-enable access to all the rows we will define RLS policies with the
 [`CREATE POLICY`](https://www.postgresql.org/docs/current/static/sql-createpolicy.html)
@@ -1265,9 +1333,7 @@ postgraphile \
   --connection postgres://forum_example_postgraphile:xyz@localhost
 ```
 
----
-
-### Conclusion
+## Conclusion
 
 You should now be equipped with the knowledge to go out and design your own
 Postgres schema. If you have any questions, encounter a bug, or just want to say

@@ -138,7 +138,7 @@ command are fairly easy to learn and understand. Creating tables is the easiest,
 but also the most fundamental part of your schema design.
 
 :::note
-We prefer singular identifers like `forum_example.person` over
+We prefer singular identifiers like `forum_example.person` over
 `forum_example.people` because when you create a table, it is like you are
 creating a class in an object-oriented language. Classes have singular names
 like “Person” while collections will often have plural names like “People.”
@@ -983,7 +983,7 @@ This code will select a single account from
 here is just another way to write the `email` argument. If we had wrote
 `email = email` or even `a.email = email`, Postgres would not have known which
 email we were referring to, so instead we just used a substitute for the `email`
-argument which depends on its placement in the identifer `$1`. If we
+argument which depends on its placement in the identifier `$1`. If we
 successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
@@ -1129,14 +1129,14 @@ give them. Let’s walk through the grants:
 
 This provides basic permissions for all of our Postgres objects, but as we
 mentioned before users can update and delete all and any persons or posts. For
-obvious reasons we don’t want this, so let’s define row level security next.
+obvious reasons we don’t want this, so let’s define row-level security next.
 
 ### Row Level Security
 
 In Postgres 9.5 (released January 2016)
-[Row Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
+[Row-Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
 was introduced. RLS allows us to specify access to the data in our Postgres
-databases on a row level instead of a table level. In order to enable row level
+databases on a row level instead of a table level. In order to enable row-level
 security on our tables we first need to run the following:
 
 ```sql
@@ -1147,7 +1147,7 @@ alter table forum_example.post enable row level security;
 Before running these commands, the `forum_example_person` and
 `forum_example_anonymous` roles could see every row in the table with a
 `select * from forum_example.person` query. After running these two commands
-those same roles can’t. By enabling row level security, our roles don’t have any
+those same roles can’t. By enabling row-level security, our roles don’t have any
 access to read or write to a table that you don’t explicitly give, so to
 re-enable access to all the rows we will define RLS policies with the
 [`CREATE POLICY`](https://www.postgresql.org/docs/current/static/sql-createpolicy.html)
