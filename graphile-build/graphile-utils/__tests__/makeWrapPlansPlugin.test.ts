@@ -378,6 +378,10 @@ describe("wrapping plans matching a filter", () => {
       `,
       contextValue: { test: true },
     })) as ExecutionResult;
+    if (result.errors) {
+      const firstError = result.errors[0];
+      console.error(firstError.originalError ?? firstError);
+    }
     expect(result.errors).toBeFalsy();
     expect(result.data.a).toBe(8);
     expect(result.data.b).toBe("1ARG2");
