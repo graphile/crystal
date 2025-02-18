@@ -10,11 +10,11 @@ graph TD
 
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant64 & Constant7 & Constant7 --> Connection14
-    Connection30{{"Connection[30∈0] ➊<br />ᐸ26ᐳ"}}:::plan
-    Constant7 & Constant7 & Constant7 --> Connection30
+    Constant62 & Constant7 & Constant7 --> Connection14
+    Connection29{{"Connection[29∈0] ➊<br />ᐸ25ᐳ"}}:::plan
+    Constant7 & Constant7 & Constant7 --> Connection29
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -23,105 +23,101 @@ graph TD
     __Value2 --> Access11
     __Value2 --> Access12
     Lambda15{{"Lambda[15∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant70 --> Lambda15
-    ApplyInput16{{"ApplyInput[16∈0] ➊"}}:::plan
-    Constant7 --> ApplyInput16
-    Lambda31{{"Lambda[31∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant71{{"Constant[71∈0] ➊<br />ᐸ[ 'LAST_DEPLOYED_DESC', 'ID_DESC' ]ᐳ"}}:::plan
-    Constant71 --> Lambda31
-    ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
-    Constant7 --> ApplyInput32
-    Lambda33[["Lambda[33∈0] ➊<br />ᐸlimitToTypesᐳ"]]:::unbatchedplan
-    Constant7 --> Lambda33
+    Constant68{{"Constant[68∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
+    Constant68 --> Lambda15
+    Lambda30{{"Lambda[30∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
+    Constant69{{"Constant[69∈0] ➊<br />ᐸ[ 'LAST_DEPLOYED_DESC', 'ID_DESC' ]ᐳ"}}:::plan
+    Constant69 --> Lambda30
+    Lambda31[["Lambda[31∈0] ➊<br />ᐸlimitToTypesᐳ"]]:::unbatchedplan
+    Constant7 --> Lambda31
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Lambda15 & ApplyInput16 & Connection14 & Constant64 & Constant7 & Constant7 --> PgSelect17
-    PgSelectRows18[["PgSelectRows[18∈1] ➊"]]:::plan
-    PgSelect17 --> PgSelectRows18
-    __Item19[/"__Item[19∈2]<br />ᐸ18ᐳ"\]:::itemplan
-    PgSelectRows18 ==> __Item19
-    PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸpeopleᐳ"}}:::plan
-    __Item19 --> PgSelectSingle20
-    PgUnionAll34[["PgUnionAll[34∈3]"]]:::plan
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object13 & PgClassExpression21 & Lambda31 & ApplyInput32 & Lambda33 & Connection30 & Constant7 & Constant7 & Constant7 --> PgUnionAll34
-    PgSelectSingle20 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression22
-    Access63{{"Access[63∈3]<br />ᐸ34.itemsᐳ"}}:::plan
-    PgUnionAll34 --> Access63
-    __Item36[/"__Item[36∈4]<br />ᐸ63ᐳ"\]:::itemplan
-    Access63 ==> __Item36
-    PgUnionAllSingle37["PgUnionAllSingle[37∈4]"]:::plan
-    __Item36 --> PgUnionAllSingle37
-    Access38{{"Access[38∈4]<br />ᐸ34.cursorDetailsᐳ"}}:::plan
-    PgUnionAll34 --> Access38
-    PgCursor39{{"PgCursor[39∈5]"}}:::plan
-    PgUnionAllSingle37 & Access38 --> PgCursor39
-    Access40{{"Access[40∈5]<br />ᐸ37.1ᐳ"}}:::plan
-    PgUnionAllSingle37 --> Access40
-    PgSelect43[["PgSelect[43∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
-    Access42{{"Access[42∈6]<br />ᐸ41.0ᐳ"}}:::plan
-    Object13 & Access42 --> PgSelect43
-    PgSelect55[["PgSelect[55∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Access54{{"Access[54∈6]<br />ᐸ53.0ᐳ"}}:::plan
-    Object13 & Access54 --> PgSelect55
-    JSONParse41[["JSONParse[41∈6]<br />ᐸ40ᐳ<br />ᐳAwsApplication"]]:::plan
-    Access40 --> JSONParse41
-    JSONParse41 --> Access42
-    First47{{"First[47∈6]"}}:::plan
-    PgSelectRows48[["PgSelectRows[48∈6]"]]:::plan
-    PgSelectRows48 --> First47
-    PgSelect43 --> PgSelectRows48
-    PgSelectSingle49{{"PgSelectSingle[49∈6]<br />ᐸaws_applicationsᐳ"}}:::plan
-    First47 --> PgSelectSingle49
-    PgClassExpression50{{"PgClassExpression[50∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression50
-    PgClassExpression51{{"PgClassExpression[51∈6]<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression51
-    PgClassExpression52{{"PgClassExpression[52∈6]<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression52
-    JSONParse53[["JSONParse[53∈6]<br />ᐸ40ᐳ<br />ᐳGcpApplication"]]:::plan
-    Access40 --> JSONParse53
-    JSONParse53 --> Access54
-    First57{{"First[57∈6]"}}:::plan
-    PgSelectRows58[["PgSelectRows[58∈6]"]]:::plan
-    PgSelectRows58 --> First57
-    PgSelect55 --> PgSelectRows58
-    PgSelectSingle59{{"PgSelectSingle[59∈6]<br />ᐸgcp_applicationsᐳ"}}:::plan
-    First57 --> PgSelectSingle59
-    PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression60
-    PgClassExpression61{{"PgClassExpression[61∈6]<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression61
-    PgClassExpression62{{"PgClassExpression[62∈6]<br />ᐸ__gcp_appl..._deployed”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression62
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object13 & Lambda15 & Connection14 & Constant62 & Constant7 & Constant7 --> PgSelect16
+    PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
+    PgSelect16 --> PgSelectRows17
+    __Item18[/"__Item[18∈2]<br />ᐸ17ᐳ"\]:::itemplan
+    PgSelectRows17 ==> __Item18
+    PgSelectSingle19{{"PgSelectSingle[19∈2]<br />ᐸpeopleᐳ"}}:::plan
+    __Item18 --> PgSelectSingle19
+    PgUnionAll32[["PgUnionAll[32∈3]"]]:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Object13 & PgClassExpression20 & Lambda30 & Lambda31 & Connection29 & Constant7 & Constant7 & Constant7 --> PgUnionAll32
+    PgSelectSingle19 --> PgClassExpression20
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle19 --> PgClassExpression21
+    Access61{{"Access[61∈3]<br />ᐸ32.itemsᐳ"}}:::plan
+    PgUnionAll32 --> Access61
+    __Item34[/"__Item[34∈4]<br />ᐸ61ᐳ"\]:::itemplan
+    Access61 ==> __Item34
+    PgUnionAllSingle35["PgUnionAllSingle[35∈4]"]:::plan
+    __Item34 --> PgUnionAllSingle35
+    Access36{{"Access[36∈4]<br />ᐸ32.cursorDetailsᐳ"}}:::plan
+    PgUnionAll32 --> Access36
+    PgCursor37{{"PgCursor[37∈5]"}}:::plan
+    PgUnionAllSingle35 & Access36 --> PgCursor37
+    Access38{{"Access[38∈5]<br />ᐸ35.1ᐳ"}}:::plan
+    PgUnionAllSingle35 --> Access38
+    PgSelect41[["PgSelect[41∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
+    Access40{{"Access[40∈6]<br />ᐸ39.0ᐳ"}}:::plan
+    Object13 & Access40 --> PgSelect41
+    PgSelect53[["PgSelect[53∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
+    Access52{{"Access[52∈6]<br />ᐸ51.0ᐳ"}}:::plan
+    Object13 & Access52 --> PgSelect53
+    JSONParse39[["JSONParse[39∈6]<br />ᐸ38ᐳ<br />ᐳAwsApplication"]]:::plan
+    Access38 --> JSONParse39
+    JSONParse39 --> Access40
+    First45{{"First[45∈6]"}}:::plan
+    PgSelectRows46[["PgSelectRows[46∈6]"]]:::plan
+    PgSelectRows46 --> First45
+    PgSelect41 --> PgSelectRows46
+    PgSelectSingle47{{"PgSelectSingle[47∈6]<br />ᐸaws_applicationsᐳ"}}:::plan
+    First45 --> PgSelectSingle47
+    PgClassExpression48{{"PgClassExpression[48∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
+    PgSelectSingle47 --> PgClassExpression48
+    PgClassExpression49{{"PgClassExpression[49∈6]<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle47 --> PgClassExpression49
+    PgClassExpression50{{"PgClassExpression[50∈6]<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
+    PgSelectSingle47 --> PgClassExpression50
+    JSONParse51[["JSONParse[51∈6]<br />ᐸ38ᐳ<br />ᐳGcpApplication"]]:::plan
+    Access38 --> JSONParse51
+    JSONParse51 --> Access52
+    First55{{"First[55∈6]"}}:::plan
+    PgSelectRows56[["PgSelectRows[56∈6]"]]:::plan
+    PgSelectRows56 --> First55
+    PgSelect53 --> PgSelectRows56
+    PgSelectSingle57{{"PgSelectSingle[57∈6]<br />ᐸgcp_applicationsᐳ"}}:::plan
+    First55 --> PgSelectSingle57
+    PgClassExpression58{{"PgClassExpression[58∈6]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression58
+    PgClassExpression59{{"PgClassExpression[59∈6]<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression59
+    PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__gcp_appl..._deployed”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression60
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-order"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 11, 12, 64, 70, 71, 13, 14, 15, 16, 30, 31, 32<br />2: Lambda[33]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 11, 12, 62, 68, 69, 13, 14, 15, 29, 30<br />2: Lambda[31]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access11,Access12,Object13,Connection14,Lambda15,ApplyInput16,Connection30,Lambda31,ApplyInput32,Lambda33,Constant64,Constant70,Constant71 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 16, 14, 64, 7, 31, 32, 33, 30<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17]<br />2: PgSelectRows[18]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant7,Access11,Access12,Object13,Connection14,Lambda15,Connection29,Lambda30,Lambda31,Constant62,Constant68,Constant69 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 14, 62, 7, 30, 31, 29<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[16]<br />2: PgSelectRows[17]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect17,PgSelectRows18 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 13, 31, 32, 33, 30, 7<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
+    class Bucket1,PgSelect16,PgSelectRows17 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 13, 30, 31, 29, 7<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 13, 31, 32, 33, 30, 7<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 21, 22<br />2: PgUnionAll[34]<br />ᐳ: Access[63]"):::bucket
+    class Bucket2,__Item18,PgSelectSingle19 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19, 13, 30, 31, 29, 7<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[19]<br />1: <br />ᐳ: 20, 21<br />2: PgUnionAll[32]<br />ᐳ: Access[61]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,PgUnionAll34,Access63 bucket3
-    Bucket4("Bucket 4 (listItem)<br />Deps: 34, 13<br /><br />ROOT __Item{4}ᐸ63ᐳ[36]"):::bucket
+    class Bucket3,PgClassExpression20,PgClassExpression21,PgUnionAll32,Access61 bucket3
+    Bucket4("Bucket 4 (listItem)<br />Deps: 32, 13<br /><br />ROOT __Item{4}ᐸ61ᐳ[34]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item36,PgUnionAllSingle37,Access38 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 38, 13<br /><br />ROOT PgUnionAllSingle{4}[37]"):::bucket
+    class Bucket4,__Item34,PgUnionAllSingle35,Access36 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 36, 13<br /><br />ROOT PgUnionAllSingle{4}[35]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgCursor39,Access40 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 40, 13, 37<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[41], JSONParse[53]<br />ᐳ: Access[42], Access[54]<br />2: PgSelect[43], PgSelect[55]<br />3: PgSelectRows[48], PgSelectRows[58]<br />ᐳ: 47, 49, 50, 51, 52, 57, 59, 60, 61, 62"):::bucket
+    class Bucket5,PgCursor37,Access38 bucket5
+    Bucket6("Bucket 6 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 38, 13, 35<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[39], JSONParse[51]<br />ᐳ: Access[40], Access[52]<br />2: PgSelect[41], PgSelect[53]<br />3: PgSelectRows[46], PgSelectRows[56]<br />ᐳ: 45, 47, 48, 49, 50, 55, 57, 58, 59, 60"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,JSONParse41,Access42,PgSelect43,First47,PgSelectRows48,PgSelectSingle49,PgClassExpression50,PgClassExpression51,PgClassExpression52,JSONParse53,Access54,PgSelect55,First57,PgSelectRows58,PgSelectSingle59,PgClassExpression60,PgClassExpression61,PgClassExpression62 bucket6
+    class Bucket6,JSONParse39,Access40,PgSelect41,First45,PgSelectRows46,PgSelectSingle47,PgClassExpression48,PgClassExpression49,PgClassExpression50,JSONParse51,Access52,PgSelect53,First55,PgSelectRows56,PgSelectSingle57,PgClassExpression58,PgClassExpression59,PgClassExpression60 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -7108,6 +7108,9 @@ const Query_tableSetQueryList_postPlanResolvers = [($select, $parent, fieldArgs,
   $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $select;
 }];
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
 const argDetailsSimple30 = [];
 const makeArgs30 = (args, path = []) => {
   const selectArgs = [];
@@ -14134,7 +14137,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14221,7 +14224,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14256,7 +14259,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14291,7 +14294,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14326,7 +14329,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14361,7 +14364,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14396,7 +14399,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14431,7 +14434,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -14466,7 +14469,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -15442,7 +15445,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -15477,7 +15480,7 @@ export const plans = {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $select, arg) {
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }

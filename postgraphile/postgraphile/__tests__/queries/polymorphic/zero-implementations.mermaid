@@ -14,30 +14,28 @@ graph TD
     Constant6 & Constant6 & Constant6 --> Connection8
     Lambda9{{"Lambda[9∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
     Constant6 --> Lambda9
-    ApplyInput10{{"ApplyInput[10∈0] ➊"}}:::plan
-    Constant6 --> ApplyInput10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUnionAll11[["PgUnionAll[11∈1] ➊"]]:::plan
-    Lambda9 & ApplyInput10 & Connection8 & Constant6 & Constant6 & Constant6 --> PgUnionAll11
-    Access15{{"Access[15∈1] ➊<br />ᐸ11.itemsᐳ"}}:::plan
-    PgUnionAll11 --> Access15
-    __Item13[/"__Item[13∈2]<br />ᐸ15ᐳ"\]:::itemplan
-    Access15 ==> __Item13
-    PgUnionAllSingle14["PgUnionAllSingle[14∈2]"]:::plan
-    __Item13 --> PgUnionAllSingle14
+    PgUnionAll10[["PgUnionAll[10∈1] ➊"]]:::plan
+    Lambda9 & Connection8 & Constant6 & Constant6 & Constant6 --> PgUnionAll10
+    Access14{{"Access[14∈1] ➊<br />ᐸ10.itemsᐳ"}}:::plan
+    PgUnionAll10 --> Access14
+    __Item12[/"__Item[12∈2]<br />ᐸ14ᐳ"\]:::itemplan
+    Access14 ==> __Item12
+    PgUnionAllSingle13["PgUnionAllSingle[13∈2]"]:::plan
+    __Item12 --> PgUnionAllSingle13
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/zero-implementations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value4,Constant6,Connection8,Lambda9,ApplyInput10 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 9, 10, 8, 6<br /><br />ROOT Connectionᐸ7ᐳ[8]"):::bucket
+    class Bucket0,__Value4,Constant6,Connection8,Lambda9 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 9, 8, 6<br /><br />ROOT Connectionᐸ7ᐳ[8]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUnionAll11,Access15 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ15ᐳ[13]"):::bucket
+    class Bucket1,PgUnionAll10,Access14 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ14ᐳ[12]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item13,PgUnionAllSingle14 bucket2
+    class Bucket2,__Item12,PgUnionAllSingle13 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end
