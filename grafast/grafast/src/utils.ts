@@ -662,7 +662,9 @@ export function arrayOfLengthCb(length: number, fill: () => any) {
   return arr;
 }
 
-function findVariableNamesUsedInValueNode(
+export const valueNodeToStaticValue = graphql.valueFromAST;
+
+export function findVariableNamesUsedInValueNode(
   valueNode: ValueNode,
   variableNames: Set<string>,
 ): void {

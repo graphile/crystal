@@ -41,6 +41,7 @@ import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
+  AnyInputStep,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -283,6 +284,12 @@ export class OperationPlan {
   >();
 
   private scalarPlanInfo: { schema: GraphQLSchema };
+
+  /** @internal */
+  public valueNodeToStaticValueCache = new Map<
+    graphql.ValueNode,
+    AnyInputStep
+  >();
 
   constructor(
     public readonly schema: GraphQLSchema,
