@@ -55,15 +55,15 @@ export class ApplyInputStep<
     const $value = this.getDep(this.valueDepId);
     if ($value instanceof ConstantStep) {
       // Replace myself with a constant!
-      return constant((parent: TParent) => {
-        inputArgsApply(
-          this.operationPlan.schema,
-          this.inputType,
-          parent,
-          $value.data,
-          this.getTargetFromParent,
-        );
-      });
+      const {
+        operationPlan: { schema },
+        inputType,
+        getTargetFromParent,
+      } = this;
+      const { data } = $value;
+      return constant(function applyInputConstant(parent: TParent) {
+        inputArgsApply(schema, inputType, parent, data, getTargetFromParent);
+      }, false);
     }
     return this;
   }
