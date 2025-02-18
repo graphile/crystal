@@ -11,43 +11,44 @@ graph TD
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant89{{"Constant[89∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ'bar'ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ'q0'ᐳ"}}:::plan
-    Constant7 & Constant89 & Constant77 & Constant78 --> __InputObject6
+    Constant8{{"Constant[8∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant74{{"Constant[74∈0] ➊<br />ᐸ'bar'ᐳ"}}:::plan
+    Constant75{{"Constant[75∈0] ➊<br />ᐸ'q0'ᐳ"}}:::plan
+    Constant7 & Constant8 & Constant74 & Constant75 --> __InputObject6
     __InputObject23{{"__InputObject[23∈0] ➊"}}:::plan
-    Constant90{{"Constant[90∈0] ➊<br />ᐸ[ 'option-1' ]ᐳ"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ''ᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ'q1'ᐳ"}}:::plan
-    Constant7 & Constant90 & Constant81 & Constant82 --> __InputObject23
-    __InputObject41{{"__InputObject[41∈0] ➊"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ'foo'ᐳ"}}:::plan
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ'q2'ᐳ"}}:::plan
-    Constant7 & Constant89 & Constant84 & Constant85 --> __InputObject41
-    __InputObject58{{"__InputObject[58∈0] ➊"}}:::plan
-    Constant91{{"Constant[91∈0] ➊<br />ᐸ[ 'option-2' ]ᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ'q3'ᐳ"}}:::plan
-    Constant7 & Constant91 & Constant81 & Constant88 --> __InputObject58
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ[ 'option-1' ]ᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ''ᐳ"}}:::plan
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ'q1'ᐳ"}}:::plan
+    Constant7 & Constant25 & Constant76 & Constant77 --> __InputObject23
+    __InputObject40{{"__InputObject[40∈0] ➊"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ'foo'ᐳ"}}:::plan
+    Constant79{{"Constant[79∈0] ➊<br />ᐸ'q2'ᐳ"}}:::plan
+    Constant7 & Constant42 & Constant78 & Constant79 --> __InputObject40
+    __InputObject57{{"__InputObject[57∈0] ➊"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ[ 'option-2' ]ᐳ"}}:::plan
+    Constant80{{"Constant[80∈0] ➊<br />ᐸ'q3'ᐳ"}}:::plan
+    Constant7 & Constant59 & Constant76 & Constant80 --> __InputObject57
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access13 & Access14 --> Object15
     BakedInput11{{"BakedInput[11∈0] ➊"}}:::plan
-    Constant89 --> BakedInput11
+    Constant8 --> BakedInput11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access13
     __Value2 --> Access14
     ApplyInput21{{"ApplyInput[21∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput21
-    ApplyInput39{{"ApplyInput[39∈0] ➊"}}:::plan
-    __InputObject23 --> ApplyInput39
-    ApplyInput56{{"ApplyInput[56∈0] ➊"}}:::plan
-    __InputObject41 --> ApplyInput56
-    ApplyInput74{{"ApplyInput[74∈0] ➊"}}:::plan
-    __InputObject58 --> ApplyInput74
+    ApplyInput38{{"ApplyInput[38∈0] ➊"}}:::plan
+    __InputObject23 --> ApplyInput38
+    ApplyInput55{{"ApplyInput[55∈0] ➊"}}:::plan
+    __InputObject40 --> ApplyInput55
+    ApplyInput72{{"ApplyInput[72∈0] ➊"}}:::plan
+    __InputObject57 --> ApplyInput72
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect12[["PgSelect[12∈1] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object15 & BakedInput11 & Constant77 & Constant78 & ApplyInput21 --> PgSelect12
+    Object15 & BakedInput11 & Constant74 & Constant75 & ApplyInput21 --> PgSelect12
     First16{{"First[16∈1] ➊"}}:::plan
     PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
     PgSelectRows17 --> First16
@@ -60,80 +61,80 @@ graph TD
     PgClassExpression19 --> Object20
     __Item22[/"__Item[22∈3]<br />ᐸ19ᐳ"\]:::itemplan
     PgClassExpression19 ==> __Item22
-    PgSelect30[["PgSelect[30∈4] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object33{{"Object[33∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    BakedInput29{{"BakedInput[29∈4] ➊"}}:::plan
-    Object33 & BakedInput29 & Constant81 & Constant82 & ApplyInput39 --> PgSelect30
-    Access31{{"Access[31∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access32{{"Access[32∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access31 & Access32 --> Object33
-    Constant90 --> BakedInput29
+    PgSelect29[["PgSelect[29∈4] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object32{{"Object[32∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    BakedInput28{{"BakedInput[28∈4] ➊"}}:::plan
+    Object32 & BakedInput28 & Constant76 & Constant77 & ApplyInput38 --> PgSelect29
+    Access30{{"Access[30∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access31{{"Access[31∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access30 & Access31 --> Object32
+    Constant25 --> BakedInput28
+    __Value2 --> Access30
     __Value2 --> Access31
-    __Value2 --> Access32
-    First34{{"First[34∈4] ➊"}}:::plan
-    PgSelectRows35[["PgSelectRows[35∈4] ➊"]]:::plan
-    PgSelectRows35 --> First34
-    PgSelect30 --> PgSelectRows35
-    PgSelectSingle36{{"PgSelectSingle[36∈4] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First34 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈4] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression37
-    Object38{{"Object[38∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression37 --> Object38
-    __Item40[/"__Item[40∈6]<br />ᐸ37ᐳ"\]:::itemplan
-    PgClassExpression37 ==> __Item40
-    PgSelect47[["PgSelect[47∈7] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object50{{"Object[50∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    BakedInput46{{"BakedInput[46∈7] ➊"}}:::plan
-    Object50 & BakedInput46 & Constant84 & Constant85 & ApplyInput56 --> PgSelect47
-    Access48{{"Access[48∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access49{{"Access[49∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access48 & Access49 --> Object50
-    Constant89 --> BakedInput46
+    First33{{"First[33∈4] ➊"}}:::plan
+    PgSelectRows34[["PgSelectRows[34∈4] ➊"]]:::plan
+    PgSelectRows34 --> First33
+    PgSelect29 --> PgSelectRows34
+    PgSelectSingle35{{"PgSelectSingle[35∈4] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First33 --> PgSelectSingle35
+    PgClassExpression36{{"PgClassExpression[36∈4] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression36
+    Object37{{"Object[37∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression36 --> Object37
+    __Item39[/"__Item[39∈6]<br />ᐸ36ᐳ"\]:::itemplan
+    PgClassExpression36 ==> __Item39
+    PgSelect46[["PgSelect[46∈7] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object49{{"Object[49∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    BakedInput45{{"BakedInput[45∈7] ➊"}}:::plan
+    Object49 & BakedInput45 & Constant78 & Constant79 & ApplyInput55 --> PgSelect46
+    Access47{{"Access[47∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access48{{"Access[48∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access47 & Access48 --> Object49
+    Constant42 --> BakedInput45
+    __Value2 --> Access47
     __Value2 --> Access48
-    __Value2 --> Access49
-    First51{{"First[51∈7] ➊"}}:::plan
-    PgSelectRows52[["PgSelectRows[52∈7] ➊"]]:::plan
-    PgSelectRows52 --> First51
-    PgSelect47 --> PgSelectRows52
-    PgSelectSingle53{{"PgSelectSingle[53∈7] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First51 --> PgSelectSingle53
-    PgClassExpression54{{"PgClassExpression[54∈7] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression54
-    Object55{{"Object[55∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression54 --> Object55
-    __Item57[/"__Item[57∈9]<br />ᐸ54ᐳ"\]:::itemplan
-    PgClassExpression54 ==> __Item57
-    PgSelect65[["PgSelect[65∈10] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object68{{"Object[68∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    BakedInput64{{"BakedInput[64∈10] ➊"}}:::plan
-    Object68 & BakedInput64 & Constant81 & Constant88 & ApplyInput74 --> PgSelect65
-    Access66{{"Access[66∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access67{{"Access[67∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access66 & Access67 --> Object68
-    Constant91 --> BakedInput64
-    __Value2 --> Access66
-    __Value2 --> Access67
-    First69{{"First[69∈10] ➊"}}:::plan
-    PgSelectRows70[["PgSelectRows[70∈10] ➊"]]:::plan
-    PgSelectRows70 --> First69
-    PgSelect65 --> PgSelectRows70
-    PgSelectSingle71{{"PgSelectSingle[71∈10] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First69 --> PgSelectSingle71
-    PgClassExpression72{{"PgClassExpression[72∈10] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle71 --> PgClassExpression72
-    Object73{{"Object[73∈10] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression72 --> Object73
-    __Item75[/"__Item[75∈12]<br />ᐸ72ᐳ"\]:::itemplan
-    PgClassExpression72 ==> __Item75
+    First50{{"First[50∈7] ➊"}}:::plan
+    PgSelectRows51[["PgSelectRows[51∈7] ➊"]]:::plan
+    PgSelectRows51 --> First50
+    PgSelect46 --> PgSelectRows51
+    PgSelectSingle52{{"PgSelectSingle[52∈7] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First50 --> PgSelectSingle52
+    PgClassExpression53{{"PgClassExpression[53∈7] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle52 --> PgClassExpression53
+    Object54{{"Object[54∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression53 --> Object54
+    __Item56[/"__Item[56∈9]<br />ᐸ53ᐳ"\]:::itemplan
+    PgClassExpression53 ==> __Item56
+    PgSelect63[["PgSelect[63∈10] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object66{{"Object[66∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    BakedInput62{{"BakedInput[62∈10] ➊"}}:::plan
+    Object66 & BakedInput62 & Constant76 & Constant80 & ApplyInput72 --> PgSelect63
+    Access64{{"Access[64∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access65{{"Access[65∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access64 & Access65 --> Object66
+    Constant59 --> BakedInput62
+    __Value2 --> Access64
+    __Value2 --> Access65
+    First67{{"First[67∈10] ➊"}}:::plan
+    PgSelectRows68[["PgSelectRows[68∈10] ➊"]]:::plan
+    PgSelectRows68 --> First67
+    PgSelect63 --> PgSelectRows68
+    PgSelectSingle69{{"PgSelectSingle[69∈10] ➊<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First67 --> PgSelectSingle69
+    PgClassExpression70{{"PgClassExpression[70∈10] ➊<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle69 --> PgClassExpression70
+    Object71{{"Object[71∈10] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression70 --> Object71
+    __Item73[/"__Item[73∈12]<br />ᐸ70ᐳ"\]:::itemplan
+    PgClassExpression70 ==> __Item73
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/b.list_bde_mutation"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,BakedInput11,Access13,Access14,Object15,ApplyInput21,__InputObject23,ApplyInput39,__InputObject41,ApplyInput56,__InputObject58,ApplyInput74,Constant77,Constant78,Constant81,Constant82,Constant84,Constant85,Constant88,Constant89,Constant90,Constant91 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 11, 77, 78, 21<br /><br />1: PgSelect[12]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19, 20"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Constant8,BakedInput11,Access13,Access14,Object15,ApplyInput21,__InputObject23,Constant25,ApplyInput38,__InputObject40,Constant42,ApplyInput55,__InputObject57,Constant59,ApplyInput72,Constant74,Constant75,Constant76,Constant77,Constant78,Constant79,Constant80 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 11, 74, 75, 21<br /><br />1: PgSelect[12]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19, 20"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect12,First16,PgSelectRows17,PgSelectSingle18,PgClassExpression19,Object20 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
@@ -142,33 +143,33 @@ graph TD
     Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ19ᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item22 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 90, 81, 82, 39, 2<br /><br />1: Access[31]<br />2: Access[32]<br />3: Object[33]<br />4: BakedInput[29]<br />5: PgSelect[30]<br />6: PgSelectRows[35]<br />ᐳ: 34, 36, 37, 38"):::bucket
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 25, 76, 77, 38, 2<br /><br />1: Access[30]<br />2: Access[31]<br />3: Object[32]<br />4: BakedInput[28]<br />5: PgSelect[29]<br />6: PgSelectRows[34]<br />ᐳ: 33, 35, 36, 37"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,BakedInput29,PgSelect30,Access31,Access32,Object33,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,Object38 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 38, 37<br /><br />ROOT Object{4}ᐸ{result}ᐳ[38]"):::bucket
+    class Bucket4,BakedInput28,PgSelect29,Access30,Access31,Object32,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36,Object37 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 36<br /><br />ROOT Object{4}ᐸ{result}ᐳ[37]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ37ᐳ[40]"):::bucket
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ36ᐳ[39]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item40 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 89, 84, 85, 56, 2<br /><br />1: Access[48]<br />2: Access[49]<br />3: Object[50]<br />4: BakedInput[46]<br />5: PgSelect[47]<br />6: PgSelectRows[52]<br />ᐳ: 51, 53, 54, 55"):::bucket
+    class Bucket6,__Item39 bucket6
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 42, 78, 79, 55, 2<br /><br />1: Access[47]<br />2: Access[48]<br />3: Object[49]<br />4: BakedInput[45]<br />5: PgSelect[46]<br />6: PgSelectRows[51]<br />ᐳ: 50, 52, 53, 54"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,BakedInput46,PgSelect47,Access48,Access49,Object50,First51,PgSelectRows52,PgSelectSingle53,PgClassExpression54,Object55 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 55, 54<br /><br />ROOT Object{7}ᐸ{result}ᐳ[55]"):::bucket
+    class Bucket7,BakedInput45,PgSelect46,Access47,Access48,Object49,First50,PgSelectRows51,PgSelectSingle52,PgClassExpression53,Object54 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 54, 53<br /><br />ROOT Object{7}ᐸ{result}ᐳ[54]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
-    Bucket9("Bucket 9 (listItem)<br /><br />ROOT __Item{9}ᐸ54ᐳ[57]"):::bucket
+    Bucket9("Bucket 9 (listItem)<br /><br />ROOT __Item{9}ᐸ53ᐳ[56]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,__Item57 bucket9
-    Bucket10("Bucket 10 (mutationField)<br />Deps: 91, 81, 88, 74, 2<br /><br />1: Access[66]<br />2: Access[67]<br />3: Object[68]<br />4: BakedInput[64]<br />5: PgSelect[65]<br />6: PgSelectRows[70]<br />ᐳ: 69, 71, 72, 73"):::bucket
+    class Bucket9,__Item56 bucket9
+    Bucket10("Bucket 10 (mutationField)<br />Deps: 59, 76, 80, 72, 2<br /><br />1: Access[64]<br />2: Access[65]<br />3: Object[66]<br />4: BakedInput[62]<br />5: PgSelect[63]<br />6: PgSelectRows[68]<br />ᐳ: 67, 69, 70, 71"):::bucket
     classDef bucket10 stroke:#ffff00
-    class Bucket10,BakedInput64,PgSelect65,Access66,Access67,Object68,First69,PgSelectRows70,PgSelectSingle71,PgClassExpression72,Object73 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 73, 72<br /><br />ROOT Object{10}ᐸ{result}ᐳ[73]"):::bucket
+    class Bucket10,BakedInput62,PgSelect63,Access64,Access65,Object66,First67,PgSelectRows68,PgSelectSingle69,PgClassExpression70,Object71 bucket10
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 71, 70<br /><br />ROOT Object{10}ᐸ{result}ᐳ[71]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
-    Bucket12("Bucket 12 (listItem)<br /><br />ROOT __Item{12}ᐸ72ᐳ[75]"):::bucket
+    Bucket12("Bucket 12 (listItem)<br /><br />ROOT __Item{12}ᐸ70ᐳ[73]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,__Item75 bucket12
+    class Bucket12,__Item73 bucket12
     Bucket0 --> Bucket1 & Bucket4 & Bucket7 & Bucket10
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
