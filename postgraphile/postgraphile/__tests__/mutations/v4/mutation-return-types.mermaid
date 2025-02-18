@@ -50,8 +50,6 @@ graph TD
     Constant7 --> ApplyInput90
     ApplyInput107{{"ApplyInput[107∈0] ➊"}}:::plan
     __InputObject99 --> ApplyInput107
-    ApplyInput143{{"ApplyInput[143∈0] ➊"}}:::plan
-    Constant7 --> ApplyInput143
     __InputObject152{{"__InputObject[152∈0] ➊"}}:::plan
     Constant7 --> __InputObject152
     ApplyInput161{{"ApplyInput[161∈0] ➊"}}:::plan
@@ -262,7 +260,7 @@ graph TD
     PgSelectSingle119 --> PgClassExpression122
     PgSelect144[["PgSelect[144∈19]<br />ᐸpostᐳ"]]:::plan
     PgClassExpression130{{"PgClassExpression[130∈19]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object105 & PgClassExpression130 & Lambda142 & ApplyInput143 & Connection141 & Constant7 & Constant7 & Constant7 --> PgSelect144
+    Object105 & PgClassExpression130 & Lambda142 & ApplyInput90 & Connection141 & Constant7 & Constant7 & Constant7 --> PgSelect144
     List131{{"List[131∈19]<br />ᐸ76,130ᐳ"}}:::plan
     Constant76 & PgClassExpression130 --> List131
     PgSelectSingle128 --> PgClassExpression130
@@ -522,7 +520,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-return-types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access11,Access12,Object13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput44,__InputObject45,ApplyInput57,Constant76,ApplyInput90,Constant95,__InputObject99,ApplyInput107,ApplyInput143,__InputObject152,ApplyInput161,__InputObject164,ApplyInput175,__InputObject188,ApplyInput195,__InputObject201,ApplyInput211,__InputObject214,ApplyInput221,__InputObject226,ApplyInput236,__InputObject241,ApplyInput248,__InputObject256,ApplyInput267,__InputObject268,ApplyInput278,__InputObject282,ApplyInput290,__InputObject296,ApplyInput304,Constant309,Constant310,Constant311,Constant312,Constant316,Constant317 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access11,Access12,Object13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput44,__InputObject45,ApplyInput57,Constant76,ApplyInput90,Constant95,__InputObject99,ApplyInput107,__InputObject152,ApplyInput161,__InputObject164,ApplyInput175,__InputObject188,ApplyInput195,__InputObject201,ApplyInput211,__InputObject214,ApplyInput221,__InputObject226,ApplyInput236,__InputObject241,ApplyInput248,__InputObject256,ApplyInput267,__InputObject268,ApplyInput278,__InputObject282,ApplyInput290,__InputObject296,ApplyInput304,Constant309,Constant310,Constant311,Constant312,Constant316,Constant317 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 309, 310, 19<br /><br />1: PgSelect[10]<br />2: PgSelectRows[15]<br />ᐳ: 14, 16, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect10,First14,PgSelectRows15,PgSelectSingle16,PgClassExpression17,Object18 bucket1
@@ -562,22 +560,22 @@ graph TD
     Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 94, 95<br /><br />ROOT PgSelectSingle{12}ᐸpostᐳ[94]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgClassExpression96,List97,Lambda98 bucket13
-    Bucket14("Bucket 14 (mutationField)<br />Deps: 311, 312, 107, 2, 7, 317, 76, 143, 95<br /><br />1: Access[103]<br />2: Access[104]<br />3: Object[105]<br />4: PgSelect[102]<br />5: <br />ᐳ: Object[106]"):::bucket
+    Bucket14("Bucket 14 (mutationField)<br />Deps: 311, 312, 107, 2, 7, 317, 76, 90, 95<br /><br />1: Access[103]<br />2: Access[104]<br />3: Object[105]<br />4: PgSelect[102]<br />5: <br />ᐳ: Object[106]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgSelect102,Access103,Access104,Object105,Object106 bucket14
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 102, 7, 317, 106, 105, 76, 143, 95<br /><br />ROOT Object{14}ᐸ{result}ᐳ[106]"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 102, 7, 317, 106, 105, 76, 90, 95<br /><br />ROOT Object{14}ᐸ{result}ᐳ[106]"):::bucket
     classDef bucket15 stroke:#ff00ff
     class Bucket15,PgSelectRows108,Connection141,Lambda142 bucket15
-    Bucket16("Bucket 16 (listItem)<br />Deps: 105, 76, 142, 143, 141, 7, 95<br /><br />ROOT __Item{16}ᐸ108ᐳ[109]"):::bucket
+    Bucket16("Bucket 16 (listItem)<br />Deps: 105, 76, 142, 90, 141, 7, 95<br /><br />ROOT __Item{16}ᐸ108ᐳ[109]"):::bucket
     classDef bucket16 stroke:#f5deb3
     class Bucket16,__Item109,PgSelectSingle110 bucket16
-    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 110, 105, 76, 142, 143, 141, 7, 95<br /><br />ROOT PgSelectSingle{16}ᐸmutation_out_complex_setofᐳ[110]<br />1: <br />ᐳ: 111, 112, 123<br />2: PgSelect[113], PgSelect[124]<br />3: PgSelectRows[118], PgSelectRows[127]<br />ᐳ: 117, 119, 126, 128"):::bucket
+    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 110, 105, 76, 142, 90, 141, 7, 95<br /><br />ROOT PgSelectSingle{16}ᐸmutation_out_complex_setofᐳ[110]<br />1: <br />ᐳ: 111, 112, 123<br />2: PgSelect[113], PgSelect[124]<br />3: PgSelectRows[118], PgSelectRows[127]<br />ᐳ: 117, 119, 126, 128"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17,PgClassExpression111,PgClassExpression112,PgSelect113,First117,PgSelectRows118,PgSelectSingle119,PgClassExpression123,PgSelect124,First126,PgSelectRows127,PgSelectSingle128 bucket17
     Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 119<br /><br />ROOT PgSelectSingle{17}ᐸfrmcdc_compoundTypeᐳ[119]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgClassExpression120,PgClassExpression121,PgClassExpression122 bucket18
-    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 128, 76, 105, 142, 143, 141, 7, 95<br /><br />ROOT PgSelectSingle{17}ᐸpersonᐳ[128]<br />1: <br />ᐳ: 130, 133, 131, 132<br />2: PgSelect[144]<br />3: PgSelectRows[145]"):::bucket
+    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 128, 76, 105, 142, 90, 141, 7, 95<br /><br />ROOT PgSelectSingle{17}ᐸpersonᐳ[128]<br />1: <br />ᐳ: 130, 133, 131, 132<br />2: PgSelect[144]<br />3: PgSelectRows[145]"):::bucket
     classDef bucket19 stroke:#7f007f
     class Bucket19,PgClassExpression130,List131,Lambda132,PgClassExpression133,PgSelect144,PgSelectRows145 bucket19
     Bucket20("Bucket 20 (listItem)<br />Deps: 95<br /><br />ROOT __Item{20}ᐸ145ᐳ[146]"):::bucket

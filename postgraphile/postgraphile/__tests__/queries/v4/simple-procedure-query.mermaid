@@ -22,8 +22,7 @@ graph TD
     Object11 & Lambda27 & Constant7 & Constant7 & ApplyInput28 --> PgSelect25
     PgSelect35[["PgSelect[35∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
     Constant91{{"Constant[91∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    ApplyInput38{{"ApplyInput[38∈0] ➊"}}:::plan
-    Object11 & Lambda27 & Constant91 & Constant91 & ApplyInput38 --> PgSelect35
+    Object11 & Lambda27 & Constant91 & Constant91 & ApplyInput28 --> PgSelect35
     PgSelect71[["PgSelect[71∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Lambda73{{"Lambda[73∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
     Constant93{{"Constant[93∈0] ➊<br />ᐸ1ᐳ"}}:::plan
@@ -47,7 +46,6 @@ graph TD
     Constant7 --> ApplyInput28
     PgSelectRows29[["PgSelectRows[29∈0] ➊"]]:::plan
     PgSelect25 --> PgSelectRows29
-    Constant7 --> ApplyInput38
     PgSelectRows39[["PgSelectRows[39∈0] ➊"]]:::plan
     PgSelect35 --> PgSelectRows39
     PgSelectRows48[["PgSelectRows[48∈0] ➊"]]:::plan
@@ -131,9 +129,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 45, 90, 91, 92, 93, 11, 27, 28, 38, 73, 74<br />2: 8, 25, 35, 46, 52, 58, 71<br />3: 12, 29, 39, 48, 54, 60, 75"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 45, 90, 91, 92, 93, 11, 27, 28, 73, 74<br />2: 8, 25, 35, 46, 52, 58, 71<br />3: 12, 29, 39, 48, 54, 60, 75"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,Lambda27,ApplyInput28,PgSelectRows29,PgSelect35,ApplyInput38,PgSelectRows39,Constant45,PgSelect46,PgSelectRows48,PgSelect52,PgSelectRows54,PgSelect58,PgSelectRows60,PgSelect71,Lambda73,ApplyInput74,PgSelectRows75,Constant90,Constant91,Constant92,Constant93 bucket0
+    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,Lambda27,ApplyInput28,PgSelectRows29,PgSelect35,PgSelectRows39,Constant45,PgSelect46,PgSelectRows48,PgSelect52,PgSelectRows54,PgSelect58,PgSelectRows60,PgSelect71,Lambda73,ApplyInput74,PgSelectRows75,Constant90,Constant91,Constant92,Constant93 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ12ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
