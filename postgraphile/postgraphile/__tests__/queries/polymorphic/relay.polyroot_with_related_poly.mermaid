@@ -31,17 +31,17 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Lambda14{{"Lambda[14∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
+    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
     Constant651{{"Constant[651∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant651 --> Lambda14
-    Lambda126{{"Lambda[126∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant651 --> Lambda126
-    Lambda457{{"Lambda[457∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant651 --> Lambda457
+    Constant651 --> ApplyInput14
+    ApplyInput126{{"ApplyInput[126∈0] ➊"}}:::plan
+    Constant651 --> ApplyInput126
+    ApplyInput457{{"ApplyInput[457∈0] ➊"}}:::plan
+    Constant651 --> ApplyInput457
     ApplyInput458{{"ApplyInput[458∈0] ➊"}}:::plan
     __InputObject452 --> ApplyInput458
-    Lambda522{{"Lambda[522∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant651 --> Lambda522
+    ApplyInput522{{"ApplyInput[522∈0] ➊"}}:::plan
+    Constant651 --> ApplyInput522
     ApplyInput523{{"ApplyInput[523∈0] ➊"}}:::plan
     __InputObject517 --> ApplyInput523
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
@@ -58,7 +58,7 @@ graph TD
     Constant463{{"Constant[463∈0] ➊<br />ᐸ'single_table_item_relations'ᐳ"}}:::plan
     Constant528{{"Constant[528∈0] ➊<br />ᐸ'relational_item_relations'ᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object12 & Lambda14 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
+    Object12 & ApplyInput14 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
@@ -124,7 +124,7 @@ graph TD
     Lambda48{{"Lambda[48∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List47 --> Lambda48
     PgSelect127[["PgSelect[127∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object12 & Lambda126 & Connection125 & Constant6 & Constant6 & Constant6 --> PgSelect127
+    Object12 & ApplyInput126 & Connection125 & Constant6 & Constant6 & Constant6 --> PgSelect127
     PgSelectRows128[["PgSelectRows[128∈5] ➊"]]:::plan
     PgSelect127 --> PgSelectRows128
     __Item129[/"__Item[129∈6]<br />ᐸ128ᐳ"\]:::itemplan
@@ -616,7 +616,7 @@ graph TD
     Lambda449{{"Lambda[449∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List448 --> Lambda449
     PgSelect459[["PgSelect[459∈13] ➊<br />ᐸsingle_table_item_relationsᐳ"]]:::plan
-    Object12 & Lambda457 & ApplyInput458 & Connection456 & Constant6 & Constant6 & Constant6 --> PgSelect459
+    Object12 & ApplyInput457 & ApplyInput458 & Connection456 & Constant6 & Constant6 & Constant6 --> PgSelect459
     PgSelectRows460[["PgSelectRows[460∈13] ➊"]]:::plan
     PgSelect459 --> PgSelectRows460
     __Item461[/"__Item[461∈14]<br />ᐸ460ᐳ"\]:::itemplan
@@ -698,7 +698,7 @@ graph TD
     Lambda514{{"Lambda[514∈17]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List513 --> Lambda514
     PgSelect524[["PgSelect[524∈18] ➊<br />ᐸrelational_item_relationsᐳ"]]:::plan
-    Object12 & Lambda522 & ApplyInput523 & Connection521 & Constant6 & Constant6 & Constant6 --> PgSelect524
+    Object12 & ApplyInput522 & ApplyInput523 & Connection521 & Constant6 & Constant6 & Constant6 --> PgSelect524
     PgSelectRows525[["PgSelectRows[525∈18] ➊"]]:::plan
     PgSelect524 --> PgSelectRows525
     __Item526[/"__Item[526∈19]<br />ᐸ525ᐳ"\]:::itemplan
@@ -885,7 +885,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/relay.polyroot_with_related_poly"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,Lambda14,Constant19,Constant37,Constant40,Constant43,Constant46,Connection125,Lambda126,Constant139,Constant167,Constant176,Constant185,Constant194,__InputObject452,Connection456,Lambda457,ApplyInput458,Constant463,__InputObject517,Connection521,Lambda522,ApplyInput523,Constant528,Constant648,Constant650,Constant651 bucket0
+    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,ApplyInput14,Constant19,Constant37,Constant40,Constant43,Constant46,Connection125,ApplyInput126,Constant139,Constant167,Constant176,Constant185,Constant194,__InputObject452,Connection456,ApplyInput457,ApplyInput458,Constant463,__InputObject517,Connection521,ApplyInput522,ApplyInput523,Constant528,Constant648,Constant650,Constant651 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 13, 6, 19, 37, 40, 43, 46<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1

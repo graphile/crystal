@@ -11,9 +11,9 @@ graph TD
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
     Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant6 & Constant35 & Lambda17 --> Connection14
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Constant6 & Constant34 & Lambda16 --> Connection14
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -21,47 +21,45 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Lambda15{{"Lambda[15∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant6 --> Lambda15
-    Lambda16[["Lambda[16∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
-    Constant34 --> Lambda16
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
-    Constant36 --> Lambda17
+    Lambda15[["Lambda[15∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
+    Constant33{{"Constant[33∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
+    Constant33 --> Lambda15
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
+    Constant35 --> Lambda16
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect18[["PgSelect[18∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object13 & Lambda15 & Lambda16 & Connection14 & Lambda17 & Constant6 & Constant35 --> PgSelect18
-    Object27{{"Object[27∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
-    Access21{{"Access[21∈1] ➊<br />ᐸ18.hasMoreᐳ"}}:::plan
-    Constant6 & Constant35 & Constant6 & Access21 --> Object27
-    PgSelect29[["PgSelect[29∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object13 & Lambda15 & Lambda16 & Connection14 --> PgSelect29
-    Object22{{"Object[22∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant6 & Constant35 & Access21 --> Object22
-    PgPageInfo19{{"PgPageInfo[19∈1] ➊"}}:::plan
-    Connection14 --> PgPageInfo19
-    PgSelect18 --> Access21
-    Lambda23{{"Lambda[23∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object22 --> Lambda23
-    Lambda28{{"Lambda[28∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
-    Object27 --> Lambda28
-    First30{{"First[30∈1] ➊"}}:::plan
-    PgSelectRows31[["PgSelectRows[31∈1] ➊"]]:::plan
-    PgSelectRows31 --> First30
-    PgSelect29 --> PgSelectRows31
-    PgSelectSingle32{{"PgSelectSingle[32∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
-    First30 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression33
+    PgSelect17[["PgSelect[17∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
+    Object13 & Lambda15 & Connection14 & Lambda16 & Constant6 & Constant34 --> PgSelect17
+    Object26{{"Object[26∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Access20{{"Access[20∈1] ➊<br />ᐸ17.hasMoreᐳ"}}:::plan
+    Constant6 & Constant34 & Constant6 & Access20 --> Object26
+    Object21{{"Object[21∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Constant6 & Constant34 & Access20 --> Object21
+    PgSelect28[["PgSelect[28∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    Object13 & Lambda15 & Connection14 --> PgSelect28
+    PgPageInfo18{{"PgPageInfo[18∈1] ➊"}}:::plan
+    Connection14 --> PgPageInfo18
+    PgSelect17 --> Access20
+    Lambda22{{"Lambda[22∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object21 --> Lambda22
+    Lambda27{{"Lambda[27∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    Object26 --> Lambda27
+    First29{{"First[29∈1] ➊"}}:::plan
+    PgSelectRows30[["PgSelectRows[30∈1] ➊"]]:::plan
+    PgSelectRows30 --> First29
+    PgSelect28 --> PgSelectRows30
+    PgSelectSingle31{{"PgSelectSingle[31∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
+    First29 --> PgSelectSingle31
+    PgClassExpression32{{"PgClassExpression[32∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression32
 
     %% define steps
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 34, 35, 36, 13, 15, 17, 14<br />2: Lambda[16]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 33, 34, 35, 13, 16, 14<br />2: Lambda[15]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access11,Access12,Object13,Connection14,Lambda15,Lambda16,Lambda17,Constant34,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 16, 14, 17, 6, 35<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[18], PgSelect[29]<br />ᐳ: 19, 21, 22, 23, 27, 28<br />2: PgSelectRows[31]<br />ᐳ: 30, 32, 33"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Access11,Access12,Object13,Connection14,Lambda15,Lambda16,Constant33,Constant34,Constant35 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 14, 16, 6, 34<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17], PgSelect[28]<br />ᐳ: 18, 20, 21, 22, 26, 27<br />2: PgSelectRows[30]<br />ᐳ: 29, 31, 32"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect18,PgPageInfo19,Access21,Object22,Lambda23,Object27,Lambda28,PgSelect29,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33 bucket1
+    class Bucket1,PgSelect17,PgPageInfo18,Access20,Object21,Lambda22,Object26,Lambda27,PgSelect28,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression32 bucket1
     Bucket0 --> Bucket1
     end

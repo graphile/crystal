@@ -1,4 +1,4 @@
-import { PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, extractEnumExtensionValue, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, constant, context, createObjectAndApplyChildren, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
@@ -7096,18 +7096,6 @@ const makeArgs29 = (args, path = []) => {
   return selectArgs;
 };
 const resource_table_set_queryPgResource = registry.pgResources["table_set_query"];
-const Query_tableSetQueryList_plan = ($root, args, _info) => {
-  const selectArgs = makeArgs29(args);
-  return resource_table_set_queryPgResource.execute(selectArgs);
-};
-const Query_tableSetQueryList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
@@ -7233,95 +7221,7 @@ const fetcher7 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Person);
-function Query_allMyTablesList_plan() {
-  return pgResource_my_tablePgResource.find();
-}
-const Query_allMyTablesList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allPersonSecretsList_plan() {
-  return pgResource_person_secretPgResource.find();
-}
-const Query_allPersonSecretsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allCompoundKeysList_plan() {
-  return pgResource_compound_keyPgResource.find();
-}
-const Query_allCompoundKeysList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allNullTestRecordsList_plan() {
-  return pgResource_null_test_recordPgResource.find();
-}
-const Query_allNullTestRecordsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 const resource_edge_casePgResource = registry.pgResources["edge_case"];
-function Query_allEdgeCasesList_plan() {
-  return resource_edge_casePgResource.find();
-}
-const Query_allEdgeCasesList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allLeftArmsList_plan() {
-  return pgResource_left_armPgResource.find();
-}
-const Query_allLeftArmsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allIssue756SList_plan() {
-  return pgResource_issue756PgResource.find();
-}
-const Query_allIssue756SList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allPeopleList_plan() {
-  return pgResource_personPgResource.find();
-}
-const Query_allPeopleList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -8213,58 +8113,6 @@ const makeArgs46 = (args, path = []) => {
   return selectArgs;
 };
 const resource_person_friendsPgResource = registry.pgResources["person_friends"];
-const Person_friendsList_plan = ($in, args, _info) => {
-  if (!hasRecord($in)) {
-    throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-  }
-  const extraSelectArgs = makeArgs46(args);
-  /**
-   * An optimisation - if all our dependencies are
-   * compatible with the expression's class plan then we
-   * can inline ourselves into that, otherwise we must
-   * issue the query separately.
-   */
-  const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-  const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-  const selectArgs = [{
-    step: $row.record()
-  }, ...extraSelectArgs];
-  if (resource_person_friendsPgResource.isUnique && !resource_person_friendsPgResource.codec.attributes && typeof resource_person_friendsPgResource.from === "function") {
-    // This is a scalar computed attribute, let's inline the expression
-    const newSelectArgs = selectArgs.map((arg, i) => {
-      const {
-        name
-      } = arg;
-      if (i === 0) {
-        return {
-          name,
-          placeholder: $row.getClassStep().alias
-        };
-      } else if ("pgCodec" in arg && arg.pgCodec) {
-        return {
-          name,
-          placeholder: $row.placeholder(arg.step, arg.pgCodec)
-        };
-      } else {
-        return {
-          name,
-          placeholder: $row.placeholder(arg.step)
-        };
-      }
-    });
-    return pgClassExpression($row, resource_person_friendsPgResource.codec, undefined)`${resource_person_friendsPgResource.from(...newSelectArgs)}`;
-  }
-  // PERF: or here, if scalar add select to `$row`?
-  return resource_person_friendsPgResource.execute(selectArgs);
-};
-const Person_friendsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 const argDetailsSimple47 = [];
 const makeArgs47 = (args, path = []) => {
   const selectArgs = [];
@@ -8416,28 +8264,6 @@ const makeArgs49 = (args, path = []) => {
 };
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
-const Person_compoundKeysByPersonId1List_plan = $record => pgResource_compound_keyPgResource.find({
-  person_id_1: $record.get("id")
-});
-const Person_compoundKeysByPersonId1List_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-const Person_compoundKeysByPersonId2List_plan = $record => pgResource_compound_keyPgResource.find({
-  person_id_2: $record.get("id")
-});
-const Person_compoundKeysByPersonId2List_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
 const argDetailsSimple50 = [];
 const makeArgs50 = (args, path = []) => {
@@ -14109,12 +13935,9 @@ export const plans = {
       }
     },
     tableSetQueryList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_tableSetQueryList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_tableSetQueryList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($root, args, _info) {
+        const selectArgs = makeArgs29(args);
+        return resource_table_set_queryPgResource.execute(selectArgs);
       },
       args: {
         first: {
@@ -14130,6 +13953,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14196,12 +14027,8 @@ export const plans = {
       return fetcher7($nodeId);
     },
     allMyTablesList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allMyTablesList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allMyTablesList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_my_tablePgResource.find();
       },
       args: {
         first: {
@@ -14217,6 +14044,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14231,12 +14066,8 @@ export const plans = {
       }
     },
     allPersonSecretsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allPersonSecretsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allPersonSecretsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_person_secretPgResource.find();
       },
       args: {
         first: {
@@ -14252,6 +14083,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14266,12 +14105,8 @@ export const plans = {
       }
     },
     allCompoundKeysList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allCompoundKeysList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allCompoundKeysList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_compound_keyPgResource.find();
       },
       args: {
         first: {
@@ -14287,6 +14122,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14301,12 +14144,8 @@ export const plans = {
       }
     },
     allNullTestRecordsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allNullTestRecordsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allNullTestRecordsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_null_test_recordPgResource.find();
       },
       args: {
         first: {
@@ -14322,6 +14161,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14336,12 +14183,8 @@ export const plans = {
       }
     },
     allEdgeCasesList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allEdgeCasesList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allEdgeCasesList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return resource_edge_casePgResource.find();
       },
       args: {
         first: {
@@ -14357,6 +14200,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14371,12 +14222,8 @@ export const plans = {
       }
     },
     allLeftArmsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allLeftArmsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allLeftArmsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_left_armPgResource.find();
       },
       args: {
         first: {
@@ -14392,6 +14239,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14406,12 +14261,8 @@ export const plans = {
       }
     },
     allIssue756SList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allIssue756SList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allIssue756SList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_issue756PgResource.find();
       },
       args: {
         first: {
@@ -14427,6 +14278,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -14441,12 +14300,8 @@ export const plans = {
       }
     },
     allPeopleList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allPeopleList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allPeopleList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_personPgResource.find();
       },
       args: {
         first: {
@@ -14462,6 +14317,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -15189,12 +15052,49 @@ export const plans = {
       return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
     },
     friendsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Person_friendsList_plan($parent, fieldArgs, info);
-        for (const ppr of Person_friendsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
         }
-        return $result;
+        const extraSelectArgs = makeArgs46(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_friendsPgResource.isUnique && !resource_person_friendsPgResource.codec.attributes && typeof resource_person_friendsPgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_friendsPgResource.codec, undefined)`${resource_person_friendsPgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_friendsPgResource.execute(selectArgs);
       },
       args: {
         first: {
@@ -15210,6 +15110,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         }
@@ -15417,12 +15325,10 @@ export const plans = {
       });
     },
     compoundKeysByPersonId1List: {
-      plan($parent, fieldArgs, info) {
-        let $result = Person_compoundKeysByPersonId1List_plan($parent, fieldArgs, info);
-        for (const ppr of Person_compoundKeysByPersonId1List_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return pgResource_compound_keyPgResource.find({
+          person_id_1: $record.get("id")
+        });
       },
       args: {
         first: {
@@ -15438,6 +15344,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
@@ -15452,12 +15366,10 @@ export const plans = {
       }
     },
     compoundKeysByPersonId2List: {
-      plan($parent, fieldArgs, info) {
-        let $result = Person_compoundKeysByPersonId2List_plan($parent, fieldArgs, info);
-        for (const ppr of Person_compoundKeysByPersonId2List_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return pgResource_compound_keyPgResource.find({
+          person_id_2: $record.get("id")
+        });
       },
       args: {
         first: {
@@ -15473,6 +15385,14 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
