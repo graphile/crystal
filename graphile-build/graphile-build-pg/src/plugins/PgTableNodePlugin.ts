@@ -184,16 +184,35 @@ return function (list, constant) {
                     },
                   [constant, identifier, list, pk],
                 ),
-            getSpec: EXPORTABLE(
-              (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
-                const spec = pk.reduce((memo, attribute, index) => {
-                  memo[attribute] = inhibitOnNull(access($list, [index + 1]));
-                  return memo;
-                }, Object.create(null));
-                return spec;
-              },
-              [access, inhibitOnNull, pk],
-            ),
+            getSpec: clean
+              ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                EXPORTABLE(
+                  te.run`\
+return function (access, inhibitOnNull) {
+  return $list => ({ ${te.join(
+    pk.map(
+      (attributeName, index) =>
+        te`${te.safeKeyOrThrow(
+          attributeName,
+        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
+    ),
+    ", ",
+  )} });
+}` as any,
+                  [access, inhibitOnNull],
+                )
+              : EXPORTABLE(
+                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
+                    const spec = pk.reduce((memo, attribute, index) => {
+                      memo[attribute] = inhibitOnNull(
+                        access($list, [index + 1]),
+                      );
+                      return memo;
+                    }, Object.create(null));
+                    return spec;
+                  },
+                  [access, inhibitOnNull, pk],
+                ),
             getIdentifiers: EXPORTABLE(() => (value) => {
               return value.slice(1);
             }, []),
