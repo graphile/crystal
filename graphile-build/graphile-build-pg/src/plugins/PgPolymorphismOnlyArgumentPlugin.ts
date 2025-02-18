@@ -1,12 +1,14 @@
 import type {
   PgCodec,
   PgCodecPolymorphismRelationalTypeSpec,
+  PgUnionAllQueryBuilderCallback,
   PgUnionAllStep,
 } from "@dataplan/pg";
 import type {
   ConnectionStep,
   FieldArgs,
   GrafastFieldConfigArgumentMap,
+  Maybe,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphileConfig } from "graphile-config";
@@ -168,6 +170,7 @@ function makeFieldsHook(isInterface: boolean) {
     const {
       getTypeByName,
       graphql: { GraphQLList, GraphQLNonNull },
+      grafast: { lambda },
       inflection,
     } = build;
     const {
@@ -204,7 +207,7 @@ function makeFieldsHook(isInterface: boolean) {
               : {
                   applyPlan: isPgFieldConnection
                     ? EXPORTABLE(
-                        () =>
+                        (lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $connection: ConnectionStep<
@@ -216,20 +219,22 @@ function makeFieldsHook(isInterface: boolean) {
                             fieldArgs: FieldArgs,
                           ) => {
                             const $union = $connection.getSubplan();
-                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                            const $ltt = fieldArgs.getRaw();
+                            $union.apply(lambda($ltt, limitToTypes));
                           },
-                        [],
+                        [lambda, limitToTypes],
                       )
                     : EXPORTABLE(
-                        () =>
+                        (lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $union: PgUnionAllStep,
                             fieldArgs: FieldArgs,
                           ) => {
-                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                            const $ltt = fieldArgs.getRaw();
+                            $union.apply(lambda($ltt, limitToTypes));
                           },
-                        [],
+                        [lambda, limitToTypes],
                       ),
                 }),
           },
@@ -240,4 +245,13 @@ function makeFieldsHook(isInterface: boolean) {
 
     return args;
   };
+}
+
+function noop() {}
+function limitToTypes(ltt: Maybe<string[]>): PgUnionAllQueryBuilderCallback {
+  if (ltt) {
+    return (qb) => qb.limitToTypes(ltt);
+  } else {
+    return noop;
+  }
 }
