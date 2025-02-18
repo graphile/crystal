@@ -12,8 +12,8 @@ graph TD
     PgSelect37[["PgSelect[37∈0] ➊<br />ᐸforeign_keyᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    ApplyInput39{{"ApplyInput[39∈0] ➊"}}:::plan
-    Object10 & Constant6 & Constant6 & ApplyInput39 --> PgSelect37
+    Constant68{{"Constant[68∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Object10 & Constant6 & Constant6 & Constant68 --> PgSelect37
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Object10 & Constant6 & Constant6 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -24,8 +24,6 @@ graph TD
     __Value2 --> Access9
     PgSelectRows11[["PgSelectRows[11∈0] ➊"]]:::plan
     PgSelect7 --> PgSelectRows11
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ[ 'PERSON_ID_ASC', 'COMPOUND_KEY_1_DESC', 'COMPOUND_KEY_2_ASᐳ"}}:::plan
-    Constant67 --> ApplyInput39
     PgSelectRows40[["PgSelectRows[40∈0] ➊"]]:::plan
     PgSelect37 --> PgSelectRows40
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
@@ -103,9 +101,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-relations-tail-head"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 67, 10, 39<br />2: PgSelect[7], PgSelect[37]<br />3: PgSelectRows[11], PgSelectRows[40]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 68, 10<br />2: PgSelect[7], PgSelect[37]<br />3: PgSelectRows[11], PgSelectRows[40]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,PgSelect7,Access8,Access9,Object10,PgSelectRows11,PgSelect37,ApplyInput39,PgSelectRows40,Constant67 bucket0
+    class Bucket0,__Value2,__Value4,Constant6,PgSelect7,Access8,Access9,Object10,PgSelectRows11,PgSelect37,PgSelectRows40,Constant68 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 10<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]<br />1: <br />ᐳ: 13, 14, 15, 16<br />2: PgSelect[17], PgSelect[26]<br />3: PgSelectRows[22], PgSelectRows[29]<br />ᐳ: 21, 23, 28, 30"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgSelect17,First21,PgSelectRows22,PgSelectSingle23,PgSelect26,First28,PgSelectRows29,PgSelectSingle30 bucket1

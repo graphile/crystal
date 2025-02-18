@@ -27,20 +27,16 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    ApplyInput16{{"ApplyInput[16∈0] ➊"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant47 --> ApplyInput16
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     __InputObject9 --> ApplyInput17
-    ApplyInput34{{"ApplyInput[34∈0] ➊"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ[ 'NATURAL' ]ᐳ"}}:::plan
-    Constant48 --> ApplyInput34
     ApplyInput35{{"ApplyInput[35∈0] ➊"}}:::plan
     __InputObject29 --> ApplyInput35
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant22{{"Constant[22∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect18[["PgSelect[18∈1] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput16 & ApplyInput17 & Connection15 & Constant6 & Constant6 & Constant6 --> PgSelect18
+    Object14 & Constant49 & ApplyInput17 & Connection15 & Constant6 & Constant6 & Constant6 --> PgSelect18
     PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
     PgSelect18 --> PgSelectRows19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
@@ -56,7 +52,7 @@ graph TD
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression26
     PgSelect36[["PgSelect[36∈4] ➊<br />ᐸedge_caseᐳ"]]:::plan
-    Object14 & ApplyInput34 & ApplyInput35 & Connection33 & Constant6 & Constant6 & Constant6 --> PgSelect36
+    Object14 & Constant50 & ApplyInput35 & Connection33 & Constant6 & Constant6 & Constant6 --> PgSelect36
     PgSelectRows37[["PgSelectRows[37∈4] ➊"]]:::plan
     PgSelect36 --> PgSelectRows37
     __Item38[/"__Item[38∈5]<br />ᐸ37ᐳ"\]:::itemplan
@@ -71,8 +67,8 @@ graph TD
     subgraph "Buckets for queries/v4/classic-ids"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,__InputObject9,Access12,Access13,Object14,Connection15,ApplyInput16,ApplyInput17,Constant22,__InputObject29,Connection33,ApplyInput34,ApplyInput35,Constant43,Constant46,Constant47,Constant48 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 16, 17, 15, 6, 22<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[18]<br />2: PgSelectRows[19]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,__InputObject9,Access12,Access13,Object14,Connection15,ApplyInput17,Constant22,__InputObject29,Connection33,ApplyInput35,Constant43,Constant46,Constant49,Constant50 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 49, 17, 15, 6, 22<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[18]<br />2: PgSelectRows[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect18,PgSelectRows19 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 22<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
@@ -81,7 +77,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 22<br /><br />ROOT PgSelectSingle{2}ᐸpostᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,List24,Lambda25,PgClassExpression26 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 34, 35, 33, 6<br /><br />ROOT Connectionᐸ31ᐳ[33]<br />1: PgSelect[36]<br />2: PgSelectRows[37]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 50, 35, 33, 6<br /><br />ROOT Connectionᐸ31ᐳ[33]<br />1: PgSelect[36]<br />2: PgSelectRows[37]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect36,PgSelectRows37 bucket4
     Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ37ᐳ[38]"):::bucket

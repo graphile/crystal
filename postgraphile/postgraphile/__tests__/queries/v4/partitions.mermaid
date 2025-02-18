@@ -19,17 +19,15 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant63 --> ApplyInput14
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant64{{"Constant[64∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸmeasurements+1ᐳ"]]:::plan
-    Object12 & ApplyInput14 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
+    Object12 & Constant64 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
     Object59{{"Object[59∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access54{{"Access[54∈1] ➊<br />ᐸ15.hasMoreᐳ"}}:::plan
     Constant6 & Constant6 & Constant6 & Access54 --> Object59
     PgSelect34[["PgSelect[34∈1] ➊<br />ᐸmeasurements(aggregate)ᐳ"]]:::plan
-    Object12 & ApplyInput14 & Connection13 --> PgSelect34
+    Object12 & Constant64 & Connection13 --> PgSelect34
     Object55{{"Object[55∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant6 & Constant6 & Access54 --> Object55
     PgCursor46{{"PgCursor[46∈1] ➊"}}:::plan
@@ -95,8 +93,8 @@ graph TD
     subgraph "Buckets for queries/v4/partitions"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,ApplyInput14,Constant63 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 13, 6<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15], PgSelect[34]<br />ᐳ: 40, 19, 54, 55, 56, 59, 60<br />2: PgSelectRows[16], PgSelectRows[36]<br />ᐳ: 35, 37, 38, 42, 44, 46, 48, 50, 52"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,Constant64 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 64, 13, 6<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15], PgSelect[34]<br />ᐳ: 40, 19, 54, 55, 56, 59, 60<br />2: PgSelectRows[16], PgSelectRows[36]<br />ᐳ: 35, 37, 38, 42, 44, 46, 48, 50, 52"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16,Access19,PgSelect34,First35,PgSelectRows36,PgSelectSingle37,PgClassExpression38,PgPageInfo40,First42,PgSelectSingle44,PgCursor46,Last48,PgSelectSingle50,PgCursor52,Access54,Object55,Lambda56,Object59,Lambda60 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 19, 12<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket

@@ -31,17 +31,8 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
-    Constant651{{"Constant[651∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant651 --> ApplyInput14
-    ApplyInput126{{"ApplyInput[126∈0] ➊"}}:::plan
-    Constant651 --> ApplyInput126
-    ApplyInput457{{"ApplyInput[457∈0] ➊"}}:::plan
-    Constant651 --> ApplyInput457
     ApplyInput458{{"ApplyInput[458∈0] ➊"}}:::plan
     __InputObject452 --> ApplyInput458
-    ApplyInput522{{"ApplyInput[522∈0] ➊"}}:::plan
-    Constant651 --> ApplyInput522
     ApplyInput523{{"ApplyInput[523∈0] ➊"}}:::plan
     __InputObject517 --> ApplyInput523
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
@@ -57,8 +48,12 @@ graph TD
     Constant194{{"Constant[194∈0] ➊<br />ᐸ'relational_checklist_items'ᐳ"}}:::plan
     Constant463{{"Constant[463∈0] ➊<br />ᐸ'single_table_item_relations'ᐳ"}}:::plan
     Constant528{{"Constant[528∈0] ➊<br />ᐸ'relational_item_relations'ᐳ"}}:::plan
+    Constant652{{"Constant[652∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Constant653{{"Constant[653∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Constant654{{"Constant[654∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Constant655{{"Constant[655∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object12 & ApplyInput14 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
+    Object12 & Constant652 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
@@ -124,7 +119,7 @@ graph TD
     Lambda48{{"Lambda[48∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List47 --> Lambda48
     PgSelect127[["PgSelect[127∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object12 & ApplyInput126 & Connection125 & Constant6 & Constant6 & Constant6 --> PgSelect127
+    Object12 & Constant653 & Connection125 & Constant6 & Constant6 & Constant6 --> PgSelect127
     PgSelectRows128[["PgSelectRows[128∈5] ➊"]]:::plan
     PgSelect127 --> PgSelectRows128
     __Item129[/"__Item[129∈6]<br />ᐸ128ᐳ"\]:::itemplan
@@ -616,7 +611,7 @@ graph TD
     Lambda449{{"Lambda[449∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List448 --> Lambda449
     PgSelect459[["PgSelect[459∈13] ➊<br />ᐸsingle_table_item_relationsᐳ"]]:::plan
-    Object12 & ApplyInput457 & ApplyInput458 & Connection456 & Constant6 & Constant6 & Constant6 --> PgSelect459
+    Object12 & Constant654 & ApplyInput458 & Connection456 & Constant6 & Constant6 & Constant6 --> PgSelect459
     PgSelectRows460[["PgSelectRows[460∈13] ➊"]]:::plan
     PgSelect459 --> PgSelectRows460
     __Item461[/"__Item[461∈14]<br />ᐸ460ᐳ"\]:::itemplan
@@ -698,7 +693,7 @@ graph TD
     Lambda514{{"Lambda[514∈17]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List513 --> Lambda514
     PgSelect524[["PgSelect[524∈18] ➊<br />ᐸrelational_item_relationsᐳ"]]:::plan
-    Object12 & ApplyInput522 & ApplyInput523 & Connection521 & Constant6 & Constant6 & Constant6 --> PgSelect524
+    Object12 & Constant655 & ApplyInput523 & Connection521 & Constant6 & Constant6 & Constant6 --> PgSelect524
     PgSelectRows525[["PgSelectRows[525∈18] ➊"]]:::plan
     PgSelect524 --> PgSelectRows525
     __Item526[/"__Item[526∈19]<br />ᐸ525ᐳ"\]:::itemplan
@@ -885,8 +880,8 @@ graph TD
     subgraph "Buckets for queries/polymorphic/relay.polyroot_with_related_poly"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,ApplyInput14,Constant19,Constant37,Constant40,Constant43,Constant46,Connection125,ApplyInput126,Constant139,Constant167,Constant176,Constant185,Constant194,__InputObject452,Connection456,ApplyInput457,ApplyInput458,Constant463,__InputObject517,Connection521,ApplyInput522,ApplyInput523,Constant528,Constant648,Constant650,Constant651 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 13, 6, 19, 37, 40, 43, 46<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,Constant19,Constant37,Constant40,Constant43,Constant46,Connection125,Constant139,Constant167,Constant176,Constant185,Constant194,__InputObject452,Connection456,ApplyInput458,Constant463,__InputObject517,Connection521,ApplyInput523,Constant528,Constant648,Constant650,Constant652,Constant653,Constant654,Constant655 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 652, 13, 6, 19, 37, 40, 43, 46<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 19, 12, 37, 40, 43, 46<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
@@ -898,7 +893,7 @@ graph TD
     Bucket4("Bucket 4 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 19, 33, 37, 40, 43, 46, 31, 36<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,List34,Lambda35,List38,Lambda39,List41,Lambda42,List44,Lambda45,List47,Lambda48 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 12, 126, 125, 6, 139, 167, 176, 185, 194<br /><br />ROOT Connectionᐸ123ᐳ[125]<br />1: PgSelect[127]<br />2: PgSelectRows[128]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 12, 653, 125, 6, 139, 167, 176, 185, 194<br /><br />ROOT Connectionᐸ123ᐳ[125]<br />1: PgSelect[127]<br />2: PgSelectRows[128]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect127,PgSelectRows128 bucket5
     Bucket6("Bucket 6 (listItem)<br />Deps: 12, 139, 167, 176, 185, 194<br /><br />ROOT __Item{6}ᐸ128ᐳ[129]"):::bucket
@@ -922,7 +917,7 @@ graph TD
     Bucket12("Bucket 12 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 12, 401, 139, 167, 176, 185, 194, 400, 413<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: 402, 414, 423, 432, 441<br />2: 407, 417, 426, 435, 444<br />ᐳ: 406, 408, 410, 411, 412, 416, 418, 420, 421, 422, 425, 427, 429, 430, 431, 434, 436, 438, 439, 440, 443, 445, 447, 448, 449"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgSelect402,First406,PgSelectRows407,PgSelectSingle408,PgClassExpression410,List411,Lambda412,PgSelect414,First416,PgSelectRows417,PgSelectSingle418,PgClassExpression420,List421,Lambda422,PgSelect423,First425,PgSelectRows426,PgSelectSingle427,PgClassExpression429,List430,Lambda431,PgSelect432,First434,PgSelectRows435,PgSelectSingle436,PgClassExpression438,List439,Lambda440,PgSelect441,First443,PgSelectRows444,PgSelectSingle445,PgClassExpression447,List448,Lambda449 bucket12
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 12, 457, 458, 456, 6, 463, 19, 37, 40, 43, 46<br /><br />ROOT Connectionᐸ454ᐳ[456]<br />1: PgSelect[459]<br />2: PgSelectRows[460]"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 12, 654, 458, 456, 6, 463, 19, 37, 40, 43, 46<br /><br />ROOT Connectionᐸ454ᐳ[456]<br />1: PgSelect[459]<br />2: PgSelectRows[460]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgSelect459,PgSelectRows460 bucket13
     Bucket14("Bucket 14 (listItem)<br />Deps: 463, 12, 19, 37, 40, 43, 46<br /><br />ROOT __Item{14}ᐸ460ᐳ[461]"):::bucket
@@ -937,7 +932,7 @@ graph TD
     Bucket17("Bucket 17 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 19, 499, 37, 40, 43, 46, 497, 502<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17,List500,Lambda501,List504,Lambda505,List507,Lambda508,List510,Lambda511,List513,Lambda514 bucket17
-    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 12, 522, 523, 521, 6, 528, 139, 167, 176, 185, 194<br /><br />ROOT Connectionᐸ519ᐳ[521]<br />1: PgSelect[524]<br />2: PgSelectRows[525]"):::bucket
+    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 12, 655, 523, 521, 6, 528, 139, 167, 176, 185, 194<br /><br />ROOT Connectionᐸ519ᐳ[521]<br />1: PgSelect[524]<br />2: PgSelectRows[525]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgSelect524,PgSelectRows525 bucket18
     Bucket19("Bucket 19 (listItem)<br />Deps: 528, 12, 139, 167, 176, 185, 194<br /><br />ROOT __Item{19}ᐸ525ᐳ[526]"):::bucket

@@ -20,12 +20,10 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant27 --> ApplyInput15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object13 & ApplyInput15 & Connection14 & Constant24 & Constant7 & Constant7 --> PgSelect16
+    Object13 & Constant28 & Connection14 & Constant24 & Constant7 & Constant7 --> PgSelect16
     PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
     PgSelect16 --> PgSelectRows17
     __Item18[/"__Item[18∈2]<br />ᐸ17ᐳ"\]:::itemplan
@@ -46,8 +44,8 @@ graph TD
     subgraph "Buckets for queries/v4/empty-array"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access11,Access12,Object13,Connection14,ApplyInput15,Constant24,Constant27 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 14, 24, 7<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[16]<br />2: PgSelectRows[17]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant7,Access11,Access12,Object13,Connection14,Constant24,Constant28 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 28, 14, 24, 7<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[16]<br />2: PgSelectRows[17]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect16,PgSelectRows17 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
