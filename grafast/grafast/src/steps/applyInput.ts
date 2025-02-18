@@ -10,7 +10,7 @@ import {
 import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
-import { operationPlan } from "./index.js";
+import { constant, ConstantStep, operationPlan } from "./index.js";
 
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
@@ -25,6 +25,7 @@ export class ApplyInputStep<
     exportName: "ApplyInputStep",
   };
   public isSyncAndSafe = true;
+  public allowMultipleOptimizations = true;
 
   valueDepId: 0;
   constructor(
@@ -48,6 +49,23 @@ export class ApplyInputStep<
         p.inputType === this.inputType &&
         p.getTargetFromParent === this.getTargetFromParent,
     );
+  }
+
+  public optimize() {
+    const $value = this.getDep(this.valueDepId);
+    if ($value instanceof ConstantStep) {
+      // Replace myself with a constant!
+      return constant((parent: TParent) => {
+        inputArgsApply(
+          this.operationPlan.schema,
+          this.inputType,
+          parent,
+          $value.data,
+          this.getTargetFromParent,
+        );
+      });
+    }
+    return this;
   }
 
   unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
