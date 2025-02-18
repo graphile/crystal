@@ -9,6 +9,14 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant27{{"Constant[27∈0] ➊<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ'000000000000'ᐳ"}}:::plan
+    Constant7 & Constant27 & Constant28 & Constant29 --> __InputObject8
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,43 +24,44 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access13
     __Value2 --> Access14
+    ApplyInput16{{"ApplyInput[16∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput16
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant17{{"Constant[17∈0] ➊<br />ᐸ'networks'ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ'000000000000'ᐳ"}}:::plan
-    PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸnetwork(inet,cidr,macaddr)ᐳ"]]:::sideeffectplan
-    Object15 & Constant25 & Constant26 & Constant27 --> PgInsertSingle12
-    Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle12 --> Object16
-    List19{{"List[19∈3] ➊<br />ᐸ17,18ᐳ"}}:::plan
-    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__network__.”id”ᐳ"}}:::plan
-    Constant17 & PgClassExpression18 --> List19
-    PgInsertSingle12 --> PgClassExpression18
-    Lambda20{{"Lambda[20∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List19 --> Lambda20
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__network__.”inet”ᐳ"}}:::plan
-    PgInsertSingle12 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
-    PgInsertSingle12 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
-    PgInsertSingle12 --> PgClassExpression24
+    Constant18{{"Constant[18∈0] ➊<br />ᐸ'networks'ᐳ"}}:::plan
+    PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸnetwork()ᐳ"]]:::sideeffectplan
+    Object15 & ApplyInput16 --> PgInsertSingle12
+    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle12 --> Object17
+    List21{{"List[21∈3] ➊<br />ᐸ18,19ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__network__.”id”ᐳ"}}:::plan
+    Constant18 & PgClassExpression19 --> List21
+    Access20{{"Access[20∈3] ➊<br />ᐸ12.tᐳ"}}:::plan
+    Access20 --> PgClassExpression19
+    PgInsertSingle12 --> Access20
+    Lambda22{{"Lambda[22∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List21 --> Lambda22
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__network__.”inet”ᐳ"}}:::plan
+    Access20 --> PgClassExpression24
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
+    Access20 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
+    Access20 --> PgClassExpression26
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/network_types.createNetwork"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access13,Access14,Object15,Constant17,Constant25,Constant26,Constant27 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 25, 26, 27, 17<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[16]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access13,Access14,Object15,ApplyInput16,Constant18,Constant27,Constant28,Constant29 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 16, 18<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[17]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle12,Object16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 12, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
+    class Bucket1,PgInsertSingle12,Object17 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 12, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 17<br /><br />ROOT PgInsertSingle{1}ᐸnetwork(inet,cidr,macaddr)ᐳ[12]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 18<br /><br />ROOT PgInsertSingle{1}ᐸnetwork()ᐳ[12]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,List19,Lambda20,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
+    class Bucket3,PgClassExpression19,Access20,List21,Lambda22,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

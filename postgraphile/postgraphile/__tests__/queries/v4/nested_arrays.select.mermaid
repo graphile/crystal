@@ -9,6 +9,9 @@ graph TD
 
 
     %% plan dependencies
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
+    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant6 & Constant6 & Constant6 --> Connection13
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -17,62 +20,63 @@ graph TD
     __Value2 --> Access10
     __Value2 --> Access11
     Lambda14{{"Lambda[14∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant37 --> Lambda14
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
+    Constant38 --> Lambda14
+    ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
+    Constant6 --> ApplyInput15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸtᐳ"]]:::plan
-    Object12 & Lambda14 & Connection13 --> PgSelect15
-    PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
-    PgSelect15 --> PgSelectRows16
-    __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
-    PgSelectRows16 ==> __Item17
-    PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸtᐳ"}}:::plan
-    __Item17 --> PgSelectSingle18
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression20
-    PgSelect24[["PgSelect[24∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
-    __Item23[/"__Item[23∈5]<br />ᐸ20ᐳ"\]:::itemplan
-    Object12 & __Item23 --> PgSelect24
-    PgClassExpression20 ==> __Item23
-    PgSelectRows28[["PgSelectRows[28∈5]"]]:::plan
-    PgSelect24 --> PgSelectRows28
-    __Item29[/"__Item[29∈6]<br />ᐸ28ᐳ"\]:::itemplan
-    PgSelectRows28 ==> __Item29
-    PgSelectSingle30{{"PgSelectSingle[30∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item29 --> PgSelectSingle30
-    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression33
-    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression34
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸtᐳ"]]:::plan
+    Object12 & Lambda14 & ApplyInput15 & Connection13 & Constant6 & Constant6 & Constant6 --> PgSelect16
+    PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
+    PgSelect16 --> PgSelectRows17
+    __Item18[/"__Item[18∈2]<br />ᐸ17ᐳ"\]:::itemplan
+    PgSelectRows17 ==> __Item18
+    PgSelectSingle19{{"PgSelectSingle[19∈2]<br />ᐸtᐳ"}}:::plan
+    __Item18 --> PgSelectSingle19
+    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
+    PgSelectSingle19 --> PgClassExpression20
+    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
+    PgSelectSingle19 --> PgClassExpression21
+    PgSelect25[["PgSelect[25∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
+    __Item24[/"__Item[24∈5]<br />ᐸ21ᐳ"\]:::itemplan
+    Object12 & __Item24 --> PgSelect25
+    PgClassExpression21 ==> __Item24
+    PgSelectRows29[["PgSelectRows[29∈5]"]]:::plan
+    PgSelect25 --> PgSelectRows29
+    __Item30[/"__Item[30∈6]<br />ᐸ29ᐳ"\]:::itemplan
+    PgSelectRows29 ==> __Item30
+    PgSelectSingle31{{"PgSelectSingle[31∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item30 --> PgSelectSingle31
+    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression32
+    PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression35
 
     %% define steps
 
     subgraph "Buckets for queries/v4/nested_arrays.select"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Lambda14,Constant37 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 13<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Access10,Access11,Object12,Connection13,Lambda14,ApplyInput15,Constant38 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 15, 13, 6<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[16]<br />2: PgSelectRows[17]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect15,PgSelectRows16 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 12<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
+    class Bucket1,PgSelect16,PgSelectRows17 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 12<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item17,PgSelectSingle18 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[18]"):::bucket
+    class Bucket2,__Item18,PgSelectSingle19 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19, 12<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[19]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression19,PgClassExpression20 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 12<br /><br />ROOT __Item{5}ᐸ20ᐳ[23]<br />1: PgSelect[24]<br />2: PgSelectRows[28]"):::bucket
+    class Bucket3,PgClassExpression20,PgClassExpression21 bucket3
+    Bucket5("Bucket 5 (listItem)<br />Deps: 12<br /><br />ROOT __Item{5}ᐸ21ᐳ[24]<br />1: PgSelect[25]<br />2: PgSelectRows[29]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item23,PgSelect24,PgSelectRows28 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ28ᐳ[29]"):::bucket
+    class Bucket5,__Item24,PgSelect25,PgSelectRows29 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ29ᐳ[30]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket6
+    class Bucket6,__Item30,PgSelectSingle31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

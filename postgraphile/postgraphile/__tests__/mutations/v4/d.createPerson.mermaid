@@ -9,6 +9,15 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ'create2'ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ'create1'ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ'create3'ᐳ"}}:::plan
+    Constant7 & Constant29 & Constant30 & Constant31 & Constant32 --> __InputObject8
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,49 +25,49 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
+    ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput17
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸ'create2'ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ'create1'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ'create3'ᐳ"}}:::plan
-    PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸperson(last_name,col_no_update,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
-    Object16 & Constant27 & Constant28 & Constant29 & Constant30 --> PgInsertSingle13
-    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle13 --> Object17
-    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-    PgInsertSingle13 --> PgClassExpression26
+    PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸperson()ᐳ"]]:::sideeffectplan
+    Object16 & ApplyInput17 --> PgInsertSingle13
+    Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle13 --> Object18
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Access20{{"Access[20∈3] ➊<br />ᐸ13.tᐳ"}}:::plan
+    Access20 --> PgClassExpression19
+    PgInsertSingle13 --> Access20
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    Access20 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    Access20 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    Access20 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    Access20 --> PgClassExpression24
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    Access20 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    Access20 --> PgClassExpression26
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    Access20 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    Access20 --> PgClassExpression28
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/d.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access14,Access15,Object16,Constant27,Constant28,Constant29,Constant30 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 27, 28, 29, 30<br /><br />1: PgInsertSingle[13]<br />2: <br />ᐳ: Object[17]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access14,Access15,Object16,ApplyInput17,Constant29,Constant30,Constant31,Constant32 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 17<br /><br />1: PgInsertSingle[13]<br />2: <br />ᐳ: Object[18]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle13,Object17 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 13<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
+    class Bucket1,PgInsertSingle13,Object18 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 13<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgInsertSingle{1}ᐸperson(last_name,col_no_update,col_no_order,col_no_filter)ᐳ[13]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgInsertSingle{1}ᐸperson()ᐳ[13]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
+    class Bucket3,PgClassExpression19,Access20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
