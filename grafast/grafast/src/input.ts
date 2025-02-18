@@ -22,6 +22,10 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+import {
+  findVariableNamesUsedInValueNode,
+  valueNodeToStaticValue,
+} from "./utils.js";
 
 const {
   assertScalarType,
@@ -83,18 +87,28 @@ export function graphqlGetTypeForNode(
 export function inputStep(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
-  rawInputValue: ValueNode | undefined,
+  inputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
 ): AnyInputStep {
-  // This prevents recursion
-  if (rawInputValue === undefined && defaultValue === undefined) {
-    return constant(undefined);
+  const { valueNodeToStaticValueCache } = operationPlan;
+  if (inputValue === undefined) {
+    // Definitely can't be or contain a variable!
+    if (defaultValue === undefined) {
+      return constant(undefined);
+    } else {
+      return valueNodeToCachedStaticValueConstantStep(
+        valueNodeToStaticValueCache,
+        defaultValue,
+        inputType,
+      );
+    }
   }
 
   const isObj = isInputObjectType(inputType);
 
-  let inputValue = rawInputValue;
-  if (inputValue?.kind === "Variable") {
+  if (inputValue.kind === "Variable") {
+    // Note: this is the only other place where `defaultValue` might be used
+    // we know `inputValue` is not a variable.
     const variableName = inputValue.name.value;
     const variableDefinition =
       operationPlan.operation.variableDefinitions?.find(
@@ -119,12 +133,13 @@ export function inputStep(
       inputType,
       defaultValue,
     );
-  }
-  // Note: past here we know whether `defaultValue` will be used or not because
-  // we know `inputValue` is not a variable.
-  inputValue = inputValue ?? defaultValue;
-  if (inputType instanceof GraphQLNonNull) {
+  } else if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
+    if (inputValue.kind === Kind.NULL) {
+      throw new Error(
+        `Null found in non-null position; this should have been prevented by validation.`,
+      );
+    }
     const valuePlan = inputStep(
       operationPlan,
       innerType,
@@ -132,7 +147,18 @@ export function inputStep(
       undefined,
     );
     return inputNonNullPlan(operationPlan, valuePlan);
+  } else if (inputValue.kind === Kind.NULL) {
+    return constant(null);
   } else if (inputType instanceof GraphQLList) {
+    const variableNames = new Set<string>();
+    findVariableNamesUsedInValueNode(inputValue, variableNames);
+    if (variableNames.size === 0) {
+      return valueNodeToCachedStaticValueConstantStep(
+        valueNodeToStaticValueCache,
+        inputValue,
+        inputType,
+      );
+    }
     return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
@@ -242,4 +268,17 @@ function inputNonNullPlan(
   innerPlan: AnyInputStep,
 ): AnyInputStep {
   return innerPlan;
+}
+
+function valueNodeToCachedStaticValueConstantStep(
+  cache: Map<ValueNode, AnyInputStep>,
+  valueNode: ValueNode,
+  inputType: GraphQLInputType,
+) {
+  let step = cache.get(valueNode);
+  if (!step) {
+    step = constant(valueNodeToStaticValue(valueNode, inputType), false);
+    cache.set(valueNode, step);
+  }
+  return step;
 }
