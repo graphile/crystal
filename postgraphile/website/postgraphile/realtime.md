@@ -2,7 +2,7 @@
 title: Realtime
 ---
 
-# PostGraphile Realtime
+# PostGraphile realtime
 
 Every application is different, and no more so than when it comes to their
 realtime requirements. Some applications are read-heavy, others write-heavy, and

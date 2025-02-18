@@ -7,7 +7,7 @@ there's a few things you'll want to think about including topics such as
 logging, security and stability. This article outlines some of the issues you
 might face, and how to solve them.
 
-## Database Access Considerations
+## Database access considerations
 
 PostGraphile is just a node app / middleware, so you can deploy it to any number
 of places: Heroku, Now.sh, a VM, a container such as Docker, or of course onto
@@ -46,7 +46,7 @@ plugin is recommended, as it results in a much leaner schema that doesn't
 contain functionality that you can't actually use. You can, however, disable it
 via `disablePlugins: ['PgRBACPlugin']`.
 
-## Database Latency
+## Database latency
 
 PostGraphile needs to issue queries to your database. For a transaction this
 might be multiple statements (`begin`, `set local ...`, `select ...`, `commit`)
@@ -59,13 +59,13 @@ seconds, no matter how fast your queries actually are.
 Run PostGraphile in the same city as your database, preferably in the same data
 centre.
 
-## Gra*fast* Considerations
+## Gra*fast* considerations
 
 Since PostGraphile uses Gra*fast* under the hood, you should also familiarize
 yourself with [Gra*fast*'s production
 considerations](https://grafast.org/grafast/production-considerations).
 
-## Common Middleware Considerations
+## Common middleware considerations
 
 In a production app, you typically want to add a few common enhancements, e.g.
 
@@ -95,7 +95,7 @@ https://github.com/graphile/postgraphile-log-consola
 
 -->
 
-## Denial of Service Considerations
+## Denial of service considerations
 
 When you run PostGraphile in production you'll want to ensure that people cannot
 easily trigger denial of service (DOS) attacks against you. Due to the nature of
@@ -145,7 +145,7 @@ separate layer; for example you could use
 [Cloudflare rate limiting](https://www.cloudflare.com/rate-limiting/) for this,
 or an Express.js middleware.
 
-### Statement Timeout
+### Statement timeout
 
 One simple solution to this issue is to place a timeout on the database
 operations via the
@@ -213,7 +213,7 @@ export default {
 };
 ```
 
-### Simple: Query Allowlist ("persisted queries" / "persisted operations")
+### Simple: query allowlist ("persisted queries" / "persisted operations")
 
 If you do not intend to allow third parties to run arbitrary operations against
 your API then using

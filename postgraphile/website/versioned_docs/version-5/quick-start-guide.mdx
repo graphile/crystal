@@ -2,15 +2,19 @@
 title: Quick-start guide
 ---
 
+import TOCInline from "@theme/TOCInline";
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
 This quick start guide will walk you through spinning up your first PostGraphile
 server, including installing the prerequisites such as Node and PostgreSQL.
 
-### Table of Contents
+</p>
 
-- [Install Node](#install-node)
-- [Install PostgreSQL](#install-postgresql)
-- [Create a Database](#create-a-database)
-- [Install PostGraphile](#install-postgraphile)
+# Table of contents
+
+<TOCInline toc={toc} />
 
 ### Install Node
 
@@ -41,7 +45,7 @@ account for this.
 
 PostgreSQL does not need to be installed on the same machine, but you'll have a
 better development experience if it is. Try and minimise database connection
-latency - do not use a database on the other side of the planet from you!
+latency — do not use a database on the other side of the planet from you!
 
 :::
 
@@ -52,7 +56,7 @@ a copy of PostgreSQL. The latest LTS version is probably a good choice, but plea
 refer to [the requirements documentation](./requirements).
 
 After that, make sure your copy of PostgreSQL is running locally by running
-`psql postgres:///` in a terminal (the three slashes is deliberate - we're
+`psql postgres:///` in a terminal (the three slashes is deliberate — we're
 deliberately not specifying a host so it uses the defaults (either a unix
 socket or hostname: localhost, port: 5432).
 
@@ -86,7 +90,7 @@ Read the documentation on
 [PostgreSQL connection strings](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING)
 to learn more about alternative formats (including using a password).
 
-### Create a Database
+### Create a database
 
 Next, create a database. You can do this by using the terminal:
 
@@ -131,7 +135,7 @@ npm install --save postgraphile@beta
 :::tip
 
 We do not recommend installing PostGraphile globally (e.g. with the `-g` flag
-to `npm`) - local installs are preferred. Though it may seem simpler to use
+to `npm`) — local installs are preferred. Though it may seem simpler to use
 global installs at first, it will become more complicated and give you hard to
 debug errors, so even if you're new to Node we suggest you get used to local
 installs.
@@ -203,7 +207,7 @@ can just run PostGraphile as:
 $ npx postgraphile
 ```
 
-### Writing GraphQL Queries
+### Writing GraphQL queries
 
 Running PostGraphile will give you a URL:
 
