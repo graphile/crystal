@@ -121,7 +121,6 @@ import {
   withSuperuserPgClientFromPgService,
 } from "./pgServices.js";
 import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
-import { extractEnumExtensionValue } from "./steps/extractEnumExtensionValue.js";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -211,7 +210,6 @@ export {
   digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
-  extractEnumExtensionValue,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   GetPgCodecAttributes,
@@ -399,7 +397,6 @@ exportAsMany("@dataplan/pg", {
   PgClassFilter,
   PgManyFilter,
   PgOrFilter,
-  extractEnumExtensionValue,
   pgClassExpression,
   PgClassExpressionStep,
   PgCondition,

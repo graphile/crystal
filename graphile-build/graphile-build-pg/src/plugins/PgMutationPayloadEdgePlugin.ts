@@ -4,15 +4,9 @@ import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
   PgResourceUnique,
-  PgSelectQueryBuilderCallback,
-  PgUnionAllQueryBuilderCallback,
 } from "@dataplan/pg";
-import {
-  extractEnumExtensionValue,
-  PgDeleteSingleStep,
-  pgSelectFromRecord,
-} from "@dataplan/pg";
-import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
+import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
+import type { FieldArgs, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep, first } from "grafast";
 import type { GraphQLEnumType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -170,7 +164,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     PgDeleteSingleStep,
                     connection,
                     constant,
-                    extractEnumExtensionValue,
                     first,
                     pgSelectFromRecord,
                     pkAttributes,
@@ -180,8 +173,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
-                      { $orderBy }: FieldArgs,
-                      { field }: FieldInfo,
+                      fieldArgs: FieldArgs,
                     ) {
                       const $result = $mutation.getStepForKey("result", true);
                       if (!$result) {
@@ -206,17 +198,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                         }
                       })();
 
-                      // Perform ordering
-                      const orderByArg = field.args.find(
-                        (a) => a.name === "orderBy",
-                      );
-                      $select.apply(
-                        extractEnumExtensionValue<
-                          // Only the methods valid on both types
-                          PgSelectQueryBuilderCallback &
-                            PgUnionAllQueryBuilderCallback
-                        >(orderByArg!.type, ["grafast", "apply"], $orderBy),
-                      );
+                      fieldArgs.apply($select, "orderBy");
 
                       const $connection = connection($select) as any;
                       // NOTE: you must not use `$single = $select.single()`
@@ -230,7 +212,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                     PgDeleteSingleStep,
                     connection,
                     constant,
-                    extractEnumExtensionValue,
                     first,
                     pgSelectFromRecord,
                     pkAttributes,

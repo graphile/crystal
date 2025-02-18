@@ -51,7 +51,6 @@ import {
 } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import {
-  getNullableType,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
@@ -63,7 +62,6 @@ import {
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
-  isInputObjectType,
   printSchema,
 } from "grafast/graphql";
 import sql from "pg-sql2";
@@ -112,9 +110,7 @@ import type {
   GetPgResourceAttributes,
   PgCodec,
   PgSelectQueryBuilderCallback,
-  PgUnionAllQueryBuilderCallback,
 } from "../interfaces";
-import { extractEnumExtensionValue } from "../steps/extractEnumExtensionValue.js";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type {
@@ -3877,13 +3873,8 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (
-            connection,
-            deoptimizeIfAppropriate,
-            extractEnumExtensionValue,
-            messageResource,
-          ) =>
-            function plan(_, { $orderBy }, { field }) {
+          (connection, deoptimizeIfAppropriate, messageResource) =>
+            function plan(_, fieldArgs, { field }) {
               const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
@@ -3892,23 +3883,12 @@ export function makeExampleSchema(
               // $messages.where(...);
               const $connectionPlan = connection($messages);
               const orderByArg = field.args.find((a) => a.name === "orderBy");
-              $messages.apply(
-                extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
-                  orderByArg!.type,
-                  ["grafast", "apply"],
-                  $orderBy,
-                ),
-              );
+              fieldArgs.apply($messages, "orderBy");
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [
-            connection,
-            deoptimizeIfAppropriate,
-            extractEnumExtensionValue,
-            messageResource,
-          ],
+          [connection, deoptimizeIfAppropriate, messageResource],
         ),
       },
 
@@ -4600,12 +4580,11 @@ export function makeExampleSchema(
           (
             TYPES,
             connection,
-            extractEnumExtensionValue,
             firstPartyVulnerabilitiesResource,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ) =>
-            function plan(_, { $orderBy }, { field }) {
+            function plan(_, fieldArgs, { field }) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 name: "vulnerabilities",
@@ -4620,20 +4599,12 @@ export function makeExampleSchema(
                   ThirdPartyVulnerability: thirdPartyVulnerabilitiesResource,
                 },
               });
-              const orderByArg = field.args.find((a) => a.name === "orderBy");
-              $vulnerabilities.apply(
-                extractEnumExtensionValue<PgUnionAllQueryBuilderCallback>(
-                  orderByArg!.type,
-                  ["grafast", "apply"],
-                  $orderBy,
-                ),
-              );
+              fieldArgs.apply($vulnerabilities, "orderBy");
               return connection($vulnerabilities);
             },
           [
             TYPES,
             connection,
-            extractEnumExtensionValue,
             firstPartyVulnerabilitiesResource,
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
