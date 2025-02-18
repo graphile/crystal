@@ -247,11 +247,10 @@ function makeFieldsHook(isInterface: boolean) {
   };
 }
 
-function noop() {}
 function limitToTypes(ltt: Maybe<string[]>): PgUnionAllQueryBuilderCallback {
   if (ltt) {
     return (qb) => qb.limitToTypes(ltt);
   } else {
-    return noop;
+    return () => {};
   }
 }
