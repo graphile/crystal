@@ -9,86 +9,111 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
+    __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
+    __InputObject21{{"__InputObject[21∈0] ➊"}}:::plan
+    Constant7 & __InputObject21 --> __InputObject19
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
+    Constant7 & Constant46 --> __InputObject21
+    __InputObject32{{"__InputObject[32∈0] ➊"}}:::plan
+    __InputObject34{{"__InputObject[34∈0] ➊"}}:::plan
+    Constant7 & __InputObject34 --> __InputObject32
+    Constant47{{"Constant[47∈0] ➊<br />ᐸ100ᐳ"}}:::plan
+    Constant47 & Constant46 --> __InputObject34
+    Constant46 --> __InputObject8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
+    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput14
+    ApplyInput27{{"ApplyInput[27∈0] ➊"}}:::plan
+    __InputObject19 --> ApplyInput27
+    ApplyInput41{{"ApplyInput[41∈0] ➊"}}:::plan
+    __InputObject32 --> ApplyInput41
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ100ᐳ"}}:::plan
-    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸalways_as_identity(t)ᐳ"]]:::sideeffectplan
-    Object13 & Constant40 --> PgInsertSingle10
-    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle10 --> Object14
-    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
-    PgInsertSingle10 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
-    PgInsertSingle10 --> PgClassExpression16
-    PgInsertSingle21[["PgInsertSingle[21∈4] ➊<br />ᐸby_default_as_identity(t)ᐳ"]]:::sideeffectplan
-    Object24{{"Object[24∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object24 & Constant40 --> PgInsertSingle21
-    Access22{{"Access[22∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access23{{"Access[23∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access22 & Access23 --> Object24
-    __Value2 --> Access22
-    __Value2 --> Access23
-    Object25{{"Object[25∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle21 --> Object25
-    PgClassExpression26{{"PgClassExpression[26∈6] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
-    PgInsertSingle21 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈6] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
-    PgInsertSingle21 --> PgClassExpression27
-    PgInsertSingle33[["PgInsertSingle[33∈7] ➊<br />ᐸby_default_as_identity(id,t)ᐳ"]]:::sideeffectplan
-    Object36{{"Object[36∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object36 & Constant41 & Constant40 --> PgInsertSingle33
-    Access34{{"Access[34∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access35{{"Access[35∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access34 & Access35 --> Object36
-    __Value2 --> Access34
-    __Value2 --> Access35
-    Object37{{"Object[37∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle33 --> Object37
-    PgClassExpression38{{"PgClassExpression[38∈9] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
-    PgInsertSingle33 --> PgClassExpression38
-    PgClassExpression39{{"PgClassExpression[39∈9] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
-    PgInsertSingle33 --> PgClassExpression39
+    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸalways_as_identity()ᐳ"]]:::sideeffectplan
+    Object13 & ApplyInput14 --> PgInsertSingle10
+    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle10 --> Object15
+    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
+    Access17{{"Access[17∈3] ➊<br />ᐸ10.tᐳ"}}:::plan
+    Access17 --> PgClassExpression16
+    PgInsertSingle10 --> Access17
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
+    Access17 --> PgClassExpression18
+    PgInsertSingle23[["PgInsertSingle[23∈4] ➊<br />ᐸby_default_as_identity()ᐳ"]]:::sideeffectplan
+    Object26{{"Object[26∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object26 & ApplyInput27 --> PgInsertSingle23
+    Access24{{"Access[24∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access25{{"Access[25∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access24 & Access25 --> Object26
+    __Value2 --> Access24
+    __Value2 --> Access25
+    Object28{{"Object[28∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle23 --> Object28
+    PgClassExpression29{{"PgClassExpression[29∈6] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
+    Access30{{"Access[30∈6] ➊<br />ᐸ23.tᐳ"}}:::plan
+    Access30 --> PgClassExpression29
+    PgInsertSingle23 --> Access30
+    PgClassExpression31{{"PgClassExpression[31∈6] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
+    Access30 --> PgClassExpression31
+    PgInsertSingle37[["PgInsertSingle[37∈7] ➊<br />ᐸby_default_as_identity()ᐳ"]]:::sideeffectplan
+    Object40{{"Object[40∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object40 & ApplyInput41 --> PgInsertSingle37
+    Access38{{"Access[38∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access39{{"Access[39∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access38 & Access39 --> Object40
+    __Value2 --> Access38
+    __Value2 --> Access39
+    Object42{{"Object[42∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle37 --> Object42
+    PgClassExpression43{{"PgClassExpression[43∈9] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
+    Access44{{"Access[44∈9] ➊<br />ᐸ37.tᐳ"}}:::plan
+    Access44 --> PgClassExpression43
+    PgInsertSingle37 --> Access44
+    PgClassExpression45{{"PgClassExpression[45∈9] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
+    Access44 --> PgClassExpression45
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/pg11.identity"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 40<br /><br />1: PgInsertSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access11,Access12,Object13,ApplyInput14,__InputObject19,__InputObject21,ApplyInput27,__InputObject32,__InputObject34,ApplyInput41,Constant46,Constant47 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 14<br /><br />1: PgInsertSingle[10]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle10,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    class Bucket1,PgInsertSingle10,Object15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 10<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10<br /><br />ROOT PgInsertSingle{1}ᐸalways_as_identity(t)ᐳ[10]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10<br /><br />ROOT PgInsertSingle{1}ᐸalways_as_identity()ᐳ[10]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression15,PgClassExpression16 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 40, 2<br /><br />1: Access[22]<br />2: Access[23]<br />3: Object[24]<br />4: PgInsertSingle[21]<br />5: <br />ᐳ: Object[25]"):::bucket
+    class Bucket3,PgClassExpression16,Access17,PgClassExpression18 bucket3
+    Bucket4("Bucket 4 (mutationField)<br />Deps: 27, 2<br /><br />1: Access[24]<br />2: Access[25]<br />3: Object[26]<br />4: PgInsertSingle[23]<br />5: <br />ᐳ: Object[28]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgInsertSingle21,Access22,Access23,Object24,Object25 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 25, 21<br /><br />ROOT Object{4}ᐸ{result}ᐳ[25]"):::bucket
+    class Bucket4,PgInsertSingle23,Access24,Access25,Object26,Object28 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 28, 23<br /><br />ROOT Object{4}ᐸ{result}ᐳ[28]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgInsertSingle{4}ᐸby_default_as_identity(t)ᐳ[21]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 23<br /><br />ROOT PgInsertSingle{4}ᐸby_default_as_identity()ᐳ[23]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression26,PgClassExpression27 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 41, 40, 2<br /><br />1: Access[34]<br />2: Access[35]<br />3: Object[36]<br />4: PgInsertSingle[33]<br />5: <br />ᐳ: Object[37]"):::bucket
+    class Bucket6,PgClassExpression29,Access30,PgClassExpression31 bucket6
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 41, 2<br /><br />1: Access[38]<br />2: Access[39]<br />3: Object[40]<br />4: PgInsertSingle[37]<br />5: <br />ᐳ: Object[42]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgInsertSingle33,Access34,Access35,Object36,Object37 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 37, 33<br /><br />ROOT Object{7}ᐸ{result}ᐳ[37]"):::bucket
+    class Bucket7,PgInsertSingle37,Access38,Access39,Object40,Object42 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 42, 37<br /><br />ROOT Object{7}ᐸ{result}ᐳ[42]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgInsertSingle{7}ᐸby_default_as_identity(id,t)ᐳ[33]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgInsertSingle{7}ᐸby_default_as_identity()ᐳ[37]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgClassExpression38,PgClassExpression39 bucket9
+    class Bucket9,PgClassExpression43,Access44,PgClassExpression45 bucket9
     Bucket0 --> Bucket1 & Bucket4 & Bucket7
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -9,37 +9,48 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
+    __InputObject15{{"__InputObject[15∈0] ➊"}}:::plan
+    Constant39 & Constant46 & Constant43 & Constant44 & __InputObject15 --> __InputObject8
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access18 & Access19 --> Object20
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ'http://example.com'ᐳ"}}:::plan
+    Constant45 --> __InputObject15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access18
     __Value2 --> Access19
+    ApplyInput21{{"ApplyInput[21∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput21
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ§{ url: 'http://example.com' }ᐳ"}}:::plan
-    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
-    Object20 & Constant39 & Constant45 & Constant42 & Constant43 & Constant46 --> PgInsertSingle17
-    Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle17 --> Object21
+    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson()ᐳ"]]:::sideeffectplan
+    Object20 & ApplyInput21 --> PgInsertSingle17
+    Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle17 --> Object22
     PgSelect31[["PgSelect[31∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
     Object20 & PgClassExpression30 --> PgSelect31
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression24
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Access24{{"Access[24∈3] ➊<br />ᐸ17.tᐳ"}}:::plan
+    Access24 --> PgClassExpression23
+    PgInsertSingle17 --> Access24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression25
+    Access24 --> PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression26
+    Access24 --> PgClassExpression26
     PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression28
+    Access24 --> PgClassExpression28
     PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgInsertSingle17 --> PgClassExpression29
-    PgInsertSingle17 --> PgClassExpression30
+    Access24 --> PgClassExpression29
+    Access24 --> PgClassExpression30
     First35{{"First[35∈3] ➊"}}:::plan
     PgSelectRows36[["PgSelectRows[36∈3] ➊"]]:::plan
     PgSelectRows36 --> First35
@@ -56,16 +67,16 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.createPerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access18,Access19,Object20,Constant39,Constant42,Constant43,Constant45,Constant46 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 39, 45, 42, 43, 46<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[21]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,__InputObject15,Access18,Access19,Object20,ApplyInput21,Constant39,Constant43,Constant44,Constant45,Constant46 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle17,Object21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 17, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
+    class Bucket1,PgInsertSingle17,Object22 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 17, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20<br /><br />ROOT PgInsertSingle{1}ᐸperson(person_full_name,aliases,about,email,site)ᐳ[17]<br />1: <br />ᐳ: 24, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />3: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 20<br /><br />ROOT PgInsertSingle{1}ᐸperson()ᐳ[17]<br />1: <br />ᐳ: 24, 23, 25, 26, 28, 29, 30<br />2: PgSelect[31]<br />3: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectRows36,PgSelectSingle37 bucket3
+    class Bucket3,PgClassExpression23,Access24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgSelect31,First35,PgSelectRows36,PgSelectSingle37 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ26ᐳ[27]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item27 bucket4

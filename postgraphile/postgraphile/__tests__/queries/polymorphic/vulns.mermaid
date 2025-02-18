@@ -9,202 +9,208 @@ graph TD
 
 
     %% plan dependencies
-    PgUnionAll80[["PgUnionAll[80∈0] ➊"]]:::plan
+    PgUnionAll81[["PgUnionAll[81∈0] ➊"]]:::plan
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Lambda16{{"Lambda[16∈0] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant119{{"Constant[119∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object14 & Lambda16 & Constant115 & Constant119 --> PgUnionAll80
+    Constant118{{"Constant[118∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant122{{"Constant[122∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    ApplyInput84{{"ApplyInput[84∈0] ➊"}}:::plan
+    Lambda19[["Lambda[19∈0] ➊<br />ᐸlimitToTypesᐳ"]]:::unbatchedplan
+    Object14 & Lambda16 & Constant118 & Constant122 & ApplyInput84 & Lambda19 --> PgUnionAll81
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Constant118 & Constant7 & Constant7 & Lambda17 --> Connection15
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant115 & Lambda17 --> Connection15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Constant121{{"Constant[121∈0] ➊<br />ᐸ[ 'CVSS_SCORE_DESC' ]ᐳ"}}:::plan
-    Constant121 --> Lambda16
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ'WyJkNGRlODQ2NjQ3IiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIᐳ"}}:::plan
-    Constant116 --> Lambda17
-    Access114{{"Access[114∈0] ➊<br />ᐸ80.itemsᐳ"}}:::plan
-    PgUnionAll80 --> Access114
+    Constant124{{"Constant[124∈0] ➊<br />ᐸ[ 'CVSS_SCORE_DESC' ]ᐳ"}}:::plan
+    Constant124 --> Lambda16
+    Constant119{{"Constant[119∈0] ➊<br />ᐸ'WyJkNGRlODQ2NjQ3IiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIᐳ"}}:::plan
+    Constant119 --> Lambda17
+    ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
+    Constant7 --> ApplyInput18
+    Constant7 --> Lambda19
+    Constant7 --> ApplyInput84
+    Access117{{"Access[117∈0] ➊<br />ᐸ81.itemsᐳ"}}:::plan
+    PgUnionAll81 --> Access117
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    PgUnionAll18[["PgUnionAll[18∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 & Lambda17 & Constant115 --> PgUnionAll18
-    PgUnionAll55[["PgUnionAll[55∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 & Lambda17 & Constant115 --> PgUnionAll55
-    PgUnionAll61[["PgUnionAll[61∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 & Lambda17 & Constant115 --> PgUnionAll61
-    PgUnionAll68[["PgUnionAll[68∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 & Lambda17 & Constant115 --> PgUnionAll68
-    PgUnionAll72[["PgUnionAll[72∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 & Lambda17 & Constant115 --> PgUnionAll72
-    Object74{{"Object[74∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
-    Access73{{"Access[73∈1] ➊<br />ᐸ72.hasMoreᐳ"}}:::plan
-    Constant115 & Constant7 & Constant7 & Access73 --> Object74
-    PgUnionAll48[["PgUnionAll[48∈1] ➊"]]:::plan
-    Object14 & Lambda16 & Connection15 --> PgUnionAll48
-    Object70{{"Object[70∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Access69{{"Access[69∈1] ➊<br />ᐸ68.hasMoreᐳ"}}:::plan
-    Constant115 & Constant7 & Access69 --> Object70
-    PgCursor60{{"PgCursor[60∈1] ➊"}}:::plan
-    PgUnionAllSingle58["PgUnionAllSingle[58∈1] ➊"]:::plan
-    Access59{{"Access[59∈1] ➊<br />ᐸ55.cursorDetailsᐳ"}}:::plan
-    PgUnionAllSingle58 & Access59 --> PgCursor60
-    PgCursor66{{"PgCursor[66∈1] ➊"}}:::plan
-    PgUnionAllSingle64["PgUnionAllSingle[64∈1] ➊"]:::plan
-    Access65{{"Access[65∈1] ➊<br />ᐸ61.cursorDetailsᐳ"}}:::plan
-    PgUnionAllSingle64 & Access65 --> PgCursor66
-    Access22{{"Access[22∈1] ➊<br />ᐸ18.cursorDetailsᐳ"}}:::plan
-    PgUnionAll18 --> Access22
-    First49{{"First[49∈1] ➊"}}:::plan
-    Access111{{"Access[111∈1] ➊<br />ᐸ48.itemsᐳ"}}:::plan
-    Access111 --> First49
-    PgUnionAllSingle51["PgUnionAllSingle[51∈1] ➊"]:::plan
-    First49 --> PgUnionAllSingle51
-    PgClassExpression52{{"PgClassExpression[52∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle51 --> PgClassExpression52
-    PgPageInfo54{{"PgPageInfo[54∈1] ➊"}}:::plan
-    Connection15 --> PgPageInfo54
-    First56{{"First[56∈1] ➊"}}:::plan
-    Access112{{"Access[112∈1] ➊<br />ᐸ55.itemsᐳ"}}:::plan
-    Access112 --> First56
-    First56 --> PgUnionAllSingle58
-    PgUnionAll55 --> Access59
-    Last62{{"Last[62∈1] ➊"}}:::plan
-    Access113{{"Access[113∈1] ➊<br />ᐸ61.itemsᐳ"}}:::plan
-    Access113 --> Last62
-    Last62 --> PgUnionAllSingle64
-    PgUnionAll61 --> Access65
-    PgUnionAll68 --> Access69
-    Lambda71{{"Lambda[71∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object70 --> Lambda71
-    PgUnionAll72 --> Access73
-    Lambda75{{"Lambda[75∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
-    Object74 --> Lambda75
-    Access110{{"Access[110∈1] ➊<br />ᐸ18.itemsᐳ"}}:::plan
-    PgUnionAll18 --> Access110
-    PgUnionAll48 --> Access111
-    PgUnionAll55 --> Access112
-    PgUnionAll61 --> Access113
-    __Item20[/"__Item[20∈2]<br />ᐸ110ᐳ"\]:::itemplan
-    Access110 ==> __Item20
-    PgUnionAllSingle21["PgUnionAllSingle[21∈2]"]:::plan
-    __Item20 --> PgUnionAllSingle21
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    PgUnionAllSingle21 & Access22 --> PgCursor23
-    Access24{{"Access[24∈3]<br />ᐸ21.1ᐳ"}}:::plan
-    PgUnionAllSingle21 --> Access24
-    PgSelect27[["PgSelect[27∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access26{{"Access[26∈4]<br />ᐸ25.0ᐳ"}}:::plan
-    Object14 & Access26 --> PgSelect27
-    PgSelect39[["PgSelect[39∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access38{{"Access[38∈4]<br />ᐸ37.0ᐳ"}}:::plan
-    Object14 & Access38 --> PgSelect39
-    JSONParse25[["JSONParse[25∈4]<br />ᐸ24ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access24 --> JSONParse25
-    JSONParse25 --> Access26
-    First31{{"First[31∈4]"}}:::plan
-    PgSelectRows32[["PgSelectRows[32∈4]"]]:::plan
-    PgSelectRows32 --> First31
-    PgSelect27 --> PgSelectRows32
-    PgSelectSingle33{{"PgSelectSingle[33∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
-    First31 --> PgSelectSingle33
-    PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression36
-    JSONParse37[["JSONParse[37∈4]<br />ᐸ24ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access24 --> JSONParse37
-    JSONParse37 --> Access38
-    First41{{"First[41∈4]"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈4]"]]:::plan
-    PgSelectRows42 --> First41
-    PgSelect39 --> PgSelectRows42
-    PgSelectSingle43{{"PgSelectSingle[43∈4]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First41 --> PgSelectSingle43
-    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression46
-    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression47
-    __Item84[/"__Item[84∈5]<br />ᐸ114ᐳ"\]:::itemplan
-    Access114 ==> __Item84
-    PgUnionAllSingle85["PgUnionAllSingle[85∈5]"]:::plan
-    __Item84 --> PgUnionAllSingle85
-    Access86{{"Access[86∈5]<br />ᐸ85.1ᐳ"}}:::plan
-    PgUnionAllSingle85 --> Access86
-    PgSelect89[["PgSelect[89∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access88{{"Access[88∈6]<br />ᐸ87.0ᐳ"}}:::plan
-    Object14 & Access88 --> PgSelect89
-    PgSelect101[["PgSelect[101∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access100{{"Access[100∈6]<br />ᐸ99.0ᐳ"}}:::plan
-    Object14 & Access100 --> PgSelect101
-    JSONParse87[["JSONParse[87∈6]<br />ᐸ86ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access86 --> JSONParse87
-    JSONParse87 --> Access88
-    First93{{"First[93∈6]"}}:::plan
-    PgSelectRows94[["PgSelectRows[94∈6]"]]:::plan
-    PgSelectRows94 --> First93
-    PgSelect89 --> PgSelectRows94
-    PgSelectSingle95{{"PgSelectSingle[95∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
-    First93 --> PgSelectSingle95
-    PgClassExpression96{{"PgClassExpression[96∈6]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle95 --> PgClassExpression96
-    PgClassExpression97{{"PgClassExpression[97∈6]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle95 --> PgClassExpression97
-    PgClassExpression98{{"PgClassExpression[98∈6]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle95 --> PgClassExpression98
-    JSONParse99[["JSONParse[99∈6]<br />ᐸ86ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access86 --> JSONParse99
-    JSONParse99 --> Access100
-    First103{{"First[103∈6]"}}:::plan
-    PgSelectRows104[["PgSelectRows[104∈6]"]]:::plan
-    PgSelectRows104 --> First103
-    PgSelect101 --> PgSelectRows104
-    PgSelectSingle105{{"PgSelectSingle[105∈6]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First103 --> PgSelectSingle105
-    PgClassExpression106{{"PgClassExpression[106∈6]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle105 --> PgClassExpression106
-    PgClassExpression107{{"PgClassExpression[107∈6]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle105 --> PgClassExpression107
-    PgClassExpression108{{"PgClassExpression[108∈6]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle105 --> PgClassExpression108
-    PgClassExpression109{{"PgClassExpression[109∈6]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle105 --> PgClassExpression109
+    PgUnionAll20[["PgUnionAll[20∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 & Lambda17 & Constant118 & Constant7 & Constant7 --> PgUnionAll20
+    PgUnionAll57[["PgUnionAll[57∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 & Lambda17 & Constant118 & Constant7 & Constant7 --> PgUnionAll57
+    PgUnionAll63[["PgUnionAll[63∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 & Lambda17 & Constant118 & Constant7 & Constant7 --> PgUnionAll63
+    PgUnionAll69[["PgUnionAll[69∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 & Lambda17 & Constant118 & Constant7 & Constant7 --> PgUnionAll69
+    PgUnionAll73[["PgUnionAll[73∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 & Lambda17 & Constant118 & Constant7 & Constant7 --> PgUnionAll73
+    PgUnionAll50[["PgUnionAll[50∈1] ➊"]]:::plan
+    Object14 & Lambda16 & ApplyInput18 & Lambda19 & Connection15 --> PgUnionAll50
+    Object75{{"Object[75∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Access74{{"Access[74∈1] ➊<br />ᐸ73.hasMoreᐳ"}}:::plan
+    Constant118 & Constant7 & Constant7 & Access74 --> Object75
+    Object71{{"Object[71∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Access70{{"Access[70∈1] ➊<br />ᐸ69.hasMoreᐳ"}}:::plan
+    Constant118 & Constant7 & Access70 --> Object71
+    PgCursor62{{"PgCursor[62∈1] ➊"}}:::plan
+    PgUnionAllSingle60["PgUnionAllSingle[60∈1] ➊"]:::plan
+    Access61{{"Access[61∈1] ➊<br />ᐸ57.cursorDetailsᐳ"}}:::plan
+    PgUnionAllSingle60 & Access61 --> PgCursor62
+    PgCursor68{{"PgCursor[68∈1] ➊"}}:::plan
+    PgUnionAllSingle66["PgUnionAllSingle[66∈1] ➊"]:::plan
+    Access67{{"Access[67∈1] ➊<br />ᐸ63.cursorDetailsᐳ"}}:::plan
+    PgUnionAllSingle66 & Access67 --> PgCursor68
+    Access24{{"Access[24∈1] ➊<br />ᐸ20.cursorDetailsᐳ"}}:::plan
+    PgUnionAll20 --> Access24
+    First51{{"First[51∈1] ➊"}}:::plan
+    Access114{{"Access[114∈1] ➊<br />ᐸ50.itemsᐳ"}}:::plan
+    Access114 --> First51
+    PgUnionAllSingle53["PgUnionAllSingle[53∈1] ➊"]:::plan
+    First51 --> PgUnionAllSingle53
+    PgClassExpression54{{"PgClassExpression[54∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgUnionAllSingle53 --> PgClassExpression54
+    PgPageInfo56{{"PgPageInfo[56∈1] ➊"}}:::plan
+    Connection15 --> PgPageInfo56
+    First58{{"First[58∈1] ➊"}}:::plan
+    Access115{{"Access[115∈1] ➊<br />ᐸ57.itemsᐳ"}}:::plan
+    Access115 --> First58
+    First58 --> PgUnionAllSingle60
+    PgUnionAll57 --> Access61
+    Last64{{"Last[64∈1] ➊"}}:::plan
+    Access116{{"Access[116∈1] ➊<br />ᐸ63.itemsᐳ"}}:::plan
+    Access116 --> Last64
+    Last64 --> PgUnionAllSingle66
+    PgUnionAll63 --> Access67
+    PgUnionAll69 --> Access70
+    Lambda72{{"Lambda[72∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object71 --> Lambda72
+    PgUnionAll73 --> Access74
+    Lambda76{{"Lambda[76∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    Object75 --> Lambda76
+    Access113{{"Access[113∈1] ➊<br />ᐸ20.itemsᐳ"}}:::plan
+    PgUnionAll20 --> Access113
+    PgUnionAll50 --> Access114
+    PgUnionAll57 --> Access115
+    PgUnionAll63 --> Access116
+    __Item22[/"__Item[22∈2]<br />ᐸ113ᐳ"\]:::itemplan
+    Access113 ==> __Item22
+    PgUnionAllSingle23["PgUnionAllSingle[23∈2]"]:::plan
+    __Item22 --> PgUnionAllSingle23
+    PgCursor25{{"PgCursor[25∈3]"}}:::plan
+    PgUnionAllSingle23 & Access24 --> PgCursor25
+    Access26{{"Access[26∈3]<br />ᐸ23.1ᐳ"}}:::plan
+    PgUnionAllSingle23 --> Access26
+    PgSelect29[["PgSelect[29∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Access28{{"Access[28∈4]<br />ᐸ27.0ᐳ"}}:::plan
+    Object14 & Access28 --> PgSelect29
+    PgSelect41[["PgSelect[41∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access40{{"Access[40∈4]<br />ᐸ39.0ᐳ"}}:::plan
+    Object14 & Access40 --> PgSelect41
+    JSONParse27[["JSONParse[27∈4]<br />ᐸ26ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Access26 --> JSONParse27
+    JSONParse27 --> Access28
+    First33{{"First[33∈4]"}}:::plan
+    PgSelectRows34[["PgSelectRows[34∈4]"]]:::plan
+    PgSelectRows34 --> First33
+    PgSelect29 --> PgSelectRows34
+    PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    First33 --> PgSelectSingle35
+    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression38
+    JSONParse39[["JSONParse[39∈4]<br />ᐸ26ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access26 --> JSONParse39
+    JSONParse39 --> Access40
+    First43{{"First[43∈4]"}}:::plan
+    PgSelectRows44[["PgSelectRows[44∈4]"]]:::plan
+    PgSelectRows44 --> First43
+    PgSelect41 --> PgSelectRows44
+    PgSelectSingle45{{"PgSelectSingle[45∈4]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First43 --> PgSelectSingle45
+    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression47
+    PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression48
+    PgClassExpression49{{"PgClassExpression[49∈4]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression49
+    __Item87[/"__Item[87∈5]<br />ᐸ117ᐳ"\]:::itemplan
+    Access117 ==> __Item87
+    PgUnionAllSingle88["PgUnionAllSingle[88∈5]"]:::plan
+    __Item87 --> PgUnionAllSingle88
+    Access89{{"Access[89∈5]<br />ᐸ88.1ᐳ"}}:::plan
+    PgUnionAllSingle88 --> Access89
+    PgSelect92[["PgSelect[92∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Access91{{"Access[91∈6]<br />ᐸ90.0ᐳ"}}:::plan
+    Object14 & Access91 --> PgSelect92
+    PgSelect104[["PgSelect[104∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access103{{"Access[103∈6]<br />ᐸ102.0ᐳ"}}:::plan
+    Object14 & Access103 --> PgSelect104
+    JSONParse90[["JSONParse[90∈6]<br />ᐸ89ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Access89 --> JSONParse90
+    JSONParse90 --> Access91
+    First96{{"First[96∈6]"}}:::plan
+    PgSelectRows97[["PgSelectRows[97∈6]"]]:::plan
+    PgSelectRows97 --> First96
+    PgSelect92 --> PgSelectRows97
+    PgSelectSingle98{{"PgSelectSingle[98∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    First96 --> PgSelectSingle98
+    PgClassExpression99{{"PgClassExpression[99∈6]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle98 --> PgClassExpression99
+    PgClassExpression100{{"PgClassExpression[100∈6]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle98 --> PgClassExpression100
+    PgClassExpression101{{"PgClassExpression[101∈6]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle98 --> PgClassExpression101
+    JSONParse102[["JSONParse[102∈6]<br />ᐸ89ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Access89 --> JSONParse102
+    JSONParse102 --> Access103
+    First106{{"First[106∈6]"}}:::plan
+    PgSelectRows107[["PgSelectRows[107∈6]"]]:::plan
+    PgSelectRows107 --> First106
+    PgSelect104 --> PgSelectRows107
+    PgSelectSingle108{{"PgSelectSingle[108∈6]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First106 --> PgSelectSingle108
+    PgClassExpression109{{"PgClassExpression[109∈6]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle108 --> PgClassExpression109
+    PgClassExpression110{{"PgClassExpression[110∈6]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle108 --> PgClassExpression110
+    PgClassExpression111{{"PgClassExpression[111∈6]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle108 --> PgClassExpression111
+    PgClassExpression112{{"PgClassExpression[112∈6]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
+    PgSelectSingle108 --> PgClassExpression112
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/vulns"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 12, 13, 115, 116, 119, 121, 14, 16, 17, 15<br />2: PgUnionAll[80]<br />ᐳ: Access[114]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 12, 13, 118, 119, 122, 124, 14, 16, 17, 18, 84, 15<br />2: Lambda[19]<br />3: PgUnionAll[81]<br />ᐳ: Access[117]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access12,Access13,Object14,Connection15,Lambda16,Lambda17,PgUnionAll80,Access114,Constant115,Constant116,Constant119,Constant121 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 16, 15, 17, 115, 7<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: 18, 48, 55, 61, 68, 72<br />ᐳ: 54, 22, 59, 65, 69, 70, 71, 73, 74, 75, 110, 111, 112, 113, 49, 56, 62<br />2: 51, 58, 64<br />ᐳ: 52, 60, 66"):::bucket
+    class Bucket0,__Value2,__Value4,Constant7,Access12,Access13,Object14,Connection15,Lambda16,Lambda17,ApplyInput18,Lambda19,PgUnionAll81,ApplyInput84,Access117,Constant118,Constant119,Constant122,Constant124 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 16, 18, 19, 15, 17, 118, 7<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: 20, 50, 57, 63, 69, 73<br />ᐳ: 56, 24, 61, 67, 70, 71, 72, 74, 75, 76, 113, 114, 115, 116, 51, 58, 64<br />2: 53, 60, 66<br />ᐳ: 54, 62, 68"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUnionAll18,Access22,PgUnionAll48,First49,PgUnionAllSingle51,PgClassExpression52,PgPageInfo54,PgUnionAll55,First56,PgUnionAllSingle58,Access59,PgCursor60,PgUnionAll61,Last62,PgUnionAllSingle64,Access65,PgCursor66,PgUnionAll68,Access69,Object70,Lambda71,PgUnionAll72,Access73,Object74,Lambda75,Access110,Access111,Access112,Access113 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 22, 14<br /><br />ROOT __Item{2}ᐸ110ᐳ[20]"):::bucket
+    class Bucket1,PgUnionAll20,Access24,PgUnionAll50,First51,PgUnionAllSingle53,PgClassExpression54,PgPageInfo56,PgUnionAll57,First58,PgUnionAllSingle60,Access61,PgCursor62,PgUnionAll63,Last64,PgUnionAllSingle66,Access67,PgCursor68,PgUnionAll69,Access70,Object71,Lambda72,PgUnionAll73,Access74,Object75,Lambda76,Access113,Access114,Access115,Access116 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 24, 14<br /><br />ROOT __Item{2}ᐸ113ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item20,PgUnionAllSingle21 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 22, 14<br /><br />ROOT PgUnionAllSingle{2}[21]"):::bucket
+    class Bucket2,__Item22,PgUnionAllSingle23 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 23, 24, 14<br /><br />ROOT PgUnionAllSingle{2}[23]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor23,Access24 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 24, 14, 21<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[25], JSONParse[37]<br />ᐳ: Access[26], Access[38]<br />2: PgSelect[27], PgSelect[39]<br />3: PgSelectRows[32], PgSelectRows[42]<br />ᐳ: 31, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
+    class Bucket3,PgCursor25,Access26 bucket3
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 26, 14, 23<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[27], JSONParse[39]<br />ᐳ: Access[28], Access[40]<br />2: PgSelect[29], PgSelect[41]<br />3: PgSelectRows[34], PgSelectRows[44]<br />ᐳ: 33, 35, 36, 37, 38, 43, 45, 46, 47, 48, 49"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,JSONParse25,Access26,PgSelect27,First31,PgSelectRows32,PgSelectSingle33,PgClassExpression34,PgClassExpression35,PgClassExpression36,JSONParse37,Access38,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
-    Bucket5("Bucket 5 (listItem)<br />Deps: 14<br /><br />ROOT __Item{5}ᐸ114ᐳ[84]"):::bucket
+    class Bucket4,JSONParse27,Access28,PgSelect29,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36,PgClassExpression37,PgClassExpression38,JSONParse39,Access40,PgSelect41,First43,PgSelectRows44,PgSelectSingle45,PgClassExpression46,PgClassExpression47,PgClassExpression48,PgClassExpression49 bucket4
+    Bucket5("Bucket 5 (listItem)<br />Deps: 14<br /><br />ROOT __Item{5}ᐸ117ᐳ[87]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item84,PgUnionAllSingle85,Access86 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 86, 14, 85<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[87], JSONParse[99]<br />ᐳ: Access[88], Access[100]<br />2: PgSelect[89], PgSelect[101]<br />3: PgSelectRows[94], PgSelectRows[104]<br />ᐳ: 93, 95, 96, 97, 98, 103, 105, 106, 107, 108, 109"):::bucket
+    class Bucket5,__Item87,PgUnionAllSingle88,Access89 bucket5
+    Bucket6("Bucket 6 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 89, 14, 88<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[90], JSONParse[102]<br />ᐳ: Access[91], Access[103]<br />2: PgSelect[92], PgSelect[104]<br />3: PgSelectRows[97], PgSelectRows[107]<br />ᐳ: 96, 98, 99, 100, 101, 106, 108, 109, 110, 111, 112"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,JSONParse87,Access88,PgSelect89,First93,PgSelectRows94,PgSelectSingle95,PgClassExpression96,PgClassExpression97,PgClassExpression98,JSONParse99,Access100,PgSelect101,First103,PgSelectRows104,PgSelectSingle105,PgClassExpression106,PgClassExpression107,PgClassExpression108,PgClassExpression109 bucket6
+    class Bucket6,JSONParse90,Access91,PgSelect92,First96,PgSelectRows97,PgSelectSingle98,PgClassExpression99,PgClassExpression100,PgClassExpression101,JSONParse102,Access103,PgSelect104,First106,PgSelectRows107,PgSelectSingle108,PgClassExpression109,PgClassExpression110,PgClassExpression111,PgClassExpression112 bucket6
     Bucket0 --> Bucket1 & Bucket5
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

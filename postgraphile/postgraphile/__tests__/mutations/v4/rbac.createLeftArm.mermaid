@@ -9,48 +9,57 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ0.66ᐳ"}}:::plan
+    Constant25 --> __InputObject8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
+    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput14
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸ0.66ᐳ"}}:::plan
-    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸleft_arm(length_in_metres)ᐳ"]]:::sideeffectplan
-    Object13 & Constant23 --> PgInsertSingle10
-    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle10 --> Object14
-    List17{{"List[17∈3] ➊<br />ᐸ15,16ᐳ"}}:::plan
-    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant15 & PgClassExpression16 --> List17
-    PgInsertSingle10 --> PgClassExpression16
-    Lambda18{{"Lambda[18∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List17 --> Lambda18
-    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    PgInsertSingle10 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgInsertSingle10 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    PgInsertSingle10 --> PgClassExpression22
+    Constant16{{"Constant[16∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
+    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸleft_arm()ᐳ"]]:::sideeffectplan
+    Object13 & ApplyInput14 --> PgInsertSingle10
+    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle10 --> Object15
+    List19{{"List[19∈3] ➊<br />ᐸ16,17ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    Constant16 & PgClassExpression17 --> List19
+    Access18{{"Access[18∈3] ➊<br />ᐸ10.tᐳ"}}:::plan
+    Access18 --> PgClassExpression17
+    PgInsertSingle10 --> Access18
+    Lambda20{{"Lambda[20∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List19 --> Lambda20
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    Access18 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    Access18 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
+    Access18 --> PgClassExpression24
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/rbac.createLeftArm"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Constant15,Constant23 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 23, 15<br /><br />1: PgInsertSingle[10]<br />2: <br />ᐳ: Object[14]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access11,Access12,Object13,ApplyInput14,Constant16,Constant25 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 14, 16<br /><br />1: PgInsertSingle[10]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle10,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 10, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    class Bucket1,PgInsertSingle10,Object15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 10, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 15<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm(length_in_metres)ᐳ[10]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 16<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[10]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression16,List17,Lambda18,PgClassExpression20,PgClassExpression21,PgClassExpression22 bucket3
+    class Bucket3,PgClassExpression17,Access18,List19,Lambda20,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

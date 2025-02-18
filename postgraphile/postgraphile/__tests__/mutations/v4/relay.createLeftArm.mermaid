@@ -9,79 +9,76 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant36{{"Constant[36∈0] ➊<br />ᐸ0.69ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
+    Constant7 & Constant36 & Constant37 --> __InputObject8
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7 & __InputObject8 --> __InputObject6
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    __Flag21[["__Flag[21∈0] ➊<br />ᐸ20, if(16), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
-    __Flag20[["__Flag[20∈0] ➊<br />ᐸ19, trapInhibited, onReject: INHIBITᐳ"]]:::plan
-    Condition16{{"Condition[16∈0] ➊<br />ᐸexistsᐳ"}}:::plan
-    __Flag20 & Condition16 --> __Flag21
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
-    Constant41 --> Condition16
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant41 --> Lambda17
-    Access18{{"Access[18∈0] ➊<br />ᐸ17.1ᐳ"}}:::plan
-    Lambda17 --> Access18
-    __Flag19[["__Flag[19∈0] ➊<br />ᐸ18, rejectNull, onReject: INHIBITᐳ"]]:::plan
-    Access18 --> __Flag19
-    __Flag19 --> __Flag20
+    ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ0.69ᐳ"}}:::plan
-    PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸleft_arm(length_in_metres,person_id)ᐳ"]]:::sideeffectplan
-    Object14 & Constant40 & __Flag21 --> PgInsertSingle11
-    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle11 --> Object15
-    List24{{"List[24∈3] ➊<br />ᐸ22,23ᐳ"}}:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant22 & PgClassExpression23 --> List24
-    PgSelect27[["PgSelect[27∈3] ➊<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    Object14 & PgClassExpression26 --> PgSelect27
-    PgInsertSingle11 --> PgClassExpression23
-    Lambda25{{"Lambda[25∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List24 --> Lambda25
-    PgInsertSingle11 --> PgClassExpression26
-    First31{{"First[31∈3] ➊"}}:::plan
-    PgSelectRows32[["PgSelectRows[32∈3] ➊"]]:::plan
-    PgSelectRows32 --> First31
-    PgSelect27 --> PgSelectRows32
-    PgSelectSingle33{{"PgSelectSingle[33∈3] ➊<br />ᐸpersonᐳ"}}:::plan
-    First31 --> PgSelectSingle33
-    PgClassExpression38{{"PgClassExpression[38∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgInsertSingle11 --> PgClassExpression38
-    PgClassExpression39{{"PgClassExpression[39∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    PgInsertSingle11 --> PgClassExpression39
-    List36{{"List[36∈4] ➊<br />ᐸ34,35ᐳ"}}:::plan
-    PgClassExpression35{{"PgClassExpression[35∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant34 & PgClassExpression35 --> List36
-    PgSelectSingle33 --> PgClassExpression35
-    Lambda37{{"Lambda[37∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List36 --> Lambda37
+    Constant17{{"Constant[17∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸleft_arm()ᐳ"]]:::sideeffectplan
+    Object14 & ApplyInput15 --> PgInsertSingle11
+    Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle11 --> Object16
+    List20{{"List[20∈3] ➊<br />ᐸ17,18ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    Constant17 & PgClassExpression18 --> List20
+    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    Object14 & PgClassExpression22 --> PgSelect23
+    Access19{{"Access[19∈3] ➊<br />ᐸ11.tᐳ"}}:::plan
+    Access19 --> PgClassExpression18
+    PgInsertSingle11 --> Access19
+    Lambda21{{"Lambda[21∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List20 --> Lambda21
+    Access19 --> PgClassExpression22
+    First27{{"First[27∈3] ➊"}}:::plan
+    PgSelectRows28[["PgSelectRows[28∈3] ➊"]]:::plan
+    PgSelectRows28 --> First27
+    PgSelect23 --> PgSelectRows28
+    PgSelectSingle29{{"PgSelectSingle[29∈3] ➊<br />ᐸpersonᐳ"}}:::plan
+    First27 --> PgSelectSingle29
+    PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    Access19 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
+    Access19 --> PgClassExpression35
+    List32{{"List[32∈4] ➊<br />ᐸ30,31ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant30 & PgClassExpression31 --> List32
+    PgSelectSingle29 --> PgClassExpression31
+    Lambda33{{"Lambda[33∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List32 --> Lambda33
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/relay.createLeftArm"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 12, 13, 22, 34, 40, 41, 14, 16, 17, 18<br />2: __Flag[19]<br />3: __Flag[20]<br />4: __Flag[21]"):::bucket
+    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Condition16,Lambda17,Access18,__Flag19,__Flag20,__Flag21,Constant22,Constant34,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 40, 21, 22, 34<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,Constant30,Constant36,Constant37 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17, 30<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle11,Object15 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 11, 22, 14, 34<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    class Bucket1,PgInsertSingle11,Object16 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 17, 14, 30<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 22, 14, 34<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm(length_in_metres,person_id)ᐳ[11]<br />1: <br />ᐳ: 23, 26, 38, 39, 24, 25<br />2: PgSelect[27]<br />3: PgSelectRows[32]<br />ᐳ: First[31], PgSelectSingle[33]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17, 14, 30<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[11]<br />1: <br />ᐳ: 19, 18, 20, 21, 22, 34, 35<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,List24,Lambda25,PgClassExpression26,PgSelect27,First31,PgSelectRows32,PgSelectSingle33,PgClassExpression38,PgClassExpression39 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 34<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[33]"):::bucket
+    class Bucket3,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29,PgClassExpression34,PgClassExpression35 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 30<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression35,List36,Lambda37 bucket4
+    class Bucket4,PgClassExpression31,List32,Lambda33 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

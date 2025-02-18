@@ -9,6 +9,10 @@ graph TD
 
 
     %% plan dependencies
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ50ᐳ"}}:::plan
+    Constant8{{"Constant[8∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant46 & Constant8 & Constant8 --> Connection15
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,32 +20,28 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ50ᐳ"}}:::plan
-    Constant47 --> Connection15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant8{{"Constant[8∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ'0d126c0c-9710-478c-9aee-0be34b250573'ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ'0d126c0c-9710-478c-9aee-0be34b250573'ᐳ"}}:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸsome_messages+1ᐳ"]]:::plan
-    Object14 & Constant46 & Connection15 & Constant47 --> PgSelect16
-    Object38{{"Object[38∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Access37{{"Access[37∈1] ➊<br />ᐸ16.hasMoreᐳ"}}:::plan
-    Constant47 & Constant8 & Access37 --> Object38
-    PgCursor45{{"PgCursor[45∈1] ➊"}}:::plan
-    PgSelectSingle43{{"PgSelectSingle[43∈1] ➊<br />ᐸsome_messagesᐳ"}}:::plan
-    Access44{{"Access[44∈1] ➊<br />ᐸ16.cursorDetailsᐳ"}}:::plan
-    PgSelectSingle43 & Access44 --> PgCursor45
+    Object14 & Constant45 & Connection15 & Constant46 & Constant8 & Constant8 --> PgSelect16
+    Object37{{"Object[37∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Access36{{"Access[36∈1] ➊<br />ᐸ16.hasMoreᐳ"}}:::plan
+    Constant46 & Constant8 & Access36 --> Object37
+    PgCursor44{{"PgCursor[44∈1] ➊"}}:::plan
+    PgSelectSingle42{{"PgSelectSingle[42∈1] ➊<br />ᐸsome_messagesᐳ"}}:::plan
+    Access43{{"Access[43∈1] ➊<br />ᐸ16.cursorDetailsᐳ"}}:::plan
+    PgSelectSingle42 & Access43 --> PgCursor44
     PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
     PgSelect16 --> PgSelectRows17
     PgPageInfo34{{"PgPageInfo[34∈1] ➊"}}:::plan
     Connection15 --> PgPageInfo34
-    PgSelect16 --> Access37
-    Lambda39{{"Lambda[39∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object38 --> Lambda39
-    Last41{{"Last[41∈1] ➊"}}:::plan
-    PgSelectRows17 --> Last41
-    Last41 --> PgSelectSingle43
-    PgSelect16 --> Access44
+    PgSelect16 --> Access36
+    Lambda38{{"Lambda[38∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object37 --> Lambda38
+    Last40{{"Last[40∈1] ➊"}}:::plan
+    PgSelectRows17 --> Last40
+    Last40 --> PgSelectSingle42
+    PgSelect16 --> Access43
     __Item18[/"__Item[18∈2]<br />ᐸ17ᐳ"\]:::itemplan
     PgSelectRows17 ==> __Item18
     PgSelectSingle19{{"PgSelectSingle[19∈2]<br />ᐸsome_messagesᐳ"}}:::plan
@@ -72,10 +72,10 @@ graph TD
     subgraph "Buckets for queries/v4/issue2210"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant8,Access12,Access13,Object14,Connection15,Constant46,Constant47 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 46, 15, 47, 8<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[16]<br />ᐳ: 34, 37, 38, 39, 44<br />2: PgSelectRows[17]<br />ᐳ: 41, 43, 45"):::bucket
+    class Bucket0,__Value2,__Value4,Constant8,Access12,Access13,Object14,Connection15,Constant45,Constant46 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 45, 15, 46, 8<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[16]<br />ᐳ: 34, 36, 37, 38, 43<br />2: PgSelectRows[17]<br />ᐳ: 40, 42, 44"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect16,PgSelectRows17,PgPageInfo34,Access37,Object38,Lambda39,Last41,PgSelectSingle43,Access44,PgCursor45 bucket1
+    class Bucket1,PgSelect16,PgSelectRows17,PgPageInfo34,Access36,Object37,Lambda38,Last40,PgSelectSingle42,Access43,PgCursor44 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 14<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item18,PgSelectSingle19 bucket2
