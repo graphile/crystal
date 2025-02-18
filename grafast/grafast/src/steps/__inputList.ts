@@ -3,7 +3,7 @@ import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
 import { assertInputStep, inputStep } from "../input.js";
-import type { InputStep, NotVariableValueNode } from "../interfaces.js";
+import type { AnyInputStep, NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
@@ -89,7 +89,7 @@ export class __InputListStep<
     );
   };
 
-  at(index: number): InputStep | ConstantStep<undefined> {
+  at(index: number): AnyInputStep {
     const itemPlan =
       index < this.itemCount ? this.getDep(index) : constant(undefined);
     assertInputStep(itemPlan);
