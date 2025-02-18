@@ -23,13 +23,11 @@ graph TD
     __Value2 --> Access13
     Constant37{{"Constant[37∈0] ➊<br />ᐸ'WyI5NjdkZTdmYTdlIiwzXQ=='ᐳ"}}:::plan
     Constant37 --> Lambda16
-    ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant41 --> ApplyInput17
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant40{{"Constant[40∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect18[["PgSelect[18∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object14 & ApplyInput17 & Connection15 & Lambda16 & Constant36 & Constant7 & Constant7 --> PgSelect18
+    Object14 & Constant42 & Connection15 & Lambda16 & Constant36 & Constant7 & Constant7 --> PgSelect18
     PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
     PgSelect18 --> PgSelectRows19
     Access34{{"Access[34∈1] ➊<br />ᐸ18.cursorDetailsᐳ"}}:::plan
@@ -62,8 +60,8 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries.after-caroline"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access12,Access13,Object14,Connection15,Lambda16,ApplyInput17,Constant36,Constant37,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 16, 36, 7, 40<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[18]<br />ᐳ: Access[34]<br />2: PgSelectRows[19]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant7,Access12,Access13,Object14,Connection15,Lambda16,Constant36,Constant37,Constant40,Constant42 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 42, 15, 16, 36, 7, 40<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[18]<br />ᐳ: Access[34]<br />2: PgSelectRows[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect18,PgSelectRows19,Access34 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 14, 40, 7, 34<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket

@@ -151,12 +151,10 @@ graph TD
     First88 --> PgSelectSingle90
     PgClassExpression91{{"PgClassExpression[91∈0] ➊<br />ᐸ__jsonb_identity__.vᐳ"}}:::plan
     PgSelectSingle90 --> PgClassExpression91
-    ApplyInput98{{"ApplyInput[98∈0] ➊"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant112 --> ApplyInput98
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant113{{"Constant[113∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect99[["PgSelect[99∈1] ➊<br />ᐸtypesᐳ"]]:::plan
-    Object10 & ApplyInput98 & Connection97 & Constant92 & Constant92 & Constant92 --> PgSelect99
+    Object10 & Constant113 & Connection97 & Constant92 & Constant92 & Constant92 --> PgSelect99
     PgSelectRows100[["PgSelectRows[100∈1] ➊"]]:::plan
     PgSelect99 --> PgSelectRows100
     __Item101[/"__Item[101∈2]<br />ᐸ100ᐳ"\]:::itemplan
@@ -171,10 +169,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/dynamic-json"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 43, 50, 57, 64, 71, 78, 85, 92, 105, 106, 107, 108, 109, 112, 10, 97, 98<br />2: 7, 16, 23, 30, 37, 44, 51, 58, 65, 72, 79, 86<br />3: 12, 19, 26, 33, 40, 47, 54, 61, 68, 75, 82, 89<br />ᐳ: 11, 13, 14, 18, 20, 21, 25, 27, 28, 32, 34, 35, 39, 41, 42, 46, 48, 49, 53, 55, 56, 60, 62, 63, 67, 69, 70, 74, 76, 77, 81, 83, 84, 88, 90, 91"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 43, 50, 57, 64, 71, 78, 85, 92, 105, 106, 107, 108, 109, 113, 10, 97<br />2: 7, 16, 23, 30, 37, 44, 51, 58, 65, 72, 79, 86<br />3: 12, 19, 26, 33, 40, 47, 54, 61, 68, 75, 82, 89<br />ᐳ: 11, 13, 14, 18, 20, 21, 25, 27, 28, 32, 34, 35, 39, 41, 42, 46, 48, 49, 53, 55, 56, 60, 62, 63, 67, 69, 70, 74, 76, 77, 81, 83, 84, 88, 90, 91"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgSelect16,First18,PgSelectRows19,PgSelectSingle20,PgClassExpression21,PgSelect23,First25,PgSelectRows26,PgSelectSingle27,PgClassExpression28,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression35,PgSelect37,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,__InputDynamicScalar43,PgSelect44,First46,PgSelectRows47,PgSelectSingle48,PgClassExpression49,__InputDynamicScalar50,PgSelect51,First53,PgSelectRows54,PgSelectSingle55,PgClassExpression56,__InputDynamicScalar57,PgSelect58,First60,PgSelectRows61,PgSelectSingle62,PgClassExpression63,__InputDynamicScalar64,PgSelect65,First67,PgSelectRows68,PgSelectSingle69,PgClassExpression70,__InputDynamicScalar71,PgSelect72,First74,PgSelectRows75,PgSelectSingle76,PgClassExpression77,__InputDynamicScalar78,PgSelect79,First81,PgSelectRows82,PgSelectSingle83,PgClassExpression84,__InputDynamicScalar85,PgSelect86,First88,PgSelectRows89,PgSelectSingle90,PgClassExpression91,Constant92,Connection97,ApplyInput98,Constant105,Constant106,Constant107,Constant108,Constant109,Constant112 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 98, 97, 92<br /><br />ROOT Connectionᐸ95ᐳ[97]<br />1: PgSelect[99]<br />2: PgSelectRows[100]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgSelect16,First18,PgSelectRows19,PgSelectSingle20,PgClassExpression21,PgSelect23,First25,PgSelectRows26,PgSelectSingle27,PgClassExpression28,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression35,PgSelect37,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,__InputDynamicScalar43,PgSelect44,First46,PgSelectRows47,PgSelectSingle48,PgClassExpression49,__InputDynamicScalar50,PgSelect51,First53,PgSelectRows54,PgSelectSingle55,PgClassExpression56,__InputDynamicScalar57,PgSelect58,First60,PgSelectRows61,PgSelectSingle62,PgClassExpression63,__InputDynamicScalar64,PgSelect65,First67,PgSelectRows68,PgSelectSingle69,PgClassExpression70,__InputDynamicScalar71,PgSelect72,First74,PgSelectRows75,PgSelectSingle76,PgClassExpression77,__InputDynamicScalar78,PgSelect79,First81,PgSelectRows82,PgSelectSingle83,PgClassExpression84,__InputDynamicScalar85,PgSelect86,First88,PgSelectRows89,PgSelectSingle90,PgClassExpression91,Constant92,Connection97,Constant105,Constant106,Constant107,Constant108,Constant109,Constant113 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 10, 113, 97, 92<br /><br />ROOT Connectionᐸ95ᐳ[97]<br />1: PgSelect[99]<br />2: PgSelectRows[100]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect99,PgSelectRows100 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ100ᐳ[101]"):::bucket

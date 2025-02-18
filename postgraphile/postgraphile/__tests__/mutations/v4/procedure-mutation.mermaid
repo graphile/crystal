@@ -196,13 +196,8 @@ graph TD
     __InputObject318 --> ApplyInput335
     ApplyInput361{{"ApplyInput[361∈0] ➊"}}:::plan
     __InputObject350 --> ApplyInput361
-    ApplyInput383{{"ApplyInput[383∈0] ➊"}}:::plan
-    Constant751{{"Constant[751∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
-    Constant751 --> ApplyInput383
     ApplyInput404{{"ApplyInput[404∈0] ➊"}}:::plan
     __InputObject393 --> ApplyInput404
-    ApplyInput426{{"ApplyInput[426∈0] ➊"}}:::plan
-    Constant751 --> ApplyInput426
     __InputObject436{{"__InputObject[436∈0] ➊"}}:::plan
     Constant7 --> __InputObject436
     ApplyInput443{{"ApplyInput[443∈0] ➊"}}:::plan
@@ -253,6 +248,7 @@ graph TD
     __InputObject547 --> List745
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant362{{"Constant[362∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant753{{"Constant[753∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect9[["PgSelect[9∈1] ➊<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object12 & Constant699 & ApplyInput18 --> PgSelect9
     First13{{"First[13∈1] ➊"}}:::plan
@@ -675,7 +671,7 @@ graph TD
     PgSelectSingle359 --> Object360
     PgSelect381[["PgSelect[381∈50] ➊<br />ᐸpostᐳ"]]:::plan
     PgClassExpression380{{"PgClassExpression[380∈50] ➊<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
-    Object356 & PgClassExpression380 & ApplyInput383 --> PgSelect381
+    Object356 & PgClassExpression380 & Constant753 --> PgSelect381
     Edge388{{"Edge[388∈50] ➊"}}:::plan
     PgSelectSingle387{{"PgSelectSingle[387∈50] ➊<br />ᐸpostᐳ"}}:::plan
     PgCursor390{{"PgCursor[390∈50] ➊"}}:::plan
@@ -732,7 +728,7 @@ graph TD
     PgSelectSingle402 --> Object403
     PgSelect424[["PgSelect[424∈56] ➊<br />ᐸpostᐳ"]]:::plan
     PgClassExpression423{{"PgClassExpression[423∈56] ➊<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
-    Object399 & PgClassExpression423 & ApplyInput426 --> PgSelect424
+    Object399 & PgClassExpression423 & Constant753 --> PgSelect424
     Edge431{{"Edge[431∈56] ➊"}}:::plan
     PgSelectSingle430{{"PgSelectSingle[430∈56] ➊<br />ᐸpostᐳ"}}:::plan
     PgCursor433{{"PgCursor[433∈56] ➊"}}:::plan
@@ -1075,7 +1071,7 @@ graph TD
     subgraph "Buckets for mutations/v4/procedure-mutation"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput18,__InputObject19,ApplyInput31,__InputObject32,ApplyInput44,__InputObject45,ApplyInput57,__InputObject58,ApplyInput70,__InputObject71,ApplyInput82,__InputObject83,ApplyInput95,__InputObject96,ApplyInput109,__InputObject111,ApplyInput124,__InputObject126,Constant130,ApplyInput140,__InputObject142,ApplyInput155,__InputObject156,ApplyInput169,__InputObject170,ApplyInput183,__InputObject184,ApplyInput197,__InputObject198,ApplyInput211,__InputObject212,ApplyInput225,__InputObject226,__InputObject236,__InputObject237,__InputObject240,ApplyInput253,__InputObject254,__InputObject256,__InputObject262,ApplyInput274,__InputObject286,__InputObject288,__InputObject294,ApplyInput303,__InputObject318,__InputObject320,__InputObject326,ApplyInput335,__InputObject350,ApplyInput361,Constant362,ApplyInput383,__InputObject393,ApplyInput404,ApplyInput426,__InputObject436,ApplyInput443,__InputObject448,ApplyInput458,__InputObject463,ApplyInput474,__InputObject476,ApplyInput487,__InputObject488,ApplyInput500,__InputObject501,ApplyInput513,__InputObject514,__InputObject517,__InputObject525,__InputObject528,__InputObject536,__InputObject539,__InputObject547,ApplyInput556,__InputObject572,__InputObject574,ApplyInput588,__InputObject591,ApplyInput601,__InputObject604,ApplyInput611,__InputObject617,__InputObject619,__InputObject625,ApplyInput634,__InputObject649,ApplyInput660,__InputObject662,ApplyInput673,__InputObject681,ApplyInput688,Constant699,Constant700,Constant701,Constant702,Constant703,Constant704,Constant705,Constant706,Constant707,Constant708,Constant709,Constant710,Constant711,Constant712,Constant713,Constant714,Constant716,Constant717,Constant718,Constant719,Constant720,Constant721,Constant722,Constant725,Constant727,Constant728,Constant730,List731,Constant732,Constant733,Constant734,Constant735,List738,Constant739,Constant740,List742,Constant743,List745,Constant746,Constant747,Constant748,Constant749,Constant750,Constant751,Constant752 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput18,__InputObject19,ApplyInput31,__InputObject32,ApplyInput44,__InputObject45,ApplyInput57,__InputObject58,ApplyInput70,__InputObject71,ApplyInput82,__InputObject83,ApplyInput95,__InputObject96,ApplyInput109,__InputObject111,ApplyInput124,__InputObject126,Constant130,ApplyInput140,__InputObject142,ApplyInput155,__InputObject156,ApplyInput169,__InputObject170,ApplyInput183,__InputObject184,ApplyInput197,__InputObject198,ApplyInput211,__InputObject212,ApplyInput225,__InputObject226,__InputObject236,__InputObject237,__InputObject240,ApplyInput253,__InputObject254,__InputObject256,__InputObject262,ApplyInput274,__InputObject286,__InputObject288,__InputObject294,ApplyInput303,__InputObject318,__InputObject320,__InputObject326,ApplyInput335,__InputObject350,ApplyInput361,Constant362,__InputObject393,ApplyInput404,__InputObject436,ApplyInput443,__InputObject448,ApplyInput458,__InputObject463,ApplyInput474,__InputObject476,ApplyInput487,__InputObject488,ApplyInput500,__InputObject501,ApplyInput513,__InputObject514,__InputObject517,__InputObject525,__InputObject528,__InputObject536,__InputObject539,__InputObject547,ApplyInput556,__InputObject572,__InputObject574,ApplyInput588,__InputObject591,ApplyInput601,__InputObject604,ApplyInput611,__InputObject617,__InputObject619,__InputObject625,ApplyInput634,__InputObject649,ApplyInput660,__InputObject662,ApplyInput673,__InputObject681,ApplyInput688,Constant699,Constant700,Constant701,Constant702,Constant703,Constant704,Constant705,Constant706,Constant707,Constant708,Constant709,Constant710,Constant711,Constant712,Constant713,Constant714,Constant716,Constant717,Constant718,Constant719,Constant720,Constant721,Constant722,Constant725,Constant727,Constant728,Constant730,List731,Constant732,Constant733,Constant734,Constant735,List738,Constant739,Constant740,List742,Constant743,List745,Constant746,Constant747,Constant748,Constant749,Constant750,Constant752,Constant753 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 699, 18<br /><br />1: PgSelect[9]<br />2: PgSelectRows[14]<br />ᐳ: 13, 15, 16, 17"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,First13,PgSelectRows14,PgSelectSingle15,PgClassExpression16,Object17 bucket1
@@ -1220,10 +1216,10 @@ graph TD
     Bucket48("Bucket 48 (nullableBoundary)<br />Deps: 345<br /><br />ROOT PgClassExpression{47}ᐸ__compound...tion__.”g”ᐳ[345]"):::bucket
     classDef bucket48 stroke:#a52a2a
     class Bucket48 bucket48
-    Bucket49("Bucket 49 (mutationField)<br />Deps: 709, 361, 2, 362, 383<br /><br />1: Access[354]<br />2: Access[355]<br />3: Object[356]<br />4: PgSelect[353]<br />5: PgSelectRows[358]<br />ᐳ: 357, 359, 360"):::bucket
+    Bucket49("Bucket 49 (mutationField)<br />Deps: 709, 361, 2, 362, 753<br /><br />1: Access[354]<br />2: Access[355]<br />3: Object[356]<br />4: PgSelect[353]<br />5: PgSelectRows[358]<br />ᐳ: 357, 359, 360"):::bucket
     classDef bucket49 stroke:#ff00ff
     class Bucket49,PgSelect353,Access354,Access355,Object356,First357,PgSelectRows358,PgSelectSingle359,Object360 bucket49
-    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 362, 359, 356, 383, 360<br /><br />ROOT Object{49}ᐸ{result}ᐳ[360]<br />1: <br />ᐳ: 368, 380, 384, 364, 365<br />2: PgSelect[369], PgSelect[381]<br />ᐳ: Access[389]<br />3: PgSelectRows[374], PgSelectRows[386]<br />ᐳ: 373, 375, 385, 387, 390, 388"):::bucket
+    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 362, 359, 356, 753, 360<br /><br />ROOT Object{49}ᐸ{result}ᐳ[360]<br />1: <br />ᐳ: 368, 380, 384, 364, 365<br />2: PgSelect[369], PgSelect[381]<br />ᐳ: Access[389]<br />3: PgSelectRows[374], PgSelectRows[386]<br />ᐳ: 373, 375, 385, 387, 390, 388"):::bucket
     classDef bucket50 stroke:#f5deb3
     class Bucket50,List364,Lambda365,PgClassExpression368,PgSelect369,First373,PgSelectRows374,PgSelectSingle375,PgClassExpression380,PgSelect381,Connection384,First385,PgSelectRows386,PgSelectSingle387,Edge388,Access389,PgCursor390 bucket50
     Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 359, 365, 380, 368<br /><br />ROOT PgSelectSingle{49}ᐸtable_mutationᐳ[359]"):::bucket
@@ -1238,10 +1234,10 @@ graph TD
     Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 387<br /><br />ROOT PgSelectSingle{50}ᐸpostᐳ[387]"):::bucket
     classDef bucket54 stroke:#ffa500
     class Bucket54,PgClassExpression391,PgClassExpression392 bucket54
-    Bucket55("Bucket 55 (mutationField)<br />Deps: 725, 404, 2, 362, 426<br /><br />1: Access[397]<br />2: Access[398]<br />3: Object[399]<br />4: PgSelect[396]<br />5: PgSelectRows[401]<br />ᐳ: 400, 402, 403"):::bucket
+    Bucket55("Bucket 55 (mutationField)<br />Deps: 725, 404, 2, 362, 753<br /><br />1: Access[397]<br />2: Access[398]<br />3: Object[399]<br />4: PgSelect[396]<br />5: PgSelectRows[401]<br />ᐳ: 400, 402, 403"):::bucket
     classDef bucket55 stroke:#0000ff
     class Bucket55,PgSelect396,Access397,Access398,Object399,First400,PgSelectRows401,PgSelectSingle402,Object403 bucket55
-    Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 362, 402, 399, 426, 403<br /><br />ROOT Object{55}ᐸ{result}ᐳ[403]<br />1: <br />ᐳ: 411, 423, 427, 407, 408<br />2: PgSelect[412], PgSelect[424]<br />ᐳ: Access[432]<br />3: PgSelectRows[417], PgSelectRows[429]<br />ᐳ: 416, 418, 428, 430, 433, 431"):::bucket
+    Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 362, 402, 399, 753, 403<br /><br />ROOT Object{55}ᐸ{result}ᐳ[403]<br />1: <br />ᐳ: 411, 423, 427, 407, 408<br />2: PgSelect[412], PgSelect[424]<br />ᐳ: Access[432]<br />3: PgSelectRows[417], PgSelectRows[429]<br />ᐳ: 416, 418, 428, 430, 433, 431"):::bucket
     classDef bucket56 stroke:#7fff00
     class Bucket56,List407,Lambda408,PgClassExpression411,PgSelect412,First416,PgSelectRows417,PgSelectSingle418,PgClassExpression423,PgSelect424,Connection427,First428,PgSelectRows429,PgSelectSingle430,Edge431,Access432,PgCursor433 bucket56
     Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 402, 408, 423, 411<br /><br />ROOT PgSelectSingle{55}ᐸtable_mutationᐳ[402]"):::bucket
