@@ -2600,6 +2600,9 @@ const Query_allUpdatableViews_postPlanResolvers = [($connection, $parent, fieldA
   $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
 function Query_allLists_plan() {
   return connection(pgResource_listsPgResource.find());
 }
@@ -5775,7 +5778,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -5835,7 +5838,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -5895,7 +5898,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }

@@ -14,20 +14,19 @@ graph TD
     Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Lambda17[["Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
-    ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
-    Object16 & Constant6 & Lambda17 & ApplyInput18 & ApplyInput19 --> PgSelect13
+    Object16 & Constant6 & Lambda17 & ApplyInput18 --> PgSelect13
     __InputObject10{{"__InputObject[10∈0] ➊"}}:::plan
     __InputObject11{{"__InputObject[11∈0] ➊"}}:::plan
     __InputObject11 & Constant6 --> __InputObject10
-    Constant43{{"Constant[43∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant43 & Constant6 --> __InputObject11
+    Constant41{{"Constant[41∈0] ➊<br />ᐸtrueᐳ"}}:::plan
+    Constant41 & Constant6 --> __InputObject11
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access14 & Access15 --> Object16
+    __InputObject23{{"__InputObject[23∈0] ➊"}}:::plan
     __InputObject24{{"__InputObject[24∈0] ➊"}}:::plan
-    __InputObject25{{"__InputObject[25∈0] ➊"}}:::plan
-    __InputObject25 & Constant6 --> __InputObject24
-    Constant6 & Constant43 --> __InputObject25
+    __InputObject24 & Constant6 --> __InputObject23
+    Constant6 & Constant41 --> __InputObject24
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
     __InputObject9 --> __InputObject8
@@ -35,60 +34,57 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
-    Constant42 --> Lambda17
-    Constant6 --> ApplyInput18
-    __InputObject8 --> ApplyInput19
-    PgSelectRows20[["PgSelectRows[20∈0] ➊"]]:::plan
-    PgSelect13 --> PgSelectRows20
-    ApplyInput33{{"ApplyInput[33∈0] ➊"}}:::plan
-    Constant6 --> ApplyInput33
-    ApplyInput34{{"ApplyInput[34∈0] ➊"}}:::plan
-    __InputObject24 --> ApplyInput34
-    Lambda36[["Lambda[36∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
-    Constant42 --> Lambda36
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
+    Constant40 --> Lambda17
+    __InputObject8 --> ApplyInput18
+    PgSelectRows19[["PgSelectRows[19∈0] ➊"]]:::plan
+    PgSelect13 --> PgSelectRows19
+    ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
+    __InputObject23 --> ApplyInput32
+    Lambda34[["Lambda[34∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
+    Constant40 --> Lambda34
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    __Item21[/"__Item[21∈1]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectRows20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈1]<br />ᐸforumsᐳ"}}:::plan
-    __Item21 --> PgSelectSingle22
-    PgSelect29[["PgSelect[29∈2]<br />ᐸmessagesᐳ"]]:::plan
-    PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgClassExpression35{{"PgClassExpression[35∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    Object16 & PgClassExpression28 & Constant6 & ApplyInput33 & ApplyInput34 & PgClassExpression35 & Lambda36 --> PgSelect29
-    PgClassExpression23{{"PgClassExpression[23∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression23
-    PgSelectSingle22 --> PgClassExpression28
-    PgSelectSingle22 --> PgClassExpression35
-    PgSelectRows37[["PgSelectRows[37∈2]"]]:::plan
-    PgSelect29 --> PgSelectRows37
-    __Item38[/"__Item[38∈3]<br />ᐸ37ᐳ"\]:::itemplan
-    PgSelectRows37 ==> __Item38
-    PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸmessagesᐳ"}}:::plan
-    __Item38 --> PgSelectSingle39
-    PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression40
-    PgClassExpression41{{"PgClassExpression[41∈4]<br />ᐸ__messages__.”featured”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression41
+    __Item20[/"__Item[20∈1]<br />ᐸ19ᐳ"\]:::itemplan
+    PgSelectRows19 ==> __Item20
+    PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸforumsᐳ"}}:::plan
+    __Item20 --> PgSelectSingle21
+    PgSelect28[["PgSelect[28∈2]<br />ᐸmessagesᐳ"]]:::plan
+    PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
+    Object16 & PgClassExpression27 & Constant6 & ApplyInput32 & PgClassExpression33 & Lambda34 --> PgSelect28
+    PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression22
+    PgSelectSingle21 --> PgClassExpression27
+    PgSelectSingle21 --> PgClassExpression33
+    PgSelectRows35[["PgSelectRows[35∈2]"]]:::plan
+    PgSelect28 --> PgSelectRows35
+    __Item36[/"__Item[36∈3]<br />ᐸ35ᐳ"\]:::itemplan
+    PgSelectRows35 ==> __Item36
+    PgSelectSingle37{{"PgSelectSingle[37∈3]<br />ᐸmessagesᐳ"}}:::plan
+    __Item36 --> PgSelectSingle37
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression38
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__messages__.”featured”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression39
 
     %% define steps
 
     subgraph "Buckets for queries/conditions/complex-filter"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 14, 15, 42, 43, 11, 16, 18, 25, 33, 10, 24, 34, 9, 8, 19<br />2: Lambda[17], Lambda[36]<br />3: PgSelect[13]<br />4: PgSelectRows[20]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 14, 15, 40, 41, 11, 16, 24, 10, 23, 32, 9, 8, 18<br />2: Lambda[17], Lambda[34]<br />3: PgSelect[13]<br />4: PgSelectRows[19]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,__InputObject8,__InputObject9,__InputObject10,__InputObject11,PgSelect13,Access14,Access15,Object16,Lambda17,ApplyInput18,ApplyInput19,PgSelectRows20,__InputObject24,__InputObject25,ApplyInput33,ApplyInput34,Lambda36,Constant42,Constant43 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 16, 6, 33, 34, 36<br /><br />ROOT __Item{1}ᐸ20ᐳ[21]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,__InputObject8,__InputObject9,__InputObject10,__InputObject11,PgSelect13,Access14,Access15,Object16,Lambda17,ApplyInput18,PgSelectRows19,__InputObject23,__InputObject24,ApplyInput32,Lambda34,Constant40,Constant41 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 16, 6, 32, 34<br /><br />ROOT __Item{1}ᐸ19ᐳ[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item21,PgSelectSingle22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 16, 6, 33, 34, 36<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[22]<br />1: <br />ᐳ: 23, 28, 35<br />2: PgSelect[29]<br />3: PgSelectRows[37]"):::bucket
+    class Bucket1,__Item20,PgSelectSingle21 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 16, 6, 32, 34<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]<br />1: <br />ᐳ: 22, 27, 33<br />2: PgSelect[28]<br />3: PgSelectRows[35]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression23,PgClassExpression28,PgSelect29,PgClassExpression35,PgSelectRows37 bucket2
-    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ37ᐳ[38]"):::bucket
+    class Bucket2,PgClassExpression22,PgClassExpression27,PgSelect28,PgClassExpression33,PgSelectRows35 bucket2
+    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ35ᐳ[36]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item38,PgSelectSingle39 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[39]"):::bucket
+    class Bucket3,__Item36,PgSelectSingle37 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[37]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression40,PgClassExpression41 bucket4
+    class Bucket4,PgClassExpression38,PgClassExpression39 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

@@ -11636,6 +11636,9 @@ const Query_tableSetQuery_postPlanResolvers = [($connection, $parent, fieldArgs,
   $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
 const argDetailsSimple46 = [];
 const makeArgs46 = (args, path = []) => {
   const selectArgs = [];
@@ -27327,7 +27330,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27501,7 +27504,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27561,7 +27564,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27621,7 +27624,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27681,7 +27684,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27741,7 +27744,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27801,7 +27804,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27861,7 +27864,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27921,7 +27924,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -27981,7 +27984,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28041,7 +28044,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28101,7 +28104,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28161,7 +28164,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28221,7 +28224,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28281,7 +28284,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28341,7 +28344,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28401,7 +28404,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28461,7 +28464,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28521,7 +28524,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28581,7 +28584,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28641,7 +28644,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28701,7 +28704,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28761,7 +28764,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28821,7 +28824,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28881,7 +28884,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -28941,7 +28944,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -29086,7 +29089,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -30046,7 +30049,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -30106,7 +30109,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -30176,7 +30179,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -30236,7 +30239,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -30924,7 +30927,7 @@ export const plans = {
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              arg.apply($select, qb => qb.whereBuilder());
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
