@@ -30,8 +30,6 @@ graph TD
     Constant6 --> Lambda39
     ApplyInput40{{"ApplyInput[40∈0] ➊"}}:::plan
     Constant6 --> ApplyInput40
-    ApplyInput84{{"ApplyInput[84∈0] ➊"}}:::plan
-    Constant6 --> ApplyInput84
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant123{{"Constant[123∈0] ➊<br />ᐸ[ 'ThirdPartyVulnerability' ]ᐳ"}}:::plan
     PgUnionAll18[["PgUnionAll[18∈1] ➊"]]:::plan
@@ -52,7 +50,7 @@ graph TD
     PgUnionAll86[["PgUnionAll[86∈3]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression79{{"PgClassExpression[79∈3]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Connection82{{"Connection[82∈3] ➊<br />ᐸ80ᐳ<br />ᐳGcpApplication"}}:::plan
-    Object13 & PgClassExpression79 & Lambda39 & ApplyInput84 & Lambda41 & Connection82 & Constant6 & Constant6 & Constant6 --> PgUnionAll86
+    Object13 & PgClassExpression79 & Lambda39 & ApplyInput40 & Lambda41 & Connection82 & Constant6 & Constant6 & Constant6 --> PgUnionAll86
     Constant6 & Constant6 & Constant6 --> Connection38
     Constant6 & Constant6 & Constant6 --> Connection82
     PgSelect25[["PgSelect[25∈3]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
@@ -178,16 +176,16 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/only"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 122, 123, 13, 14, 15, 16, 39, 40, 84<br />2: Lambda[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 122, 123, 13, 14, 15, 16, 39, 40<br />2: Lambda[17]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access11,Access12,Object13,Connection14,Lambda15,ApplyInput16,Lambda17,Lambda39,ApplyInput40,ApplyInput84,Constant122,Constant123 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 16, 17, 14, 6, 123, 39, 40, 84<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant6,Access11,Access12,Object13,Connection14,Lambda15,ApplyInput16,Lambda17,Lambda39,ApplyInput40,Constant122,Constant123 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 16, 17, 14, 6, 123, 39, 40<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll18,Access115 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 13, 6, 123, 39, 40, 84<br /><br />ROOT __Item{2}ᐸ115ᐳ[20]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 13, 6, 123, 39, 40<br /><br />ROOT __Item{2}ᐸ115ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item20,PgUnionAllSingle21,Access22 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 22, 13, 6, 123, 39, 40, 84, 21<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: 23, 41, 69<br />ᐳ: 38, 82, 24, 70<br />2: PgSelect[25], PgSelect[71]<br />3: PgSelectRows[30], PgSelectRows[74]<br />ᐳ: 29, 31, 32, 35, 73, 75, 76, 79<br />4: PgUnionAll[42], PgUnionAll[86]<br />ᐳ: Access[113], Access[114]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 22, 13, 6, 123, 39, 40, 21<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: 23, 41, 69<br />ᐳ: 38, 82, 24, 70<br />2: PgSelect[25], PgSelect[71]<br />3: PgSelectRows[30], PgSelectRows[74]<br />ᐳ: 29, 31, 32, 35, 73, 75, 76, 79<br />4: PgUnionAll[42], PgUnionAll[86]<br />ᐳ: Access[113], Access[114]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,JSONParse23,Access24,PgSelect25,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression32,PgClassExpression35,Connection38,Lambda41,PgUnionAll42,JSONParse69,Access70,PgSelect71,First73,PgSelectRows74,PgSelectSingle75,PgClassExpression76,PgClassExpression79,Connection82,PgUnionAll86,Access113,Access114 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 13<br /><br />ROOT __Item{4}ᐸ113ᐳ[44]"):::bucket
