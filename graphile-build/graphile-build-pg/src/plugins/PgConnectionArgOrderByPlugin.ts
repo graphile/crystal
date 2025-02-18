@@ -4,16 +4,10 @@ import "graphile-config";
 import type {
   PgCodec,
   PgSelectParsedCursorStep,
-  PgSelectQueryBuilderCallback,
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import { extractEnumExtensionValue } from "@dataplan/pg";
-import type {
-  ConnectionStep,
-  ExecutableStep,
-  GrafastFieldConfigArgumentMap,
-} from "grafast";
+import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -182,56 +176,6 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
 
         // TODO: inflection
         const argName = "orderBy";
-
-        if (isPgFieldConnection) {
-          addToPlanResolver<
-            any,
-            ExecutableStep,
-            ConnectionStep<
-              PgSelectSingleStep<any>,
-              PgSelectParsedCursorStep,
-              PgSelectStep<any>
-            >
-          >(
-            EXPORTABLE(
-              (argName, extractEnumExtensionValue) =>
-                ($connection, $parent, fieldArgs, { field }) => {
-                  const $orderBy = fieldArgs.getRaw(argName);
-                  const $select = $connection.getSubplan();
-                  const orderByArg = field.args.find((a) => a.name === argName);
-                  $select.apply(
-                    extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
-                      orderByArg!.type,
-                      ["grafast", "apply"],
-                      $orderBy,
-                    ),
-                  );
-                  return $connection;
-                },
-              [argName, extractEnumExtensionValue],
-            ),
-          );
-        } else {
-          addToPlanResolver<any, ExecutableStep, PgSelectStep<any>>(
-            EXPORTABLE(
-              (argName, extractEnumExtensionValue) =>
-                ($select, $parent, fieldArgs, { field }) => {
-                  const $orderBy = fieldArgs.getRaw(argName);
-                  const orderByArg = field.args.find((a) => a.name === argName);
-                  $select.apply(
-                    extractEnumExtensionValue<PgSelectQueryBuilderCallback>(
-                      orderByArg!.type,
-                      ["grafast", "apply"],
-                      $orderBy,
-                    ),
-                  );
-                  return $select;
-                },
-              [argName, extractEnumExtensionValue],
-            ),
-          );
-        }
-
         return extend(
           args,
           {
@@ -241,6 +185,29 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
+              applyPlan: isPgFieldConnection
+                ? EXPORTABLE(
+                    () =>
+                      (
+                        parent,
+                        $connection: ConnectionStep<
+                          PgSelectSingleStep<any>,
+                          PgSelectParsedCursorStep,
+                          PgSelectStep<any>
+                        >,
+                        value,
+                      ) => {
+                        const $select = $connection.getSubplan();
+                        value.apply($select);
+                      },
+                    [],
+                  )
+                : EXPORTABLE(
+                    () => (parent, $select: PgSelectStep<any>, value) => {
+                      value.apply($select);
+                    },
+                    [],
+                  ),
             },
           } as GrafastFieldConfigArgumentMap,
           `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
