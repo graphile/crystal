@@ -2,7 +2,7 @@
 title: Plugin gallery
 ---
 
-# PostGraphile Plugin Gallery
+# PostGraphile plugin gallery
 
 Sorry, this has not been ported from the V4 documentation yet.
 

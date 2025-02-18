@@ -62,7 +62,7 @@ export const client = new ApolloClient({
 });
 ```
 
-### Using the Global Object Identifier in Function Arguments
+### Using the Global Object Identifier in function arguments
 
 The global object identifier can be accepted as a function argument using
 [`@argNvariant nodeId`](./smart-tags/#arg0variant-arg1variant-).
@@ -113,7 +113,7 @@ client though!
 known as the Relay Global Object Identification Specification, but it is not
 specific to Relay and is a general best practice for GraphQL APIs.)
 
-### More On the Relay Preset
+### More on the relay preset
 
 If having both `id: ID!` and `rowId: Int!` in your schema bothers you (as it
 should!), you should consider using the `postgraphile/presets/relay` preset.
@@ -137,7 +137,7 @@ export default {
 };
 ```
 
-### Globally Unique ID Structure
+### Globally unique ID SStructure
 
 In GraphQL a globally unique ID should be treated as an "opaque" value: you should
 not extract values from inside it in your application. Though the globally unique
