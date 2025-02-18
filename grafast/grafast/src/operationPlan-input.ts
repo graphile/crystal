@@ -7,8 +7,20 @@ import type {
 import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import { __InputObjectStep, __TrackedValueStep, applyInput } from "./index.js";
-import type { FieldArgs, TrackedArguments } from "./interfaces.js";
+import type { ObjectStep } from "./index.js";
+import {
+  __InputObjectStep,
+  __TrackedValueStep,
+  applyInput,
+  object,
+} from "./index.js";
+import { inspect } from "./inspect.js";
+import type {
+  AnyInputStep,
+  FieldArg,
+  FieldArgs,
+  TrackedArguments,
+} from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { assertNotPromise } from "./utils.js";
@@ -103,7 +115,13 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
     },
     getRaw(path) {
       assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
-      if (typeof path === "string") {
+      if (path === undefined) {
+        return object(
+          Object.fromEntries(
+            Object.keys(args).map((argName) => [argName, $all.get(argName)]),
+          ),
+        );
+      } else if (typeof path === "string") {
         return $all.get(path);
       } else if (Array.isArray(path)) {
         const [first, ...rest] = path;
@@ -124,7 +142,11 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
         }
         return $entry;
       } else {
-        throw new Error(`Invalid path`);
+        throw new Error(
+          `Invalid path passed to FieldArgs.getRaw(); please check your code. Path: ${inspect(
+            path,
+          )}`,
+        );
       }
     },
     apply($target, inPathOrGetTargetFromParent, maybeGetTargetFromParent) {
@@ -163,7 +185,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
           throw new Error(`Invalid path; argument '${argName}' does not exist`);
         }
         const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
-        const $valueAtPath = fieldArgs.getRaw(inPath);
+        const $valueAtPath = fieldArgs.getRaw(inPath) as AnyInputStep;
         $target.apply(
           applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
         );
@@ -208,12 +230,14 @@ function processAfter(
         : null;
     if (autoApply) {
       // TODO: should this have dollars on it for accessing subkeys?
-      const input: FieldArgs = {
+      const input: FieldArg = {
         typeAt(path) {
           return rootFieldArgs.typeAt(concatPath(argName, path));
         },
         getRaw(path) {
-          return rootFieldArgs.getRaw(concatPath(argName, path));
+          return rootFieldArgs.getRaw(
+            concatPath(argName, path),
+          ) as AnyInputStep;
         },
         apply($target, pathOrTargetGetter, maybeTargetGetter) {
           if (typeof pathOrTargetGetter === "function") {

@@ -71,7 +71,7 @@ const makeEchoSpy = (fn?: FieldPlanResolver<any, any, any>) =>
   jest.fn(
     fn ||
       (($parent, args) => {
-        return args.get("message");
+        return args.getRaw("message");
       }),
   );
 
@@ -329,7 +329,7 @@ describe("wrapping plans matching a filter", () => {
             argValues,
           ]);
         }
-        sideEffect(args.get(), beforeFn);
+        sideEffect(args.getRaw(), beforeFn);
 
         const $result = plan();
 
@@ -343,8 +343,8 @@ describe("wrapping plans matching a filter", () => {
     const add: FieldPlanResolver<any, any, any> = (_, args) =>
       lambda(
         [
-          args.get("arg1") as ExecutableStep<number>,
-          args.get("arg2") as ExecutableStep<number>,
+          args.getRaw("arg1") as ExecutableStep<number>,
+          args.getRaw("arg2") as ExecutableStep<number>,
         ],
         ([arg1, arg2]) => arg1 + arg2,
       );
