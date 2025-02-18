@@ -234,39 +234,41 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                         sql`${expression} is null`,
                                     });
                                   }
+                                  return;
                                 } else if (typeof nodeId !== "string") {
                                   throw new Error(
                                     `Invalid node identifier for '${typeName}'; expected string`,
                                   );
-                                }
-                                const identifiers = getIdentifiers(nodeId);
-                                if (identifiers == null) {
-                                  throw new Error(
-                                    `Invalid node identifier for '${typeName}'`,
-                                  );
-                                }
-                                for (let i = 0; i < attributeCount; i++) {
-                                  const localName = localAttributes[i];
-                                  const value = identifiers[i];
-                                  if (value == null) {
-                                    condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} is null`,
-                                    });
-                                  } else {
-                                    const codec = localAttributeCodecs[i];
-                                    const sqlRemoteValue = sqlValueWithCodec(
-                                      value,
-                                      codec,
+                                } else {
+                                  const identifiers = getIdentifiers(nodeId);
+                                  if (identifiers == null) {
+                                    throw new Error(
+                                      `Invalid node identifier for '${typeName}'`,
                                     );
-                                    condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} = ${sqlRemoteValue}`,
-                                    });
+                                  }
+                                  for (let i = 0; i < attributeCount; i++) {
+                                    const localName = localAttributes[i];
+                                    const value = identifiers[i];
+                                    if (value == null) {
+                                      condition.where({
+                                        type: "attribute",
+                                        attribute: localName,
+                                        callback: (expression) =>
+                                          sql`${expression} is null`,
+                                      });
+                                    } else {
+                                      const codec = localAttributeCodecs[i];
+                                      const sqlRemoteValue = sqlValueWithCodec(
+                                        value,
+                                        codec,
+                                      );
+                                      condition.where({
+                                        type: "attribute",
+                                        attribute: localName,
+                                        callback: (expression) =>
+                                          sql`${expression} = ${sqlRemoteValue}`,
+                                      });
+                                    }
                                   }
                                 }
                               },
@@ -294,20 +296,23 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   for (const localName of localAttributes) {
                                     record.set(localName, null);
                                   }
+                                  return;
                                 } else if (typeof nodeId !== "string") {
                                   throw new Error(
                                     `Invalid node identifier for '${typeName}'; expected string`,
                                   );
-                                }
-                                const identifiers = getIdentifiers(nodeId);
-                                if (identifiers == null) {
-                                  throw new Error(
-                                    `Invalid node identifier for '${typeName}'`,
-                                  );
-                                }
-                                for (let i = 0; i < attributeCount; i++) {
-                                  const localName = localAttributes[i];
-                                  record.set(localName, identifiers[i]);
+                                } else {
+                                  const identifiers = getIdentifiers(nodeId);
+                                  if (identifiers == null) {
+                                    console.log(identifiers, nodeId, typeName);
+                                    throw new Error(
+                                      `Invalid node identifier for '${typeName}'`,
+                                    );
+                                  }
+                                  for (let i = 0; i < attributeCount; i++) {
+                                    const localName = localAttributes[i];
+                                    record.set(localName, identifiers[i]);
+                                  }
                                 }
                               },
                             [
