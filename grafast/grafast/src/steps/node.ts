@@ -4,6 +4,7 @@ import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
   AnyInputStep,
+  Maybe,
   NodeIdHandler,
   PolymorphicData,
   UnbatchedExecutionExtra,
@@ -101,9 +102,10 @@ export function node(
 
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string> | AnyInputStep,
+  $id: ExecutableStep<Maybe<string>>,
 ) {
-  function decodeWithCodecAndHandler(raw: string) {
+  function decodeWithCodecAndHandler(raw: Maybe<string>) {
+    if (raw == null) return raw;
     try {
       const decoded = handler.codec.decode(raw);
       if (handler.match(decoded)) {

@@ -589,7 +589,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       fetcher,
                     } = argDetailsSimple[i];
                     const fullPath = [...path, graphqlArgName];
-                    const $raw = args.getRaw(fullPath);
+                    const $raw = args.getRaw(fullPath) as __TrackedValueStep;
                     let step: ExecutableStep;
                     if ($raw.evalIs(undefined)) {
                       if (
