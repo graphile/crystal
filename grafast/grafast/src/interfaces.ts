@@ -304,7 +304,7 @@ export type AnyInputStep =
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
   | __InputObjectStepWithDollars<GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
-  | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
+  | ConstantStep<any>; // .eval(), .evalIs(), .evalIsEmpty()
 
 export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
 
