@@ -1,4 +1,4 @@
-import { PgExecutor, TYPES, assertPgClassSingleStep, extractEnumExtensionValue, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -230,18 +230,6 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Employee);
-function Query_allEmployees_plan() {
-  return connection(pgResource_employeePgResource.find());
-}
-const Query_allEmployees_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
@@ -420,12 +408,8 @@ export const plans = {
       return fetcher($nodeId);
     },
     allEmployees: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allEmployees_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allEmployees_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_employeePgResource.find());
       },
       args: {
         first: {
@@ -465,6 +449,15 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },

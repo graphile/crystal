@@ -27,6 +27,9 @@ graph TD
     __Value2 --> Access37
     ApplyInput52{{"ApplyInput[52∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput52
+    ApplyInput62{{"ApplyInput[62∈0] ➊"}}:::plan
+    Constant121{{"Constant[121∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
+    Constant121 --> ApplyInput62
     Lambda9 --> Access116
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant75{{"Constant[75∈0] ➊<br />ᐸ'relational_topics'ᐳ"}}:::plan
@@ -35,7 +38,6 @@ graph TD
     Constant103{{"Constant[103∈0] ➊<br />ᐸ'relational_checklists'ᐳ"}}:::plan
     Constant112{{"Constant[112∈0] ➊<br />ᐸ'relational_checklist_items'ᐳ"}}:::plan
     Constant118{{"Constant[118∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant121{{"Constant[121∈0] ➊<br />ᐸ[ 'PRIMARY_KEY_ASC' ]ᐳ"}}:::plan
     List32{{"List[32∈1] ➊<br />ᐸ15,19,23,27,31ᐳ"}}:::plan
     Object15{{"Object[15∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
     Object19{{"Object[19∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
@@ -86,10 +88,8 @@ graph TD
     PgClassExpression50 --> Object51
     Connection61{{"Connection[61∈2] ➊<br />ᐸ57ᐳ"}}:::plan
     Constant118 & Constant7 & Constant7 --> Connection61
-    Lambda62{{"Lambda[62∈2] ➊<br />ᐸextractList_grafast_applyᐳ"}}:::plan
-    Constant121 --> Lambda62
     PgSelect63[["PgSelect[63∈4] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object38 & Lambda62 & Connection61 & Constant118 & Constant7 & Constant7 --> PgSelect63
+    Object38 & ApplyInput62 & Connection61 & Constant118 & Constant7 & Constant7 --> PgSelect63
     PgSelectRows64[["PgSelectRows[64∈4] ➊"]]:::plan
     PgSelect63 --> PgSelectRows64
     __Item65[/"__Item[65∈5]<br />ᐸ64ᐳ"\]:::itemplan
@@ -176,13 +176,13 @@ graph TD
     subgraph "Buckets for mutations/v4/polymorphic.relay.custom_delete"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Lambda9,List14,Access36,Access37,Object38,ApplyInput52,Constant75,Constant85,Constant94,Constant103,Constant112,Access116,Constant117,Constant118,Constant121 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 9, 14, 38, 52, 118, 7, 121, 4, 75, 85, 94, 103, 112<br /><br />1: Lambda[13]<br />2: Object[15]<br />3: Lambda[17]<br />4: Object[19]<br />5: Lambda[21]<br />6: Object[23]<br />7: Lambda[25]<br />8: Object[27]<br />9: Lambda[29]<br />10: Object[31]<br />11: List[32]<br />12: Lambda[33]<br />13: Access[34]<br />14: PgSelect[35]<br />15: PgSelectRows[40]<br />16: First[39]<br />17: PgSelectSingle[41]<br />18: PgClassExpression[42]<br />19: PgSelect[43]<br />20: PgSelectRows[48]<br />ᐳ: 47, 49, 50, 51"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Lambda9,List14,Access36,Access37,Object38,ApplyInput52,ApplyInput62,Constant75,Constant85,Constant94,Constant103,Constant112,Access116,Constant117,Constant118,Constant121 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 9, 14, 38, 52, 118, 7, 4, 62, 75, 85, 94, 103, 112<br /><br />1: Lambda[13]<br />2: Object[15]<br />3: Lambda[17]<br />4: Object[19]<br />5: Lambda[21]<br />6: Object[23]<br />7: Lambda[25]<br />8: Object[27]<br />9: Lambda[29]<br />10: Object[31]<br />11: List[32]<br />12: Lambda[33]<br />13: Access[34]<br />14: PgSelect[35]<br />15: PgSelectRows[40]<br />16: First[39]<br />17: PgSelectSingle[41]<br />18: PgClassExpression[42]<br />19: PgSelect[43]<br />20: PgSelectRows[48]<br />ᐳ: 47, 49, 50, 51"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Lambda13,Object15,Lambda17,Object19,Lambda21,Object23,Lambda25,Object27,Lambda29,Object31,List32,Lambda33,Access34,PgSelect35,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,PgSelect43,First47,PgSelectRows48,PgSelectSingle49,PgClassExpression50,Object51 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 118, 7, 121, 51, 4, 38, 75, 85, 94, 103, 112, 50<br /><br />ROOT Object{1}ᐸ{result}ᐳ[51]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 118, 7, 51, 4, 38, 62, 75, 85, 94, 103, 112, 50<br /><br />ROOT Object{1}ᐸ{result}ᐳ[51]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Connection61,Lambda62 bucket2
+    class Bucket2,Connection61 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 38, 62, 61, 118, 7, 75, 85, 94, 103, 112<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3

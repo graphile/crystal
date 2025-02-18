@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, extractEnumExtensionValue, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -801,57 +801,9 @@ const fetcher4 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Type);
-function Query_allAlwaysAsIdentities_plan() {
-  return connection(pgResource_always_as_identityPgResource.find());
-}
-const Query_allAlwaysAsIdentities_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
-function Query_allByDefaultAsIdentities_plan() {
-  return connection(pgResource_by_default_as_identityPgResource.find());
-}
-const Query_allByDefaultAsIdentities_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allNetworks_plan() {
-  return connection(pgResource_networkPgResource.find());
-}
-const Query_allNetworks_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allTypes_plan() {
-  return connection(pgResource_typesPgResource.find());
-}
-const Query_allTypes_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
 function InternetAddressSerialize(value) {
   return "" + value;
 }
@@ -2332,12 +2284,8 @@ export const plans = {
       return fetcher4($nodeId);
     },
     allAlwaysAsIdentities: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allAlwaysAsIdentities_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allAlwaysAsIdentities_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_always_as_identityPgResource.find());
       },
       args: {
         first: {
@@ -2377,6 +2325,15 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
@@ -2392,12 +2349,8 @@ export const plans = {
       }
     },
     allByDefaultAsIdentities: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allByDefaultAsIdentities_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allByDefaultAsIdentities_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_by_default_as_identityPgResource.find());
       },
       args: {
         first: {
@@ -2437,6 +2390,15 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
@@ -2452,12 +2414,8 @@ export const plans = {
       }
     },
     allNetworks: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allNetworks_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allNetworks_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_networkPgResource.find());
       },
       args: {
         first: {
@@ -2497,6 +2455,15 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
@@ -2512,12 +2479,8 @@ export const plans = {
       }
     },
     allTypes: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allTypes_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allTypes_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_typesPgResource.find());
       },
       args: {
         first: {
@@ -2557,6 +2520,15 @@ export const plans = {
           grafast: {
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
@@ -4377,11 +4349,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    alwaysAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    alwaysAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4397,9 +4365,7 @@ export const plans = {
           return pgResource_always_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4445,11 +4411,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    byDefaultAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    byDefaultAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4465,9 +4427,7 @@ export const plans = {
           return pgResource_by_default_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4521,11 +4481,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    networkEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    networkEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4541,9 +4497,7 @@ export const plans = {
           return pgResource_networkPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4621,11 +4575,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    typeEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4641,9 +4591,7 @@ export const plans = {
           return pgResource_typesPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4721,11 +4669,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    alwaysAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    alwaysAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4741,9 +4685,7 @@ export const plans = {
           return pgResource_always_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4805,11 +4747,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    byDefaultAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    byDefaultAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4825,9 +4763,7 @@ export const plans = {
           return pgResource_by_default_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -4897,11 +4833,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    networkEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    networkEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -4917,9 +4849,7 @@ export const plans = {
           return pgResource_networkPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -5013,11 +4943,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    typeEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -5033,9 +4959,7 @@ export const plans = {
           return pgResource_typesPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -5134,11 +5058,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    alwaysAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    alwaysAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -5154,9 +5074,7 @@ export const plans = {
           return pgResource_always_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -5198,11 +5116,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    byDefaultAsIdentityEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    byDefaultAsIdentityEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -5218,9 +5132,7 @@ export const plans = {
           return pgResource_by_default_as_identityPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -5262,11 +5174,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    networkEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    networkEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -5282,9 +5190,7 @@ export const plans = {
           return pgResource_networkPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -5326,11 +5232,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    typeEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    typeEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -5346,9 +5248,7 @@ export const plans = {
           return pgResource_typesPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
