@@ -11,7 +11,7 @@ import type {
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import { pgDeleteSingle, pgUpdateSingle } from "@dataplan/pg";
-import type { ExecutableStep, FieldArgs } from "grafast";
+import type { ExecutableStep, FieldArgs, Maybe } from "grafast";
 import {
   __InputObjectStep,
   __TrackedValueStep,
@@ -801,7 +801,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             const $nodeId = args.getRaw([
                               "input",
                               nodeIdFieldName,
-                            ]);
+                            ]) as ExecutableStep<Maybe<string>>;
                             return specFromNodeId(handler!, $nodeId);
                           },
                         [handler, nodeIdFieldName, specFromNodeId],
