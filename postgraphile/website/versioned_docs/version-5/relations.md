@@ -12,29 +12,29 @@ An example of a foreign key constraint when defining a table would be the
 `REFERENCES` keyword below:
 
 ```sql
-CREATE TABLE app_public.users (
+create table app_public.users (
   -- ...
-  organization_id int NOT NULL
+  organization_id int not null
     /* highlight-next-line */
-    REFERENCES app_public.organizations ON DELETE CASCADE,
+    references app_public.organizations on delete cascade,
   -- ...
 );
-CREATE INDEX ON app_public.users (organization_id);
+create index on app_public.users (organization_id);
 ```
 
 Alternatively a foreign key constraint can be added after table creation:
 
 ```sql
-ALTER TABLE users
-  ADD CONSTRAINT users_organization_id_fkey
-  FOREIGN KEY (organization_id)
-  REFERENCES organizations
-  ON DELETE CASCADE;
-CREATE INDEX ON users (organization_id);
+alter table users
+  add constraint users_organization_id_fkey
+  foreign key (organization_id)
+  references organizations
+  on delete cascade;
+create index on users (organization_id);
 ```
 
 You can read more about defining foreign key constraints, including constraints
-that utilise multiple columns, in the
+that utilize multiple columns, in the
 [PostgreSQL documentation](https://www.postgresql.org/docs/current/static/ddl-constraints.html#DDL-CONSTRAINTS-FK).
 
 PostGraphile detects and exposes one-to-one, one-to-many and many-to-one
