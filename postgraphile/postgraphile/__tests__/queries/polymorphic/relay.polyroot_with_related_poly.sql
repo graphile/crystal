@@ -17,7 +17,7 @@ select
   __single_table_item_relations__."parent_id"::text as "2"
 from "polymorphic"."single_table_item_relations" as __single_table_item_relations__
 where (
-  (($1::"int4" is null and __single_table_item_relations__."child_id" is null) or ($1::"int4" is not null and __single_table_item_relations__."child_id" = $1::"int4"))
+  __single_table_item_relations__."child_id" = $1::"int4"
 )
 order by __single_table_item_relations__."id" asc;
 
@@ -27,7 +27,7 @@ select
   __relational_item_relations__."parent_id"::text as "2"
 from "polymorphic"."relational_item_relations" as __relational_item_relations__
 where (
-  (($1::"int4" is null and __relational_item_relations__."child_id" is null) or ($1::"int4" is not null and __relational_item_relations__."child_id" = $1::"int4"))
+  __relational_item_relations__."child_id" = $1::"int4"
 )
 order by __relational_item_relations__."id" asc;
 

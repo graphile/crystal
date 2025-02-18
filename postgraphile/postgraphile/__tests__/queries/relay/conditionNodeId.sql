@@ -11,7 +11,7 @@ select
   __post__."id"::text as "2"
 from "d"."post" as __post__
 where (
-  (($1::"int4" is null and __post__."author_id" is null) or ($1::"int4" is not null and __post__."author_id" = $1::"int4"))
+  __post__."author_id" = $1::"int4"
 )
 order by __post__."id" asc;
 
@@ -21,7 +21,7 @@ select
   __post__."id"::text as "2"
 from "d"."post" as __post__
 where (
-  (($1::"int4" is null and __post__."author_id" is null) or ($1::"int4" is not null and __post__."author_id" = $1::"int4"))
+  __post__."author_id" is null
 )
 order by __post__."id" asc;
 
