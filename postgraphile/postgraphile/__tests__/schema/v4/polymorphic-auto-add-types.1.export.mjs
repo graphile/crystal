@@ -1,5 +1,5 @@
-import { PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgSelectSingleFromRecord, pgUnionAll, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgSelectSingleFromRecord, pgUnionAll, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, assertEdgeCapableStep, assertPageInfoCapableStep, bakedInput, connection, constant, context, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 function hasRecord($row) {
@@ -17,7 +17,8 @@ const makeArgs = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -27,9 +28,10 @@ const makeArgs = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -229,7 +231,7 @@ const spec_gcpApplicationThirdPartyVulnerabilities = {
 };
 const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationThirdPartyVulnerabilities);
 const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
-const spec_organizations = {
+const organizationsCodec = recordCodec({
   name: "organizations",
   identifier: organizationsIdentifier,
   attributes: {
@@ -267,8 +269,7 @@ const spec_organizations = {
     }
   },
   executor: executor
-};
-const organizationsCodec = recordCodec(spec_organizations);
+});
 const peopleIdentifier = sql.identifier("polymorphic", "people");
 const spec_people = {
   name: "people",
@@ -536,7 +537,7 @@ const spec_relationalChecklists = {
 };
 const relationalChecklistsCodec = recordCodec(spec_relationalChecklists);
 const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
-const spec_relationalItemRelationCompositePks = {
+const relationalItemRelationCompositePksCodec = recordCodec({
   name: "relationalItemRelationCompositePks",
   identifier: relationalItemRelationCompositePksIdentifier,
   attributes: {
@@ -573,10 +574,9 @@ const spec_relationalItemRelationCompositePks = {
     }
   },
   executor: executor
-};
-const relationalItemRelationCompositePksCodec = recordCodec(spec_relationalItemRelationCompositePks);
+});
 const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
-const spec_relationalTopics = {
+const relationalTopicsCodec = recordCodec({
   name: "relationalTopics",
   identifier: relationalTopicsIdentifier,
   attributes: {
@@ -724,10 +724,9 @@ const spec_relationalTopics = {
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+});
 const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
-const spec_singleTableItemRelationCompositePks = {
+const singleTableItemRelationCompositePksCodec = recordCodec({
   name: "singleTableItemRelationCompositePks",
   identifier: singleTableItemRelationCompositePksIdentifier,
   attributes: {
@@ -764,10 +763,9 @@ const spec_singleTableItemRelationCompositePks = {
     }
   },
   executor: executor
-};
-const singleTableItemRelationCompositePksCodec = recordCodec(spec_singleTableItemRelationCompositePks);
+});
 const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
-const spec_relationalChecklistItems = {
+const relationalChecklistItemsCodec = recordCodec({
   name: "relationalChecklistItems",
   identifier: relationalChecklistItemsIdentifier,
   attributes: {
@@ -924,10 +922,9 @@ const spec_relationalChecklistItems = {
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalChecklistItemsCodec = recordCodec(spec_relationalChecklistItems);
+});
 const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
-const spec_relationalDividers = {
+const relationalDividersCodec = recordCodec({
   name: "relationalDividers",
   identifier: relationalDividersIdentifier,
   attributes: {
@@ -1084,10 +1081,9 @@ const spec_relationalDividers = {
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalDividersCodec = recordCodec(spec_relationalDividers);
+});
 const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
-const spec_relationalItemRelations = {
+const relationalItemRelationsCodec = recordCodec({
   name: "relationalItemRelations",
   identifier: relationalItemRelationsIdentifier,
   attributes: {
@@ -1133,10 +1129,9 @@ const spec_relationalItemRelations = {
     }
   },
   executor: executor
-};
-const relationalItemRelationsCodec = recordCodec(spec_relationalItemRelations);
+});
 const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
-const spec_singleTableItemRelations = {
+const singleTableItemRelationsCodec = recordCodec({
   name: "singleTableItemRelations",
   identifier: singleTableItemRelationsIdentifier,
   attributes: {
@@ -1182,8 +1177,7 @@ const spec_singleTableItemRelations = {
     }
   },
   executor: executor
-};
-const singleTableItemRelationsCodec = recordCodec(spec_singleTableItemRelations);
+});
 const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
 const spec_logEntries = {
   name: "logEntries",
@@ -1259,7 +1253,7 @@ const spec_logEntries = {
 };
 const logEntriesCodec = recordCodec(spec_logEntries);
 const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
-const spec_relationalPosts = {
+const relationalPostsCodec = recordCodec({
   name: "relationalPosts",
   identifier: relationalPostsIdentifier,
   attributes: {
@@ -1425,8 +1419,7 @@ const spec_relationalPosts = {
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalPostsCodec = recordCodec(spec_relationalPosts);
+});
 const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
 const spec_firstPartyVulnerabilities = {
   name: "firstPartyVulnerabilities",
@@ -4801,6 +4794,13 @@ const Person_applications_postPlanResolvers = [($connection, $parent, fieldArgs,
   $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
   return $connection;
 }];
+function limitToTypes(ltt) {
+  if (ltt) {
+    return qb => qb.limitToTypes(ltt);
+  } else {
+    return () => {};
+  }
+}
 const otherSource_organizationsPgResource = registry.pgResources["organizations"];
 const attributes = {};
 const members2 = [{
@@ -4867,7 +4867,8 @@ const makeArgs2 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple2[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -4877,9 +4878,10 @@ const makeArgs2 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -5003,7 +5005,8 @@ const makeArgs3 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple3[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -5013,9 +5016,10 @@ const makeArgs3 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -5123,7 +5127,8 @@ const makeArgs4 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple4[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -5133,9 +5138,10 @@ const makeArgs4 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -5243,7 +5249,8 @@ const makeArgs5 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple5[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -5253,9 +5260,10 @@ const makeArgs5 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -5960,7 +5968,8 @@ const makeArgs6 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple6[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -5970,9 +5979,10 @@ const makeArgs6 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -6016,7 +6026,8 @@ const makeArgs7 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple7[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -6026,9 +6037,10 @@ const makeArgs7 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -11779,7 +11791,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -11788,7 +11799,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -11797,7 +11807,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -11806,7 +11815,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -11815,7 +11823,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -11824,10 +11831,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -11845,7 +11851,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -11854,7 +11859,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -11863,7 +11867,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -11872,7 +11875,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -11881,7 +11883,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -11890,10 +11891,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -11911,7 +11911,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -11920,7 +11919,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -11929,7 +11927,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -11938,7 +11935,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -11947,7 +11943,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -11956,10 +11951,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -11977,7 +11971,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -11986,7 +11979,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -11995,7 +11987,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12004,7 +11995,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12013,7 +12003,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12022,10 +12011,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12043,7 +12031,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12052,7 +12039,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12061,7 +12047,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12070,7 +12055,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12079,7 +12063,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12088,10 +12071,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12143,7 +12125,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12152,7 +12133,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12161,7 +12141,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12170,7 +12149,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12179,7 +12157,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12188,10 +12165,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12209,7 +12185,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12218,7 +12193,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12227,7 +12201,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12236,7 +12209,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12245,7 +12217,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12254,10 +12225,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12275,7 +12245,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12284,7 +12253,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12293,7 +12261,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12302,7 +12269,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12311,7 +12277,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12320,10 +12285,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12341,7 +12305,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12350,7 +12313,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12359,7 +12321,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12368,7 +12329,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12377,7 +12337,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12386,20 +12345,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -12494,7 +12452,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -12503,7 +12460,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -12512,7 +12468,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -12521,7 +12476,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -12530,7 +12484,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -12539,10 +12492,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -12753,8 +12705,8 @@ export const plans = {
   },
   LogEntryCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -12767,17 +12719,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "person_id",
@@ -12790,17 +12740,15 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.person_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "organization_id",
@@ -12813,17 +12761,15 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.organization_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     text: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "text",
@@ -12836,13 +12782,11 @@ export const plans = {
             type: "attribute",
             attribute: "text",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.text.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   LogEntriesEdge: {
@@ -13316,8 +13260,8 @@ export const plans = {
   },
   SingleTableItemCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -13330,17 +13274,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -13353,17 +13295,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -13376,17 +13316,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -13399,17 +13337,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -13422,17 +13358,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -13445,17 +13379,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -13468,17 +13400,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -13491,17 +13421,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -13514,17 +13442,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -13537,13 +13463,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalItemsConnection: {
@@ -14084,8 +14008,8 @@ export const plans = {
   },
   RelationalItemCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -14098,17 +14022,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -14121,17 +14043,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -14144,17 +14064,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -14167,17 +14085,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -14190,17 +14106,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -14213,17 +14127,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -14236,17 +14148,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -14259,17 +14169,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -14282,17 +14190,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -14305,13 +14211,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ApplicationsConnection: {
@@ -14504,8 +14408,8 @@ export const plans = {
   },
   ApplicationCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -14518,17 +14422,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -14541,17 +14443,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     lastDeployed: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "last_deployed",
@@ -14564,13 +14464,11 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.last_deployed.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   SingleTableItemRelationsConnection: {
@@ -14820,8 +14718,8 @@ export const plans = {
   },
   SingleTableItemRelationCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -14834,17 +14732,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -14857,17 +14753,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "child_id",
@@ -14880,13 +14774,11 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.child_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   SingleTableItemRelationCompositePksOrderBy: {
@@ -15007,8 +14899,8 @@ export const plans = {
   },
   SingleTableItemRelationCompositePkCondition: {
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -15021,17 +14913,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "child_id",
@@ -15044,13 +14934,11 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.child_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   SingleTablePost: {
@@ -15168,7 +15056,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15177,7 +15064,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15186,7 +15072,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15195,7 +15080,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15204,7 +15088,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15213,10 +15096,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15234,7 +15116,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15243,7 +15124,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15252,7 +15132,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15261,7 +15140,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15270,7 +15148,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15279,10 +15156,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15300,7 +15176,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15309,7 +15184,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15318,7 +15192,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15327,7 +15200,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15336,7 +15208,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15345,10 +15216,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15366,7 +15236,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15375,7 +15244,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15384,7 +15252,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15393,7 +15260,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15402,7 +15268,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15411,10 +15276,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15432,7 +15296,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15441,7 +15304,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15450,7 +15312,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15459,7 +15320,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15468,7 +15328,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15477,10 +15336,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15512,7 +15370,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15521,7 +15378,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15530,7 +15386,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15539,7 +15394,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15548,7 +15402,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15557,10 +15410,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15671,7 +15523,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15680,7 +15531,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15689,7 +15539,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15698,7 +15547,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15707,7 +15555,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15716,10 +15563,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15737,7 +15583,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15746,7 +15591,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15755,7 +15599,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15764,7 +15607,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15773,7 +15615,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15782,10 +15623,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15803,7 +15643,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15812,7 +15651,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15821,7 +15659,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15830,7 +15667,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15839,7 +15675,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15848,10 +15683,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15869,7 +15703,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15878,7 +15711,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15887,7 +15719,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15896,7 +15727,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15905,7 +15735,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15914,10 +15743,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -15935,7 +15763,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -15944,7 +15771,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -15953,7 +15779,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -15962,7 +15787,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -15971,7 +15795,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -15980,10 +15803,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16096,7 +15918,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16105,7 +15926,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16114,7 +15934,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16123,7 +15942,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16132,7 +15950,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16141,10 +15958,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16162,7 +15978,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16171,7 +15986,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16180,7 +15994,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16189,7 +16002,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16198,7 +16010,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16207,10 +16018,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16228,7 +16038,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16237,7 +16046,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16246,7 +16054,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16255,7 +16062,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16264,7 +16070,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16273,10 +16078,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16294,7 +16098,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16303,7 +16106,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16312,7 +16114,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16321,7 +16122,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16330,7 +16130,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16339,10 +16138,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16360,7 +16158,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16369,7 +16166,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16378,7 +16174,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16387,7 +16182,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16396,7 +16190,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16405,10 +16198,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16537,7 +16329,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16546,7 +16337,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16555,7 +16345,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16564,7 +16353,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16573,7 +16361,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16582,10 +16369,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16603,7 +16389,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16612,7 +16397,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16621,7 +16405,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16630,7 +16413,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16639,7 +16421,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16648,10 +16429,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16669,7 +16449,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16678,7 +16457,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16687,7 +16465,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16696,7 +16473,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16705,7 +16481,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16714,10 +16489,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16735,7 +16509,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16744,7 +16517,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16753,7 +16525,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16762,7 +16533,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16771,7 +16541,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16780,10 +16549,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16801,7 +16569,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16810,7 +16577,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16819,7 +16585,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16828,7 +16593,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16837,7 +16601,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16846,10 +16609,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -16908,7 +16670,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -16917,7 +16678,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -16926,7 +16686,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -16935,7 +16694,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -16944,7 +16702,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -16953,10 +16710,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17016,7 +16772,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17025,7 +16780,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17034,7 +16788,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17043,7 +16796,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17052,7 +16804,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17061,10 +16812,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17082,7 +16832,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17091,7 +16840,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17100,7 +16848,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17109,7 +16856,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17118,7 +16864,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17127,10 +16872,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17148,7 +16892,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17157,7 +16900,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17166,7 +16908,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17175,7 +16916,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17184,7 +16924,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17193,10 +16932,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17214,7 +16952,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17223,7 +16960,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17232,7 +16968,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17241,7 +16976,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17250,7 +16984,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17259,10 +16992,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17280,7 +17012,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17289,7 +17020,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17298,7 +17028,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17307,7 +17036,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17316,7 +17044,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17325,10 +17052,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17491,8 +17217,8 @@ export const plans = {
   },
   RelationalItemRelationCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -17505,17 +17231,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -17528,17 +17252,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "child_id",
@@ -17551,13 +17273,11 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.child_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalItemRelationCompositePksOrderBy: {
@@ -17678,8 +17398,8 @@ export const plans = {
   },
   RelationalItemRelationCompositePkCondition: {
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -17692,17 +17412,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "child_id",
@@ -17715,13 +17433,11 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.child_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalPost: {
@@ -17819,7 +17535,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17828,7 +17543,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17837,7 +17551,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17846,7 +17559,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17855,7 +17567,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17864,10 +17575,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17885,7 +17595,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17894,7 +17603,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17903,7 +17611,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17912,7 +17619,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17921,7 +17627,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17930,10 +17635,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -17951,7 +17655,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -17960,7 +17663,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -17969,7 +17671,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -17978,7 +17679,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -17987,7 +17687,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -17996,10 +17695,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18017,7 +17715,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18026,7 +17723,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18035,7 +17731,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18044,7 +17739,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18053,7 +17747,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18062,10 +17755,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18083,7 +17775,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18092,7 +17783,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18101,7 +17791,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18110,7 +17799,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18119,7 +17807,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18128,10 +17815,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18230,7 +17916,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18239,7 +17924,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18248,7 +17932,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18257,7 +17940,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18266,7 +17948,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18275,10 +17956,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18296,7 +17976,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18305,7 +17984,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18314,7 +17992,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18323,7 +18000,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18332,7 +18008,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18341,10 +18016,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18362,7 +18036,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18371,7 +18044,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18380,7 +18052,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18389,7 +18060,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18398,7 +18068,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18407,10 +18076,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18428,7 +18096,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18437,7 +18104,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18446,7 +18112,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18455,7 +18120,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18464,7 +18128,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18473,10 +18136,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18494,7 +18156,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18503,7 +18164,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18512,7 +18172,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18521,7 +18180,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18530,7 +18188,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18539,10 +18196,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18638,7 +18294,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18647,7 +18302,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18656,7 +18310,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18665,7 +18318,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18674,7 +18326,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18683,10 +18334,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18704,7 +18354,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18713,7 +18362,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18722,7 +18370,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18731,7 +18378,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18740,7 +18386,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18749,10 +18394,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18770,7 +18414,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18779,7 +18422,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18788,7 +18430,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18797,7 +18438,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18806,7 +18446,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18815,10 +18454,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18836,7 +18474,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18845,7 +18482,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18854,7 +18490,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18863,7 +18498,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18872,7 +18506,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18881,10 +18514,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -18902,7 +18534,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -18911,7 +18542,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -18920,7 +18550,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -18929,7 +18558,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -18938,7 +18566,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -18947,10 +18574,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19049,7 +18675,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19058,7 +18683,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19067,7 +18691,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19076,7 +18699,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19085,7 +18707,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19094,10 +18715,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19115,7 +18735,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19124,7 +18743,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19133,7 +18751,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19142,7 +18759,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19151,7 +18767,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19160,10 +18775,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19181,7 +18795,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19190,7 +18803,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19199,7 +18811,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19208,7 +18819,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19217,7 +18827,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19226,10 +18835,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19247,7 +18855,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19256,7 +18863,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19265,7 +18871,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19274,7 +18879,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19283,7 +18887,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19292,10 +18895,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19313,7 +18915,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19322,7 +18923,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19331,7 +18931,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19340,7 +18939,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19349,7 +18947,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19358,10 +18955,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19377,91 +18973,91 @@ export const plans = {
     },
     organizationByOrganizationId(_$root, args) {
       return otherSource_organizationsPgResource.get({
-        organization_id: args.get("organizationId")
+        organization_id: args.getRaw("organizationId")
       });
     },
     organizationByName(_$root, args) {
       return otherSource_organizationsPgResource.get({
-        name: args.get("name")
+        name: args.getRaw("name")
       });
     },
     personByPersonId(_$root, args) {
       return otherSource_peoplePgResource.get({
-        person_id: args.get("personId")
+        person_id: args.getRaw("personId")
       });
     },
     personByUsername(_$root, args) {
       return otherSource_peoplePgResource.get({
-        username: args.get("username")
+        username: args.getRaw("username")
       });
     },
     priorityById(_$root, args) {
       return otherSource_prioritiesPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     relationalChecklistByChecklistItemId(_$root, args) {
       return resource_relational_checklistsPgResource.get({
-        checklist_item_id: args.get("checklistItemId")
+        checklist_item_id: args.getRaw("checklistItemId")
       });
     },
     relationalItemRelationCompositePkByParentIdAndChildId(_$root, args) {
       return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.get({
-        parent_id: args.get("parentId"),
-        child_id: args.get("childId")
+        parent_id: args.getRaw("parentId"),
+        child_id: args.getRaw("childId")
       });
     },
     relationalTopicByTopicItemId(_$root, args) {
       return relational_topics_relational_topicsPgResource.get({
-        topic_item_id: args.get("topicItemId")
+        topic_item_id: args.getRaw("topicItemId")
       });
     },
     singleTableItemRelationCompositePkByParentIdAndChildId(_$root, args) {
       return otherSource_single_table_item_relation_composite_pksPgResource.get({
-        parent_id: args.get("parentId"),
-        child_id: args.get("childId")
+        parent_id: args.getRaw("parentId"),
+        child_id: args.getRaw("childId")
       });
     },
     relationalChecklistItemByChecklistItemItemId(_$root, args) {
       return resource_relational_checklist_itemsPgResource.get({
-        checklist_item_item_id: args.get("checklistItemItemId")
+        checklist_item_item_id: args.getRaw("checklistItemItemId")
       });
     },
     relationalDividerByDividerItemId(_$root, args) {
       return resource_relational_dividersPgResource.get({
-        divider_item_id: args.get("dividerItemId")
+        divider_item_id: args.getRaw("dividerItemId")
       });
     },
     relationalItemRelationById(_$root, args) {
       return relational_item_relations_relational_item_relationsPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     relationalItemRelationByParentIdAndChildId(_$root, args) {
       return relational_item_relations_relational_item_relationsPgResource.get({
-        parent_id: args.get("parentId"),
-        child_id: args.get("childId")
+        parent_id: args.getRaw("parentId"),
+        child_id: args.getRaw("childId")
       });
     },
     singleTableItemRelationById(_$root, args) {
       return otherSource_single_table_item_relationsPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     singleTableItemRelationByParentIdAndChildId(_$root, args) {
       return otherSource_single_table_item_relationsPgResource.get({
-        parent_id: args.get("parentId"),
-        child_id: args.get("childId")
+        parent_id: args.getRaw("parentId"),
+        child_id: args.getRaw("childId")
       });
     },
     logEntryById(_$root, args) {
       return otherSource_log_entriesPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     relationalPostByPostItemId(_$root, args) {
       return resource_relational_postsPgResource.get({
-        post_item_id: args.get("postItemId")
+        post_item_id: args.getRaw("postItemId")
       });
     },
     allSingleTables: {
@@ -19478,7 +19074,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19487,7 +19082,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19496,7 +19090,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19505,7 +19098,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19514,7 +19106,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19538,7 +19129,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19547,7 +19137,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19556,7 +19145,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19565,7 +19153,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19574,7 +19161,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19583,20 +19169,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -19614,7 +19199,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19623,7 +19207,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19632,7 +19215,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19641,7 +19223,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19650,7 +19231,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19659,20 +19239,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -19690,7 +19269,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19699,7 +19277,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19708,7 +19285,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19717,7 +19293,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19726,7 +19301,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19735,10 +19309,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19756,7 +19329,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19765,7 +19337,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19774,7 +19345,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19783,7 +19353,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19792,7 +19361,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19801,10 +19369,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19822,7 +19389,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19831,7 +19397,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19840,7 +19405,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19849,7 +19413,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19858,7 +19421,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19867,10 +19429,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -19884,7 +19445,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19893,7 +19453,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19902,7 +19461,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19911,7 +19469,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19920,7 +19477,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19940,7 +19496,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -19949,7 +19504,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -19958,7 +19512,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -19967,7 +19520,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -19976,7 +19528,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -19985,10 +19536,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20006,7 +19556,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20015,7 +19564,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20024,7 +19572,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20033,7 +19580,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20042,7 +19588,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20051,10 +19596,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20072,7 +19616,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20081,7 +19624,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20090,7 +19632,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20099,7 +19640,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20108,7 +19648,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20117,10 +19656,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20138,7 +19676,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20147,7 +19684,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20156,7 +19692,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20165,7 +19700,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20174,7 +19708,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20183,10 +19716,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20204,7 +19736,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20213,7 +19744,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20222,7 +19752,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20231,7 +19760,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20240,7 +19768,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20249,10 +19776,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20270,7 +19796,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20279,7 +19804,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20288,7 +19812,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20297,7 +19820,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20306,7 +19828,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20315,10 +19836,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20336,7 +19856,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20345,7 +19864,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20354,7 +19872,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20363,7 +19880,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20372,7 +19888,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20381,10 +19896,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20402,7 +19916,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20411,7 +19924,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20420,7 +19932,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20429,7 +19940,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20438,7 +19948,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20447,10 +19956,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20468,7 +19976,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20477,7 +19984,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20486,7 +19992,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20495,7 +20000,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20504,7 +20008,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20513,10 +20016,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20534,7 +20036,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20543,7 +20044,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20552,7 +20052,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20561,7 +20060,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20570,7 +20068,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20579,10 +20076,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20600,7 +20096,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20609,7 +20104,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20618,7 +20112,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20627,7 +20120,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20636,7 +20128,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20645,10 +20136,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20666,7 +20156,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -20675,7 +20164,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -20684,7 +20172,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -20693,7 +20180,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -20702,7 +20188,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -20711,10 +20196,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -20839,8 +20323,8 @@ export const plans = {
   },
   VulnerabilityCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -20853,17 +20337,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -20876,17 +20358,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     cvssScore: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "cvss_score",
@@ -20899,13 +20379,11 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.cvss_score.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ZeroImplementationsConnection: {
@@ -21013,8 +20491,8 @@ export const plans = {
   },
   ZeroImplementationCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -21027,17 +20505,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -21050,13 +20526,11 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   OrganizationsConnection: {
@@ -21202,8 +20676,8 @@ export const plans = {
   },
   OrganizationCondition: {
     organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "organization_id",
@@ -21216,17 +20690,15 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.organization_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -21239,13 +20711,11 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   PeopleConnection: {
@@ -21391,8 +20861,8 @@ export const plans = {
   },
   PersonCondition: {
     personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "person_id",
@@ -21405,17 +20875,15 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.person_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     username: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "username",
@@ -21428,13 +20896,11 @@ export const plans = {
             type: "attribute",
             attribute: "username",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.username.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   PrioritiesConnection: {
@@ -21947,8 +21413,8 @@ export const plans = {
   },
   RelationalChecklistCondition: {
     title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "title",
@@ -21961,17 +21427,15 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.title.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -21984,17 +21448,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -22007,17 +21469,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -22030,17 +21490,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -22053,17 +21511,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -22076,17 +21532,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -22099,17 +21553,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -22122,17 +21574,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -22145,17 +21595,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -22168,17 +21616,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -22191,13 +21637,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalTopicsConnection: {
@@ -22685,8 +22129,8 @@ export const plans = {
   },
   RelationalTopicCondition: {
     title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "title",
@@ -22699,17 +22143,15 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.title.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -22722,17 +22164,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -22745,17 +22185,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -22768,17 +22206,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -22791,17 +22227,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -22814,17 +22248,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -22837,17 +22269,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -22860,17 +22290,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -22883,17 +22311,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -22906,17 +22332,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -22929,13 +22353,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalChecklistItemsConnection: {
@@ -23461,8 +22883,8 @@ export const plans = {
   },
   RelationalChecklistItemCondition: {
     description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "description",
@@ -23475,17 +22897,15 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.description.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     note: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "note",
@@ -23498,17 +22918,15 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.note.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -23521,17 +22939,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -23544,17 +22960,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -23567,17 +22981,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -23590,17 +23002,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -23613,17 +23023,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -23636,17 +23044,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -23659,17 +23065,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -23682,17 +23086,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -23705,17 +23107,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -23728,13 +23128,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalDividersConnection: {
@@ -24260,8 +23658,8 @@ export const plans = {
   },
   RelationalDividerCondition: {
     title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "title",
@@ -24274,17 +23672,15 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.title.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     color: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "color",
@@ -24297,17 +23693,15 @@ export const plans = {
             type: "attribute",
             attribute: "color",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.color.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -24320,17 +23714,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -24343,17 +23735,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -24366,17 +23756,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -24389,17 +23777,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -24412,17 +23798,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -24435,17 +23819,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -24458,17 +23840,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -24481,17 +23861,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -24504,17 +23882,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -24527,13 +23903,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalPostsConnection: {
@@ -25097,8 +24471,8 @@ export const plans = {
   },
   RelationalPostCondition: {
     title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "title",
@@ -25111,17 +24485,15 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.title.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "description",
@@ -25134,17 +24506,15 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.description.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     note: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "note",
@@ -25157,17 +24527,15 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.note.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -25180,17 +24548,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -25203,17 +24569,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "parent_id",
@@ -25226,17 +24590,15 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.parent_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "root_topic_id",
@@ -25249,17 +24611,15 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "author_id",
@@ -25272,17 +24632,15 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.author_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "position",
@@ -25295,17 +24653,15 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.position.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "created_at",
@@ -25318,17 +24674,15 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.created_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "updated_at",
@@ -25341,17 +24695,15 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.updated_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "is_explicitly_archived",
@@ -25364,17 +24716,15 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "archived_at",
@@ -25387,13 +24737,11 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.archived_at.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   FirstPartyVulnerability: {
@@ -25466,7 +24814,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -25475,7 +24822,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -25484,7 +24830,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -25493,7 +24838,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -25502,7 +24846,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -25511,20 +24854,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -25600,7 +24942,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -25609,7 +24950,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -25618,7 +24958,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -25627,7 +24966,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -25636,7 +24974,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -25645,20 +24982,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -25734,7 +25070,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -25743,7 +25078,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -25752,7 +25086,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -25761,7 +25094,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -25770,7 +25102,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -25779,20 +25110,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }
@@ -25896,7 +25226,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -25905,7 +25234,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -25914,7 +25242,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -25923,7 +25250,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -25932,7 +25258,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -25941,20 +25266,19 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         },
         only: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan($parent, $connection, fieldArgs) {
               const $union = $connection.getSubplan();
-              $union.limitToTypes(fieldArgs.getRaw().eval());
+              const $ltt = fieldArgs.getRaw();
+              $union.apply(lambda($ltt, limitToTypes));
             }
           }
         }

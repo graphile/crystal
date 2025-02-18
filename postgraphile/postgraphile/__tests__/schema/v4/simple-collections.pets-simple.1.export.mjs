@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const handler = {
@@ -19,6 +19,9 @@ const handler = {
   },
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -76,7 +79,7 @@ const executor = new PgExecutor({
   }
 });
 const peopleIdentifier = sql.identifier("simple_collections", "people");
-const spec_people = {
+const peopleCodec = recordCodec({
   name: "people",
   identifier: peopleIdentifier,
   attributes: {
@@ -113,10 +116,9 @@ const spec_people = {
     }
   },
   executor: executor
-};
-const peopleCodec = recordCodec(spec_people);
+});
 const petsIdentifier = sql.identifier("simple_collections", "pets");
-const spec_pets = {
+const petsCodec = recordCodec({
   name: "pets",
   identifier: petsIdentifier,
   attributes: {
@@ -162,8 +164,7 @@ const spec_pets = {
     }
   },
   executor: executor
-};
-const petsCodec = recordCodec(spec_pets);
+});
 const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -333,6 +334,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_peoplePgResource.get(spec);
     },
@@ -351,6 +355,9 @@ const nodeIdHandlerByTypeName = {
       return {
         id: inhibitOnNull(access($list, [1]))
       };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
     },
     get(spec) {
       return pgResource_petsPgResource.get(spec);
@@ -433,7 +440,8 @@ const makeArgs = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -443,9 +451,10 @@ const makeArgs = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -526,19 +535,19 @@ function CursorSerialize(value) {
   return "" + value;
 }
 const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
 const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Pet, $nodeId);
 };
 const specFromArgs3 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
 const specFromArgs4 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Pet, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
@@ -1238,24 +1247,24 @@ export const plans = {
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
     },
     node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.get("nodeId"));
+      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
     personById(_$root, args) {
       return pgResource_peoplePgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     petById(_$root, args) {
       return pgResource_petsPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     person(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher($nodeId);
     },
     pet(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher2($nodeId);
     },
     allPeople: {
@@ -1270,7 +1279,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -1279,7 +1287,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -1288,7 +1295,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -1297,7 +1303,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -1306,7 +1311,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -1315,10 +1319,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -1336,7 +1339,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -1345,7 +1347,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -1354,7 +1355,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -1363,7 +1363,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -1372,7 +1371,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -1381,10 +1379,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -1411,7 +1408,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -1420,7 +1416,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -1429,7 +1424,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -1438,7 +1432,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -1447,7 +1440,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -1473,7 +1465,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -1482,7 +1473,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -1491,9 +1481,8 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -1727,8 +1716,8 @@ export const plans = {
   },
   PetCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -1741,17 +1730,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     ownerId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "owner_id",
@@ -1764,17 +1751,15 @@ export const plans = {
             type: "attribute",
             attribute: "owner_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.owner_id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -1787,13 +1772,11 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   PeopleConnection: {
@@ -1939,8 +1922,8 @@ export const plans = {
   },
   PersonCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -1953,17 +1936,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -1976,30 +1957,28 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   Mutation: {
     __assertStep: __ValueStep,
     createPerson: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_peoplePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_peoplePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -2009,17 +1988,17 @@ export const plans = {
     },
     createPet: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_petsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_petsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -2029,11 +2008,11 @@ export const plans = {
     },
     updatePerson: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_peoplePgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(pgResource_peoplePgResource, specFromArgs(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -2048,13 +2027,13 @@ export const plans = {
     },
     updatePersonById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_peoplePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_peoplePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -2069,11 +2048,11 @@ export const plans = {
     },
     updatePet: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_petsPgResource, specFromArgs2(args))
+        const $update = pgUpdateSingle(pgResource_petsPgResource, specFromArgs2(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -2088,13 +2067,13 @@ export const plans = {
     },
     updatePetById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_petsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_petsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -2109,11 +2088,11 @@ export const plans = {
     },
     deletePerson: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_peoplePgResource, specFromArgs3(args))
+        const $delete = pgDeleteSingle(pgResource_peoplePgResource, specFromArgs3(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -2128,13 +2107,13 @@ export const plans = {
     },
     deletePersonById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_peoplePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_peoplePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -2149,11 +2128,11 @@ export const plans = {
     },
     deletePet: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_petsPgResource, specFromArgs4(args))
+        const $delete = pgDeleteSingle(pgResource_petsPgResource, specFromArgs4(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -2168,13 +2147,13 @@ export const plans = {
     },
     deletePetById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_petsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_petsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -2191,7 +2170,8 @@ export const plans = {
   CreatePersonPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -2232,42 +2212,42 @@ export const plans = {
   },
   CreatePersonInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     person: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   PersonInput: {
-    "__inputPlan": function PersonInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreatePetPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     pet($object) {
       return $object.get("result");
@@ -2313,49 +2293,50 @@ export const plans = {
   },
   CreatePetInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     pet: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   PetInput: {
-    "__inputPlan": function PetInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ownerId: {
-      applyPlan($insert, val) {
-        $insert.set("owner_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdatePersonPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -2396,55 +2377,58 @@ export const plans = {
   },
   UpdatePersonInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     personPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   PersonPatch: {
-    "__inputPlan": function PersonPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdatePersonByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     personPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdatePetPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     pet($object) {
       return $object.get("result");
@@ -2490,62 +2474,66 @@ export const plans = {
   },
   UpdatePetInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     petPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   PetPatch: {
-    "__inputPlan": function PetPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ownerId: {
-      applyPlan($insert, val) {
-        $insert.set("owner_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdatePetByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     petPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   DeletePersonPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -2591,16 +2579,16 @@ export const plans = {
   },
   DeletePersonInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeletePersonByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
@@ -2608,7 +2596,8 @@ export const plans = {
   DeletePetPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     pet($object) {
       return $object.get("result");
@@ -2659,16 +2648,16 @@ export const plans = {
   },
   DeletePetInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeletePetByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined

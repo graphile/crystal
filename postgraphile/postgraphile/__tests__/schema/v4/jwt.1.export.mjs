@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, extractEnumExtensionValue, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, extractEnumExtensionValue, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import jsonwebtoken from "jsonwebtoken";
 import { sql } from "pg-sql2";
@@ -20,6 +20,9 @@ const handler = {
   },
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -91,7 +94,7 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
   notNull: false
 });
 const updatableViewIdentifier = sql.identifier("b", "updatable_view");
-const spec_updatableView = {
+const updatableViewCodec = recordCodec({
   name: "updatableView",
   identifier: updatableViewIdentifier,
   attributes: {
@@ -148,8 +151,7 @@ const spec_updatableView = {
     }
   },
   executor: executor
-};
-const updatableViewCodec = recordCodec(spec_updatableView);
+});
 const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
@@ -512,7 +514,7 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
   description: undefined,
   name: "byteaArray"
 });
-const spec_lists = {
+const listsCodec = recordCodec({
   name: "lists",
   identifier: listsIdentifier,
   attributes: {
@@ -648,8 +650,7 @@ const spec_lists = {
     }
   },
   executor: executor
-};
-const listsCodec = recordCodec(spec_lists);
+});
 const typesIdentifier = sql.identifier("b", "types");
 const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
   description: undefined,
@@ -2257,6 +2258,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_listsPgResource.get(spec);
     },
@@ -2275,6 +2279,9 @@ const nodeIdHandlerByTypeName = {
       return {
         id: inhibitOnNull(access($list, [1]))
       };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
     },
     get(spec) {
       return pgResource_typesPgResource.get(spec);
@@ -2302,7 +2309,8 @@ const makeArgs = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2312,9 +2320,10 @@ const makeArgs = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2354,7 +2363,8 @@ const makeArgs2 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple2[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2364,9 +2374,10 @@ const makeArgs2 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2400,7 +2411,8 @@ const makeArgs3 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple3[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2410,9 +2422,10 @@ const makeArgs3 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2456,7 +2469,8 @@ const makeArgs4 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple4[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2466,9 +2480,10 @@ const makeArgs4 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2502,7 +2517,8 @@ const makeArgs5 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple5[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2512,9 +2528,10 @@ const makeArgs5 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2645,7 +2662,8 @@ const makeArgs6 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple6[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 2 - 1) {
@@ -2655,9 +2673,10 @@ const makeArgs6 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2703,7 +2722,8 @@ const makeArgs7 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple7[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 2 - 1) {
@@ -2713,9 +2733,10 @@ const makeArgs7 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2761,7 +2782,8 @@ const makeArgs8 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple8[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 2 - 1) {
@@ -2771,9 +2793,10 @@ const makeArgs8 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2819,7 +2842,8 @@ const makeArgs9 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple9[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 2 - 1) {
@@ -2829,9 +2853,10 @@ const makeArgs9 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2871,7 +2896,8 @@ const makeArgs10 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple10[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2881,9 +2907,10 @@ const makeArgs10 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2917,7 +2944,8 @@ const makeArgs11 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple11[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2927,9 +2955,10 @@ const makeArgs11 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2981,7 +3010,8 @@ const makeArgs12 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple12[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2991,9 +3021,10 @@ const makeArgs12 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3045,7 +3076,8 @@ const makeArgs13 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple13[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3055,9 +3087,10 @@ const makeArgs13 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3109,7 +3142,8 @@ const makeArgs14 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple14[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3119,9 +3153,10 @@ const makeArgs14 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3173,7 +3208,8 @@ const makeArgs15 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple15[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3183,9 +3219,10 @@ const makeArgs15 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3225,7 +3262,8 @@ const makeArgs16 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple16[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3235,9 +3273,10 @@ const makeArgs16 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3277,7 +3316,8 @@ const makeArgs17 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple17[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3287,9 +3327,10 @@ const makeArgs17 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3329,7 +3370,8 @@ const makeArgs18 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple18[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3339,9 +3381,10 @@ const makeArgs18 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3375,7 +3418,8 @@ const makeArgs19 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple19[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3385,9 +3429,10 @@ const makeArgs19 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3427,7 +3472,8 @@ const makeArgs20 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple20[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3437,9 +3483,10 @@ const makeArgs20 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3473,7 +3520,8 @@ const makeArgs21 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple21[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -3483,9 +3531,10 @@ const makeArgs21 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -3508,19 +3557,19 @@ const makeArgs21 = (args, path = []) => {
 };
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.List, $nodeId);
 };
 const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
 const specFromArgs3 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.List, $nodeId);
 };
 const specFromArgs4 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
 const attributeNames = ["role", "exp", "a", "b", "c"];
@@ -5583,16 +5632,16 @@ export const plans = {
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
     },
     node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.get("nodeId"));
+      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
     listById(_$root, args) {
       return pgResource_listsPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     typeById(_$root, args) {
       return pgResource_typesPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     compoundTypeQuery($root, args, _info) {
@@ -5617,7 +5666,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -5626,7 +5674,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -5635,7 +5682,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -5644,7 +5690,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -5653,7 +5698,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -5670,11 +5714,11 @@ export const plans = {
       return resource_type_function_listPgResource.execute(selectArgs);
     },
     list(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher($nodeId);
     },
     type(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher2($nodeId);
     },
     allUpdatableViews: {
@@ -5689,7 +5733,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -5698,7 +5741,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -5707,7 +5749,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -5716,7 +5757,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -5725,7 +5765,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -5734,10 +5773,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -5755,7 +5793,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -5764,7 +5801,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -5773,7 +5809,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -5782,7 +5817,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -5791,7 +5825,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -5800,10 +5833,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -5821,7 +5853,6 @@ export const plans = {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -5830,7 +5861,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -5839,7 +5869,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -5848,7 +5877,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -5857,7 +5885,6 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
             }
@@ -5866,10 +5893,9 @@ export const plans = {
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qb => qb.whereBuilder());
             }
           }
         }
@@ -6423,64 +6449,70 @@ export const plans = {
     }
   },
   CompoundTypeInput: {
-    "__inputPlan": function CompoundTypeInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     a: {
-      applyPlan($insert, val) {
-        $insert.set("a", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      }
     },
     b: {
-      applyPlan($insert, val) {
-        $insert.set("b", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      }
     },
     c: {
-      applyPlan($insert, val) {
-        $insert.set("c", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      }
     },
     d: {
-      applyPlan($insert, val) {
-        $insert.set("d", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      }
     },
     e: {
-      applyPlan($insert, val) {
-        $insert.set("e", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      }
     },
     f: {
-      applyPlan($insert, val) {
-        $insert.set("f", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      }
     },
     g: {
-      applyPlan($insert, val) {
-        $insert.set("g", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      }
     },
     fooBar: {
-      applyPlan($insert, val) {
-        $insert.set("foo_bar", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   IntervalInput: {
@@ -6737,8 +6769,8 @@ export const plans = {
   },
   UpdatableViewCondition: {
     x: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "x",
@@ -6751,17 +6783,15 @@ export const plans = {
             type: "attribute",
             attribute: "x",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.x.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -6774,17 +6804,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "description",
@@ -6797,17 +6825,15 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.description.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constant: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constant",
@@ -6820,13 +6846,11 @@ export const plans = {
             type: "attribute",
             attribute: "constant",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.constant.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ListsConnection: {
@@ -6934,8 +6958,8 @@ export const plans = {
   },
   ListCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -6948,17 +6972,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     intArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "int_array",
@@ -6971,17 +6993,15 @@ export const plans = {
             type: "attribute",
             attribute: "int_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.int_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     intArrayNn: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "int_array_nn",
@@ -6994,17 +7014,15 @@ export const plans = {
             type: "attribute",
             attribute: "int_array_nn",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.int_array_nn.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     enumArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "enum_array",
@@ -7017,17 +7035,15 @@ export const plans = {
             type: "attribute",
             attribute: "enum_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.enum_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     enumArrayNn: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "enum_array_nn",
@@ -7040,17 +7056,15 @@ export const plans = {
             type: "attribute",
             attribute: "enum_array_nn",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.enum_array_nn.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     dateArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "date_array",
@@ -7063,17 +7077,15 @@ export const plans = {
             type: "attribute",
             attribute: "date_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.date_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     dateArrayNn: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "date_array_nn",
@@ -7086,17 +7098,15 @@ export const plans = {
             type: "attribute",
             attribute: "date_array_nn",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.date_array_nn.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     timestamptzArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "timestamptz_array",
@@ -7109,17 +7119,15 @@ export const plans = {
             type: "attribute",
             attribute: "timestamptz_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.timestamptz_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     timestamptzArrayNn: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "timestamptz_array_nn",
@@ -7132,17 +7140,15 @@ export const plans = {
             type: "attribute",
             attribute: "timestamptz_array_nn",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.timestamptz_array_nn.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     compoundTypeArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "compound_type_array",
@@ -7155,17 +7161,15 @@ export const plans = {
             type: "attribute",
             attribute: "compound_type_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.compound_type_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     compoundTypeArrayNn: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "compound_type_array_nn",
@@ -7178,13 +7182,11 @@ export const plans = {
             type: "attribute",
             attribute: "compound_type_array_nn",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_lists.attributes.compound_type_array_nn.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   TypesOrderBy: {
@@ -8635,8 +8637,8 @@ export const plans = {
   },
   TypeCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -8649,17 +8651,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     smallint: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "smallint",
@@ -8672,17 +8672,15 @@ export const plans = {
             type: "attribute",
             attribute: "smallint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.smallint.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     bigint: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "bigint",
@@ -8695,17 +8693,15 @@ export const plans = {
             type: "attribute",
             attribute: "bigint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.bigint.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     numeric: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "numeric",
@@ -8718,17 +8714,15 @@ export const plans = {
             type: "attribute",
             attribute: "numeric",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.numeric.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     decimal: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "decimal",
@@ -8741,17 +8735,15 @@ export const plans = {
             type: "attribute",
             attribute: "decimal",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.decimal.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     boolean: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "boolean",
@@ -8764,17 +8756,15 @@ export const plans = {
             type: "attribute",
             attribute: "boolean",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.boolean.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     varchar: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "varchar",
@@ -8787,17 +8777,15 @@ export const plans = {
             type: "attribute",
             attribute: "varchar",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.varchar.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     enum: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "enum",
@@ -8810,17 +8798,15 @@ export const plans = {
             type: "attribute",
             attribute: "enum",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.enum.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     enumArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "enum_array",
@@ -8833,17 +8819,15 @@ export const plans = {
             type: "attribute",
             attribute: "enum_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.enum_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     domain: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "domain",
@@ -8856,17 +8840,15 @@ export const plans = {
             type: "attribute",
             attribute: "domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.domain.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     domain2: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "domain2",
@@ -8879,17 +8861,15 @@ export const plans = {
             type: "attribute",
             attribute: "domain2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.domain2.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     textArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "text_array",
@@ -8902,17 +8882,15 @@ export const plans = {
             type: "attribute",
             attribute: "text_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.text_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     json: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "json",
@@ -8925,17 +8903,15 @@ export const plans = {
             type: "attribute",
             attribute: "json",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.json.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     jsonb: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "jsonb",
@@ -8948,17 +8924,15 @@ export const plans = {
             type: "attribute",
             attribute: "jsonb",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.jsonb.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     nullableRange: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "nullable_range",
@@ -8971,17 +8945,15 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_range.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     numrange: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "numrange",
@@ -8994,17 +8966,15 @@ export const plans = {
             type: "attribute",
             attribute: "numrange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.numrange.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     daterange: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "daterange",
@@ -9017,17 +8987,15 @@ export const plans = {
             type: "attribute",
             attribute: "daterange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.daterange.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     anIntRange: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "an_int_range",
@@ -9040,17 +9008,15 @@ export const plans = {
             type: "attribute",
             attribute: "an_int_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.an_int_range.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     timestamp: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "timestamp",
@@ -9063,17 +9029,15 @@ export const plans = {
             type: "attribute",
             attribute: "timestamp",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timestamp.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     timestamptz: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "timestamptz",
@@ -9086,17 +9050,15 @@ export const plans = {
             type: "attribute",
             attribute: "timestamptz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timestamptz.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     date: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "date",
@@ -9109,17 +9071,15 @@ export const plans = {
             type: "attribute",
             attribute: "date",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.date.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     time: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "time",
@@ -9132,17 +9092,15 @@ export const plans = {
             type: "attribute",
             attribute: "time",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.time.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     timetz: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "timetz",
@@ -9155,17 +9113,15 @@ export const plans = {
             type: "attribute",
             attribute: "timetz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timetz.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     interval: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "interval",
@@ -9178,17 +9134,15 @@ export const plans = {
             type: "attribute",
             attribute: "interval",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.interval.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     intervalArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "interval_array",
@@ -9201,17 +9155,15 @@ export const plans = {
             type: "attribute",
             attribute: "interval_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.interval_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     money: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "money",
@@ -9224,17 +9176,15 @@ export const plans = {
             type: "attribute",
             attribute: "money",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.money.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     compoundType: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "compound_type",
@@ -9247,17 +9197,15 @@ export const plans = {
             type: "attribute",
             attribute: "compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.compound_type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     nestedCompoundType: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "nested_compound_type",
@@ -9270,17 +9218,15 @@ export const plans = {
             type: "attribute",
             attribute: "nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nested_compound_type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     nullableCompoundType: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "nullable_compound_type",
@@ -9293,17 +9239,15 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_compound_type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     nullableNestedCompoundType: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "nullable_nested_compound_type",
@@ -9316,17 +9260,15 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_nested_compound_type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     point: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "point",
@@ -9339,17 +9281,15 @@ export const plans = {
             type: "attribute",
             attribute: "point",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.point.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     nullablePoint: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "nullablePoint",
@@ -9362,17 +9302,15 @@ export const plans = {
             type: "attribute",
             attribute: "nullablePoint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullablePoint.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     inet: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "inet",
@@ -9385,17 +9323,15 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.inet.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     cidr: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "cidr",
@@ -9408,17 +9344,15 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.cidr.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     macaddr: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "macaddr",
@@ -9431,17 +9365,15 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.macaddr.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regproc: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regproc",
@@ -9454,17 +9386,15 @@ export const plans = {
             type: "attribute",
             attribute: "regproc",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regproc.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regprocedure: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regprocedure",
@@ -9477,17 +9407,15 @@ export const plans = {
             type: "attribute",
             attribute: "regprocedure",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regprocedure.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regoper: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regoper",
@@ -9500,17 +9428,15 @@ export const plans = {
             type: "attribute",
             attribute: "regoper",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regoper.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regoperator: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regoperator",
@@ -9523,17 +9449,15 @@ export const plans = {
             type: "attribute",
             attribute: "regoperator",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regoperator.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regclass: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regclass",
@@ -9546,17 +9470,15 @@ export const plans = {
             type: "attribute",
             attribute: "regclass",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regclass.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regtype: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regtype",
@@ -9569,17 +9491,15 @@ export const plans = {
             type: "attribute",
             attribute: "regtype",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regtype.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regconfig: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regconfig",
@@ -9592,17 +9512,15 @@ export const plans = {
             type: "attribute",
             attribute: "regconfig",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regconfig.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     regdictionary: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "regdictionary",
@@ -9615,17 +9533,15 @@ export const plans = {
             type: "attribute",
             attribute: "regdictionary",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regdictionary.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     textArrayDomain: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "text_array_domain",
@@ -9638,17 +9554,15 @@ export const plans = {
             type: "attribute",
             attribute: "text_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.text_array_domain.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     int8ArrayDomain: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "int8_array_domain",
@@ -9661,17 +9575,15 @@ export const plans = {
             type: "attribute",
             attribute: "int8_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.int8_array_domain.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     ltree: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "ltree",
@@ -9684,17 +9596,15 @@ export const plans = {
             type: "attribute",
             attribute: "ltree",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.ltree.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     ltreeArray: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "ltree_array",
@@ -9707,13 +9617,11 @@ export const plans = {
             type: "attribute",
             attribute: "ltree_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.ltree_array.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   BigFloatRangeInput: {
@@ -9741,29 +9649,30 @@ export const plans = {
     inclusive: undefined
   },
   NestedCompoundTypeInput: {
-    "__inputPlan": function NestedCompoundTypeInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     a: {
-      applyPlan($insert, val) {
-        $insert.set("a", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      }
     },
     b: {
-      applyPlan($insert, val) {
-        $insert.set("b", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      }
     },
     bazBuz: {
-      applyPlan($insert, val) {
-        $insert.set("baz_buz", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("baz_buz", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   PointInput: {
@@ -9784,9 +9693,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9804,9 +9722,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9824,9 +9751,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9844,9 +9780,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9864,9 +9809,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9884,9 +9838,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9904,9 +9867,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9924,9 +9896,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9944,9 +9925,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9964,9 +9954,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -9984,9 +9983,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10004,9 +10012,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10024,9 +10041,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10044,9 +10070,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10064,9 +10099,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10084,9 +10128,18 @@ export const plans = {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_, $object) {
-              return $object;
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
             }
           }
         }
@@ -10094,17 +10147,17 @@ export const plans = {
     },
     createUpdatableView: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_updatable_viewPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(resource_updatable_viewPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -10114,17 +10167,17 @@ export const plans = {
     },
     createList: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_listsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_listsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -10134,17 +10187,17 @@ export const plans = {
     },
     createType: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_typesPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_typesPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -10154,11 +10207,11 @@ export const plans = {
     },
     updateList: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_listsPgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(pgResource_listsPgResource, specFromArgs(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -10173,13 +10226,13 @@ export const plans = {
     },
     updateListById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_listsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_listsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -10194,11 +10247,11 @@ export const plans = {
     },
     updateType: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_typesPgResource, specFromArgs2(args))
+        const $update = pgUpdateSingle(pgResource_typesPgResource, specFromArgs2(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -10213,13 +10266,13 @@ export const plans = {
     },
     updateTypeById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_typesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_typesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -10234,11 +10287,11 @@ export const plans = {
     },
     deleteList: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_listsPgResource, specFromArgs3(args))
+        const $delete = pgDeleteSingle(pgResource_listsPgResource, specFromArgs3(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -10253,13 +10306,13 @@ export const plans = {
     },
     deleteListById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_listsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_listsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -10274,11 +10327,11 @@ export const plans = {
     },
     deleteType: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_typesPgResource, specFromArgs4(args))
+        const $delete = pgDeleteSingle(pgResource_typesPgResource, specFromArgs4(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -10293,13 +10346,13 @@ export const plans = {
     },
     deleteTypeById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_typesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_typesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -10316,7 +10369,8 @@ export const plans = {
   Mult1Payload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     integer($object) {
       return $object.get("result");
@@ -10327,10 +10381,9 @@ export const plans = {
   },
   Mult1Input: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     arg0: undefined,
     arg1: undefined
@@ -10338,7 +10391,8 @@ export const plans = {
   Mult2Payload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     integer($object) {
       return $object.get("result");
@@ -10349,10 +10403,9 @@ export const plans = {
   },
   Mult2Input: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     arg0: undefined,
     arg1: undefined
@@ -10360,7 +10413,8 @@ export const plans = {
   Mult3Payload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     integer($object) {
       return $object.get("result");
@@ -10371,10 +10425,9 @@ export const plans = {
   },
   Mult3Input: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     arg0: undefined,
     arg1: undefined
@@ -10382,7 +10435,8 @@ export const plans = {
   Mult4Payload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     integer($object) {
       return $object.get("result");
@@ -10393,10 +10447,9 @@ export const plans = {
   },
   Mult4Input: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     arg0: undefined,
     arg1: undefined
@@ -10404,7 +10457,8 @@ export const plans = {
   GuidFnPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     guid($object) {
       return $object.get("result");
@@ -10420,17 +10474,17 @@ export const plans = {
   },
   GuidFnInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     g: undefined
   },
   AuthenticateFailPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     jwtToken($object) {
       return $object.get("result");
@@ -10469,16 +10523,16 @@ export const plans = {
   },
   AuthenticateFailInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     }
   },
   AuthenticatePayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     jwtToken($object) {
       return $object.get("result");
@@ -10489,10 +10543,9 @@ export const plans = {
   },
   AuthenticateInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     a: undefined,
     b: undefined,
@@ -10501,7 +10554,8 @@ export const plans = {
   ListBdeMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     uuids($object) {
       return $object.get("result");
@@ -10512,10 +10566,9 @@ export const plans = {
   },
   ListBdeMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     b: undefined,
     d: undefined,
@@ -10524,7 +10577,8 @@ export const plans = {
   AuthenticateManyPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     jwtTokens($object) {
       return $object.get("result");
@@ -10535,10 +10589,9 @@ export const plans = {
   },
   AuthenticateManyInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     a: undefined,
     b: undefined,
@@ -10547,7 +10600,8 @@ export const plans = {
   AuthenticatePayloadPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     authPayload($object) {
       return $object.get("result");
@@ -10576,10 +10630,9 @@ export const plans = {
   },
   AuthenticatePayloadInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     a: undefined,
     b: undefined,
@@ -10588,7 +10641,8 @@ export const plans = {
   CompoundTypeMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     compoundType($object) {
       return $object.get("result");
@@ -10599,17 +10653,17 @@ export const plans = {
   },
   CompoundTypeMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     object: undefined
   },
   CompoundTypeSetMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     compoundTypes($object) {
       return $object.get("result");
@@ -10620,17 +10674,17 @@ export const plans = {
   },
   CompoundTypeSetMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     object: undefined
   },
   CompoundTypeArrayMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     compoundTypes($object) {
       return $object.get("result");
@@ -10641,17 +10695,17 @@ export const plans = {
   },
   CompoundTypeArrayMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     object: undefined
   },
   TypeFunctionConnectionMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     types($object) {
       return $object.get("result");
@@ -10662,16 +10716,16 @@ export const plans = {
   },
   TypeFunctionConnectionMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     }
   },
   TypeFunctionMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     type($object) {
       return $object.get("result");
@@ -10712,17 +10766,17 @@ export const plans = {
   },
   TypeFunctionMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     id: undefined
   },
   TypeFunctionListMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     types($object) {
       return $object.get("result");
@@ -10733,16 +10787,16 @@ export const plans = {
   },
   TypeFunctionListMutationInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     }
   },
   CreateUpdatableViewPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     updatableView($object) {
       return $object.get("result");
@@ -10753,56 +10807,58 @@ export const plans = {
   },
   CreateUpdatableViewInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     updatableView: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   UpdatableViewInput: {
-    "__inputPlan": function UpdatableViewInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     x: {
-      applyPlan($insert, val) {
-        $insert.set("x", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("x", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     description: {
-      applyPlan($insert, val) {
-        $insert.set("description", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("description", bakedInputRuntime(schema, field.type, val));
+      }
     },
     constant: {
-      applyPlan($insert, val) {
-        $insert.set("constant", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("constant", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateListPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     list($object) {
       return $object.get("result");
@@ -10843,119 +10899,130 @@ export const plans = {
   },
   CreateListInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     list: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   ListInput: {
-    "__inputPlan": function ListInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intArray: {
-      applyPlan($insert, val) {
-        $insert.set("int_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("int_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArray: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     dateArray: {
-      applyPlan($insert, val) {
-        $insert.set("date_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     dateArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("date_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptzArray: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptzArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundTypeArray: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundTypeArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArray: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateTypePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     type($object) {
       return $object.get("result");
@@ -10996,371 +11063,418 @@ export const plans = {
   },
   CreateTypeInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     type: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   TypeInput: {
-    "__inputPlan": function TypeInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     smallint: {
-      applyPlan($insert, val) {
-        $insert.set("smallint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     bigint: {
-      applyPlan($insert, val) {
-        $insert.set("bigint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     numeric: {
-      applyPlan($insert, val) {
-        $insert.set("numeric", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
+      }
     },
     decimal: {
-      applyPlan($insert, val) {
-        $insert.set("decimal", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
+      }
     },
     boolean: {
-      applyPlan($insert, val) {
-        $insert.set("boolean", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
+      }
     },
     varchar: {
-      applyPlan($insert, val) {
-        $insert.set("varchar", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enum: {
-      applyPlan($insert, val) {
-        $insert.set("enum", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArray: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     domain: {
-      applyPlan($insert, val) {
-        $insert.set("domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     domain2: {
-      applyPlan($insert, val) {
-        $insert.set("domain2", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
+      }
     },
     textArray: {
-      applyPlan($insert, val) {
-        $insert.set("text_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     json: {
-      applyPlan($insert, val) {
-        $insert.set("json", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("json", bakedInputRuntime(schema, field.type, val));
+      }
     },
     jsonb: {
-      applyPlan($insert, val) {
-        $insert.set("jsonb", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableRange: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_range", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
+      }
     },
     numrange: {
-      applyPlan($insert, val) {
-        $insert.set("numrange", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
+      }
     },
     daterange: {
-      applyPlan($insert, val) {
-        $insert.set("daterange", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
+      }
     },
     anIntRange: {
-      applyPlan($insert, val) {
-        $insert.set("an_int_range", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamp: {
-      applyPlan($insert, val) {
-        $insert.set("timestamp", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptz: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
+      }
     },
     date: {
-      applyPlan($insert, val) {
-        $insert.set("date", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date", bakedInputRuntime(schema, field.type, val));
+      }
     },
     time: {
-      applyPlan($insert, val) {
-        $insert.set("time", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("time", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timetz: {
-      applyPlan($insert, val) {
-        $insert.set("timetz", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
+      }
     },
     interval: {
-      applyPlan($insert, val) {
-        $insert.set("interval", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("interval", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intervalArray: {
-      applyPlan($insert, val) {
-        $insert.set("interval_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     money: {
-      applyPlan($insert, val) {
-        $insert.set("money", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("money", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundType: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nestedCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nested_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableNestedCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_nested_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     point: {
-      applyPlan($insert, val) {
-        $insert.set("point", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("point", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullablePoint: {
-      applyPlan($insert, val) {
-        $insert.set("nullablePoint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     inet: {
-      applyPlan($insert, val) {
-        $insert.set("inet", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("inet", bakedInputRuntime(schema, field.type, val));
+      }
     },
     cidr: {
-      applyPlan($insert, val) {
-        $insert.set("cidr", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+      }
     },
     macaddr: {
-      applyPlan($insert, val) {
-        $insert.set("macaddr", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regproc: {
-      applyPlan($insert, val) {
-        $insert.set("regproc", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regprocedure: {
-      applyPlan($insert, val) {
-        $insert.set("regprocedure", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regoper: {
-      applyPlan($insert, val) {
-        $insert.set("regoper", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regoperator: {
-      applyPlan($insert, val) {
-        $insert.set("regoperator", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regclass: {
-      applyPlan($insert, val) {
-        $insert.set("regclass", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regtype: {
-      applyPlan($insert, val) {
-        $insert.set("regtype", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regconfig: {
-      applyPlan($insert, val) {
-        $insert.set("regconfig", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regdictionary: {
-      applyPlan($insert, val) {
-        $insert.set("regdictionary", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
+      }
     },
     textArrayDomain: {
-      applyPlan($insert, val) {
-        $insert.set("text_array_domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     int8ArrayDomain: {
-      applyPlan($insert, val) {
-        $insert.set("int8_array_domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     bytea: {
-      applyPlan($insert, val) {
-        $insert.set("bytea", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArray: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ltree: {
-      applyPlan($insert, val) {
-        $insert.set("ltree", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ltreeArray: {
-      applyPlan($insert, val) {
-        $insert.set("ltree_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateListPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     list($object) {
       return $object.get("result");
@@ -11401,132 +11515,146 @@ export const plans = {
   },
   UpdateListInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     listPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   ListPatch: {
-    "__inputPlan": function ListPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intArray: {
-      applyPlan($insert, val) {
-        $insert.set("int_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("int_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArray: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     dateArray: {
-      applyPlan($insert, val) {
-        $insert.set("date_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     dateArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("date_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptzArray: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptzArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundTypeArray: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundTypeArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArray: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArrayNn: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array_nn", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateListByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     listPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateTypePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     type($object) {
       return $object.get("result");
@@ -11567,384 +11695,434 @@ export const plans = {
   },
   UpdateTypeInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     typePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   TypePatch: {
-    "__inputPlan": function TypePatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     smallint: {
-      applyPlan($insert, val) {
-        $insert.set("smallint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     bigint: {
-      applyPlan($insert, val) {
-        $insert.set("bigint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     numeric: {
-      applyPlan($insert, val) {
-        $insert.set("numeric", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
+      }
     },
     decimal: {
-      applyPlan($insert, val) {
-        $insert.set("decimal", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
+      }
     },
     boolean: {
-      applyPlan($insert, val) {
-        $insert.set("boolean", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
+      }
     },
     varchar: {
-      applyPlan($insert, val) {
-        $insert.set("varchar", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enum: {
-      applyPlan($insert, val) {
-        $insert.set("enum", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum", bakedInputRuntime(schema, field.type, val));
+      }
     },
     enumArray: {
-      applyPlan($insert, val) {
-        $insert.set("enum_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     domain: {
-      applyPlan($insert, val) {
-        $insert.set("domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     domain2: {
-      applyPlan($insert, val) {
-        $insert.set("domain2", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
+      }
     },
     textArray: {
-      applyPlan($insert, val) {
-        $insert.set("text_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     json: {
-      applyPlan($insert, val) {
-        $insert.set("json", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("json", bakedInputRuntime(schema, field.type, val));
+      }
     },
     jsonb: {
-      applyPlan($insert, val) {
-        $insert.set("jsonb", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableRange: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_range", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
+      }
     },
     numrange: {
-      applyPlan($insert, val) {
-        $insert.set("numrange", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
+      }
     },
     daterange: {
-      applyPlan($insert, val) {
-        $insert.set("daterange", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
+      }
     },
     anIntRange: {
-      applyPlan($insert, val) {
-        $insert.set("an_int_range", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamp: {
-      applyPlan($insert, val) {
-        $insert.set("timestamp", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timestamptz: {
-      applyPlan($insert, val) {
-        $insert.set("timestamptz", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
+      }
     },
     date: {
-      applyPlan($insert, val) {
-        $insert.set("date", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("date", bakedInputRuntime(schema, field.type, val));
+      }
     },
     time: {
-      applyPlan($insert, val) {
-        $insert.set("time", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("time", bakedInputRuntime(schema, field.type, val));
+      }
     },
     timetz: {
-      applyPlan($insert, val) {
-        $insert.set("timetz", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
+      }
     },
     interval: {
-      applyPlan($insert, val) {
-        $insert.set("interval", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("interval", bakedInputRuntime(schema, field.type, val));
+      }
     },
     intervalArray: {
-      applyPlan($insert, val) {
-        $insert.set("interval_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     money: {
-      applyPlan($insert, val) {
-        $insert.set("money", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("money", bakedInputRuntime(schema, field.type, val));
+      }
     },
     compoundType: {
-      applyPlan($insert, val) {
-        $insert.set("compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nestedCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nested_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullableNestedCompoundType: {
-      applyPlan($insert, val) {
-        $insert.set("nullable_nested_compound_type", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
+      }
     },
     point: {
-      applyPlan($insert, val) {
-        $insert.set("point", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("point", bakedInputRuntime(schema, field.type, val));
+      }
     },
     nullablePoint: {
-      applyPlan($insert, val) {
-        $insert.set("nullablePoint", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
+      }
     },
     inet: {
-      applyPlan($insert, val) {
-        $insert.set("inet", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("inet", bakedInputRuntime(schema, field.type, val));
+      }
     },
     cidr: {
-      applyPlan($insert, val) {
-        $insert.set("cidr", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+      }
     },
     macaddr: {
-      applyPlan($insert, val) {
-        $insert.set("macaddr", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regproc: {
-      applyPlan($insert, val) {
-        $insert.set("regproc", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regprocedure: {
-      applyPlan($insert, val) {
-        $insert.set("regprocedure", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regoper: {
-      applyPlan($insert, val) {
-        $insert.set("regoper", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regoperator: {
-      applyPlan($insert, val) {
-        $insert.set("regoperator", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regclass: {
-      applyPlan($insert, val) {
-        $insert.set("regclass", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regtype: {
-      applyPlan($insert, val) {
-        $insert.set("regtype", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regconfig: {
-      applyPlan($insert, val) {
-        $insert.set("regconfig", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
+      }
     },
     regdictionary: {
-      applyPlan($insert, val) {
-        $insert.set("regdictionary", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
+      }
     },
     textArrayDomain: {
-      applyPlan($insert, val) {
-        $insert.set("text_array_domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     int8ArrayDomain: {
-      applyPlan($insert, val) {
-        $insert.set("int8_array_domain", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
+      }
     },
     bytea: {
-      applyPlan($insert, val) {
-        $insert.set("bytea", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
+      }
     },
     byteaArray: {
-      applyPlan($insert, val) {
-        $insert.set("bytea_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ltree: {
-      applyPlan($insert, val) {
-        $insert.set("ltree", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
+      }
     },
     ltreeArray: {
-      applyPlan($insert, val) {
-        $insert.set("ltree_array", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateTypeByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     typePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   DeleteListPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     list($object) {
       return $object.get("result");
@@ -11990,16 +12168,16 @@ export const plans = {
   },
   DeleteListInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteListByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
@@ -12007,7 +12185,8 @@ export const plans = {
   DeleteTypePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     type($object) {
       return $object.get("result");
@@ -12053,16 +12232,16 @@ export const plans = {
   },
   DeleteTypeInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteTypeByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
