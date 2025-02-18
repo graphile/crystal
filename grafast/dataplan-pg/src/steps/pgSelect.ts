@@ -300,7 +300,8 @@ export class PgSelectStep<
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
-    >
+    >,
+    PgSelectQueryBuilder
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -470,6 +471,8 @@ export class PgSelectStep<
   public readonly mode: PgSelectMode;
 
   protected locker: PgLocker<this> = new PgLocker(this);
+
+  private _meta: Record<string, any> = Object.create(null);
 
   static clone<TResource extends PgResource<any, any, any, any, any>>(
     cloneFrom: PgSelectStep<TResource>,
@@ -1037,6 +1040,7 @@ export class PgSelectStep<
       needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
       relationJoins: this.relationJoins,
+      meta: this._meta,
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1570,6 +1574,15 @@ export class PgSelectStep<
   [$$toSQL]() {
     return this.alias;
   }
+  whereBuilder() {
+    return new PgCondition(this);
+  }
+  havingBuilder() {
+    return new PgCondition(this, true);
+  }
+  setMeta(key: string, value: unknown): void {
+    this._meta[key] = value;
+  }
 }
 
 export class PgSelectRowsStep<
@@ -1870,6 +1883,7 @@ interface PgSelectQueryInfo<
     keyof GetPgResourceRelations<TResource>,
     SQL
   >;
+  readonly meta: { readonly [key: string]: any };
 }
 interface MutablePgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
@@ -1883,6 +1897,7 @@ interface MutablePgSelectQueryInfo<
   readonly havingConditions: Array<SQL>;
   isOrderUnique: boolean;
   readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
+  readonly meta: Record<string, any>;
 }
 
 function buildTheQuery<
@@ -1899,6 +1914,7 @@ function buildTheQuery<
     havingConditions: [...rawInfo.havingConditions],
     relationJoins: new Map(rawInfo.relationJoins),
     joins: [...rawInfo.joins],
+    meta: { __proto__: null, ...rawInfo.meta },
 
     // Will be populated by applyConditionFromCursor
     cursorLower: null,
@@ -1921,7 +1937,7 @@ function buildTheQuery<
     return info.selects.push(expression) - 1;
   }
 
-  const meta = Object.create(null);
+  const meta = info.meta;
   const queryBuilder: PgSelectQueryBuilder = {
     alias: info.alias,
     [$$toSQL]() {
