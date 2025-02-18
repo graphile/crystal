@@ -135,7 +135,6 @@ export function applyInput<
         inputArgsApply(schema, inputType, parent, data, getTargetFromParent);
       }, false);
     } else {
-      console.log(String($value));
       return new ApplyInputStep<TParent, TTarget>(
         inputType,
         $value,
