@@ -35,13 +35,13 @@ If you haven't installed PostGraphile already, you can follow our
 
 </p>
 
-# Table of Contents
+# Table of contents
 
 <TOCInline toc={toc} />
 
-## The Basics
+## The basics
 
-### Setting Up Your Schemas
+### Setting up your schemas
 
 All of our database objects will go into one or two custom Postgres schemas. A
 schema is essentially a namespace, it allows you to create tables with the same
@@ -82,7 +82,7 @@ flag, with watch mode enabled PostGraphile will update your API as we add
 tables and types throughout this tutorial.
 :::
 
-### The Person Table
+### The person table
 
 Now we are going to create the tables in our database which will correspond to
 our users. We will do this by running the Postgres
@@ -176,7 +176,7 @@ There are pros and cons to both approaches, choose what works best for your
 application!
 :::
 
-### Table Documentation
+### Table documentation
 
 Now that we have created our table, we want to document it within the Postgres
 database. By adding comments to our table and its columns using the Postgres
@@ -206,7 +206,7 @@ appropriate styles.
 With this we have completed our person table, now let’s create a table for our
 forum posts.
 
-### The Post Table
+### The post table
 
 The users of our forum will want to be able to create posts. That’s the entire
 reason we have a forum after all. To create the post table we go through a very
@@ -301,7 +301,7 @@ write `integer` as the column type. We also made sure to include comments.
 Now that we have gone over the basics, let’s explore Postgres functions and see
 how we can use them to extend the functionality of our database.
 
-## Database Functions
+## Database functions
 
 The Postgres
 [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/sql-createfunction.html)
@@ -412,7 +412,7 @@ type Person {
 
 :::
 
-### Set Returning Functions
+### Set returning functions
 
 Sometimes it is useful to not just return single values from your function, but
 perhaps entire tables. What returning a table from a function could mean is you
@@ -556,7 +556,7 @@ your reference are as follows:
 
 Next up, we are going to learn about auth in Postgres and PostGraphile!
 
-## Authentication and Authorization
+## Authentication and authorization
 
 Authentication and authorization is incredibly important whenever you build an
 application. You want your users to be able to login and out of your service,
@@ -570,7 +570,7 @@ some pretty important data in our schema. How are users supposed to even login?
 Not by guessing their first and last name one would hope, so we will define
 another table which will store user emails and passwords.
 
-### Storing Emails and Passwords
+### Storing emails and passwords
 
 To store user emails and passwords we will create another table in the
 `forum_example_private` schema.
@@ -626,7 +626,7 @@ use
 as a reference.
 :::
 
-### Registering Users
+### Registering users
 
 Before a user can log in, they need to have an account in our database. To
 register a user we are going to implement a Postgres function in PL/pgSQL which
@@ -732,7 +732,7 @@ PostGraphile agnostic, the next two sections will be specific to PostGraphile,
 but useful to anyone wanting to learn just a little bit more about Postgres and
 JSON Web Tokens (JWTs).
 
-### Postgres Roles
+### Postgres roles
 
 When a user logs in, we want them to make their queries using a specific
 PostGraphile role. Using that role we can define rules that restrict what data
@@ -906,7 +906,7 @@ tokens.
 We now know how PostGraphile uses JWTs to authorize the user, but how does
 PostGraphile create a JWT? Stay tuned.
 
-### Logging In
+### Logging in
 
 You can pass an option to PostGraphile, called
 `--jwt-token-identifier <identifier>` in the CLI, which takes a composite type
@@ -1024,7 +1024,7 @@ Be careful about logging around this function too.
 
 Now that we know how to get JWTs for our users, let’s use the JWTs.
 
-### Using the Authorized User
+### Using the authorized user
 
 Before we define permissions for our user, let’s utilize the fact that they are
 logged in by defining a quick Postgres function.
@@ -1131,7 +1131,7 @@ This provides basic permissions for all of our Postgres objects, but as we
 mentioned before users can update and delete all and any persons or posts. For
 obvious reasons we don’t want this, so let’s define row level security next.
 
-### Row Level Security
+### Row-level security
 
 In Postgres 9.5 (released January 2016)
 [Row Level Security (RLS)](https://www.postgresql.org/docs/current/static/ddl-rowsecurity.html)
