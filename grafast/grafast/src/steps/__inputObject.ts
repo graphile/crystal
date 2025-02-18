@@ -4,7 +4,7 @@ import te from "tamedevil";
 
 import { inputStep } from "../input.js";
 import type {
-  InputStep,
+  AnyInputStep,
   NotVariableValueNode,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
@@ -27,7 +27,7 @@ export class __InputObjectStep<
   isSyncAndSafe = true;
 
   private inputFields: {
-    [fieldName: string]: { dependencyIndex: number; step: InputStep };
+    [fieldName: string]: { dependencyIndex: number; step: AnyInputStep };
   } = Object.create(null);
   constructor(
     private inputObjectType: TInputType,
@@ -118,7 +118,7 @@ export class __InputObjectStep<
     return resultValues;
   }
 
-  get(attrName: string): InputStep {
+  get(attrName: string): AnyInputStep {
     const step = this.inputFields[attrName]?.step;
     if (step === undefined) {
       throw new Error(
@@ -218,7 +218,5 @@ export type __InputObjectStepWithDollars<
   TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
 > = __InputObjectStep<TInputType> & {
   [key in keyof ReturnType<TInputType["getFields"]> &
-    string as `$${key}`]: InputStep<
-    ReturnType<TInputType["getFields"]>[key]["type"]
-  >;
+    string as `$${key}`]: AnyInputStep;
 };

@@ -298,24 +298,6 @@ export type FieldArg = {
   ): void;
 };
 
-export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
-  GraphQLInputType extends TInputType
-    ? AnyInputStep
-    : TInputType extends GraphQLNonNull<infer U>
-    ? Exclude<InputStep<U & GraphQLInputType>, ConstantStep<undefined>>
-    : TInputType extends GraphQLList<GraphQLInputType>
-    ?
-        | __InputListStep<TInputType> // .at(), .eval(), .evalLength(), .evalIs(null)
-        | __TrackedValueStep<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
-        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : TInputType extends GraphQLInputObjectType
-    ?
-        | __TrackedValueStepWithDollars<any, TInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
-        | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
-        | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
-    : // TYPES: handle the other types
-      AnyInputStep;
-
 export type AnyInputStep =
   | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
@@ -415,7 +397,7 @@ export type ScalarPlanResolver<
 export type ScalarInputPlanResolver<
   TResultStep extends ExecutableStep = ExecutableStep,
 > = (
-  $inputValue: InputStep,
+  $inputValue: AnyInputStep,
   /*
     | __InputListStep
     | __InputStaticLeafStep
