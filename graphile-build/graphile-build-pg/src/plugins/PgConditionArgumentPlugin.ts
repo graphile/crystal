@@ -4,6 +4,7 @@ import "graphile-config";
 import type {
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
@@ -184,10 +185,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                     arg,
                   ) => {
                     const $select = $connection.getSubplan();
-                    arg.apply($select, (qb) => qb.whereBuilder());
+                    arg.apply($select, qbWhereBuilder);
                   }
                 : (_condition, $select: PgSelectStep, arg) => {
-                    arg.apply($select, (qb) => qb.whereBuilder());
+                    arg.apply($select, qbWhereBuilder);
                   },
             },
           },
@@ -197,3 +198,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+function qbWhereBuilder(qb: PgSelectQueryBuilder) {
+  return qb.whereBuilder();
+}

@@ -2517,33 +2517,30 @@ export function makeExampleSchema(
             type: MessageCondition,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              () =>
+              (pgWhere) =>
                 function plan(
                   _$forum: ForumStep,
                   $messages: PgSelectStep<typeof messageResource>,
                   arg,
                 ) {
-                  arg.apply($messages, (qb) => qb.whereBuilder());
+                  arg.apply($messages, pgWhere);
                 },
-              [],
+              [pgWhere],
             ),
           },
           filter: {
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (PgClassFilter) =>
+              (pgClassFilterWhere) =>
                 function plan(
                   _$forum: ForumStep,
                   $messages: PgSelectStep<typeof messageResource>,
                   arg,
                 ) {
-                  arg.apply(
-                    $messages,
-                    (qb) => new PgClassFilter(qb.whereBuilder(), qb.alias),
-                  );
+                  arg.apply($messages, pgClassFilterWhere);
                 },
-              [PgClassFilter],
+              [pgClassFilterWhere],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -2606,35 +2603,32 @@ export function makeExampleSchema(
             type: MessageCondition,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              () =>
+              (pgWhere) =>
                 function plan(
                   _$forum,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
-                  arg.apply($messages, (qb) => qb.whereBuilder());
+                  arg.apply($messages, pgWhere);
                 },
-              [],
+              [pgWhere],
             ),
           },
           filter: {
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (PgClassFilter) =>
+              (pgClassFilterWhere) =>
                 function plan(
                   _$forum,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
-                  arg.apply(
-                    $messages,
-                    (qb) => new PgClassFilter(qb.whereBuilder(), qb.alias),
-                  );
+                  arg.apply($messages, pgClassFilterWhere);
                 },
-              [PgClassFilter],
+              [pgClassFilterWhere],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -3701,33 +3695,30 @@ export function makeExampleSchema(
             type: ForumCondition,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              () =>
+              (pgWhere) =>
                 function plan(
                   _$root,
                   $forums: PgSelectStep<typeof forumResource>,
                   arg,
                 ) {
-                  arg.apply($forums, (qb) => qb.whereBuilder());
+                  arg.apply($forums, pgWhere);
                 },
-              [],
+              [pgWhere],
             ),
           },
           filter: {
             type: ForumFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (PgClassFilter) =>
+              (pgClassFilterWhere) =>
                 function plan(
                   _$root,
                   $forums: PgSelectStep<typeof forumResource>,
                   arg,
                 ) {
-                  arg.apply(
-                    $forums,
-                    (qb) => new PgClassFilter(qb.whereBuilder(), qb.alias),
-                  );
+                  arg.apply($forums, pgClassFilterWhere);
                 },
-              [PgClassFilter],
+              [pgClassFilterWhere],
             ),
           },
         },
@@ -3786,35 +3777,32 @@ export function makeExampleSchema(
             type: MessageCondition,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              () =>
+              (pgWhere) =>
                 function plan(
                   _$root: any,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
-                  arg.apply($messages, (qb) => qb.whereBuilder());
+                  arg.apply($messages, pgWhere);
                 },
-              [],
+              [pgWhere],
             ),
           },
           filter: {
             type: MessageFilter,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              (PgClassFilter) =>
+              (pgClassFilterWhere) =>
                 function plan(
                   _$root: any,
                   $connection: ResourceConnectionPlan<typeof messageResource>,
                   arg,
                 ) {
                   const $messages = $connection.getSubplan();
-                  arg.apply(
-                    $messages,
-                    (qb) => new PgClassFilter(qb.whereBuilder(), qb.alias),
-                  );
+                  arg.apply($messages, pgClassFilterWhere);
                 },
-              [PgClassFilter],
+              [pgClassFilterWhere],
             ),
           },
           includeArchived: makeIncludeArchivedArg<
@@ -4512,16 +4500,16 @@ export function makeExampleSchema(
             type: VulnerabilityCondition,
             autoApplyAfterParentPlan: true,
             applyPlan: EXPORTABLE(
-              () =>
+              (pgWhere) =>
                 function plan(
                   _$root: any,
                   $connection: VulnerabilityConnectionStep,
                   arg,
                 ) {
                   const $collection = $connection.getSubplan();
-                  arg.apply($collection, (qb) => qb.whereBuilder());
+                  arg.apply($collection, pgWhere);
                 },
-              [],
+              [pgWhere],
             ),
           },
           first: {
@@ -5265,4 +5253,10 @@ if (require.main === module) {
     console.error(e);
     process.exit(1);
   });
+}
+function pgClassFilterWhere(qb: PgSelectQueryBuilder) {
+  return new PgClassFilter(qb.whereBuilder(), qb.alias);
+}
+function pgWhere(qb: PgSelectQueryBuilder | PgUnionAllQueryBuilder) {
+  return qb.whereBuilder();
 }
