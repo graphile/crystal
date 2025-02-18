@@ -125,14 +125,24 @@ export function applyInput<
   $value: AnyInputStep,
   getTargetFromParent?: (parent: TParent) => TTarget,
 ) {
-  return operationPlan().withRootLayerPlan(
-    () =>
-      new ApplyInputStep<TParent, TTarget>(
+  const opPlan = operationPlan();
+  const { schema } = opPlan;
+  return opPlan.withRootLayerPlan(() => {
+    if ($value instanceof ConstantStep) {
+      // Replace us with a constant
+      const { data } = $value;
+      return constant(function applyInputConstant(parent: TParent) {
+        inputArgsApply(schema, inputType, parent, data, getTargetFromParent);
+      }, false);
+    } else {
+      console.log(String($value));
+      return new ApplyInputStep<TParent, TTarget>(
         inputType,
         $value,
         getTargetFromParent,
-      ),
-  );
+      );
+    }
+  });
 }
 
 /*
