@@ -20,8 +20,8 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant18{{"Constant[18∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
-    Constant18 --> Lambda12
+    Constant7{{"Constant[7∈0] ➊<br />ᐸ'INHERIT'ᐳ"}}:::plan
+    Constant7 --> Lambda12
     PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
@@ -37,9 +37,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/super-simple/self-reference"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 18, 11<br />2: Lambda[12]<br />3: PgSelect[8]<br />4: PgSelectRows[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 7, 9, 10, 11<br />2: Lambda[12]<br />3: PgSelect[8]<br />4: PgSelectRows[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,PgSelect8,Access9,Access10,Object11,Lambda12,PgSelectRows13,Constant18 bucket0
+    class Bucket0,__Value2,__Value4,Constant6,Constant7,PgSelect8,Access9,Access10,Object11,Lambda12,PgSelectRows13 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ13ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,PgSelectSingle15 bucket1

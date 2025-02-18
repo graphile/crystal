@@ -18,11 +18,11 @@ graph TD
     __Value2 --> Access13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant9{{"Constant[9∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant112{{"Constant[112∈0] ➊<br />ᐸnullᐳ"}}:::plan
     Constant210{{"Constant[210∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant211{{"Constant[211∈0] ➊<br />ᐸ'A description'ᐳ"}}:::plan
     Constant212{{"Constant[212∈0] ➊<br />ᐸ'A note'ᐳ"}}:::plan
-    Constant213{{"Constant[213∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant214{{"Constant[214∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
+    Constant213{{"Constant[213∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgUpdateSingle11[["PgUpdateSingle[11∈1] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object14 & Constant210 & Constant9 & Constant211 --> PgUpdateSingle11
     PgSelect18[["PgSelect[18∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
@@ -147,7 +147,7 @@ graph TD
     PgSelectSingle105 --> PgClassExpression107
     PgUpdateSingle113[["PgUpdateSingle[113∈9] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object116{{"Object[116∈9] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object116 & Constant210 & Constant9 & Constant213 --> PgUpdateSingle113
+    Object116 & Constant210 & Constant9 & Constant112 --> PgUpdateSingle113
     Access114{{"Access[114∈9] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access115{{"Access[115∈9] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access114 & Access115 --> Object116
@@ -211,7 +211,7 @@ graph TD
     PgSelectSingle156 --> PgClassExpression158
     PgUpdateSingle164[["PgUpdateSingle[164∈13] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object167{{"Object[167∈13] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object167 & Constant214 & Constant9 & Constant213 --> PgUpdateSingle164
+    Object167 & Constant213 & Constant9 & Constant112 --> PgUpdateSingle164
     Access165{{"Access[165∈13] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access166{{"Access[166∈13] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access165 & Access166 --> Object167
@@ -279,7 +279,7 @@ graph TD
     subgraph "Buckets for mutations/basics/update-relational-post"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant9,Access12,Access13,Object14,Constant210,Constant211,Constant212,Constant213,Constant214 bucket0
+    class Bucket0,__Value2,__Value4,Constant9,Access12,Access13,Object14,Constant112,Constant210,Constant211,Constant212,Constant213 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 210, 9, 211"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle11 bucket1
@@ -304,7 +304,7 @@ graph TD
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 105<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[105]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression106,PgClassExpression107 bucket8
-    Bucket9("Bucket 9 (mutationField)<br />Deps: 210, 9, 213, 2<br /><br />1: Access[114]<br />2: Access[115]<br />3: Object[116]<br />4: PgUpdateSingle[113]"):::bucket
+    Bucket9("Bucket 9 (mutationField)<br />Deps: 210, 9, 112, 2<br /><br />1: Access[114]<br />2: Access[115]<br />3: Object[116]<br />4: PgUpdateSingle[113]"):::bucket
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgUpdateSingle113,Access114,Access115,Object116 bucket9
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 113, 116<br /><br />ROOT PgUpdateSingle{9}ᐸrelational_posts(id;title,description,note)ᐳ[113]<br />1: <br />ᐳ: Access[118], PgClassExpression[117]<br />2: PgSelect[120]<br />3: PgSelectRows[125]<br />ᐳ: First[124], PgSelectSingle[126]"):::bucket
@@ -316,7 +316,7 @@ graph TD
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 156<br /><br />ROOT PgSelectSingle{11}ᐸpeopleᐳ[156]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression157,PgClassExpression158 bucket12
-    Bucket13("Bucket 13 (mutationField)<br />Deps: 214, 9, 213, 2<br /><br />1: Access[165]<br />2: Access[166]<br />3: Object[167]<br />4: PgUpdateSingle[164]"):::bucket
+    Bucket13("Bucket 13 (mutationField)<br />Deps: 213, 9, 112, 2<br /><br />1: Access[165]<br />2: Access[166]<br />3: Object[167]<br />4: PgUpdateSingle[164]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgUpdateSingle164,Access165,Access166,Object167 bucket13
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 164, 167<br /><br />ROOT PgUpdateSingle{13}ᐸrelational_posts(id;title,description,note)ᐳ[164]<br />1: <br />ᐳ: Access[169], PgClassExpression[168]<br />2: PgSelect[171]<br />3: PgSelectRows[176]<br />ᐳ: First[175], PgSelectSingle[177]"):::bucket
