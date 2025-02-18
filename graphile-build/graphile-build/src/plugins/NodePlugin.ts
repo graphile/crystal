@@ -1,6 +1,11 @@
 import "graphile-config";
 
-import type { NodeIdCodec, NodeIdHandler } from "grafast";
+import type {
+  Maybe,
+  NodeIdCodec,
+  NodeIdHandler,
+  ExecutableStep,
+} from "grafast";
 import { node } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
@@ -217,7 +222,9 @@ export const NodePlugin: GraphileConfig.Plugin = {
                     function plan(_$root, args) {
                       return node(
                         nodeIdHandlerByTypeName!,
-                        args.getRaw(nodeIdFieldName),
+                        args.getRaw(nodeIdFieldName) as ExecutableStep<
+                          Maybe<string>
+                        >,
                       );
                     },
                   [node, nodeIdFieldName, nodeIdHandlerByTypeName],

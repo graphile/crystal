@@ -58,7 +58,7 @@ function getEnumExtensionPropertyValueLookups(
 export function extractEnumExtensionValue<T>(
   type: GraphQLInputType,
   path: string[],
-  $step: InputStep,
+  $step: ExecutableStep,
 ): ExecutableStep<ReadonlyArrayOrDirect<Maybe<T>>> {
   const nullableType = getNullableType(type);
   const enumType = getNamedType(nullableType);

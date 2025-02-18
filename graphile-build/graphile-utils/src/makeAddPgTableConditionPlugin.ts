@@ -14,11 +14,12 @@ export function makeAddPgTableConditionPlugin(
   conditionGenerator?: (
     value: unknown,
     helpers: {
-      $condition: PgCondition;
       sql: typeof sql;
       sqlTableAlias: SQL;
-      build: GraphileBuild.Build;
       sqlValueWithCodec: typeof sqlValueWithCodec;
+      build: GraphileBuild.Build;
+      /** @internal We might expose this in future if needed */
+      condition: PgCondition;
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
@@ -85,16 +86,17 @@ export function makeAddPgTableConditionPlugin(
             }
             // build applyPlan
             conditionFieldSpec.apply = EXPORTABLE(
-              (build, conditionGenerator, sql, sqlValueWithCodec) => function applyPlan($condition: PgCondition, val) {
+              (build, conditionGenerator, sql, sqlValueWithCodec) =>
+                function applyPlan(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
-                    $condition,
                     sql,
-                    sqlTableAlias: $condition.alias,
-                    build,
+                    sqlTableAlias: condition.alias,
                     sqlValueWithCodec,
+                    build,
+                    condition,
                   });
                   if (expression) {
-                    $condition.where(expression);
+                    condition.where(expression);
                   }
                 },
               [build, conditionGenerator, sql, sqlValueWithCodec],

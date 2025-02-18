@@ -42,6 +42,7 @@ import type {
   __TrackedValueStep,
   __TrackedValueStepWithDollars,
   ConstantStep,
+  ObjectStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
 
@@ -261,8 +262,9 @@ export type BaseGraphQLInputObject = BaseGraphQLArguments;
 export type FieldArgs = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
-  /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
+  getRaw(
+    path?: string | ReadonlyArray<string | number>,
+  ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
   typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
@@ -277,6 +279,24 @@ export type FieldArgs = {
     justTargetFromParent?: never,
   ): void;
 } & AnyInputStepDollars;
+export type FieldArg = {
+  /** @deprecated Use bakedInput() step instead. */
+  get?: never;
+  getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
+  typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
+  /** This also works (without path) to apply each list entry against $target */
+  apply<TArg extends object>(
+    $target: ApplyableExecutableStep<TArg>,
+    path?: string | ReadonlyArray<string | number>,
+    getTargetFromParent?: (parent: TArg) => object,
+  ): void;
+  apply<TArg extends object>(
+    $target: ApplyableExecutableStep<TArg>,
+    getTargetFromParent: (parent: TArg) => object,
+    // TYPES: Really not sure why TypeScript requires this here?
+    justTargetFromParent?: never,
+  ): void;
+};
 
 export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
   GraphQLInputType extends TInputType
@@ -371,7 +391,7 @@ export type ArgumentApplyPlanResolver<
 > = (
   $parentPlan: TParentStep,
   $fieldPlan: TFieldStep,
-  input: FieldArgs,
+  input: FieldArg,
   info: {
     schema: GraphQLSchema;
     arg: GraphQLArgument;
