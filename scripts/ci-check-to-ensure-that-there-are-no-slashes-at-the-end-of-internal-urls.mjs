@@ -75,4 +75,7 @@ function wrongLinkCheck(link) {
     }
   }
   console.log(wrongLinks);
+  if (wrongLinks.length !== 0) {
+    process.exitCode = 1;
+  }
 })();
