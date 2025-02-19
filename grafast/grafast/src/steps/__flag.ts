@@ -18,7 +18,7 @@ import {
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep,Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -54,7 +54,7 @@ export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Error | null;
-  if?: ExecutableStep<boolean>;
+  if?: Step<boolean>;
   // Trapping an error might want to result in a null or an empty list.
   valueForInhibited?: TrapValue;
   valueForError?: TrapValue;
@@ -89,7 +89,7 @@ function resolveTrapValue(tv: TrapValue): ResolvedTrapValue {
   }
 }
 
-export class __FlagStep<TData> extends ExecutableStep<TData> {
+export class __FlagStep<TData> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__FlagStep",
@@ -102,7 +102,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   private valueForInhibited: ResolvedTrapValue;
   private valueForError: ResolvedTrapValue;
   private canBeInlined: boolean;
-  constructor(step: ExecutableStep, options: FlagStepOptions) {
+  constructor(step: Step, options: FlagStepOptions) {
     super();
     const {
       acceptFlags = DEFAULT_ACCEPT_FLAGS,
@@ -147,16 +147,14 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       $if ? `if(${$if.id}), ` : ``
     }${digestAcceptFlags(acceptFlags)}, onReject: ${rej}`;
   }
-  [$$deepDepSkip](): ExecutableStep {
+  [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
   listItem?: (
-    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
-  ) => ExecutableStep;
+    $item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>,
+  ) => Step;
   // Copied over listItem if the dependent step is a list capable step
-  _listItem(
-    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
-  ) {
+  _listItem($item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
@@ -196,9 +194,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     return null;
   }
 
-  public deduplicate(
-    _peers: readonly ExecutableStep<any>[],
-  ): readonly ExecutableStep<any>[] {
+  public deduplicate(_peers: readonly Step<any>[]): readonly Step<any>[] {
     return (_peers as __FlagStep<any>[]).filter((p) => {
       // ifDep has already been tested by Grafast (it's a dependency)
       if (p.forbiddenFlags !== this.forbiddenFlags) return false;
@@ -289,7 +285,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
  * since we know they won't exist.
  */
 export function inhibitOnNull<T>(
-  $step: ExecutableStep<T>,
+  $step: Step<T>,
   options?: { if?: FlagStepOptions["if"] },
 ) {
   return new __FlagStep<T>($step, {
@@ -304,7 +300,7 @@ export function inhibitOnNull<T>(
  * data.
  */
 export function assertNotNull<T>(
-  $step: ExecutableStep<T>,
+  $step: Step<T>,
   message: string,
   options?: { if?: FlagStepOptions["if"] },
 ) {
@@ -316,7 +312,7 @@ export function assertNotNull<T>(
 }
 
 export function trap<T>(
-  $step: ExecutableStep<T>,
+  $step: Step<T>,
   acceptFlags: ExecutionEntryFlags,
   options?: {
     valueForInhibited?: FlagStepOptions["valueForInhibited"];
@@ -331,10 +327,7 @@ export function trap<T>(
 }
 
 // Have to overwrite the getDep method due to circular dependency
-(ExecutableStep.prototype as any).getDep = function (
-  this: ExecutableStep,
-  depId: number,
-) {
+(Step.prototype as any).getDep = function (this: Step, depId: number) {
   const { step, acceptFlags, onReject } = this.getDepOptions(depId);
   if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
     return step;

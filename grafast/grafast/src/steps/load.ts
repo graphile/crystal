@@ -7,7 +7,7 @@ import type {
 } from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { isMultistep, multistep } from "../multistep.js";
-import { ExecutableStep, isListLikeStep, isObjectLikeStep } from "../step.js";
+import { isListLikeStep, isObjectLikeStep,Step } from "../step.js";
 import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
 import { access } from "./access.js";
 
@@ -98,7 +98,7 @@ let loadCounter = 0;
 export class LoadedRecordStep<
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-> extends ExecutableStep<TItem> {
+> extends Step<TItem> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LoadedRecordStep",
@@ -109,11 +109,11 @@ export class LoadedRecordStep<
   attributes = new Set<keyof TItem>();
   params: Partial<TParams> = Object.create(null);
   constructor(
-    $data: ExecutableStep<TItem>,
+    $data: Step<TItem>,
     private isSingle: boolean,
     private sourceDescription: string,
     // Only safe to reference this during planning phase
-    private ioEquivalence: Record<string, ExecutableStep>,
+    private ioEquivalence: Record<string, Step>,
   ) {
     super();
     this.addDependency($data);
@@ -183,7 +183,7 @@ export class LoadStep<
   TData extends TItem | ReadonlyArray<TItem>,
   TParams extends Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
-> extends ExecutableStep {
+> extends Step {
   /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
@@ -222,7 +222,7 @@ export class LoadStep<
   toStringMeta() {
     return this.load.displayName || this.load.name;
   }
-  private makeAccessMap(): Record<string, ExecutableStep> {
+  private makeAccessMap(): Record<string, Step> {
     const map = Object.create(null);
     const $spec = this.getDep(0);
     if (this.ioEquivalence == null) {

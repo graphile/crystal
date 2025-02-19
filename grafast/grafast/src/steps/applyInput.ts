@@ -8,8 +8,8 @@ import {
 } from "graphql";
 
 import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { constant, ConstantStep, operationPlan } from "./index.js";
 
 let currentModifiers: Modifier<any>[] = [];
@@ -19,7 +19,7 @@ let inputArgsApplyDepth = 0;
 export class ApplyInputStep<
   TParent extends object = any,
   TTarget extends object = TParent,
-> extends UnbatchedExecutableStep<(arg: TParent) => void> {
+> extends UnbatchedStep<(arg: TParent) => void> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ApplyInputStep",
@@ -304,12 +304,12 @@ function processAfter(
 export type ApplyableExecutableStep<
   TArg extends object = any,
   TData = any,
-> = ExecutableStep<TData> & {
-  apply($apply: ExecutableStep<(arg: TArg) => void>): void;
+> = Step<TData> & {
+  apply($apply: Step<(arg: TArg) => void>): void;
 };
 
 export function isApplyableStep<TArg extends object = any, TData = any>(
-  s: ExecutableStep<TData>,
+  s: Step<TData>,
 ): s is ApplyableExecutableStep<TArg, TData> {
   return typeof (s as any).apply === "function";
 }

@@ -5,7 +5,7 @@ import type {
   GrafastResultStreamList,
   GrafastSubscriber,
 } from "../interfaces.js";
-import { ExecutableStep, isExecutableStep } from "../step.js";
+import { isExecutableStep,Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 
@@ -17,8 +17,8 @@ import { constant } from "./constant.js";
 export class ListenStep<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,
-  TPayloadStep extends ExecutableStep,
-> extends ExecutableStep<TTopics[TTopic][]> {
+  TPayloadStep extends Step,
+> extends Step<TTopics[TTopic][]> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ListenStep",
@@ -37,10 +37,10 @@ export class ListenStep<
 
   constructor(
     pubsubOrPlan:
-      | ExecutableStep<GrafastSubscriber<TTopics> | null>
+      | Step<GrafastSubscriber<TTopics> | null>
       | GrafastSubscriber<TTopics>
       | null,
-    topicOrPlan: ExecutableStep<TTopic> | string,
+    topicOrPlan: Step<TTopic> | string,
     public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
       $item,
     ) => $item as any,
@@ -95,13 +95,13 @@ export class ListenStep<
 export function listen<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,
-  TPayloadStep extends ExecutableStep,
+  TPayloadStep extends Step,
 >(
   pubsubOrPlan:
-    | ExecutableStep<GrafastSubscriber<TTopics> | null>
+    | Step<GrafastSubscriber<TTopics> | null>
     | GrafastSubscriber<TTopics>
     | null,
-  topicOrPlan: ExecutableStep<TTopic> | string,
+  topicOrPlan: Step<TTopic> | string,
   itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
   return new ListenStep<TTopics, TTopic, TPayloadStep>(

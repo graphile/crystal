@@ -1,5 +1,5 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "..";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 
 const unaryOperators = ["null", "not null", "exists", "not exists"] as const;
 type UnaryOperator = (typeof unaryOperators)[number];
@@ -7,7 +7,7 @@ const binaryOperators = ["===", "!=="] as const;
 type BinaryOperator = (typeof binaryOperators)[number];
 type Operator = UnaryOperator | BinaryOperator;
 
-export class ConditionStep extends UnbatchedExecutableStep<boolean> {
+export class ConditionStep extends UnbatchedStep<boolean> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConditionStep",

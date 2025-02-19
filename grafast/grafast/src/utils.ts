@@ -34,7 +34,7 @@ import type {
   GrafastInputFieldConfig,
   OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutableStep } from "./step.js";
+import type { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
 
 const {
@@ -333,18 +333,18 @@ export function arraysMatch<T>(
   return true;
 }
 
-export type ObjectTypeFields<TParentStep extends ExecutableStep> = {
+export type ObjectTypeFields<TParentStep extends Step> = {
   [key: string]: GrafastFieldConfig<GraphQLOutputType, TParentStep, any, any>;
 };
 
 export type ObjectTypeSpec<
-  TParentStep extends ExecutableStep,
+  TParentStep extends Step,
   TFields extends ObjectTypeFields<TParentStep>,
 > = Omit<GraphQLObjectTypeConfig<any, Grafast.Context>, "fields"> & {
   fields: TFields | (() => TFields);
-  assertStep?: TParentStep extends ExecutableStep
+  assertStep?: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
 };
@@ -353,7 +353,7 @@ export type ObjectTypeSpec<
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectSpec<
-  TParentStep extends ExecutableStep,
+  TParentStep extends Step,
   TFields extends ObjectTypeFields<TParentStep>,
 >(
   spec: ObjectTypeSpec<TParentStep, TFields>,
@@ -392,19 +392,20 @@ export function objectSpec<
 }
 
 export type GrafastObjectType<
-  TParentStep extends ExecutableStep,
+  TParentStep extends Step,
   TFields extends ObjectTypeFields<TParentStep>,
-> = graphql.GraphQLObjectType<
-  TParentStep extends ExecutableStep<infer U> ? U : never
-> & { TParentStep: TParentStep; TFields: TFields };
+> = graphql.GraphQLObjectType<TParentStep extends Step<infer U> ? U : never> & {
+  TParentStep: TParentStep;
+  TFields: TFields;
+};
 
 /**
  * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
  */
-export function newObjectTypeBuilder<TParentStep extends ExecutableStep>(
-  assertStep: TParentStep extends ExecutableStep
+export function newObjectTypeBuilder<TParentStep extends Step>(
+  assertStep: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : never,
 ): <TFields extends ObjectTypeFields<TParentStep>>(
@@ -420,8 +421,8 @@ export function newObjectTypeBuilder<TParentStep extends ExecutableStep>(
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectFieldSpec<
-  TSource extends ExecutableStep,
-  TResult extends ExecutableStep = ExecutableStep,
+  TSource extends Step,
+  TResult extends Step = Step,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   grafastSpec: GrafastFieldConfig<GraphQLOutputType, TSource, TResult, TArgs>,
@@ -482,9 +483,7 @@ export function objectFieldSpec<
  *
  * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
  */
-export function newGrafastFieldConfigBuilder<
-  TParentStep extends ExecutableStep,
->(): <
+export function newGrafastFieldConfigBuilder<TParentStep extends Step>(): <
   TType extends GraphQLOutputType,
   TFieldStep extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
@@ -850,14 +849,14 @@ export function isTypePlanned(
  *
  * @internal
  */
-export type Sudo<T> = T extends ExecutableStep<any>
+export type Sudo<T> = T extends Step<any>
   ? T & {
-      dependencies: ReadonlyArray<ExecutableStep>;
-      implicitSideEffectStep: ExecutableStep | null;
+      dependencies: ReadonlyArray<Step>;
+      implicitSideEffectStep: Step | null;
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
       dependencyOnReject: ReadonlyArray<Error | null | undefined>;
       defaultForbiddenFlags: ExecutionEntryFlags;
-      getDepOptions: ExecutableStep["getDepOptions"];
+      getDepOptions: Step["getDepOptions"];
     }
   : T;
 
@@ -885,10 +884,7 @@ export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
  * Returns `true` if the first argument depends on the second argument either
  * directly or indirectly (via a chain of dependencies).
  */
-export function stepADependsOnStepB(
-  stepA: ExecutableStep,
-  stepB: ExecutableStep,
-): boolean {
+export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
@@ -915,10 +911,7 @@ export function stepADependsOnStepB(
  * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
  * mostly relates to heirarchy.)
  */
-export function stepAMayDependOnStepB(
-  $a: ExecutableStep,
-  $b: ExecutableStep,
-): boolean {
+export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
   if ($a.isFinalized) {
     return false;
   }
@@ -958,10 +951,7 @@ export function stepAMayDependOnStepB(
  * approach. Once you have, you can use this function to help you, should you
  * need it.
  */
-export function stepsAreInSamePhase(
-  ancestor: ExecutableStep,
-  descendent: ExecutableStep,
-) {
+export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
   do {
     if (currentLayerPlan === ancestor.layerPlan) {
@@ -1033,11 +1023,11 @@ export function assertNotPromise<TVal>(
 }
 
 export function hasItemPlan(
-  step: ExecutableStep & {
-    itemPlan?: ($item: ExecutableStep) => ExecutableStep;
+  step: Step & {
+    itemPlan?: ($item: Step) => Step;
   },
-): step is ExecutableStep & {
-  itemPlan: ($item: ExecutableStep) => ExecutableStep;
+): step is Step & {
+  itemPlan: ($item: Step) => Step;
 } {
   return "itemPlan" in step && typeof step.itemPlan === "function";
 }
@@ -1099,7 +1089,7 @@ export function directiveArgument<T>(
     | graphql.Kind.FLOAT
     | graphql.Kind.BOOLEAN
     | graphql.Kind.STRING,
-): ExecutableStep<T> | undefined {
+): Step<T> | undefined {
   const arg = directive.arguments?.find((n) => n.name.value === argName);
   if (!arg) return undefined;
   const val = arg.value;
