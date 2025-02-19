@@ -45,7 +45,7 @@ function wrongLinkCheck(link) {
 }
 
 (async () => {
-  let allFiles = new Array();
+  let allFiles = [];
   for (const directory of WEBSITE_FOLDERS) {
     const fileStructure = await walkDir(directory);
     const fileStructureFiltered = fileStructure.filter(
@@ -59,12 +59,12 @@ function wrongLinkCheck(link) {
     const data = await readFileAsync(file);
     const matches = [...data.matchAll(regex)];
 
-    let links = new Array();
+    let links = [];
 
     matches.forEach((match) => {
       links.push(match[2]);
     });
-    let localwrongLinks = new Array();
+    let localwrongLinks = [];
     for (const link of links) {
       if (wrongLinkCheck(link)) {
         localwrongLinks.push(link);
