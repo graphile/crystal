@@ -87,7 +87,7 @@ export function makeAddPgTableConditionPlugin(
             // build applyPlan
             conditionFieldSpec.apply = EXPORTABLE(
               (build, conditionGenerator, sql, sqlValueWithCodec) =>
-                function applyPlan(condition: PgCondition, val) {
+                function apply(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
                     sql,
                     sqlTableAlias: condition.alias,
