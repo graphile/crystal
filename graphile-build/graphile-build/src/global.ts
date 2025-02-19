@@ -658,13 +658,6 @@ declare global {
     interface ContextObjectFieldsFieldArgs
       extends Omit<ContextObjectFieldsField, "fieldWitHHooks"> {
       scope: ScopeObjectFieldsFieldArgs;
-      addToPlanResolver<
-        _TArgs extends BaseGraphQLArguments,
-        TParentStep extends ExecutableStep | null,
-        TResultStep extends ExecutableStep,
-      >(
-        cb: PostPlanResolver<_TArgs, TParentStep, TResultStep>,
-      ): void;
     }
 
     interface ScopeObjectFieldsFieldArgsArg extends ScopeObjectFieldsFieldArgs {

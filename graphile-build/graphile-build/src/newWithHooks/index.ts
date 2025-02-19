@@ -254,18 +254,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
-                const postPlanResolvers: PostPlanResolver<any, any, any>[] = [];
-                exportNameHint(
-                  postPlanResolvers,
-                  `${Self.name}_${fieldName}_postPlanResolvers`,
-                );
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
-                  {
-                    ...fieldContext,
-                    addToPlanResolver(cb) {
-                      postPlanResolvers.push(cb);
-                    },
-                  };
+                  { ...fieldContext };
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
                   args: builder.applyHooks(
@@ -299,24 +289,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     build,
                     argContext,
                     `|${typeName}.fields.${fieldName}.args.${argName}`,
-                  );
-                }
-
-                if (postPlanResolvers.length > 0) {
-                  const basePlan = finalFieldSpec.plan ?? defaultPlanResolver;
-                  if (basePlan !== defaultPlanResolver) {
-                    exportNameHint(basePlan, `${Self.name}_${fieldName}_plan`);
-                  }
-                  finalFieldSpec.plan = EXPORTABLE(
-                    (basePlan, postPlanResolvers) =>
-                      ($parent, fieldArgs, info) => {
-                        let $result = basePlan($parent, fieldArgs, info);
-                        for (const ppr of postPlanResolvers) {
-                          $result = ppr($result, $parent, fieldArgs, info);
-                        }
-                        return $result;
-                      },
-                    [basePlan, postPlanResolvers],
                   );
                 }
 
