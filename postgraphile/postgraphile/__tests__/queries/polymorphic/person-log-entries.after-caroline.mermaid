@@ -11,9 +11,8 @@ graph TD
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
     Constant35{{"Constant[35∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Lambda15{{"Lambda[15∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant35 & Constant7 & Constant7 & Lambda15 --> Connection14
+    Constant35 & Lambda15 --> Connection14
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -26,7 +25,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant37{{"Constant[37∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Connection14 & Lambda15 & Constant35 & Constant7 & Constant7 --> PgSelect17
+    Object13 & Connection14 & Lambda15 & Constant35 --> PgSelect17
     PgSelectRows18[["PgSelectRows[18∈1] ➊"]]:::plan
     PgSelect17 --> PgSelectRows18
     Access33{{"Access[33∈1] ➊<br />ᐸ17.cursorDetailsᐳ"}}:::plan
@@ -37,7 +36,7 @@ graph TD
     __Item19 --> PgSelectSingle20
     PgSelect23[["PgSelect[23∈3]<br />ᐸlog_entriesᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object13 & PgClassExpression22 & Constant37 & Constant7 --> PgSelect23
+    Object13 & PgClassExpression22 & Constant37 --> PgSelect23
     PgCursor34{{"PgCursor[34∈3]"}}:::plan
     PgSelectSingle20 & Access33 --> PgCursor34
     PgSelectSingle20 --> PgClassExpression22
@@ -59,7 +58,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries.after-caroline"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access11,Access12,Object13,Connection14,Lambda15,Constant35,Constant36,Constant37 bucket0
+    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda15,Constant35,Constant36,Constant37 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 35, 7, 37<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17]<br />ᐳ: Access[33]<br />2: PgSelectRows[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows18,Access33 bucket1

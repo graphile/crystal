@@ -10,26 +10,26 @@ graph TD
 
     %% plan dependencies
     __InputObject38{{"__InputObject[38∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant56{{"Constant[56∈0] ➊<br />ᐸ'a1'ᐳ"}}:::plan
     Constant57{{"Constant[57∈0] ➊<br />ᐸ'b2'ᐳ"}}:::plan
     Constant58{{"Constant[58∈0] ➊<br />ᐸ'c4'ᐳ"}}:::plan
     Constant59{{"Constant[59∈0] ➊<br />ᐸ'Qux'ᐳ"}}:::plan
-    Constant7 & Constant56 & Constant57 & Constant58 & Constant59 --> __InputObject38
+    Constant56 & Constant57 & Constant58 & Constant59 --> __InputObject38
     __InputObject21{{"__InputObject[21∈0] ➊"}}:::plan
     Constant54{{"Constant[54∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
     Constant55{{"Constant[55∈0] ➊<br />ᐸ'One does like to see the letter C'ᐳ"}}:::plan
-    Constant7 & Constant54 & Constant54 & Constant55 --> __InputObject21
+    Constant55 --> __InputObject21
+    Constant54 -- 2 --> __InputObject21
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & Constant54 --> __InputObject6
+    Constant54 --> __InputObject6
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
-    Constant7 & __InputObject21 --> __InputObject19
+    __InputObject21 --> __InputObject19
     __InputObject36{{"__InputObject[36∈0] ➊"}}:::plan
-    Constant7 & __InputObject38 --> __InputObject36
+    __InputObject38 --> __InputObject36
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
@@ -98,7 +98,7 @@ graph TD
     subgraph "Buckets for mutations/v4/enum_tables.mutations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput13,__InputObject19,__InputObject21,ApplyInput29,__InputObject36,__InputObject38,ApplyInput53,Constant54,Constant55,Constant56,Constant57,Constant58,Constant59 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,__InputObject19,__InputObject21,ApplyInput29,__InputObject36,__InputObject38,ApplyInput53,Constant54,Constant55,Constant56,Constant57,Constant58,Constant59 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 54, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9,Object14 bucket1

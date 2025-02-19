@@ -10,29 +10,28 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant305{{"Constant[305∈0] ➊<br />ᐸ10ᐳ"}}:::plan
     Constant306{{"Constant[306∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant7 & Constant305 & Constant306 --> __InputObject6
+    Constant305 & Constant306 --> __InputObject6
     __InputObject45{{"__InputObject[45∈0] ➊"}}:::plan
     Constant307{{"Constant[307∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant308{{"Constant[308∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
-    Constant7 & Constant307 & Constant308 --> __InputObject45
+    Constant307 & Constant308 --> __InputObject45
     __InputObject97{{"__InputObject[97∈0] ➊"}}:::plan
-    Constant7 & Constant307 & Constant308 --> __InputObject97
+    Constant307 & Constant308 --> __InputObject97
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
     __InputObject20{{"__InputObject[20∈0] ➊"}}:::plan
-    Constant7 & Constant305 --> __InputObject20
+    Constant305 --> __InputObject20
     __InputObject160{{"__InputObject[160∈0] ➊"}}:::plan
-    Constant7 & Constant305 --> __InputObject160
+    Constant305 --> __InputObject160
     __InputObject278{{"__InputObject[278∈0] ➊"}}:::plan
     Constant309{{"Constant[309∈0] ➊<br />ᐸ20ᐳ"}}:::plan
-    Constant7 & Constant309 --> __InputObject278
+    Constant309 --> __InputObject278
     __InputObject292{{"__InputObject[292∈0] ➊"}}:::plan
-    Constant7 & Constant309 --> __InputObject292
+    Constant309 --> __InputObject292
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
@@ -41,7 +40,6 @@ graph TD
     ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
     __InputObject20 --> ApplyInput32
     __InputObject33{{"__InputObject[33∈0] ➊"}}:::plan
-    Constant7 --> __InputObject33
     ApplyInput44{{"ApplyInput[44∈0] ➊"}}:::plan
     __InputObject33 --> ApplyInput44
     ApplyInput57{{"ApplyInput[57∈0] ➊"}}:::plan
@@ -49,37 +47,29 @@ graph TD
     ApplyInput105{{"ApplyInput[105∈0] ➊"}}:::plan
     __InputObject97 --> ApplyInput105
     __InputObject148{{"__InputObject[148∈0] ➊"}}:::plan
-    Constant7 --> __InputObject148
     ApplyInput157{{"ApplyInput[157∈0] ➊"}}:::plan
     __InputObject148 --> ApplyInput157
     ApplyInput171{{"ApplyInput[171∈0] ➊"}}:::plan
     __InputObject160 --> ApplyInput171
     __InputObject184{{"__InputObject[184∈0] ➊"}}:::plan
-    Constant7 --> __InputObject184
     ApplyInput191{{"ApplyInput[191∈0] ➊"}}:::plan
     __InputObject184 --> ApplyInput191
     __InputObject197{{"__InputObject[197∈0] ➊"}}:::plan
-    Constant7 --> __InputObject197
     ApplyInput207{{"ApplyInput[207∈0] ➊"}}:::plan
     __InputObject197 --> ApplyInput207
     __InputObject210{{"__InputObject[210∈0] ➊"}}:::plan
-    Constant7 --> __InputObject210
     ApplyInput217{{"ApplyInput[217∈0] ➊"}}:::plan
     __InputObject210 --> ApplyInput217
     __InputObject222{{"__InputObject[222∈0] ➊"}}:::plan
-    Constant7 --> __InputObject222
     ApplyInput232{{"ApplyInput[232∈0] ➊"}}:::plan
     __InputObject222 --> ApplyInput232
     __InputObject237{{"__InputObject[237∈0] ➊"}}:::plan
-    Constant7 --> __InputObject237
     ApplyInput244{{"ApplyInput[244∈0] ➊"}}:::plan
     __InputObject237 --> ApplyInput244
     __InputObject252{{"__InputObject[252∈0] ➊"}}:::plan
-    Constant7 --> __InputObject252
     ApplyInput263{{"ApplyInput[263∈0] ➊"}}:::plan
     __InputObject252 --> ApplyInput263
     __InputObject264{{"__InputObject[264∈0] ➊"}}:::plan
-    Constant7 --> __InputObject264
     ApplyInput274{{"ApplyInput[274∈0] ➊"}}:::plan
     __InputObject264 --> ApplyInput274
     ApplyInput286{{"ApplyInput[286∈0] ➊"}}:::plan
@@ -154,7 +144,6 @@ graph TD
     Object56{{"Object[56∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle55 --> Object56
     Connection87{{"Connection[87∈8] ➊<br />ᐸ83ᐳ"}}:::plan
-    Constant7 & Constant7 & Constant7 --> Connection87
     PgSelect60[["PgSelect[60∈9] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
     PgClassExpression59{{"PgClassExpression[59∈9] ➊<br />ᐸ__mutation...plex__.”y”ᐳ"}}:::plan
     Object52 & PgClassExpression59 --> PgSelect60
@@ -185,7 +174,7 @@ graph TD
     PgSelectSingle66 --> PgClassExpression69
     PgSelect89[["PgSelect[89∈11] ➊<br />ᐸpostᐳ"]]:::plan
     PgClassExpression77{{"PgClassExpression[77∈11] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object52 & PgClassExpression77 & Connection87 & Constant7 & Constant7 & Constant7 --> PgSelect89
+    Object52 & PgClassExpression77 & Connection87 --> PgSelect89
     List78{{"List[78∈11] ➊<br />ᐸ76,77ᐳ"}}:::plan
     Constant76 & PgClassExpression77 --> List78
     PgSelectSingle75 --> PgClassExpression77
@@ -216,7 +205,6 @@ graph TD
     Object104{{"Object[104∈14] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect100 --> Object104
     Connection138{{"Connection[138∈15] ➊<br />ᐸ134ᐳ"}}:::plan
-    Constant7 & Constant7 & Constant7 --> Connection138
     PgSelectRows106[["PgSelectRows[106∈15] ➊"]]:::plan
     PgSelect100 --> PgSelectRows106
     __Item107[/"__Item[107∈16]<br />ᐸ106ᐳ"\]:::itemplan
@@ -253,7 +241,7 @@ graph TD
     PgSelectSingle117 --> PgClassExpression120
     PgSelect140[["PgSelect[140∈19]<br />ᐸpostᐳ"]]:::plan
     PgClassExpression128{{"PgClassExpression[128∈19]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object103 & PgClassExpression128 & Connection138 & Constant7 & Constant7 & Constant7 --> PgSelect140
+    Object103 & PgClassExpression128 & Connection138 --> PgSelect140
     List129{{"List[129∈19]<br />ᐸ76,128ᐳ"}}:::plan
     Constant76 & PgClassExpression128 --> List129
     PgSelectSingle126 --> PgClassExpression128
@@ -513,7 +501,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-return-types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access11,Access12,Object13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput44,__InputObject45,ApplyInput57,Constant76,Constant93,__InputObject97,ApplyInput105,__InputObject148,ApplyInput157,__InputObject160,ApplyInput171,__InputObject184,ApplyInput191,__InputObject197,ApplyInput207,__InputObject210,ApplyInput217,__InputObject222,ApplyInput232,__InputObject237,ApplyInput244,__InputObject252,ApplyInput263,__InputObject264,ApplyInput274,__InputObject278,ApplyInput286,__InputObject292,ApplyInput300,Constant305,Constant306,Constant307,Constant308,Constant309 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access11,Access12,Object13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput44,__InputObject45,ApplyInput57,Constant76,Constant93,__InputObject97,ApplyInput105,__InputObject148,ApplyInput157,__InputObject160,ApplyInput171,__InputObject184,ApplyInput191,__InputObject197,ApplyInput207,__InputObject210,ApplyInput217,__InputObject222,ApplyInput232,__InputObject237,ApplyInput244,__InputObject252,ApplyInput263,__InputObject264,ApplyInput274,__InputObject278,ApplyInput286,__InputObject292,ApplyInput300,Constant305,Constant306,Constant307,Constant308,Constant309 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 305, 306, 19<br /><br />1: PgSelect[10]<br />2: PgSelectRows[15]<br />ᐳ: 14, 16, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect10,First14,PgSelectRows15,PgSelectSingle16,PgClassExpression17,Object18 bucket1

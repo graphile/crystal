@@ -10,10 +10,7 @@ graph TD
 
     %% plan dependencies
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection12
     Connection26{{"Connection[26∈0] ➊<br />ᐸ24ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection26
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -23,7 +20,7 @@ graph TD
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object11 & Connection12 & Constant6 & Constant6 & Constant6 --> PgSelect14
+    Object11 & Connection12 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     Access18{{"Access[18∈1] ➊<br />ᐸ14.cursorDetailsᐳ"}}:::plan
@@ -41,7 +38,7 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression22
     PgSelect28[["PgSelect[28∈4] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object11 & Connection26 & Constant6 & Constant6 & Constant6 --> PgSelect28
+    Object11 & Connection26 --> PgSelect28
     PgSelectRows29[["PgSelectRows[29∈4] ➊"]]:::plan
     PgSelect28 --> PgSelectRows29
     Access32{{"Access[32∈4] ➊<br />ᐸ28.cursorDetailsᐳ"}}:::plan
@@ -64,7 +61,7 @@ graph TD
     subgraph "Buckets for queries/v4/view"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access9,Access10,Object11,Connection12,Connection26 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection26 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[18]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access18 bucket1

@@ -10,7 +10,6 @@ graph TD
 
     %% plan dependencies
     __InputObject649{{"__InputObject[649∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant1208{{"Constant[1208∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant1209{{"Constant[1209∈0] ➊<br />ᐸ'1'ᐳ"}}:::plan
     Constant1210{{"Constant[1210∈0] ➊<br />ᐸtrueᐳ"}}:::plan
@@ -50,7 +49,10 @@ graph TD
     Constant718{{"Constant[718∈0] ➊<br />ᐸ[ ᐸBuffer 01 a0 5b 09 c0 ddᐳ, ᐸBuffer 01 a0 5bᐳ ]ᐳ"}}:::plan
     Constant1239{{"Constant[1239∈0] ➊<br />ᐸ'Foo.Bar.Baz'ᐳ"}}:::plan
     Constant720{{"Constant[720∈0] ➊<br />ᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ"}}:::plan
-    Constant7 & Constant1208 & Constant1209 & Constant1209 & Constant1209 & Constant1210 & Constant1209 & Constant1211 & Constant657 & Constant1208 & Constant1208 & Constant660 & Constant1212 & Constant1213 & __InputObject663 & __InputObject670 & __InputObject677 & Constant1218 & Constant1219 & Constant1220 & Constant1221 & Constant1221 & __InputObject689 & Constant691 & Constant1222 & __InputObject693 & __InputObject695 & __InputObject698 & __InputObject701 & Constant1227 & Constant1228 & Constant1229 & Constant1230 & Constant1231 & Constant1232 & Constant1233 & Constant1234 & Constant1235 & Constant1236 & Constant1237 & Constant715 & Constant716 & Constant1238 & Constant718 & Constant1239 & Constant720 --> __InputObject649
+    Constant1210 & Constant1211 & Constant657 & Constant660 & Constant1212 & Constant1213 & __InputObject663 & __InputObject670 & __InputObject677 & Constant1218 & Constant1219 & Constant1220 & __InputObject689 & Constant691 & Constant1222 & __InputObject693 & __InputObject695 & __InputObject698 & __InputObject701 & Constant1227 & Constant1228 & Constant1229 & Constant1230 & Constant1231 & Constant1232 & Constant1233 & Constant1234 & Constant1235 & Constant1236 & Constant1237 & Constant715 & Constant716 & Constant1238 & Constant718 & Constant1239 & Constant720 --> __InputObject649
+    Constant1208 -- 3 --> __InputObject649
+    Constant1209 -- 4 --> __InputObject649
+    Constant1221 -- 2 --> __InputObject649
     __InputObject934{{"__InputObject[934∈0] ➊"}}:::plan
     Constant942{{"Constant[942∈0] ➊<br />ᐸ[ 'red', 'green', 'blue' ]ᐳ"}}:::plan
     Constant945{{"Constant[945∈0] ➊<br />ᐸ[ 'Hi' ]ᐳ"}}:::plan
@@ -65,12 +67,15 @@ graph TD
     __InputObject980{{"__InputObject[980∈0] ➊"}}:::plan
     __InputObject983{{"__InputObject[983∈0] ➊"}}:::plan
     Constant995{{"Constant[995∈0] ➊<br />ᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ"}}:::plan
-    Constant7 & Constant1208 & Constant1209 & Constant1209 & Constant1209 & Constant1210 & Constant1209 & Constant1211 & Constant942 & Constant1208 & Constant1208 & Constant945 & Constant1240 & Constant1241 & __InputObject948 & __InputObject955 & __InputObject962 & Constant1218 & Constant1219 & Constant1220 & Constant1221 & Constant1221 & __InputObject974 & Constant976 & Constant1222 & __InputObject978 & __InputObject980 & __InputObject983 & Constant1230 & Constant1231 & Constant1232 & Constant1233 & Constant1234 & Constant1235 & Constant1236 & Constant1237 & Constant1239 & Constant995 --> __InputObject934
+    Constant1210 & Constant1211 & Constant942 & Constant945 & Constant1240 & Constant1241 & __InputObject948 & __InputObject955 & __InputObject962 & Constant1218 & Constant1219 & Constant1220 & __InputObject974 & Constant976 & Constant1222 & __InputObject978 & __InputObject980 & __InputObject983 & Constant1230 & Constant1231 & Constant1232 & Constant1233 & Constant1234 & Constant1235 & Constant1236 & Constant1237 & Constant1239 & Constant995 --> __InputObject934
+    Constant1208 -- 3 --> __InputObject934
+    Constant1209 -- 4 --> __InputObject934
+    Constant1221 -- 2 --> __InputObject934
     __InputObject646{{"__InputObject[646∈0] ➊"}}:::plan
     Constant1207{{"Constant[1207∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant7 & Constant1207 & __InputObject649 --> __InputObject646
+    Constant1207 & __InputObject649 --> __InputObject646
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & Constant1207 --> __InputObject6
+    Constant1207 --> __InputObject6
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -94,11 +99,11 @@ graph TD
     Constant1208 & Constant1210 --> __InputObject678
     Constant1217{{"Constant[1217∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant1217 & Constant1210 --> __InputObject681
-    Constant7 & Constant1222 --> __InputObject689
-    Constant1208 & Constant7 --> __InputObject693
+    Constant1222 --> __InputObject689
+    Constant1208 --> __InputObject693
     __InputObject696{{"__InputObject[696∈0] ➊"}}:::plan
-    __InputObject696 & Constant7 --> __InputObject695
-    Constant1208 & Constant7 --> __InputObject696
+    __InputObject696 --> __InputObject695
+    Constant1208 --> __InputObject696
     Constant1223{{"Constant[1223∈0] ➊<br />ᐸ99ᐳ"}}:::plan
     Constant1224{{"Constant[1224∈0] ➊<br />ᐸ77ᐳ"}}:::plan
     Constant1223 & Constant1224 --> __InputObject698
@@ -106,7 +111,7 @@ graph TD
     Constant1226{{"Constant[1226∈0] ➊<br />ᐸ42ᐳ"}}:::plan
     Constant1225 & Constant1226 --> __InputObject701
     __InputObject932{{"__InputObject[932∈0] ➊"}}:::plan
-    Constant7 & __InputObject934 --> __InputObject932
+    __InputObject934 --> __InputObject932
     __InputObject949{{"__InputObject[949∈0] ➊"}}:::plan
     __InputObject952{{"__InputObject[952∈0] ➊"}}:::plan
     __InputObject949 & __InputObject952 --> __InputObject948
@@ -122,11 +127,11 @@ graph TD
     __InputObject963 & __InputObject966 --> __InputObject962
     Constant1208 & Constant1210 --> __InputObject963
     Constant1217 & Constant1210 --> __InputObject966
-    Constant7 & Constant1222 --> __InputObject974
-    Constant1208 & Constant7 --> __InputObject978
+    Constant1222 --> __InputObject974
+    Constant1208 --> __InputObject978
     __InputObject981{{"__InputObject[981∈0] ➊"}}:::plan
-    __InputObject981 & Constant7 --> __InputObject980
-    Constant1208 & Constant7 --> __InputObject981
+    __InputObject981 --> __InputObject980
+    Constant1208 --> __InputObject981
     Constant1223 & Constant1224 --> __InputObject983
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
@@ -134,11 +139,9 @@ graph TD
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput17
     __InputObject220{{"__InputObject[220∈0] ➊"}}:::plan
-    Constant7 --> __InputObject220
     ApplyInput227{{"ApplyInput[227∈0] ➊"}}:::plan
     __InputObject220 --> ApplyInput227
     __InputObject433{{"__InputObject[433∈0] ➊"}}:::plan
-    Constant7 --> __InputObject433
     ApplyInput440{{"ApplyInput[440∈0] ➊"}}:::plan
     __InputObject433 --> ApplyInput440
     ApplyInput725{{"ApplyInput[725∈0] ➊"}}:::plan
@@ -1778,7 +1781,7 @@ graph TD
     subgraph "Buckets for mutations/v4/types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput17,__InputObject220,ApplyInput227,__InputObject433,ApplyInput440,__InputObject646,__InputObject649,Constant657,Constant660,__InputObject663,__InputObject664,__InputObject667,__InputObject670,__InputObject671,__InputObject674,__InputObject677,__InputObject678,__InputObject681,__InputObject689,Constant691,__InputObject693,__InputObject695,__InputObject696,__InputObject698,__InputObject701,Constant715,Constant716,Constant718,Constant720,ApplyInput725,__InputObject932,__InputObject934,Constant942,Constant945,__InputObject948,__InputObject949,__InputObject952,__InputObject955,__InputObject956,__InputObject959,__InputObject962,__InputObject963,__InputObject966,__InputObject974,Constant976,__InputObject978,__InputObject980,__InputObject981,__InputObject983,Constant995,ApplyInput1000,Constant1207,Constant1208,Constant1209,Constant1210,Constant1211,Constant1212,Constant1213,Constant1214,Constant1215,Constant1216,Constant1217,Constant1218,Constant1219,Constant1220,Constant1221,Constant1222,Constant1223,Constant1224,Constant1225,Constant1226,Constant1227,Constant1228,Constant1229,Constant1230,Constant1231,Constant1232,Constant1233,Constant1234,Constant1235,Constant1236,Constant1237,Constant1238,Constant1239,Constant1240,Constant1241 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput17,__InputObject220,ApplyInput227,__InputObject433,ApplyInput440,__InputObject646,__InputObject649,Constant657,Constant660,__InputObject663,__InputObject664,__InputObject667,__InputObject670,__InputObject671,__InputObject674,__InputObject677,__InputObject678,__InputObject681,__InputObject689,Constant691,__InputObject693,__InputObject695,__InputObject696,__InputObject698,__InputObject701,Constant715,Constant716,Constant718,Constant720,ApplyInput725,__InputObject932,__InputObject934,Constant942,Constant945,__InputObject948,__InputObject949,__InputObject952,__InputObject955,__InputObject956,__InputObject959,__InputObject962,__InputObject963,__InputObject966,__InputObject974,Constant976,__InputObject978,__InputObject980,__InputObject981,__InputObject983,Constant995,ApplyInput1000,Constant1207,Constant1208,Constant1209,Constant1210,Constant1211,Constant1212,Constant1213,Constant1214,Constant1215,Constant1216,Constant1217,Constant1218,Constant1219,Constant1220,Constant1221,Constant1222,Constant1223,Constant1224,Constant1225,Constant1226,Constant1227,Constant1228,Constant1229,Constant1230,Constant1231,Constant1232,Constant1233,Constant1234,Constant1235,Constant1236,Constant1237,Constant1238,Constant1239,Constant1240,Constant1241 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 1207, 17<br /><br />1: PgSelect[9]<br />2: PgSelectRows[14]<br />ᐳ: 13, 15, 16"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,First13,PgSelectRows14,PgSelectSingle15,Object16 bucket1
