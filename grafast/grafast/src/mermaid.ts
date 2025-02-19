@@ -271,9 +271,7 @@ export function planToMermaid(
                 normal.push(r);
               }
             }
-            if (normal.length) {
-              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
-            }
+            outputGroupedNormalLinks(graph, planNode, normal);
           }
         } else {
           if (
@@ -305,9 +303,7 @@ export function planToMermaid(
                 normal.push(r);
               }
             }
-            if (normal.length) {
-              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
-            }
+            outputGroupedNormalLinks(graph, planNode, normal);
           }
         }
       }
@@ -453,5 +449,31 @@ function trim(string: string, length = 15): string {
     return string.substring(0, length - 2) + "…";
   } else {
     return string;
+  }
+}
+
+function outputGroupedNormalLinks(
+  graph: string[],
+  planNode: string,
+  normal: string[],
+) {
+  if (normal.length) {
+    const counts: Record<string, number> = Object.create(null);
+    for (const n of normal) {
+      if (counts[n]) {
+        counts[n]++;
+      } else {
+        counts[n] = 1;
+      }
+    }
+    const oners = Object.keys(counts).filter((n) => counts[n] === 1);
+    if (oners.length >= 1) {
+      graph.push(`    ${oners.join(" & ")} --> ${planNode}`);
+    }
+    for (const [n, c] of Object.entries(counts)) {
+      if (c !== 1) {
+        graph.push(`    ${n} -- ${c} --> ${planNode}`);
+      }
+    }
   }
 }
