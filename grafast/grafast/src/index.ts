@@ -117,7 +117,6 @@ import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
-  BaseStep,
   ExecutableStep,
   isExecutableStep,
   isListCapableStep,
@@ -305,7 +304,6 @@ export {
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  BaseStep,
   BatchExecutionValue,
   condition,
   ConditionStep,
