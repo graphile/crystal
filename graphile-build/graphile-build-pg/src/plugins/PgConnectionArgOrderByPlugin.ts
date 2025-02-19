@@ -130,7 +130,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
         } = build;
-        const { scope, Self, addToPlanResolver } = context;
+        const { scope, Self } = context;
         const {
           fieldName,
           isPgFieldConnection,
