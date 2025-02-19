@@ -45,7 +45,7 @@ import type {
   PgQueryBuilder,
   PgSelectQueryBuilderCallback,
   PgSQLCallbackOrDirect,
-  PgTypedExecutableStep,
+  PgTypedStep,
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
@@ -120,7 +120,7 @@ export type PgSelectIdentifierSpec =
       matches: (alias: SQL) => SQL;
     }
   | {
-      step: PgTypedExecutableStep<any>;
+      step: PgTypedStep<any>;
       codec?: PgCodec;
       matches: (alias: SQL) => SQL;
     };
@@ -132,7 +132,7 @@ export type PgSelectArgumentSpec =
       name?: string;
     }
   | {
-      step: PgTypedExecutableStep<any>;
+      step: PgTypedStep<any>;
       name?: string;
     };
 
@@ -648,7 +648,7 @@ export class PgSelectStep<
         const { step, matches } = identifier;
         const codec =
           identifier.codec ||
-          (identifier.step as PgTypedExecutableStep<any>).pgCodec;
+          (identifier.step as PgTypedStep<any>).pgCodec;
         identifierMatches.push({
           expression: matches(this.alias),
           dependencyIndex: this.addDependency(step),

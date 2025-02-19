@@ -125,7 +125,7 @@ export class PgUpdateSingleStep<
       GetPgResourceUniques<TResource>
     >,
     attributes?: {
-      [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+      [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedStep<TAttributes[key]["codec"]>
     },
   ) {
     super();
@@ -193,7 +193,7 @@ export class PgUpdateSingleStep<
 
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: Step, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: Step, // | PgTypedStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -511,7 +511,7 @@ export function pgUpdateSingle<
     GetPgResourceUniques<TResource>
   >,
   attributes?: {
-    [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+    [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedStep<TAttributes[key]["codec"]>
   },
 ): PgUpdateSingleStep<TResource> {
   return new PgUpdateSingleStep(resource, getBy, attributes);

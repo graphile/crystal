@@ -21,7 +21,7 @@ import type {
   PgCodec,
   PgCodecWithAttributes,
   PgQueryBuilder,
-  PgTypedExecutableStep,
+  PgTypedStep,
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -112,7 +112,7 @@ export class PgInsertSingleStep<
     resource: TResource,
     attributes?: {
       [key in keyof GetPgResourceAttributes<TResource>]?:
-        | PgTypedExecutableStep<
+        | PgTypedStep<
             GetPgResourceAttributes<TResource>[key]["codec"]
           >
         | Step;
@@ -143,7 +143,7 @@ export class PgInsertSingleStep<
 
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: Step, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: Step, // | PgTypedStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -425,7 +425,7 @@ export function pgInsertSingle<
   resource: TResource,
   attributes?: {
     [key in keyof GetPgResourceAttributes<TResource>]?:
-      | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
+      | PgTypedStep<GetPgResourceAttributes<TResource>[key]["codec"]>
       | Step;
   },
 ): PgInsertSingleStep<TResource> {
