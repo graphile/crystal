@@ -22,7 +22,7 @@ import type {
   PgCodecRelation,
   PgRegistry,
   PgSQLCallbackOrDirect,
-  PgTypedExecutableStep,
+  PgTypedStep,
 } from "../interfaces.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -71,7 +71,7 @@ export class PgSelectSingleStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
-    PgTypedExecutableStep<
+    PgTypedStep<
       TResource extends PgResource<any, infer UCodec, any, any, any>
         ? UCodec
         : never
@@ -314,15 +314,15 @@ export class PgSelectSingleStep<
 
   public scopedSQL = makeScopedSQL(this);
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: PgTypedStep<any>): SQL;
   public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    $step: ExecutableStep | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
-      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+      : this.getClassStep().placeholder($step as PgTypedStep<any>);
   }
 
   private existingSingleRelation<

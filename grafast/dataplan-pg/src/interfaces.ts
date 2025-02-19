@@ -320,10 +320,10 @@ export interface PgEnumCodec<
 }
 
 /**
- * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
+ * A PgTypedStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<TCodec extends PgCodec> extends Step {
+export interface PgTypedStep<TCodec extends PgCodec> extends Step {
   pgCodec: TCodec;
 }
 
@@ -734,7 +734,7 @@ export type GetPgResourceUniques<
 > = TResource["uniques"];
 
 export type PgSQLCallback<TResult> = (
-  sql: PgSQL<PgTypedExecutableStep<PgCodec>>,
+  sql: PgSQL<PgTypedStep<PgCodec>>,
 ) => TResult;
 export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
 

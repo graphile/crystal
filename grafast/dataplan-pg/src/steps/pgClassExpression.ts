@@ -8,7 +8,7 @@ import type {
   GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
-  PgTypedExecutableStep,
+  PgTypedStep,
 } from "../interfaces.js";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.js";
 import { PgInsertSingleStep } from "./pgInsertSingle.js";
@@ -32,7 +32,7 @@ export class PgClassExpressionStep<
     TResource extends PgResource<any, any, any, any, any>,
   >
   extends UnbatchedStep<any>
-  implements PgTypedExecutableStep<TExpressionCodec>
+  implements PgTypedStep<TExpressionCodec>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -64,7 +64,7 @@ export class PgClassExpressionStep<
     $table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
-    dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
+    dependencies: ReadonlyArray<PgTypedStep<any> | SQL> = [],
     private guaranteedNotNull?: boolean,
   ) {
     super();
@@ -306,7 +306,7 @@ function pgClassExpression<
   guaranteedNotNull?: boolean,
 ): (
   strings: TemplateStringsArray,
-  ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>
+  ...dependencies: ReadonlyArray<PgTypedStep<any> | SQL>
 ) => PgClassExpressionStep<TExpressionCodec, TResource> {
   return (strings, ...dependencies) => {
     return new PgClassExpressionStep(

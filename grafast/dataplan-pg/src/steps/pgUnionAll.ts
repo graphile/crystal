@@ -40,7 +40,7 @@ import type {
   PgOrderSpec,
   PgQueryBuilder,
   PgSQLCallbackOrDirect,
-  PgTypedExecutableStep,
+  PgTypedStep,
   PgUnionAllQueryBuilderCallback,
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
@@ -143,7 +143,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
   match?: {
     [resourceAttributeName: string]:
       | {
-          step: PgTypedExecutableStep<any>;
+          step: PgTypedStep<any>;
           codec?: never;
         }
       | {
@@ -272,15 +272,15 @@ export class PgUnionAllSingleStep
 
   public scopedSQL = makeScopedSQL(this);
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
+  public placeholder($step: PgTypedStep<any>): SQL;
   public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: Step | PgTypedExecutableStep<any>,
+    $step: Step | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
-      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+      : this.getClassStep().placeholder($step as PgTypedStep<any>);
   }
 
   /**

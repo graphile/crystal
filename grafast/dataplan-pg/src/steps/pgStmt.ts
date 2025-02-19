@@ -5,7 +5,7 @@ import { type SQL, sql } from "pg-sql2";
 import type {
   PgCodec,
   PgGroupSpec,
-  PgTypedExecutableStep,
+  PgTypedStep,
 } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
@@ -81,14 +81,14 @@ export abstract class PgStmtBaseStep<T> extends Step<T> {
     return sql.placeholder(symbol, UNHANDLED_DEFERRED);
   }
 
-  public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
+  public placeholder($step: PgTypedStep<PgCodec>): SQL;
   public placeholder(
     $step: Step,
     codec: PgCodec,
     alreadyEncoded?: boolean,
   ): SQL;
   public placeholder(
-    $step: Step | PgTypedExecutableStep<PgCodec>,
+    $step: Step | PgTypedStep<PgCodec>,
     overrideCodec?: PgCodec,
     alreadyEncoded = false,
   ): SQL {
