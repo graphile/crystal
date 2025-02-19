@@ -18,7 +18,6 @@ import {
   access,
   arrayOfLength,
   ConstantStep,
-  ExecutableStep,
   exportAs,
   first,
   isAsyncIterable,
@@ -26,6 +25,7 @@ import {
   isPromiseLike,
   reverseArray,
   SafeError,
+  Step,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
@@ -115,7 +115,7 @@ type PgSelectScopedPlanJoin = PgSQLCallbackOrDirect<PgSelectPlanJoin>;
 
 export type PgSelectIdentifierSpec =
   | {
-      step: ExecutableStep;
+      step: Step;
       codec: PgCodec;
       matches: (alias: SQL) => SQL;
     }
@@ -127,7 +127,7 @@ export type PgSelectIdentifierSpec =
 
 export type PgSelectArgumentSpec =
   | {
-      step: ExecutableStep;
+      step: Step;
       pgCodec: PgCodec<any, any, any, any>;
       name?: string;
     }
@@ -148,7 +148,7 @@ interface QueryValue {
   alreadyEncoded: boolean;
 }
 
-function assertSensible(step: ExecutableStep): void {
+function assertSensible(step: Step): void {
   if (step instanceof PgSelectStep) {
     throw new Error(
       "You passed a PgSelectStep as an identifier, perhaps you forgot to add `.record()`?",
@@ -230,7 +230,7 @@ export interface PgSelectOptions<
   joinAsLateral?: boolean;
 
   /** @internal @experimental */
-  context?: ExecutableStep<PgExecutorContextPlans<any>>;
+  context?: Step<PgExecutorContextPlans<any>>;
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */
@@ -939,9 +939,7 @@ export class PgSelectStep<
   }
 
   apply(
-    $step: ExecutableStep<
-      ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>
-    >,
+    $step: Step<ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>>,
   ) {
     if ($step instanceof ConstantStep) {
       ($step.data as PgSelectQueryBuilderCallback)(this);
@@ -975,7 +973,7 @@ export class PgSelectStep<
     return pgPageInfo($connectionPlan);
   }
 
-  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+  public getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
   }
@@ -1454,7 +1452,7 @@ export class PgSelectStep<
     }
   }
 
-  optimize(): ExecutableStep {
+  optimize(): Step {
     // In case we have any lock actions in future:
     this.lock();
 
@@ -1542,7 +1540,7 @@ export class PgSelectStep<
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
-  row($row: ExecutableStep, options?: PgSelectSinglePlanOptions) {
+  row($row: Step, options?: PgSelectSinglePlanOptions) {
     return new PgSelectSingleStep(this, $row, options);
   }
 
@@ -1560,7 +1558,7 @@ export class PgSelectStep<
    * be called by Grafast.
    */
   listItem(
-    itemPlan: ExecutableStep,
+    itemPlan: Step,
   ): TResource extends PgResource<
     any,
     PgCodec<any, infer UAttributes, any, any, any, any, any>,
@@ -1596,7 +1594,7 @@ export class PgSelectStep<
 
 export class PgSelectRowsStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends ExecutableStep {
+> extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgSelectRowsStep",
@@ -1613,11 +1611,11 @@ export class PgSelectRowsStep<
     return this.getDep<PgSelectStep<TResource>>(0);
   }
 
-  listItem(itemPlan: ExecutableStep) {
+  listItem(itemPlan: Step) {
     return this.getClassStep().listItem(itemPlan);
   }
 
-  public deduplicate(_peers: readonly ExecutableStep[]) {
+  public deduplicate(_peers: readonly Step[]) {
     // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
     return _peers;
   }
@@ -1725,7 +1723,7 @@ export function pgSelectFromRecords<
         >,
         TResource
       >
-    | ExecutableStep<any[]>,
+    | Step<any[]>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
     resource,
@@ -1755,7 +1753,7 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 export function digestsFromArgumentSpecs(
   $placeholderable: {
-    placeholder(step: ExecutableStep, codec: PgCodec): SQL;
+    placeholder(step: Step, codec: PgCodec): SQL;
   },
   specs: PgSelectArgumentSpec[],
   digests: PgSelectArgumentDigest[] = [],

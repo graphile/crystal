@@ -5,14 +5,7 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import {
-  access,
-  ExecutableStep,
-  exportAs,
-  isDev,
-  SafeError,
-  setter,
-} from "grafast";
+import { access, exportAs, isDev, SafeError, setter,Step } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -54,7 +47,7 @@ interface PgUpdatePlanFinalizeResults {
 export class PgUpdateSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends ExecutableStep<unknown[]>
+  extends Step<unknown[]>
   implements SQLable
 {
   static $$export = {
@@ -132,7 +125,7 @@ export class PgUpdateSingleStep<
       GetPgResourceUniques<TResource>
     >,
     attributes?: {
-      [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+      [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
     },
   ) {
     super();
@@ -185,7 +178,7 @@ export class PgUpdateSingleStep<
         if (value) {
           this.set(
             key as keyof GetPgResourceAttributes<TResource>,
-            value as ExecutableStep,
+            value as Step,
           );
         }
       });
@@ -200,7 +193,7 @@ export class PgUpdateSingleStep<
 
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: Step, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -303,7 +296,7 @@ export class PgUpdateSingleStep<
   }
 
   apply(
-    $step: ExecutableStep<
+    $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgUpdateSingleQueryBuilderCallback>>
     >,
   ) {
@@ -518,7 +511,7 @@ export function pgUpdateSingle<
     GetPgResourceUniques<TResource>
   >,
   attributes?: {
-    [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+    [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
   },
 ): PgUpdateSingleStep<TResource> {
   return new PgUpdateSingleStep(resource, getBy, attributes);
