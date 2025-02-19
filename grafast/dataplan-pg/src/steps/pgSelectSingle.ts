@@ -3,7 +3,7 @@ import type {
   ExecutableStep,
   UnbatchedExecutionExtra,
 } from "grafast";
-import { exportAs, polymorphicWrap, UnbatchedExecutableStep } from "grafast";
+import { exportAs, polymorphicWrap, UnbatchedStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -67,7 +67,7 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
 export class PgSelectSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends UnbatchedExecutableStep<
+  extends UnbatchedStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements

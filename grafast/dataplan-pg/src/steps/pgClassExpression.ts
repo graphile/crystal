@@ -1,5 +1,5 @@
 import type { AccessStep, UnbatchedExecutionExtra } from "grafast";
-import { access, exportAs, UnbatchedExecutableStep } from "grafast";
+import { access, exportAs, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -31,7 +31,7 @@ export class PgClassExpressionStep<
     TExpressionCodec extends PgCodec,
     TResource extends PgResource<any, any, any, any, any>,
   >
-  extends UnbatchedExecutableStep<any>
+  extends UnbatchedStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
 {
   static $$export = {
