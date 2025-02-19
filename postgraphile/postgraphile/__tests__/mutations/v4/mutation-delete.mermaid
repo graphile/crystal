@@ -10,13 +10,12 @@ graph TD
 
     %% plan dependencies
     __InputObject288{{"__InputObject[288∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant442{{"Constant[442∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant443{{"Constant[443∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant7 & Constant442 & Constant443 --> __InputObject288
+    Constant442 & Constant443 --> __InputObject288
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     Constant430{{"Constant[430∈0] ➊<br />ᐸ'WyJwb3N0cyIsMV0='ᐳ"}}:::plan
-    Constant7 & Constant430 --> __InputObject6
+    Constant430 --> __InputObject6
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -27,7 +26,7 @@ graph TD
     Constant431 & Constant432 --> __InputObject34
     __InputObject62{{"__InputObject[62∈0] ➊"}}:::plan
     Constant433{{"Constant[433∈0] ➊<br />ᐸ'WyJwb3N0cyIsMjAwMDAwMF0='ᐳ"}}:::plan
-    Constant7 & Constant433 --> __InputObject62
+    Constant433 --> __InputObject62
     __InputObject90{{"__InputObject[90∈0] ➊"}}:::plan
     Constant434{{"Constant[434∈0] ➊<br />ᐸ'world'ᐳ"}}:::plan
     Constant435{{"Constant[435∈0] ➊<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
@@ -38,27 +37,27 @@ graph TD
     Constant436 & Constant437 --> __InputObject118
     __InputObject133{{"__InputObject[133∈0] ➊"}}:::plan
     Constant438{{"Constant[438∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Constant7 & Constant438 --> __InputObject133
+    Constant438 --> __InputObject133
     __InputObject158{{"__InputObject[158∈0] ➊"}}:::plan
     Constant439{{"Constant[439∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant431 & Constant439 --> __InputObject158
     __InputObject183{{"__InputObject[183∈0] ➊"}}:::plan
     Constant440{{"Constant[440∈0] ➊<br />ᐸ2000000ᐳ"}}:::plan
-    Constant7 & Constant440 --> __InputObject183
+    Constant440 --> __InputObject183
     __InputObject208{{"__InputObject[208∈0] ➊"}}:::plan
     Constant434 & Constant437 --> __InputObject208
     __InputObject233{{"__InputObject[233∈0] ➊"}}:::plan
     Constant441{{"Constant[441∈0] ➊<br />ᐸ'WyJjb21wb3VuZF9rZXlzIiw0LDNd'ᐳ"}}:::plan
-    Constant7 & Constant441 --> __InputObject233
+    Constant441 --> __InputObject233
     __InputObject339{{"__InputObject[339∈0] ➊"}}:::plan
     Constant444{{"Constant[444∈0] ➊<br />ᐸ'budd.deey@email.com'ᐳ"}}:::plan
-    Constant7 & Constant444 --> __InputObject339
+    Constant444 --> __InputObject339
     __InputObject356{{"__InputObject[356∈0] ➊"}}:::plan
     Constant445{{"Constant[445∈0] ➊<br />ᐸ'graphile-build.issue.27.exists@example.com'ᐳ"}}:::plan
-    Constant7 & Constant445 --> __InputObject356
+    Constant445 --> __InputObject356
     __InputObject392{{"__InputObject[392∈0] ➊"}}:::plan
     Constant446{{"Constant[446∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant7 & Constant446 --> __InputObject392
+    Constant446 --> __InputObject392
     Lambda9{{"Lambda[9∈0] ➊<br />ᐸdecode_Post_base64JSONᐳ"}}:::plan
     Constant430 --> Lambda9
     Access10{{"Access[10∈0] ➊<br />ᐸ9.1ᐳ"}}:::plan
@@ -545,7 +544,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-delete"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Lambda9,Access10,Access13,Access14,Object15,ApplyInput16,Constant19,Constant32,__InputObject34,ApplyInput44,__InputObject62,ApplyInput72,__InputObject90,ApplyInput100,__InputObject118,ApplyInput125,Constant128,__InputObject133,ApplyInput140,__InputObject158,ApplyInput165,__InputObject183,ApplyInput190,__InputObject208,ApplyInput215,__InputObject233,ApplyInput245,Constant248,Constant270,__InputObject288,ApplyInput296,__InputObject339,ApplyInput346,__InputObject356,ApplyInput363,__InputObject392,ApplyInput399,Constant430,Constant431,Constant432,Constant433,Constant434,Constant435,Constant436,Constant437,Constant438,Constant439,Constant440,Constant441,Constant442,Constant443,Constant444,Constant445,Constant446 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Lambda9,Access10,Access13,Access14,Object15,ApplyInput16,Constant19,Constant32,__InputObject34,ApplyInput44,__InputObject62,ApplyInput72,__InputObject90,ApplyInput100,__InputObject118,ApplyInput125,Constant128,__InputObject133,ApplyInput140,__InputObject158,ApplyInput165,__InputObject183,ApplyInput190,__InputObject208,ApplyInput215,__InputObject233,ApplyInput245,Constant248,Constant270,__InputObject288,ApplyInput296,__InputObject339,ApplyInput346,__InputObject356,ApplyInput363,__InputObject392,ApplyInput399,Constant430,Constant431,Constant432,Constant433,Constant434,Constant435,Constant436,Constant437,Constant438,Constant439,Constant440,Constant441,Constant442,Constant443,Constant444,Constant445,Constant446 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 16, 19, 32, 4<br /><br />1: PgDeleteSingle[12]<br />2: <br />ᐳ: Object[17]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle12,Object17 bucket1

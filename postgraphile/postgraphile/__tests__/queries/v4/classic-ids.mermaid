@@ -10,20 +10,17 @@ graph TD
 
     %% plan dependencies
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection14
     Connection31{{"Connection[31∈0] ➊<br />ᐸ29ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection31
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     Constant39{{"Constant[39∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant39 & Constant6 --> __InputObject8
+    Constant39 --> __InputObject8
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
     __InputObject27{{"__InputObject[27∈0] ➊"}}:::plan
     Constant40{{"Constant[40∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant6 & Constant40 --> __InputObject27
+    Constant40 --> __InputObject27
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
@@ -34,7 +31,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant21{{"Constant[21∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpostᐳ"]]:::plan
-    Object13 & ApplyInput16 & Connection14 & Constant6 & Constant6 & Constant6 --> PgSelect17
+    Object13 & ApplyInput16 & Connection14 --> PgSelect17
     PgSelectRows18[["PgSelectRows[18∈1] ➊"]]:::plan
     PgSelect17 --> PgSelectRows18
     __Item19[/"__Item[19∈2]<br />ᐸ18ᐳ"\]:::itemplan
@@ -50,7 +47,7 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression25
     PgSelect34[["PgSelect[34∈4] ➊<br />ᐸedge_caseᐳ"]]:::plan
-    Object13 & ApplyInput33 & Connection31 & Constant6 & Constant6 & Constant6 --> PgSelect34
+    Object13 & ApplyInput33 & Connection31 --> PgSelect34
     PgSelectRows35[["PgSelectRows[35∈4] ➊"]]:::plan
     PgSelect34 --> PgSelectRows35
     __Item36[/"__Item[36∈5]<br />ᐸ35ᐳ"\]:::itemplan
@@ -65,7 +62,7 @@ graph TD
     subgraph "Buckets for queries/v4/classic-ids"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,__InputObject8,Access11,Access12,Object13,Connection14,ApplyInput16,Constant21,__InputObject27,Connection31,ApplyInput33,Constant39,Constant40 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject8,Access11,Access12,Object13,Connection14,ApplyInput16,Constant21,__InputObject27,Connection31,ApplyInput33,Constant39,Constant40 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 16, 14, 6, 21<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17]<br />2: PgSelectRows[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows18 bucket1

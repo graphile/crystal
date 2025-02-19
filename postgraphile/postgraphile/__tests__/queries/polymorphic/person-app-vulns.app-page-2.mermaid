@@ -11,12 +11,11 @@ graph TD
     %% plan dependencies
     Connection27{{"Connection[27∈0] ➊<br />ᐸ23ᐳ"}}:::plan
     Constant119{{"Constant[119∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Lambda28{{"Lambda[28∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant119 & Constant7 & Constant7 & Lambda28 --> Connection27
+    Constant119 & Lambda28 --> Connection27
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant118{{"Constant[118∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant118 & Constant7 & Constant7 --> Connection13
+    Constant118 --> Connection13
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -27,10 +26,9 @@ graph TD
     Constant120{{"Constant[120∈0] ➊<br />ᐸ'WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ"}}:::plan
     Constant120 --> Lambda28
     Lambda29[["Lambda[29∈0] ➊<br />ᐸlimitToTypesᐳ"]]:::unbatchedplan
-    Constant7 --> Lambda29
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object12 & Connection13 & Constant118 & Constant7 & Constant7 --> PgSelect15
+    Object12 & Connection13 & Constant118 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
@@ -39,7 +37,7 @@ graph TD
     __Item17 --> PgSelectSingle18
     PgUnionAll30[["PgUnionAll[30∈3]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression19 & Lambda29 & Connection27 & Lambda28 & Constant119 & Constant7 & Constant7 --> PgUnionAll30
+    Object12 & PgClassExpression19 & Lambda29 & Connection27 & Lambda28 & Constant119 --> PgUnionAll30
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
@@ -58,13 +56,13 @@ graph TD
     PgUnionAll52[["PgUnionAll[52∈6]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Connection50{{"Connection[50∈6] ➊<br />ᐸ48ᐳ<br />ᐳAwsApplication"}}:::plan
-    Object12 & PgClassExpression46 & Lambda29 & Connection50 & Constant119 & Constant7 & Constant7 --> PgUnionAll52
+    Object12 & PgClassExpression46 & Lambda29 & Connection50 & Constant119 --> PgUnionAll52
     PgUnionAll90[["PgUnionAll[90∈6]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression84{{"PgClassExpression[84∈6]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Connection88{{"Connection[88∈6] ➊<br />ᐸ86ᐳ<br />ᐳGcpApplication"}}:::plan
-    Object12 & PgClassExpression84 & Lambda29 & Connection88 & Constant119 & Constant7 & Constant7 --> PgUnionAll90
-    Constant119 & Constant7 & Constant7 --> Connection50
-    Constant119 & Constant7 & Constant7 --> Connection88
+    Object12 & PgClassExpression84 & Lambda29 & Connection88 & Constant119 --> PgUnionAll90
+    Constant119 --> Connection50
+    Constant119 --> Connection88
     PgSelect39[["PgSelect[39∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access38{{"Access[38∈6]<br />ᐸ37.0ᐳ"}}:::plan
     Object12 & Access38 --> PgSelect39
@@ -177,7 +175,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-page-2"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 10, 11, 118, 119, 120, 12, 13, 28, 27<br />2: Lambda[29]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access10,Access11,Object12,Connection13,Connection27,Lambda28,Lambda29,Constant118,Constant119,Constant120 bucket0
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection27,Lambda28,Lambda29,Constant118,Constant119,Constant120 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 118, 7, 29, 27, 28, 119<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1

@@ -10,21 +10,20 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
     __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
     __InputObject21{{"__InputObject[21∈0] ➊"}}:::plan
-    Constant7 & __InputObject21 --> __InputObject19
+    __InputObject21 --> __InputObject19
     Constant46{{"Constant[46∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
-    Constant7 & Constant46 --> __InputObject21
+    Constant46 --> __InputObject21
     __InputObject32{{"__InputObject[32∈0] ➊"}}:::plan
     __InputObject34{{"__InputObject[34∈0] ➊"}}:::plan
-    Constant7 & __InputObject34 --> __InputObject32
+    __InputObject34 --> __InputObject32
     Constant47{{"Constant[47∈0] ➊<br />ᐸ100ᐳ"}}:::plan
     Constant47 & Constant46 --> __InputObject34
     Constant46 --> __InputObject8
@@ -86,7 +85,7 @@ graph TD
     subgraph "Buckets for mutations/v4/pg11.identity"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access11,Access12,Object13,ApplyInput14,__InputObject19,__InputObject21,ApplyInput27,__InputObject32,__InputObject34,ApplyInput41,Constant46,Constant47 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access11,Access12,Object13,ApplyInput14,__InputObject19,__InputObject21,ApplyInput27,__InputObject32,__InputObject34,ApplyInput41,Constant46,Constant47 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 14<br /><br />1: PgInsertSingle[10]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle10,Object15 bucket1

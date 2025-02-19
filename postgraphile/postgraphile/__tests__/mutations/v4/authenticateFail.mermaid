@@ -14,8 +14,6 @@ graph TD
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant7 --> __InputObject6
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -40,7 +38,7 @@ graph TD
     subgraph "Buckets for mutations/v4/authenticateFail"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access9,Access10,Object11,ApplyInput16 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1

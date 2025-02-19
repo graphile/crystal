@@ -10,28 +10,21 @@ graph TD
 
     %% plan dependencies
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection12
     Connection26{{"Connection[26∈0] ➊<br />ᐸ22ᐳ"}}:::plan
     Constant95{{"Constant[95∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant6 & Constant95 & Constant6 --> Connection26
+    Constant95 --> Connection26
     Connection39{{"Connection[39∈0] ➊<br />ᐸ37ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection39
     Connection51{{"Connection[51∈0] ➊<br />ᐸ49ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection51
     Connection62{{"Connection[62∈0] ➊<br />ᐸ60ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection62
     Connection73{{"Connection[73∈0] ➊<br />ᐸ71ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection73
     Connection86{{"Connection[86∈0] ➊<br />ᐸ82ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection86
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __InputObject35{{"__InputObject[35∈0] ➊"}}:::plan
     Constant96{{"Constant[96∈0] ➊<br />ᐸ'Large bet on myself in round one.'ᐳ"}}:::plan
-    Constant6 & Constant96 --> __InputObject35
+    Constant96 --> __InputObject35
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -39,7 +32,7 @@ graph TD
     __InputObject35 --> ApplyInput41
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11 & Connection12 & Constant6 & Constant6 & Constant6 --> PgSelect14
+    Object11 & Connection12 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
@@ -48,13 +41,13 @@ graph TD
     __Item16 --> PgSelectSingle17
     PgSelect42[["PgSelect[42∈3]<br />ᐸpostᐳ"]]:::plan
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object11 & PgClassExpression18 & ApplyInput41 & Connection39 & Constant6 & Constant6 & Constant6 --> PgSelect42
+    Object11 & PgClassExpression18 & ApplyInput41 & Connection39 --> PgSelect42
     PgSelect28[["PgSelect[28∈3]<br />ᐸpostᐳ"]]:::plan
-    Object11 & PgClassExpression18 & Connection26 & Constant6 & Constant95 & Constant6 --> PgSelect28
+    Object11 & PgClassExpression18 & Connection26 & Constant95 --> PgSelect28
     PgSelect53[["PgSelect[53∈3]<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & PgClassExpression18 & Connection51 & Constant6 & Constant6 & Constant6 --> PgSelect53
+    Object11 & PgClassExpression18 & Connection51 --> PgSelect53
     PgSelect64[["PgSelect[64∈3]<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & PgClassExpression18 & Connection62 & Constant6 & Constant6 & Constant6 --> PgSelect64
+    Object11 & PgClassExpression18 & Connection62 --> PgSelect64
     PgSelectSingle17 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression19
@@ -99,7 +92,7 @@ graph TD
     PgClassExpression69{{"PgClassExpression[69∈11]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle67 --> PgClassExpression69
     PgSelect75[["PgSelect[75∈12] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & Connection73 & Constant6 & Constant6 & Constant6 --> PgSelect75
+    Object11 & Connection73 --> PgSelect75
     PgSelectRows76[["PgSelectRows[76∈12] ➊"]]:::plan
     PgSelect75 --> PgSelectRows76
     __Item77[/"__Item[77∈13]<br />ᐸ76ᐳ"\]:::itemplan
@@ -109,7 +102,7 @@ graph TD
     PgSelect88[["PgSelect[88∈14]<br />ᐸforeign_keyᐳ"]]:::plan
     PgClassExpression79{{"PgClassExpression[79∈14]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression80{{"PgClassExpression[80∈14]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    Object11 & PgClassExpression79 & PgClassExpression80 & Connection86 & Constant6 & Constant6 & Constant6 --> PgSelect88
+    Object11 & PgClassExpression79 & PgClassExpression80 & Connection86 --> PgSelect88
     PgSelectSingle78 --> PgClassExpression79
     PgSelectSingle78 --> PgClassExpression80
     PgSelectRows89[["PgSelectRows[89∈14]"]]:::plan
@@ -130,7 +123,7 @@ graph TD
     subgraph "Buckets for queries/v4/relation-head-tail"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access9,Access10,Object11,Connection12,Connection26,__InputObject35,Connection39,ApplyInput41,Connection51,Connection62,Connection73,Connection86,Constant95,Constant96 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection26,__InputObject35,Connection39,ApplyInput41,Connection51,Connection62,Connection73,Connection86,Constant95,Constant96 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 26, 95, 41, 39, 51, 62<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1

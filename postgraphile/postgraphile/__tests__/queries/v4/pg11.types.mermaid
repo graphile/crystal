@@ -10,8 +10,6 @@ graph TD
 
     %% plan dependencies
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection12
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -21,12 +19,12 @@ graph TD
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸtypes+1ᐳ"]]:::plan
-    Object11 & Connection12 & Constant6 & Constant6 & Constant6 --> PgSelect14
+    Object11 & Connection12 --> PgSelect14
     Object73{{"Object[73∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access68{{"Access[68∈1] ➊<br />ᐸ14.hasMoreᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 & Access68 --> Object73
+    Access68 --> Object73
     Object69{{"Object[69∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant6 & Constant6 & Access68 --> Object69
+    Access68 --> Object69
     PgSelect60[["PgSelect[60∈1] ➊<br />ᐸtypes(aggregate)ᐳ"]]:::plan
     Object11 & Connection12 --> PgSelect60
     PgCursor80{{"PgCursor[80∈1] ➊"}}:::plan
@@ -138,7 +136,7 @@ graph TD
     subgraph "Buckets for queries/v4/pg11.types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access9,Access10,Object11,Connection12 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14], PgSelect[60]<br />ᐳ: 66, 68, 69, 70, 73, 74, 79<br />2: PgSelectRows[15], PgSelectRows[62]<br />ᐳ: 61, 63, 64, 76, 78, 80, 82, 84, 86"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,PgSelect60,First61,PgSelectRows62,PgSelectSingle63,PgClassExpression64,PgPageInfo66,Access68,Object69,Lambda70,Object73,Lambda74,First76,PgSelectSingle78,Access79,PgCursor80,Last82,PgSelectSingle84,PgCursor86 bucket1
