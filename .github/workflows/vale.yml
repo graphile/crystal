@@ -10,5 +10,5 @@ jobs:
       - uses: errata-ai/vale-action@v2.1.1
         with:
           files:
-            '["/postgraphile/website", "/grafast/website",
-            "/graphile-build/website", "/utils/wesbite"]'
+            '["postgraphile/website", "grafast/website",
+            "graphile-build/website", "utils/wesbite"]'
