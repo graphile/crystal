@@ -4,7 +4,7 @@ title: Registry
 
 As you know: PostGraphile builds a GraphQL schema for you by introspecting your
 database. What you may not know is that it does this through multiple phases
-using the [Graphile Build](https://build.graphile.org/graphile-build/) library.
+using the [Graphile Build](https://build.graphile.org/graphile-build/5) library.
 In the `gather` phase, PostGraphile introspects your database, and builds up a
 "registry" of all of the "codecs", "resources" and "relations" that it finds.
 Then during the `schema` phase, it inspects this registry and uses it to decide
