@@ -75,7 +75,7 @@ import {
 } from "./pgStmt.js";
 import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
-export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
+export type PgSelectParsedCursorStep = LambdaStep<string, null | any[]>;
 
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
