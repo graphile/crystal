@@ -2504,7 +2504,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $messages.setFirst(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -2574,7 +2573,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setFirst(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -2590,7 +2588,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -3679,7 +3676,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $forums.setFirst(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -3815,7 +3811,6 @@ export function makeExampleSchema(
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -3831,7 +3826,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -3847,7 +3841,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -3863,7 +3856,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4153,7 +4145,6 @@ export function makeExampleSchema(
                   const $commentables =
                     $each.getListStep() as RelationalCommentablesStep;
                   $commentables.setFirst(val.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4503,7 +4494,6 @@ export function makeExampleSchema(
                   val,
                 ) {
                   $connection.setFirst(val.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4519,7 +4509,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setLast(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4535,7 +4524,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setOffset(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4551,7 +4539,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setAfter(arg.getRaw());
-                  return null;
                 },
               [],
             ),
@@ -4567,7 +4554,6 @@ export function makeExampleSchema(
                   arg,
                 ) {
                   $connection.setBefore(arg.getRaw());
-                  return null;
                 },
               [],
             ),
