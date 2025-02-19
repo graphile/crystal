@@ -236,6 +236,7 @@ function inputVariablePlan(
         inputType.ofType,
         defaultValue,
       );
+      // TODO: find a way to do this without doing eval. For example: track list of variables that may not be nullish.
       if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
         throw new GraphQLError(
           `Expected non-null value of type ${inputType.ofType.toString()}`,
