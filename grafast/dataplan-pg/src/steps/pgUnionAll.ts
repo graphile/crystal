@@ -16,7 +16,6 @@ import {
   access,
   arrayOfLength,
   constant,
-  ExecutableStep,
   exportAs,
   first,
   isDev,
@@ -24,6 +23,7 @@ import {
   polymorphicWrap,
   reverseArray,
   SafeError,
+  Step,
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -147,7 +147,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
           codec?: never;
         }
       | {
-          step: ExecutableStep;
+          step: Step;
           codec: PgCodec;
         };
   };
@@ -189,7 +189,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 }
 
 export class PgUnionAllSingleStep
-  extends ExecutableStep
+  extends Step
   implements PolymorphicStep, EdgeCapableStep<any>
 {
   static $$export = {
@@ -200,7 +200,7 @@ export class PgUnionAllSingleStep
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
-  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep) {
+  constructor($parent: PgUnionAllStep<any, any>, $item: Step) {
     super();
     this.addDependency($item);
     this.spec = $parent.spec;
@@ -213,7 +213,7 @@ export class PgUnionAllSingleStep
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep {
+  planForType(objectType: GraphQLObjectType<any, any>): Step {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
@@ -273,9 +273,9 @@ export class PgUnionAllSingleStep
   public scopedSQL = makeScopedSQL(this);
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    $step: Step | PgTypedExecutableStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
@@ -790,14 +790,12 @@ on (${sql.indent(
     return this.singleAsRecord();
   }
 
-  row($row: ExecutableStep) {
+  row($row: Step) {
     return new PgUnionAllSingleStep(this, $row);
   }
 
   apply(
-    $step: ExecutableStep<
-      ReadonlyArrayOrDirect<Maybe<PgUnionAllQueryBuilderCallback>>
-    >,
+    $step: Step<ReadonlyArrayOrDirect<Maybe<PgUnionAllQueryBuilderCallback>>>,
   ) {
     this.applyDepIds.push(this.addUnaryDependency($step));
   }
@@ -811,7 +809,7 @@ on (${sql.indent(
     );
   }
 
-  listItem(itemPlan: ExecutableStep) {
+  listItem(itemPlan: Step) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
   }
@@ -938,7 +936,7 @@ on (${sql.indent(
     return this;
   }
 
-  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+  public getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
   }
@@ -1087,7 +1085,7 @@ on (${sql.indent(
 export class PgUnionAllRowsStep<
   TAttributes extends string = string,
   TTypeNames extends string = string,
-> extends ExecutableStep {
+> extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllRowsStep",
@@ -1101,11 +1099,11 @@ export class PgUnionAllRowsStep<
     return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
   }
 
-  listItem(itemPlan: ExecutableStep) {
+  listItem(itemPlan: Step) {
     return this.getClassStep().listItem(itemPlan);
   }
 
-  public deduplicate(_peers: readonly ExecutableStep[]) {
+  public deduplicate(_peers: readonly Step[]) {
     // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
     return _peers;
   }

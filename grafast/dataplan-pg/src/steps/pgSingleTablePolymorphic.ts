@@ -5,7 +5,7 @@ import type {
   PolymorphicStep,
   PromiseOrDirect,
 } from "grafast";
-import { ExecutableStep, exportAs, polymorphicWrap } from "grafast";
+import { exportAs, polymorphicWrap,Step } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
 import type { PgResource } from "../datasource.js";
@@ -21,7 +21,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 export class PgSingleTablePolymorphicStep<
     TResource extends PgResource<any, any, any, any, any>,
   >
-  extends ExecutableStep<unknown>
+  extends Step<unknown>
   implements PolymorphicStep
 {
   static $$export = {
@@ -34,7 +34,7 @@ export class PgSingleTablePolymorphicStep<
   private rowStepId: number;
 
   constructor(
-    $typeName: ExecutableStep<string | null>,
+    $typeName: Step<string | null>,
     $row: PgSelectSingleStep<TResource>,
   ) {
     super();
@@ -52,7 +52,7 @@ export class PgSingleTablePolymorphicStep<
     return peers;
   }
 
-  planForType(_type: GraphQLObjectType): ExecutableStep {
+  planForType(_type: GraphQLObjectType): Step {
     return this.rowPlan();
   }
 
@@ -76,7 +76,7 @@ export class PgSingleTablePolymorphicStep<
 export function pgSingleTablePolymorphic<
   TResource extends PgResource<any, any, any, any, any>,
 >(
-  $typeName: ExecutableStep<string | null>,
+  $typeName: Step<string | null>,
   $row: PgSelectSingleStep<TResource>,
 ): PgSingleTablePolymorphicStep<TResource> {
   return new PgSingleTablePolymorphicStep($typeName, $row);

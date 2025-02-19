@@ -6,7 +6,7 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import { access, ExecutableStep, exportAs, isDev, setter } from "grafast";
+import { access, exportAs, isDev, setter,Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -38,13 +38,12 @@ interface PgInsertSinglePlanFinalizeResults {
 export class PgInsertSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends ExecutableStep<
+  extends Step<
     unknown[] // tuple depending on what's selected
   >
   implements
     SetterCapable<{
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
+      [key in keyof GetPgResourceAttributes<TResource> & string]: Step;
     }>,
     SQLable
 {
@@ -116,7 +115,7 @@ export class PgInsertSingleStep<
         | PgTypedExecutableStep<
             GetPgResourceAttributes<TResource>[key]["codec"]
           >
-        | ExecutableStep;
+        | Step;
     },
   ) {
     super();
@@ -131,7 +130,7 @@ export class PgInsertSingleStep<
         if (value) {
           this.set(
             key as keyof GetPgResourceAttributes<TResource>,
-            value as ExecutableStep,
+            value as Step,
           );
         }
       });
@@ -144,7 +143,7 @@ export class PgInsertSingleStep<
 
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: Step, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -260,7 +259,7 @@ export class PgInsertSingleStep<
   }
 
   apply(
-    $step: ExecutableStep<
+    $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgInsertSingleQueryBuilderCallback>>
     >,
   ) {
@@ -427,7 +426,7 @@ export function pgInsertSingle<
   attributes?: {
     [key in keyof GetPgResourceAttributes<TResource>]?:
       | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
-      | ExecutableStep;
+      | Step;
   },
 ): PgInsertSingleStep<TResource> {
   return new PgInsertSingleStep(resource, attributes);

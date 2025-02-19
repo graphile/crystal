@@ -1,11 +1,5 @@
 import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
-import {
-  access,
-  applyTransforms,
-  ExecutableStep,
-  lambda,
-  SafeError,
-} from "grafast";
+import { access, applyTransforms, lambda, SafeError,Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type {
@@ -48,7 +42,7 @@ export type PgStmtDeferredSQL = {
 const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
-export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
+export abstract class PgStmtBaseStep<T> extends Step<T> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgStmtBaseStep",
@@ -80,7 +74,7 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
    * request-global dependencies such as variableValues, context, and input
    * arguments.
    */
-  public deferredSQL($step: ExecutableStep<SQL>): SQL {
+  public deferredSQL($step: Step<SQL>): SQL {
     const symbol = Symbol(`deferred-${$step.id}`);
     const dependencyIndex = this.addUnaryDependency($step);
     this.deferreds.push({ symbol, dependencyIndex });
@@ -89,12 +83,12 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
 
   public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
   public placeholder(
-    $step: ExecutableStep,
+    $step: Step,
     codec: PgCodec,
     alreadyEncoded?: boolean,
   ): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<PgCodec>,
+    $step: Step | PgTypedExecutableStep<PgCodec>,
     overrideCodec?: PgCodec,
     alreadyEncoded = false,
   ): SQL {
@@ -198,14 +192,14 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   }
   protected abstract assertCursorPaginationAllowed(): void;
 
-  public setFirst($first: ExecutableStep<Maybe<number>>): this {
+  public setFirst($first: Step<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("first");
     this.firstStepId = this.addUnaryDependency($first);
     this.locker.lockParameter("first");
     return this;
   }
 
-  public setLast($last: ExecutableStep<Maybe<number>>): this {
+  public setLast($last: Step<Maybe<number>>): this {
     this.assertCursorPaginationAllowed();
     this.locker.assertParameterUnlocked("orderBy");
     this.locker.assertParameterUnlocked("last");
@@ -214,7 +208,7 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     return this;
   }
 
-  public setOffset($offset: ExecutableStep<Maybe<number>>): this {
+  public setOffset($offset: Step<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("offset");
     this.offsetStepId = this.addUnaryDependency($offset);
     this.locker.lockParameter("offset");
@@ -247,7 +241,7 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
    */
-  public hasMore(): ExecutableStep<boolean> {
+  public hasMore(): Step<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
   }

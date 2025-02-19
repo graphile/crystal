@@ -9,9 +9,9 @@ import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
 import {
   access,
   context,
-  ExecutableStep,
   grafast,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -49,12 +49,12 @@ function run(db: sqlite3.Database, sql: string, values: any[] = []) {
   });
 }
 
-class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
+class GetRecordsStep<T extends Record<string, any>> extends Step {
   depIdByIdentifier: Record<string, number>;
   dbDepId: number;
   constructor(
     private tableName: string,
-    identifiers: Record<string, ExecutableStep> = Object.create(null),
+    identifiers: Record<string, Step> = Object.create(null),
   ) {
     super();
     this.dbDepId = this.addUnaryDependency(context().get("db"));
@@ -78,7 +78,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
 
   // Unary Dep Id
   private firstUDI: number | undefined;
-  setFirst($first: ExecutableStep) {
+  setFirst($first: Step) {
     this.firstUDI = this.addUnaryDependency($first);
   }
 
@@ -152,7 +152,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
       });
     });
   }
-  listItem($item: ExecutableStep) {
+  listItem($item: Step) {
     return access($item);
   }
 }
@@ -173,7 +173,7 @@ const makeSchema = () => {
     `,
     plans: {
       Query: {
-        allPeople(_: ExecutableStep) {
+        allPeople(_: Step) {
           return getRecords("people");
         },
       },
@@ -190,10 +190,7 @@ const makeSchema = () => {
   });
 };
 
-function getRecords(
-  tableName: string,
-  identifiers?: Record<string, ExecutableStep>,
-) {
+function getRecords(tableName: string, identifiers?: Record<string, Step>) {
   return new GetRecordsStep(tableName, identifiers);
 }
 

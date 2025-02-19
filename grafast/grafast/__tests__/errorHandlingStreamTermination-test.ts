@@ -11,11 +11,11 @@ import type {
 } from "../dist/index.js";
 import {
   constant,
-  ExecutableStep,
   grafast,
   isAsyncIterable,
   lambda,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -23,13 +23,10 @@ const requestContext = {};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-class SyncListCallbackStep<
-  TIn,
-  TOut extends any[],
-> extends ExecutableStep<TOut> {
+class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
   constructor(
-    $dep: ExecutableStep<TIn>,
+    $dep: Step<TIn>,
     private callback: (val: TIn) => PromiseOrDirect<TOut>,
     private setStreaming: (isStreaming: boolean) => void,
   ) {
@@ -89,10 +86,10 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         },
       },
       Thing: {
-        id($i: ExecutableStep<number>) {
+        id($i: Step<number>) {
           return $i;
         },
-        anotherList($i: ExecutableStep<number>) {
+        anotherList($i: Step<number>) {
           return new SyncListCallbackStep(
             $i,
             (i) => [i + 0, i + 1, i + 2],
@@ -104,7 +101,7 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         },
       },
       OtherThing: {
-        id($i: ExecutableStep<number>) {
+        id($i: Step<number>) {
           return $i;
         },
       },
