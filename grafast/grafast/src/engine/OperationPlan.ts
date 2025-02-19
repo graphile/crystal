@@ -794,6 +794,7 @@ export class OperationPlan {
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
+        rootType.name,
         fieldName,
         this.rootLayerPlan,
         path,
@@ -1245,6 +1246,7 @@ export class OperationPlan {
         }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
+            objectType.name,
             fieldName,
             fieldLayerPlan,
             fieldPath,
@@ -1919,6 +1921,7 @@ export class OperationPlan {
   }
 
   private planField(
+    typeName: string,
     fieldName: string,
     layerPlan: LayerPlan,
     path: readonly string[],
@@ -1935,6 +1938,8 @@ export class OperationPlan {
     streamDetails: StreamDetails | true | false | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
+    const coordinate = `${typeName}.${fieldName}`;
+
     // The step may have been de-duped whilst sibling steps were planned
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
@@ -1954,6 +1959,7 @@ export class OperationPlan {
         field,
         parentStep,
         applyAfterMode,
+        coordinate,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
             fieldName,

@@ -377,6 +377,7 @@ export type ArgumentApplyPlanResolver<
   info: {
     schema: GraphQLSchema;
     arg: GraphQLArgument;
+    argName: string;
   },
 ) => void;
 
