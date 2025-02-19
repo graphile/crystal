@@ -69,7 +69,7 @@ import {
   assertFinalized,
   isListCapableStep,
   isPolymorphicStep,
-  isUnbatchedExecutableStep,
+  isUnbatchedStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
@@ -3438,7 +3438,7 @@ export class OperationPlan {
           ) {
             sstep.implicitSideEffectStep = latestSideEffectStep;
           }
-          if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+          if (step.isSyncAndSafe && isUnbatchedStep(step)) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
                 step,
@@ -3466,7 +3466,7 @@ export class OperationPlan {
         do {
           foundOne = false;
           for (const step of pending) {
-            if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+            if (step.isSyncAndSafe && isUnbatchedStep(step)) {
               if (readyToExecute(step)) {
                 processed.add(step);
                 pending.delete(step);

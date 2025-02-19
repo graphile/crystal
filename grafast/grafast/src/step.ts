@@ -792,5 +792,3 @@ export function assertExecutableStep<TData>(
 ): asserts step is Step<TData> {
   return assertStep(step);
 }
-/** @deprecated Use isStep instead */
-export const isUnbatchedExecutableStep = isUnbatchedStep;
