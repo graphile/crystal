@@ -523,7 +523,6 @@ exportAsMany("grafast", {
   assertStep,
   assertListCapableStep,
   assertModifier,
-  isExecutableStep,
   isStep,
   isListCapableStep,
   isModifier,
