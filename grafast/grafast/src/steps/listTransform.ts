@@ -14,7 +14,7 @@ import type { ConnectionCapableStep, ExecutionDetails } from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
 import { $$deepDepSkip } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep,Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type { ItemsStep } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
@@ -26,8 +26,8 @@ export type ListTransformReduce<TMemo, TItemPlanData> = (
 ) => TMemo;
 
 export type ListTransformItemPlanCallback<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TDepsStep extends ExecutableStep,
+  TListStep extends Step<readonly any[]>,
+  TDepsStep extends Step,
 > = (
   listItemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
     ? ReturnType<ItemsStep<TListStep>["listItem"]>
@@ -36,11 +36,11 @@ export type ListTransformItemPlanCallback<
 
 export interface ListTransformOptions<
   TListStep extends
-    | ExecutableStep<readonly any[]>
-    | ConnectionCapableStep<ExecutableStep<any>, any>,
-  TDepsStep extends ExecutableStep,
+    | Step<readonly any[]>
+    | ConnectionCapableStep<Step<any>, any>,
+  TDepsStep extends Step,
   TMemo,
-  TItemStep extends ExecutableStep | undefined = undefined,
+  TItemStep extends Step | undefined = undefined,
 > {
   listStep: TListStep;
   itemPlanCallback: ListTransformItemPlanCallback<
@@ -50,14 +50,14 @@ export interface ListTransformOptions<
   initialState(): TMemo;
   reduceCallback: ListTransformReduce<
     TMemo,
-    TDepsStep extends ExecutableStep<infer U> ? U : never
+    TDepsStep extends Step<infer U> ? U : never
   >;
-  listItem?(itemPlan: ExecutableStep): TItemStep;
+  listItem?(itemPlan: Step): TItemStep;
   finalizeCallback?(data: TMemo): TMemo;
   meta?: string;
   optimize?: (
     this: __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>,
-  ) => ExecutableStep;
+  ) => Step;
   connectionClone?: ConnectionCapableStep<TListStep, any>["connectionClone"];
 }
 
@@ -71,15 +71,13 @@ export interface ListTransformOptions<
  * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformStep<
-  TListStep extends
-    | ExecutableStep<readonly any[]>
-    | ConnectionCapableStep<any, any> =
-    | ExecutableStep<readonly any[]>
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any> =
+    | Step<readonly any[]>
     | ConnectionCapableStep<any, any>,
-  TDepsStep extends ExecutableStep = ExecutableStep,
+  TDepsStep extends Step = Step,
   TMemo = any,
-  TItemStep extends ExecutableStep | undefined = ExecutableStep | undefined,
-> extends ExecutableStep<TMemo> {
+  TItemStep extends Step | undefined = Step | undefined,
+> extends Step<TMemo> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ListTransformStep",
@@ -96,7 +94,7 @@ export class __ListTransformStep<
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
     TMemo,
-    TDepsStep extends ExecutableStep<infer U> ? U : never
+    TDepsStep extends Step<infer U> ? U : never
   >;
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemStep<this>) => TItemStep;
@@ -214,7 +212,7 @@ export class __ListTransformStep<
 
   // ListTransform plans must _NOT_ optimize away. They must persist (unless
   // the options overrides this)
-  optimize(): ExecutableStep {
+  optimize(): Step {
     return this;
   }
 
@@ -373,12 +371,10 @@ export class __ListTransformStep<
  * {@page ~grafast/steps/listTransform.md}
  */
 export function listTransform<
-  TListStep extends
-    | ExecutableStep<readonly any[]>
-    | ConnectionCapableStep<any, any>,
-  TDepsStep extends ExecutableStep,
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TDepsStep extends Step,
   TMemo,
-  TItemStep extends ExecutableStep | undefined = undefined,
+  TItemStep extends Step | undefined = undefined,
 >(
   options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
 ): __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep> {

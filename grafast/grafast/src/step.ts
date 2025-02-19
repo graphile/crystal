@@ -778,7 +778,7 @@ export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
 }
 
 export {
-  /** @deprecated Use Step instead */
+  /** @deprecated Use ExecutableStep instead */
   Step as ExecutableStep,
   /** @deprecated Use UnbatchedStep instead */
   UnbatchedStep as UnbatchedExecutableStep,

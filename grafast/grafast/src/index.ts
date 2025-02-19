@@ -117,7 +117,6 @@ import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
-  ExecutableStep,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
@@ -126,7 +125,8 @@ import {
   ListLikeStep,
   ObjectLikeStep,
   PolymorphicStep,
-  UnbatchedExecutableStep,
+  Step,
+  UnbatchedStep,
 } from "./step.js";
 import {
   __FlagStep,
@@ -328,7 +328,7 @@ export {
   ErrorStep,
   EventCallback,
   EventMapKey,
-  ExecutableStep,
+  Step as ExecutableStep,
   execute,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -491,7 +491,7 @@ export {
   TRAP_INHIBITED,
   TypedEventEmitter,
   UnaryExecutionValue,
-  UnbatchedExecutableStep,
+  UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
   UnwrapMultistep,
 };
@@ -690,8 +690,8 @@ declare global {
 
     interface ObjectTypeExtensions {
       assertStep?:
-        | ((step: ExecutableStep) => asserts step is ExecutableStep)
-        | { new (...args: any[]): ExecutableStep }
+        | ((step: Step) => asserts step is Step)
+        | { new (...args: any[]): Step }
         | null;
     }
 

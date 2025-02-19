@@ -1,13 +1,13 @@
 import { inspect } from "../inspect.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
-import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { Step, UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { operationPlan } from "./index.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
  */
-export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
+export class ConstantStep<TData> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConstantStep",
@@ -164,10 +164,10 @@ export function constant<TData>(
 }
 
 // Have to overwrite the getDepOrConstant method due to circular dependency
-(ExecutableStep.prototype as any).getDepOrConstant = function <TData>(
-  this: ExecutableStep,
+(Step.prototype as any).getDepOrConstant = function <TData>(
+  this: Step,
   depId: number | null,
   fallback: TData,
-): ExecutableStep<TData> {
+): Step<TData> {
   return this.maybeGetDep(depId) ?? constant(fallback, false);
 };

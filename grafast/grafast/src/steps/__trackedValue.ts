@@ -20,7 +20,7 @@ import type {
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
 
@@ -49,7 +49,7 @@ export class __TrackedValueStep<
     | GraphQLInputType
     | ReadonlyArray<VariableDefinitionNode>
     | undefined = undefined,
-> extends UnbatchedExecutableStep<TData> {
+> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__TrackedValueStep",

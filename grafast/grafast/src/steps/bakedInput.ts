@@ -7,13 +7,11 @@ import type {
 import { getNullableType, isInputObjectType, isListType } from "graphql";
 
 import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { inputArgsApply } from "./applyInput.js";
 
-export class BakedInputStep<
-  TData = any,
-> extends UnbatchedExecutableStep<TData> {
+export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "BakedInputStep",
@@ -23,7 +21,7 @@ export class BakedInputStep<
   valueDepId: 0;
   constructor(
     private inputType: GraphQLInputObjectType | GraphQLList<any>,
-    $value: ExecutableStep,
+    $value: Step,
   ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
@@ -53,7 +51,7 @@ export class BakedInputStep<
  */
 export function bakedInput<TArg = any>(
   inputType: GraphQLInputType,
-  $value: ExecutableStep,
+  $value: Step,
 ) {
   const nullableInputType = getNullableType(inputType);
   // Could have done this in `optimize()` but faster to do it here.

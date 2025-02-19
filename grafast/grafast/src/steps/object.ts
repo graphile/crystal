@@ -9,8 +9,8 @@ import type {
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
 
@@ -21,21 +21,17 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
 // const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-export type DataFromObjectSteps<
-  TSteps extends { [key: string]: ExecutableStep },
-> = {
+export type DataFromObjectSteps<TSteps extends { [key: string]: Step }> = {
   [key in keyof TSteps]: DataFromStep<TSteps[key]>;
 };
-type Results<TSteps extends { [key: string]: ExecutableStep }> = Array<
+type Results<TSteps extends { [key: string]: Step }> = Array<
   [
     Array<DataFromObjectSteps<TSteps>[keyof TSteps]>,
     DataFromObjectSteps<TSteps>,
   ]
 >;
 
-export interface ObjectPlanMeta<
-  TSteps extends { [key: string]: ExecutableStep },
-> {
+export interface ObjectPlanMeta<TSteps extends { [key: string]: Step }> {
   results: Results<TSteps>;
 }
 
@@ -49,10 +45,10 @@ interface ObjectStepCacheConfig {
  * the results of the associated plans.
  */
 export class ObjectStep<
-  TPlans extends { [key: string]: ExecutableStep } = {
-    [key: string]: ExecutableStep;
+  TPlans extends { [key: string]: Step } = {
+    [key: string]: Step;
   },
-> extends UnbatchedExecutableStep<DataFromObjectSteps<TPlans>> {
+> extends UnbatchedStep<DataFromObjectSteps<TPlans>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ObjectStep",
@@ -328,7 +324,7 @@ ${inner}
  * A plan that represents an object using the keys given and the values being
  * the results of the associated plans.
  */
-export function object<TPlans extends { [key: string]: ExecutableStep }>(
+export function object<TPlans extends { [key: string]: Step }>(
   obj: TPlans,
   cacheConfig?: ObjectStepCacheConfig,
 ): ObjectStep<TPlans> {
