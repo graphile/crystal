@@ -460,6 +460,90 @@ from steps which don't adhere to these expectations.
 
 :::
 
+### apply()
+
+Implement `.apply()` if your step wants to allow for runtime modification of
+its action based on non-trivial input values - for example, if your step
+represents an SQL query it might want to allow dynamic `WHERE` or `ORDER BY`
+clauses based on input arguments to a GraphQL field. `.apply()` will accept a
+single argument, a step that represents a runtime callback function. The step
+should then call this function from `.execute()`; a common implementation might
+look like:
+
+<!-- TODO: should we move this example somewhere else, it's a bit long! -->
+
+```ts
+import {
+  ExecutableStep,
+  ExecutionDetails,
+  GrafastResultsList,
+  Maybe,
+} from "grafast";
+
+interface QueryBuilder {
+  orderBy(columnName: string, ascending?: boolean): void;
+}
+
+type Callback = (queryBuilder: QueryBuilder) => void;
+
+class MyQueryStep extends ExecutableStep {
+  private applyDepIds: number[] = [];
+
+  // [...]
+  //   this.foreignKeyDepId = this.addDependency($fkey);
+  // [...]
+
+  // Handling `ExecutableStep<Callback>` is enough for some use cases, but
+  // handling this combination is the most flexible.
+  apply($step: ExecutableStep<Maybe<Callback | ReadonlyArray<Callback>>>) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultsList<Record<string, any>>> {
+    const { values, indexMap } = executionDetails;
+    const foreignKeyEV = values[this.foreignKeyDepId];
+
+    // Create a query builder to collect together the orderBy values
+    const orderBys: string[] = [];
+    const queryBuilder: QueryBuilder = {
+      orderBy(columnName, asc = true) {
+        orderBys.push(`${columnName} ${asc ? "ASC" : "DESC"}`);
+      },
+    };
+
+    // For each of the `apply()` callbacks, run it against the query builder
+    for (const applyDepId of this.applyDepIds) {
+      const callback = values[applyDepId].unaryValue();
+      if (Array.isArray(callback)) {
+        callback.forEach((cb) => cb(queryBuilder));
+      } else if (callback != null) {
+        callback(queryBuilder);
+      }
+    }
+
+    // Now we can use `orderBys` to build a query:
+    const query = `
+      select *
+      from my_table
+      where foreign_key = any($1)
+      order by ${orderBys}
+    `;
+
+    // Then we can fetch the data:
+    const allForeignKeys = indexMap((i) => foreignKeyEV.at(i));
+    const rows = await runQuery(query, [allForeignKeys]);
+
+    // And return the right data to go with each input value:
+    return indexMap((i) => {
+      const foreignKey = foreignKeyEV.at(i);
+      return rows.filter((r) => r.foreign_key === foreignKey);
+    });
+  }
+}
+```
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come

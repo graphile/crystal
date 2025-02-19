@@ -46,6 +46,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
   field: GraphQLField<any, any, any>,
   $parent: ExecutableStep,
   applyAfterMode: ApplyAfterModeArg,
+  coordinate: string,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
 ): Exclude<T, undefined | null> | null {
   if (operationPlan.loc !== null)
@@ -213,7 +214,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
   assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied && result != null) {
-    processAfter($parent, fieldArgs, result, args, applyAfterMode);
+    processAfter($parent, fieldArgs, result, args, applyAfterMode, coordinate);
   }
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
@@ -227,6 +228,7 @@ function processAfter(
   $result: ExecutableStep,
   args: Record<string, GraphQLArgument>,
   applyAfterMode: ApplyAfterModeArg,
+  coordinate: string,
 ) {
   const schema = $parent.operationPlan.schema;
   for (const [argName, arg] of Object.entries(args)) {
@@ -259,10 +261,19 @@ function processAfter(
           }
         },
       };
-      autoApply($parent, $result, input, {
+      const result = autoApply($parent, $result, input, {
         schema,
         arg,
+        argName,
       });
+      if (result !== undefined) {
+        const fullCoordinate = `${coordinate}(${argName}:)`;
+        throw new Error(
+          `Argument ${fullCoordinate}'s applyPlan returned a value. This may indicate a bug in that method, please see https://err.red/gaap#coord=${encodeURIComponent(
+            fullCoordinate,
+          )}`,
+        );
+      }
     }
   }
 }
