@@ -83,6 +83,10 @@ function isGrafastPlanJSONv1(json: GrafastPlanJSON): json is GrafastPlanJSONv1 {
   return json.version === "v1";
 }
 
+function shouldHideStep(step: GrafastPlanStepJSONv1) {
+  return (step.extra?.constant as any)?.type === "undefined";
+}
+
 export function planToMermaid(
   planJSON: GrafastPlanJSON,
   {
@@ -162,6 +166,11 @@ export function planToMermaid(
   const planIdMap = Object.create(null);
   const planId = (plan: GrafastPlanStepJSONv1): string => {
     if (!planIdMap[plan.id]) {
+      if (shouldHideStep(plan)) {
+        console.warn(
+          `Was expecting to hide step ${plan.id}, but we're rendering it anyway?`,
+        );
+      }
       const planName = plan.stepClass.replace(/Step$/, "");
       const planNode = `${planName}${plan.id}`;
       planIdMap[plan.id] = planNode;
@@ -241,10 +250,18 @@ export function planToMermaid(
   sortedSteps.forEach(
     // This comment is here purely to maintain the previous formatting to reduce a git diff.
     (plan) => {
+      if (shouldHideStep(plan)) return;
       const planNode = planId(plan);
-      const depNodes = plan.dependencyIds.map((depId) => {
-        return planId(stepById[depId]);
-      });
+      const depNodes = plan.dependencyIds
+        .map((depId) => {
+          const step = stepById[depId];
+          if (shouldHideStep(step)) {
+            return null;
+          } else {
+            return planId(step);
+          }
+        })
+        .filter((n): n is string => n !== null);
       const transformItemPlanNode = null;
       /*
       plan.stepClass === '__ListTransformStep'
@@ -317,7 +334,9 @@ export function planToMermaid(
   graph.push("");
   graph.push("    %% define steps");
   sortedSteps.forEach((step) => {
-    planId(step);
+    if (!shouldHideStep(step)) {
+      planId(step);
+    }
   });
 
   const stepToString = (step: GrafastPlanStepJSONv1): string => {
@@ -381,9 +400,10 @@ export function planToMermaid(
       `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
     );
     graph.push(
-      `    class ${[`Bucket${layerPlan.id}`, ...steps.map(planId)].join(
-        ",",
-      )} bucket${layerPlan.id}`,
+      `    class ${[
+        `Bucket${layerPlan.id}`,
+        ...steps.filter((s) => !shouldHideStep(s)).map(planId),
+      ].join(",")} bucket${layerPlan.id}`,
     );
   }
   if (!skipBuckets) {
