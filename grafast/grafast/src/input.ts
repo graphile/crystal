@@ -248,9 +248,8 @@ function inputVariablePlan(
   }
   const variableValuePlan =
     operationPlan.trackedVariableValuesStep.get(variableName);
-  if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
-    // There's no default value, or we know for sure that our variable will be
-    // set (even if null) and thus the default will not be used; use the variable.
+  if (defaultValue === undefined) {
+    // There's no default value and thus the default will not be used; use the variable.
     return variableValuePlan;
   } else {
     // `defaultValue` is NOT undefined, and we know variableValue is
