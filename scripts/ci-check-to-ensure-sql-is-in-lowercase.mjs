@@ -96,4 +96,9 @@ async function main() {
   if (wrongSQL.length !== 0) {
     process.exitCode = 1;
   }
-})();
+}
+
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
