@@ -10,7 +10,7 @@ directed to the plugin authors, not to this project. This page is maintained by
 the community and is not an endorsement by the project.
 
 If you have written a PostGraphile plugin (or have found one that is not listed
-here), then please feel free to add it, you can use the "edit this page" link
+here), then please feel free to add it, you can use the “edit this page” link below
 to do so.
 
 See [the configuration docs](./config) for how to load
