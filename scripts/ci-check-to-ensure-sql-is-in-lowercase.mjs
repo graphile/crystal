@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const regex = /```sql\n([\s\S]*?)\n```/g;
+const regex = /^```sql\n([\s\S]*?)\n```$/gm;
 const keywords = [
   "SELECT",
   "UPDATE",
