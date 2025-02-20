@@ -44,7 +44,8 @@ async function readFileAsync(filePath) {
     const data = await fs.promises.readFile(filePath, "utf-8");
     return data;
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error(`Error reading file ${filePath}:`, error);
+    throw error;
   }
 }
 
