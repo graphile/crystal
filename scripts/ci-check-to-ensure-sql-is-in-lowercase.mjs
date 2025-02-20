@@ -18,10 +18,10 @@ const keywords = [
 ];
 
 const WEBSITE_FOLDERS = [
-  "../postgraphile/website",
-  "../grafast/website",
-  "../graphile-build/website",
-  "../utils/website",
+  `${__dirname}/../postgraphile/website`,
+  `${__dirname}/../grafast/website`,
+  `${__dirname}/../graphile-build/website`,
+  `${__dirname}/../utils/website`,
 ];
 
 async function walkDir(dir) {
