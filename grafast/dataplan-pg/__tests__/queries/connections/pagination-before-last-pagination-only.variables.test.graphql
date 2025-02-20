@@ -5,12 +5,10 @@
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(true);
 # 'first' is not set, so hasNextPage is false.
 ## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(false);
-{
+#> variableValues: {"value": "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0="}
+query Q($value: String) {
   # The last 3 records before Postgres/Bob
-  allMessagesConnection(
-    last: 3
-    before: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0="
-  ) {
+  allMessagesConnection(last: 3, before: $value) {
     pageInfo {
       hasNextPage
       hasPreviousPage
