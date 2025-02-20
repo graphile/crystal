@@ -88,12 +88,13 @@ async function main() {
     }
   }
 
-  console.log(
-    Object.keys(wrongSQL),
-    `The above ${Object.keys(wrongSQL).length} files contain capital SQL.`,
-  );
-
-  if (wrongSQL.length !== 0) {
+  if (wrongSQL.length === 0) {
+    console.log("All files pass checks");
+  } else {
+    console.log(
+      `Found ${Object.keys(wrongSQL).length} files containing capitalized SQL; the Graphile style guide encourages the use of lower case SQL. Please lowercase the SQL in the following files:`,
+    );
+    console.dir(wrongSQL);
     process.exitCode = 1;
   }
 }
