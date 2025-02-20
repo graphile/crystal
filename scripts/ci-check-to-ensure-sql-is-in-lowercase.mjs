@@ -57,7 +57,7 @@ function wrongSQLCheck(segment) {
   }
 }
 
-(async () => {
+async function main() {
   let allFiles = [];
   for (const directory of WEBSITE_FOLDERS) {
     const fileStructure = await walkDir(directory);
