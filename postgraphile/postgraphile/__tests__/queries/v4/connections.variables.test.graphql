@@ -1,15 +1,15 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
-#> variableValues: {"cursor2": "WyIwOGUwZDM0MmRlIiwyXQ==", "cursor6": "WyIwOGUwZDM0MmRlIiw2XQ==", "null": null}
-query Q($cursor2: Cursor, $cursor6: Cursor, $unset: Cursor, $null: Cursor) {
+#> variableValues: {"cursor2": "WyIwOGUwZDM0MmRlIiwyXQ==", "cursor6": "WyIwOGUwZDM0MmRlIiw2XQ==", "null": null, "two": 2}
+query Q($cursor2: Cursor, $cursor6: Cursor, $unset: Cursor, $null: Cursor, $two: Int!) {
   a: allPeople {
     ...personConnection
   }
-  b: allPeople(first: 2) {
+  b: allPeople(first: $two) {
     ...personConnection
   }
-  c: allPeople(last: 2) {
+  c: allPeople(last: $two) {
     ...personConnection
   }
   d: allPeople(orderBy: NAME_ASC, before: $unset, after: $unset) {
@@ -44,10 +44,10 @@ query Q($cursor2: Cursor, $cursor6: Cursor, $unset: Cursor, $null: Cursor) {
       }
     }
   }
-  j: allPosts(condition: { authorId: 2 }) {
+  j: allPosts(condition: { authorId: $two }) {
     ...postConnection
   }
-  k: allPosts(first: 2, condition: { authorId: 2 }) {
+  k: allPosts(first: $two, condition: { authorId: $two }) {
     ...postConnection
   }
   l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) {
