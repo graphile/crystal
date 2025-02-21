@@ -28,6 +28,7 @@ graph TD
     Object13 & Access8 & ApplyInput14 --> PgUpdateSingle10
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle10 --> Object15
+    PgFromExpression26{{"PgFromExpression[26∈2] ➊"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__t__.”k”ᐳ"}}:::plan
     Access17{{"Access[17∈3] ➊<br />ᐸ10.tᐳ"}}:::plan
     Access17 --> PgClassExpression16
@@ -36,22 +37,22 @@ graph TD
     Access17 --> PgClassExpression18
     PgSelect22[["PgSelect[22∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
     __Item21[/"__Item[21∈5]<br />ᐸ18ᐳ"\]:::itemplan
-    Object13 & __Item21 --> PgSelect22
+    Object13 & __Item21 & PgFromExpression26 --> PgSelect22
     PgClassExpression18 ==> __Item21
-    PgSelectRows26[["PgSelectRows[26∈5]"]]:::plan
-    PgSelect22 --> PgSelectRows26
-    __Item27[/"__Item[27∈6]<br />ᐸ26ᐳ"\]:::itemplan
-    PgSelectRows26 ==> __Item27
-    PgSelectSingle28{{"PgSelectSingle[28∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item27 --> PgSelectSingle28
-    PgClassExpression29{{"PgClassExpression[29∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression29
-    PgClassExpression30{{"PgClassExpression[30∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression32
+    PgSelectRows27[["PgSelectRows[27∈5]"]]:::plan
+    PgSelect22 --> PgSelectRows27
+    __Item28[/"__Item[28∈6]<br />ᐸ27ᐳ"\]:::itemplan
+    PgSelectRows27 ==> __Item28
+    PgSelectSingle29{{"PgSelectSingle[29∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item28 --> PgSelectSingle29
+    PgClassExpression30{{"PgClassExpression[30∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression30
+    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression31
+    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression32
+    PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle29 --> PgClassExpression33
 
     %% define steps
 
@@ -64,16 +65,16 @@ graph TD
     class Bucket1,PgUpdateSingle10,Object15 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 10, 13<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 13<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;)ᐳ[10]"):::bucket
+    class Bucket2,PgFromExpression26 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 13, 26<br /><br />ROOT PgUpdateSingle{1}ᐸt(k;)ᐳ[10]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression16,Access17,PgClassExpression18 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 13<br /><br />ROOT __Item{5}ᐸ18ᐳ[21]<br />1: PgSelect[22]<br />2: PgSelectRows[26]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 13, 26<br /><br />ROOT __Item{5}ᐸ18ᐳ[21]<br />1: PgSelect[22]<br />2: PgSelectRows[27]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item21,PgSelect22,PgSelectRows26 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ26ᐳ[27]"):::bucket
+    class Bucket5,__Item21,PgSelect22,PgSelectRows27 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ27ᐳ[28]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item27,PgSelectSingle28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32 bucket6
+    class Bucket6,__Item28,PgSelectSingle29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
