@@ -25,6 +25,7 @@ import {
   isAsyncIterable,
   isDev,
   isPromiseLike,
+  operationPlan,
   reverseArray,
   SafeError,
   Step,
@@ -147,6 +148,7 @@ export interface PgSelectArgumentDigest {
   position?: number;
   name?: string;
   placeholder: SQL;
+  step?: never;
 }
 
 interface PgSelectArgumentBasics {
@@ -1772,7 +1774,7 @@ export function pgFromExpression(
   },
   baseFrom: SQL | ((...args: PgSelectArgumentDigest[]) => SQL),
   parameters: PgResourceParameter[] = [],
-  specs: PgSelectArgumentSpec[] = [],
+  specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
     return baseFrom;
@@ -1783,30 +1785,35 @@ export function pgFromExpression(
   const digests: Array<
     PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
   > = [];
-  for (const identifier of specs) {
-    if (isDev) {
-      assertSensible(identifier.step);
-    }
-    const { step, name } = identifier;
+  for (const spec of specs) {
+    if (spec.step) {
+      if (isDev) {
+        assertSensible(spec.step);
+      }
+      const { step, name } = spec;
 
-    const codec =
-      "pgCodec" in identifier ? identifier.pgCodec : identifier.step.pgCodec;
-    if (step.getAndFreezeIsUnary()) {
-      // It's a unary step
-      digests.push({
-        name,
-        step,
-      });
+      const codec = "pgCodec" in spec ? spec.pgCodec : spec.step.pgCodec;
+      if (step.getAndFreezeIsUnary()) {
+        // It's a unary step
+        digests.push({
+          name,
+          step,
+        });
+      } else {
+        const placeholder = $placeholderable.placeholder(step, codec);
+        digests.push({
+          name,
+          placeholder,
+        });
+      }
     } else {
-      const placeholder = $placeholderable.placeholder(step, codec);
-      digests.push({
-        name,
-        placeholder,
-      });
+      digests.push(spec);
     }
   }
-  return $placeholderable.deferredSQL(
-    new PgFromExpressionStep(baseFrom, parameters, digests),
+  return operationPlan().withRootLayerPlan(() =>
+    $placeholderable.deferredSQL(
+      new PgFromExpressionStep(baseFrom, parameters, digests),
+    ),
   );
 }
 
@@ -1818,6 +1825,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     [argName: string]: PgResourceParameter;
   };
   private indexAfterWhichAllArgsAreNamed: number;
+  public isSyncAndSafe = true;
   constructor(
     private from: (...args: PgSelectArgumentDigest[]) => SQL,
     private parameters: PgResourceParameter[],
@@ -1836,7 +1844,8 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
       if (param.name != null) {
         this.parameterByName[param.name] = param;
       }
-      if (param.name == null) {
+      // Note that `name = ''` counts as having no name.
+      if (!param.name) {
         indexAfterWhichAllArgsAreNamed = i + 1;
       }
     }
@@ -1869,13 +1878,16 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
       const digest = this.digests[digestIndex];
       if (
         !namedOnly &&
-        digest.name != null &&
+        // Note that name can be the empty string, we treat that as "no name"
+        digest.name &&
         this.parameters[digestIndex].name !== digest.name
       ) {
         namedOnly = true;
       }
       if (namedOnly && !digest.name) {
-        throw new Error("Cannot have unnamed argument after named arguments");
+        throw new Error(
+          `Cannot have unnamed argument after named arguments at index ${digestIndex}`,
+        );
       }
       const parameter = namedOnly
         ? this.parameterByName[digest.name!]
@@ -1905,7 +1917,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
       } else {
         args.push({
           placeholder: sqlValue,
-          position: ++argIndex,
+          position: argIndex++,
         });
       }
     }
