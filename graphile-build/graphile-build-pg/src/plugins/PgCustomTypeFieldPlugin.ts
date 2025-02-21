@@ -16,7 +16,6 @@ import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
   PgSelectQueryBuilder,
-  PgTypedStep,
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
@@ -42,7 +41,6 @@ import {
   __ListTransformStep,
   bakedInput,
   connection,
-  constant,
   object,
   ObjectStep,
   stepAMayDependOnStepB,
@@ -555,13 +553,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               argDetailsSimple,
               `argDetailsSimple_${resource.name}`,
             );
-            let indexAfterWhichAllArgsAreNamed = 0;
-            const argDetailsLength = argDetails.length;
-            for (let i = 0; i < argDetailsLength; i++) {
-              if (!argDetails[i].postgresArgName) {
-                indexAfterWhichAllArgsAreNamed = i + 1;
-              }
-            }
 
             const makeArgs = EXPORTABLE(
               (argDetailsSimple, makeArg) =>
