@@ -1,8 +1,4 @@
-import type {
-  EdgeCapableStep,
-  ExecutableStep,
-  UnbatchedExecutionExtra,
-} from "grafast";
+import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
 import { exportAs, polymorphicWrap, UnbatchedStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
@@ -96,7 +92,7 @@ export class PgSelectSingleStep<
 
   constructor(
     $class: PgSelectStep<TResource>,
-    $item: ExecutableStep<unknown[]>,
+    $item: Step<unknown[]>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
@@ -130,7 +126,7 @@ export class PgSelectSingleStep<
   }
 
   /** @internal */
-  public getItemStep(): ExecutableStep<unknown[]> {
+  public getItemStep(): Step<unknown[]> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
@@ -315,14 +311,18 @@ export class PgSelectSingleStep<
   public scopedSQL = makeScopedSQL(this);
 
   public placeholder($step: PgTypedStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedStep<any>,
+    $step: Step | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
       : this.getClassStep().placeholder($step as PgTypedStep<any>);
+  }
+
+  public deferredSQL($step: Step<SQL>): SQL {
+    return this.getClassStep().deferredSQL($step);
   }
 
   private existingSingleRelation<
@@ -465,7 +465,7 @@ export class PgSelectSingleStep<
     });
   }
 
-  planForType(type: GraphQLObjectType): ExecutableStep {
+  planForType(type: GraphQLObjectType): Step {
     const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single") {
       return this;
@@ -635,8 +635,8 @@ export function pgSelectFromRecord<
   resource: TResource,
   $record:
     | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
-    | ExecutableStep<{
-        [Attr in keyof TResource["codec"]["attributes"]]: ExecutableStep;
+    | Step<{
+        [Attr in keyof TResource["codec"]["attributes"]]: Step;
       }>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({

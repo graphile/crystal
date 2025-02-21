@@ -21,6 +21,7 @@ import type {
 } from "@dataplan/pg";
 import {
   pgClassExpression,
+  pgFromExpression,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
   PgSelectStep,
@@ -41,6 +42,7 @@ import {
   __ListTransformStep,
   bakedInput,
   connection,
+  constant,
   object,
   ObjectStep,
   stepAMayDependOnStepB,
@@ -992,6 +994,7 @@ function modFields(
                 hasRecord,
                 makeArgs,
                 pgClassExpression,
+                pgFromExpression,
                 pgSelectSingleFromRecord,
                 resource,
                 stepAMayDependOnStepB,
@@ -1031,39 +1034,29 @@ function modFields(
                       (
                         arg,
                         i,
-                      ): PgSelectArgumentDigest & {
-                        // We _MUST_ set `name` if we're told one
-                        name: string | undefined;
-                      } => {
-                        const { name } = arg;
+                      ): PgSelectArgumentSpec | PgSelectArgumentDigest => {
                         if (i === 0) {
+                          const { step, ...rest } = arg;
                           return {
-                            name,
+                            ...rest,
                             placeholder: $row.getClassStep().alias,
                           };
-                        } else if ("pgCodec" in arg && arg.pgCodec) {
-                          return {
-                            name,
-                            placeholder: $row.placeholder(
-                              arg.step,
-                              arg.pgCodec,
-                            ),
-                          };
                         } else {
-                          return {
-                            name,
-                            placeholder: $row.placeholder(
-                              arg.step as PgTypedStep<any>,
-                            ),
-                          };
+                          return arg;
                         }
                       },
+                    );
+                    const from = pgFromExpression(
+                      $row,
+                      resource.from,
+                      resource.parameters,
+                      newSelectArgs,
                     );
                     return pgClassExpression(
                       $row,
                       resource.codec,
                       undefined,
-                    )`${resource.from(...newSelectArgs)}`;
+                    )`${from}`;
                   }
                   // PERF: or here, if scalar add select to `$row`?
                   return resource.execute(selectArgs);
@@ -1073,6 +1066,7 @@ function modFields(
                 hasRecord,
                 makeArgs,
                 pgClassExpression,
+                pgFromExpression,
                 pgSelectSingleFromRecord,
                 resource,
                 stepAMayDependOnStepB,
