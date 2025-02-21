@@ -33,8 +33,7 @@ graph TD
     PgFromExpression25{{"PgFromExpression[25∈1] ➊"}}:::plan
     Object10 & PgFromExpression25 & Connection26 --> PgSelect27
     PgSelect37[["PgSelect[37∈1] ➊<br />ᐸperson_friends(aggregate)ᐳ"]]:::plan
-    PgFromExpression35{{"PgFromExpression[35∈1] ➊"}}:::plan
-    Object10 & PgFromExpression35 & Connection36 --> PgSelect37
+    Object10 & PgFromExpression25 & Connection36 --> PgSelect37
     List16{{"List[16∈1] ➊<br />ᐸ14,15ᐳ"}}:::plan
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant14 & PgClassExpression15 --> List16
@@ -54,7 +53,6 @@ graph TD
     First28 --> PgSelectSingle30
     PgClassExpression31{{"PgClassExpression[31∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression20 --> PgFromExpression35
     First38{{"First[38∈1] ➊"}}:::plan
     PgSelectRows39[["PgSelectRows[39∈1] ➊"]]:::plan
     PgSelectRows39 --> First38
@@ -70,8 +68,8 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 14, 19, 42, 10, 26, 36<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant14,Connection26,Connection36,Constant42 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 10, 26, 36<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]<br />1: <br />ᐳ: 15, 18, 20, 16, 17, 25, 35<br />2: PgSelect[27], PgSelect[37]<br />3: PgSelectRows[29], PgSelectRows[39]<br />ᐳ: 28, 30, 31, 38, 40, 41"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 10, 26, 36<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]<br />1: <br />ᐳ: 15, 18, 20, 16, 17, 25<br />2: PgSelect[27], PgSelect[37]<br />3: PgSelectRows[29], PgSelectRows[39]<br />ᐳ: 28, 30, 31, 38, 40, 41"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,List16,Lambda17,PgClassExpression18,PgClassExpression20,PgFromExpression25,PgSelect27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,PgFromExpression35,PgSelect37,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41 bucket1
+    class Bucket1,PgClassExpression15,List16,Lambda17,PgClassExpression18,PgClassExpression20,PgFromExpression25,PgSelect27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,PgSelect37,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41 bucket1
     Bucket0 --> Bucket1
     end
