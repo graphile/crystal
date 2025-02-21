@@ -1773,7 +1773,7 @@ export function pgFromExpression(
       deferredSQL($step: Step<SQL>): SQL;
     };
   },
-  baseFrom: SQL | ((...args: PgSelectArgumentDigest[]) => SQL),
+  baseFrom: SQL | ((...args: readonly PgSelectArgumentDigest[]) => SQL),
   inParameters: PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
@@ -1782,6 +1782,14 @@ export function pgFromExpression(
   }
   if (specs.length === 0) {
     return baseFrom();
+  }
+  if (
+    specs.every(
+      (spec): spec is PgSelectArgumentDigest =>
+        "placeholder" in spec && spec.placeholder != null,
+    )
+  ) {
+    return baseFrom(...specs);
   }
   const $placeholderable = $target.getPgRoot();
   let parameters: PgResourceParameter[];
