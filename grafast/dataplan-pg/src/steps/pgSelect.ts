@@ -1290,9 +1290,6 @@ export class PgSelectStep<
       if (p.resource !== this.resource) {
         return false;
       }
-      if (p.from !== this.from) {
-        return false;
-      }
 
       // Check mode matches
       if (p.mode !== this.mode) {
@@ -1336,6 +1333,27 @@ export class PgSelectStep<
         return false;
       }
 
+      // Check DEFERREDs match
+      if (
+        !arraysMatch(this.deferreds, p.deferreds, (a, b) => {
+          const equivalent = a.dependencyIndex === b.dependencyIndex;
+          if (equivalent) {
+            if (a.symbol !== b.symbol) {
+              // Make symbols appear equivalent
+              symbolSubstitutes.set(a.symbol, b.symbol);
+            }
+          }
+          return equivalent;
+        })
+      ) {
+        debugPlanVerbose(
+          "Refusing to deduplicate %c with %c because the deferreds don't match",
+          this,
+          p,
+        );
+        return false;
+      }
+
       const sqlIsEquivalent = (a: SQL, b: SQL) =>
         sql.isEquivalent(a, b, options);
 
@@ -1346,6 +1364,11 @@ export class PgSelectStep<
 
       // Check inliningForbidden matches
       if (p.inliningForbidden !== this.inliningForbidden) {
+        return false;
+      }
+
+      // Check FROM
+      if (!sqlIsEquivalent(p.from, this.from)) {
         return false;
       }
 
@@ -1907,8 +1930,23 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     peers: readonly PgFromExpressionStep[],
   ): readonly PgFromExpressionStep[] {
     return peers.filter((p) => {
-      if (p.from !== this.from) return false;
-      if (p.parameters !== this.parameters) return false;
+      if (p.from !== this.from) {
+        return false;
+      }
+      if (
+        !arraysMatch(
+          p.parameters,
+          this.parameters,
+          (a, b) =>
+            a.name === b.name &&
+            a.codec === b.codec &&
+            a.notNull === b.notNull &&
+            a.required === b.required &&
+            a.extensions === b.extensions,
+        )
+      ) {
+        return false;
+      }
       if (
         !arraysMatch(p.digests, this.digests, (a, b) => {
           return (
