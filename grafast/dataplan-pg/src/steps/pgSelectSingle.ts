@@ -16,6 +16,7 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
+  PgQueryRootStep,
   PgRegistry,
   PgSQLCallbackOrDirect,
   PgTypedStep,
@@ -310,7 +311,13 @@ export class PgSelectSingleStep<
 
   public scopedSQL = makeScopedSQL(this);
 
+  public getPgRoot(): PgQueryRootStep {
+    return this.getClassStep();
+  }
+
+  /** @deprecated Use .getPgRoot().placeholder() */
   public placeholder($step: PgTypedStep<any>): SQL;
+  /** @deprecated Use .getPgRoot().placeholder() */
   public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
     $step: Step | PgTypedStep<any>,

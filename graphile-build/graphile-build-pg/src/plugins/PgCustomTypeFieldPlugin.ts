@@ -1040,7 +1040,7 @@ function modFields(
                           return {
                             ...rest,
                             placeholder: $row.getClassStep().alias,
-                          };
+                          } as PgSelectArgumentDigest;
                         } else {
                           return arg;
                         }

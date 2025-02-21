@@ -1767,9 +1767,11 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 // Previously: digestsFromArgumentSpecs; now combined
 export function pgFromExpression(
-  $placeholderable: Step & {
-    placeholder(step: Step, codec: PgCodec): SQL;
-    deferredSQL($step: Step<SQL>): SQL;
+  $target: {
+    getPgRoot(): Step & {
+      placeholder(step: Step, codec: PgCodec): SQL;
+      deferredSQL($step: Step<SQL>): SQL;
+    };
   },
   baseFrom: SQL | ((...args: PgSelectArgumentDigest[]) => SQL),
   inParameters: PgResourceParameter[] | undefined = undefined,
@@ -1781,6 +1783,7 @@ export function pgFromExpression(
   if (specs.length === 0) {
     return baseFrom();
   }
+  const $placeholderable = $target.getPgRoot();
   let parameters: PgResourceParameter[];
   if (!inParameters) {
     parameters = [];
@@ -1841,7 +1844,7 @@ export function pgFromExpression(
       digests.push(spec);
     }
   }
-  return operationPlan().withRootLayerPlan(() =>
+  return $placeholderable.withLayerPlan(() =>
     $placeholderable.deferredSQL(
       new PgFromExpressionStep(baseFrom, parameters, digests),
     ),

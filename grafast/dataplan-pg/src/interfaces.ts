@@ -756,3 +756,10 @@ export type ObjectForResource<
 > = {
   [key in keyof GetPgResourceAttributes<TResource> & string]?: any; // TYPES: we should be able to make this stronger using the attribute codec
 };
+
+export interface PgQueryRootStep extends Step {
+  getPgRoot(): PgQueryRootStep;
+  placeholder($step: PgTypedStep<PgCodec>): SQL;
+  placeholder($step: Step, codec: PgCodec, alreadyEncoded?: boolean): SQL;
+  deferredSQL($step: Step<SQL>): SQL;
+}
