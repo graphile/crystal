@@ -381,7 +381,7 @@ Create a `tsconfig.json` file with the following
     "skipLibCheck": true,
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
-    "baseUrl": "." // Base directory for path resolution
+    "baseUrl": "."
   }
 }
 ```
