@@ -20,7 +20,6 @@ import type {
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
-  digestsFromArgumentSpecs,
   pgClassExpression,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
@@ -36,19 +35,18 @@ import type {
   FieldPlanResolver,
   GrafastFieldConfig,
   GrafastInputFieldConfigMap,
+  Maybe,
 } from "grafast";
 import {
   __ListTransformStep,
   bakedInput,
   connection,
-  constant,
   object,
   ObjectStep,
   stepAMayDependOnStepB,
 } from "grafast";
 import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import type { SQL } from "pg-sql2";
 
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
@@ -97,15 +95,6 @@ declare global {
           inputType: GraphQLInputType;
           required: boolean;
         }>;
-        makeExpression(opts: {
-          $placeholderable: {
-            placeholder($step: ExecutableStep, codec: PgCodec): SQL;
-          };
-          resource: PgResource<any, any, any, any, any>;
-          fieldArgs: FieldArgs;
-          path?: string[];
-          initialArgs?: SQL[];
-        }): SQL;
       };
     }
 
@@ -487,7 +476,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 getSpec && codecResource
                   ? EXPORTABLE(
                       (codecResource, getSpec) =>
-                        ($nodeId: ExecutableStep<string>) =>
+                        ($nodeId: ExecutableStep<Maybe<string>>) =>
                           codecResource.get(getSpec($nodeId)),
                       [codecResource, getSpec],
                     )
@@ -569,111 +558,38 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             }
 
             const makeArgs = EXPORTABLE(
-              (
-                argDetailsLength,
-                argDetailsSimple,
-                bakedInput,
-                constant,
-                indexAfterWhichAllArgsAreNamed,
-              ) =>
-                (args: FieldArgs, path: string[] = []) => {
-                  const selectArgs: PgSelectArgumentSpec[] = [];
-
-                  let skipped = false;
-                  for (let i = 0; i < argDetailsLength; i++) {
+              (argDetailsSimple, bakedInput) =>
+                (args: FieldArgs, path: string[] = []) =>
+                  argDetailsSimple.map((details, i): PgSelectArgumentSpec => {
                     const {
                       graphqlArgName,
                       postgresArgName,
                       pgCodec,
-                      required,
                       fetcher,
-                    } = argDetailsSimple[i];
+                    } = details;
                     const fullPath = [...path, graphqlArgName];
                     const $raw = args.getRaw(fullPath) as __TrackedValueStep;
-                    let step: ExecutableStep;
-                    if ($raw.evalIs(undefined)) {
-                      if (
-                        !required &&
-                        i >= indexAfterWhichAllArgsAreNamed - 1
-                      ) {
-                        skipped = true;
-                        continue;
-                      } else {
-                        step = constant(null);
-                      }
-                    } else if (fetcher) {
-                      step = (
-                        fetcher(
-                          $raw as ExecutableStep<string>,
-                        ) as PgSelectSingleStep
-                      ).record();
-                    } else {
-                      const type = args.typeAt(fullPath);
-                      step = bakedInput(type, $raw);
-                    }
+                    const step = fetcher
+                      ? (
+                          fetcher(
+                            $raw as ExecutableStep<Maybe<string>>,
+                          ) as PgSelectSingleStep
+                        ).record()
+                      : bakedInput(args.typeAt(fullPath), $raw);
 
-                    if (skipped) {
-                      const name = postgresArgName;
-                      if (!name) {
-                        throw new Error(
-                          "GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed",
-                        );
-                      }
-                      selectArgs.push({
-                        step,
-                        pgCodec,
-                        name,
-                      });
-                    } else {
-                      selectArgs.push({
-                        step,
-                        pgCodec,
-                      });
-                    }
-                  }
-
-                  return selectArgs;
-                },
-              [
-                argDetailsLength,
-                argDetailsSimple,
-                bakedInput,
-                constant,
-                indexAfterWhichAllArgsAreNamed,
-              ],
+                    return {
+                      step,
+                      pgCodec,
+                      name: postgresArgName ?? undefined,
+                    };
+                  }),
+              [argDetailsSimple, bakedInput],
             );
 
             return {
               argDetails,
               makeArgs,
               makeFieldArgs,
-              makeExpression: EXPORTABLE(
-                (digestsFromArgumentSpecs, makeArgs) =>
-                  ({
-                    $placeholderable,
-                    resource,
-                    fieldArgs,
-                    path = [],
-                    initialArgs = [],
-                  }) => {
-                    const args = makeArgs(fieldArgs, path);
-                    const { digests } = digestsFromArgumentSpecs(
-                      $placeholderable,
-                      args,
-                      initialArgs.map((a, position) => ({
-                        placeholder: a,
-                        position,
-                      })),
-                      initialArgs.length,
-                    );
-                    if (typeof resource.from !== "function") {
-                      throw new Error("!function");
-                    }
-                    const src = resource.from(...digests);
-                    return src;
-                  },
-                [digestsFromArgumentSpecs, makeArgs],
-              ),
             };
           };
 

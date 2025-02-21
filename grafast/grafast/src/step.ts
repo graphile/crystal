@@ -324,6 +324,16 @@ export /* abstract */ class Step<TData = any> {
     this.id = this.layerPlan._addStep(this);
   }
 
+  /**
+   * Generally you should only use this once the dependencies of a step are
+   * established, if you use it beforehand and it returns `true` then adding a
+   * non-unary dependency later will result in an error.
+   */
+  public getAndFreezeIsUnary() {
+    this._isUnaryLocked = true;
+    return this._isUnary;
+  }
+
   protected withMyLayerPlan<T>(callback: () => T): T {
     return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
   }
