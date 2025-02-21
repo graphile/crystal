@@ -1903,6 +1903,28 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     });
   }
 
+  public deduplicate(
+    peers: readonly PgFromExpressionStep[],
+  ): readonly PgFromExpressionStep[] {
+    return peers.filter((p) => {
+      if (p.from !== this.from) return false;
+      if (p.parameters !== this.parameters) return false;
+      if (
+        !arraysMatch(p.digests, this.digests, (a, b) => {
+          return (
+            a.name === b.name &&
+            a.position === b.position &&
+            a.depId === b.depId &&
+            a.placeholder === b.placeholder
+          );
+        })
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+
   unbatchedExecute(_extra: UnbatchedExecutionExtra, ...deps: any[]): SQL {
     /**
      * If true, we can only use named parameters now. Set this if we skip an
