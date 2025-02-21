@@ -1063,9 +1063,9 @@ export function arraysMatch<T>(
     return false;
   }
   for (let i = 0; i < l; i++) {
-    if (
-      comparator ? !comparator(array1[i]!, array2[i]!) : array1[i] !== array2[i]
-    ) {
+    const a = array1[i]!;
+    const b = array2[i]!;
+    if (a !== b && (!comparator || !comparator(a, b))) {
       return false;
     }
   }
