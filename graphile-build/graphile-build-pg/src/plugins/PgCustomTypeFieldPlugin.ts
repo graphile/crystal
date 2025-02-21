@@ -50,7 +50,7 @@ import {
 import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { tagToString } from "../utils.js";
+import { exportNameHint, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
@@ -551,6 +551,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 fetcher,
               }),
             );
+            exportNameHint(
+              argDetailsSimple,
+              `argDetailsSimple_${resource.name}`,
+            );
             let indexAfterWhichAllArgsAreNamed = 0;
             const argDetailsLength = argDetails.length;
             for (let i = 0; i < argDetailsLength; i++) {
@@ -560,33 +564,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             }
 
             const makeArgs = EXPORTABLE(
-              (argDetailsSimple, bakedInput) =>
+              (argDetailsSimple, makeArg) =>
                 (args: FieldArgs, path: string[] = []) =>
-                  argDetailsSimple.map((details, i): PgSelectArgumentSpec => {
-                    const {
-                      graphqlArgName,
-                      postgresArgName,
-                      pgCodec,
-                      fetcher,
-                    } = details;
-                    const fullPath = [...path, graphqlArgName];
-                    const $raw = args.getRaw(fullPath) as __TrackedValueStep;
-                    const step = fetcher
-                      ? (
-                          fetcher(
-                            $raw as ExecutableStep<Maybe<string>>,
-                          ) as PgSelectSingleStep
-                        ).record()
-                      : bakedInput(args.typeAt(fullPath), $raw);
-
-                    return {
-                      step,
-                      pgCodec,
-                      name: postgresArgName ?? undefined,
-                    };
-                  }),
-              [argDetailsSimple, bakedInput],
+                  argDetailsSimple.map((details) =>
+                    makeArg(path, args, details),
+                  ),
+              [argDetailsSimple, makeArg],
             );
+
+            exportNameHint(makeArgs, `makeArgs_${resource.name}`);
 
             return {
               argDetails,
@@ -1447,3 +1433,37 @@ function getFunctionSourceReturnGraphQLType(
       : innerType;
   return type;
 }
+
+const makeArg = EXPORTABLE(
+  (bakedInput) =>
+    function makeArg(
+      path: string[],
+      args: FieldArgs,
+      details: {
+        graphqlArgName: string;
+        postgresArgName: string | null;
+        pgCodec: PgCodec;
+        fetcher:
+          | null
+          | ((
+              $nodeId: ExecutableStep<Maybe<string>>,
+            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+      },
+    ): PgSelectArgumentSpec {
+      const { graphqlArgName, postgresArgName, pgCodec, fetcher } = details;
+      const fullPath = [...path, graphqlArgName];
+      const $raw = args.getRaw(fullPath) as __TrackedValueStep;
+      const step = fetcher
+        ? (
+            fetcher($raw as ExecutableStep<Maybe<string>>) as PgSelectSingleStep
+          ).record()
+        : bakedInput(args.typeAt(fullPath), $raw);
+
+      return {
+        step,
+        pgCodec,
+        name: postgresArgName ?? undefined,
+      };
+    },
+  [bakedInput],
+);
