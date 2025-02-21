@@ -141,6 +141,7 @@ export type PgSelectArgumentSpec =
     }
   | {
       step: PgTypedStep<any>;
+      pgCodec?: never;
       name?: string;
     };
 
@@ -217,6 +218,8 @@ export interface PgSelectOptions<
    * call the relevant function once and re-use the result.
    */
   forceIdentity?: boolean;
+
+  parameters?: PgResourceParameter[];
 
   /**
    * If your `from` (or resource.from if omitted) is a function, the arguments
@@ -605,6 +608,7 @@ export class PgSelectStep<
     super();
     const {
       resource,
+      parameters = resource.parameters,
       identifiers,
       args: inArgs,
       from: inFrom = null,
@@ -674,12 +678,7 @@ export class PgSelectStep<
       this.identifierMatches = identifierMatches;
 
       const ourFrom = inFrom ?? resource.from;
-      this.from = pgFromExpression(
-        this,
-        ourFrom,
-        this.resource.parameters,
-        inArgs,
-      );
+      this.from = pgFromExpression(this, ourFrom, parameters, inArgs);
     }
 
     this.peerKey = this.resource.name;
@@ -1768,12 +1767,12 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 // Previously: digestsFromArgumentSpecs; now combined
 export function pgFromExpression(
-  $placeholderable: {
+  $placeholderable: Step & {
     placeholder(step: Step, codec: PgCodec): SQL;
     deferredSQL($step: Step<SQL>): SQL;
   },
   baseFrom: SQL | ((...args: PgSelectArgumentDigest[]) => SQL),
-  parameters: PgResourceParameter[] = [],
+  inParameters: PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
@@ -1781,6 +1780,38 @@ export function pgFromExpression(
   }
   if (specs.length === 0) {
     return baseFrom();
+  }
+  let parameters: PgResourceParameter[];
+  if (!inParameters) {
+    parameters = [];
+    for (const spec of specs) {
+      if (spec.step) {
+        if (spec.pgCodec) {
+          parameters.push({
+            name: spec.name ?? null,
+            codec: spec.pgCodec,
+            required: false,
+          });
+        } else {
+          parameters.push({
+            name: spec.name ?? null,
+            codec: spec.step.pgCodec,
+            required: false,
+          });
+        }
+      } else {
+        throw new Error(
+          `Cannot use placeholder steps without passing accurate placeholders`,
+        );
+      }
+    }
+  } else {
+    parameters = inParameters;
+  }
+  if (specs.length > parameters.length) {
+    throw new Error(
+      `Attempted to build function-like from expression for ${$placeholderable}, but insufficient parameter definitions (${parameters.length}) were provided for the arguments passed (${specs.length}).`,
+    );
   }
   const digests: Array<
     PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
@@ -1892,6 +1923,13 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
       const parameter = namedOnly
         ? this.parameterByName[digest.name!]
         : this.parameters[digestIndex];
+      if (!parameter) {
+        throw new Error(
+          `Could not determine parameter for argument at index ${digestIndex}${
+            digest.name ? ` (${digest.name})` : ""
+          }`,
+        );
+      }
       let sqlValue: SQL;
       if (digest.depId != null) {
         const dep = deps[digest.depId];
