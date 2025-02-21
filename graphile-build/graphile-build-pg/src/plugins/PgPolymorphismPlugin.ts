@@ -86,13 +86,13 @@ declare global {
       nodeIdHelpersForCodec(
         codec: PgCodec<any, any, any, any, any, any, any>,
       ): {
-        getSpec: ($nodeId: ExecutableStep<string>) => {
+        getSpec: ($nodeId: ExecutableStep<Maybe<string>>) => {
           [key: string]: ExecutableStep<any>;
         };
         getIdentifiers: (nodeId: Maybe<string>) => null | readonly any[];
       } | null;
       nodeIdSpecForCodec(codec: PgCodec<any, any, any, any, any, any, any>):
-        | (($nodeId: ExecutableStep<string>) => {
+        | (($nodeId: ExecutableStep<Maybe<string>>) => {
             [key: string]: ExecutableStep<any>;
           })
         | null;
@@ -986,7 +986,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   getSpec: EXPORTABLE(
                     (handler, lambda, specForHandler) =>
                       (
-                        $nodeId: ExecutableStep<string>,
+                        $nodeId: ExecutableStep<Maybe<string>>,
                       ): { [key: string]: ExecutableStep<any> } => {
                         // TODO: should change this to a common method like
                         // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
@@ -1421,7 +1421,7 @@ function makeGetRelationalSpec(
   return EXPORTABLE(
     (access, decodeNodeId, details, lambda, list, object, tablePkAttributes) =>
       (
-        $nodeId: ExecutableStep<string>,
+        $nodeId: ExecutableStep<Maybe<string>>,
       ): { [key: string]: ExecutableStep<any> } => {
         const $specifier = decodeNodeId($nodeId);
         const $handlerMatches = list(
@@ -1481,7 +1481,7 @@ function makeGetSingleSpec(
   return EXPORTABLE(
     (access, decodeNodeId, handlers, lambda, list, object, tablePkAttributes) =>
       (
-        $nodeId: ExecutableStep<string>,
+        $nodeId: ExecutableStep<Maybe<string>>,
       ): { [key: string]: ExecutableStep<any> } => {
         const $specifier = decodeNodeId($nodeId);
         const $handlerMatches = list(

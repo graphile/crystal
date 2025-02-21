@@ -3,11 +3,13 @@ import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   ConnectionStep,
+  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
   LambdaStep,
   Maybe,
   PromiseOrDirect,
+  UnbatchedExecutionExtra,
 } from "grafast";
 import {
   __InputListStep,
@@ -26,13 +28,18 @@ import {
   reverseArray,
   SafeError,
   Step,
+  UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
-import { listOfCodec, TYPES } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../datasource.js";
+import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
+import type {
+  PgResource,
+  PgResourceParameter,
+  PgResourceUnique,
+} from "../datasource.js";
 import type { PgExecutorContextPlans, PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
@@ -140,6 +147,24 @@ export interface PgSelectArgumentDigest {
   position?: number;
   name?: string;
   placeholder: SQL;
+}
+
+interface PgSelectArgumentBasics {
+  position?: number;
+  name?: string;
+}
+interface PgSelectArgumentPlaceholder extends PgSelectArgumentBasics {
+  placeholder: SQL;
+  step?: never;
+  depId?: never;
+}
+interface PgSelectArgumentUnaryStep extends PgSelectArgumentBasics {
+  placeholder?: never;
+  step: ExecutableStep;
+}
+interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
+  placeholder?: never;
+  depId: number;
 }
 
 interface QueryValue {
@@ -316,9 +341,7 @@ export class PgSelectStep<
   isSyncAndSafe = false;
 
   // FROM
-  private readonly from:
-    | SQL
-    | ((...args: Array<PgSelectArgumentDigest>) => SQL);
+  private readonly from: SQL;
   private readonly hasImplicitOrder: boolean;
 
   /**
@@ -417,11 +440,6 @@ export class PgSelectStep<
    * call the relevant function once and re-use the result.
    */
   public forceIdentity: boolean;
-
-  /**
-   * If the resource is a function, this is the names of the arguments to pass
-   */
-  private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
   protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
   protected deferreds: Array<PgStmtDeferredSQL> = [];
@@ -524,7 +542,6 @@ export class PgSelectStep<
 
     $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.identifierMatches = [...cloneFrom.identifierMatches];
-    $clone.arguments = [...cloneFrom.arguments];
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
@@ -624,7 +641,6 @@ export class PgSelectStep<
     this.name = name ?? resource.name;
     this.symbol = _internalCloneSymbol ?? Symbol(this.name);
     this.alias = _internalCloneAlias ?? sql.identifier(this.symbol);
-    this.from = inFrom ?? resource.from;
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
     this.forceIdentity = inForceIdentity;
@@ -639,8 +655,6 @@ export class PgSelectStep<
         codec: PgCodec;
         _matches: PgSelectIdentifierSpec["matches"];
       }[] = [];
-      let args: PgSelectArgumentDigest[] = [];
-      let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
         if (isDev) {
           assertSensible(identifier.step);
@@ -655,14 +669,15 @@ export class PgSelectStep<
           _matches: matches,
         });
       });
-      if (inArgs != null) {
-        const { digests: newArgs, argIndex: newArgIndex } =
-          digestsFromArgumentSpecs(this, inArgs, args, argIndex);
-        args = newArgs;
-        argIndex = newArgIndex;
-      }
       this.identifierMatches = identifierMatches;
-      this.arguments = args;
+
+      const ourFrom = inFrom ?? resource.from;
+      this.from = pgFromExpression(
+        this,
+        ourFrom,
+        this.resource.parameters,
+        inArgs,
+      );
     }
 
     this.peerKey = this.resource.name;
@@ -1042,7 +1057,6 @@ export class PgSelectStep<
       _symbolSubstitutes: this._symbolSubstitutes,
       from: this.from,
       joins: this.joins,
-      arguments: this.arguments,
       needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
       relationJoins: this.relationJoins,
@@ -1750,42 +1764,156 @@ export function sqlFromArgDigests(
 }
 exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
-export function digestsFromArgumentSpecs(
+// Previously: digestsFromArgumentSpecs; now combined
+export function pgFromExpression(
   $placeholderable: {
     placeholder(step: Step, codec: PgCodec): SQL;
+    deferredSQL($step: Step<SQL>): SQL;
   },
-  specs: PgSelectArgumentSpec[],
-  digests: PgSelectArgumentDigest[] = [],
-  initialArgIndex: number | null = 0,
-): { digests: PgSelectArgumentDigest[]; argIndex: number | null } {
-  let argIndex: null | number = initialArgIndex;
+  baseFrom: SQL | ((...args: PgSelectArgumentDigest[]) => SQL),
+  parameters: PgResourceParameter[] = [],
+  specs: PgSelectArgumentSpec[] = [],
+): SQL {
+  if (typeof baseFrom !== "function") {
+    return baseFrom;
+  }
+  if (specs.length === 0) {
+    return baseFrom();
+  }
+  const digests: Array<
+    PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
+  > = [];
   for (const identifier of specs) {
     if (isDev) {
       assertSensible(identifier.step);
     }
     const { step, name } = identifier;
+
     const codec =
       "pgCodec" in identifier ? identifier.pgCodec : identifier.step.pgCodec;
-    const placeholder = $placeholderable.placeholder(step, codec);
-    if (name !== undefined) {
-      argIndex = null;
+    if (step.getAndFreezeIsUnary()) {
+      // It's a unary step
+      digests.push({
+        name,
+        step,
+      });
+    } else {
+      const placeholder = $placeholderable.placeholder(step, codec);
       digests.push({
         name,
         placeholder,
       });
-    } else {
-      if (argIndex === null) {
-        throw new Error("Cannot have unnamed argument after named arguments");
-      }
-      digests.push({
-        position: argIndex++,
-        placeholder,
-      });
     }
   }
-  return { digests, argIndex };
+  return $placeholderable.deferredSQL(
+    new PgFromExpressionStep(baseFrom, parameters, digests),
+  );
 }
-exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
+
+class PgFromExpressionStep extends UnbatchedStep<SQL> {
+  private digests: ReadonlyArray<
+    PgSelectArgumentPlaceholder | PgSelectArgumentDepId
+  >;
+  private parameterByName: {
+    [argName: string]: PgResourceParameter;
+  };
+  private indexAfterWhichAllArgsAreNamed: number;
+  constructor(
+    private from: (...args: PgSelectArgumentDigest[]) => SQL,
+    private parameters: PgResourceParameter[],
+    digests: ReadonlyArray<
+      PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
+    >,
+  ) {
+    super();
+    if (this.getAndFreezeIsUnary() !== true) {
+      throw new Error(`PgFromExpressionStep must be unary`);
+    }
+    this.parameterByName = Object.create(null);
+    let indexAfterWhichAllArgsAreNamed = 0;
+    for (let i = 0, l = parameters.length; i < l; i++) {
+      const param = parameters[i];
+      if (param.name != null) {
+        this.parameterByName[param.name] = param;
+      }
+      if (param.name == null) {
+        indexAfterWhichAllArgsAreNamed = i + 1;
+      }
+    }
+    this.indexAfterWhichAllArgsAreNamed = indexAfterWhichAllArgsAreNamed;
+    this.digests = digests.map((digest) => {
+      if (digest.step) {
+        const { step, ...rest } = digest;
+        const depId = this.addDependency(digest.step);
+        return { ...rest, depId };
+      } else {
+        return digest;
+      }
+    });
+  }
+
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, ...deps: any[]): SQL {
+    /**
+     * If true, we can only use named parameters now. Set this if we skip an
+     * entry, or if the input has a name that doesn't match the parameter name.
+     */
+    let namedOnly = false;
+    let argIndex = 0;
+
+    const args: PgSelectArgumentDigest[] = [];
+    for (
+      let digestIndex = 0, digestsCount = this.digests.length;
+      digestIndex < digestsCount;
+      digestIndex++
+    ) {
+      const digest = this.digests[digestIndex];
+      if (
+        !namedOnly &&
+        digest.name != null &&
+        this.parameters[digestIndex].name !== digest.name
+      ) {
+        namedOnly = true;
+      }
+      if (namedOnly && !digest.name) {
+        throw new Error("Cannot have unnamed argument after named arguments");
+      }
+      const parameter = namedOnly
+        ? this.parameterByName[digest.name!]
+        : this.parameters[digestIndex];
+      let sqlValue: SQL;
+      if (digest.depId != null) {
+        const dep = deps[digest.depId];
+        if (
+          dep === undefined &&
+          (namedOnly ||
+            (!parameter.required &&
+              digestIndex >= this.indexAfterWhichAllArgsAreNamed - 1))
+        ) {
+          namedOnly = true;
+          continue;
+        }
+        sqlValue = sqlValueWithCodec(dep ?? null, parameter.codec);
+      } else {
+        // It's a placeholder, always use it
+        sqlValue = digest.placeholder;
+      }
+      if (namedOnly) {
+        args.push({
+          placeholder: sqlValue,
+          name: parameter.name!,
+        });
+      } else {
+        args.push({
+          placeholder: sqlValue,
+          position: ++argIndex,
+        });
+      }
+    }
+    return this.from(...args);
+  }
+}
+
+exportAs("@dataplan/pg", pgFromExpression, "pgFromExpression");
 
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
@@ -1880,8 +2008,7 @@ interface PgSelectQueryInfo<
   readonly _symbolSubstitutes: ReadonlyMap<symbol, symbol>;
 
   readonly selects: ReadonlyArray<SQL>;
-  readonly from: SQL | ((...args: Array<PgSelectArgumentDigest>) => SQL);
-  readonly arguments: ReadonlyArray<PgSelectArgumentDigest>;
+  readonly from: SQL;
   readonly joins: ReadonlyArray<PgSelectPlanJoin>;
   readonly conditions: ReadonlyArray<SQL>;
   readonly orders: ReadonlyArray<PgOrderSpec>;
@@ -2646,12 +2773,8 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
   }
 
   function buildFrom() {
-    const fromSql =
-      typeof info.from === "function"
-        ? info.from(...info.arguments)
-        : info.from;
     return {
-      sql: sql`\nfrom ${fromSql} as ${alias}${
+      sql: sql`\nfrom ${info.from} as ${alias}${
         resource.codec.attributes ? sql.blank : sql`(v)`
       }`,
     };
