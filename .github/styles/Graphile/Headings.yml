@@ -5,7 +5,7 @@ level: suggestion
 scope: heading
 match: $sentence
 indicators:
-  - ':'
+  - ":"
 exceptions:
   - Azure
   - CLI
@@ -26,3 +26,7 @@ exceptions:
   - Visual
   - VS
   - Windows
+  - PostGraphile
+  - Grafast
+  - Graphile
+  - EXPORTABLE

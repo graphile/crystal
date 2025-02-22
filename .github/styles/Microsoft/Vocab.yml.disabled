@@ -1,6 +1,7 @@
+#disabled
 extends: existence
 message: "Verify your use of '%s' with the A-Z word list."
-link: 'https://docs.microsoft.com/en-us/style-guide'
+link: "https://docs.microsoft.com/en-us/style-guide"
 level: suggestion
 ignorecase: true
 tokens:

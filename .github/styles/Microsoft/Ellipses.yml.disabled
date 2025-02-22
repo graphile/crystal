@@ -1,3 +1,4 @@
+#disabled
 extends: existence
 message: "In general, don't use an ellipsis."
 link: https://docs.microsoft.com/en-us/style-guide/punctuation/ellipses

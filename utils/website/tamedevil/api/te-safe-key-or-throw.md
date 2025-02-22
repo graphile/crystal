@@ -20,5 +20,5 @@ this is intended to be used with relatively straightforward strings
 `const obj = { ${te.safeKeyOrThrow(untrustedKey)}: value }` you instead use
 `const obj = Object.create(null);` and then set the properties on the resulting
 object via `${obj}[${te.lit(untrustedKey)}] = value;` - this prevents attacks
-such as **prototype polution** since properties like `__proto__` are not special
-on null-prototype objects, whereas they can cause havok in regular `{}` objects.
+such as **prototype pollution** since properties like `__proto__` are not special
+on null-prototype objects, whereas they can cause havoc in regular `{}` objects.

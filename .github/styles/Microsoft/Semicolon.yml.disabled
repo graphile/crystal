@@ -1,3 +1,4 @@
+#disabled
 extends: existence
 message: "Try to simplify this sentence."
 link: https://docs.microsoft.com/en-us/style-guide/punctuation/semicolons
@@ -5,4 +6,4 @@ nonword: true
 scope: sentence
 level: suggestion
 tokens:
-  - ';'
+  - ";"

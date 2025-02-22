@@ -8,7 +8,7 @@ title: tamedevil
 **Eval is evil, this module helps tame it!**
 
 It's generally recommended that you don't use `eval` or `new Function` when
-writing JavaScript/TypeScript code. There's many many reasons for this, here are
+writing JavaScript/TypeScript code. There's many reasons for this, here are
 but a few:
 
 - **code injection**: without sufficient caution, attackers could inject
@@ -23,7 +23,7 @@ but a few:
 However, `eval` and `new Function` can be powerful tools for building performant
 code - if you have a list of operations to perform, it may be much more
 performant to build a dynamic function to evaluate those operations at native JS
-speed rather than to build your own interpretter.
+speed rather than to build your own interpreter.
 
 `tamedevil` makes it much safer to build this kind of dynamic function, by
 ensuring that every string and substring that is to be evaluated is either code

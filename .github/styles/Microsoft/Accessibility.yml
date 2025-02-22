@@ -1,5 +1,7 @@
+# doesnt seem relevant to these docs
 extends: existence
-message: "Don't use language (such as '%s') that defines people by their disability."
+message:
+  "Don't use language (such as '%s') that defines people by their disability."
 link: https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/accessibility-terms
 level: suggestion
 ignorecase: true

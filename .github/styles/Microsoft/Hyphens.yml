@@ -12,3 +12,5 @@ action:
     - " "
 tokens:
   - '\b[^\s-]+ly-\w+\b'
+exceptions:
+  - strongly-typed

@@ -3,7 +3,7 @@ sidebar_position: 2
 title: Preset
 ---
 
-# GraphileConfig.Preset
+# `GraphileConfig.Preset`
 
 _Target Audience: all Graphile Config users ⚙️🔌📚_
 
@@ -208,7 +208,7 @@ following implications:
 
 :::warning Order of composition is important
 
-Consider a preset, APreset, that extends two other presets: Preset1 and Preset2,
+Consider a preset, `APreset`, that extends two other presets: Preset1 and Preset2,
 each of which `extends` the same preset, Preset0:
 
 ```ts
@@ -218,7 +218,7 @@ const Preset2 = { extends: [Preset0], myScope: { option2: true } };
 const APreset = { extends: [Preset1, Preset2] };
 ```
 
-Any overrides to the options set in Preset0 by Preset1 will be reset in APreset
+Any overrides to the options set in Preset0 by Preset1 will be reset in `APreset`
 since they will be overridden when Preset2 applies the Preset0 options again:
 
 ```ts

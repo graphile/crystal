@@ -1,3 +1,4 @@
+#disabled
 extends: existence
 message: "For a general audience, use 'address' rather than 'URL'."
 link: https://docs.microsoft.com/en-us/style-guide/urls-web-addresses
