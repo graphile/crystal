@@ -1,3 +1,4 @@
+#disabled
 extends: existence
 message: "Try to avoid using first-person plural like '%s'."
 link: https://docs.microsoft.com/en-us/style-guide/grammar/person#avoid-first-person-plural
