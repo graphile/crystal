@@ -236,6 +236,7 @@ function inputVariablePlan(
         inputType.ofType,
         defaultValue,
       );
+      // TODO: find a way to do this without doing eval. For example: track list of variables that may not be nullish.
       if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
         throw new GraphQLError(
           `Expected non-null value of type ${inputType.ofType.toString()}`,
@@ -248,9 +249,8 @@ function inputVariablePlan(
   }
   const variableValuePlan =
     operationPlan.trackedVariableValuesStep.get(variableName);
-  if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
-    // There's no default value, or we know for sure that our variable will be
-    // set (even if null) and thus the default will not be used; use the variable.
+  if (defaultValue === undefined) {
+    // There's no default value and thus the default will not be used; use the variable.
     return variableValuePlan;
   } else {
     // `defaultValue` is NOT undefined, and we know variableValue is

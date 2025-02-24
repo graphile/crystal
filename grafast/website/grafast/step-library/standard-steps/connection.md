@@ -29,7 +29,7 @@ methods, specifically:
   setLast($step: Step<Maybe<number>> | number): void;
   setOffset($step: Step<Maybe<number>> | number): void;
 
-  parseCursor($step: Step<Maybe<string>>): TCursorStep | null | undefined;
+  parseCursor($step: Step<Maybe<string>>): TCursorStep;
   setBefore($step: TCursorStep): void;
   setAfter($step: TCursorStep): void;
 ```

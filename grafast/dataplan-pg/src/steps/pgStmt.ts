@@ -220,15 +220,9 @@ export abstract class PgStmtBaseStep<T> extends Step<T> {
   }
 
   parseCursor(
-    $cursorPlan: __InputStaticLeafStep<string>,
-  ): PgSelectParsedCursorStep | null {
+    $cursorPlan: __InputStaticLeafStep<Maybe<string>>,
+  ): PgSelectParsedCursorStep {
     this.assertCursorPaginationAllowed();
-    if ($cursorPlan.evalIs(null)) {
-      return null;
-    } else if ($cursorPlan.evalIs(undefined)) {
-      return null;
-    }
-
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
   }
@@ -243,13 +237,9 @@ export abstract class PgStmtBaseStep<T> extends Step<T> {
   }
 }
 
-function parseCursor(cursor: string | null) {
+function parseCursor(cursor: Maybe<string>) {
   if (cursor == null) {
-    // This throw should never happen, so we can still be isSyncAndSafe.
-    // If it does throw, the entire lambda will throw, which is allowed.
-    throw new Error(
-      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-    );
+    return null;
   }
   try {
     if (typeof cursor !== "string") {

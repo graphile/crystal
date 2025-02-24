@@ -8,7 +8,7 @@ import type {
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
-import { constant } from "./constant.js";
+import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
 
 type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
@@ -74,7 +74,7 @@ export interface ConnectionCapableStep<
   setLast($last: Step<Maybe<number>>): void;
   setOffset($offset: Step<Maybe<number>>): void;
 
-  parseCursor($cursor: Step<Maybe<string>>): Maybe<TCursorStep>;
+  parseCursor($cursor: Step<Maybe<string>>): TCursorStep;
   setBefore($before: TCursorStep): void;
   setAfter($after: TCursorStep): void;
 
@@ -189,33 +189,35 @@ export class ConnectionStep<
     return this.maybeGetDep<TCursorStep>(this._beforeDepId);
   }
   public setBefore($beforePlan: Step<string | null | undefined>) {
+    if ($beforePlan instanceof ConstantStep && $beforePlan.data == null) {
+      return;
+    }
     if (this._beforeDepId !== undefined) {
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan = this.getSubplan().parseCursor($beforePlan);
-    this._beforeDepId = $parsedBeforePlan
-      ? this.addUnaryDependency({
-          step: $parsedBeforePlan,
-          nonUnaryMessage: () =>
-            `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
-        })
-      : null;
+    this._beforeDepId = this.addUnaryDependency({
+      step: $parsedBeforePlan,
+      nonUnaryMessage: () =>
+        `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
+    });
   }
   public getAfter(): TCursorStep | null {
     return this.maybeGetDep<TCursorStep>(this._afterDepId);
   }
   public setAfter($afterPlan: Step<string | null | undefined>) {
+    if ($afterPlan instanceof ConstantStep && $afterPlan.data == null) {
+      return;
+    }
     if (this._afterDepId !== undefined) {
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan = this.getSubplan().parseCursor($afterPlan);
-    this._afterDepId = $parsedAfterPlan
-      ? this.addUnaryDependency({
-          step: $parsedAfterPlan,
-          nonUnaryMessage: () =>
-            `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
-        })
-      : null;
+    this._afterDepId = this.addUnaryDependency({
+      step: $parsedAfterPlan,
+      nonUnaryMessage: () =>
+        `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
+    });
   }
 
   /**
