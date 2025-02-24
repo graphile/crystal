@@ -4,7 +4,9 @@ import "graphile-config";
 import type {
   PgCodecWithAttributes,
   PgResourceUnique,
-  PgSelectStep,
+  PgSelectQueryBuilder,
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilder,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
@@ -32,7 +34,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, sql, options } = build;
+        const { extend, inflection, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec: rawPgCodec },
         } = context;
@@ -68,16 +70,16 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
             [inflection.builtin("PRIMARY_KEY_ASC")]: {
               extensions: {
                 grafast: {
-                  applyPlan: EXPORTABLE(
-                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: PgSelectStep) => {
+                  apply: EXPORTABLE(
+                    (pgOrderByNullsLast, primaryKeyAttributes) =>
+                      ((
+                        queryBuilder:
+                          | PgSelectQueryBuilder
+                          | PgUnionAllQueryBuilder,
+                      ) => {
                         primaryKeyAttributes.forEach((attributeName) => {
-                          const attribute = pgCodec.attributes[attributeName];
-                          step.orderBy({
-                            codec: attribute.codec,
-                            fragment: sql`${step}.${sql.identifier(
-                              attributeName,
-                            )}`,
+                          queryBuilder.orderBy({
+                            attribute: attributeName,
                             direction: "ASC",
                             ...(pgOrderByNullsLast != null
                               ? {
@@ -86,9 +88,9 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               : null),
                           });
                         });
-                        step.setOrderIsUnique();
-                      },
-                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
+                        queryBuilder.setOrderIsUnique();
+                      }) as PgSelectQueryBuilderCallback,
+                    [pgOrderByNullsLast, primaryKeyAttributes],
                   ),
                 },
               },
@@ -96,16 +98,16 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
             [inflection.builtin("PRIMARY_KEY_DESC")]: {
               extensions: {
                 grafast: {
-                  applyPlan: EXPORTABLE(
-                    (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: PgSelectStep) => {
+                  apply: EXPORTABLE(
+                    (pgOrderByNullsLast, primaryKeyAttributes) =>
+                      ((
+                        queryBuilder:
+                          | PgSelectQueryBuilder
+                          | PgUnionAllQueryBuilder,
+                      ) => {
                         primaryKeyAttributes.forEach((attributeName) => {
-                          const attribute = pgCodec.attributes[attributeName];
-                          step.orderBy({
-                            codec: attribute.codec,
-                            fragment: sql`${step}.${sql.identifier(
-                              attributeName,
-                            )}`,
+                          queryBuilder.orderBy({
+                            attribute: attributeName,
                             direction: "DESC",
                             ...(pgOrderByNullsLast != null
                               ? {
@@ -114,9 +116,9 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                               : null),
                           });
                         });
-                        step.setOrderIsUnique();
-                      },
-                    [pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql],
+                        queryBuilder.setOrderIsUnique();
+                      }) as PgSelectQueryBuilderCallback,
+                    [pgOrderByNullsLast, primaryKeyAttributes],
                   ),
                 },
               },

@@ -324,14 +324,6 @@ export function makeGrafastSchema(details: {
                         argSpec.grafast?.inputPlan,
                         `${typeName}_${fieldName}_${argName}_inputPlan`,
                       );
-                      exportNameHint(
-                        argSpec.pgSelectApply,
-                        `${typeName}_${fieldName}_${argName}_pgSelectApply`,
-                      );
-                      exportNameHint(
-                        argSpec.pgUnionAllApply,
-                        `${typeName}_${fieldName}_${argName}_pgUnionAllApply`,
-                      );
                       Object.assign(arg.extensions!, argSpec);
                     }
                   }

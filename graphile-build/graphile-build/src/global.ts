@@ -39,6 +39,7 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
+import type { PostPlanResolver } from "./interfaces.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
 /*
@@ -660,8 +661,16 @@ declare global {
     }
 
     interface ScopeObjectFieldsFieldArgs extends ScopeObjectFieldsField {}
-    interface ContextObjectFieldsFieldArgs extends ContextObjectFieldsField {
+    interface ContextObjectFieldsFieldArgs
+      extends Omit<ContextObjectFieldsField, "fieldWitHHooks"> {
       scope: ScopeObjectFieldsFieldArgs;
+      addToPlanResolver<
+        _TArgs extends BaseGraphQLArguments,
+        TParentStep extends ExecutableStep | null,
+        TResultStep extends ExecutableStep,
+      >(
+        cb: PostPlanResolver<_TArgs, TParentStep, TResultStep>,
+      ): void;
     }
 
     interface ScopeObjectFieldsFieldArgsArg extends ScopeObjectFieldsFieldArgs {
