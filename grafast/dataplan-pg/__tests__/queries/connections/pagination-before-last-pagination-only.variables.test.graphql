@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy()
+#// expect(queries).toHaveLength(2);
+# See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+# 'last' is set, so hasPreviousPage is true if a larger last would return more records.
+## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(true);
+# 'first' is not set, so hasNextPage is false.
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(false);
+#> variableValues: {"value": "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0="}
+query Q($value: String) {
+  # The last 3 records before Postgres/Bob
+  allMessagesConnection(last: 3, before: $value) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    totalCount
+  }
+}

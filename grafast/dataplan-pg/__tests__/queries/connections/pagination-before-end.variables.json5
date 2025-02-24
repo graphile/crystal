@@ -1,0 +1,43 @@
+{
+  allMessagesConnection: {
+    edges: [
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
+        node: {
+          body: "Cats = awesome -- Alice",
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
+        node: {
+          body: "Cats = awesome -- Bob",
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
+        node: {
+          body: "Cats = awesome -- Cecilia",
+          author: {
+            username: "Cecilia",
+            gravatarUrl: null,
+          },
+        },
+      },
+    ],
+    pageInfo: {
+      hasNextPage: true,
+      hasPreviousPage: false,
+      startCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
+      endCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
+    },
+    totalCount: 6,
+  },
+}
