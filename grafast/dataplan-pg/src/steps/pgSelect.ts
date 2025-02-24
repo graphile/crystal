@@ -9,6 +9,7 @@ import type {
   LambdaStep,
   Maybe,
   PromiseOrDirect,
+  StepOptimizeOptions,
   UnbatchedExecutionExtra,
 } from "grafast";
 import {
@@ -1488,9 +1489,18 @@ export class PgSelectStep<
     }
   }
 
-  optimize(): Step {
+  optimize({ stream }: StepOptimizeOptions): Step {
     // In case we have any lock actions in future:
     this.lock();
+
+    if (
+      !this.isInliningForbidden &&
+      !this.hasSideEffects &&
+      !stream &&
+      !this.joins.some((j) => j.type !== "left")
+    ) {
+      // Consider inlining
+    }
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
@@ -3061,4 +3071,7 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   havingBuilder(): PgCondition<this>;
+
+  // IMPORTANT: if you add `JOIN` here, **only** allow `LEFT JOIN`, otherwise
+  // if we're inlined things may go wrong.
 }

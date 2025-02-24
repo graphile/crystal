@@ -3154,7 +3154,11 @@ export class OperationPlan {
     }
     const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
-      // ...stepOptions,
+      stream: step._stepOptions.stream
+        ? {
+            // We could add more details here, but for now we don't really need them?
+          }
+        : null,
       meta,
     });
     if (wasLocked) lock(step);
