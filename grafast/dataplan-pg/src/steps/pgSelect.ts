@@ -647,8 +647,7 @@ export class PgSelectStep<
         }
         const { step, matches } = identifier;
         const codec =
-          identifier.codec ||
-          (identifier.step as PgTypedStep<any>).pgCodec;
+          identifier.codec || (identifier.step as PgTypedStep<any>).pgCodec;
         identifierMatches.push({
           expression: matches(this.alias),
           dependencyIndex: this.addDependency(step),

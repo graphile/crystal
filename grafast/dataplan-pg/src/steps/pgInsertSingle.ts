@@ -6,7 +6,7 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import { access, exportAs, isDev, setter,Step } from "grafast";
+import { access, exportAs, isDev, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -112,9 +112,7 @@ export class PgInsertSingleStep<
     resource: TResource,
     attributes?: {
       [key in keyof GetPgResourceAttributes<TResource>]?:
-        | PgTypedStep<
-            GetPgResourceAttributes<TResource>[key]["codec"]
-          >
+        | PgTypedStep<GetPgResourceAttributes<TResource>[key]["codec"]>
         | Step;
     },
   ) {

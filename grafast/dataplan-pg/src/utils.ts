@@ -37,10 +37,7 @@ export function assertPgClassSingleStep<
 export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
   that: TThis,
 ): <T>(cb: PgSQLCallbackOrDirect<T>) => T {
-  const sqlTransformer: Transformer<PgTypedStep<PgCodec>> = (
-    sql,
-    value,
-  ) => {
+  const sqlTransformer: Transformer<PgTypedStep<PgCodec>> = (sql, value) => {
     if (value instanceof ExecutableStep && "pgCodec" in value) {
       if (value.pgCodec) {
         return that.placeholder(value);

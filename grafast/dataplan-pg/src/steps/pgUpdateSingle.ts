@@ -5,7 +5,7 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import { access, exportAs, isDev, SafeError, setter,Step } from "grafast";
+import { access, exportAs, isDev, SafeError, setter, Step } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 

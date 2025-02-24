@@ -5,7 +5,7 @@ import type {
   GrafastResultStreamList,
   GrafastSubscriber,
 } from "../interfaces.js";
-import { isExecutableStep,Step } from "../step.js";
+import { isExecutableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 

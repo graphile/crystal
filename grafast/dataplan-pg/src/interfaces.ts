@@ -1,4 +1,4 @@
-import type { Modifier,Step } from "grafast";
+import type { Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";

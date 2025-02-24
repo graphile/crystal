@@ -1,12 +1,8 @@
 import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
-import { access, applyTransforms, lambda, SafeError,Step } from "grafast";
+import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import type {
-  PgCodec,
-  PgGroupSpec,
-  PgTypedStep,
-} from "../interfaces.js";
+import type { PgCodec, PgGroupSpec, PgTypedStep } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
