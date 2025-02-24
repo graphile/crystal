@@ -8,7 +8,7 @@ import type {
   NotVariableValueNode,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
 
@@ -19,7 +19,7 @@ const { Kind } = graphql;
  */
 export class __InputObjectStep<
   TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
-> extends UnbatchedExecutableStep {
+> extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputObjectStep",

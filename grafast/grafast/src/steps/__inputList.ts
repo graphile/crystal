@@ -4,7 +4,7 @@ import * as graphql from "graphql";
 import * as assert from "../assert.js";
 import { assertInputStep, inputStep } from "../input.js";
 import type { AnyInputStep, NotVariableValueNode } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { Step } from "../step.js";
 import { constant } from "./constant.js";
 import { list } from "./list.js";
 
@@ -16,7 +16,7 @@ const { GraphQLList, Kind } = graphql;
 export class __InputListStep<
   TInputType extends
     graphql.GraphQLList<GraphQLInputType> = graphql.GraphQLList<GraphQLInputType>,
-> extends ExecutableStep {
+> extends Step {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputListStep",
@@ -63,12 +63,12 @@ export class __InputListStep<
     }
   }
 
-  optimize(): ExecutableStep {
+  optimize(): Step {
     const { inputValues } = this;
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const arr: ExecutableStep[] = [];
+      const arr: Step[] = [];
       for (let idx = 0; idx < this.itemCount; idx++) {
         const itemPlan = this.getDep(idx);
         arr[idx] = itemPlan;

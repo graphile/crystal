@@ -1,5 +1,5 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { UnbatchedStep } from "grafast";
 
 import type { PgCodec } from "../interfaces.js";
 
@@ -11,7 +11,7 @@ import type { PgCodec } from "../interfaces.js";
  *
  * @internal
  */
-export class ToPgStep extends UnbatchedExecutableStep<any> {
+export class ToPgStep extends UnbatchedStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "ToPgStep",

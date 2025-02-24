@@ -1,8 +1,8 @@
 import type {
   BaseGraphQLArguments,
-  ExecutableStep,
   GrafastFieldConfig,
   OutputPlanForType,
+  Step,
 } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
@@ -189,7 +189,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
-                TParentStep extends ExecutableStep,
+                TParentStep extends Step,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(

@@ -109,7 +109,7 @@ import {
   PgRefDefinitionExtensions,
   PgRefDefinitions,
   PgRegistry,
-  PgTypedExecutableStep,
+  PgTypedStep,
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
@@ -339,7 +339,7 @@ export {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
   PgTempTable,
-  PgTypedExecutableStep,
+  PgTypedStep,
   pgUnionAll,
   PgUnionAllQueryBuilder,
   PgUnionAllQueryBuilderCallback,

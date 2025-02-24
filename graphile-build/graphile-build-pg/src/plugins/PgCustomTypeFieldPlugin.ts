@@ -16,7 +16,7 @@ import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
   PgSelectQueryBuilder,
-  PgTypedExecutableStep,
+  PgTypedStep,
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
@@ -1137,7 +1137,7 @@ function modFields(
                           return {
                             name,
                             placeholder: $row.placeholder(
-                              arg.step as PgTypedExecutableStep<any>,
+                              arg.step as PgTypedStep<any>,
                             ),
                           };
                         }

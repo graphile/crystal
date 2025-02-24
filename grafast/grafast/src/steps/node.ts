@@ -9,8 +9,8 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
-import type { ExecutableStep, PolymorphicStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { PolymorphicStep, Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { access } from "./access.js";
 import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
@@ -21,10 +21,7 @@ import { lambda } from "./lambda.js";
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
  */
-export class NodeStep
-  extends UnbatchedExecutableStep
-  implements PolymorphicStep
-{
+export class NodeStep extends UnbatchedStep implements PolymorphicStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "NodeStep",
@@ -38,14 +35,14 @@ export class NodeStep
     private possibleTypes: {
       [typeName: string]: NodeIdHandler;
     },
-    $id: ExecutableStep<string | null | undefined>,
+    $id: Step<string | null | undefined>,
   ) {
     super();
     const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
     this.specPlanDep = this.addDependency(decodeNodeId($id));
   }
 
-  planForType(type: GraphQLObjectType): ExecutableStep {
+  planForType(type: GraphQLObjectType): Step {
     const spec = this.possibleTypes[type.name];
     if (spec !== undefined) {
       return spec.get(
@@ -94,14 +91,14 @@ export function node(
   possibleTypes: {
     [typeName: string]: NodeIdHandler;
   },
-  $id: ExecutableStep<string | null | undefined>,
+  $id: Step<string | null | undefined>,
 ): NodeStep {
   return new NodeStep(possibleTypes, $id);
 }
 
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<Maybe<string>>,
+  $id: Step<Maybe<string>>,
 ) {
   function decodeWithCodecAndHandler(raw: Maybe<string>) {
     if (raw == null) return raw;
@@ -117,17 +114,11 @@ export function specFromNodeId(
   }
   decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codec.name}`;
   decodeWithCodecAndHandler.isSyncAndSafe = true; // Optimization
-  const $decoded = lambda(
-    $id as ExecutableStep<string>,
-    decodeWithCodecAndHandler,
-  );
+  const $decoded = lambda($id as Step<string>, decodeWithCodecAndHandler);
   return handler.getSpec($decoded);
 }
 
-export function nodeIdFromNode(
-  handler: NodeIdHandler<any>,
-  $node: ExecutableStep,
-) {
+export function nodeIdFromNode(handler: NodeIdHandler<any>, $node: Step) {
   const specifier = handler.plan($node);
   return lambda(specifier, handler.codec.encode);
 }
@@ -157,6 +148,6 @@ export function makeDecodeNodeIdRuntime(handlers: readonly NodeIdHandler[]) {
 
 export function makeDecodeNodeId(handlers: readonly NodeIdHandler[]) {
   const decodeNodeIdWithCodecs = makeDecodeNodeIdRuntime(handlers);
-  return ($id: ExecutableStep<string | null | undefined>) =>
+  return ($id: Step<string | null | undefined>) =>
     lambda($id, decodeNodeIdWithCodecs);
 }

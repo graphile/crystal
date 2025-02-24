@@ -4,14 +4,14 @@ import type {
 } from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { multistep } from "../multistep.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { sideEffect } from "./sideEffect.js";
 
 /**
  * Calls the given lambda function for each tuple
  */
-export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
+export class LambdaStep<TIn, TOut> extends UnbatchedStep<TOut> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LambdaStep",
@@ -22,7 +22,7 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
 
   private depId: number | null;
   constructor(
-    $plan: ExecutableStep<TIn> | null | undefined,
+    $plan: Step<TIn> | null | undefined,
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();

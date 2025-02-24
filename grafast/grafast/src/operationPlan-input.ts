@@ -21,7 +21,7 @@ import type {
   FieldArgs,
   TrackedArguments,
 } from "./interfaces.js";
-import type { ExecutableStep } from "./step.js";
+import type { Step } from "./step.js";
 import type { __ItemStep } from "./steps/__item.js";
 import { assertNotPromise } from "./utils.js";
 
@@ -39,11 +39,11 @@ function assertNotRuntime(operationPlan: OperationPlan, description: string) {
   }
 }
 
-export function withFieldArgsForArguments<T extends ExecutableStep>(
+export function withFieldArgsForArguments<T extends Step>(
   operationPlan: OperationPlan,
   $all: TrackedArguments,
   field: GraphQLField<any, any, any>,
-  $parent: ExecutableStep,
+  $parent: Step,
   applyAfterMode: ApplyAfterModeArg,
   coordinate: string,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
@@ -58,7 +58,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
     args[arg.name] = arg;
   }
 
-  const applied = new Map<string, ExecutableStep>();
+  const applied = new Map<string, Step>();
   let explicitlyApplied = false;
 
   const fieldArgs: FieldArgs = {
@@ -201,7 +201,7 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
     },
   };
   for (const argName of Object.keys(args)) {
-    let val: ExecutableStep;
+    let val: Step;
     Object.defineProperty(fieldArgs, `$${argName}`, {
       get() {
         return (val ??= fieldArgs.getRaw(argName));
@@ -222,9 +222,9 @@ export function withFieldArgsForArguments<T extends ExecutableStep>(
 }
 
 function processAfter(
-  $parent: ExecutableStep,
+  $parent: Step,
   rootFieldArgs: FieldArgs,
-  $result: ExecutableStep,
+  $result: Step,
   args: Record<string, GraphQLArgument>,
   applyAfterMode: ApplyAfterModeArg,
   coordinate: string,

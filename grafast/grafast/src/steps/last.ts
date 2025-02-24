@@ -1,11 +1,11 @@
 import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import type { ConnectionCapableStep } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
-export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
+export class LastStep<TData> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LastStep",
@@ -15,8 +15,8 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
 
   constructor(
     parentPlan:
-      | ExecutableStep<ReadonlyArray<TData>>
-      | ConnectionCapableStep<ExecutableStep<TData>, any>,
+      | Step<ReadonlyArray<TData>>
+      | ConnectionCapableStep<Step<TData>, any>,
   ) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
@@ -48,9 +48,7 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
  * plan.
  */
 export function last<TData>(
-  plan:
-    | ExecutableStep<ReadonlyArray<TData>>
-    | ConnectionCapableStep<ExecutableStep<TData>, any>,
+  plan: Step<ReadonlyArray<TData>> | ConnectionCapableStep<Step<TData>, any>,
 ): LastStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,

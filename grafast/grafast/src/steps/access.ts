@@ -4,8 +4,8 @@ import te from "tamedevil";
 
 import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { arraysMatch, digestKeys } from "../utils.js";
 
 /** @internal */
@@ -133,7 +133,7 @@ return (_meta, value) => value?.${te.join(access, "?.")}${
  * preferably where the objects have null prototypes, and be sure to adhere to
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
-export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
+export class AccessStep<TData> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "AccessStep",
@@ -145,7 +145,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
   private readonly hasSymbols: boolean;
 
   constructor(
-    parentPlan: ExecutableStep<unknown>,
+    parentPlan: Step<unknown>,
     path: (string | number | symbol)[],
     public readonly fallback?: any,
   ) {
@@ -165,7 +165,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
       .join(".")}`;
   }
 
-  getParentStep(): ExecutableStep {
+  getParentStep(): Step {
     return this.getDep(0);
   }
 
@@ -244,7 +244,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
  * falling back to `fallback` if it were null-ish.
  */
 export function access<TData>(
-  parentPlan: ExecutableStep<unknown>,
+  parentPlan: Step<unknown>,
   rawPath?: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {

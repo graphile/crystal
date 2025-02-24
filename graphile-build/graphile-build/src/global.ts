@@ -1,12 +1,12 @@
 import type {
   BaseGraphQLArguments,
-  ExecutableStep,
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
   OutputPlanForType,
+  Step,
 } from "grafast";
 import type {
   GraphQLArgumentConfig,
@@ -63,7 +63,7 @@ interface RegisterObjectType {
    * scope so that other plugins may hook it; it can also be helpful to
    * indicate where a conflict has occurred.
    */
-  <TStep extends ExecutableStep>(
+  <TStep extends Step>(
     typeName: string,
     scope: GraphileBuild.ScopeObject,
     specGenerator: () => Omit<
@@ -77,12 +77,12 @@ interface RegisterObjectType {
    * @deprecated Please pass 'assertStep' as part of the object spec. This
    * compatibility signature will not be supported for long!
    */
-  <TStep extends ExecutableStep>(
+  <TStep extends Step>(
     typeName: string,
     scope: GraphileBuild.ScopeObject,
-    assertStep: TStep extends ExecutableStep
+    assertStep: TStep extends Step
       ?
-          | ((step: ExecutableStep) => asserts step is TStep)
+          | ((step: Step) => asserts step is TStep)
           | { new (...args: any[]): TStep }
       : null,
     specGenerator: () => Omit<
@@ -212,16 +212,13 @@ declare global {
     interface Inflection extends InflectionBase {}
 
     /** Our take on GraphQLFieldConfigMap that allows for plans */
-    type GrafastFieldConfigMap<
-      TParentStep extends ExecutableStep = ExecutableStep,
-    > = {
+    type GrafastFieldConfigMap<TParentStep extends Step = Step> = {
       [fieldName: string]: GrafastFieldConfig<any, TParentStep, any, any>;
     };
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
-    interface GrafastObjectTypeConfig<
-      TParentStep extends ExecutableStep = ExecutableStep,
-    > extends Omit<
+    interface GrafastObjectTypeConfig<TParentStep extends Step = Step>
+      extends Omit<
         GraphQLObjectTypeConfig<unknown, Grafast.Context>,
         "fields" | "interfaces"
       > {
@@ -233,9 +230,9 @@ declare global {
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextObjectInterfaces) => GraphQLInterfaceType[]);
-      assertStep?: TParentStep extends ExecutableStep
+      assertStep?: TParentStep extends Step
         ?
-            | ((step: ExecutableStep) => asserts step is TParentStep)
+            | ((step: Step) => asserts step is TParentStep)
             | { new (...args: any[]): TParentStep }
         : null;
     }
@@ -433,7 +430,7 @@ declare global {
         Constructor: { new (spec: any): GraphQLNamedType };
         scope: GraphileBuild.SomeScope;
         origin: string | null | undefined;
-        Step?: { new (...args: any[]): ExecutableStep } | null;
+        Step?: { new (...args: any[]): Step } | null;
         specGenerator:
           | (() => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">)
           | (() => Omit<GrafastInterfaceTypeConfig<any>, "name">)
@@ -820,7 +817,7 @@ declare global {
      */
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,
-      TParentStep extends ExecutableStep,
+      TParentStep extends Step,
       TFieldStep extends OutputPlanForType<TType>,
       TArgs extends BaseGraphQLArguments,
     >(

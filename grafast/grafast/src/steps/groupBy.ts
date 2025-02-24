@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import type { ExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import type { ConnectionCapableStep, ItemsStep } from "./connection.js";
@@ -37,10 +37,8 @@ const initialState = (): GroupByPlanMemo => new Map();
  * grouping keys.
  */
 export function groupBy<
-  TListStep extends
-    | ExecutableStep<readonly any[]>
-    | ConnectionCapableStep<any, any>,
-  TItemStep extends ExecutableStep<number>,
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TItemStep extends Step<number>,
 >(
   listStep: TListStep,
   mapper: ListTransformItemPlanCallback<ItemsStep<TListStep>, TItemStep>,

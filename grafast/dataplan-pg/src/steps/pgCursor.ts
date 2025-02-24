@@ -1,5 +1,5 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
-import { UnbatchedExecutableStep } from "grafast";
+import { UnbatchedStep } from "grafast";
 
 import type { PgCodec } from "../index.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
@@ -20,7 +20,7 @@ export interface PgCursorDetails {
  */
 export class PgCursorStep<
   TStep extends PgSelectSingleStep<any> | PgUnionAllSingleStep,
-> extends UnbatchedExecutableStep<any> {
+> extends UnbatchedStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgCursorStep",

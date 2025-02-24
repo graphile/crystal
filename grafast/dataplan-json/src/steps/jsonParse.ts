@@ -5,7 +5,7 @@ import type {
   GrafastResultsList,
   PromiseOrDirect,
 } from "grafast";
-import { access, ExecutableStep, exportAs } from "grafast";
+import { access, exportAs, Step } from "grafast";
 
 export type JSONValue =
   | string
@@ -19,9 +19,7 @@ export type JSONValue =
  * This plan accepts as JSON string as its only input and will result in the
  * parsed JSON object (or array, boolean, string, etc).
  */
-export class JSONParseStep<
-  TJSON extends JSONValue,
-> extends ExecutableStep<TJSON> {
+export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
   static $$export = {
     moduleName: "@dataplan/json",
     exportName: "JSONParseStep",
@@ -30,7 +28,7 @@ export class JSONParseStep<
   // promise.
   isSyncAndSafe = false;
 
-  constructor($stringPlan: ExecutableStep<string | null>) {
+  constructor($stringPlan: Step<string | null>) {
     super();
     this.addDependency($stringPlan);
   }
@@ -85,7 +83,7 @@ export class JSONParseStep<
  * parsed JSON object (or array, boolean, string, etc).
  */
 export function jsonParse<TJSON extends JSONValue>(
-  $string: ExecutableStep<string | null>,
+  $string: Step<string | null>,
 ): JSONParseStep<TJSON> {
   return new JSONParseStep<TJSON>($string);
 }

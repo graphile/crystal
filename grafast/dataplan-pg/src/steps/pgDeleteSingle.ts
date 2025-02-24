@@ -4,7 +4,7 @@ import type {
   Maybe,
   PromiseOrDirect,
 } from "grafast";
-import { access, ExecutableStep, exportAs, isDev, SafeError } from "grafast";
+import { access, exportAs, isDev, SafeError, Step } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -48,7 +48,7 @@ interface PgDeletePlanFinalizeResults {
  */
 export class PgDeleteSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends ExecutableStep<unknown[]> {
+> extends Step<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgDeleteSingleStep",
@@ -251,7 +251,7 @@ export class PgDeleteSingleStep<
   }
 
   apply(
-    $step: ExecutableStep<
+    $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgDeleteSingleQueryBuilderCallback>>
     >,
   ) {

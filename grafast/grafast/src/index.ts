@@ -117,17 +117,18 @@ import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
-  BaseStep,
-  ExecutableStep,
+  assertStep,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
   isObjectLikeStep,
+  isStep,
   ListCapableStep,
   ListLikeStep,
   ObjectLikeStep,
   PolymorphicStep,
-  UnbatchedExecutableStep,
+  Step,
+  UnbatchedStep,
 } from "./step.js";
 import {
   __FlagStep,
@@ -298,6 +299,7 @@ export {
   assertModifier,
   assertNotNull,
   assertPageInfoCapableStep,
+  assertStep,
   bakedInput,
   bakedInputRuntime,
   BakedInputStep,
@@ -305,7 +307,6 @@ export {
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  BaseStep,
   BatchExecutionValue,
   condition,
   ConditionStep,
@@ -330,7 +331,7 @@ export {
   ErrorStep,
   EventCallback,
   EventMapKey,
-  ExecutableStep,
+  Step as ExecutableStep,
   execute,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -395,6 +396,7 @@ export {
   isObjectLikeStep,
   isPromiseLike,
   isSafeError,
+  isStep,
   isUnaryStep,
   JSONArray,
   JSONObject,
@@ -477,6 +479,7 @@ export {
   sideEffect,
   SideEffectStep,
   specFromNodeId,
+  Step,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   StepOptimizeOptions,
@@ -493,8 +496,9 @@ export {
   TRAP_INHIBITED,
   TypedEventEmitter,
   UnaryExecutionValue,
-  UnbatchedExecutableStep,
+  UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
+  UnbatchedStep,
   UnwrapMultistep,
 };
 
@@ -516,9 +520,10 @@ exportAsMany("grafast", {
   __InputObjectStep,
   __InputStaticLeafStep,
   assertExecutableStep,
+  assertStep,
   assertListCapableStep,
   assertModifier,
-  isExecutableStep,
+  isStep,
   isListCapableStep,
   isModifier,
   isObjectLikeStep,
@@ -692,8 +697,8 @@ declare global {
 
     interface ObjectTypeExtensions {
       assertStep?:
-        | ((step: ExecutableStep) => asserts step is ExecutableStep)
-        | { new (...args: any[]): ExecutableStep }
+        | ((step: Step) => asserts step is Step)
+        | { new (...args: any[]): Step }
         | null;
     }
 

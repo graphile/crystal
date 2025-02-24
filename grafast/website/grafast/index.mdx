@@ -273,7 +273,7 @@ Here's a step class which retrieves records matching a given column (i.e.
 Optionally, you may request to limit to the first `$first` results.
 
 ```ts
-export class RecordsByColumnStep extends ExecutableStep {
+export class RecordsByColumnStep extends Step {
   constructor(tableName, columnName, $columnValue) {
     super();
     this.tableName = tableName;

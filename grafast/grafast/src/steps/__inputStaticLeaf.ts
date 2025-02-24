@@ -9,7 +9,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { constant } from "./constant.js";
 
 const { valueFromAST } = graphql;
@@ -19,9 +19,7 @@ const { valueFromAST } = graphql;
  *
  * @see __InputDynamicScalarStep
  */
-export class __InputStaticLeafStep<
-  TLeaf = any,
-> extends UnbatchedExecutableStep<TLeaf> {
+export class __InputStaticLeafStep<TLeaf = any> extends UnbatchedStep<TLeaf> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputStaticLeafStep",

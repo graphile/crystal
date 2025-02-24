@@ -1,5 +1,5 @@
 import type { GrafastResultsList } from "../index.js";
-import { $$noExec, ExecutableStep } from "../step.js";
+import { $$noExec, Step } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 
@@ -8,7 +8,7 @@ import { access } from "./access.js";
  * internal - we populate the value as part of the algorithm - see
  * `GetValueStepId` and `PopulateValueStep`.
  */
-export class __ValueStep<TData> extends ExecutableStep<TData> {
+export class __ValueStep<TData> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ValueStep",

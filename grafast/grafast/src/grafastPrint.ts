@@ -4,7 +4,7 @@ import type { Bucket } from "./bucket.js";
 import { bucketToString } from "./engine/executeBucket.js";
 import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
-import { ExecutableStep } from "./step.js";
+import { Step } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {
   isDeferred,
@@ -60,7 +60,7 @@ export function _grafastPrint(
   if (symbol === ROOT_VALUE_OBJECT) {
     return chalk.gray`(blank)`;
   }
-  if (symbol instanceof ExecutableStep) {
+  if (symbol instanceof Step) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {

@@ -3,8 +3,8 @@ import type {
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 
 /**
  * Returns a reversed copy of the list.
@@ -26,9 +26,7 @@ export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
 /**
  * Reverses a list.
  */
-export class ReverseStep<TData> extends UnbatchedExecutableStep<
-  readonly TData[]
-> {
+export class ReverseStep<TData> extends UnbatchedStep<readonly TData[]> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ReverseStep",
@@ -36,7 +34,7 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  constructor(plan: ExecutableStep<readonly TData[]>) {
+  constructor(plan: Step<readonly TData[]>) {
     super();
     this.addDependency(plan);
   }
@@ -64,7 +62,7 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
  * Reverses a list.
  */
 export function reverse<TData>(
-  plan: ExecutableStep<readonly TData[]>,
+  plan: Step<readonly TData[]>,
 ): ReverseStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,
