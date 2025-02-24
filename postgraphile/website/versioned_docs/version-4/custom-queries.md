@@ -46,6 +46,14 @@ could be queried in GraphQL like this:
 }
 ```
 
+:::tip Nullability Note
+
+By default all attributes on postgres types are nullable, and so a function that
+returns a type instead of a table will have all its fields treated as such by the
+generated GraphQL schema. This can be over-ridden on an attribute-by-attribute basis
+with the `@notNull` [smart tag](./smart-tags).
+:::
+
 ### Example
 
 Here we write a search query for our [forum example][] using the PostgreSQL
@@ -72,6 +80,43 @@ create function search_posts(search text)
   returns setof post as $$
     -- Write our advanced query as a SQL query!
     select *
+    from post
+    where
+      -- Use the `ILIKE` operator on both the `headline` and `body` columns. If
+      -- either return true, return the post.
+      headline ilike ('%' || search || '%') or
+      body ilike ('%' || search || '%')
+  -- End the function declaring the language we used as SQL and add the
+  -- `STABLE` marker so PostGraphile knows its a query and not a mutation.
+  $$ language sql stable;
+```
+
+Or using a type to return a subset of the columns on the table:
+```
+-- Columns unnecessary to this demo were omitted. You can find the full table in
+-- our forum example.
+create table post (
+  …
+  headline         text not null,
+  body             text,
+  …
+);
+
+create type post_search_result as (
+  headline         text,
+  body             text
+);
+comment on column post_search_result.headline is E'@notNull';
+
+-- Create the function named `search_posts` with a text argument named `search`.
+-- This will expose `Query.searchPosts(search: String!, ...)` to GraphQL.
+create function search_posts(search text)
+  -- This function will return a set of posts from the `post` table. The
+  -- `setof` part is important to PostGraphile, check out our Functions article
+  -- to learn why.
+  returns setof post_search_result as $$
+    -- Write our advanced query as a SQL query!
+    select headline, body
     from post
     where
       -- Use the `ILIKE` operator on both the `headline` and `body` columns. If
