@@ -166,7 +166,7 @@ return function (resource) {
   return (_$root, args) => resource.get({ ${te.join(
     attributeNames.map(
       (attributeName) =>
-        te`${te.safeKeyOrThrow(attributeName)}: args.get(${te.lit(
+        te`${te.safeKeyOrThrow(attributeName)}: args.getRaw(${te.lit(
           detailsByAttributeName[attributeName].graphqlName,
         )})`,
     ),
@@ -180,7 +180,7 @@ return function (resource) {
                           function plan(_$root: any, args: FieldArgs) {
                             const spec = Object.create(null);
                             for (const attributeName in detailsByAttributeName) {
-                              spec[attributeName] = args.get(
+                              spec[attributeName] = args.getRaw(
                                 detailsByAttributeName[attributeName]
                                   .graphqlName,
                               );

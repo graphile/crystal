@@ -39,7 +39,7 @@ export type PlanWrapperRulesGenerator = (
 export type PlanWrapperFilter<T> = (
   context: GraphileBuild.ContextObjectFieldsField,
   build: GraphileBuild.Build,
-  field: GrafastFieldConfig<any, any, any, any, any>,
+  field: GrafastFieldConfig<any, any, any, any>,
 ) => T | null;
 
 export type PlanWrapperFilterRule<T> = (

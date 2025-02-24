@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, extractEnumExtensionValue, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const handler_codec_base64JSON = {
@@ -110,7 +110,7 @@ const spec_relationalTopics = {
 };
 const relationalTopicsCodec = recordCodec(spec_relationalTopics);
 const __proto__Identifier = sql.identifier("js_reserved", "__proto__");
-const spec___proto__ = {
+const __proto__Codec = recordCodec({
   name: "__proto__",
   identifier: __proto__Identifier,
   attributes: {
@@ -156,10 +156,9 @@ const spec___proto__ = {
     }
   },
   executor: executor
-};
-const __proto__Codec = recordCodec(spec___proto__);
+});
 const buildingIdentifier = sql.identifier("js_reserved", "building");
-const spec_building = {
+const buildingCodec = recordCodec({
   name: "building",
   identifier: buildingIdentifier,
   attributes: {
@@ -205,10 +204,9 @@ const spec_building = {
     }
   },
   executor: executor
-};
-const buildingCodec = recordCodec(spec_building);
+});
 const constructorIdentifier = sql.identifier("js_reserved", "constructor");
-const spec_constructor = {
+const constructorCodec = recordCodec({
   name: "constructor",
   identifier: constructorIdentifier,
   attributes: {
@@ -254,10 +252,9 @@ const spec_constructor = {
     }
   },
   executor: executor
-};
-const constructorCodec = recordCodec(spec_constructor);
+});
 const cropIdentifier = sql.identifier("js_reserved", "crop");
-const spec_crop = {
+const cropCodec = recordCodec({
   name: "crop",
   identifier: cropIdentifier,
   attributes: {
@@ -303,10 +300,9 @@ const spec_crop = {
     }
   },
   executor: executor
-};
-const cropCodec = recordCodec(spec_crop);
+});
 const machineIdentifier = sql.identifier("js_reserved", "machine");
-const spec_machine = {
+const machineCodec = recordCodec({
   name: "machine",
   identifier: machineIdentifier,
   attributes: {
@@ -352,10 +348,9 @@ const spec_machine = {
     }
   },
   executor: executor
-};
-const machineCodec = recordCodec(spec_machine);
+});
 const materialIdentifier = sql.identifier("js_reserved", "material");
-const spec_material = {
+const materialCodec = recordCodec({
   name: "material",
   identifier: materialIdentifier,
   attributes: {
@@ -401,10 +396,9 @@ const spec_material = {
     }
   },
   executor: executor
-};
-const materialCodec = recordCodec(spec_material);
+});
 const nullIdentifier = sql.identifier("js_reserved", "null");
-const spec_null = {
+const nullCodec = recordCodec({
   name: "null",
   identifier: nullIdentifier,
   attributes: {
@@ -450,10 +444,9 @@ const spec_null = {
     }
   },
   executor: executor
-};
-const nullCodec = recordCodec(spec_null);
+});
 const projectIdentifier = sql.identifier("js_reserved", "project");
-const spec_project = {
+const projectCodec = recordCodec({
   name: "project",
   identifier: projectIdentifier,
   attributes: Object.fromEntries([["id", {
@@ -494,10 +487,9 @@ const spec_project = {
     }
   },
   executor: executor
-};
-const projectCodec = recordCodec(spec_project);
+});
 const relationalStatusIdentifier = sql.identifier("js_reserved", "relational_status");
-const spec_relationalStatus = {
+const relationalStatusCodec = recordCodec({
   name: "relationalStatus",
   identifier: relationalStatusIdentifier,
   attributes: {
@@ -567,10 +559,9 @@ const spec_relationalStatus = {
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalStatusCodec = recordCodec(spec_relationalStatus);
+});
 const yieldIdentifier = sql.identifier("js_reserved", "yield");
-const spec_yield = {
+const yieldCodec = recordCodec({
   name: "yield",
   identifier: yieldIdentifier,
   attributes: {
@@ -616,10 +607,9 @@ const spec_yield = {
     }
   },
   executor: executor
-};
-const yieldCodec = recordCodec(spec_yield);
+});
 const reservedIdentifier = sql.identifier("js_reserved", "reserved");
-const spec_reserved = {
+const reservedCodec = recordCodec({
   name: "reserved",
   identifier: reservedIdentifier,
   attributes: {
@@ -674,8 +664,7 @@ const spec_reserved = {
     }
   },
   executor: executor
-};
-const reservedCodec = recordCodec(spec_reserved);
+});
 const relationalItemsIdentifier = sql.identifier("js_reserved", "relational_items");
 const spec_relationalItems = {
   name: "relationalItems",
@@ -1618,6 +1607,9 @@ const handler = {
       id: inhibitOnNull(access($list, [1]))
     };
   },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
   get(spec) {
     return pgResource_relational_topicsPgResource.get(spec);
   },
@@ -1669,6 +1661,9 @@ const handler2 = {
       id: inhibitOnNull(access($list, [1]))
     };
   },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
   get(spec) {
     return building_buildingPgResource.get(spec);
   },
@@ -1683,58 +1678,15 @@ const specFromRecord = $record => {
     return memo;
   }, Object.create(null));
 };
-function Building_machinesByConstructor_plan($record) {
-  return connection(otherSource_machinePgResource.find(specFromRecord($record)));
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
 }
-const Building_machinesByConstructor_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Building_machinesByConstructorList_plan($record) {
-  return otherSource_machinePgResource.find(specFromRecord($record));
-}
-const Building_machinesByConstructorList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 const specFromRecord2 = $record => {
   return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
     memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
     return memo;
   }, Object.create(null));
 };
-function Building_relationalItemsByConstructor_plan($record) {
-  return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
-}
-const Building_relationalItemsByConstructor_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Building_relationalItemsByConstructorList_plan($record) {
-  return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
-}
-const Building_relationalItemsByConstructorList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
 const handler3 = {
   typeName: "Machine",
   codec: handler_codec_base64JSON,
@@ -1746,6 +1698,9 @@ const handler3 = {
     return {
       id: inhibitOnNull(access($list, [1]))
     };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
   },
   get(spec) {
     return otherSource_machinePgResource.get(spec);
@@ -1776,6 +1731,9 @@ const handler4 = {
       id: inhibitOnNull(access($list, [1]))
     };
   },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
   get(spec) {
     return pgResource_relational_statusPgResource.get(spec);
   },
@@ -1788,6 +1746,9 @@ const handler5 = {
   codec: nodeIdCodecs.raw,
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -1825,6 +1786,9 @@ const nodeIdHandlerByTypeName = {
       }, Object.create(null));
       return spec;
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource___proto__PgResource.get(spec);
     },
@@ -1845,6 +1809,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_constructorPgResource.get(spec);
     },
@@ -1863,6 +1830,9 @@ const nodeIdHandlerByTypeName = {
       return {
         id: inhibitOnNull(access($list, [1]))
       };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
     },
     get(spec) {
       return pgResource_cropPgResource.get(spec);
@@ -1884,6 +1854,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_materialPgResource.get(spec);
     },
@@ -1903,6 +1876,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_nullPgResource.get(spec);
     },
@@ -1921,6 +1897,9 @@ const nodeIdHandlerByTypeName = {
       return {
         id: inhibitOnNull(access($list, [1]))
       };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
     },
     get(spec) {
       return pgResource_projectPgResource.get(spec);
@@ -1942,6 +1921,9 @@ const nodeIdHandlerByTypeName = {
         id: inhibitOnNull(access($list, [1]))
       };
     },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
     get(spec) {
       return pgResource_yieldPgResource.get(spec);
     },
@@ -1960,6 +1942,9 @@ const nodeIdHandlerByTypeName = {
       return {
         id: inhibitOnNull(access($list, [1]))
       };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
     },
     get(spec) {
       return pgResource_reservedPgResource.get(spec);
@@ -2030,7 +2015,8 @@ const makeArgs = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2040,9 +2026,10 @@ const makeArgs = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2100,7 +2087,8 @@ const makeArgs2 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple2[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2110,9 +2098,10 @@ const makeArgs2 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2170,7 +2159,8 @@ const makeArgs3 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple3[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2180,9 +2170,10 @@ const makeArgs3 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2318,305 +2309,6 @@ const fetcher12 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Reserved);
-function Query_allRelationalTopicsList_plan() {
-  return pgResource_relational_topicsPgResource.find();
-}
-const Query_allRelationalTopicsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allRelationalTopics_plan() {
-  return connection(pgResource_relational_topicsPgResource.find());
-}
-const Query_allRelationalTopics_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allProtoSList_plan() {
-  return pgResource___proto__PgResource.find();
-}
-const Query_allProtoSList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allProtoS_plan() {
-  return connection(pgResource___proto__PgResource.find());
-}
-const Query_allProtoS_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allBuildingsList_plan() {
-  return building_buildingPgResource.find();
-}
-const Query_allBuildingsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allBuildings_plan() {
-  return connection(building_buildingPgResource.find());
-}
-const Query_allBuildings_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allConstructorsList_plan() {
-  return pgResource_constructorPgResource.find();
-}
-const Query_allConstructorsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allConstructors_plan() {
-  return connection(pgResource_constructorPgResource.find());
-}
-const Query_allConstructors_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allCropsList_plan() {
-  return pgResource_cropPgResource.find();
-}
-const Query_allCropsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allCrops_plan() {
-  return connection(pgResource_cropPgResource.find());
-}
-const Query_allCrops_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allMachinesList_plan() {
-  return otherSource_machinePgResource.find();
-}
-const Query_allMachinesList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allMachines_plan() {
-  return connection(otherSource_machinePgResource.find());
-}
-const Query_allMachines_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allMaterialsList_plan() {
-  return pgResource_materialPgResource.find();
-}
-const Query_allMaterialsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allMaterials_plan() {
-  return connection(pgResource_materialPgResource.find());
-}
-const Query_allMaterials_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allNullsList_plan() {
-  return pgResource_nullPgResource.find();
-}
-const Query_allNullsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allNulls_plan() {
-  return connection(pgResource_nullPgResource.find());
-}
-const Query_allNulls_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allProjectsList_plan() {
-  return pgResource_projectPgResource.find();
-}
-const Query_allProjectsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allProjects_plan() {
-  return connection(pgResource_projectPgResource.find());
-}
-const Query_allProjects_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allRelationalStatusesList_plan() {
-  return pgResource_relational_statusPgResource.find();
-}
-const Query_allRelationalStatusesList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allRelationalStatuses_plan() {
-  return connection(pgResource_relational_statusPgResource.find());
-}
-const Query_allRelationalStatuses_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allYieldsList_plan() {
-  return pgResource_yieldPgResource.find();
-}
-const Query_allYieldsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allYields_plan() {
-  return connection(pgResource_yieldPgResource.find());
-}
-const Query_allYields_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allReservedsList_plan() {
-  return pgResource_reservedPgResource.find();
-}
-const Query_allReservedsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allReserveds_plan() {
-  return connection(pgResource_reservedPgResource.find());
-}
-const Query_allReserveds_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
-function Query_allRelationalItemsList_plan() {
-  return relational_items_relational_itemsPgResource.find();
-}
-const Query_allRelationalItemsList_postPlanResolvers = [($select, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $select;
-}];
-function Query_allRelationalItems_plan() {
-  return connection(relational_items_relational_itemsPgResource.find());
-}
-const Query_allRelationalItems_postPlanResolvers = [($connection, $parent, fieldArgs, {
-  field
-}) => {
-  const $orderBy = fieldArgs.getRaw("orderBy");
-  const $select = $connection.getSubplan();
-  const orderByArg = field.args.find(a => a.name === "orderBy");
-  $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
-  return $connection;
-}];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -2656,7 +2348,8 @@ const makeArgs4 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple4[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
+    const fullPath = [...path, graphqlArgName];
+    const $raw = args.getRaw(fullPath);
     let step;
     if ($raw.evalIs(undefined)) {
       if (!required && i >= 0 - 1) {
@@ -2666,9 +2359,10 @@ const makeArgs4 = (args, path = []) => {
         step = constant(null);
       }
     } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
+      step = fetcher($raw).record();
     } else {
-      step = args.get([...path, graphqlArgName]);
+      const type = args.typeAt(fullPath);
+      step = bakedInput(type, $raw);
     }
     if (skipped) {
       const name = postgresArgName;
@@ -2691,139 +2385,139 @@ const makeArgs4 = (args, path = []) => {
 };
 const resource_null_yieldPgResource = registry.pgResources["null_yield"];
 const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
 };
 const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(handler2, $nodeId);
 };
 const uniqueAttributes = [["constructor", "constructor"]];
 const specFromArgs3 = args => {
   return uniqueAttributes.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs4 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
 };
 const specFromArgs5 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
 };
 const specFromArgs6 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(handler3, $nodeId);
 };
 const specFromArgs7 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
 };
 const uniqueAttributes2 = [["valueOf", "valueOf"]];
 const specFromArgs8 = args => {
   return uniqueAttributes2.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs9 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
 };
 const uniqueAttributes3 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs10 = args => {
   return uniqueAttributes3.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs11 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
 };
 const uniqueAttributes4 = [["__proto__", "_proto__"]];
 const specFromArgs12 = args => {
   return uniqueAttributes4.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs13 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
 };
 const specFromArgs14 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
 const specFromArgs15 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
 };
 const specFromArgs16 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(handler2, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs17 = args => {
   return uniqueAttributes5.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs18 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
 };
 const specFromArgs19 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
 };
 const specFromArgs20 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(handler3, $nodeId);
 };
 const specFromArgs21 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
 };
 const uniqueAttributes6 = [["valueOf", "valueOf"]];
 const specFromArgs22 = args => {
   return uniqueAttributes6.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs23 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
 };
 const uniqueAttributes7 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs24 = args => {
   return uniqueAttributes7.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs25 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
 };
 const uniqueAttributes8 = [["__proto__", "_proto__"]];
 const specFromArgs26 = args => {
   return uniqueAttributes8.reduce((memo, [attributeName, fieldName]) => {
-    memo[attributeName] = args.get(["input", fieldName]);
+    memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
 };
 const specFromArgs27 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
 };
 const specFromArgs28 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
+  const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
 const specFromRecord4 = $record => {
@@ -7209,18 +6903,13 @@ export const plans = {
       return $record.get("constructor");
     },
     machinesByConstructor: {
-      plan($parent, fieldArgs, info) {
-        let $result = Building_machinesByConstructor_plan($parent, fieldArgs, info);
-        for (const ppr of Building_machinesByConstructor_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return connection(otherSource_machinePgResource.find(specFromRecord($record)));
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -7229,7 +6918,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -7238,7 +6926,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -7247,7 +6934,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -7256,37 +6942,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     machinesByConstructorList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Building_machinesByConstructorList_plan($parent, fieldArgs, info);
-        for (const ppr of Building_machinesByConstructorList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return otherSource_machinePgResource.find(specFromRecord($record));
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -7295,36 +6983,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     relationalItemsByConstructor: {
-      plan($parent, fieldArgs, info) {
-        let $result = Building_relationalItemsByConstructor_plan($parent, fieldArgs, info);
-        for (const ppr of Building_relationalItemsByConstructor_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -7333,7 +7022,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -7342,7 +7030,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -7351,7 +7038,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -7360,37 +7046,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     relationalItemsByConstructorList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Building_relationalItemsByConstructorList_plan($parent, fieldArgs, info);
-        for (const ppr of Building_relationalItemsByConstructorList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan($record) {
+        return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -7399,18 +7087,24 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -7642,8 +7336,8 @@ export const plans = {
   },
   MachineCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -7656,17 +7350,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     input: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "input",
@@ -7679,17 +7371,15 @@ export const plans = {
             type: "attribute",
             attribute: "input",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.input.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constructor",
@@ -7702,13 +7392,11 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.constructor.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalItemsConnection: {
@@ -7892,8 +7580,8 @@ export const plans = {
   },
   RelationalItemCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -7906,17 +7594,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -7929,17 +7615,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constructor",
@@ -7952,13 +7636,11 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.constructor.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalStatus: {
@@ -8009,144 +7691,144 @@ export const plans = {
       return lambda(specifier, nodeIdCodecs[handler5.codec.name].encode);
     },
     node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.get("nodeId"));
+      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
     relationalTopicById(_$root, args) {
       return pgResource_relational_topicsPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     _protoById(_$root, args) {
       return pgResource___proto__PgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     _protoByName(_$root, args) {
       return pgResource___proto__PgResource.get({
-        name: args.get("name")
+        name: args.getRaw("name")
       });
     },
     buildingById(_$root, args) {
       return building_buildingPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     buildingByConstructor(_$root, args) {
       const spec = Object.create(null);
       for (const attributeName in detailsByAttributeName) {
-        spec[attributeName] = args.get(detailsByAttributeName[attributeName].graphqlName);
+        spec[attributeName] = args.getRaw(detailsByAttributeName[attributeName].graphqlName);
       }
       return building_buildingPgResource.get(spec);
     },
     constructorById(_$root, args) {
       return pgResource_constructorPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     constructorByExport(_$root, args) {
       return pgResource_constructorPgResource.get({
-        export: args.get("export")
+        export: args.getRaw("export")
       });
     },
     constructorByName(_$root, args) {
       return pgResource_constructorPgResource.get({
-        name: args.get("name")
+        name: args.getRaw("name")
       });
     },
     cropById(_$root, args) {
       return pgResource_cropPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     cropByYield(_$root, args) {
       return pgResource_cropPgResource.get({
-        yield: args.get("yield")
+        yield: args.getRaw("yield")
       });
     },
     machineById(_$root, args) {
       return otherSource_machinePgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     materialById(_$root, args) {
       return pgResource_materialPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     materialByClass(_$root, args) {
       return pgResource_materialPgResource.get({
-        class: args.get("class")
+        class: args.getRaw("class")
       });
     },
     materialByValueOf(_$root, args) {
       const spec = Object.create(null);
       for (const attributeName in detailsByAttributeName2) {
-        spec[attributeName] = args.get(detailsByAttributeName2[attributeName].graphqlName);
+        spec[attributeName] = args.getRaw(detailsByAttributeName2[attributeName].graphqlName);
       }
       return pgResource_materialPgResource.get(spec);
     },
     nullById(_$root, args) {
       return pgResource_nullPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     nullByBreak(_$root, args) {
       return pgResource_nullPgResource.get({
-        break: args.get("break")
+        break: args.getRaw("break")
       });
     },
     nullByHasOwnProperty(_$root, args) {
       const spec = Object.create(null);
       for (const attributeName in detailsByAttributeName3) {
-        spec[attributeName] = args.get(detailsByAttributeName3[attributeName].graphqlName);
+        spec[attributeName] = args.getRaw(detailsByAttributeName3[attributeName].graphqlName);
       }
       return pgResource_nullPgResource.get(spec);
     },
     projectById(_$root, args) {
       return pgResource_projectPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     projectByProto__(_$root, args) {
       const spec = Object.create(null);
       for (const attributeName in detailsByAttributeName4) {
-        spec[attributeName] = args.get(detailsByAttributeName4[attributeName].graphqlName);
+        spec[attributeName] = args.getRaw(detailsByAttributeName4[attributeName].graphqlName);
       }
       return pgResource_projectPgResource.get(spec);
     },
     relationalStatusById(_$root, args) {
       return pgResource_relational_statusPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     yieldById(_$root, args) {
       return pgResource_yieldPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     yieldByExport(_$root, args) {
       return pgResource_yieldPgResource.get({
-        export: args.get("export")
+        export: args.getRaw("export")
       });
     },
     reservedById(_$root, args) {
       return pgResource_reservedPgResource.get({
-        id: args.get("id")
+        id: args.getRaw("id")
       });
     },
     reservedByCase(_$root, args) {
       return pgResource_reservedPgResource.get({
-        case: args.get("case")
+        case: args.getRaw("case")
       });
     },
     reservedByDo(_$root, args) {
       return pgResource_reservedPgResource.get({
-        do: args.get("do")
+        do: args.getRaw("do")
       });
     },
     reservedByNull(_$root, args) {
       return pgResource_reservedPgResource.get({
-        null: args.get("null")
+        null: args.getRaw("null")
       });
     },
     await($root, args, _info) {
@@ -8162,66 +7844,61 @@ export const plans = {
       return resource_valueOfPgResource.execute(selectArgs);
     },
     relationalTopic(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher($nodeId);
     },
     _proto__(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher2($nodeId);
     },
     building(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher3($nodeId);
     },
     constructor(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher4($nodeId);
     },
     crop(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher5($nodeId);
     },
     machine(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher6($nodeId);
     },
     material(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher7($nodeId);
     },
     null(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher8($nodeId);
     },
     project(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher9($nodeId);
     },
     relationalStatus(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher10($nodeId);
     },
     yield(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher11($nodeId);
     },
     reserved(_$parent, args) {
-      const $nodeId = args.get("nodeId");
+      const $nodeId = args.getRaw("nodeId");
       return fetcher12($nodeId);
     },
     allRelationalTopicsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalTopicsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalTopicsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_relational_topicsPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8230,36 +7907,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allRelationalTopics: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalTopics_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalTopics_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_relational_topicsPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8268,7 +7946,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8277,7 +7954,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8286,7 +7962,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8295,37 +7970,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allProtoSList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allProtoSList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allProtoSList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource___proto__PgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8334,36 +8011,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allProtoS: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allProtoS_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allProtoS_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource___proto__PgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8372,7 +8050,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8381,7 +8058,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8390,7 +8066,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8399,37 +8074,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allBuildingsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allBuildingsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allBuildingsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return building_buildingPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8438,36 +8115,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allBuildings: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allBuildings_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allBuildings_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(building_buildingPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8476,7 +8154,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8485,7 +8162,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8494,7 +8170,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8503,37 +8178,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allConstructorsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allConstructorsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allConstructorsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_constructorPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8542,36 +8219,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allConstructors: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allConstructors_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allConstructors_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_constructorPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8580,7 +8258,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8589,7 +8266,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8598,7 +8274,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8607,37 +8282,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allCropsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allCropsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allCropsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_cropPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8646,36 +8323,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allCrops: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allCrops_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allCrops_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_cropPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8684,7 +8362,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8693,7 +8370,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8702,7 +8378,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8711,37 +8386,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allMachinesList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allMachinesList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allMachinesList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return otherSource_machinePgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8750,36 +8427,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allMachines: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allMachines_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allMachines_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(otherSource_machinePgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8788,7 +8466,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8797,7 +8474,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8806,7 +8482,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8815,37 +8490,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allMaterialsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allMaterialsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allMaterialsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_materialPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8854,36 +8531,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allMaterials: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allMaterials_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allMaterials_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_materialPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8892,7 +8570,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -8901,7 +8578,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -8910,7 +8586,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -8919,37 +8594,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allNullsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allNullsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allNullsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_nullPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8958,36 +8635,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allNulls: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allNulls_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allNulls_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_nullPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -8996,7 +8674,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9005,7 +8682,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9014,7 +8690,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9023,37 +8698,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allProjectsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allProjectsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allProjectsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_projectPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9062,36 +8739,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allProjects: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allProjects_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allProjects_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_projectPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9100,7 +8778,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9109,7 +8786,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9118,7 +8794,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9127,37 +8802,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allRelationalStatusesList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalStatusesList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalStatusesList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_relational_statusPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9166,36 +8843,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allRelationalStatuses: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalStatuses_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalStatuses_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_relational_statusPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9204,7 +8882,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9213,7 +8890,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9222,7 +8898,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9231,37 +8906,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allYieldsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allYieldsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allYieldsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_yieldPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9270,36 +8947,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allYields: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allYields_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allYields_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_yieldPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9308,7 +8986,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9317,7 +8994,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9326,7 +9002,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9335,37 +9010,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allReservedsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allReservedsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allReservedsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return pgResource_reservedPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9374,36 +9051,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allReserveds: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allReserveds_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allReserveds_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(pgResource_reservedPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9412,7 +9090,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9421,7 +9098,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9430,7 +9106,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9439,37 +9114,39 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allRelationalItemsList: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalItemsList_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalItemsList_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return relational_items_relational_itemsPgResource.find();
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9478,36 +9155,37 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $select, value) {
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $select) {
-              return $select.wherePlan();
+            applyPlan(_condition, $select, arg) {
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
       }
     },
     allRelationalItems: {
-      plan($parent, fieldArgs, info) {
-        let $result = Query_allRelationalItems_plan($parent, fieldArgs, info);
-        for (const ppr of Query_allRelationalItems_postPlanResolvers) {
-          $result = ppr($result, $parent, fieldArgs, info);
-        }
-        return $result;
+      plan() {
+        return connection(relational_items_relational_itemsPgResource.find());
       },
       args: {
         first: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, arg) {
               $connection.setFirst(arg.getRaw());
             }
@@ -9516,7 +9194,6 @@ export const plans = {
         last: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setLast(val.getRaw());
             }
@@ -9525,7 +9202,6 @@ export const plans = {
         offset: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setOffset(val.getRaw());
             }
@@ -9534,7 +9210,6 @@ export const plans = {
         before: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setBefore(val.getRaw());
             }
@@ -9543,19 +9218,26 @@ export const plans = {
         after: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $connection, val) {
               $connection.setAfter(val.getRaw());
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         },
         condition: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
-            applyPlan(_condition, $connection) {
+            applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
-              return $select.wherePlan();
+              arg.apply($select, qbWhereBuilder);
             }
           }
         }
@@ -9931,8 +9613,8 @@ export const plans = {
   },
   RelationalTopicCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -9945,17 +9627,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "title",
@@ -9968,17 +9648,15 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.title.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -9991,17 +9669,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constructor",
@@ -10014,13 +9690,11 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.constructor.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalTopicsConnection: {
@@ -10204,8 +9878,8 @@ export const plans = {
   },
   _ProtoCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -10218,17 +9892,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -10241,17 +9913,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     brand: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "brand",
@@ -10264,13 +9934,11 @@ export const plans = {
             type: "attribute",
             attribute: "brand",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.brand.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   _Proto__SConnection: {
@@ -10454,8 +10122,8 @@ export const plans = {
   },
   BuildingCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -10468,17 +10136,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -10491,17 +10157,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constructor",
@@ -10514,13 +10178,11 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.constructor.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   BuildingsConnection: {
@@ -10704,8 +10366,8 @@ export const plans = {
   },
   ConstructorCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -10718,17 +10380,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "name",
@@ -10741,17 +10401,15 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.name.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     export: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "export",
@@ -10764,13 +10422,11 @@ export const plans = {
             type: "attribute",
             attribute: "export",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.export.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ConstructorsConnection: {
@@ -10954,8 +10610,8 @@ export const plans = {
   },
   CropCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -10968,17 +10624,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     yield: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "yield",
@@ -10991,17 +10645,15 @@ export const plans = {
             type: "attribute",
             attribute: "yield",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.yield.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     amount: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "amount",
@@ -11014,13 +10666,11 @@ export const plans = {
             type: "attribute",
             attribute: "amount",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.amount.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   CropsConnection: {
@@ -11204,8 +10854,8 @@ export const plans = {
   },
   MaterialCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -11218,17 +10868,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     class: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "class",
@@ -11241,17 +10889,15 @@ export const plans = {
             type: "attribute",
             attribute: "class",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.class.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     valueOf: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "valueOf",
@@ -11264,13 +10910,11 @@ export const plans = {
             type: "attribute",
             attribute: "valueOf",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.valueOf.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   MaterialsConnection: {
@@ -11454,8 +11098,8 @@ export const plans = {
   },
   NullCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -11468,17 +11112,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     hasOwnProperty: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "hasOwnProperty",
@@ -11491,17 +11133,15 @@ export const plans = {
             type: "attribute",
             attribute: "hasOwnProperty",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.hasOwnProperty.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     break: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "break",
@@ -11514,13 +11154,11 @@ export const plans = {
             type: "attribute",
             attribute: "break",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.break.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   NullsConnection: {
@@ -11704,8 +11342,8 @@ export const plans = {
   },
   ProjectCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -11718,17 +11356,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["id"].codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     brand: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "brand",
@@ -11741,17 +11377,15 @@ export const plans = {
             type: "attribute",
             attribute: "brand",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["brand"].codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     _proto__: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "__proto__",
@@ -11764,13 +11398,11 @@ export const plans = {
             type: "attribute",
             attribute: "__proto__",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["__proto__"].codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ProjectsConnection: {
@@ -12030,8 +11662,8 @@ export const plans = {
   },
   RelationalStatusCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -12044,17 +11676,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "description",
@@ -12067,17 +11697,15 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.description.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     note: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "note",
@@ -12090,17 +11718,15 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.note.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "type",
@@ -12113,17 +11739,15 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.type.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "constructor",
@@ -12136,13 +11760,11 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.constructor.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   RelationalStatusesConnection: {
@@ -12326,8 +11948,8 @@ export const plans = {
   },
   YieldCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -12340,17 +11962,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     crop: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "crop",
@@ -12363,17 +11983,15 @@ export const plans = {
             type: "attribute",
             attribute: "crop",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.crop.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     export: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "export",
@@ -12386,13 +12004,11 @@ export const plans = {
             type: "attribute",
             attribute: "export",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.export.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   YieldsConnection: {
@@ -12614,8 +12230,8 @@ export const plans = {
   },
   ReservedCondition: {
     id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "id",
@@ -12628,17 +12244,15 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.id.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     null: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "null",
@@ -12651,17 +12265,15 @@ export const plans = {
             type: "attribute",
             attribute: "null",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.null.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     case: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "case",
@@ -12674,17 +12286,15 @@ export const plans = {
             type: "attribute",
             attribute: "case",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.case.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     },
     do: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
+      apply($condition, val) {
+        if (val === null) {
           $condition.where({
             type: "attribute",
             attribute: "do",
@@ -12697,13 +12307,11 @@ export const plans = {
             type: "attribute",
             attribute: "do",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.do.codec)}`;
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      }
     }
   },
   ReservedsConnection: {
@@ -12735,17 +12343,17 @@ export const plans = {
     __assertStep: __ValueStep,
     createProto__: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource___proto__PgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource___proto__PgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12755,17 +12363,17 @@ export const plans = {
     },
     createBuilding: {
       plan(_, args) {
+        const $insert = pgInsertSingle(building_buildingPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(building_buildingPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12775,17 +12383,17 @@ export const plans = {
     },
     createConstructor: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_constructorPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_constructorPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12795,17 +12403,17 @@ export const plans = {
     },
     createCrop: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_cropPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_cropPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12815,17 +12423,17 @@ export const plans = {
     },
     createMachine: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_machinePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_machinePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12835,17 +12443,17 @@ export const plans = {
     },
     createMaterial: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_materialPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_materialPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12855,17 +12463,17 @@ export const plans = {
     },
     createNull: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_nullPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_nullPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12875,17 +12483,17 @@ export const plans = {
     },
     createProject: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_projectPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_projectPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12895,17 +12503,17 @@ export const plans = {
     },
     createYield: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_yieldPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_yieldPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12915,17 +12523,17 @@ export const plans = {
     },
     createReserved: {
       plan(_, args) {
+        const $insert = pgInsertSingle(pgResource_reservedPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_reservedPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
         input: {
           __proto__: null,
           grafast: {
-            autoApplyAfterParentPlan: true,
             applyPlan(_, $object) {
               return $object;
             }
@@ -12935,11 +12543,11 @@ export const plans = {
     },
     updateProto__: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource___proto__PgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(pgResource___proto__PgResource, specFromArgs(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -12954,13 +12562,13 @@ export const plans = {
     },
     updateProtoById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource___proto__PgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource___proto__PgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -12975,13 +12583,13 @@ export const plans = {
     },
     updateProtoByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource___proto__PgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $update = pgUpdateSingle(pgResource___proto__PgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -12996,11 +12604,11 @@ export const plans = {
     },
     updateBuilding: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(building_buildingPgResource, specFromArgs2(args))
+        const $update = pgUpdateSingle(building_buildingPgResource, specFromArgs2(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13015,13 +12623,13 @@ export const plans = {
     },
     updateBuildingById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(building_buildingPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(building_buildingPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13036,11 +12644,11 @@ export const plans = {
     },
     updateBuildingByConstructor: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(building_buildingPgResource, specFromArgs3(args))
+        const $update = pgUpdateSingle(building_buildingPgResource, specFromArgs3(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13055,11 +12663,11 @@ export const plans = {
     },
     updateConstructor: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_constructorPgResource, specFromArgs4(args))
+        const $update = pgUpdateSingle(pgResource_constructorPgResource, specFromArgs4(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13074,13 +12682,13 @@ export const plans = {
     },
     updateConstructorById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_constructorPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13095,13 +12703,13 @@ export const plans = {
     },
     updateConstructorByExport: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_constructorPgResource, {
-            export: args.get(['input', "export"])
-          })
+        const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          export: args.getRaw(['input', "export"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13116,13 +12724,13 @@ export const plans = {
     },
     updateConstructorByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_constructorPgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13137,11 +12745,11 @@ export const plans = {
     },
     updateCrop: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_cropPgResource, specFromArgs5(args))
+        const $update = pgUpdateSingle(pgResource_cropPgResource, specFromArgs5(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13156,13 +12764,13 @@ export const plans = {
     },
     updateCropById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_cropPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_cropPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13177,13 +12785,13 @@ export const plans = {
     },
     updateCropByYield: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_cropPgResource, {
-            yield: args.get(['input', "yield"])
-          })
+        const $update = pgUpdateSingle(pgResource_cropPgResource, {
+          yield: args.getRaw(['input', "yield"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13198,11 +12806,11 @@ export const plans = {
     },
     updateMachine: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_machinePgResource, specFromArgs6(args))
+        const $update = pgUpdateSingle(otherSource_machinePgResource, specFromArgs6(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13217,13 +12825,13 @@ export const plans = {
     },
     updateMachineById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_machinePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(otherSource_machinePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13238,11 +12846,11 @@ export const plans = {
     },
     updateMaterial: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_materialPgResource, specFromArgs7(args))
+        const $update = pgUpdateSingle(pgResource_materialPgResource, specFromArgs7(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13257,13 +12865,13 @@ export const plans = {
     },
     updateMaterialById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_materialPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_materialPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13278,13 +12886,13 @@ export const plans = {
     },
     updateMaterialByClass: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_materialPgResource, {
-            class: args.get(['input', "class"])
-          })
+        const $update = pgUpdateSingle(pgResource_materialPgResource, {
+          class: args.getRaw(['input', "class"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13299,11 +12907,11 @@ export const plans = {
     },
     updateMaterialByValueOf: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_materialPgResource, specFromArgs8(args))
+        const $update = pgUpdateSingle(pgResource_materialPgResource, specFromArgs8(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13318,11 +12926,11 @@ export const plans = {
     },
     updateNull: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_nullPgResource, specFromArgs9(args))
+        const $update = pgUpdateSingle(pgResource_nullPgResource, specFromArgs9(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13337,13 +12945,13 @@ export const plans = {
     },
     updateNullById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_nullPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_nullPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13358,13 +12966,13 @@ export const plans = {
     },
     updateNullByBreak: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_nullPgResource, {
-            break: args.get(['input', "break"])
-          })
+        const $update = pgUpdateSingle(pgResource_nullPgResource, {
+          break: args.getRaw(['input', "break"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13379,11 +12987,11 @@ export const plans = {
     },
     updateNullByHasOwnProperty: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_nullPgResource, specFromArgs10(args))
+        const $update = pgUpdateSingle(pgResource_nullPgResource, specFromArgs10(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13398,11 +13006,11 @@ export const plans = {
     },
     updateProject: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_projectPgResource, specFromArgs11(args))
+        const $update = pgUpdateSingle(pgResource_projectPgResource, specFromArgs11(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13417,13 +13025,13 @@ export const plans = {
     },
     updateProjectById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_projectPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_projectPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13438,11 +13046,11 @@ export const plans = {
     },
     updateProjectByProto__: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_projectPgResource, specFromArgs12(args))
+        const $update = pgUpdateSingle(pgResource_projectPgResource, specFromArgs12(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13457,11 +13065,11 @@ export const plans = {
     },
     updateYield: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_yieldPgResource, specFromArgs13(args))
+        const $update = pgUpdateSingle(pgResource_yieldPgResource, specFromArgs13(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13476,13 +13084,13 @@ export const plans = {
     },
     updateYieldById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_yieldPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_yieldPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13497,13 +13105,13 @@ export const plans = {
     },
     updateYieldByExport: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_yieldPgResource, {
-            export: args.get(['input', "export"])
-          })
+        const $update = pgUpdateSingle(pgResource_yieldPgResource, {
+          export: args.getRaw(['input', "export"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13518,11 +13126,11 @@ export const plans = {
     },
     updateReserved: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_reservedPgResource, specFromArgs14(args))
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, specFromArgs14(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13537,13 +13145,13 @@ export const plans = {
     },
     updateReservedById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_reservedPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13558,13 +13166,13 @@ export const plans = {
     },
     updateReservedByCase: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_reservedPgResource, {
-            case: args.get(['input', "case"])
-          })
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          case: args.getRaw(['input', "case"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13579,13 +13187,13 @@ export const plans = {
     },
     updateReservedByDo: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_reservedPgResource, {
-            do: args.get(['input', "do"])
-          })
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          do: args.getRaw(['input', "do"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13600,13 +13208,13 @@ export const plans = {
     },
     updateReservedByNull: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_reservedPgResource, {
-            null: args.get(['input', "null"])
-          })
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          null: args.getRaw(['input', "null"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
         input: {
@@ -13621,11 +13229,11 @@ export const plans = {
     },
     deleteProto__: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource___proto__PgResource, specFromArgs15(args))
+        const $delete = pgDeleteSingle(pgResource___proto__PgResource, specFromArgs15(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13640,13 +13248,13 @@ export const plans = {
     },
     deleteProtoById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource___proto__PgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource___proto__PgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13661,13 +13269,13 @@ export const plans = {
     },
     deleteProtoByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource___proto__PgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $delete = pgDeleteSingle(pgResource___proto__PgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13682,11 +13290,11 @@ export const plans = {
     },
     deleteBuilding: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(building_buildingPgResource, specFromArgs16(args))
+        const $delete = pgDeleteSingle(building_buildingPgResource, specFromArgs16(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13701,13 +13309,13 @@ export const plans = {
     },
     deleteBuildingById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(building_buildingPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(building_buildingPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13722,11 +13330,11 @@ export const plans = {
     },
     deleteBuildingByConstructor: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(building_buildingPgResource, specFromArgs17(args))
+        const $delete = pgDeleteSingle(building_buildingPgResource, specFromArgs17(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13741,11 +13349,11 @@ export const plans = {
     },
     deleteConstructor: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_constructorPgResource, specFromArgs18(args))
+        const $delete = pgDeleteSingle(pgResource_constructorPgResource, specFromArgs18(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13760,13 +13368,13 @@ export const plans = {
     },
     deleteConstructorById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_constructorPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13781,13 +13389,13 @@ export const plans = {
     },
     deleteConstructorByExport: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_constructorPgResource, {
-            export: args.get(['input', "export"])
-          })
+        const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          export: args.getRaw(['input', "export"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13802,13 +13410,13 @@ export const plans = {
     },
     deleteConstructorByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_constructorPgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13823,11 +13431,11 @@ export const plans = {
     },
     deleteCrop: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_cropPgResource, specFromArgs19(args))
+        const $delete = pgDeleteSingle(pgResource_cropPgResource, specFromArgs19(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13842,13 +13450,13 @@ export const plans = {
     },
     deleteCropById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_cropPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_cropPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13863,13 +13471,13 @@ export const plans = {
     },
     deleteCropByYield: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_cropPgResource, {
-            yield: args.get(['input', "yield"])
-          })
+        const $delete = pgDeleteSingle(pgResource_cropPgResource, {
+          yield: args.getRaw(['input', "yield"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13884,11 +13492,11 @@ export const plans = {
     },
     deleteMachine: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_machinePgResource, specFromArgs20(args))
+        const $delete = pgDeleteSingle(otherSource_machinePgResource, specFromArgs20(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13903,13 +13511,13 @@ export const plans = {
     },
     deleteMachineById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_machinePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(otherSource_machinePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13924,11 +13532,11 @@ export const plans = {
     },
     deleteMaterial: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_materialPgResource, specFromArgs21(args))
+        const $delete = pgDeleteSingle(pgResource_materialPgResource, specFromArgs21(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -13943,13 +13551,13 @@ export const plans = {
     },
     deleteMaterialById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_materialPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_materialPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13964,13 +13572,13 @@ export const plans = {
     },
     deleteMaterialByClass: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_materialPgResource, {
-            class: args.get(['input', "class"])
-          })
+        const $delete = pgDeleteSingle(pgResource_materialPgResource, {
+          class: args.getRaw(['input', "class"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -13985,11 +13593,11 @@ export const plans = {
     },
     deleteMaterialByValueOf: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_materialPgResource, specFromArgs22(args))
+        const $delete = pgDeleteSingle(pgResource_materialPgResource, specFromArgs22(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14004,11 +13612,11 @@ export const plans = {
     },
     deleteNull: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_nullPgResource, specFromArgs23(args))
+        const $delete = pgDeleteSingle(pgResource_nullPgResource, specFromArgs23(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14023,13 +13631,13 @@ export const plans = {
     },
     deleteNullById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_nullPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_nullPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14044,13 +13652,13 @@ export const plans = {
     },
     deleteNullByBreak: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_nullPgResource, {
-            break: args.get(['input', "break"])
-          })
+        const $delete = pgDeleteSingle(pgResource_nullPgResource, {
+          break: args.getRaw(['input', "break"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14065,11 +13673,11 @@ export const plans = {
     },
     deleteNullByHasOwnProperty: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_nullPgResource, specFromArgs24(args))
+        const $delete = pgDeleteSingle(pgResource_nullPgResource, specFromArgs24(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14084,11 +13692,11 @@ export const plans = {
     },
     deleteProject: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_projectPgResource, specFromArgs25(args))
+        const $delete = pgDeleteSingle(pgResource_projectPgResource, specFromArgs25(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14103,13 +13711,13 @@ export const plans = {
     },
     deleteProjectById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_projectPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_projectPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14124,11 +13732,11 @@ export const plans = {
     },
     deleteProjectByProto__: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_projectPgResource, specFromArgs26(args))
+        const $delete = pgDeleteSingle(pgResource_projectPgResource, specFromArgs26(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14143,11 +13751,11 @@ export const plans = {
     },
     deleteYield: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_yieldPgResource, specFromArgs27(args))
+        const $delete = pgDeleteSingle(pgResource_yieldPgResource, specFromArgs27(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14162,13 +13770,13 @@ export const plans = {
     },
     deleteYieldById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_yieldPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_yieldPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14183,13 +13791,13 @@ export const plans = {
     },
     deleteYieldByExport: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_yieldPgResource, {
-            export: args.get(['input', "export"])
-          })
+        const $delete = pgDeleteSingle(pgResource_yieldPgResource, {
+          export: args.getRaw(['input', "export"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14204,11 +13812,11 @@ export const plans = {
     },
     deleteReserved: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_reservedPgResource, specFromArgs28(args))
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, specFromArgs28(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
         input: {
@@ -14223,13 +13831,13 @@ export const plans = {
     },
     deleteReservedById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_reservedPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14244,13 +13852,13 @@ export const plans = {
     },
     deleteReservedByCase: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_reservedPgResource, {
-            case: args.get(['input', "case"])
-          })
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          case: args.getRaw(['input', "case"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14265,13 +13873,13 @@ export const plans = {
     },
     deleteReservedByDo: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_reservedPgResource, {
-            do: args.get(['input', "do"])
-          })
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          do: args.getRaw(['input', "do"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14286,13 +13894,13 @@ export const plans = {
     },
     deleteReservedByNull: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_reservedPgResource, {
-            null: args.get(['input', "null"])
-          })
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          null: args.getRaw(['input', "null"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
         input: {
@@ -14309,7 +13917,8 @@ export const plans = {
   CreateProtoPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     _proto__($object) {
       return $object.get("result");
@@ -14317,11 +13926,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    _protoEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14337,9 +13942,7 @@ export const plans = {
           return pgResource___proto__PgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14350,49 +13953,50 @@ export const plans = {
   },
   CreateProtoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     _proto__: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   _Proto__Input: {
-    "__inputPlan": function _Proto__Input_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     brand: {
-      applyPlan($insert, val) {
-        $insert.set("brand", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("brand", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateBuildingPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     building($object) {
       return $object.get("result");
@@ -14400,11 +14004,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    buildingEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14420,9 +14020,7 @@ export const plans = {
           return building_buildingPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14433,49 +14031,50 @@ export const plans = {
   },
   CreateBuildingInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     building: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   BuildingInput: {
-    "__inputPlan": function BuildingInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     constructor: {
-      applyPlan($insert, val) {
-        $insert.set("constructor", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateConstructorPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     constructor($object) {
       return $object.get("result");
@@ -14483,11 +14082,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    constructorEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14503,9 +14098,7 @@ export const plans = {
           return pgResource_constructorPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14516,49 +14109,50 @@ export const plans = {
   },
   CreateConstructorInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     constructor: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   ConstructorInput: {
-    "__inputPlan": function ConstructorInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     export: {
-      applyPlan($insert, val) {
-        $insert.set("export", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("export", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateCropPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     crop($object) {
       return $object.get("result");
@@ -14566,11 +14160,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    cropEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14586,9 +14176,7 @@ export const plans = {
           return pgResource_cropPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14599,49 +14187,50 @@ export const plans = {
   },
   CreateCropInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     crop: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   CropInput: {
-    "__inputPlan": function CropInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     yield: {
-      applyPlan($insert, val) {
-        $insert.set("yield", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("yield", bakedInputRuntime(schema, field.type, val));
+      }
     },
     amount: {
-      applyPlan($insert, val) {
-        $insert.set("amount", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("amount", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateMachinePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     machine($object) {
       return $object.get("result");
@@ -14649,11 +14238,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    machineEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14669,9 +14254,7 @@ export const plans = {
           return otherSource_machinePgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14686,49 +14269,50 @@ export const plans = {
   },
   CreateMachineInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     machine: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   MachineInput: {
-    "__inputPlan": function MachineInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     input: {
-      applyPlan($insert, val) {
-        $insert.set("input", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("input", bakedInputRuntime(schema, field.type, val));
+      }
     },
     constructor: {
-      applyPlan($insert, val) {
-        $insert.set("constructor", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateMaterialPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     material($object) {
       return $object.get("result");
@@ -14736,11 +14320,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    materialEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14756,9 +14336,7 @@ export const plans = {
           return pgResource_materialPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14769,49 +14347,50 @@ export const plans = {
   },
   CreateMaterialInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     material: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   MaterialInput: {
-    "__inputPlan": function MaterialInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     class: {
-      applyPlan($insert, val) {
-        $insert.set("class", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("class", bakedInputRuntime(schema, field.type, val));
+      }
     },
     valueOf: {
-      applyPlan($insert, val) {
-        $insert.set("valueOf", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("valueOf", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateNullPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     null($object) {
       return $object.get("result");
@@ -14819,11 +14398,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    nullEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14839,9 +14414,7 @@ export const plans = {
           return pgResource_nullPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14852,49 +14425,50 @@ export const plans = {
   },
   CreateNullInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     null: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   NullInput: {
-    "__inputPlan": function NullInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     hasOwnProperty: {
-      applyPlan($insert, val) {
-        $insert.set("hasOwnProperty", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("hasOwnProperty", bakedInputRuntime(schema, field.type, val));
+      }
     },
     break: {
-      applyPlan($insert, val) {
-        $insert.set("break", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("break", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateProjectPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     project($object) {
       return $object.get("result");
@@ -14902,11 +14476,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    projectEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -14922,9 +14492,7 @@ export const plans = {
           return pgResource_projectPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -14935,49 +14503,50 @@ export const plans = {
   },
   CreateProjectInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     project: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   ProjectInput: {
-    "__inputPlan": function ProjectInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     brand: {
-      applyPlan($insert, val) {
-        $insert.set("brand", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("brand", bakedInputRuntime(schema, field.type, val));
+      }
     },
     _proto__: {
-      applyPlan($insert, val) {
-        $insert.set("__proto__", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("__proto__", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateYieldPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     yield($object) {
       return $object.get("result");
@@ -14985,11 +14554,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    yieldEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15005,9 +14570,7 @@ export const plans = {
           return pgResource_yieldPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15018,49 +14581,50 @@ export const plans = {
   },
   CreateYieldInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     yield: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   YieldInput: {
-    "__inputPlan": function YieldInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     crop: {
-      applyPlan($insert, val) {
-        $insert.set("crop", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("crop", bakedInputRuntime(schema, field.type, val));
+      }
     },
     export: {
-      applyPlan($insert, val) {
-        $insert.set("export", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("export", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   CreateReservedPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     reserved($object) {
       return $object.get("result");
@@ -15068,11 +14632,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    reservedEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15088,9 +14648,7 @@ export const plans = {
           return pgResource_reservedPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15101,56 +14659,58 @@ export const plans = {
   },
   CreateReservedInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
     },
     reserved: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
   ReservedInput: {
-    "__inputPlan": function ReservedInput_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     null: {
-      applyPlan($insert, val) {
-        $insert.set("null", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("null", bakedInputRuntime(schema, field.type, val));
+      }
     },
     case: {
-      applyPlan($insert, val) {
-        $insert.set("case", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("case", bakedInputRuntime(schema, field.type, val));
+      }
     },
     do: {
-      applyPlan($insert, val) {
-        $insert.set("do", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("do", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateProtoPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     _proto__($object) {
       return $object.get("result");
@@ -15158,11 +14718,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    _protoEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15178,9 +14734,7 @@ export const plans = {
           return pgResource___proto__PgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15191,76 +14745,81 @@ export const plans = {
   },
   UpdateProtoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     _protoPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   _ProtoPatch: {
-    "__inputPlan": function _ProtoPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     brand: {
-      applyPlan($insert, val) {
-        $insert.set("brand", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("brand", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateProtoByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     _protoPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateProtoByNameInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     name: undefined,
     _protoPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateBuildingPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     building($object) {
       return $object.get("result");
@@ -15268,11 +14827,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    buildingEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15288,9 +14843,7 @@ export const plans = {
           return building_buildingPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15301,76 +14854,81 @@ export const plans = {
   },
   UpdateBuildingInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     buildingPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   BuildingPatch: {
-    "__inputPlan": function BuildingPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     constructor: {
-      applyPlan($insert, val) {
-        $insert.set("constructor", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateBuildingByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     buildingPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateBuildingByConstructorInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     constructor: undefined,
     buildingPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateConstructorPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     constructor($object) {
       return $object.get("result");
@@ -15378,11 +14936,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    constructorEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15398,9 +14952,7 @@ export const plans = {
           return pgResource_constructorPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15411,90 +14963,96 @@ export const plans = {
   },
   UpdateConstructorInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     constructorPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   ConstructorPatch: {
-    "__inputPlan": function ConstructorPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
     },
     export: {
-      applyPlan($insert, val) {
-        $insert.set("export", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("export", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateConstructorByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     constructorPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateConstructorByExportInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     export: undefined,
     constructorPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateConstructorByNameInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     name: undefined,
     constructorPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateCropPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     crop($object) {
       return $object.get("result");
@@ -15502,11 +15060,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    cropEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15522,9 +15076,7 @@ export const plans = {
           return pgResource_cropPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15535,76 +15087,81 @@ export const plans = {
   },
   UpdateCropInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     cropPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   CropPatch: {
-    "__inputPlan": function CropPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     yield: {
-      applyPlan($insert, val) {
-        $insert.set("yield", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("yield", bakedInputRuntime(schema, field.type, val));
+      }
     },
     amount: {
-      applyPlan($insert, val) {
-        $insert.set("amount", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("amount", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateCropByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     cropPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateCropByYieldInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     yield: undefined,
     cropPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateMachinePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     machine($object) {
       return $object.get("result");
@@ -15612,11 +15169,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    machineEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15632,9 +15185,7 @@ export const plans = {
           return otherSource_machinePgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15649,62 +15200,66 @@ export const plans = {
   },
   UpdateMachineInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     machinePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   MachinePatch: {
-    "__inputPlan": function MachinePatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     input: {
-      applyPlan($insert, val) {
-        $insert.set("input", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("input", bakedInputRuntime(schema, field.type, val));
+      }
     },
     constructor: {
-      applyPlan($insert, val) {
-        $insert.set("constructor", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateMachineByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     machinePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateMaterialPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     material($object) {
       return $object.get("result");
@@ -15712,11 +15267,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    materialEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15732,9 +15283,7 @@ export const plans = {
           return pgResource_materialPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15745,90 +15294,96 @@ export const plans = {
   },
   UpdateMaterialInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     materialPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   MaterialPatch: {
-    "__inputPlan": function MaterialPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     class: {
-      applyPlan($insert, val) {
-        $insert.set("class", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("class", bakedInputRuntime(schema, field.type, val));
+      }
     },
     valueOf: {
-      applyPlan($insert, val) {
-        $insert.set("valueOf", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("valueOf", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateMaterialByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     materialPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateMaterialByClassInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     class: undefined,
     materialPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateMaterialByValueOfInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     valueOf: undefined,
     materialPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateNullPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     null($object) {
       return $object.get("result");
@@ -15836,11 +15391,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    nullEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15856,9 +15407,7 @@ export const plans = {
           return pgResource_nullPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15869,90 +15418,96 @@ export const plans = {
   },
   UpdateNullInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     nullPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   NullPatch: {
-    "__inputPlan": function NullPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     hasOwnProperty: {
-      applyPlan($insert, val) {
-        $insert.set("hasOwnProperty", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("hasOwnProperty", bakedInputRuntime(schema, field.type, val));
+      }
     },
     break: {
-      applyPlan($insert, val) {
-        $insert.set("break", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("break", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateNullByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     nullPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateNullByBreakInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     break: undefined,
     nullPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateNullByHasOwnPropertyInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     hasOwnProperty: undefined,
     nullPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateProjectPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     project($object) {
       return $object.get("result");
@@ -15960,11 +15515,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    projectEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -15980,9 +15531,7 @@ export const plans = {
           return pgResource_projectPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -15993,76 +15542,81 @@ export const plans = {
   },
   UpdateProjectInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     projectPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   ProjectPatch: {
-    "__inputPlan": function ProjectPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     brand: {
-      applyPlan($insert, val) {
-        $insert.set("brand", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("brand", bakedInputRuntime(schema, field.type, val));
+      }
     },
     _proto__: {
-      applyPlan($insert, val) {
-        $insert.set("__proto__", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("__proto__", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateProjectByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     projectPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateProjectByProtoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     _proto__: undefined,
     projectPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateYieldPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     yield($object) {
       return $object.get("result");
@@ -16070,11 +15624,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    yieldEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16090,9 +15640,7 @@ export const plans = {
           return pgResource_yieldPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16103,76 +15651,81 @@ export const plans = {
   },
   UpdateYieldInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     yieldPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   YieldPatch: {
-    "__inputPlan": function YieldPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     crop: {
-      applyPlan($insert, val) {
-        $insert.set("crop", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("crop", bakedInputRuntime(schema, field.type, val));
+      }
     },
     export: {
-      applyPlan($insert, val) {
-        $insert.set("export", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("export", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateYieldByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     yieldPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateYieldByExportInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     export: undefined,
     yieldPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateReservedPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     reserved($object) {
       return $object.get("result");
@@ -16180,11 +15733,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    reservedEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16200,9 +15749,7 @@ export const plans = {
           return pgResource_reservedPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16213,111 +15760,119 @@ export const plans = {
   },
   UpdateReservedInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined,
     reservedPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   ReservedPatch: {
-    "__inputPlan": function ReservedPatch_inputPlan() {
-      return object(Object.create(null));
-    },
+    "__baked": createObjectAndApplyChildren,
     id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
     },
     null: {
-      applyPlan($insert, val) {
-        $insert.set("null", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("null", bakedInputRuntime(schema, field.type, val));
+      }
     },
     case: {
-      applyPlan($insert, val) {
-        $insert.set("case", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("case", bakedInputRuntime(schema, field.type, val));
+      }
     },
     do: {
-      applyPlan($insert, val) {
-        $insert.set("do", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("do", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   UpdateReservedByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined,
     reservedPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateReservedByCaseInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     case: undefined,
     reservedPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateReservedByDoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     do: undefined,
     reservedPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   UpdateReservedByNullInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     null: undefined,
     reservedPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+      apply(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
     }
   },
   DeleteProtoPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     _proto__($object) {
       return $object.get("result");
@@ -16330,11 +15885,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    _protoEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    _protoEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16350,9 +15901,7 @@ export const plans = {
           return pgResource___proto__PgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16363,24 +15912,24 @@ export const plans = {
   },
   DeleteProtoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteProtoByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteProtoByNameInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     name: undefined
@@ -16388,7 +15937,8 @@ export const plans = {
   DeleteBuildingPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     building($object) {
       return $object.get("result");
@@ -16401,11 +15951,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    buildingEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    buildingEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16421,9 +15967,7 @@ export const plans = {
           return building_buildingPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16434,24 +15978,24 @@ export const plans = {
   },
   DeleteBuildingInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteBuildingByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteBuildingByConstructorInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     constructor: undefined
@@ -16459,7 +16003,8 @@ export const plans = {
   DeleteConstructorPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     constructor($object) {
       return $object.get("result");
@@ -16472,11 +16017,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    constructorEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    constructorEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16492,9 +16033,7 @@ export const plans = {
           return pgResource_constructorPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16505,32 +16044,32 @@ export const plans = {
   },
   DeleteConstructorInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteConstructorByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteConstructorByExportInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     export: undefined
   },
   DeleteConstructorByNameInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     name: undefined
@@ -16538,7 +16077,8 @@ export const plans = {
   DeleteCropPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     crop($object) {
       return $object.get("result");
@@ -16551,11 +16091,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    cropEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    cropEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16571,9 +16107,7 @@ export const plans = {
           return pgResource_cropPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16584,24 +16118,24 @@ export const plans = {
   },
   DeleteCropInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteCropByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteCropByYieldInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     yield: undefined
@@ -16609,7 +16143,8 @@ export const plans = {
   DeleteMachinePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     machine($object) {
       return $object.get("result");
@@ -16622,11 +16157,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    machineEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    machineEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16642,9 +16173,7 @@ export const plans = {
           return otherSource_machinePgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16659,16 +16188,16 @@ export const plans = {
   },
   DeleteMachineInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteMachineByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
@@ -16676,7 +16205,8 @@ export const plans = {
   DeleteMaterialPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     material($object) {
       return $object.get("result");
@@ -16689,11 +16219,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    materialEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    materialEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16709,9 +16235,7 @@ export const plans = {
           return pgResource_materialPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16722,32 +16246,32 @@ export const plans = {
   },
   DeleteMaterialInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteMaterialByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteMaterialByClassInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     class: undefined
   },
   DeleteMaterialByValueOfInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     valueOf: undefined
@@ -16755,7 +16279,8 @@ export const plans = {
   DeleteNullPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     null($object) {
       return $object.get("result");
@@ -16768,11 +16293,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    nullEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    nullEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16788,9 +16309,7 @@ export const plans = {
           return pgResource_nullPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16801,32 +16320,32 @@ export const plans = {
   },
   DeleteNullInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteNullByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteNullByBreakInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     break: undefined
   },
   DeleteNullByHasOwnPropertyInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     hasOwnProperty: undefined
@@ -16834,7 +16353,8 @@ export const plans = {
   DeleteProjectPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     project($object) {
       return $object.get("result");
@@ -16847,11 +16367,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    projectEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    projectEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16867,9 +16383,7 @@ export const plans = {
           return pgResource_projectPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16880,24 +16394,24 @@ export const plans = {
   },
   DeleteProjectInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteProjectByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteProjectByProtoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     _proto__: undefined
@@ -16905,7 +16419,8 @@ export const plans = {
   DeleteYieldPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     yield($object) {
       return $object.get("result");
@@ -16918,11 +16433,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    yieldEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    yieldEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -16938,9 +16449,7 @@ export const plans = {
           return pgResource_yieldPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -16951,24 +16460,24 @@ export const plans = {
   },
   DeleteYieldInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteYieldByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteYieldByExportInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     export: undefined
@@ -16976,7 +16485,8 @@ export const plans = {
   DeleteReservedPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     reserved($object) {
       return $object.get("result");
@@ -16989,11 +16499,7 @@ export const plans = {
     query() {
       return rootValue();
     },
-    reservedEdge($mutation, {
-      $orderBy
-    }, {
-      field
-    }) {
+    reservedEdge($mutation, fieldArgs) {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) {
         return constant(null);
@@ -17009,9 +16515,7 @@ export const plans = {
           return pgResource_reservedPgResource.find(spec);
         }
       })();
-      // Perform ordering
-      const orderByArg = field.args.find(a => a.name === "orderBy");
-      $select.apply(extractEnumExtensionValue(orderByArg.type, ["grafast", "apply"], $orderBy));
+      fieldArgs.apply($select, "orderBy");
       const $connection = connection($select);
       // NOTE: you must not use `$single = $select.single()`
       // here because doing so will mark the row as unique, and
@@ -17022,40 +16526,40 @@ export const plans = {
   },
   DeleteReservedInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     nodeId: undefined
   },
   DeleteReservedByIdInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     id: undefined
   },
   DeleteReservedByCaseInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     case: undefined
   },
   DeleteReservedByDoInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     do: undefined
   },
   DeleteReservedByNullInput: {
     clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     },
     null: undefined

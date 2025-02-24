@@ -1,4 +1,4 @@
-import type { ExecutableStep, ModifierStep } from "grafast";
+import type { ExecutableStep, Modifier } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";
@@ -411,9 +411,8 @@ export type PlanByUniques<
     >[number]
   : undefined;
 
-export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
+export type PgConditionLike = Modifier<any> & {
   alias: SQL;
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
@@ -725,7 +724,7 @@ export type GetPgResourceCodec<
 > = TResource["codec"];
 
 export type GetPgResourceAttributes<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
 > = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
@@ -745,6 +744,7 @@ export interface PgQueryBuilder {
   /** The alias of the current table */
   alias: SQL;
   [$$toSQL](): SQL;
+  setMeta(key: string, value: unknown): void;
 }
 
 export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;
@@ -752,3 +752,9 @@ export type PgUnionAllQueryBuilderCallback = (
   qb: PgUnionAllQueryBuilder,
 ) => void;
 export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
+
+export type ObjectForResource<
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
+> = {
+  [key in keyof GetPgResourceAttributes<TResource> & string]?: any; // TYPES: we should be able to make this stronger using the attribute codec
+};

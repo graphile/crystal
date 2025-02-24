@@ -128,7 +128,7 @@ export function makeChangeNullabilityPlugin(
   let pendingMatches = new Set<string>();
 
   function objectOrInterfaceFieldCallback<
-    T extends GrafastFieldConfig<any, any, any, any, any>,
+    T extends GrafastFieldConfig<any, any, any, any>,
   >(
     field: T,
     build: GraphileBuild.Build,
@@ -161,9 +161,7 @@ export function makeChangeNullabilityPlugin(
     return field;
   }
 
-  function objectOrInterfaceArgsArgCallback<
-    T extends GrafastArgumentConfig<any, any, any, any, any, any>,
-  >(
+  function objectOrInterfaceArgsArgCallback<T extends GrafastArgumentConfig>(
     arg: T,
     build: GraphileBuild.Build,
     context:
@@ -190,7 +188,7 @@ export function makeChangeNullabilityPlugin(
         spec,
         build.graphql,
         `${Self.name}.${fieldName}(${argName}:)`,
-      );
+      ) as GraphQLInputType;
     }
     return arg;
   }

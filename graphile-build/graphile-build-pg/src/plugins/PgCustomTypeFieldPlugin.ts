@@ -6,6 +6,7 @@ import "./PgProceduresPlugin.js";
 import "graphile-config";
 
 import type {
+  PgClassExpressionStep,
   PgClassSingleStep,
   PgCodec,
   PgDeleteSingleStep,
@@ -14,7 +15,7 @@ import type {
   PgResourceParameter,
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
-  PgSelectStep,
+  PgSelectQueryBuilder,
   PgTypedExecutableStep,
   PgUpdateSingleStep,
 } from "@dataplan/pg";
@@ -23,6 +24,7 @@ import {
   pgClassExpression,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
+  PgSelectStep,
   TYPES,
 } from "@dataplan/pg";
 import type {
@@ -37,6 +39,7 @@ import type {
 } from "grafast";
 import {
   __ListTransformStep,
+  bakedInput,
   connection,
   constant,
   object,
@@ -569,6 +572,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               (
                 argDetailsLength,
                 argDetailsSimple,
+                bakedInput,
                 constant,
                 indexAfterWhichAllArgsAreNamed,
               ) =>
@@ -584,7 +588,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       required,
                       fetcher,
                     } = argDetailsSimple[i];
-                    const $raw = args.getRaw([...path, graphqlArgName]);
+                    const fullPath = [...path, graphqlArgName];
+                    const $raw = args.getRaw(fullPath) as __TrackedValueStep;
                     let step: ExecutableStep;
                     if ($raw.evalIs(undefined)) {
                       if (
@@ -599,11 +604,12 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     } else if (fetcher) {
                       step = (
                         fetcher(
-                          args.get([...path, graphqlArgName]),
+                          $raw as ExecutableStep<string>,
                         ) as PgSelectSingleStep
                       ).record();
                     } else {
-                      step = args.get([...path, graphqlArgName]);
+                      const type = args.typeAt(fullPath);
+                      step = bakedInput(type, $raw);
                     }
 
                     if (skipped) {
@@ -631,6 +637,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               [
                 argDetailsLength,
                 argDetailsSimple,
+                bakedInput,
                 constant,
                 indexAfterWhichAllArgsAreNamed,
               ],
@@ -802,19 +809,18 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             Object.assign(Object.create(null), {
                               clientMutationId: {
                                 type: GraphQLString,
-                                autoApplyAfterParentApplyPlan: true,
-                                applyPlan: EXPORTABLE(
+                                apply: EXPORTABLE(
                                   () =>
-                                    function plan(
-                                      $input: ObjectStep<any>,
-                                      val: FieldArgs,
+                                    function apply(
+                                      qb: PgSelectQueryBuilder,
+                                      val: string | null,
                                     ) {
-                                      $input.set("clientMutationId", val.get());
+                                      qb.setMeta("clientMutationId", val);
                                     },
                                   [],
                                 ),
                               },
-                            }) as GrafastInputFieldConfigMap<any, any>,
+                            }) as GrafastInputFieldConfigMap<any>,
                           );
                         },
                       };
@@ -845,21 +851,25 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           clientMutationId: {
                             type: GraphQLString,
                             plan: EXPORTABLE(
-                              (constant) =>
-                                function plan($object: ObjectStep<any>) {
-                                  return (
-                                    $object.getStepForKey(
-                                      "clientMutationId",
-                                      true,
-                                    ) ?? constant(undefined)
-                                  );
+                              () =>
+                                function plan(
+                                  $object: ObjectStep<{
+                                    result:
+                                      | PgSelectStep
+                                      | PgSelectSingleStep
+                                      | PgClassExpressionStep<any, any>;
+                                  }>,
+                                ) {
+                                  const $result =
+                                    $object.getStepForKey("result");
+                                  return $result.getMeta("clientMutationId");
                                 },
-                              [constant],
+                              [],
                             ),
                           },
                         }) as Record<
                           string,
-                          GrafastFieldConfig<any, any, any, any, any>
+                          GrafastFieldConfig<any, any, any, any>
                         >;
                         if (isVoid) {
                           return fields;
@@ -955,7 +965,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 };
 
 function modFields(
-  fields: GraphileBuild.GrafastFieldConfigMap<any, any>,
+  fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFields
@@ -1183,13 +1193,39 @@ function modFields(
               args: {
                 input: {
                   type: new GraphQLNonNull(inputType),
-                  autoApplyAfterParentPlan: true,
                   applyPlan: EXPORTABLE(
-                    () =>
-                      function plan(_: any, $object: ObjectStep<any>) {
-                        return $object;
+                    (PgSelectStep) =>
+                      function plan(
+                        _: any,
+                        $object: ObjectStep<{
+                          result:
+                            | PgSelectStep
+                            | PgSelectSingleStep
+                            | PgClassExpressionStep<any, any>;
+                        }>,
+                        arg,
+                      ) {
+                        // We might have any number of step types here; we need
+                        // to get back to the underlying pgSelect.
+                        const $result = $object.getStepForKey("result");
+                        const $parent =
+                          "getParentStep" in $result
+                            ? ($result.getParentStep() as PgSelectSingleStep)
+                            : $result;
+                        const $pgSelect =
+                          "getClassStep" in $parent
+                            ? $parent.getClassStep()
+                            : $parent;
+                        if ($pgSelect instanceof PgSelectStep) {
+                          // Mostly so `clientMutationId` works!
+                          arg.apply($pgSelect);
+                        } else {
+                          throw new Error(
+                            `Could not determine PgSelectStep for ${$result}`,
+                          );
+                        }
                       },
-                    [],
+                    [PgSelectStep],
                   ),
                 },
               },

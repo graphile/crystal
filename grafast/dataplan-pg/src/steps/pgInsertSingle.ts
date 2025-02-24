@@ -1,42 +1,35 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  Maybe,
   PromiseOrDirect,
-  SetterCapableStep,
-  SetterStep,
+  Setter,
+  SetterCapable,
 } from "grafast";
-import { ExecutableStep, exportAs, isDev, setter } from "grafast";
-import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
+import { access, ExecutableStep, exportAs, isDev, setter } from "grafast";
+import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource } from "../index.js";
+import { sqlValueWithCodec } from "../codecs.js";
+import type { PgResource } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
+  ObjectForResource,
   PgCodec,
+  PgCodecWithAttributes,
+  PgQueryBuilder,
   PgTypedExecutableStep,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 
-const EMPTY_MAP = new Map<never, never>();
-
-type QueryValueDetailsBySymbol = Map<
-  symbol,
-  { depId: number; processor: (value: any) => SQLRawValue }
->;
-
 interface PgInsertSinglePlanFinalizeResults {
-  /** The SQL query text */
-  text: string;
-
-  /** The values to feed into the query */
-  rawSqlValues: ReadonlyArray<SQLRawValue>;
-
-  /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
-  queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
+  table: SQL;
+  returning: SQL;
 }
 
 /**
@@ -49,7 +42,7 @@ export class PgInsertSingleStep<
     unknown[] // tuple depending on what's selected
   >
   implements
-    SetterCapableStep<{
+    SetterCapable<{
       [key in keyof GetPgResourceAttributes<TResource> &
         string]: ExecutableStep;
     }>,
@@ -114,6 +107,8 @@ export class PgInsertSingleStep<
    */
   private selects: Array<SQL> = [];
 
+  private applyDepIds: number[] = [];
+
   constructor(
     resource: TResource,
     attributes?: {
@@ -174,21 +169,6 @@ export class PgInsertSingleStep<
     this.attributes.push({ name, depId, pgCodec });
   }
 
-  setPlan(): SetterStep<
-    {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
-    },
-    this
-  > {
-    if (this.locked) {
-      throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`,
-      );
-    }
-    return setter(this);
-  }
-
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
@@ -242,6 +222,10 @@ export class PgInsertSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return access(this, ["m", key]);
+  }
+
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
     TResource
@@ -275,6 +259,14 @@ export class PgInsertSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  apply(
+    $step: ExecutableStep<
+      ReadonlyArrayOrDirect<Maybe<PgInsertSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -291,37 +283,102 @@ export class PgInsertSingleStep<
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
+    const { resource, contextId, finalizeResults, alias } = this;
+    if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { text, rawSqlValues, queryValueDetailsBySymbol } =
-      this.finalizeResults;
+    const { table, returning } = finalizeResults;
+    const contextDep = values[contextId];
 
+    /*
+     * NOTE: Though we'd like to do bulk inserts, there's no way of us
+     * reliably linking the data back up again given users might:
+     *
+     * - rely on auto-generated primary keys
+     * - have triggers manipulating the data so we can't match it back up
+     *
+     * Currently it seems that the order returned from `insert into ...
+     * select ... order by ... returning ...` is the same order as the
+     * `order by` was, however this is not guaranteed in the documentation
+     * and as such cannot be relied upon. Further the pgsql-hackers list
+     * explicitly declined guaranteeing this behavior:
+     *
+     * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
+     *
+     * So we have to make do with single inserts, alas.
+     */
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
     return indexMap<PromiseOrDirect<any>>(async (i) => {
-      const value = values.map((v) => v.at(i));
-      const sqlValues = queryValueDetailsBySymbol.size
-        ? rawSqlValues.map((v) => {
-            if (typeof v === "symbol") {
-              const details = queryValueDetailsBySymbol.get(v);
-              if (!details) {
-                throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
-              }
-              const val = value[details.depId];
-              return val == null ? null : details.processor(val);
-            } else {
-              return v;
-            }
-          })
-        : rawSqlValues;
+      const context = contextDep.at(i);
+
+      const sqlAttributes: SQL[] = [];
+      const sqlValues: SQL[] = [];
+      for (const { depId, name, pgCodec } of this.attributes) {
+        const attVal = values[depId].at(i);
+        // `null` is kept, `undefined` is skipped
+        if (attVal !== undefined) {
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlAttributes.push(sqlIdent);
+          sqlValues.push(sqlVal);
+        }
+      }
+
+      const meta = Object.create(null);
+      const queryBuilder: PgInsertSingleQueryBuilder = {
+        alias,
+        [$$toSQL]() {
+          return alias;
+        },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
+        set(name, attVal) {
+          const pgCodec = resource.codec.attributes[name]?.codec;
+          if (!pgCodec) {
+            throw new Error(`Attribute ${name} not recognized on ${resource}`);
+          }
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlAttributes.push(sqlIdent);
+          sqlValues.push(sqlVal);
+        },
+        setBuilder() {
+          return setter(this);
+        },
+      };
+
+      for (const applyDepId of this.applyDepIds) {
+        const val = values[applyDepId].unaryValue();
+        if (Array.isArray(val)) {
+          val.forEach((v) => v?.(queryBuilder));
+        } else {
+          val?.(queryBuilder);
+        }
+      }
+
+      let compileResult: ReturnType<typeof sql.compile>;
+      if (sqlAttributes.length > 0) {
+        // This is our common path
+        const attributes = sql.join(sqlAttributes, ", ");
+        const values = sql.join(sqlValues, ", ");
+        const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
+        compileResult = sql.compile(query);
+      } else {
+        // No columns to insert?! Odd... but okay.
+        const query = sql`insert into ${table} default values${returning};`;
+        compileResult = sql.compile(query);
+      }
+
+      const { text, values: stmtValues } = compileResult;
       const { rows } = await this.resource.executeMutation({
-        context: value[this.contextId],
+        context,
         text,
-        values: sqlValues,
+        values: stmtValues,
       });
-      return rows[0] ?? Object.create(null);
+      return { __proto__: null, m: meta, t: rows[0] ?? [] };
     });
   }
 
@@ -347,65 +404,10 @@ export class PgInsertSingleStep<
               sql.join(fragmentsWithAliases, ",\n"),
             )}`
           : sql.blank;
-
-      /*
-       * NOTE: Though we'd like to do bulk inserts, there's no way of us
-       * reliably linking the data back up again given users might:
-       *
-       * - rely on auto-generated primary keys
-       * - have triggers manipulating the data so we can't match it back up
-       *
-       * Currently it seems that the order returned from `insert into ...
-       * select ... order by ... returning ...` is the same order as the
-       * `order by` was, however this is not guaranteed in the documentation
-       * and as such cannot be relied upon. Further the pgsql-hackers list
-       * explicitly declined guaranteeing this behavior:
-       *
-       * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
-       *
-       * So we have to make do with single inserts, alas.
-       */
-      const attributesCount = this.attributes.length;
-      if (attributesCount > 0) {
-        // This is our common path
-        const sqlAttributes: SQL[] = [];
-        const valuePlaceholders: SQL[] = [];
-        const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
-        for (let i = 0; i < attributesCount; i++) {
-          const { name, depId, pgCodec } = this.attributes[i];
-          sqlAttributes[i] = sql.identifier(name as string);
-          const symbol = Symbol(name as string);
-          valuePlaceholders[i] = sql`${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            symbol as any,
-          )}::${pgCodec.sqlType}`;
-          queryValueDetailsBySymbol.set(symbol, {
-            depId,
-            processor: pgCodec.toPg,
-          });
-        }
-        const attributes = sql.join(sqlAttributes, ", ");
-        const values = sql.join(valuePlaceholders, ", ");
-        const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
-        const { text, values: rawSqlValues } = sql.compile(query);
-
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          queryValueDetailsBySymbol,
-        };
-      } else {
-        // No columns to insert?! Odd... but okay.
-        const query = sql`insert into ${table} default values${returning};`;
-        const { text, values: rawSqlValues } = sql.compile(query);
-
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          queryValueDetailsBySymbol: EMPTY_MAP,
-        };
-      }
+      this.finalizeResults = {
+        table,
+        returning,
+      };
     }
 
     super.finalize();
@@ -431,3 +433,24 @@ export function pgInsertSingle<
   return new PgInsertSingleStep(resource, attributes);
 }
 exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");
+
+export interface PgInsertSingleQueryBuilder<
+  TResource extends PgResource<
+    any,
+    PgCodecWithAttributes,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
+> extends PgQueryBuilder,
+    SetterCapable<ObjectForResource<TResource>> {
+  set<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+    value: ObjectForResource<TResource>[TAttributeName],
+  ): void;
+  setBuilder(): Setter<ObjectForResource<TResource>, this>;
+}
+
+type PgInsertSingleQueryBuilderCallback = (
+  qb: PgInsertSingleQueryBuilder,
+) => void;

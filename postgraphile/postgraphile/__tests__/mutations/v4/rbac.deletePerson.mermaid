@@ -9,6 +9,10 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant7 & Constant20 --> __InputObject6
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,32 +20,35 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
+    ApplyInput13{{"ApplyInput[13∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant14{{"Constant[14∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    Constant18{{"Constant[18∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant15{{"Constant[15∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
-    Object12 & Constant18 --> PgDeleteSingle9
-    Object13{{"Object[13∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgDeleteSingle9 --> Object13
-    List16{{"List[16∈2] ➊<br />ᐸ14,15ᐳ"}}:::plan
-    PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant14 & PgClassExpression15 --> List16
-    PgDeleteSingle9 --> PgClassExpression15
-    Lambda17{{"Lambda[17∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List16 --> Lambda17
+    Object12 & Constant20 & ApplyInput13 --> PgDeleteSingle9
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgDeleteSingle9 --> Object14
+    List18{{"List[18∈2] ➊<br />ᐸ15,16ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant15 & PgClassExpression16 --> List18
+    Access17{{"Access[17∈2] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access17 --> PgClassExpression16
+    PgDeleteSingle9 --> Access17
+    Lambda19{{"Lambda[19∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List18 --> Lambda19
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/rbac.deletePerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Constant14,Constant18 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 18, 14<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[13]"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput13,Constant15,Constant20 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDeleteSingle9,Object13 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 14, 13<br /><br />ROOT Object{1}ᐸ{result}ᐳ[13]"):::bucket
+    class Bucket1,PgDeleteSingle9,Object14 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 15, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression15,List16,Lambda17 bucket2
+    class Bucket2,PgClassExpression16,Access17,List18,Lambda19 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

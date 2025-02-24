@@ -5,9 +5,9 @@ select
 from app_public.forums as __forums__
 where
   (
-    __forums__.archived_at is not null
-  ) and (
     true /* authorization checks */
+  ) and (
+    __forums__.archived_at is not null
   )
 order by __forums__."id" asc;
 

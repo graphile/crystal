@@ -1,5 +1,6 @@
-import type { PgConditionStep, PgSelectStep } from "@dataplan/pg";
-import type { FieldArgs, GrafastInputFieldConfig } from "grafast";
+import type { PgCondition } from "@dataplan/pg";
+import { sqlValueWithCodec } from "@dataplan/pg";
+import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.js";
@@ -9,14 +10,16 @@ export function makeAddPgTableConditionPlugin(
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build,
-  ) => GrafastInputFieldConfig<any, any, any, any, any>,
+  ) => GrafastInputFieldConfig,
   conditionGenerator?: (
-    value: FieldArgs,
+    value: unknown,
     helpers: {
-      $condition: PgConditionStep<PgSelectStep>;
       sql: typeof sql;
       sqlTableAlias: SQL;
+      sqlValueWithCodec: typeof sqlValueWithCodec;
       build: GraphileBuild.Build;
+      /** @internal We might expose this in future if needed */
+      condition: PgCondition;
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
@@ -66,12 +69,12 @@ export function makeAddPgTableConditionPlugin(
           }
           const conditionFieldSpec = conditionFieldSpecGenerator(build);
           if (
-            conditionFieldSpec.applyPlan ||
-            conditionFieldSpec.extensions?.grafast?.applyPlan
+            conditionFieldSpec.apply ||
+            conditionFieldSpec.extensions?.grafast?.apply
           ) {
             if (conditionGenerator) {
               throw new Error(
-                `${displayName}: You supplied 'applyPlan' for your field spec, so you cannot also supply a 'conditionGenerator'`,
+                `${displayName}: You supplied 'apply' for your field spec, so you cannot also supply a 'conditionGenerator'`,
               );
             }
             // Done.
@@ -82,23 +85,21 @@ export function makeAddPgTableConditionPlugin(
               );
             }
             // build applyPlan
-            conditionFieldSpec.applyPlan = EXPORTABLE(
-              (build, conditionGenerator, sql) =>
-                function applyPlan(
-                  $condition: PgConditionStep<PgSelectStep>,
-                  val,
-                ) {
+            conditionFieldSpec.apply = EXPORTABLE(
+              (build, conditionGenerator, sql, sqlValueWithCodec) =>
+                function apply(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
-                    $condition,
                     sql,
-                    sqlTableAlias: $condition.alias,
+                    sqlTableAlias: condition.alias,
+                    sqlValueWithCodec,
                     build,
+                    condition,
                   });
                   if (expression) {
-                    $condition.where(expression);
+                    condition.where(expression);
                   }
                 },
-              [build, conditionGenerator, sql],
+              [build, conditionGenerator, sql, sqlValueWithCodec],
             );
           }
           const meta = build._pluginMeta[displayName]!;

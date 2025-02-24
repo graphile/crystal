@@ -165,6 +165,10 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
       .join(".")}`;
   }
 
+  getParentStep(): ExecutableStep {
+    return this.getDep(0);
+  }
+
   /**
    * Get the named property of an object.
    */

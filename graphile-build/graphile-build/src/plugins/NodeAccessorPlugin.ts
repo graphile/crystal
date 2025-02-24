@@ -150,7 +150,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (fetcher, nodeIdFieldName) =>
                     function plan(_$parent: ExecutableStep, args: FieldArgs) {
-                      const $nodeId = args.get(nodeIdFieldName);
+                      const $nodeId = args.getRaw(
+                        nodeIdFieldName,
+                      ) as ExecutableStep<string>;
                       return fetcher($nodeId);
                     },
                   [fetcher, nodeIdFieldName],

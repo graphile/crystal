@@ -5,9 +5,9 @@ select
 from app_public.messages as __messages__
 where
   (
-    __messages__.archived_at is null
-  ) and (
     true /* authorization checks */
+  ) and (
+    __messages__.archived_at is null
   ) and (
     __messages__."id" > $1::"uuid"
   )
@@ -19,9 +19,9 @@ select
 from app_public.messages as __messages__
 where
   (
-    __messages__.archived_at is null
-  ) and (
     true /* authorization checks */
+  ) and (
+    __messages__.archived_at is null
   );
 
 select __users_result__.*

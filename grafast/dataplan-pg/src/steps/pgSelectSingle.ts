@@ -282,6 +282,10 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   /**
    * Returns a plan representing the result of an expression.
    */

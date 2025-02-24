@@ -3,7 +3,7 @@ import type { GraphQLObjectType } from "graphql";
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
-  AnyInputStep,
+  Maybe,
   NodeIdHandler,
   PolymorphicData,
   UnbatchedExecutionExtra,
@@ -101,9 +101,10 @@ export function node(
 
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string> | AnyInputStep,
+  $id: ExecutableStep<Maybe<string>>,
 ) {
-  function decodeWithCodecAndHandler(raw: string) {
+  function decodeWithCodecAndHandler(raw: Maybe<string>) {
+    if (raw == null) return raw;
     try {
       const decoded = handler.codec.decode(raw);
       if (handler.match(decoded)) {
@@ -131,7 +132,7 @@ export function nodeIdFromNode(
   return lambda(specifier, handler.codec.encode);
 }
 
-export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
+export function makeDecodeNodeIdRuntime(handlers: readonly NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
   function decodeNodeIdWithCodecs(raw: string | null | undefined) {
@@ -151,6 +152,11 @@ export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
     );
   }
   decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
+  return decodeNodeIdWithCodecs;
+}
+
+export function makeDecodeNodeId(handlers: readonly NodeIdHandler[]) {
+  const decodeNodeIdWithCodecs = makeDecodeNodeIdRuntime(handlers);
   return ($id: ExecutableStep<string | null | undefined>) =>
     lambda($id, decodeNodeIdWithCodecs);
 }

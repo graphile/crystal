@@ -17,6 +17,7 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  ConstantStep,
   ExecutableStep,
   exportAs,
   first,
@@ -53,7 +54,7 @@ import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
@@ -88,6 +89,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
+  m: Object.create(null),
   hasMore: false,
   items: [],
 } as PgSelectStepResult);
@@ -240,6 +242,8 @@ export interface PgSelectOptions<
  * the relevant queryValues. This saves repeating this work at execution time.
  */
 interface QueryBuildResult {
+  meta: Record<string, unknown>;
+
   // The SQL query text
   text: string;
 
@@ -276,6 +280,7 @@ interface PgSelectStepResult {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails?: PgCursorDetails;
+  m: Record<string, unknown>;
 }
 
 /**
@@ -295,7 +300,13 @@ export class PgSelectStep<
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
-    >
+    >,
+    /**
+     * @internal PgSelectStep might not always implement PgSelectQueryBuilder;
+     * we only use it for internal optimizations (specifically around
+     * `.apply(...)`).
+     */
+    PgSelectQueryBuilder
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -465,6 +476,8 @@ export class PgSelectStep<
   public readonly mode: PgSelectMode;
 
   protected locker: PgLocker<this> = new PgLocker(this);
+
+  private _meta: Record<string, any> = Object.create(null);
 
   static clone<TResource extends PgResource<any, any, any, any, any>>(
     cloneFrom: PgSelectStep<TResource>,
@@ -770,6 +783,10 @@ export class PgSelectStep<
     this.joins.push(this.scopedSQL(spec));
   }
 
+  public getMeta(key: string) {
+    return access(this, ["m", key]);
+  }
+
   /**
    * Select an SQL fragment, returning the index the result will have.
    *
@@ -878,33 +895,12 @@ export class PgSelectStep<
     }
   }
 
-  wherePlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
-      );
-    }
-    return new PgConditionStep(this);
-  }
-
   groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(this.scopedSQL(group));
-  }
-
-  havingPlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
-      );
-    }
-    if (this.mode !== "aggregate") {
-      throw new SafeError(`Cannot add having to a non-aggregate query`);
-    }
-    return new PgConditionStep(this, true);
   }
 
   having(
@@ -947,7 +943,11 @@ export class PgSelectStep<
       ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>
     >,
   ) {
-    this.applyDepIds.push(this.addUnaryDependency($step));
+    if ($step instanceof ConstantStep) {
+      ($step.data as PgSelectQueryBuilderCallback)(this);
+    } else {
+      this.applyDepIds.push(this.addUnaryDependency($step));
+    }
   }
 
   protected assertCursorPaginationAllowed(): void {
@@ -1003,6 +1003,7 @@ export class PgSelectStep<
       stream,
     } = executionDetails;
     const {
+      meta,
       text,
       rawSqlValues,
       textForDeclare,
@@ -1031,6 +1032,7 @@ export class PgSelectStep<
       hasSideEffects: this.hasSideEffects,
       name: this.name,
       alias: this.alias,
+      symbol: this.symbol,
       resource: this.resource,
       groups: this.groups,
       orders: this.orders,
@@ -1047,6 +1049,7 @@ export class PgSelectStep<
       needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
       relationJoins: this.relationJoins,
+      meta: this._meta,
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1107,6 +1110,7 @@ export class PgSelectStep<
           ? reverseArray(slicedRows)
           : slicedRows;
         return {
+          m: meta,
           items: orderedRows,
           hasMore,
           cursorDetails,
@@ -1179,6 +1183,7 @@ export class PgSelectStep<
         }
         if (!initialFetchResult) {
           return {
+            m: meta,
             items: iterable,
             hasMore: false,
             cursorDetails,
@@ -1227,6 +1232,7 @@ export class PgSelectStep<
           },
         };
         return {
+          m: meta,
           items: mergedGenerator,
           hasMore: false,
           cursorDetails,
@@ -1577,6 +1583,15 @@ export class PgSelectStep<
   [$$toSQL]() {
     return this.alias;
   }
+  whereBuilder() {
+    return new PgCondition(this);
+  }
+  havingBuilder() {
+    return new PgCondition(this, true);
+  }
+  setMeta(key: string, value: unknown): void {
+    this._meta[key] = value;
+  }
 }
 
 export class PgSelectRowsStep<
@@ -1877,6 +1892,7 @@ interface PgSelectQueryInfo<
     keyof GetPgResourceRelations<TResource>,
     SQL
   >;
+  readonly meta: { readonly [key: string]: any };
 }
 interface MutablePgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
@@ -1890,6 +1906,7 @@ interface MutablePgSelectQueryInfo<
   readonly havingConditions: Array<SQL>;
   isOrderUnique: boolean;
   readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
+  readonly meta: Record<string, any>;
 }
 
 function buildTheQuery<
@@ -1906,6 +1923,7 @@ function buildTheQuery<
     havingConditions: [...rawInfo.havingConditions],
     relationJoins: new Map(rawInfo.relationJoins),
     joins: [...rawInfo.joins],
+    meta: { __proto__: null, ...rawInfo.meta },
 
     // Will be populated by applyConditionFromCursor
     cursorLower: null,
@@ -1928,11 +1946,14 @@ function buildTheQuery<
     return info.selects.push(expression) - 1;
   }
 
-  // TODO: evaluate runtime orders, conditions, etc here
+  const meta = info.meta;
   const queryBuilder: PgSelectQueryBuilder = {
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
+    },
+    setMeta(key, value) {
+      meta[key] = value;
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
@@ -1992,6 +2013,46 @@ function buildTheQuery<
       });
       info.relationJoins.set(relationIdentifier, alias);
       return alias;
+    },
+    // TODO: where, whereBuilder, having, havingBuilder
+    where(condition) {
+      if (sql.isSQL(condition)) {
+        info.conditions.push(condition);
+      } else {
+        switch (condition.type) {
+          case "attribute": {
+            info.conditions.push(
+              condition.callback(
+                sql`${info.alias}.${sql.identifier(condition.attribute)}`,
+              ),
+            );
+            break;
+          }
+          default: {
+            const never: never = condition.type;
+            console.error("Unsupported condition: ", never);
+            throw new Error(`Unsupported condition`);
+          }
+        }
+      }
+    },
+    having(condition) {
+      if (info.mode !== "aggregate") {
+        throw new SafeError(`Cannot add having to a non-aggregate query`);
+      }
+      if (sql.isSQL(condition)) {
+        info.havingConditions.push(condition);
+      } else {
+        const never: never = condition;
+        console.error("Unsupported condition: ", never);
+        throw new Error(`Unsupported condition`);
+      }
+    },
+    whereBuilder() {
+      return new PgCondition(this);
+    },
+    havingBuilder() {
+      return new PgCondition(this, true);
     },
   };
 
@@ -2326,6 +2387,7 @@ ${lateralText};`;
       }
       const identifierIndex = initialFetchIdentifierIndex;
       return {
+        meta,
         text,
         rawSqlValues,
         textForDeclare,
@@ -2355,6 +2417,7 @@ ${lateralText};`;
         },
       });
       return {
+        meta,
         // This is a hack since this is the _only_ place we don't want
         // `text`; loosening the types would risk us forgetting in more
         // places (and cause us to do excessive type safety checks) so we
@@ -2379,6 +2442,7 @@ ${lateralText};`;
       },
     });
     return {
+      meta,
       text,
       rawSqlValues,
       identifierIndex,
@@ -2745,4 +2809,16 @@ export interface PgSelectQueryBuilder<
   >(
     relationIdentifier: TRelationName,
   ): SQL;
+  where(
+    condition: PgWhereConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string
+    >,
+  ): void;
+  whereBuilder(): PgCondition<this>;
+  having(
+    condition: PgHavingConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string
+    >,
+  ): void;
+  havingBuilder(): PgCondition<this>;
 }
