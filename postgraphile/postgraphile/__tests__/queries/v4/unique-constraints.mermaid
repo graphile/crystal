@@ -16,7 +16,8 @@ graph TD
     Object10 & Constant53 & Constant54 --> PgSelect26
     PgSelect35[["PgSelect[35∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Constant55{{"Constant[55∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Object10 & Constant55 & Constant55 --> PgSelect35
+    Object10 --> PgSelect35
+    Constant55 -- 2 --> PgSelect35
     PgSelect44[["PgSelect[44∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Constant56{{"Constant[56∈0] ➊<br />ᐸ100ᐳ"}}:::plan
     Object10 & Constant53 & Constant56 --> PgSelect44

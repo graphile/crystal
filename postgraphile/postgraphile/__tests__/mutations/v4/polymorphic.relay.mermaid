@@ -10,29 +10,28 @@ graph TD
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant392{{"Constant[392∈0] ➊<br />ᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ"}}:::plan
     Constant393{{"Constant[393∈0] ➊<br />ᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0='ᐳ"}}:::plan
-    Constant7 & Constant392 & Constant393 --> __InputObject8
+    Constant392 & Constant393 --> __InputObject8
     __InputObject265{{"__InputObject[265∈0] ➊"}}:::plan
     Constant394{{"Constant[394∈0] ➊<br />ᐸ'WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ=='ᐳ"}}:::plan
     Constant395{{"Constant[395∈0] ➊<br />ᐸ'WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=='ᐳ"}}:::plan
-    Constant7 & Constant394 & Constant395 --> __InputObject265
+    Constant394 & Constant395 --> __InputObject265
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
     __InputObject134{{"__InputObject[134∈0] ➊"}}:::plan
     __InputObject136{{"__InputObject[136∈0] ➊"}}:::plan
-    Constant7 & __InputObject136 --> __InputObject134
+    __InputObject136 --> __InputObject134
     Constant392 & Constant393 --> __InputObject136
     __InputObject263{{"__InputObject[263∈0] ➊"}}:::plan
-    Constant7 & __InputObject265 --> __InputObject263
+    __InputObject265 --> __InputObject263
     __InputObject327{{"__InputObject[327∈0] ➊"}}:::plan
     __InputObject329{{"__InputObject[329∈0] ➊"}}:::plan
-    Constant7 & __InputObject329 --> __InputObject327
+    __InputObject329 --> __InputObject327
     Constant394 & Constant395 --> __InputObject329
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
@@ -600,7 +599,7 @@ graph TD
     subgraph "Buckets for mutations/v4/polymorphic.relay"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,Constant38,Constant48,Constant57,Constant66,Constant75,__InputObject134,__InputObject136,ApplyInput143,Constant145,__InputObject263,__InputObject265,ApplyInput272,Constant274,Constant287,Constant292,Constant295,Constant298,Constant301,__InputObject327,__InputObject329,ApplyInput336,Constant338,Constant392,Constant393,Constant394,Constant395 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,Constant38,Constant48,Constant57,Constant66,Constant75,__InputObject134,__InputObject136,ApplyInput143,Constant145,__InputObject263,__InputObject265,ApplyInput272,Constant274,Constant287,Constant292,Constant295,Constant298,Constant301,__InputObject327,__InputObject329,ApplyInput336,Constant338,Constant392,Constant393,Constant394,Constant395 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17, 38, 48, 57, 66, 75<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1

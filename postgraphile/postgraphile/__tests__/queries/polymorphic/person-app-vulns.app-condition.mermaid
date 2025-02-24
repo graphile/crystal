@@ -11,19 +11,18 @@ graph TD
     %% plan dependencies
     Connection29{{"Connection[29∈0] ➊<br />ᐸ25ᐳ"}}:::plan
     Constant62{{"Constant[62∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Lambda30{{"Lambda[30∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant62 & Constant7 & Constant7 & Lambda30 --> Connection29
+    Constant62 & Lambda30 --> Connection29
     Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
     Constant61{{"Constant[61∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant61 & Constant7 & Constant7 --> Connection13
+    Constant61 --> Connection13
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __InputObject23{{"__InputObject[23∈0] ➊"}}:::plan
     Constant64{{"Constant[64∈0] ➊<br />ᐸ'AWfulS'ᐳ"}}:::plan
-    Constant7 & Constant64 --> __InputObject23
+    Constant64 --> __InputObject23
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
@@ -32,10 +31,9 @@ graph TD
     ApplyInput31{{"ApplyInput[31∈0] ➊"}}:::plan
     __InputObject23 --> ApplyInput31
     Lambda32[["Lambda[32∈0] ➊<br />ᐸlimitToTypesᐳ"]]:::unbatchedplan
-    Constant7 --> Lambda32
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object12 & Connection13 & Constant61 & Constant7 & Constant7 --> PgSelect15
+    Object12 & Connection13 & Constant61 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
@@ -44,7 +42,7 @@ graph TD
     __Item17 --> PgSelectSingle18
     PgUnionAll33[["PgUnionAll[33∈3]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression19 & ApplyInput31 & Lambda32 & Connection29 & Lambda30 & Constant62 & Constant7 & Constant7 --> PgUnionAll33
+    Object12 & PgClassExpression19 & ApplyInput31 & Lambda32 & Connection29 & Lambda30 & Constant62 --> PgUnionAll33
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
@@ -98,7 +96,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-condition"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 10, 11, 61, 62, 63, 64, 12, 13, 23, 30, 31, 29<br />2: Lambda[32]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,Access10,Access11,Object12,Connection13,__InputObject23,Connection29,Lambda30,ApplyInput31,Lambda32,Constant61,Constant62,Constant63,Constant64 bucket0
+    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,__InputObject23,Connection29,Lambda30,ApplyInput31,Lambda32,Constant61,Constant62,Constant63,Constant64 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 61, 7, 31, 32, 29, 30, 62<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1

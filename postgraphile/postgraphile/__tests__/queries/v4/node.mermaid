@@ -10,10 +10,7 @@ graph TD
 
     %% plan dependencies
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection12
     Connection26{{"Connection[26∈0] ➊<br />ᐸ24ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection26
     PgSelect1345[["PgSelect[1345∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access1341{{"Access[1341∈0] ➊<br />ᐸ1340.1ᐳ"}}:::plan
@@ -196,7 +193,7 @@ graph TD
     Constant233{{"Constant[233∈0] ➊<br />ᐸ'issue756S'ᐳ"}}:::plan
     Constant243{{"Constant[243∈0] ➊<br />ᐸ'lists'ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11 & Connection12 & Constant6 & Constant6 & Constant6 --> PgSelect14
+    Object11 & Connection12 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
@@ -212,7 +209,7 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression22
     PgSelect28[["PgSelect[28∈4] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & Connection26 & Constant6 & Constant6 & Constant6 --> PgSelect28
+    Object11 & Connection26 --> PgSelect28
     PgSelectRows29[["PgSelectRows[29∈4] ➊"]]:::plan
     PgSelect28 --> PgSelectRows29
     __Item30[/"__Item[30∈5]<br />ᐸ29ᐳ"\]:::itemplan
@@ -2769,7 +2766,7 @@ graph TD
     subgraph "Buckets for queries/v4/node"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 18, 32, 41, 53, 63, 73, 83, 93, 103, 137, 147, 157, 167, 177, 187, 197, 210, 223, 233, 243, 1841, 1844, 1847, 1850, 1853, 1856, 1859, 1862, 11, 12, 26, 39, 249, 459, 669, 879, 1089, 1298, 1299, 1312, 1313, 1326, 1327, 1340, 1341, 1343, 1356, 1357, 1359, 1372, 1373, 1375, 1389, 1599, 1808, 1809, 1824, 1825, 38, 248, 458, 668, 878, 1088, 1388, 1598<br />2: 1301, 1315, 1329, 1345, 1361, 1377, 1811, 1827<br />3: 1304, 1318, 1332, 1348, 1364, 1380, 1814, 1830<br />ᐳ: 1303, 1305, 1317, 1319, 1331, 1333, 1347, 1349, 1363, 1365, 1379, 1381, 1813, 1815, 1829, 1831"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,Access9,Access10,Object11,Connection12,Constant18,Connection26,Constant32,Node38,Lambda39,Constant41,Constant53,Constant63,Constant73,Constant83,Constant93,Constant103,Constant137,Constant147,Constant157,Constant167,Constant177,Constant187,Constant197,Constant210,Constant223,Constant233,Constant243,Node248,Lambda249,Node458,Lambda459,Node668,Lambda669,Node878,Lambda879,Node1088,Lambda1089,Lambda1298,Access1299,PgSelect1301,First1303,PgSelectRows1304,PgSelectSingle1305,Lambda1312,Access1313,PgSelect1315,First1317,PgSelectRows1318,PgSelectSingle1319,Lambda1326,Access1327,PgSelect1329,First1331,PgSelectRows1332,PgSelectSingle1333,Lambda1340,Access1341,Access1343,PgSelect1345,First1347,PgSelectRows1348,PgSelectSingle1349,Lambda1356,Access1357,Access1359,PgSelect1361,First1363,PgSelectRows1364,PgSelectSingle1365,Lambda1372,Access1373,Access1375,PgSelect1377,First1379,PgSelectRows1380,PgSelectSingle1381,Node1388,Lambda1389,Node1598,Lambda1599,Lambda1808,Access1809,PgSelect1811,First1813,PgSelectRows1814,PgSelectSingle1815,Lambda1824,Access1825,PgSelect1827,First1829,PgSelectRows1830,PgSelectSingle1831,Constant1841,Constant1844,Constant1847,Constant1850,Constant1853,Constant1856,Constant1859,Constant1862 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant18,Connection26,Constant32,Node38,Lambda39,Constant41,Constant53,Constant63,Constant73,Constant83,Constant93,Constant103,Constant137,Constant147,Constant157,Constant167,Constant177,Constant187,Constant197,Constant210,Constant223,Constant233,Constant243,Node248,Lambda249,Node458,Lambda459,Node668,Lambda669,Node878,Lambda879,Node1088,Lambda1089,Lambda1298,Access1299,PgSelect1301,First1303,PgSelectRows1304,PgSelectSingle1305,Lambda1312,Access1313,PgSelect1315,First1317,PgSelectRows1318,PgSelectSingle1319,Lambda1326,Access1327,PgSelect1329,First1331,PgSelectRows1332,PgSelectSingle1333,Lambda1340,Access1341,Access1343,PgSelect1345,First1347,PgSelectRows1348,PgSelectSingle1349,Lambda1356,Access1357,Access1359,PgSelect1361,First1363,PgSelectRows1364,PgSelectSingle1365,Lambda1372,Access1373,Access1375,PgSelect1377,First1379,PgSelectRows1380,PgSelectSingle1381,Node1388,Lambda1389,Node1598,Lambda1599,Lambda1808,Access1809,PgSelect1811,First1813,PgSelectRows1814,PgSelectSingle1815,Lambda1824,Access1825,PgSelect1827,First1829,PgSelectRows1830,PgSelectSingle1831,Constant1841,Constant1844,Constant1847,Constant1850,Constant1853,Constant1856,Constant1859,Constant1862 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 18<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1

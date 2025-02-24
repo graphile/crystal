@@ -12,16 +12,15 @@ graph TD
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     Constant67{{"Constant[67∈0] ➊<br />ᐸ9000ᐳ"}}:::plan
     Constant68{{"Constant[68∈0] ➊<br />ᐸ'John Smith Jr.'ᐳ"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant69{{"Constant[69∈0] ➊<br />ᐸ'Son of Sara and John Smith.'ᐳ"}}:::plan
     Constant70{{"Constant[70∈0] ➊<br />ᐸ'johnny.boy.smith@email.com'ᐳ"}}:::plan
     __InputDynamicScalar13{{"__InputDynamicScalar[13∈0] ➊"}}:::plan
     Constant71{{"Constant[71∈0] ➊<br />ᐸ'172.16.1.2'ᐳ"}}:::plan
     Constant72{{"Constant[72∈0] ➊<br />ᐸ'172.16.0.0/12'ᐳ"}}:::plan
     Constant73{{"Constant[73∈0] ➊<br />ᐸ'00:00:00:00:00:00'ᐳ"}}:::plan
-    Constant67 & Constant68 & Constant7 & Constant69 & Constant70 & __InputDynamicScalar13 & Constant71 & Constant72 & Constant73 --> __InputObject8
+    Constant67 & Constant68 & Constant69 & Constant70 & __InputDynamicScalar13 & Constant71 & Constant72 & Constant73 --> __InputObject8
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -86,7 +85,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-create.single-variables"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,__InputDynamicScalar13,Access18,Access19,Object20,ApplyInput21,Constant41,Constant65,Constant67,Constant68,Constant69,Constant70,Constant71,Constant72,Constant73 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,__InputDynamicScalar13,Access18,Access19,Object20,ApplyInput21,Constant41,Constant65,Constant67,Constant68,Constant69,Constant70,Constant71,Constant72,Constant73 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 65, 41, 4<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object22 bucket1

@@ -10,11 +10,9 @@ graph TD
 
     %% plan dependencies
     Connection8{{"Connection[8∈0] ➊<br />ᐸ7ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection8
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgUnionAll9[["PgUnionAll[9∈1] ➊"]]:::plan
-    Connection8 & Constant6 & Constant6 & Constant6 --> PgUnionAll9
+    Connection8 --> PgUnionAll9
     Access13{{"Access[13∈1] ➊<br />ᐸ9.itemsᐳ"}}:::plan
     PgUnionAll9 --> Access13
     __Item11[/"__Item[11∈2]<br />ᐸ13ᐳ"\]:::itemplan
@@ -27,7 +25,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/zero-implementations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value4,Constant6,Connection8 bucket0
+    class Bucket0,__Value4,Connection8 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8, 6<br /><br />ROOT Connectionᐸ7ᐳ[8]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll9,Access13 bucket1

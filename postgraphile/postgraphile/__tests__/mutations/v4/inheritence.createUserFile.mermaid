@@ -10,13 +10,12 @@ graph TD
 
     %% plan dependencies
     __InputObject26{{"__InputObject[26∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant50{{"Constant[50∈0] ➊<br />ᐸ'foo.txt'ᐳ"}}:::plan
     Constant48{{"Constant[48∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant7 & Constant50 & Constant48 --> __InputObject26
+    Constant50 & Constant48 --> __InputObject26
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Constant49{{"Constant[49∈0] ➊<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
     Constant48 & Constant49 --> __InputObject8
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -24,7 +23,7 @@ graph TD
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
     __InputObject24{{"__InputObject[24∈0] ➊"}}:::plan
-    Constant7 & __InputObject26 --> __InputObject24
+    __InputObject26 --> __InputObject24
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
@@ -84,7 +83,7 @@ graph TD
     subgraph "Buckets for mutations/v4/inheritence.createUserFile"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,__InputObject24,__InputObject26,ApplyInput33,Constant48,Constant49,Constant50 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,__InputObject24,__InputObject26,ApplyInput33,Constant48,Constant49,Constant50 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1

@@ -10,30 +10,29 @@ graph TD
 
     %% plan dependencies
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant78{{"Constant[78∈0] ➊<br />ᐸ'postgraphile_test_authenticator'ᐳ"}}:::plan
     Constant79{{"Constant[79∈0] ➊<br />ᐸ'pg11'ᐳ"}}:::plan
     Constant12{{"Constant[12∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
     __InputObject13{{"__InputObject[13∈0] ➊"}}:::plan
-    Constant7 & Constant78 & Constant79 & Constant12 & __InputObject13 --> __InputObject9
+    Constant78 & Constant79 & Constant12 & __InputObject13 --> __InputObject9
     __InputObject44{{"__InputObject[44∈0] ➊"}}:::plan
     Constant81{{"Constant[81∈0] ➊<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
     Constant82{{"Constant[82∈0] ➊<br />ᐸ'c'ᐳ"}}:::plan
     Constant47{{"Constant[47∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
     __InputObject48{{"__InputObject[48∈0] ➊"}}:::plan
-    Constant7 & Constant81 & Constant82 & Constant47 & __InputObject48 --> __InputObject44
+    Constant81 & Constant82 & Constant47 & __InputObject48 --> __InputObject44
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     Constant77{{"Constant[77∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Constant7 & Constant77 & __InputObject9 --> __InputObject6
+    Constant77 & __InputObject9 --> __InputObject6
     Constant80{{"Constant[80∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant80 & Constant7 --> __InputObject13
+    Constant80 --> __InputObject13
     Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
     __InputObject42{{"__InputObject[42∈0] ➊"}}:::plan
-    Constant7 & __InputObject44 --> __InputObject42
-    Constant80 & Constant7 --> __InputObject48
+    __InputObject44 --> __InputObject42
+    Constant80 --> __InputObject48
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access16
     __Value2 --> Access17
@@ -134,7 +133,7 @@ graph TD
     subgraph "Buckets for mutations/v4/pg11.types"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject9,Constant12,__InputObject13,Access16,Access17,Object18,ApplyInput19,__InputObject42,__InputObject44,Constant47,__InputObject48,ApplyInput54,Constant77,Constant78,Constant79,Constant80,Constant81,Constant82 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Constant12,__InputObject13,Access16,Access17,Object18,ApplyInput19,__InputObject42,__InputObject44,Constant47,__InputObject48,ApplyInput54,Constant77,Constant78,Constant79,Constant80,Constant81,Constant82 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 77, 19<br /><br />1: PgUpdateSingle[15]<br />2: <br />ᐳ: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle15,Object20 bucket1

@@ -10,9 +10,8 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant25{{"Constant[25∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant7 & Constant25 --> __InputObject6
+    Constant25 --> __InputObject6
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -53,7 +52,7 @@ graph TD
     subgraph "Buckets for mutations/v4/d.deletePerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access10,Access11,Object12,ApplyInput13,Constant25 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant25 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 25, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9,Object14 bucket1

@@ -17,9 +17,8 @@ graph TD
     __InputObject14{{"__InputObject[14∈0] ➊"}}:::plan
     Constant39 & Constant11 & Constant12 & Constant40 & __InputObject14 --> __InputObject9
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant38{{"Constant[38∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant7 & Constant38 & __InputObject9 --> __InputObject6
+    Constant38 & __InputObject9 --> __InputObject6
     Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -68,7 +67,7 @@ graph TD
     subgraph "Buckets for mutations/v4/rbac.updatePerson"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject9,Constant11,Constant12,__InputObject14,Access17,Access18,Object19,ApplyInput20,Constant38,Constant39,Constant40,Constant41 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Constant11,Constant12,__InputObject14,Access17,Access18,Object19,ApplyInput20,Constant38,Constant39,Constant40,Constant41 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 38, 20<br /><br />1: PgUpdateSingle[16]<br />2: <br />ᐳ: Object[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle16,Object21 bucket1

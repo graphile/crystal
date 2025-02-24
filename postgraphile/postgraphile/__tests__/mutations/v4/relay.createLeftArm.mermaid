@@ -10,12 +10,11 @@ graph TD
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant36{{"Constant[36∈0] ➊<br />ᐸ0.69ᐳ"}}:::plan
     Constant37{{"Constant[37∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
-    Constant7 & Constant36 & Constant37 --> __InputObject8
+    Constant36 & Constant37 --> __InputObject8
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -66,7 +65,7 @@ graph TD
     subgraph "Buckets for mutations/v4/relay.createLeftArm"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,Constant30,Constant36,Constant37 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant17,Constant30,Constant36,Constant37 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17, 30<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1

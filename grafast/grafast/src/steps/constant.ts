@@ -1,5 +1,9 @@
 import { inspect } from "../inspect.js";
-import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  JSONValue,
+} from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 import { operationPlan } from "./index.js";
@@ -40,6 +44,23 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
           .replace(/[\r\n]/g, " ")
           .replaceAll("[Object: null prototype] ", "§")
           .slice(0, 60);
+  }
+
+  public planJSONExtra(): undefined | Record<string, JSONValue> {
+    if (this.isSensitive) return;
+    const data = this.data as unknown;
+    if (
+      data == null ||
+      typeof data === "boolean" ||
+      typeof data === "number" ||
+      typeof data === "string"
+    ) {
+      return {
+        constant: {
+          type: typeof data,
+        },
+      };
+    }
   }
 
   deduplicate(peers: readonly ConstantStep<any>[]) {

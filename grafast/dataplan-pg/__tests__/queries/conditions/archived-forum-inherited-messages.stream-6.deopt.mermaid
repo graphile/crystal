@@ -11,14 +11,12 @@ graph TD
     %% plan dependencies
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Lambda12[["Lambda[12∈0] ➊<br />ᐸincludeArchivedConditionᐳ"]]:::unbatchedplan
-    Object11 & Constant6 & Lambda12 --> PgSelect8
+    Object11 & Lambda12 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     Connection23{{"Connection[23∈0] ➊<br />ᐸ19ᐳ"}}:::plan
-    Constant6 & Constant6 --> Connection23
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -43,9 +41,9 @@ graph TD
     PgClassExpression24{{"PgClassExpression[24∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression24
     PgSelect28[["PgSelect[28∈3@s]<br />ᐸmessagesᐳ"]]:::plan
-    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 & Constant6 & Constant6 --> PgSelect28
+    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 --> PgSelect28
     PgSelect43[["PgSelect[43∈3@s]<br />ᐸmessagesᐳ"]]:::plan
-    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 & Constant6 & Constant6 --> PgSelect43
+    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 --> PgSelect43
     PgSelectRows29[["PgSelectRows[29∈3@s]"]]:::plan
     PgSelect28 --> PgSelectRows29
     PgSelectRows44[["PgSelectRows[44∈3@s]"]]:::plan
@@ -97,14 +95,14 @@ graph TD
     PgClassExpression59{{"PgClassExpression[59∈9]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle57 --> PgClassExpression59
     PgSelect60[["PgSelect[60∈10]<br />ᐸmessages+1ᐳ"]]:::plan
-    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 & Constant6 & Constant6 --> PgSelect60
+    Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 --> PgSelect60
     PgSelect71[["PgSelect[71∈10]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object11 & PgClassExpression18 & PgClassExpression24 & Lambda25 & Connection23 --> PgSelect71
     Object69{{"Object[69∈10]<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access63{{"Access[63∈10]<br />ᐸ60.hasMoreᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 & Access63 --> Object69
+    Access63 --> Object69
     Object64{{"Object[64∈10]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant6 & Constant6 & Access63 --> Object64
+    Access63 --> Object64
     PgSelect60 --> Access63
     Lambda65{{"Lambda[65∈10]<br />ᐸhasNextPageCbᐳ"}}:::plan
     Object64 --> Lambda65
@@ -124,7 +122,7 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.stream-6"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 26, 27, 76, 77, 11, 23<br />2: Lambda[12], Lambda[25]<br />3: PgSelect[8]<br />4: PgSelectRows[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant6,PgSelect8,Access9,Access10,Object11,Lambda12,PgSelectRows13,Connection23,Lambda25,Constant26,Constant27,Constant76,Constant77 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda12,PgSelectRows13,Connection23,Lambda25,Constant26,Constant27,Constant76,Constant77 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 25, 23, 6, 26, 27<br /><br />ROOT __Item{1}ᐸ13ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,PgSelectSingle15 bucket1

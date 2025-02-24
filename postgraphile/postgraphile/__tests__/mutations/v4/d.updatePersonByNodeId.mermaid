@@ -10,15 +10,14 @@ graph TD
 
     %% plan dependencies
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant38{{"Constant[38∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
     Constant39{{"Constant[39∈0] ➊<br />ᐸ'update2'ᐳ"}}:::plan
     Constant40{{"Constant[40∈0] ➊<br />ᐸ'update1'ᐳ"}}:::plan
     Constant41{{"Constant[41∈0] ➊<br />ᐸ'update3'ᐳ"}}:::plan
-    Constant7 & Constant38 & Constant39 & Constant40 & Constant41 --> __InputObject9
+    Constant38 & Constant39 & Constant40 & Constant41 --> __InputObject9
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     Constant37{{"Constant[37∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDFd'ᐳ"}}:::plan
-    Constant7 & Constant37 & __InputObject9 --> __InputObject6
+    Constant37 & __InputObject9 --> __InputObject6
     Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -69,7 +68,7 @@ graph TD
     subgraph "Buckets for mutations/v4/d.updatePersonByNodeId"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject9,Lambda14,Access15,Access18,Access19,Object20,ApplyInput21,Constant25,Constant37,Constant38,Constant39,Constant40,Constant41 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Lambda14,Access15,Access18,Access19,Object20,ApplyInput21,Constant25,Constant37,Constant38,Constant39,Constant40,Constant41 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 15, 21, 25<br /><br />1: PgUpdateSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle17,Object22 bucket1

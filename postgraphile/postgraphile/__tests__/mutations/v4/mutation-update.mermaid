@@ -13,7 +13,8 @@ graph TD
     Constant560{{"Constant[560∈0] ➊<br />ᐸ'hello'ᐳ"}}:::plan
     Constant572{{"Constant[572∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     __InputObject392{{"__InputObject[392∈0] ➊"}}:::plan
-    Constant560 & Constant572 & Constant572 & __InputObject392 --> __InputObject388
+    Constant560 & __InputObject392 --> __InputObject388
+    Constant572 -- 2 --> __InputObject388
     __InputObject432{{"__InputObject[432∈0] ➊"}}:::plan
     Constant564{{"Constant[564∈0] ➊<br />ᐸ'world'ᐳ"}}:::plan
     Constant575{{"Constant[575∈0] ➊<br />ᐸ4ᐳ"}}:::plan
@@ -21,71 +22,70 @@ graph TD
     __InputObject436{{"__InputObject[436∈0] ➊"}}:::plan
     Constant564 & Constant575 & Constant566 & __InputObject436 --> __InputObject432
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant556{{"Constant[556∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDFd'ᐳ"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant7 & Constant556 & __InputObject9 --> __InputObject6
+    Constant556 & __InputObject9 --> __InputObject6
     Constant557{{"Constant[557∈0] ➊<br />ᐸ'John Smith Sr.'ᐳ"}}:::plan
     Constant558{{"Constant[558∈0] ➊<br />ᐸ'An older John Smith'ᐳ"}}:::plan
-    Constant7 & Constant557 & Constant558 --> __InputObject9
+    Constant557 & Constant558 --> __InputObject9
     __InputObject63{{"__InputObject[63∈0] ➊"}}:::plan
     Constant561{{"Constant[561∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDJd'ᐳ"}}:::plan
     __InputObject66{{"__InputObject[66∈0] ➊"}}:::plan
     Constant560 & Constant561 & __InputObject66 --> __InputObject63
     Constant562{{"Constant[562∈0] ➊<br />ᐸ'Sarah Smith'ᐳ"}}:::plan
     Constant563{{"Constant[563∈0] ➊<br />ᐸ'sarah.smith@email.com'ᐳ"}}:::plan
-    Constant7 & Constant562 & Constant563 --> __InputObject66
+    Constant562 & Constant563 --> __InputObject66
     __InputObject121{{"__InputObject[121∈0] ➊"}}:::plan
     __InputObject124{{"__InputObject[124∈0] ➊"}}:::plan
     Constant564 & Constant561 & __InputObject124 --> __InputObject121
     __InputObject178{{"__InputObject[178∈0] ➊"}}:::plan
     __InputObject181{{"__InputObject[181∈0] ➊"}}:::plan
-    Constant7 & Constant561 & __InputObject181 --> __InputObject178
+    Constant561 & __InputObject181 --> __InputObject178
     __InputObject234{{"__InputObject[234∈0] ➊"}}:::plan
     __InputObject237{{"__InputObject[237∈0] ➊"}}:::plan
-    Constant7 & Constant566 & __InputObject237 --> __InputObject234
+    Constant566 & __InputObject237 --> __InputObject234
     Constant567{{"Constant[567∈0] ➊<br />ᐸ'Best Pal'ᐳ"}}:::plan
     Constant568{{"Constant[568∈0] ➊<br />ᐸ'I have taken over Budd’s account. Hehehe.'ᐳ"}}:::plan
-    Constant7 & Constant567 & Constant568 --> __InputObject237
+    Constant567 & Constant568 --> __InputObject237
     __InputObject288{{"__InputObject[288∈0] ➊"}}:::plan
     Constant569{{"Constant[569∈0] ➊<br />ᐸ'kathryn.ramirez@email.com'ᐳ"}}:::plan
     __InputObject291{{"__InputObject[291∈0] ➊"}}:::plan
-    Constant7 & Constant569 & __InputObject291 --> __InputObject288
+    Constant569 & __InputObject291 --> __InputObject288
     __InputObject341{{"__InputObject[341∈0] ➊"}}:::plan
     Constant571{{"Constant[571∈0] ➊<br />ᐸ'WyJjb21wb3VuZF9rZXlzIiwxLDJd'ᐳ"}}:::plan
     __InputObject344{{"__InputObject[344∈0] ➊"}}:::plan
-    Constant7 & Constant571 & __InputObject344 --> __InputObject341
+    Constant571 & __InputObject344 --> __InputObject341
     Constant573{{"Constant[573∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant7 & Constant572 & Constant573 --> __InputObject344
+    Constant572 & Constant573 --> __InputObject344
     Constant574{{"Constant[574∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Constant7 & Constant566 & Constant574 --> __InputObject392
+    Constant566 & Constant574 --> __InputObject392
     __InputObject475{{"__InputObject[475∈0] ➊"}}:::plan
     Constant559{{"Constant[559∈0] ➊<br />ᐸ'graphile-build.issue.27.exists@example.com'ᐳ"}}:::plan
     __InputObject478{{"__InputObject[478∈0] ➊"}}:::plan
-    Constant7 & Constant559 & __InputObject478 --> __InputObject475
+    Constant559 & __InputObject478 --> __InputObject475
     __InputObject528{{"__InputObject[528∈0] ➊"}}:::plan
     Constant577{{"Constant[577∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     __InputObject531{{"__InputObject[531∈0] ➊"}}:::plan
-    Constant7 & Constant577 & __InputObject531 --> __InputObject528
+    Constant577 & __InputObject531 --> __InputObject528
     __InputObject542{{"__InputObject[542∈0] ➊"}}:::plan
     __InputObject545{{"__InputObject[545∈0] ➊"}}:::plan
-    Constant7 & Constant577 & __InputObject545 --> __InputObject542
+    Constant577 & __InputObject545 --> __InputObject542
     Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
     Constant565{{"Constant[565∈0] ➊<br />ᐸ'Now with an “H.”'ᐳ"}}:::plan
-    Constant7 & Constant565 --> __InputObject124
+    Constant565 --> __InputObject124
     Constant182{{"Constant[182∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant7 & Constant182 --> __InputObject181
+    Constant182 --> __InputObject181
     Constant570{{"Constant[570∈0] ➊<br />ᐸ'Make art not friends.'ᐳ"}}:::plan
-    Constant7 & Constant570 --> __InputObject291
-    Constant7 & Constant574 --> __InputObject436
+    Constant570 --> __InputObject291
+    Constant574 --> __InputObject436
     Constant576{{"Constant[576∈0] ➊<br />ᐸ'somethingelse@example.com'ᐳ"}}:::plan
-    Constant7 & Constant576 --> __InputObject478
-    Constant7 & Constant182 --> __InputObject531
+    Constant576 --> __InputObject478
+    Constant182 --> __InputObject531
     Constant578{{"Constant[578∈0] ➊<br />ᐸ'New String'ᐳ"}}:::plan
-    Constant7 & Constant578 --> __InputObject545
+    Constant578 --> __InputObject545
     Lambda12{{"Lambda[12∈0] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
     Constant556 --> Lambda12
     Access13{{"Access[13∈0] ➊<br />ᐸ12.1ᐳ"}}:::plan
@@ -543,7 +543,8 @@ graph TD
     PgSelectSingle383 --> PgClassExpression385
     PgUpdateSingle396[["PgUpdateSingle[396∈43] ➊<br />ᐸcompound_key(person_id_1,person_id_2;)ᐳ"]]:::sideeffectplan
     Object399{{"Object[399∈43] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object399 & Constant572 & Constant572 & ApplyInput400 --> PgUpdateSingle396
+    Object399 & ApplyInput400 --> PgUpdateSingle396
+    Constant572 -- 2 --> PgUpdateSingle396
     Access397{{"Access[397∈43] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access398{{"Access[398∈43] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access397 & Access398 --> Object399
@@ -734,7 +735,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-update"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject9,Lambda12,Access13,Access16,Access17,Object18,ApplyInput19,Constant22,Constant61,__InputObject63,__InputObject66,ApplyInput77,__InputObject121,__InputObject124,ApplyInput134,__InputObject178,__InputObject181,Constant182,ApplyInput190,__InputObject234,__InputObject237,ApplyInput244,__InputObject288,__InputObject291,ApplyInput297,__InputObject341,__InputObject344,ApplyInput356,Constant359,__InputObject388,__InputObject392,ApplyInput400,__InputObject432,__InputObject436,ApplyInput443,__InputObject475,__InputObject478,ApplyInput484,__InputObject528,__InputObject531,ApplyInput537,__InputObject542,__InputObject545,ApplyInput551,Constant556,Constant557,Constant558,Constant559,Constant560,Constant561,Constant562,Constant563,Constant564,Constant565,Constant566,Constant567,Constant568,Constant569,Constant570,Constant571,Constant572,Constant573,Constant574,Constant575,Constant576,Constant577,Constant578 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Lambda12,Access13,Access16,Access17,Object18,ApplyInput19,Constant22,Constant61,__InputObject63,__InputObject66,ApplyInput77,__InputObject121,__InputObject124,ApplyInput134,__InputObject178,__InputObject181,Constant182,ApplyInput190,__InputObject234,__InputObject237,ApplyInput244,__InputObject288,__InputObject291,ApplyInput297,__InputObject341,__InputObject344,ApplyInput356,Constant359,__InputObject388,__InputObject392,ApplyInput400,__InputObject432,__InputObject436,ApplyInput443,__InputObject475,__InputObject478,ApplyInput484,__InputObject528,__InputObject531,ApplyInput537,__InputObject542,__InputObject545,ApplyInput551,Constant556,Constant557,Constant558,Constant559,Constant560,Constant561,Constant562,Constant563,Constant564,Constant565,Constant566,Constant567,Constant568,Constant569,Constant570,Constant571,Constant572,Constant573,Constant574,Constant575,Constant576,Constant577,Constant578 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 13, 19, 22, 559, 61, 4<br /><br />1: PgUpdateSingle[15]<br />2: <br />ᐳ: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle15,Object20 bucket1

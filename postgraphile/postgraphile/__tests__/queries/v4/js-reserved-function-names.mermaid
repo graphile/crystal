@@ -15,12 +15,14 @@ graph TD
     Constant51{{"Constant[51∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant53{{"Constant[53∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Constant54{{"Constant[54∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Object13 & Constant52 & Constant51 & Constant52 & Constant53 & Constant54 --> PgSelect39
+    Object13 & Constant51 & Constant53 & Constant54 --> PgSelect39
+    Constant52 -- 2 --> PgSelect39
     PgSelect10[["PgSelect[10∈0] ➊<br />ᐸawaitᐳ"]]:::plan
     Object13 & Constant51 & Constant52 & Constant53 & Constant54 --> PgSelect10
     PgSelect22[["PgSelect[22∈0] ➊<br />ᐸcaseᐳ"]]:::plan
     Constant55{{"Constant[55∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Object13 & Constant55 & Constant55 & Constant55 & Constant55 --> PgSelect22
+    Object13 --> PgSelect22
+    Constant55 -- 4 --> PgSelect22
     PgSelect32[["PgSelect[32∈0] ➊<br />ᐸvalueOfᐳ"]]:::plan
     Constant56{{"Constant[56∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant57{{"Constant[57∈0] ➊<br />ᐸ6ᐳ"}}:::plan

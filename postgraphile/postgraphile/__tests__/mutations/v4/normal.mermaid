@@ -10,11 +10,10 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant25{{"Constant[25∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant26{{"Constant[26∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
     Constant27{{"Constant[27∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
-    Constant7 & Constant25 & Constant26 & Constant27 --> __InputObject6
+    Constant25 & Constant26 & Constant27 --> __InputObject6
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -51,7 +50,7 @@ graph TD
     subgraph "Buckets for mutations/v4/normal"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,Access12,Access13,Object14,ApplyInput19,Constant25,Constant26,Constant27 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access12,Access13,Object14,ApplyInput19,Constant25,Constant26,Constant27 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 25, 26, 27, 19<br /><br />1: PgSelect[11]<br />2: PgSelectRows[16]<br />ᐳ: 15, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First15,PgSelectRows16,PgSelectSingle17,Object18 bucket1
