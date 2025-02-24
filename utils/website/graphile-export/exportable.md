@@ -8,7 +8,7 @@ made in such a way that it can work with Graphile Export. This applies both to
 the parts of the schema you write yourself, and the parts you may import from
 external libraries.
 
-Generally speaking there are 2 methods of acheiving this, used in unison:
+Generally speaking there are 2 methods of achieving this, used in unison:
 
 1. All non-pure functions and their non-trivial scope dependencies must be made
    exportable by wrapping in an `EXPORTABLE()` call, or be made importable via
@@ -262,7 +262,7 @@ export const preset: GraphileConfig.Preset = {
 
 ## Troubleshooting
 
-### undefined variable `EXPORTABLE`
+### `undefined variable EXPORTABLE`
 
 Our ESLint plugin isn't smart enough to actually `import` the `EXPORTABLE`
 helper, so after running the autofix you might end up with "undefined variable
