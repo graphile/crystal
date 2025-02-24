@@ -436,7 +436,7 @@ export function pgDeleteSingle<
 exportAs("@dataplan/pg", pgDeleteSingle, "pgDeleteSingle");
 
 export interface PgDeleteSingleQueryBuilder<
-  TResource extends PgResource<
+  _TResource extends PgResource<
     any,
     PgCodecWithAttributes,
     any,

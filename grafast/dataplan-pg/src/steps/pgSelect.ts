@@ -40,7 +40,6 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
-  PgConditionLike,
   PgGroupSpec,
   PgOrderSpec,
   PgQueryBuilder,

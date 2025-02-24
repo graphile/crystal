@@ -44,7 +44,7 @@ import type {
   ConstantStep,
   ObjectStep,
 } from "./steps/index.js";
-import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
+import type { GrafastObjectType } from "./utils.js";
 
 export interface GrafastTimeouts {
   /**
@@ -416,9 +416,7 @@ export type ScalarInputPlanResolver<
  *
  * @experimental
  */
-export type EnumValueApplyResolver<TParent extends any = any> = (
-  parent: TParent,
-) => void;
+export type EnumValueApplyResolver<TParent = any> = (parent: TParent) => void;
 
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
@@ -445,67 +443,6 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
-
-// TypeScript gets upset if we go too deep, so we try and cover the most common
-// use cases and fall back to `any`
-type InputTypeForNamedType<TType extends GraphQLType> =
-  TType extends GraphQLScalarType<infer U> ? U : any;
-type InputTypeFor<TType extends GraphQLInputType> =
-  TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? InputTypeForNamedType<U>
-    : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? InputTypeForNamedType<U>
-    : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? InputTypeForNamedType<U>
-    : TType extends GraphQLList<infer U>
-    ? InputTypeForNamedType<U>
-    : TType extends GraphQLNonNull<infer U>
-    ? InputTypeForNamedType<U>
-    : InputTypeForNamedType<TType>;
-
-/*
-type OutputPlanForType<TType extends GraphQLOutputType> =
-  TType extends GraphQLList<
-  infer U
->
-  ? U extends GraphQLOutputType
-    ? ListCapableStep<any, OutputPlanForType<U>>
-    : never
-  : TType extends GraphQLNonNull<infer V>
-  ? V extends GraphQLOutputType
-    ? OutputPlanForType<V>
-    : never
-  : TType extends GraphQLScalarType | GraphQLEnumType
-  ? ExecutableStep<boolean | number | string>
-  : ExecutableStep<{ [key: string]: any }>;
-
-type InputPlanForType<TType extends GraphQLInputType> =
-  TType extends GraphQLList<infer U>
-    ? U extends GraphQLInputType
-      ? InputPlanForType<U>
-      : never
-    : TType extends GraphQLNonNull<infer V>
-    ? V extends GraphQLInputType
-      ? InputPlanForType<V>
-      : never
-    : TType extends GraphQLScalarType | GraphQLEnumType
-    ? null
-    : ExecutableStep<{ [key: string]: any }> | null;
-
-type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
-  infer U
->
-  ? U extends GraphQLInputType
-    ? InputTypeFor<U>
-    : never
-  : TType extends GraphQLNonNull<infer V>
-  ? V extends GraphQLInputType
-    ? InputTypeFor<V>
-    : never
-  : TType extends GraphQLScalarType<infer U>
-  ? U
-  : any;
-  */
 
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.

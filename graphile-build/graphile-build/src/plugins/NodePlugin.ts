@@ -1,10 +1,10 @@
 import "graphile-config";
 
 import type {
+  ExecutableStep,
   Maybe,
   NodeIdCodec,
   NodeIdHandler,
-  ExecutableStep,
 } from "grafast";
 import { node } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";

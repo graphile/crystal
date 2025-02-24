@@ -93,10 +93,10 @@ export {
 } from "./remapKeys.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
 export {
+  createObjectAndApplyChildren,
   Setter,
   setter,
   SetterCapable,
-  createObjectAndApplyChildren,
 } from "./setter.js";
 export { sideEffect, SideEffectStep } from "./sideEffect.js";
 

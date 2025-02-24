@@ -4,7 +4,7 @@ import type {
   GrafastFieldConfig,
   OutputPlanForType,
 } from "grafast";
-import { defaultPlanResolver, inputObjectFieldSpec, objectSpec } from "grafast";
+import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -30,9 +30,8 @@ import {
 import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";
-import type { PostPlanResolver } from "../interfaces.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
-import { EXPORTABLE, exportNameHint } from "../utils.js";
+import { EXPORTABLE } from "../utils.js";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 
@@ -136,10 +135,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawObjectSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
-            any,
-            any
-          >;
+          const rawObjectSpec =
+            inSpec as GraphileBuild.GrafastObjectTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeObject;
 
@@ -192,7 +189,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
-                TContext extends Grafast.Context,
                 TParentStep extends ExecutableStep,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
@@ -349,7 +345,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInterfaceType: {
           const rawInterfaceSpec =
-            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any, any>;
+            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInterface;
 
@@ -536,10 +532,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawUnionSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
-            any,
-            any
-          >;
+          const rawUnionSpec =
+            inSpec as GraphileBuild.GrafastUnionTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeUnion;
 

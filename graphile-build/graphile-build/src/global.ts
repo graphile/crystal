@@ -39,7 +39,6 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
-import type { PostPlanResolver } from "./interfaces.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
 /*
@@ -64,11 +63,11 @@ interface RegisterObjectType {
    * scope so that other plugins may hook it; it can also be helpful to
    * indicate where a conflict has occurred.
    */
-  <TStep extends ExecutableStep | null>(
+  <TStep extends ExecutableStep>(
     typeName: string,
     scope: GraphileBuild.ScopeObject,
     specGenerator: () => Omit<
-      GraphileBuild.GrafastObjectTypeConfig<TStep, any>,
+      GraphileBuild.GrafastObjectTypeConfig<TStep>,
       "name"
     >,
     origin: string | null | undefined,
@@ -78,7 +77,7 @@ interface RegisterObjectType {
    * @deprecated Please pass 'assertStep' as part of the object spec. This
    * compatibility signature will not be supported for long!
    */
-  <TStep extends ExecutableStep | null>(
+  <TStep extends ExecutableStep>(
     typeName: string,
     scope: GraphileBuild.ScopeObject,
     assertStep: TStep extends ExecutableStep
@@ -87,7 +86,7 @@ interface RegisterObjectType {
           | { new (...args: any[]): TStep }
       : null,
     specGenerator: () => Omit<
-      GraphileBuild.GrafastObjectTypeConfig<TStep, any>,
+      GraphileBuild.GrafastObjectTypeConfig<TStep>,
       "name"
     >,
     origin: string | null | undefined,
@@ -214,25 +213,23 @@ declare global {
 
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GrafastFieldConfigMap<
-      TParentStep extends ExecutableStep | null,
-      TContext extends Grafast.Context,
+      TParentStep extends ExecutableStep = ExecutableStep,
     > = {
       [fieldName: string]: GrafastFieldConfig<any, TParentStep, any, any>;
     };
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
     interface GrafastObjectTypeConfig<
-      TParentStep extends ExecutableStep | null,
-      TContext extends Grafast.Context,
+      TParentStep extends ExecutableStep = ExecutableStep,
     > extends Omit<
-        GraphQLObjectTypeConfig<unknown, TContext>,
+        GraphQLObjectTypeConfig<unknown, Grafast.Context>,
         "fields" | "interfaces"
       > {
       fields?:
-        | GrafastFieldConfigMap<TParentStep, TContext>
+        | GrafastFieldConfigMap<TParentStep>
         | ((
             context: ContextObjectFields,
-          ) => GrafastFieldConfigMap<TParentStep, TContext>);
+          ) => GrafastFieldConfigMap<TParentStep>);
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextObjectInterfaces) => GraphQLInterfaceType[]);
@@ -254,24 +251,24 @@ declare global {
     }
 
     /** Our take on GraphQLUnionTypeConfig that allows for plans */
-    interface GrafastUnionTypeConfig<TSource, TContext>
-      extends Omit<GraphQLUnionTypeConfig<TSource, TContext>, "types"> {
+    interface GrafastUnionTypeConfig<TSource>
+      extends Omit<GraphQLUnionTypeConfig<TSource, Grafast.Context>, "types"> {
       types?:
         | GraphQLObjectType[]
         | ((context: ContextUnionTypes) => GraphQLObjectType[]);
     }
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
-    interface GrafastInterfaceTypeConfig<TSource, TContext>
+    interface GrafastInterfaceTypeConfig<TSource>
       extends Omit<
-        GraphQLInterfaceTypeConfig<TSource, TContext>,
+        GraphQLInterfaceTypeConfig<TSource, Grafast.Context>,
         "fields" | "interfaces"
       > {
       fields?:
-        | GraphQLFieldConfigMap<TSource, TContext>
+        | GraphQLFieldConfigMap<TSource, Grafast.Context>
         | ((
             context: ContextInterfaceFields,
-          ) => GraphQLFieldConfigMap<TSource, TContext>);
+          ) => GraphQLFieldConfigMap<TSource, Grafast.Context>);
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextInterfaceInterfaces) => GraphQLInterfaceType[]);
@@ -390,14 +387,14 @@ declare global {
       registerInterfaceType: (
         typeName: string,
         scope: ScopeInterface,
-        specGenerator: () => Omit<GrafastInterfaceTypeConfig<any, any>, "name">,
+        specGenerator: () => Omit<GrafastInterfaceTypeConfig<any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for unions */
       registerUnionType: (
         typeName: string,
         scope: ScopeUnion,
-        specGenerator: () => Omit<GrafastUnionTypeConfig<any, any>, "name">,
+        specGenerator: () => Omit<GrafastUnionTypeConfig<any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for scalars */
@@ -438,12 +435,9 @@ declare global {
         origin: string | null | undefined;
         Step?: { new (...args: any[]): ExecutableStep } | null;
         specGenerator:
-          | (() => Omit<
-              GraphileBuild.GrafastObjectTypeConfig<any, any>,
-              "name"
-            >)
-          | (() => Omit<GrafastInterfaceTypeConfig<any, any>, "name">)
-          | (() => Omit<GrafastUnionTypeConfig<any, any>, "name">)
+          | (() => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">)
+          | (() => Omit<GrafastInterfaceTypeConfig<any>, "name">)
+          | (() => Omit<GrafastUnionTypeConfig<any>, "name">)
           | (() => Omit<GraphQLScalarTypeConfig<any, any>, "name">)
           | (() => Omit<GraphQLEnumTypeConfig, "name">)
           | (() => Omit<GrafastInputObjectTypeConfig, "name">);
@@ -928,7 +922,7 @@ declare global {
        * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
        */
       GraphQLObjectType: GraphileBuild.Hook<
-        GrafastObjectTypeConfig<any, any>,
+        GrafastObjectTypeConfig<any>,
         GraphileBuild.ContextObject,
         TBuild
       >[];
@@ -938,7 +932,7 @@ declare global {
         TBuild
       >[];
       GraphQLObjectType_fields: GraphileBuild.Hook<
-        GrafastFieldConfigMap<any, any>,
+        GrafastFieldConfigMap<any>,
         GraphileBuild.ContextObjectFields,
         TBuild
       >[];
@@ -1013,7 +1007,7 @@ declare global {
        * - 'GraphQLUnionType_types' to add additional types to this union
        */
       GraphQLUnionType: GraphileBuild.Hook<
-        GraphileBuild.GrafastUnionTypeConfig<any, any>,
+        GraphileBuild.GrafastUnionTypeConfig<any>,
         GraphileBuild.ContextUnion,
         TBuild
       >[];
@@ -1034,7 +1028,7 @@ declare global {
        *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
        */
       GraphQLInterfaceType: GraphileBuild.Hook<
-        GraphileBuild.GrafastInterfaceTypeConfig<any, any>,
+        GraphileBuild.GrafastInterfaceTypeConfig<any>,
         GraphileBuild.ContextInterface,
         TBuild
       >[];
@@ -1087,15 +1081,15 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema
     ? Partial<GraphQLSchemaConfig>
     : TType extends GraphQLObjectType
-    ? Partial<GraphileBuild.GrafastObjectTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GrafastObjectTypeConfig<any>> & {
         name: string;
       }
     : TType extends GraphQLInterfaceType
-    ? Partial<GraphileBuild.GrafastInterfaceTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GrafastInterfaceTypeConfig<any>> & {
         name: string;
       }
     : TType extends GraphQLUnionType
-    ? Partial<GraphileBuild.GrafastUnionTypeConfig<any, any>> & {
+    ? Partial<GraphileBuild.GrafastUnionTypeConfig<any>> & {
         name: string;
       }
     : TType extends GraphQLScalarType

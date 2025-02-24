@@ -992,7 +992,7 @@ declare global {
            */
           GraphQLObjectType?: PluginHook<
             GraphileBuild.Hook<
-              GraphileBuild.GrafastObjectTypeConfig<any, any>,
+              GraphileBuild.GrafastObjectTypeConfig<any>,
               GraphileBuild.ContextObject,
               GraphileBuild.Build
             >
@@ -1006,7 +1006,7 @@ declare global {
           >;
           GraphQLObjectType_fields?: PluginHook<
             GraphileBuild.Hook<
-              GraphileBuild.GrafastFieldConfigMap<any, any>,
+              GraphileBuild.GrafastFieldConfigMap<any>,
               GraphileBuild.ContextObjectFields,
               GraphileBuild.Build
             >
@@ -1101,7 +1101,7 @@ declare global {
            */
           GraphQLUnionType?: PluginHook<
             GraphileBuild.Hook<
-              GraphileBuild.GrafastUnionTypeConfig<any, any>,
+              GraphileBuild.GrafastUnionTypeConfig<any>,
               GraphileBuild.ContextUnion,
               GraphileBuild.Build
             >
@@ -1127,7 +1127,7 @@ declare global {
            */
           GraphQLInterfaceType?: PluginHook<
             GraphileBuild.Hook<
-              GraphileBuild.GrafastInterfaceTypeConfig<any, any>,
+              GraphileBuild.GrafastInterfaceTypeConfig<any>,
               GraphileBuild.ContextInterface,
               GraphileBuild.Build
             >

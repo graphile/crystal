@@ -18,7 +18,7 @@ import {
   sqlValueWithCodec,
 } from "@dataplan/pg";
 import type { GrafastFieldConfig, Setter } from "grafast";
-import { bakedInput, bakedInputRuntime, each } from "grafast";
+import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 

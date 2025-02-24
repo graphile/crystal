@@ -22,10 +22,10 @@ declare global {
  */
 function rmEmptyTypeDescription<
   T extends
-    | GraphileBuild.GrafastObjectTypeConfig<any, any>
+    | GraphileBuild.GrafastObjectTypeConfig<any>
     | GraphileBuild.GrafastInputObjectTypeConfig
-    | GraphileBuild.GrafastUnionTypeConfig<any, any>
-    | GraphileBuild.GrafastInterfaceTypeConfig<any, any>
+    | GraphileBuild.GrafastUnionTypeConfig<any>
+    | GraphileBuild.GrafastInterfaceTypeConfig<any>
     | GraphQLEnumTypeConfig,
 >(type: T): T {
   if (type.description?.trim() === "") {
