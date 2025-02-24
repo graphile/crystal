@@ -8459,13 +8459,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookies@npm:~0.8.0":
-  version: 0.8.0
-  resolution: "cookies@npm:0.8.0"
+"cookies@npm:~0.9.0":
+  version: 0.9.1
+  resolution: "cookies@npm:0.9.1"
   dependencies:
     depd: "npm:~2.0.0"
     keygrip: "npm:~1.1.0"
-  checksum: c4b20efaf8f3aa2128cc0505b65caa0e4258acc25e4d7b9307b5b53b4e1c2f3a8a70d43d4987e377c663c27b74836af5e3e344c0b9d71f96390596f7c25bf3d9
+  checksum: 4567c5b212176c6f86ae021acdc963bd10ae9213bcd41114d5c2cac79d22cc304d2655e94e700d367d8146406a9effbf1fcb26dc1c7277202c7fd13695636168
   languageName: node
   linkType: hard
 
@@ -11986,7 +11986,7 @@ __metadata:
     h3: "npm:^1.13.0"
     jest: "npm:^29.6.4"
     jest-serializer-graphql-schema: "workspace:^"
-    koa: "npm:^2.14.2"
+    koa: "npm:^2.15.4"
     koa-bodyparser: "npm:^4.4.1"
     nodemon: "npm:^3.0.1"
     ruru: "workspace:^"
@@ -14551,15 +14551,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"koa@npm:^2.14.2":
-  version: 2.14.2
-  resolution: "koa@npm:2.14.2"
+"koa@npm:^2.15.4":
+  version: 2.15.4
+  resolution: "koa@npm:2.15.4"
   dependencies:
     accepts: "npm:^1.3.5"
     cache-content-type: "npm:^1.0.0"
     content-disposition: "npm:~0.5.2"
     content-type: "npm:^1.0.4"
-    cookies: "npm:~0.8.0"
+    cookies: "npm:~0.9.0"
     debug: "npm:^4.3.2"
     delegates: "npm:^1.0.0"
     depd: "npm:^2.0.0"
@@ -14578,7 +14578,7 @@ __metadata:
     statuses: "npm:^1.5.0"
     type-is: "npm:^1.6.16"
     vary: "npm:^1.1.2"
-  checksum: ee54cf8b839bcbb2ab28110883014e8bda1a426d087fd3306f9be028da5e258b5bdb357cd6f54d0b6ab34c1b93aa66af731db9c4e03cb881b78fdabf9ab913b1
+  checksum: 5f48d5778c9388d836dff845500626efae8a7bed87edc5537552a99d629860007b6594074f13b51c5727352f776cd73428aff1c9a990aeafa00fb66cf32526c8
   languageName: node
   linkType: hard
 
