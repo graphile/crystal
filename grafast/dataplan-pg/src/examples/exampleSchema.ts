@@ -457,7 +457,13 @@ export function makeExampleSchema(
             sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
               args,
             )})`,
-          parameters: [],
+          parameters: [
+            {
+              codec: forumCodec,
+              name: null,
+              required: true,
+            },
+          ],
           returnsArray: true,
           returnsSetof: true,
           extensions: {

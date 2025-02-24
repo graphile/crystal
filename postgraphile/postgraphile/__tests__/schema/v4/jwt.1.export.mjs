@@ -2291,272 +2291,64 @@ const nodeIdHandlerByTypeName = {
     }
   }
 };
-const argDetailsSimple = [{
+const argDetailsSimple_compound_type_query = [{
   graphqlArgName: "object",
   postgresArgName: "object",
   pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_compound_type_query = (args, path = []) => argDetailsSimple_compound_type_query.map(details => makeArg(path, args, details));
 const resource_compound_type_queryPgResource = registry.pgResources["compound_type_query"];
-const argDetailsSimple2 = [{
+const argDetailsSimple_compound_type_array_query = [{
   graphqlArgName: "object",
   postgresArgName: "object",
   pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs2 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple2[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_compound_type_array_query = (args, path = []) => argDetailsSimple_compound_type_array_query.map(details => makeArg(path, args, details));
 const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
-const argDetailsSimple3 = [];
-const makeArgs3 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple3[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const argDetailsSimple_type_function_connection = [];
+const makeArgs_type_function_connection = (args, path = []) => argDetailsSimple_type_function_connection.map(details => makeArg(path, args, details));
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs3(args);
+  const selectArgs = makeArgs_type_function_connection(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
-const argDetailsSimple4 = [{
+const argDetailsSimple_type_function = [{
   graphqlArgName: "id",
   postgresArgName: "id",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
-const makeArgs4 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple4[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_type_function = (args, path = []) => argDetailsSimple_type_function.map(details => makeArg(path, args, details));
 const resource_type_functionPgResource = registry.pgResources["type_function"];
-const argDetailsSimple5 = [];
-const makeArgs5 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple5[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const argDetailsSimple_type_function_list = [];
+const makeArgs_type_function_list = (args, path = []) => argDetailsSimple_type_function_list.map(details => makeArg(path, args, details));
 const resource_type_function_listPgResource = registry.pgResources["type_function_list"];
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -2605,7 +2397,7 @@ const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcd
 function LTreeParseValue(value) {
   return value;
 }
-const argDetailsSimple6 = [{
+const argDetailsSimple_mult_1 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
   pgCodec: TYPES.int,
@@ -2618,54 +2410,9 @@ const argDetailsSimple6 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs6 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 2; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple6[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 2 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_mult_1 = (args, path = []) => argDetailsSimple_mult_1.map(details => makeArg(path, args, details));
 const resource_mult_1PgResource = registry.pgResources["mult_1"];
-const argDetailsSimple7 = [{
+const argDetailsSimple_mult_2 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
   pgCodec: TYPES.int,
@@ -2678,54 +2425,9 @@ const argDetailsSimple7 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs7 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 2; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple7[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 2 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_mult_2 = (args, path = []) => argDetailsSimple_mult_2.map(details => makeArg(path, args, details));
 const resource_mult_2PgResource = registry.pgResources["mult_2"];
-const argDetailsSimple8 = [{
+const argDetailsSimple_mult_3 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
   pgCodec: TYPES.int,
@@ -2738,54 +2440,9 @@ const argDetailsSimple8 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs8 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 2; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple8[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 2 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_mult_3 = (args, path = []) => argDetailsSimple_mult_3.map(details => makeArg(path, args, details));
 const resource_mult_3PgResource = registry.pgResources["mult_3"];
-const argDetailsSimple9 = [{
+const argDetailsSimple_mult_4 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
   pgCodec: TYPES.int,
@@ -2798,156 +2455,21 @@ const argDetailsSimple9 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs9 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 2; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple9[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 2 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_mult_4 = (args, path = []) => argDetailsSimple_mult_4.map(details => makeArg(path, args, details));
 const resource_mult_4PgResource = registry.pgResources["mult_4"];
-const argDetailsSimple10 = [{
+const argDetailsSimple_guid_fn = [{
   graphqlArgName: "g",
   postgresArgName: "g",
   pgCodec: guidCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs10 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple10[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_guid_fn = (args, path = []) => argDetailsSimple_guid_fn.map(details => makeArg(path, args, details));
 const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
-const argDetailsSimple11 = [];
-const makeArgs11 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple11[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const argDetailsSimple_authenticate_fail = [];
+const makeArgs_authenticate_fail = (args, path = []) => argDetailsSimple_authenticate_fail.map(details => makeArg(path, args, details));
 const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
-const argDetailsSimple12 = [{
+const argDetailsSimple_authenticate = [{
   graphqlArgName: "a",
   postgresArgName: "a",
   pgCodec: TYPES.int,
@@ -2966,54 +2488,9 @@ const argDetailsSimple12 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs12 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 3; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple12[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_authenticate = (args, path = []) => argDetailsSimple_authenticate.map(details => makeArg(path, args, details));
 const resource_authenticatePgResource = registry.pgResources["authenticate"];
-const argDetailsSimple13 = [{
+const argDetailsSimple_list_bde_mutation = [{
   graphqlArgName: "b",
   postgresArgName: "b",
   pgCodec: textArrayCodec,
@@ -3032,54 +2509,9 @@ const argDetailsSimple13 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs13 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 3; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple13[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_list_bde_mutation = (args, path = []) => argDetailsSimple_list_bde_mutation.map(details => makeArg(path, args, details));
 const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
-const argDetailsSimple14 = [{
+const argDetailsSimple_authenticate_many = [{
   graphqlArgName: "a",
   postgresArgName: "a",
   pgCodec: TYPES.int,
@@ -3098,54 +2530,9 @@ const argDetailsSimple14 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs14 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 3; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple14[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_authenticate_many = (args, path = []) => argDetailsSimple_authenticate_many.map(details => makeArg(path, args, details));
 const resource_authenticate_manyPgResource = registry.pgResources["authenticate_many"];
-const argDetailsSimple15 = [{
+const argDetailsSimple_authenticate_payload = [{
   graphqlArgName: "a",
   postgresArgName: "a",
   pgCodec: TYPES.int,
@@ -3164,364 +2551,49 @@ const argDetailsSimple15 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs15 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 3; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple15[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_authenticate_payload = (args, path = []) => argDetailsSimple_authenticate_payload.map(details => makeArg(path, args, details));
 const resource_authenticate_payloadPgResource = registry.pgResources["authenticate_payload"];
-const argDetailsSimple16 = [{
+const argDetailsSimple_compound_type_mutation = [{
   graphqlArgName: "object",
   postgresArgName: "object",
   pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs16 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple16[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_compound_type_mutation = (args, path = []) => argDetailsSimple_compound_type_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_mutationPgResource = registry.pgResources["compound_type_mutation"];
-const argDetailsSimple17 = [{
+const argDetailsSimple_compound_type_set_mutation = [{
   graphqlArgName: "object",
   postgresArgName: "object",
   pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs17 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple17[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_compound_type_set_mutation = (args, path = []) => argDetailsSimple_compound_type_set_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
-const argDetailsSimple18 = [{
+const argDetailsSimple_compound_type_array_mutation = [{
   graphqlArgName: "object",
   postgresArgName: "object",
   pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs18 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple18[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_compound_type_array_mutation = (args, path = []) => argDetailsSimple_compound_type_array_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
-const argDetailsSimple19 = [];
-const makeArgs19 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple19[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const argDetailsSimple_type_function_connection_mutation = [];
+const makeArgs_type_function_connection_mutation = (args, path = []) => argDetailsSimple_type_function_connection_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
-const argDetailsSimple20 = [{
+const argDetailsSimple_type_function_mutation = [{
   graphqlArgName: "id",
   postgresArgName: "id",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
-const makeArgs20 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple20[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_type_function_mutation = (args, path = []) => argDetailsSimple_type_function_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
-const argDetailsSimple21 = [];
-const makeArgs21 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple21[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const argDetailsSimple_type_function_list_mutation = [];
+const makeArgs_type_function_list_mutation = (args, path = []) => argDetailsSimple_type_function_list_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -5612,11 +4684,11 @@ export const plans = {
       });
     },
     compoundTypeQuery($root, args, _info) {
-      const selectArgs = makeArgs(args);
+      const selectArgs = makeArgs_compound_type_query(args);
       return resource_compound_type_queryPgResource.execute(selectArgs);
     },
     compoundTypeArrayQuery($root, args, _info) {
-      const selectArgs = makeArgs2(args);
+      const selectArgs = makeArgs_compound_type_array_query(args);
       return resource_compound_type_array_queryPgResource.execute(selectArgs);
     },
     typeFunctionConnection: {
@@ -5673,11 +4745,11 @@ export const plans = {
       }
     },
     typeFunction($root, args, _info) {
-      const selectArgs = makeArgs4(args);
+      const selectArgs = makeArgs_type_function(args);
       return resource_type_functionPgResource.execute(selectArgs);
     },
     typeFunctionList($root, args, _info) {
-      const selectArgs = makeArgs5(args);
+      const selectArgs = makeArgs_type_function_list(args);
       return resource_type_function_listPgResource.execute(selectArgs);
     },
     list(_$parent, args) {
@@ -9665,7 +8737,7 @@ export const plans = {
     __assertStep: __ValueStep,
     mult1: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs6(args, ["input"]);
+        const selectArgs = makeArgs_mult_1(args, ["input"]);
         const $result = resource_mult_1PgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9694,7 +8766,7 @@ export const plans = {
     },
     mult2: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs7(args, ["input"]);
+        const selectArgs = makeArgs_mult_2(args, ["input"]);
         const $result = resource_mult_2PgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9723,7 +8795,7 @@ export const plans = {
     },
     mult3: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs8(args, ["input"]);
+        const selectArgs = makeArgs_mult_3(args, ["input"]);
         const $result = resource_mult_3PgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9752,7 +8824,7 @@ export const plans = {
     },
     mult4: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs9(args, ["input"]);
+        const selectArgs = makeArgs_mult_4(args, ["input"]);
         const $result = resource_mult_4PgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9781,7 +8853,7 @@ export const plans = {
     },
     guidFn: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs10(args, ["input"]);
+        const selectArgs = makeArgs_guid_fn(args, ["input"]);
         const $result = resource_guid_fnPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9810,7 +8882,7 @@ export const plans = {
     },
     authenticateFail: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs11(args, ["input"]);
+        const selectArgs = makeArgs_authenticate_fail(args, ["input"]);
         const $result = resource_authenticate_failPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9839,7 +8911,7 @@ export const plans = {
     },
     authenticate: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs12(args, ["input"]);
+        const selectArgs = makeArgs_authenticate(args, ["input"]);
         const $result = resource_authenticatePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9868,7 +8940,7 @@ export const plans = {
     },
     listBdeMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs13(args, ["input"]);
+        const selectArgs = makeArgs_list_bde_mutation(args, ["input"]);
         const $result = resource_list_bde_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9897,7 +8969,7 @@ export const plans = {
     },
     authenticateMany: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs14(args, ["input"]);
+        const selectArgs = makeArgs_authenticate_many(args, ["input"]);
         const $result = resource_authenticate_manyPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9926,7 +8998,7 @@ export const plans = {
     },
     authenticatePayload: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs15(args, ["input"]);
+        const selectArgs = makeArgs_authenticate_payload(args, ["input"]);
         const $result = resource_authenticate_payloadPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9955,7 +9027,7 @@ export const plans = {
     },
     compoundTypeMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs16(args, ["input"]);
+        const selectArgs = makeArgs_compound_type_mutation(args, ["input"]);
         const $result = resource_compound_type_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -9984,7 +9056,7 @@ export const plans = {
     },
     compoundTypeSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs17(args, ["input"]);
+        const selectArgs = makeArgs_compound_type_set_mutation(args, ["input"]);
         const $result = resource_compound_type_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -10013,7 +9085,7 @@ export const plans = {
     },
     compoundTypeArrayMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs18(args, ["input"]);
+        const selectArgs = makeArgs_compound_type_array_mutation(args, ["input"]);
         const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -10042,7 +9114,7 @@ export const plans = {
     },
     typeFunctionConnectionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs19(args, ["input"]);
+        const selectArgs = makeArgs_type_function_connection_mutation(args, ["input"]);
         const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -10071,7 +9143,7 @@ export const plans = {
     },
     typeFunctionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs20(args, ["input"]);
+        const selectArgs = makeArgs_type_function_mutation(args, ["input"]);
         const $result = resource_type_function_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -10100,7 +9172,7 @@ export const plans = {
     },
     typeFunctionListMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs21(args, ["input"]);
+        const selectArgs = makeArgs_type_function_list_mutation(args, ["input"]);
         const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result

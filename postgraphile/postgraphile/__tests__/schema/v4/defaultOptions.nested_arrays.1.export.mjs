@@ -361,64 +361,36 @@ const nodeIdHandlerByTypeName = {
     }
   }
 };
-const argDetailsSimple = [{
+const argDetailsSimple_check_work_hours = [{
   graphqlArgName: "wh",
   postgresArgName: "wh",
   pgCodec: workHourArrayCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_check_work_hours = (args, path = []) => argDetailsSimple_check_work_hours.map(details => makeArg(path, args, details));
 const resource_check_work_hoursPgResource = registry.pgResources["check_work_hours"];
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -824,7 +796,7 @@ export const plans = {
       });
     },
     checkWorkHours($root, args, _info) {
-      const selectArgs = makeArgs(args);
+      const selectArgs = makeArgs_check_work_hours(args);
       return resource_check_work_hoursPgResource.execute(selectArgs);
     },
     t(_$parent, args) {

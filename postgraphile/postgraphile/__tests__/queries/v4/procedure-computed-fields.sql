@@ -149,18 +149,25 @@ lateral (
   from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
 ) as __frmcdc_nested_compound_type_result__;
 
-select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+select __post_computed_compound_type_array_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($2::json) with ordinality as ids) as __post_computed_compound_type_array_identifiers__,
 lateral (
   select
-    case when (__post__) is not distinct from null then null::text else json_build_array((((__post__)."id"))::text, ((__post__)."headline"), ((__post__)."body"), (((__post__)."author_id"))::text, (((__post__)."enums"))::text, (case when (((__post__)."comptypes")) is not distinct from null then null::text else array(
-      select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
-      from unnest(((__post__)."comptypes")) __comptype__
-    )::text end))::text end as "0",
-    __post__."id"::text as "1",
-    __post_identifiers__.idx as "2"
-  from (select (__post_identifiers__."id0").*) as __post__
-) as __post_result__;
+    __post_computed_compound_type_array__."a"::text as "0",
+    __post_computed_compound_type_array__."b" as "1",
+    __post_computed_compound_type_array__."c"::text as "2",
+    __post_computed_compound_type_array__."d" as "3",
+    __post_computed_compound_type_array__."e"::text as "4",
+    __post_computed_compound_type_array__."f"::text as "5",
+    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+    __post_computed_compound_type_array__."foo_bar"::text as "7",
+    (not (__post_computed_compound_type_array__ is null))::text as "8",
+    __post_computed_compound_type_array_identifiers__.idx as "9"
+  from unnest("a"."post_computed_compound_type_array"(
+    __post_computed_compound_type_array_identifiers__."id0",
+    $1::"c"."compound_type"
+  )) as __post_computed_compound_type_array__
+) as __post_computed_compound_type_array_result__;
 
 select __post_computed_interval_set_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_computed_interval_set_identifiers__,
@@ -216,26 +223,6 @@ lateral (
     __frmcdc_compound_type_identifiers__.idx as "4"
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
-
-select __post_computed_compound_type_array_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($2::json) with ordinality as ids) as __post_computed_compound_type_array_identifiers__,
-lateral (
-  select
-    __post_computed_compound_type_array__."a"::text as "0",
-    __post_computed_compound_type_array__."b" as "1",
-    __post_computed_compound_type_array__."c"::text as "2",
-    __post_computed_compound_type_array__."d" as "3",
-    __post_computed_compound_type_array__."e"::text as "4",
-    __post_computed_compound_type_array__."f"::text as "5",
-    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-    __post_computed_compound_type_array__."foo_bar"::text as "7",
-    (not (__post_computed_compound_type_array__ is null))::text as "8",
-    __post_computed_compound_type_array_identifiers__.idx as "9"
-  from unnest("a"."post_computed_compound_type_array"(
-    __post_computed_compound_type_array_identifiers__."id0",
-    $1::"c"."compound_type"
-  )) as __post_computed_compound_type_array__
-) as __post_computed_compound_type_array_result__;
 
 select __person_friends_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,

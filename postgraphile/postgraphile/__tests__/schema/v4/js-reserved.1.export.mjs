@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -1979,7 +1979,7 @@ const detailsByAttributeName4 = Object.fromEntries([["__proto__", {
   graphqlName: "_proto__",
   codec: TYPES.text
 }]]);
-const argDetailsSimple = [{
+const argDetailsSimple_await = [{
   graphqlArgName: "yield",
   postgresArgName: "yield",
   pgCodec: TYPES.int,
@@ -2004,54 +2004,25 @@ const argDetailsSimple = [{
   required: true,
   fetcher: null
 }];
-const makeArgs = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 4; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_await = (args, path = []) => argDetailsSimple_await.map(details => makeArg(path, args, details));
 const resource_awaitPgResource = registry.pgResources["await"];
-const argDetailsSimple2 = [{
+const argDetailsSimple_case = [{
   graphqlArgName: "yield",
   postgresArgName: "yield",
   pgCodec: TYPES.int,
@@ -2076,54 +2047,9 @@ const argDetailsSimple2 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs2 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 4; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple2[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_case = (args, path = []) => argDetailsSimple_case.map(details => makeArg(path, args, details));
 const resource_casePgResource = registry.pgResources["case"];
-const argDetailsSimple3 = [{
+const argDetailsSimple_valueOf = [{
   graphqlArgName: "yield",
   postgresArgName: "yield",
   pgCodec: TYPES.int,
@@ -2148,57 +2074,13 @@ const argDetailsSimple3 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs3 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 4; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple3[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_valueOf = (args, path = []) => argDetailsSimple_valueOf.map(details => makeArg(path, args, details));
 const resource_valueOfPgResource = registry.pgResources["valueOf"];
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -2312,7 +2194,7 @@ const fetcher12 = (handler => {
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
-const argDetailsSimple4 = [{
+const argDetailsSimple_null_yield = [{
   graphqlArgName: "yield",
   postgresArgName: "yield",
   pgCodec: TYPES.int,
@@ -2337,52 +2219,7 @@ const argDetailsSimple4 = [{
   required: true,
   fetcher: null
 }];
-const makeArgs4 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 4; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple4[i];
-    const fullPath = [...path, graphqlArgName];
-    const $raw = args.getRaw(fullPath);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher($raw).record();
-    } else {
-      const type = args.typeAt(fullPath);
-      step = bakedInput(type, $raw);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+const makeArgs_null_yield = (args, path = []) => argDetailsSimple_null_yield.map(details => makeArg(path, args, details));
 const resource_null_yieldPgResource = registry.pgResources["null_yield"];
 const specFromArgs = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -7832,15 +7669,15 @@ export const plans = {
       });
     },
     await($root, args, _info) {
-      const selectArgs = makeArgs(args);
+      const selectArgs = makeArgs_await(args);
       return resource_awaitPgResource.execute(selectArgs);
     },
     case($root, args, _info) {
-      const selectArgs = makeArgs2(args);
+      const selectArgs = makeArgs_case(args);
       return resource_casePgResource.execute(selectArgs);
     },
     valueOf($root, args, _info) {
-      const selectArgs = makeArgs3(args);
+      const selectArgs = makeArgs_valueOf(args);
       return resource_valueOfPgResource.execute(selectArgs);
     },
     relationalTopic(_$parent, args) {
@@ -9318,7 +9155,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs4(args);
+      const extraSelectArgs = makeArgs_null_yield(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -9333,27 +9170,21 @@ export const plans = {
       if (resource_null_yieldPgResource.isUnique && !resource_null_yieldPgResource.codec.attributes && typeof resource_null_yieldPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
         const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
           if (i === 0) {
+            const {
+              step,
+              ...rest
+            } = arg;
             return {
-              name,
+              ...rest,
               placeholder: $row.getClassStep().alias
             };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
           } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
+            return arg;
           }
         });
-        return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${resource_null_yieldPgResource.from(...newSelectArgs)}`;
+        const from = pgFromExpression($row, resource_null_yieldPgResource.from, resource_null_yieldPgResource.parameters, newSelectArgs);
+        return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${from}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_null_yieldPgResource.execute(selectArgs);

@@ -2,7 +2,12 @@ import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
 import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import type { PgCodec, PgGroupSpec, PgTypedStep } from "../interfaces.js";
+import type {
+  PgCodec,
+  PgGroupSpec,
+  PgQueryRootStep,
+  PgTypedStep,
+} from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
@@ -38,7 +43,10 @@ export type PgStmtDeferredSQL = {
 const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
-export abstract class PgStmtBaseStep<T> extends Step<T> {
+export abstract class PgStmtBaseStep<T>
+  extends Step<T>
+  implements PgQueryRootStep
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgStmtBaseStep",
@@ -234,6 +242,10 @@ export abstract class PgStmtBaseStep<T> extends Step<T> {
   public hasMore(): Step<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
+  }
+
+  public getPgRoot() {
+    return this;
   }
 }
 
