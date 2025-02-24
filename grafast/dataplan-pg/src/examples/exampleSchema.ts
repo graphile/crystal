@@ -5210,9 +5210,13 @@ if (require.main === module) {
     process.exit(1);
   });
 }
-function pgClassFilterWhere(qb: PgSelectQueryBuilder) {
-  return new PgClassFilter(qb.whereBuilder(), qb.alias);
-}
+const pgClassFilterWhere = EXPORTABLE(
+  (PgClassFilter) =>
+    function pgClassFilterWhere(qb: PgSelectQueryBuilder) {
+      return new PgClassFilter(qb.whereBuilder(), qb.alias);
+    },
+  [PgClassFilter],
+);
 function pgWhere(qb: PgSelectQueryBuilder | PgUnionAllQueryBuilder) {
   return qb.whereBuilder();
 }
