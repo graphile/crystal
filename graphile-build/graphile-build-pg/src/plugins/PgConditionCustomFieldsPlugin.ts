@@ -1,12 +1,11 @@
 import "graphile-config";
 
-import {
-  type PgCondition,
-  type PgResource,
-  type PgResourceParameter,
-  type PgSelectStep,
-  sqlValueWithCodec,
+import type {
+  PgCondition,
+  PgResource,
+  PgResourceParameter,
 } from "@dataplan/pg";
+import { sqlValueWithCodec } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputType } from "graphql";
 
@@ -135,7 +134,8 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                     ),
                     type,
                     apply: EXPORTABLE(
-                      (pgFieldSource, sql, sqlValueWithCodec) => function plan($condition: PgCondition, val: unknown) {
+                      (pgFieldSource, sql, sqlValueWithCodec) =>
+                        function plan($condition: PgCondition, val: unknown) {
                           if (val === undefined) return;
                           if (typeof pgFieldSource.from !== "function") {
                             throw new Error(

@@ -3,7 +3,6 @@ import type { GraphQLObjectType } from "graphql";
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
-  AnyInputStep,
   Maybe,
   NodeIdHandler,
   PolymorphicData,

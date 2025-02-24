@@ -15,7 +15,6 @@ import type { ExecutableStep, FieldArgs, Maybe } from "grafast";
 import {
   __InputObjectStep,
   __TrackedValueStep,
-  constant,
   lambda,
   object,
   ObjectStep,

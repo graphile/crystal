@@ -180,7 +180,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               const anAttributeIsNotNull = attributes.some(
                 (attr) => attr.notNull || attr.extensions?.tags?.notNull,
               );
-              const { localAttributes, remoteAttributes } = relation;
+              const { localAttributes } = relation;
               const attributeCount = localAttributes.length;
               const localAttributeCodecs = localAttributes.map(
                 (name) => pgCodec.attributes[name].codec,

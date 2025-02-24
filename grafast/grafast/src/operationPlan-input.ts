@@ -7,7 +7,6 @@ import type {
 import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { ObjectStep } from "./index.js";
 import {
   __InputObjectStep,
   __TrackedValueStep,

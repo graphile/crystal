@@ -965,7 +965,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 };
 
 function modFields(
-  fields: GraphileBuild.GrafastFieldConfigMap<any, any>,
+  fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFields

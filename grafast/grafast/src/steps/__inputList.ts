@@ -5,7 +5,6 @@ import * as assert from "../assert.js";
 import { assertInputStep, inputStep } from "../input.js";
 import type { AnyInputStep, NotVariableValueNode } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
-import type { ConstantStep } from "./constant.js";
 import { constant } from "./constant.js";
 import { list } from "./list.js";
 

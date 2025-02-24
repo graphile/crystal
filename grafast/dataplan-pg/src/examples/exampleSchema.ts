@@ -3866,7 +3866,7 @@ export function makeExampleSchema(
         },
         plan: EXPORTABLE(
           (connection, deoptimizeIfAppropriate, messageResource) =>
-            function plan(_, fieldArgs, { field }) {
+            function plan(_, fieldArgs) {
               const $messages = messageResource.find();
               deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
@@ -3874,7 +3874,6 @@ export function makeExampleSchema(
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
               const $connectionPlan = connection($messages);
-              const orderByArg = field.args.find((a) => a.name === "orderBy");
               fieldArgs.apply($messages, "orderBy");
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
@@ -4570,7 +4569,7 @@ export function makeExampleSchema(
             pgUnionAll,
             thirdPartyVulnerabilitiesResource,
           ) =>
-            function plan(_, fieldArgs, { field }) {
+            function plan(_, fieldArgs) {
               // IMPORTANT: for cursor pagination, type must be part of cursor condition
               const $vulnerabilities = pgUnionAll({
                 name: "vulnerabilities",

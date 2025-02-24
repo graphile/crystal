@@ -6,7 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
-import { createObjectAndApplyChildren, object, setter } from "grafast";
+import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
