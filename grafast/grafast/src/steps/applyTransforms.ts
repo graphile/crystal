@@ -17,7 +17,7 @@ import {
   type GrafastResultsList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { isListCapableStep,Step } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type { ConnectionCapableStep } from "./connection.js";
 import { itemsOrStep } from "./connection.js";

@@ -7,7 +7,7 @@ import type {
 } from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { isMultistep, multistep } from "../multistep.js";
-import { isListLikeStep, isObjectLikeStep,Step } from "../step.js";
+import { isListLikeStep, isObjectLikeStep, Step } from "../step.js";
 import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
 import { access } from "./access.js";
 

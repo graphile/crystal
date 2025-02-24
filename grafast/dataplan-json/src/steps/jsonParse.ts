@@ -5,7 +5,7 @@ import type {
   GrafastResultsList,
   PromiseOrDirect,
 } from "grafast";
-import { access, exportAs,Step } from "grafast";
+import { access, exportAs, Step } from "grafast";
 
 export type JSONValue =
   | string

@@ -4,7 +4,7 @@ import type {
   Maybe,
   PromiseOrDirect,
 } from "grafast";
-import { access, exportAs, isDev, SafeError,Step } from "grafast";
+import { access, exportAs, isDev, SafeError, Step } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 

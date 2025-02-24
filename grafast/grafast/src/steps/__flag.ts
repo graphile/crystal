@@ -18,7 +18,7 @@ import {
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { isListCapableStep,Step } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS

@@ -5,7 +5,7 @@ import type {
   PolymorphicStep,
   PromiseOrDirect,
 } from "grafast";
-import { exportAs, polymorphicWrap,Step } from "grafast";
+import { exportAs, polymorphicWrap, Step } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
 import type { PgResource } from "../datasource.js";
