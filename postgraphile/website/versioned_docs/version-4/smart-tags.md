@@ -71,7 +71,8 @@ The column can also be renamed:
 comment on column original_table.col1 is E'@name colA';
 ```
 
-The same can be done for types and custom queries:
+The same can be done for types, type attributes (i.e. "columns"), and custom
+queries:
 
 ```sql
 create type flibble as (f text);
@@ -81,6 +82,7 @@ create function getFlamble() returns SETOF flibble as $$
 $$ language sql;
 
 comment on type flibble is E'@name flamble';
+comment on column flibble.f is E'@notNull';
 comment on function getFlamble() is E'@name allFlambles';
 ```
 
