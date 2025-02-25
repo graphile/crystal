@@ -1626,6 +1626,8 @@ export class OperationPlan {
         }
       }
 
+      // TODO: this seems unsafe; what if a different path has dependencies on
+      // the exact same step but doesn't want the nullable boundary?
       if (!isNonNull) {
         // INHIBIT ON NULL
         $step[$$isNullableBoundary] = true;

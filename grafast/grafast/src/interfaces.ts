@@ -788,7 +788,7 @@ export interface LocationDetails {
 }
 
 export type UnwrapPlanTuple</* const */ TIn extends readonly Step[]> = {
-  [Index in keyof TIn]: TIn[Index] extends Step<infer U> ? U : never;
+  [Index in keyof TIn]: DataFromStep<TIn[Index]>;
 };
 
 export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
@@ -809,8 +809,8 @@ export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
 
-export interface AddDependencyOptions {
-  step: Step;
+export interface AddDependencyOptions<TStep extends Step = Step> {
+  step: TStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
