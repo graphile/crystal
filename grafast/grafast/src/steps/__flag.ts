@@ -12,6 +12,7 @@ import {
   $$deepDepSkip,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
+  DEFAULT_ACCEPT_FLAGS_FOR_NULLABLE_BOUNDARY,
   DEFAULT_FORBIDDEN_FLAGS,
   FLAG_ERROR,
   FLAG_INHIBITED,
@@ -334,12 +335,11 @@ export function trap<TStep extends Step>(
   throwOnFlagged = false,
 ) {
   const { step, acceptFlags, onReject } = this.getDepOptions(depId);
-  const defaultAcceptFlags = step[$$isNullableBoundary]
-    ? DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL
-    : DEFAULT_ACCEPT_FLAGS;
   if (
-    acceptFlags === undefined ||
-    (acceptFlags === defaultAcceptFlags && onReject == null)
+    (acceptFlags === DEFAULT_ACCEPT_FLAGS ||
+      (step[$$isNullableBoundary] &&
+        acceptFlags === DEFAULT_ACCEPT_FLAGS_FOR_NULLABLE_BOUNDARY)) &&
+    onReject == null
   ) {
     return step;
   } else {
@@ -347,6 +347,8 @@ export function trap<TStep extends Step>(
       throw new Error(
         `When retrieving dependency ${step} of ${this}, the dependency is flagged as ${digestAcceptFlags(
           acceptFlags,
+        )}/onReject=${String(
+          onReject,
         )}. Please use \`this.getDepOptions(depId)\` instead, and handle the flags`,
       );
     }

@@ -704,6 +704,8 @@ export const ALL_FLAGS = flag(
 
 /** By default, accept null values as an input */
 export const DEFAULT_ACCEPT_FLAGS = flag(FLAG_NULL);
+export const DEFAULT_ACCEPT_FLAGS_FOR_NULLABLE_BOUNDARY =
+  DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL;
 export const TRAPPABLE_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED);
 export const DEFAULT_FORBIDDEN_FLAGS = flag(ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS);
 export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(
@@ -814,9 +816,16 @@ export interface AddDependencyOptions<TStep extends Step = Step> {
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
-  onReject?: null | Error | undefined;
+  onReject?: Maybe<Error>;
   nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
 }
+
+export interface DependencyOptions<TStep extends Step = Step> {
+  step: TStep;
+  acceptFlags: ExecutionEntryFlags;
+  onReject: Maybe<Error>;
+}
+
 /**
  * @internal
  */

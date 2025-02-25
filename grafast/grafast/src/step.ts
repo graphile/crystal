@@ -20,6 +20,7 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   AddDependencyOptions,
+  DependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   ExecutionResults,
@@ -357,7 +358,7 @@ export /* abstract */ class Step<TData = any> {
 
   protected getDepOptions<TStep extends Step = Step>(
     depId: number,
-  ): AddDependencyOptions<TStep> {
+  ): DependencyOptions<TStep> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
