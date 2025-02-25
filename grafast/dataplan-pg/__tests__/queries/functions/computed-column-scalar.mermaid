@@ -11,11 +11,26 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Object10 & Constant43 --> PgSelect7
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Object10 & Constant41 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    PgSelect16[["PgSelect[16∈0] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
+    PgFromExpression18{{"PgFromExpression[18∈0] ➊"}}:::plan
+    Object10 & PgFromExpression18 --> PgSelect16
+    PgClassExpression15{{"PgClassExpression[15∈0] ➊<br />ᐸ__forums__ᐳ"}}:::plan
+    PgClassExpression15 --> PgFromExpression18
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
+    PgFromExpression27{{"PgFromExpression[27∈0] ➊"}}:::plan
+    Object10 & PgFromExpression27 --> PgSelect25
+    Constant42{{"Constant[42∈0] ➊<br />ᐸtrueᐳ"}}:::plan
+    PgClassExpression15 & Constant42 --> PgFromExpression27
+    PgSelect34[["PgSelect[34∈0] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
+    PgFromExpression36{{"PgFromExpression[36∈0] ➊"}}:::plan
+    Object10 & PgFromExpression36 --> PgSelect34
+    Constant43{{"Constant[43∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    PgClassExpression15 & Constant43 --> PgFromExpression36
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -25,56 +40,37 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
-    PgFromExpression20{{"PgFromExpression[20∈1] ➊"}}:::plan
-    Object10 & PgFromExpression20 --> PgSelect16
-    PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
-    PgClassExpression15 --> PgFromExpression20
-    PgSelect27[["PgSelect[27∈1] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
-    PgFromExpression29{{"PgFromExpression[29∈1] ➊"}}:::plan
-    Object10 & PgFromExpression29 --> PgSelect27
-    PgClassExpression15 & Constant44 --> PgFromExpression29
-    PgSelect36[["PgSelect[36∈1] ➊<br />ᐸforums_unique_author_countᐳ"]]:::plan
-    PgFromExpression38{{"PgFromExpression[38∈1] ➊"}}:::plan
-    Object10 & PgFromExpression38 --> PgSelect36
-    PgClassExpression15 & Constant45 --> PgFromExpression38
     PgSelectSingle13 --> PgClassExpression15
-    First21{{"First[21∈1] ➊"}}:::plan
-    PgSelectRows22[["PgSelectRows[22∈1] ➊"]]:::plan
-    PgSelectRows22 --> First21
-    PgSelect16 --> PgSelectRows22
-    PgSelectSingle23{{"PgSelectSingle[23∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First21 --> PgSelectSingle23
-    PgClassExpression24{{"PgClassExpression[24∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
-    PgSelectSingle23 --> PgClassExpression24
-    First30{{"First[30∈1] ➊"}}:::plan
-    PgSelectRows31[["PgSelectRows[31∈1] ➊"]]:::plan
-    PgSelectRows31 --> First30
-    PgSelect27 --> PgSelectRows31
-    PgSelectSingle32{{"PgSelectSingle[32∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First30 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression33
-    First39{{"First[39∈1] ➊"}}:::plan
-    PgSelectRows40[["PgSelectRows[40∈1] ➊"]]:::plan
-    PgSelectRows40 --> First39
-    PgSelect36 --> PgSelectRows40
-    PgSelectSingle41{{"PgSelectSingle[41∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First39 --> PgSelectSingle41
-    PgClassExpression42{{"PgClassExpression[42∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression42
+    First19{{"First[19∈0] ➊"}}:::plan
+    PgSelectRows20[["PgSelectRows[20∈0] ➊"]]:::plan
+    PgSelectRows20 --> First19
+    PgSelect16 --> PgSelectRows20
+    PgSelectSingle21{{"PgSelectSingle[21∈0] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    First19 --> PgSelectSingle21
+    PgClassExpression22{{"PgClassExpression[22∈0] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression22
+    First28{{"First[28∈0] ➊"}}:::plan
+    PgSelectRows29[["PgSelectRows[29∈0] ➊"]]:::plan
+    PgSelectRows29 --> First28
+    PgSelect25 --> PgSelectRows29
+    PgSelectSingle30{{"PgSelectSingle[30∈0] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    First28 --> PgSelectSingle30
+    PgClassExpression31{{"PgClassExpression[31∈0] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression31
+    First37{{"First[37∈0] ➊"}}:::plan
+    PgSelectRows38[["PgSelectRows[38∈0] ➊"]]:::plan
+    PgSelectRows38 --> First37
+    PgSelect34 --> PgSelectRows38
+    PgSelectSingle39{{"PgSelectSingle[39∈0] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    First37 --> PgSelectSingle39
+    PgClassExpression40{{"PgClassExpression[40∈0] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
+    PgSelectSingle39 --> PgClassExpression40
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-scalar"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 14, 43, 44, 45, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 14, 41, 42, 43, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 15, 18, 27, 36<br />4: 16, 25, 34<br />5: 20, 29, 38<br />ᐳ: 19, 21, 22, 28, 30, 31, 37, 39, 40"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant43,Constant44,Constant45 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10, 14, 44, 45<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 15, 20, 29, 38<br />2: 16, 27, 36<br />3: 22, 31, 40<br />ᐳ: 21, 23, 24, 30, 32, 33, 39, 41, 42"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,PgSelect16,PgFromExpression20,First21,PgSelectRows22,PgSelectSingle23,PgClassExpression24,PgSelect27,PgFromExpression29,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgSelect36,PgFromExpression38,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42 bucket1
-    Bucket0 --> Bucket1
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression15,PgSelect16,PgFromExpression18,First19,PgSelectRows20,PgSelectSingle21,PgClassExpression22,PgSelect25,PgFromExpression27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,PgSelect34,PgFromExpression36,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,Constant41,Constant42,Constant43 bucket0
     end

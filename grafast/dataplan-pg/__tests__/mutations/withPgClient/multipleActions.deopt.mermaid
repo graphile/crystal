@@ -20,8 +20,8 @@ graph TD
     Constant15{{"Constant[15∈0] ➊<br />ᐸ§{ a: 3 }ᐳ"}}:::plan
     WithPgClient9[["WithPgClient[9∈1] ➊"]]:::sideeffectplan
     Object12 & Constant15 --> WithPgClient9
-    __Item13[/"__Item[13∈3]<br />ᐸ9ᐳ"\]:::itemplan
-    WithPgClient9 ==> __Item13
+    __Item13[/"__Item[13∈2]<br />ᐸ9ᐳ"\]:::itemplan
+    WithPgClient9 ==>|rejectNull| __Item13
 
     %% define steps
 
@@ -32,13 +32,9 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 15"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,WithPgClient9 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9<br /><br />ROOT WithPgClient{1}[9]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ9ᐳ[13]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ9ᐳ[13]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item13 bucket3
+    class Bucket2,__Item13 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

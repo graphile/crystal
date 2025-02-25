@@ -114,6 +114,8 @@ graph TD
     PgSelect41 --> PgSelectRows44
     PgSelectSingle45{{"PgSelectSingle[45∈2] ➊<br />ᐸpeopleᐳ"}}:::plan
     First43 --> PgSelectSingle45
+    PgClassExpression46{{"PgClassExpression[46∈2] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression46
     First49{{"First[49∈2] ➊"}}:::plan
     PgSelectRows50[["PgSelectRows[50∈2] ➊"]]:::plan
     PgSelectRows50 --> First49
@@ -138,8 +140,6 @@ graph TD
     PgSelect77 --> PgSelectRows80
     PgSelectSingle81{{"PgSelectSingle[81∈2] ➊<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First79 --> PgSelectSingle81
-    PgClassExpression46{{"PgClassExpression[46∈3] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression46
 
     %% define steps
 
@@ -150,13 +150,9 @@ graph TD
     Bucket1("Bucket 1 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 16, 24, 15<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 17, 25, 87, 149, 211, 273<br />2: 22, 28, 90, 152, 214, 276<br />ᐳ: 21, 23, 27, 29, 30, 31, 32, 40, 89, 91, 151, 153, 213, 215, 275, 277"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,First21,PgSelectRows22,PgSelectSingle23,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,PgClassExpression30,PgPolymorphic31,PgClassExpression32,PgClassExpression40,PgSelect87,First89,PgSelectRows90,PgSelectSingle91,PgSelect149,First151,PgSelectRows152,PgSelectSingle153,PgSelect211,First213,PgSelectRows214,PgSelectSingle215,PgSelect273,First275,PgSelectRows276,PgSelectSingle277 bucket1
-    Bucket2("Bucket 2 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 32, 40, 31<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: 33, 41, 47, 57, 67, 77<br />2: 38, 44, 50, 60, 70, 80<br />ᐳ: 37, 39, 43, 45, 49, 51, 59, 61, 69, 71, 79, 81"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 32, 40, 31<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: 33, 41, 47, 57, 67, 77<br />2: 38, 44, 50, 60, 70, 80<br />ᐳ: 37, 39, 43, 45, 46, 49, 51, 59, 61, 69, 71, 79, 81"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect33,First37,PgSelectRows38,PgSelectSingle39,PgSelect41,First43,PgSelectRows44,PgSelectSingle45,PgSelect47,First49,PgSelectRows50,PgSelectSingle51,PgSelect57,First59,PgSelectRows60,PgSelectSingle61,PgSelect67,First69,PgSelectRows70,PgSelectSingle71,PgSelect77,First79,PgSelectRows80,PgSelectSingle81 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[45]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression46 bucket3
+    class Bucket2,PgSelect33,First37,PgSelectRows38,PgSelectSingle39,PgSelect41,First43,PgSelectRows44,PgSelectSingle45,PgClassExpression46,PgSelect47,First49,PgSelectRows50,PgSelectSingle51,PgSelect57,First59,PgSelectRows60,PgSelectSingle61,PgSelect67,First69,PgSelectRows70,PgSelectSingle71,PgSelect77,First79,PgSelectRows80,PgSelectSingle81 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

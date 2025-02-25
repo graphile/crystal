@@ -60,7 +60,7 @@ graph TD
     PgSelect30 --> PgSelectRows35
     PgSelectSingle36{{"PgSelectSingle[36∈2] ➊<br />ᐸpeopleᐳ"}}:::plan
     First34 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈2] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
 
     %% define steps
@@ -72,13 +72,9 @@ graph TD
     Bucket1("Bucket 1 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 13, 10, 16, 58<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[17]<br />2: PgSelect[18]<br />3: PgSelectRows[23]<br />ᐳ: 22, 24, 25, 26, 29<br />4: PgSingleTablePolymorphic[27]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression17,PgSelect18,First22,PgSelectRows23,PgSelectSingle24,PgClassExpression25,Lambda26,PgSingleTablePolymorphic27,PgClassExpression29 bucket1
-    Bucket2("Bucket 2 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 29, 27, 24, 17<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem<br /><br />1: PgSelect[30]<br />2: PgSelectRows[35]<br />ᐳ: First[34], PgSelectSingle[36]"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 29, 27, 24, 17<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem<br /><br />1: PgSelect[30]<br />2: PgSelectRows[35]<br />ᐳ: 34, 36, 37"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect30,First34,PgSelectRows35,PgSelectSingle36 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[36]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression37 bucket3
+    class Bucket2,PgSelect30,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

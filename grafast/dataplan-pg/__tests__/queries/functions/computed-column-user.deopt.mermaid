@@ -11,11 +11,14 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Object10 & Constant25 --> PgSelect7
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Object10 & Constant23 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸforums_random_userᐳ"]]:::plan
+    PgFromExpression17{{"PgFromExpression[17∈0] ➊"}}:::plan
+    Object10 & PgFromExpression17 --> PgSelect15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -25,36 +28,25 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸforums_random_userᐳ"]]:::plan
-    PgFromExpression19{{"PgFromExpression[19∈1] ➊"}}:::plan
-    Object10 & PgFromExpression19 --> PgSelect15
-    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__forums__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    PgClassExpression14 --> PgFromExpression19
-    First20{{"First[20∈1] ➊"}}:::plan
-    PgSelectRows21[["PgSelectRows[21∈1] ➊"]]:::plan
-    PgSelectRows21 --> First20
-    PgSelect15 --> PgSelectRows21
-    PgSelectSingle22{{"PgSelectSingle[22∈1] ➊<br />ᐸusersᐳ"}}:::plan
-    First20 --> PgSelectSingle22
-    PgClassExpression23{{"PgClassExpression[23∈2] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈2] ➊<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression24
+    PgClassExpression14 --> PgFromExpression17
+    First18{{"First[18∈0] ➊"}}:::plan
+    PgSelectRows19[["PgSelectRows[19∈0] ➊"]]:::plan
+    PgSelectRows19 --> First18
+    PgSelect15 --> PgSelectRows19
+    PgSelectSingle20{{"PgSelectSingle[20∈0] ➊<br />ᐸusersᐳ"}}:::plan
+    First18 --> PgSelectSingle20
+    PgClassExpression21{{"PgClassExpression[21∈0] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈0] ➊<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression22
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/functions/computed-column-user"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 25, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 23, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 17<br />4: PgSelect[15]<br />5: PgSelectRows[19]<br />ᐳ: 18, 20, 21, 22"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant25 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 19<br />2: PgSelect[15]<br />3: PgSelectRows[21]<br />ᐳ: First[20], PgSelectSingle[22]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14,PgSelect15,PgFromExpression19,First20,PgSelectRows21,PgSelectSingle22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[22]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression23,PgClassExpression24 bucket2
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgSelect15,PgFromExpression17,First18,PgSelectRows19,PgSelectSingle20,PgClassExpression21,PgClassExpression22,Constant23 bucket0
     end
