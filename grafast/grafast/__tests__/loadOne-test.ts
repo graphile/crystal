@@ -567,6 +567,9 @@ it("uses stable identifiers to avoid the need for double-fetches (obj)", async (
     resolvedPreset,
     requestContext,
   })) as ExecutionResult;
+  if (result.errors) {
+    console.error(result.errors[0]?.originalError);
+  }
   expect(result).to.deep.equal({
     data: {
       t1: {
