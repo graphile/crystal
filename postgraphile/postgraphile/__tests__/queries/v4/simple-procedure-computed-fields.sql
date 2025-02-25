@@ -6,6 +6,12 @@ select
 from "c"."person" as __person__
 order by __person__."id" asc;
 
+select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from "c"."person" as __person__
+order by __person__."id" asc;
+
 select __person_friends_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
 lateral (
@@ -107,23 +113,6 @@ lateral (
   order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 ) as __compound_key_result__;
 
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-order by __person__."id" asc;
-
-select __person_friends_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
-lateral (
-  select
-    __person_friends__."person_full_name" as "0",
-    "c"."person_first_name"(__person_friends__) as "1",
-    __person_friends_identifiers__.idx as "2"
-  from "c"."person_friends"(__person_friends_identifiers__."id0") as __person_friends__
-  limit 1
-) as __person_friends_result__;
-
 select __post_computed_interval_set_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_computed_interval_set_identifiers__,
 lateral (
@@ -148,3 +137,14 @@ select
   to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0"
 from "a"."post_computed_interval_set"($1::"a"."post") as __post_computed_interval_set__(v)
 limit 1;
+
+select __person_friends_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
+lateral (
+  select
+    __person_friends__."person_full_name" as "0",
+    "c"."person_first_name"(__person_friends__) as "1",
+    __person_friends_identifiers__.idx as "2"
+  from "c"."person_friends"(__person_friends_identifiers__."id0") as __person_friends__
+  limit 1
+) as __person_friends_result__;

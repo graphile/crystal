@@ -24,6 +24,23 @@ from "c"."func_out_complex"(
 ) as __func_out_complex__;
 
 select
+  __func_out_complex_setof__."x"::text as "0",
+  case when (__func_out_complex_setof__."y") is not distinct from null then null::text else json_build_array((((__func_out_complex_setof__."y")."a"))::text, ((__func_out_complex_setof__."y")."b"), (((__func_out_complex_setof__."y")."c"))::text, ((__func_out_complex_setof__."y")."d"), (((__func_out_complex_setof__."y")."e"))::text, (((__func_out_complex_setof__."y")."f"))::text, to_char(((__func_out_complex_setof__."y")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__func_out_complex_setof__."y")."foo_bar"))::text)::text end as "1",
+  case when (__func_out_complex_setof__."z") is not distinct from null then null::text else json_build_array((((__func_out_complex_setof__."z")."id"))::text, ((__func_out_complex_setof__."z")."person_full_name"), (((__func_out_complex_setof__."z")."aliases"))::text, ((__func_out_complex_setof__."z")."about"), ((__func_out_complex_setof__."z")."email"), case when (((__func_out_complex_setof__."z")."site")) is not distinct from null then null::text else json_build_array(((((__func_out_complex_setof__."z")."site"))."url"))::text end, (((__func_out_complex_setof__."z")."config"))::text, (((__func_out_complex_setof__."z")."last_login_from_ip"))::text, (((__func_out_complex_setof__."z")."last_login_from_subnet"))::text, (((__func_out_complex_setof__."z")."user_mac"))::text, to_char(((__func_out_complex_setof__."z")."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "2",
+  (not (__func_out_complex_setof__ is null))::text as "3"
+from "c"."func_out_complex_setof"(
+  $1::"int4",
+  $2::"text"
+) as __func_out_complex_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_complex_setof"(
+  $1::"int4",
+  $2::"text"
+) as __func_out_complex_setof__;
+
+select
   __func_out_out__."first_out"::text as "0",
   __func_out_out__."second_out" as "1",
   (not (__func_out_out__ is null))::text as "2"
@@ -36,14 +53,40 @@ select
 from "c"."func_out_out_compound_type"($1::"int4") as __func_out_out_compound_type__;
 
 select
+  __func_out_out_setof__."o1"::text as "0",
+  __func_out_out_setof__."o2" as "1",
+  (not (__func_out_out_setof__ is null))::text as "2"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
   __func_out_out_unnamed__."column1"::text as "0",
   __func_out_out_unnamed__."column2" as "1",
   (not (__func_out_out_unnamed__ is null))::text as "2"
 from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__;
 
 select
+  __func_out_setof__.v::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
   __func_out_table__."id"::text as "0"
 from "c"."func_out_table"() as __func_out_table__;
+
+select
+  __func_out_table_setof__."id"::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select
   __func_out_unnamed__.v::text as "0"
@@ -55,6 +98,24 @@ select
   __func_out_unnamed_out_out_unnamed__."o2" as "2",
   (not (__func_out_unnamed_out_out_unnamed__ is null))::text as "3"
 from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
+
+select
+  __func_returns_table_multi_col__."col1"::text as "0",
+  __func_returns_table_multi_col__."col2" as "1",
+  (not (__func_returns_table_multi_col__ is null))::text as "2"
+from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
+
+select
+  __func_returns_table_one_col__.v::text as "0"
+from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
+
+select
+  (count(*))::text as "0"
+from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
 
 select
   __person__."id"::text as "0",
@@ -115,67 +176,6 @@ select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1"
 from (select ($1::"c"."person").*) as __person__;
-
-select
-  __func_out_complex_setof__."x"::text as "0",
-  case when (__func_out_complex_setof__."y") is not distinct from null then null::text else json_build_array((((__func_out_complex_setof__."y")."a"))::text, ((__func_out_complex_setof__."y")."b"), (((__func_out_complex_setof__."y")."c"))::text, ((__func_out_complex_setof__."y")."d"), (((__func_out_complex_setof__."y")."e"))::text, (((__func_out_complex_setof__."y")."f"))::text, to_char(((__func_out_complex_setof__."y")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__func_out_complex_setof__."y")."foo_bar"))::text)::text end as "1",
-  case when (__func_out_complex_setof__."z") is not distinct from null then null::text else json_build_array((((__func_out_complex_setof__."z")."id"))::text, ((__func_out_complex_setof__."z")."person_full_name"), (((__func_out_complex_setof__."z")."aliases"))::text, ((__func_out_complex_setof__."z")."about"), ((__func_out_complex_setof__."z")."email"), case when (((__func_out_complex_setof__."z")."site")) is not distinct from null then null::text else json_build_array(((((__func_out_complex_setof__."z")."site"))."url"))::text end, (((__func_out_complex_setof__."z")."config"))::text, (((__func_out_complex_setof__."z")."last_login_from_ip"))::text, (((__func_out_complex_setof__."z")."last_login_from_subnet"))::text, (((__func_out_complex_setof__."z")."user_mac"))::text, to_char(((__func_out_complex_setof__."z")."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "2",
-  (not (__func_out_complex_setof__ is null))::text as "3"
-from "c"."func_out_complex_setof"(
-  $1::"int4",
-  $2::"text"
-) as __func_out_complex_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_complex_setof"(
-  $1::"int4",
-  $2::"text"
-) as __func_out_complex_setof__;
-
-select
-  __func_out_out_setof__."o1"::text as "0",
-  __func_out_out_setof__."o2" as "1",
-  (not (__func_out_out_setof__ is null))::text as "2"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  __func_out_setof__.v::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  __func_out_table_setof__."id"::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  __func_returns_table_multi_col__."col1"::text as "0",
-  __func_returns_table_multi_col__."col2" as "1",
-  (not (__func_returns_table_multi_col__ is null))::text as "2"
-from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
-
-select
-  __func_returns_table_one_col__.v::text as "0"
-from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
 
 select
   __person_computed_complex__."x"::text as "0",

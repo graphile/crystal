@@ -3,16 +3,16 @@ select
   __single_table_items__."type"::text as "1",
   __single_table_items__."root_topic_id"::text as "2"
 from "polymorphic"."single_table_items" as __single_table_items__
-where (
-  __single_table_items__."id" = $1::"int4"
-);
+order by __single_table_items__."id" asc;
 
 select
   __single_table_items__."id"::text as "0",
   __single_table_items__."type"::text as "1",
   __single_table_items__."root_topic_id"::text as "2"
 from "polymorphic"."single_table_items" as __single_table_items__
-order by __single_table_items__."id" asc;
+where (
+  __single_table_items__."id" = $1::"int4"
+);
 
 select
   __single_table_items__."id"::text as "0",

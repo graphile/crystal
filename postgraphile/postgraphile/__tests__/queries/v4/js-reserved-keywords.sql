@@ -17,6 +17,13 @@ where (
 );
 
 select
+  __relational_items__."id"::text as "0",
+  __relational_items__."constructor" as "1",
+  __relational_items__."type"::text as "2"
+from "js_reserved"."relational_items" as __relational_items__
+order by __relational_items__."id" asc;
+
+select
   __building__."id"::text as "0",
   __building__."constructor" as "1"
 from "js_reserved"."building" as __building__
@@ -33,13 +40,6 @@ where (
   __machine__."constructor" = $1::"text"
 )
 order by __machine__."id" asc;
-
-select
-  __relational_items__."id"::text as "0",
-  __relational_items__."constructor" as "1",
-  __relational_items__."type"::text as "2"
-from "js_reserved"."relational_items" as __relational_items__
-order by __relational_items__."id" asc;
 
 select __relational_topics_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
