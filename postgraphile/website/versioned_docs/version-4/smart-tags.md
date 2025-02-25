@@ -71,7 +71,8 @@ The column can also be renamed:
 comment on column original_table.col1 is E'@name colA';
 ```
 
-The same can be done for types, type attributes, and custom queries:
+The same can be done for types, type attributes (i.e. "columns"), and custom
+queries:
 
 ```sql
 create type flibble as (f text);
