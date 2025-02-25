@@ -3,7 +3,6 @@ import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   ConnectionStep,
-  ExecutableStep,
   ExecutionDetails,
   GrafastResultsList,
   LambdaStep,
@@ -29,6 +28,7 @@ import {
   reverseArray,
   SafeError,
   Step,
+  stepsAreInSamePhase,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -57,7 +57,7 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
+import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
@@ -163,7 +163,7 @@ interface PgSelectArgumentPlaceholder extends PgSelectArgumentBasics {
 }
 interface PgSelectArgumentUnaryStep extends PgSelectArgumentBasics {
   placeholder?: never;
-  step: ExecutableStep;
+  step: Step;
 }
 interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
   placeholder?: never;
@@ -1489,17 +1489,224 @@ export class PgSelectStep<
     }
   }
 
+  private getParentForInlining(): {
+    $pgSelect: PgSelectStep<PgResource>;
+    $pgSelectSingle: PgSelectSingleStep<PgResource>;
+  } | null {
+    /**
+     * These are the dependencies that are not PgClassExpressionSteps, we just
+     * need them to be at a higher level than $pgSelect
+     */
+    const otherDeps: Step[] = [];
+
+    /**
+     * This is the PgSelectStep that we would like to try and inline ourself
+     * into. If `undefined`, this hasn't been found yet. If `null`, this has
+     * been explicitly forbidden due to a mismatch of some kind.
+     */
+    let $pgSelect: PgSelectStep<PgResource> | null | undefined = undefined;
+
+    /**
+     * This is the pgSelectSingle representing a single record from $pgSelect,
+     * it's used when remapping of keys is required after inlining ourself into
+     * $pgSelect.
+     */
+    let $pgSelectSingle: PgSelectSingleStep<PgResource> | undefined = undefined;
+
+    // Scan through the dependencies to find a suitable ancestor step to merge with
+    for (
+      let dependencyIndex = 0, l = this.dependencies.length;
+      dependencyIndex < l;
+      dependencyIndex++
+    ) {
+      if (dependencyIndex === this.contextId) {
+        // We check myContext vs tsContext below; so lets assume it's fine
+        // for now.
+        continue;
+      }
+      const $dep = this.getDep(dependencyIndex);
+      if ($dep instanceof PgClassExpressionStep) {
+        const $depPgSelectSingle = $dep.getParentStep();
+        if (!($depPgSelectSingle instanceof PgSelectSingleStep)) {
+          continue;
+        }
+        const $depPgSelect = $depPgSelectSingle.getClassStep();
+        if ($depPgSelect === this) {
+          throw new Error(
+            `Recursion error - record plan ${$dep} is dependent on ${$depPgSelect}, and ${this} is dependent on ${$dep}`,
+          );
+        }
+
+        if ($depPgSelect.hasSideEffects) {
+          // It's a mutation; don't merge
+          continue;
+        }
+
+        // Don't allow merging across a stream/defer/subscription boundary
+        if (!stepsAreInSamePhase($depPgSelect, this)) {
+          continue;
+        }
+
+        // Don't want to make this a join as it can result in the order being
+        // messed up
+        if (
+          $depPgSelect.hasImplicitOrder &&
+          !this.joinAsLateral &&
+          this.isUnique
+        ) {
+          continue;
+        }
+
+        /*
+          if (!planGroupsOverlap(this, t2)) {
+            // We're not in the same group (i.e. there's probably a @defer or
+            // @stream between us) - do not merge.
+            continue;
+          }
+          */
+
+        if ($pgSelect === undefined && $pgSelectSingle === undefined) {
+          $pgSelectSingle = $depPgSelectSingle;
+          $pgSelect = $depPgSelect;
+        } else if ($depPgSelect !== $pgSelect) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
+            this,
+            $dep,
+            $depPgSelect,
+            $pgSelect,
+          );
+          $pgSelect = null;
+          break;
+        } else if ($depPgSelectSingle !== $pgSelectSingle) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
+            this,
+            $depPgSelectSingle,
+            $pgSelectSingle,
+          );
+          $pgSelect = null;
+          break;
+        }
+      } else {
+        otherDeps.push($dep);
+      }
+    }
+
+    // Check the contexts are the same
+    if ($pgSelect != null && $pgSelectSingle != null) {
+      const myContext = this.getDep(this.contextId);
+      const tsContext = $pgSelect.getDep($pgSelect.contextId);
+      if (myContext !== tsContext) {
+        debugPlanVerbose(
+          "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
+          this,
+          myContext,
+          tsContext,
+          $pgSelect.dependencies[$pgSelect.contextId],
+          $pgSelect,
+        );
+        $pgSelect = null;
+      }
+    }
+
+    // Check the dependencies can be moved across to `t`
+    if ($pgSelect != null && $pgSelectSingle != null) {
+      for (const dep of otherDeps) {
+        if ($pgSelect.canAddDependency(dep)) {
+          // All good; just move the dependency over
+        } else {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to dependency %c which cannot be added as a dependency of %c",
+            this,
+            dep,
+            $pgSelect,
+          );
+          $pgSelect = null;
+          break;
+        }
+      }
+    }
+
+    if ($pgSelect != null && $pgSelectSingle != null) {
+      // Looks feasible.
+      if ($pgSelect.id === this.id) {
+        throw new Error(
+          `Something's gone catastrophically wrong - ${this} is trying to merge with itself!`,
+        );
+      }
+      return { $pgSelect, $pgSelectSingle };
+    } else {
+      return null;
+    }
+  }
+
   optimize({ stream }: StepOptimizeOptions): Step {
     // In case we have any lock actions in future:
     this.lock();
 
+    // Inline ourself into our parent if we can.
+    let parentDetails: ReturnType<typeof this.getParentForInlining>;
     if (
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
       !stream &&
-      !this.joins.some((j) => j.type !== "left")
+      this.mode === "normal" &&
+      !this.joins.some((j) => j.type !== "left") &&
+      (parentDetails = this.getParentForInlining()) !== null &&
+      parentDetails.$pgSelect.mode === "normal"
     ) {
-      // Consider inlining
+      const { $pgSelect, $pgSelectSingle } = parentDetails;
+      if (
+        this.isUnique &&
+        this.firstStepId == null &&
+        this.lastStepId == null &&
+        this.offsetStepId == null &&
+        // For uniques these should all pass anyway, but pays to be cautious..
+        this.groups.length === 0 &&
+        this.havingConditions.length === 0 &&
+        this.orders.length === 0 &&
+        !this.fetchOneExtra
+      ) {
+        // Allow, do it via left join
+        // TODO
+        console.log(
+          `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - single`,
+        );
+      } else {
+        const identifierMatchesExpressions = this.identifierMatches
+          .map((m) => {
+            const $dep = this.getDep(m.dependencyIndex);
+            if (!($dep instanceof PgClassExpressionStep)) return null;
+            if ($dep.getParentStep() !== $pgSelectSingle) return null;
+            return $dep.expression;
+          })
+          .filter((e): e is SQL => e !== null);
+
+        // TODO: this isn't really accurate plus it's expensive to calculate; fix it properly!
+        // An approximation of "belongs to" is: we're referencing a unique combination of columns on the parent.
+        const relationshipIsBelongsTo = $pgSelect.resource.uniques.some((u) =>
+          u.attributes.every((remoteColumn) => {
+            const remoteColumnExpression = sql`${
+              $pgSelect.alias
+            }.${sql.identifier(String(remoteColumn))}`;
+            return identifierMatchesExpressions.some((e) =>
+              sql.isEquivalent(e, remoteColumnExpression),
+            );
+          }),
+        );
+
+        const allowed =
+          $pgSelectSingle.getAndFreezeIsUnary() ||
+          (!$pgSelect.isUnique && relationshipIsBelongsTo);
+        if (allowed) {
+          // Add a nested select expression
+          // TODO
+          console.log(
+            `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - many`,
+          );
+        }
+      }
     }
 
     // PERF: we should serialize our `SELECT` clauses and then if any are
