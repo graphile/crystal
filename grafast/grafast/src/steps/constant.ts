@@ -71,14 +71,17 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
     return arrayOfLength(count, this.data);
   }
 
+  /** @internal */
   eval() {
     return this.data;
   }
 
+  /** @internal */
   evalIs(value: any) {
     return this.data === value;
   }
 
+  /** @internal */
   evalIsEmpty() {
     return (
       typeof this.data === "object" &&
@@ -87,10 +90,12 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
     );
   }
 
+  /** @internal */
   evalLength() {
     return Array.isArray(this.data) ? this.data.length : null;
   }
 
+  /** @internal */
   evalKeys(): ReadonlyArray<keyof TData & string> | null {
     if (this.data == null || typeof this.data !== "object") {
       return null;
