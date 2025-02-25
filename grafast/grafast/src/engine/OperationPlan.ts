@@ -1625,30 +1625,7 @@ export class OperationPlan {
         }
       }
 
-      let objectLayerPlan: LayerPlan;
-      if (
-        isNonNull ||
-        (parentLayerPlan.reason.type === "nullableBoundary" &&
-          parentLayerPlan.rootStep === $step)
-      ) {
-        objectLayerPlan = parentLayerPlan;
-      } else {
-        // Find existing match
-        const match = parentLayerPlan.children.find(
-          (clp) =>
-            clp.reason.type === "nullableBoundary" &&
-            clp.reason.parentStep === $step,
-        );
-        if (match !== undefined) {
-          objectLayerPlan = match;
-        } else {
-          objectLayerPlan = new LayerPlan(this, parentLayerPlan, {
-            type: "nullableBoundary",
-            parentStep: $step,
-          });
-          objectLayerPlan.setRootStep($step);
-        }
-      }
+      const objectLayerPlan = parentLayerPlan;
 
       const $sideEffect = objectLayerPlan.latestSideEffectStep;
       try {
@@ -2622,15 +2599,6 @@ export class OperationPlan {
         // Should be safe to hoist.
         break;
       }
-      case "nullableBoundary": {
-        // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
-        const $root = step.layerPlan.reason.parentStep!;
-        if (sudo(step).dependencies.includes($root)) {
-          return;
-        } else {
-          break;
-        }
-      }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
@@ -2755,7 +2723,6 @@ export class OperationPlan {
       case "defer":
       case "polymorphic":
       case "subroutine":
-      case "nullableBoundary":
       case "listItem": {
         // Fine to push lower
         break;
@@ -3675,10 +3642,6 @@ export class OperationPlan {
         case "root": {
           const { type } = reason;
           return { type };
-        }
-        case "nullableBoundary": {
-          const { type, parentStep } = reason;
-          return { type, parentStepId: parentStep.id };
         }
         case "listItem": {
           const { type, parentStep, stream } = reason;

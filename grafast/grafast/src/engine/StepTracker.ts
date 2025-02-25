@@ -137,7 +137,6 @@ export class StepTracker {
       case "defer": {
         break;
       }
-      case "nullableBoundary":
       case "listItem":
       case "polymorphic": {
         const store = this.layerPlansByParentStep.get(

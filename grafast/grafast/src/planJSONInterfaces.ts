@@ -29,7 +29,6 @@ export interface GrafastPlanBucketPhaseJSONv1 {
 
 export type GrafastPlanBucketReasonJSONv1 =
   | GrafastPlanBucketReasonRootJSONv1
-  | GrafastPlanBucketReasonNullableFieldJSONv1
   | GrafastPlanBucketReasonListItemJSONv1
   | GrafastPlanBucketReasonSubscriptionJSONv1
   | GrafastPlanBucketReasonMutationFieldJSONv1
@@ -39,11 +38,6 @@ export type GrafastPlanBucketReasonJSONv1 =
 
 export interface GrafastPlanBucketReasonRootJSONv1 {
   type: "root";
-}
-/** Non-branching, non-deferred */
-export interface GrafastPlanBucketReasonNullableFieldJSONv1 {
-  type: "nullableBoundary";
-  parentStepId: string | number;
 }
 /** Non-branching, non-deferred */
 export interface GrafastPlanBucketReasonListItemJSONv1 {

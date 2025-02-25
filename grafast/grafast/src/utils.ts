@@ -980,7 +980,6 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
         }
       }
       case "root":
-      case "nullableBoundary":
       case "subroutine":
       case "mutationField": {
         continue;
