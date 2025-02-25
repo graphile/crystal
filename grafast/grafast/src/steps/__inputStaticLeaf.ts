@@ -55,10 +55,12 @@ export class __InputStaticLeafStep<TLeaf = any> extends UnbatchedStep<TLeaf> {
     return constant(this.coercedValue, false);
   }
 
+  /** @internal */
   eval(): TLeaf {
     return this.coercedValue;
   }
 
+  /** @internal */
   evalIs(expectedValue: unknown): boolean {
     return this.coercedValue === expectedValue;
   }

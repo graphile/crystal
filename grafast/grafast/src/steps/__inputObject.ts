@@ -128,6 +128,7 @@ export class __InputObjectStep<
     return step;
   }
 
+  /** @internal */
   eval(): any {
     if (this.inputValues?.kind === "NullValue") {
       return null;
@@ -140,6 +141,7 @@ export class __InputObjectStep<
     return resultValues;
   }
 
+  /** @internal */
   evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
@@ -156,6 +158,7 @@ export class __InputObjectStep<
     }
   }
 
+  /** @internal */
   evalIsEmpty(): boolean {
     return (
       this.inputValues?.kind === "ObjectValue" &&
@@ -164,6 +167,7 @@ export class __InputObjectStep<
   }
 
   // Written without consulting spec.
+  /** @internal */
   evalHas(attrName: string): boolean {
     if (!this.inputValues) {
       return false;
@@ -177,6 +181,7 @@ export class __InputObjectStep<
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
 
+  /** @internal */
   evalKeys(): ReadonlyArray<keyof TInputType & string> | null {
     if (this.inputValues === undefined) {
       return null;
