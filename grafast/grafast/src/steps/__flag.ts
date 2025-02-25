@@ -18,7 +18,7 @@ import {
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { isListCapableStep, Step } from "../step.js";
+import { $$isNullableBoundary, isListCapableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -329,7 +329,10 @@ export function trap<T>(
 // Have to overwrite the getDep method due to circular dependency
 (Step.prototype as any).getDep = function (this: Step, depId: number) {
   const { step, acceptFlags, onReject } = this.getDepOptions(depId);
-  if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
+  const defaultAcceptFlags = step[$$isNullableBoundary]
+    ? DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL
+    : DEFAULT_ACCEPT_FLAGS;
+  if (acceptFlags === defaultAcceptFlags && onReject == null) {
     return step;
   } else {
     // Return a __FlagStep around options.step so that all the options are preserved.

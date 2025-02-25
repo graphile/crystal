@@ -64,9 +64,10 @@ import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { PolymorphicStep } from "../step.js";
 import {
+  $$isNullableBoundary,
   $$noExec,
-  assertExecutableStep,
   assertFinalized,
+  assertStep,
   isListCapableStep,
   isPolymorphicStep,
   isUnbatchedStep,
@@ -1625,6 +1626,11 @@ export class OperationPlan {
         }
       }
 
+      if (!isNonNull) {
+        // INHIBIT ON NULL
+        $step[$$isNullableBoundary] = true;
+      }
+
       const objectLayerPlan = parentLayerPlan;
 
       const $sideEffect = objectLayerPlan.latestSideEffectStep;
@@ -1954,7 +1960,7 @@ export class OperationPlan {
           );
         haltTree = true;
       }
-      assertExecutableStep(step);
+      assertStep(step);
 
       if (streamDetails === true) {
         // subscription

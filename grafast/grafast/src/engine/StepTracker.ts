@@ -2,8 +2,13 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddDependencyOptions } from "../interfaces.js";
-import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
-import { Step } from "../step.js";
+import {
+  $$subroutine,
+  ALL_FLAGS,
+  FLAG_NULL,
+  TRAPPABLE_FLAGS,
+} from "../interfaces.js";
+import { $$isNullableBoundary, Step } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
@@ -326,11 +331,12 @@ export class StepTracker {
     const dependentDependencyOnReject = writeableArray(
       $dependent.dependencyOnReject,
     );
-    const {
-      skipDeduplication,
-      acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
-      onReject,
-    } = options;
+    const { skipDeduplication, onReject } = options;
+    let acceptFlags =
+      options.acceptFlags ?? ALL_FLAGS & ~$dependent.defaultForbiddenFlags;
+    if ($dependency[$$isNullableBoundary]) {
+      acceptFlags = acceptFlags & ~FLAG_NULL;
+    }
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.

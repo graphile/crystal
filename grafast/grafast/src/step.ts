@@ -46,6 +46,11 @@ import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
  * @internal
  */
 export const $$noExec = Symbol("noExec");
+/**
+ * If this property is set to `true` on a step, all steps that depend on it
+ * should automatically remove NULL from their acceptFlags.
+ */
+export const $$isNullableBoundary = Symbol("isNullableBoundary");
 
 const ref_flagError = te.ref(flagError, "flagError");
 
@@ -123,6 +128,9 @@ export /* abstract */ class Step<TData = any> {
 
   /** @internal */
   [$$unlock]: undefined | (() => void) = undefined;
+
+  /** @internal */
+  [$$isNullableBoundary] = false;
 
   /**
    * Setting this true is a performance optimisation, but it comes with strong
