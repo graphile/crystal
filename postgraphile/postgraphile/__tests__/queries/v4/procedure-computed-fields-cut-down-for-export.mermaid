@@ -11,11 +11,17 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object10 & Constant27 --> PgSelect7
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Object10 & Constant25 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    PgSelect19[["PgSelect[19∈0] ➊<br />ᐸpost_computed_compound_type_arrayᐳ"]]:::plan
+    PgFromExpression21{{"PgFromExpression[21∈0] ➊"}}:::plan
+    Object10 & PgFromExpression21 --> PgSelect19
+    PgClassExpression18{{"PgClassExpression[18∈0] ➊<br />ᐸ__post__ᐳ"}}:::plan
+    BakedInput17{{"BakedInput[17∈0] ➊"}}:::plan
+    PgClassExpression18 & BakedInput17 --> PgFromExpression21
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -25,41 +31,27 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __InputObject15{{"__InputObject[15∈0] ➊"}}:::plan
-    BakedInput17{{"BakedInput[17∈0] ➊"}}:::plan
-    __InputObject15 --> BakedInput17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpost_computed_compound_type_arrayᐳ"]]:::plan
-    PgFromExpression23{{"PgFromExpression[23∈1] ➊"}}:::plan
-    Object10 & PgFromExpression23 --> PgSelect19
-    PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__post__ᐳ"}}:::plan
-    PgClassExpression18 & BakedInput17 --> PgFromExpression23
-    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
+    __InputObject15{{"__InputObject[15∈0] ➊"}}:::plan
+    __InputObject15 --> BakedInput17
     PgSelectSingle13 --> PgClassExpression18
-    PgSelectRows24[["PgSelectRows[24∈1] ➊"]]:::plan
-    PgSelect19 --> PgSelectRows24
-    __Item25[/"__Item[25∈2]<br />ᐸ24ᐳ"\]:::itemplan
-    PgSelectRows24 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
-    __Item25 --> PgSelectSingle26
+    PgSelectRows22[["PgSelectRows[22∈0] ➊"]]:::plan
+    PgSelect19 --> PgSelectRows22
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    __Item23[/"__Item[23∈1]<br />ᐸ22ᐳ"\]:::itemplan
+    PgSelectRows22 ==> __Item23
+    PgSelectSingle24{{"PgSelectSingle[24∈1]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
+    __Item23 --> PgSelectSingle24
 
     %% define steps
 
     subgraph "Buckets for queries/v4/procedure-computed-fields-cut-down-for-export"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 16, 27, 10, 15, 17<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 16, 25, 10, 15, 17<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 18, 21<br />4: PgSelect[19]<br />5: PgSelectRows[22]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,__InputObject15,BakedInput17,Constant27 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10, 17<br /><br />ROOT PgSelectSingleᐸpostᐳ[13]<br />1: <br />ᐳ: 14, 18, 23<br />2: PgSelect[19]<br />3: PgSelectRows[24]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,__InputObject15,BakedInput17,PgClassExpression18,PgSelect19,PgFromExpression21,PgSelectRows22,Constant25 bucket0
+    Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ22ᐳ[23]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14,PgClassExpression18,PgSelect19,PgFromExpression23,PgSelectRows24 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ24ᐳ[25]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item25,PgSelectSingle26 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[26]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3 bucket3
+    class Bucket1,__Item23,PgSelectSingle24 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

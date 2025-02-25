@@ -34,6 +34,9 @@ graph TD
     Constant24{{"Constant[24∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
     Object17 & PgFromExpression18 & ApplyInput23 --> PgSelect14
+    List26{{"List[26∈1] ➊<br />ᐸ24,25ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈1] ➊<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
+    Constant24 & PgClassExpression25 --> List26
     First19{{"First[19∈1] ➊"}}:::plan
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
     PgSelectRows20 --> First19
@@ -42,17 +45,14 @@ graph TD
     First19 --> PgSelectSingle21
     Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle21 --> Object22
-    List26{{"List[26∈3] ➊<br />ᐸ24,25ᐳ"}}:::plan
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
-    Constant24 & PgClassExpression25 --> List26
     PgSelectSingle21 --> PgClassExpression25
-    Lambda27{{"Lambda[27∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda27{{"Lambda[27∈1] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List26 --> Lambda27
-    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈1] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression28
-    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈1] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression29
-    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈1] ➊<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression30
 
     %% define steps
@@ -61,16 +61,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,BakedInput13,Access15,Access16,Object17,PgFromExpression18,ApplyInput23,Constant24,Constant31,Constant32,Constant33,Constant34 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 18, 23, 24<br /><br />1: PgSelect[14]<br />2: PgSelectRows[20]<br />ᐳ: 19, 21, 22"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 18, 23, 24<br /><br />1: PgSelect[14]<br />2: PgSelectRows[20]<br />ᐳ: 19, 21, 22, 25, 26, 27, 28, 29, 30"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14,First19,PgSelectRows20,PgSelectSingle21,Object22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 21, 24<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 24<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[21]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30 bucket3
+    class Bucket1,PgSelect14,First19,PgSelectRows20,PgSelectSingle21,Object22,PgClassExpression25,List26,Lambda27,PgClassExpression28,PgClassExpression29,PgClassExpression30 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

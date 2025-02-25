@@ -25,15 +25,15 @@ graph TD
     Constant15{{"Constant[15∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
     Object12 & Constant20 & ApplyInput13 --> PgDeleteSingle9
+    List18{{"List[18∈1] ➊<br />ᐸ15,16ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant15 & PgClassExpression16 --> List18
     Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object14
-    List18{{"List[18∈2] ➊<br />ᐸ15,16ᐳ"}}:::plan
-    PgClassExpression16{{"PgClassExpression[16∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant15 & PgClassExpression16 --> List18
-    Access17{{"Access[17∈2] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access17{{"Access[17∈1] ➊<br />ᐸ9.tᐳ"}}:::plan
     Access17 --> PgClassExpression16
     PgDeleteSingle9 --> Access17
-    Lambda19{{"Lambda[19∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda19{{"Lambda[19∈1] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List18 --> Lambda19
 
     %% define steps
@@ -42,12 +42,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant15,Constant20 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: 14, 17, 16, 18, 19"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDeleteSingle9,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 15, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression16,Access17,List18,Lambda19 bucket2
+    class Bucket1,PgDeleteSingle9,Object14,PgClassExpression16,Access17,List18,Lambda19 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
     end

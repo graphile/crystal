@@ -46,53 +46,53 @@ graph TD
     Object12 & Constant55 & ApplyInput13 --> PgDeleteSingle9
     Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object14
-    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
-    Access16{{"Access[16∈3] ➊<br />ᐸ9.tᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    Access16{{"Access[16∈1] ➊<br />ᐸ9.tᐳ"}}:::plan
     Access16 --> PgClassExpression15
     PgDeleteSingle9 --> Access16
-    PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     Access16 --> PgClassExpression17
-    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     Access16 --> PgClassExpression18
-    PgInsertSingle25[["PgInsertSingle[25∈4] ➊<br />ᐸletter_descriptions()ᐳ"]]:::sideeffectplan
-    Object28{{"Object[28∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgInsertSingle25[["PgInsertSingle[25∈2] ➊<br />ᐸletter_descriptions()ᐳ"]]:::sideeffectplan
+    Object28{{"Object[28∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object28 & ApplyInput29 --> PgInsertSingle25
-    Access26{{"Access[26∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access27{{"Access[27∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access26{{"Access[26∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access27{{"Access[27∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access26 & Access27 --> Object28
     __Value2 --> Access26
     __Value2 --> Access27
-    Object30{{"Object[30∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    Object30{{"Object[30∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle25 --> Object30
-    PgClassExpression31{{"PgClassExpression[31∈6] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
-    Access32{{"Access[32∈6] ➊<br />ᐸ25.tᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈2] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    Access32{{"Access[32∈2] ➊<br />ᐸ25.tᐳ"}}:::plan
     Access32 --> PgClassExpression31
     PgInsertSingle25 --> Access32
-    PgClassExpression33{{"PgClassExpression[33∈6] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈2] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     Access32 --> PgClassExpression33
-    PgClassExpression34{{"PgClassExpression[34∈6] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression34{{"PgClassExpression[34∈2] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     Access32 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈6] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    PgClassExpression35{{"PgClassExpression[35∈2] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     Access32 --> PgClassExpression35
-    PgSelect44[["PgSelect[44∈7] ➊<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object47{{"Object[47∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression48{{"PgFromExpression[48∈7] ➊"}}:::plan
+    PgSelect44[["PgSelect[44∈3] ➊<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object47{{"Object[47∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgFromExpression48{{"PgFromExpression[48∈3] ➊"}}:::plan
     Object47 & PgFromExpression48 & ApplyInput54 --> PgSelect44
-    Access45{{"Access[45∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access46{{"Access[46∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access45{{"Access[45∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access46{{"Access[46∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access45 & Access46 --> Object47
     __Value2 --> Access45
     __Value2 --> Access46
     BakedInput43 --> PgFromExpression48
-    First49{{"First[49∈7] ➊"}}:::plan
-    PgSelectRows50[["PgSelectRows[50∈7] ➊"]]:::plan
+    First49{{"First[49∈3] ➊"}}:::plan
+    PgSelectRows50[["PgSelectRows[50∈3] ➊"]]:::plan
     PgSelectRows50 --> First49
     PgSelect44 --> PgSelectRows50
-    PgSelectSingle51{{"PgSelectSingle[51∈7] ➊<br />ᐸreferencing_table_mutationᐳ"}}:::plan
+    PgSelectSingle51{{"PgSelectSingle[51∈3] ➊<br />ᐸreferencing_table_mutationᐳ"}}:::plan
     First49 --> PgSelectSingle51
-    PgClassExpression52{{"PgClassExpression[52∈7] ➊<br />ᐸ__referenc...tation__.vᐳ"}}:::plan
+    PgClassExpression52{{"PgClassExpression[52∈3] ➊<br />ᐸ__referenc...tation__.vᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression52
-    Object53{{"Object[53∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    Object53{{"Object[53∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression52 --> Object53
 
     %% define steps
@@ -101,34 +101,14 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,__InputObject19,__InputObject21,ApplyInput29,__InputObject36,__InputObject38,BakedInput43,ApplyInput54,Constant55,Constant56,Constant57,Constant58,Constant59,Constant60 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 55, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 55, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: 14, 16, 15, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDeleteSingle9,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 9<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    class Bucket1,PgDeleteSingle9,Object14,PgClassExpression15,Access16,PgClassExpression17,PgClassExpression18 bucket1
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 29, 2<br /><br />1: Access[26]<br />2: Access[27]<br />3: Object[28]<br />4: PgInsertSingle[25]<br />5: <br />ᐳ: 30, 32, 31, 33, 34, 35"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 9<br /><br />ROOT PgDeleteSingle{1}ᐸletter_descriptions(letter)ᐳ[9]"):::bucket
+    class Bucket2,PgInsertSingle25,Access26,Access27,Object28,Object30,PgClassExpression31,Access32,PgClassExpression33,PgClassExpression34,PgClassExpression35 bucket2
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 54, 2, 43<br /><br />1: Access[45]<br />2: Access[46]<br />3: Object[47]<br />4: PgFromExpression[48]<br />5: PgSelect[44]<br />6: PgSelectRows[50]<br />ᐳ: 49, 51, 52, 53"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression15,Access16,PgClassExpression17,PgClassExpression18 bucket3
-    Bucket4("Bucket 4 (mutationField)<br />Deps: 29, 2<br /><br />1: Access[26]<br />2: Access[27]<br />3: Object[28]<br />4: PgInsertSingle[25]<br />5: <br />ᐳ: Object[30]"):::bucket
-    classDef bucket4 stroke:#0000ff
-    class Bucket4,PgInsertSingle25,Access26,Access27,Object28,Object30 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 30, 25<br /><br />ROOT Object{4}ᐸ{result}ᐳ[30]"):::bucket
-    classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25<br /><br />ROOT PgInsertSingle{4}ᐸletter_descriptions()ᐳ[25]"):::bucket
-    classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression31,Access32,PgClassExpression33,PgClassExpression34,PgClassExpression35 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 54, 2, 43<br /><br />1: Access[45]<br />2: Access[46]<br />3: Object[47]<br />4: PgFromExpression[48]<br />5: PgSelect[44]<br />6: PgSelectRows[50]<br />ᐳ: 49, 51, 52, 53"):::bucket
-    classDef bucket7 stroke:#808000
-    class Bucket7,PgSelect44,Access45,Access46,Object47,PgFromExpression48,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression52,Object53 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 53, 52<br /><br />ROOT Object{7}ᐸ{result}ᐳ[53]"):::bucket
-    classDef bucket8 stroke:#dda0dd
-    class Bucket8 bucket8
-    Bucket0 --> Bucket1 & Bucket4 & Bucket7
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket4 --> Bucket5
-    Bucket5 --> Bucket6
-    Bucket7 --> Bucket8
+    class Bucket3,PgSelect44,Access45,Access46,Object47,PgFromExpression48,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression52,Object53 bucket3
+    Bucket0 --> Bucket1 & Bucket2 & Bucket3
     end

@@ -28,21 +28,21 @@ graph TD
     Constant17{{"Constant[17∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgUpdateSingle11[["PgUpdateSingle[11∈1] ➊<br />ᐸleft_arm(id;)ᐳ"]]:::sideeffectplan
     Object14 & Constant26 & ApplyInput15 --> PgUpdateSingle11
+    List20{{"List[20∈1] ➊<br />ᐸ17,18ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    Constant17 & PgClassExpression18 --> List20
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle11 --> Object16
-    List20{{"List[20∈3] ➊<br />ᐸ17,18ᐳ"}}:::plan
-    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant17 & PgClassExpression18 --> List20
-    Access19{{"Access[19∈3] ➊<br />ᐸ11.tᐳ"}}:::plan
+    Access19{{"Access[19∈1] ➊<br />ᐸ11.tᐳ"}}:::plan
     Access19 --> PgClassExpression18
     PgUpdateSingle11 --> Access19
-    Lambda21{{"Lambda[21∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda21{{"Lambda[21∈1] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List20 --> Lambda21
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈1] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     Access19 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈1] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     Access19 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈1] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
     Access19 --> PgClassExpression25
 
     %% define steps
@@ -51,16 +51,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Access12,Access13,Object14,ApplyInput15,Constant17,Constant26,Constant27 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 26, 15, 17<br /><br />1: PgUpdateSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 26, 15, 17<br /><br />1: PgUpdateSingle[11]<br />2: <br />ᐳ: 16, 19, 18, 20, 21, 23, 24, 25"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUpdateSingle11,Object16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 17<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;)ᐳ[11]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression23,PgClassExpression24,PgClassExpression25 bucket3
+    class Bucket1,PgUpdateSingle11,Object16,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression23,PgClassExpression24,PgClassExpression25 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end

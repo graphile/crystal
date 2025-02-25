@@ -30,7 +30,7 @@ graph TD
     First12 --> PgSelectSingle14
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle14 --> Object15
-    PgClassExpression17{{"PgClassExpression[17∈2] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression17
 
     %% define steps
@@ -39,12 +39,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15, 17"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression17 bucket2
+    class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15,PgClassExpression17 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
     end
