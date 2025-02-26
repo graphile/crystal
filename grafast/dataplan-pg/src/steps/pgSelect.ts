@@ -73,6 +73,7 @@ import type {
   PgStmtCommonQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
+  ResolvedPgStmtCommonQueryInfo,
 } from "./pgStmt.js";
 import {
   applyCommonPaginationStuff,
@@ -2290,7 +2291,7 @@ export function getFragmentAndCodecFromOrder(
 
 function calculateOrderBySQL(params: {
   reverse: boolean;
-  orders: PgOrderSpec[];
+  orders: ReadonlyArray<PgOrderSpec>;
   alias: SQL;
   codec: PgCodec;
 }) {
@@ -2368,6 +2369,14 @@ interface MutablePgSelectQueryInfo<
   isOrderUnique: boolean;
   readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
   readonly meta: Record<string, any>;
+}
+
+interface ResolvedPgSelectQueryInfo<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends PgSelectQueryInfo<TResource>,
+    ResolvedPgStmtCommonQueryInfo {
+  readonly groups: ReadonlyArray<PgGroupSpec>;
+  readonly havingConditions: ReadonlyArray<SQL>;
 }
 
 function buildTheQueryCore<
@@ -3115,7 +3124,7 @@ function getOrderByDigest<
 }
 
 function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
-  info: MutablePgSelectQueryInfo<TResource>,
+  info: ResolvedPgSelectQueryInfo<TResource>,
   options: {
     withIdentifiers?: boolean;
     extraSelects?: SQL[];
@@ -3202,8 +3211,8 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
 
   function buildWhereOrHaving(
     whereOrHaving: SQL,
-    baseConditions: SQL[],
-    options: { extraWheres?: SQL[] } = Object.create(null),
+    baseConditions: ReadonlyArray<SQL>,
+    options: { extraWheres?: ReadonlyArray<SQL> } = Object.create(null),
   ) {
     const allConditions = options.extraWheres
       ? [...baseConditions, ...options.extraWheres]
@@ -3316,7 +3325,7 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
 }
 
 function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
-  info: MutablePgSelectQueryInfo<TResource>,
+  info: ResolvedPgSelectQueryInfo<TResource>,
   reverse: boolean,
 ) {
   const {
