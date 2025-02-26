@@ -1644,7 +1644,7 @@ export class PgSelectRowsStep<
   }
 
   public getClassStep(): PgSelectStep<TResource> {
-    return this.getDep<PgSelectStep<TResource>>(0);
+    return this.getDepOptions<PgSelectStep<TResource>>(0).step;
   }
 
   listItem(itemPlan: Step) {
