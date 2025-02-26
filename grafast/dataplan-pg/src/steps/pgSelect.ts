@@ -2370,9 +2370,9 @@ interface MutablePgSelectQueryInfo<
   readonly meta: Record<string, any>;
 }
 
-function buildTheQuery<
+function buildTheQueryCore<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
->(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
+>(rawInfo: Readonly<PgSelectQueryInfo<TResource>>) {
   const info: MutablePgSelectQueryInfo<TResource> = {
     ...rawInfo,
 
@@ -2620,6 +2620,54 @@ function buildTheQuery<
     // Now it's essentially a placeholder:
     handlePlaceholder({ ...identifierMatch, symbol, alreadyEncoded });
   }
+  const forceOrder = (stream && info.shouldReverseOrder) || false;
+
+  return {
+    queryValues,
+    count,
+    forceIdentity,
+    hasSideEffects,
+    identifiersAlias,
+    identifiersSymbol,
+    name,
+    forceOrder,
+    trueOrderBySQL,
+    info,
+    extraWheres,
+    cursorDigest,
+    cursorIndicies,
+    stream,
+    placeholderValues,
+    meta,
+    first,
+    last,
+    shouldReverseOrder,
+  };
+}
+function buildTheQuery<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+>(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
+  const {
+    queryValues,
+    count,
+    forceIdentity,
+    hasSideEffects,
+    identifiersAlias,
+    identifiersSymbol,
+    name,
+    forceOrder,
+    trueOrderBySQL,
+    info,
+    extraWheres,
+    cursorDigest,
+    cursorIndicies,
+    stream,
+    placeholderValues,
+    meta,
+    first,
+    last,
+    shouldReverseOrder,
+  } = buildTheQueryCore(rawInfo);
 
   const makeQuery = ({
     limit,
@@ -2634,7 +2682,6 @@ function buildTheQuery<
     rawSqlValues: SQLRawValue[];
     identifierIndex: number | null;
   } => {
-    const forceOrder = (stream && info.shouldReverseOrder) || false;
     if (
       queryValues.length > 0 ||
       (count !== 1 && (forceIdentity || hasSideEffects))
