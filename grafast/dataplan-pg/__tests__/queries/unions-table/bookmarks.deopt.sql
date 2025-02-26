@@ -4,9 +4,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -19,9 +19,9 @@ select
 from interfaces_and_unions.person_bookmarks as __person_bookmarks__
 where
   (
-    true /* authorization checks */
-  ) and (
     __person_bookmarks__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   )
 order by __person_bookmarks__."id" asc;
 
@@ -34,9 +34,9 @@ lateral (
   from interfaces_and_unions.people as __people__
   where
     (
-      true /* authorization checks */
-    ) and (
       __people__."person_id" = __people_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __people_result__;
 
@@ -47,9 +47,9 @@ select
 from interfaces_and_unions.posts as __posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __posts__."post_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -60,9 +60,9 @@ select
 from interfaces_and_unions.comments as __comments__
 where
   (
-    true /* authorization checks */
-  ) and (
     __comments__."comment_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -70,9 +70,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -80,9 +80,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -90,7 +90,7 @@ select
 from interfaces_and_unions.posts as __posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __posts__."post_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );

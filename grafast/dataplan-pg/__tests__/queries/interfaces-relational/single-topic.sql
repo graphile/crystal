@@ -4,9 +4,9 @@ select
 from interfaces_and_unions.relational_topics as __relational_topics__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_topics__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -20,7 +20,7 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );

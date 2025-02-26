@@ -28,10 +28,10 @@ select
 from app_public.messages as __messages__
 where
   (
-    __messages__.featured <> $1::"bool"
+    __messages__."forum_id" = $1::"uuid"
   ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
+    __messages__.featured <> $2::"bool"
   ) and (
-    __messages__."forum_id" = $3::"uuid"
+    (__messages__.archived_at is null) = ($3::"timestamptz" is null)
   )
 order by __messages__."id" asc;

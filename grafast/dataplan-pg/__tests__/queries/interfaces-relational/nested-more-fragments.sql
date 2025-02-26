@@ -25,9 +25,9 @@ lateral (
   from interfaces_and_unions.relational_items as __relational_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_items__."author_id" = __relational_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
   order by __relational_items__."id" asc
 ) as __relational_items_result__;
@@ -42,9 +42,9 @@ lateral (
   from interfaces_and_unions.relational_topics as __relational_topics__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_topics__."id" = __relational_topics_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_topics_result__;
 
@@ -65,9 +65,9 @@ lateral (
   from interfaces_and_unions.relational_items as __relational_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_items__."id" = __relational_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_items_result__;
 
@@ -80,9 +80,9 @@ lateral (
   from interfaces_and_unions.people as __people__
   where
     (
-      true /* authorization checks */
-    ) and (
       __people__."person_id" = __people_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __people_result__;
 
@@ -98,9 +98,9 @@ lateral (
   from interfaces_and_unions.relational_posts as __relational_posts__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_posts__."id" = __relational_posts_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_posts_result__;
 
@@ -115,9 +115,9 @@ lateral (
   from interfaces_and_unions.relational_dividers as __relational_dividers__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_dividers__."id" = __relational_dividers_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_dividers_result__;
 
@@ -127,9 +127,9 @@ select
 from interfaces_and_unions.relational_checklists as __relational_checklists__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_checklists__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select __relational_checklist_items_result__.*
@@ -142,9 +142,9 @@ lateral (
   from interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_checklist_items__."id" = __relational_checklist_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_checklist_items_result__;
 
@@ -156,9 +156,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select __relational_checklists_result__.*
@@ -171,8 +171,8 @@ lateral (
   from interfaces_and_unions.relational_checklists as __relational_checklists__
   where
     (
-      true /* authorization checks */
-    ) and (
       __relational_checklists__."id" = __relational_checklists_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __relational_checklists_result__;

@@ -11,9 +11,9 @@ select
 from interfaces_and_unions.single_table_items as __single_table_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __single_table_items__."id" = $1::"int4"
   ) and (
     __single_table_items__."type" = $2::interfaces_and_unions.item_type
+  ) and (
+    true /* authorization checks */
   );

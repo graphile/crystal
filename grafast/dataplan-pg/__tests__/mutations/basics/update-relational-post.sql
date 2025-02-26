@@ -10,9 +10,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -28,9 +28,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -39,9 +39,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "note" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
@@ -56,9 +56,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -74,9 +74,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -85,9 +85,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
@@ -102,9 +102,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -120,9 +120,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -131,9 +131,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning

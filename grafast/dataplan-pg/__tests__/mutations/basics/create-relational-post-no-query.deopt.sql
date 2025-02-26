@@ -16,9 +16,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -27,9 +27,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -38,9 +38,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -51,9 +51,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -64,9 +64,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 insert into interfaces_and_unions.relational_items as __relational_items__ ("type", "author_id") values ($1::interfaces_and_unions.item_type, $2::"int4") returning
@@ -81,9 +81,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -92,9 +92,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -103,9 +103,9 @@ select
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -116,9 +116,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -129,9 +129,9 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -142,7 +142,7 @@ select
 from interfaces_and_unions.relational_posts as __relational_posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __relational_posts__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
