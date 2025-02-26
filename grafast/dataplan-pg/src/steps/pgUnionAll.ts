@@ -1096,7 +1096,7 @@ export class PgUnionAllRowsStep<
     this.addDependency($pgUnionAll);
   }
   public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
-    return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
+    return this.getDepOptions<PgUnionAllStep<TAttributes, TTypeNames>>(0).step;
   }
 
   listItem(itemPlan: Step) {

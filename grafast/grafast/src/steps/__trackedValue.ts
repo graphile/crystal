@@ -166,7 +166,7 @@ export class __TrackedValueStep<
   }
 
   private getValuePlan() {
-    return this.getDep<__ValueStep<TData> | AccessStep<TData>>(0);
+    return this.getDep<__ValueStep<TData> | AccessStep<TData>>(0, true);
   }
 
   /**

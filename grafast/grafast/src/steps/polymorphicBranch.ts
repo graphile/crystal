@@ -54,7 +54,7 @@ export class PolymorphicBranchStep<TStep extends Step>
 
   planForType(objectType: GraphQLObjectType): Step {
     const matcher = this.matchers[objectType.name];
-    const $step = this.getDep<TStep>(0);
+    const $step = this.getDep<TStep>(0, true);
     if (matcher) {
       if (typeof matcher.plan === "function") {
         return matcher.plan($step);

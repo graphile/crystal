@@ -186,7 +186,7 @@ export class ConnectionStep<
     });
   }
   public getBefore(): TCursorStep | null {
-    return this.maybeGetDep<TCursorStep>(this._beforeDepId);
+    return this.maybeGetDep<TCursorStep>(this._beforeDepId, true);
   }
   public setBefore($beforePlan: Step<string | null | undefined>) {
     if ($beforePlan instanceof ConstantStep && $beforePlan.data == null) {
@@ -203,7 +203,7 @@ export class ConnectionStep<
     });
   }
   public getAfter(): TCursorStep | null {
-    return this.maybeGetDep<TCursorStep>(this._afterDepId);
+    return this.maybeGetDep<TCursorStep>(this._afterDepId, true);
   }
   public setAfter($afterPlan: Step<string | null | undefined>) {
     if ($afterPlan instanceof ConstantStep && $afterPlan.data == null) {

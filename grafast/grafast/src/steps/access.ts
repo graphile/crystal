@@ -160,12 +160,12 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
   }
 
   toStringMeta(): string {
-    return `${chalk.bold.yellow(String(this.getDep(0).id))}.${this.path
-      .map((p) => String(p))
-      .join(".")}`;
+    return `${chalk.bold.yellow(
+      String(this.getDepOptions(0).step.id),
+    )}.${this.path.map((p) => String(p)).join(".")}`;
   }
 
-  getParentStep(): Step {
+  getParentStep() {
     return this.getDep(0);
   }
 

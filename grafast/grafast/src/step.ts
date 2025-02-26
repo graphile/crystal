@@ -20,6 +20,7 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   AddDependencyOptions,
+  DependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   ExecutionResults,
@@ -36,7 +37,7 @@ import {
   ALL_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
 } from "./interfaces.js";
-import type { __ItemStep } from "./steps/index.js";
+import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
 
 /**
@@ -167,8 +168,11 @@ export /* abstract */ class Step<TData = any> {
   /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
+   *
+   * @internal
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  /** @internal */
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
@@ -347,25 +351,49 @@ export /* abstract */ class Step<TData = any> {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDepOptions(depId: number): AddDependencyOptions {
-    const step = this.dependencies[depId];
+  protected getDepOptions<TStep extends Step = Step>(
+    depId: number,
+  ): DependencyOptions<TStep> {
+    const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject };
   }
 
-  protected getDep<T extends Step = Step>(_depId: number): T {
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+  ): TStep | __FlagStep<TStep>;
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+    throwOnFlagged: true,
+  ): TStep;
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+    _throwOnFlagged = false,
+  ): TStep | __FlagStep<TStep> {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
     // just put the code here, but since we're not we have to avoid the
     // circular dependency.
     throw new Error(`Grafast failed to load correctly`);
   }
 
-  protected maybeGetDep<T extends Step = Step>(
+  protected maybeGetDep<TStep extends Step = Step>(
     depId: number | null | undefined,
-  ): T | null {
-    return depId == null ? null : this.getDep<T>(depId);
+  ): TStep | __FlagStep<TStep> | null;
+  protected maybeGetDep<TStep extends Step = Step>(
+    depId: number | null | undefined,
+    throwOnFlagged: true,
+  ): TStep | null;
+  protected maybeGetDep<TStep extends Step = Step>(
+    depId: number | null | undefined,
+    throwOnFlagged = false,
+  ): TStep | __FlagStep<TStep> | null {
+    return depId == null
+      ? null
+      : throwOnFlagged
+      ? this.getDep<TStep>(depId, true)
+      : this.getDep<TStep>(depId);
   }
 
   protected getDepOrConstant<TData = any>(

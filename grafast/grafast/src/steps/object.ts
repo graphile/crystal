@@ -97,10 +97,15 @@ export class ObjectStep<
     this.addDependency({ step: plan, skipDeduplication: true });
   }
 
+  getStepForKey<TKey extends keyof TPlans>(key: TKey): TPlans[TKey];
+  getStepForKey<TKey extends keyof TPlans>(
+    key: TKey,
+    allowMissing: true,
+  ): TPlans[TKey] | null;
   getStepForKey<TKey extends keyof TPlans>(
     key: TKey,
     allowMissing = false,
-  ): TKey extends keyof TPlans ? TPlans[TKey] : null {
+  ): TPlans[TKey] | null {
     const idx = this.keys.indexOf(key as string);
     if (idx < 0) {
       if (!allowMissing) {
@@ -110,9 +115,9 @@ export class ObjectStep<
           )}' - we have no such key`,
         );
       }
-      return null as any;
+      return null;
     }
-    return this.getDep(idx) as any;
+    return this.getDepOptions<TPlans[TKey]>(idx).step;
   }
 
   toStringMeta(): string {
@@ -316,7 +321,7 @@ ${inner}
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getDep<TPlans[TKey]>(index);
+    return this.getDepOptions<TPlans[TKey]>(index).step;
   }
 }
 

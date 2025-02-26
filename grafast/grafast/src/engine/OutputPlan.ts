@@ -466,7 +466,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
       if (expressionDetails !== undefined) {
         // @ts-ignore
-        const $parent: Step = $root.getDep(0);
+        const { step: $parent } = $root.getDepOptions(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,

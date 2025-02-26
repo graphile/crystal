@@ -82,12 +82,13 @@ export class PgPolymorphicStep<
     }) as any;
   }
 
-  itemPlan(): TItemStep {
-    return this.getDep<any>(this.itemStepId);
+  private itemPlan(): TItemStep {
+    return this.getDepOptions<TItemStep>(this.itemStepId).step;
   }
 
-  typeSpecifierPlan(): TTypeSpecifierStep {
-    return this.getDep<TTypeSpecifierStep>(this.typeSpecifierStepId);
+  private typeSpecifierPlan(): TTypeSpecifierStep {
+    return this.getDepOptions<TTypeSpecifierStep>(this.typeSpecifierStepId)
+      .step;
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
@@ -101,7 +102,9 @@ export class PgPolymorphicStep<
         ).join("', '")}'`,
       );
     }
-    return spec.plan(this.typeSpecifierPlan(), this.itemPlan());
+    const $typeSpecifier = this.typeSpecifierPlan();
+    const $item = this.itemPlan();
+    return spec.plan($typeSpecifier, $item);
   }
 
   private getTypeNameFromSpecifier(specifier: TTypeSpecifier) {
