@@ -3114,19 +3114,15 @@ function getOrderByDigest<
   return digest;
 }
 
-function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
+function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
-    asJsonAgg?: boolean;
     withIdentifiers?: boolean;
     extraSelects?: SQL[];
     extraWheres?: SQL[];
     forceOrder?: boolean;
   } = Object.create(null),
-): {
-  sql: SQL;
-  extraSelectIndexes: number[];
-} {
+) {
   const { alias, resource, selects: baseSelects, _symbolSubstitutes } = info;
   function buildSelect(
     options: {
@@ -3271,6 +3267,44 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
     options.forceOrder ? false : info.shouldReverseOrder,
   );
   const { sql: limitAndOffset } = buildLimitAndOffset();
+
+  return {
+    select,
+    from,
+    join,
+    where,
+    groupBy,
+    having,
+    orderBy,
+    limitAndOffset,
+    extraSelectIndexes,
+  };
+}
+
+function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
+  info: MutablePgSelectQueryInfo<TResource>,
+  options: {
+    asJsonAgg?: boolean;
+    withIdentifiers?: boolean;
+    extraSelects?: SQL[];
+    extraWheres?: SQL[];
+    forceOrder?: boolean;
+  } = Object.create(null),
+): {
+  sql: SQL;
+  extraSelectIndexes: number[];
+} {
+  const {
+    select,
+    from,
+    join,
+    where,
+    groupBy,
+    having,
+    orderBy,
+    limitAndOffset,
+    extraSelectIndexes,
+  } = buildQueryParts(info, options);
 
   const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   const query = options.asJsonAgg
