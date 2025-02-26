@@ -1488,7 +1488,7 @@ export class OperationPlan {
             labelStepId: streamDetails.label.id,
           }
         : undefined;
-      const $__item = this.itemStepForListStep(
+      let $__item = this.itemStepForListStep(
         parentLayerPlan,
         $list,
         listDepth,
@@ -1496,7 +1496,7 @@ export class OperationPlan {
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
-        const $item = isListCapableStep($list)
+        let $item = isListCapableStep($list)
           ? withGlobalLayerPlan(
               $__item.layerPlan,
               $__item.polymorphicPaths,
@@ -1505,6 +1505,12 @@ export class OperationPlan {
               $__item,
             )
           : $__item;
+
+        this.deduplicateSteps();
+        // Refetch steps following deduplicate
+        $__item = this.stepTracker.getStepById<typeof $__item>($__item.id);
+        $item = this.stepTracker.getStepById<typeof $item>($item.id);
+
         this.planIntoOutputPlan(
           listOutputPlan,
           $item.layerPlan,
