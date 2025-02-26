@@ -1,44 +1,4 @@
 select
-  ("c"."person_optional_missing_middle_1"(
-    __person__,
-    $1::"int4",
-    "c" := $2::"int4"
-  ))::text as "0",
-  ("c"."person_optional_missing_middle_1"(
-    __person__,
-    $3::"int4",
-    $4::"int4",
-    $5::"int4"
-  ))::text as "1",
-  ("c"."person_optional_missing_middle_2"(
-    __person__,
-    $6::"int4",
-    "c" := $7::"int4"
-  ))::text as "2",
-  ("c"."person_optional_missing_middle_3"(
-    __person__,
-    $8::"int4",
-    "c" := $9::"int4"
-  ))::text as "3",
-  ("c"."person_optional_missing_middle_4"(
-    __person__,
-    $10::"int4",
-    $11::"int4",
-    $12::"int4"
-  ))::text as "4",
-  ("c"."person_optional_missing_middle_5"(
-    __person__,
-    $13::"int4",
-    $14::"int4",
-    $15::"int4"
-  ))::text as "5",
-  __person__."id"::text as "6"
-from "c"."person" as __person__
-where (
-  __person__."id" = $16::"int4"
-);
-
-select
   case when (__types__."compound_type") is not distinct from null then null::text else json_build_array((((__types__."compound_type")."a"))::text, ((__types__."compound_type")."b"), (((__types__."compound_type")."c"))::text, ((__types__."compound_type")."d"), (((__types__."compound_type")."e"))::text, (((__types__."compound_type")."f"))::text, to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."compound_type")."foo_bar"))::text)::text end as "0",
   case when (__types__."nested_compound_type") is not distinct from null then null::text else json_build_array(case when (((__types__."nested_compound_type")."a")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."a"))."a"))::text, ((((__types__."nested_compound_type")."a"))."b"), (((((__types__."nested_compound_type")."a"))."c"))::text, ((((__types__."nested_compound_type")."a"))."d"), (((((__types__."nested_compound_type")."a"))."e"))::text, (((((__types__."nested_compound_type")."a"))."f"))::text, to_char(((((__types__."nested_compound_type")."a"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."a"))."foo_bar"))::text)::text end, case when (((__types__."nested_compound_type")."b")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."b"))."a"))::text, ((((__types__."nested_compound_type")."b"))."b"), (((((__types__."nested_compound_type")."b"))."c"))::text, ((((__types__."nested_compound_type")."b"))."d"), (((((__types__."nested_compound_type")."b"))."e"))::text, (((((__types__."nested_compound_type")."b"))."f"))::text, to_char(((((__types__."nested_compound_type")."b"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."b"))."foo_bar"))::text)::text end, (((__types__."nested_compound_type")."baz_buz"))::text)::text end as "1",
   case when (__types__."nullable_compound_type") is not distinct from null then null::text else json_build_array((((__types__."nullable_compound_type")."a"))::text, ((__types__."nullable_compound_type")."b"), (((__types__."nullable_compound_type")."c"))::text, ((__types__."nullable_compound_type")."d"), (((__types__."nullable_compound_type")."e"))::text, (((__types__."nullable_compound_type")."f"))::text, to_char(((__types__."nullable_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."nullable_compound_type")."foo_bar"))::text)::text end as "2",
@@ -102,6 +62,46 @@ select
   __edge_case__."wont_cast_easy"::text as "1",
   "c"."edge_case_computed"(__edge_case__) as "2"
 from "c"."edge_case" as __edge_case__;
+
+select
+  ("c"."person_optional_missing_middle_1"(
+    __person__,
+    $1::"int4",
+    "c" := $2::"int4"
+  ))::text as "0",
+  ("c"."person_optional_missing_middle_1"(
+    __person__,
+    $3::"int4",
+    $4::"int4",
+    $5::"int4"
+  ))::text as "1",
+  ("c"."person_optional_missing_middle_2"(
+    __person__,
+    $6::"int4",
+    "c" := $7::"int4"
+  ))::text as "2",
+  ("c"."person_optional_missing_middle_3"(
+    __person__,
+    $8::"int4",
+    "c" := $9::"int4"
+  ))::text as "3",
+  ("c"."person_optional_missing_middle_4"(
+    __person__,
+    $10::"int4",
+    $11::"int4",
+    $12::"int4"
+  ))::text as "4",
+  ("c"."person_optional_missing_middle_5"(
+    __person__,
+    $13::"int4",
+    $14::"int4",
+    $15::"int4"
+  ))::text as "5",
+  __person__."id"::text as "6"
+from "c"."person" as __person__
+where (
+  __person__."id" = $16::"int4"
+);
 
 select __frmcdc_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,

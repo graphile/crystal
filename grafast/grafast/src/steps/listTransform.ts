@@ -10,7 +10,11 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { ConnectionCapableStep, ExecutionDetails } from "../index.js";
+import type {
+  __FlagStep,
+  ConnectionCapableStep,
+  ExecutionDetails,
+} from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
 import { $$deepDepSkip } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
@@ -186,7 +190,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep<TListStep>(this.rawListStepDepId);
+    return this.getDepOptions<TListStep>(this.rawListStepDepId).step;
   }
 
   [$$deepDepSkip]() {

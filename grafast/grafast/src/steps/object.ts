@@ -112,7 +112,7 @@ export class ObjectStep<
       }
       return null as any;
     }
-    return this.getDep(idx) as any;
+    return this.getDepOptions(idx).step as any;
   }
 
   toStringMeta(): string {
@@ -316,7 +316,7 @@ ${inner}
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getDep<TPlans[TKey]>(index);
+    return this.getDepOptions<TPlans[TKey]>(index).step;
   }
 }
 

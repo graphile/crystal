@@ -137,9 +137,9 @@ select
 from unnest("b"."compound_type_array_mutation"($1::"c"."compound_type")) as __compound_type_array_mutation__;
 
 select
-  __table_mutation__."headline" as "0",
-  __table_mutation__."author_id"::text as "1",
-  __table_mutation__."id"::text as "2"
+  __table_mutation__."id"::text as "0",
+  __table_mutation__."headline" as "1",
+  __table_mutation__."author_id"::text as "2"
 from "c"."table_mutation"($1::"int4") as __table_mutation__;
 
 select
@@ -160,27 +160,10 @@ where (
 order by __post__."id" asc;
 
 select
-  __table_mutation__."headline" as "0",
-  __table_mutation__."author_id"::text as "1",
-  __table_mutation__."id"::text as "2"
+  __table_mutation__."id"::text as "0",
+  __table_mutation__."headline" as "1",
+  __table_mutation__."author_id"::text as "2"
 from "c"."table_mutation"($1::"int4") as __table_mutation__;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-);
-
-select
-  __post__."id"::text as "0",
-  __post__."headline" as "1"
-from "a"."post" as __post__
-where (
-  __post__."id" = $1::"int4"
-)
-order by __post__."id" asc;
 
 select
   __table_set_mutation__."person_full_name" as "0"

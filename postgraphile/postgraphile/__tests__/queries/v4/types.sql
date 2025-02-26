@@ -60,6 +60,10 @@ from "b"."types" as __types__
 order by __types__."id" asc;
 
 select
+  (count(*))::text as "0"
+from "b"."types" as __types__;
+
+select
   __types__."id"::text as "0",
   __types__."smallint"::text as "1",
   __types__."bigint"::text as "2",
@@ -243,217 +247,6 @@ select
 from unnest("b"."type_function_list"()) as __type_function_list__;
 
 select
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0",
-  __person__."id"::text as "1"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-);
-
-select
-  __post__."id"::text as "0",
-  __post__."headline" as "1"
-from "a"."post" as __post__
-where (
-  __post__."id" = $1::"int4"
-);
-
-select
-  __types__."id"::text as "0",
-  __types__."smallint"::text as "1",
-  __types__."bigint"::text as "2",
-  __types__."numeric"::text as "3",
-  __types__."decimal"::text as "4",
-  __types__."boolean"::text as "5",
-  __types__."varchar" as "6",
-  __types__."enum"::text as "7",
-  __types__."enum_array"::text as "8",
-  __types__."domain"::text as "9",
-  __types__."domain2"::text as "10",
-  __types__."text_array"::text as "11",
-  __types__."json"::text as "12",
-  __types__."jsonb"::text as "13",
-  __types__."nullable_range"::text as "14",
-  __types__."numrange"::text as "15",
-  json_build_array(
-    lower_inc(__types__."daterange"),
-    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
-    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
-  )::text as "16",
-  __types__."an_int_range"::text as "17",
-  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
-  to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
-  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
-  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry__
-  )::text as "24",
-  __types__."money"::numeric::text as "25",
-  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array((((__types__."compound_type")."a"))::text, ((__types__."compound_type")."b"), (((__types__."compound_type")."c"))::text, ((__types__."compound_type")."d"), (((__types__."compound_type")."e"))::text, (((__types__."compound_type")."f"))::text, to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."compound_type")."foo_bar"))::text)::text end as "26",
-  case when (__types__."nested_compound_type") is not distinct from null then null::text else json_build_array(case when (((__types__."nested_compound_type")."a")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."a"))."a"))::text, ((((__types__."nested_compound_type")."a"))."b"), (((((__types__."nested_compound_type")."a"))."c"))::text, ((((__types__."nested_compound_type")."a"))."d"), (((((__types__."nested_compound_type")."a"))."e"))::text, (((((__types__."nested_compound_type")."a"))."f"))::text, to_char(((((__types__."nested_compound_type")."a"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."a"))."foo_bar"))::text)::text end, case when (((__types__."nested_compound_type")."b")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."b"))."a"))::text, ((((__types__."nested_compound_type")."b"))."b"), (((((__types__."nested_compound_type")."b"))."c"))::text, ((((__types__."nested_compound_type")."b"))."d"), (((((__types__."nested_compound_type")."b"))."e"))::text, (((((__types__."nested_compound_type")."b"))."f"))::text, to_char(((((__types__."nested_compound_type")."b"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."b"))."foo_bar"))::text)::text end, (((__types__."nested_compound_type")."baz_buz"))::text)::text end as "27",
-  case when (__types__."nullable_compound_type") is not distinct from null then null::text else json_build_array((((__types__."nullable_compound_type")."a"))::text, ((__types__."nullable_compound_type")."b"), (((__types__."nullable_compound_type")."c"))::text, ((__types__."nullable_compound_type")."d"), (((__types__."nullable_compound_type")."e"))::text, (((__types__."nullable_compound_type")."f"))::text, to_char(((__types__."nullable_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."nullable_compound_type")."foo_bar"))::text)::text end as "28",
-  case when (__types__."nullable_nested_compound_type") is not distinct from null then null::text else json_build_array(case when (((__types__."nullable_nested_compound_type")."a")) is not distinct from null then null::text else json_build_array((((((__types__."nullable_nested_compound_type")."a"))."a"))::text, ((((__types__."nullable_nested_compound_type")."a"))."b"), (((((__types__."nullable_nested_compound_type")."a"))."c"))::text, ((((__types__."nullable_nested_compound_type")."a"))."d"), (((((__types__."nullable_nested_compound_type")."a"))."e"))::text, (((((__types__."nullable_nested_compound_type")."a"))."f"))::text, to_char(((((__types__."nullable_nested_compound_type")."a"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nullable_nested_compound_type")."a"))."foo_bar"))::text)::text end, case when (((__types__."nullable_nested_compound_type")."b")) is not distinct from null then null::text else json_build_array((((((__types__."nullable_nested_compound_type")."b"))."a"))::text, ((((__types__."nullable_nested_compound_type")."b"))."b"), (((((__types__."nullable_nested_compound_type")."b"))."c"))::text, ((((__types__."nullable_nested_compound_type")."b"))."d"), (((((__types__."nullable_nested_compound_type")."b"))."e"))::text, (((((__types__."nullable_nested_compound_type")."b"))."f"))::text, to_char(((((__types__."nullable_nested_compound_type")."b"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nullable_nested_compound_type")."b"))."foo_bar"))::text)::text end, (((__types__."nullable_nested_compound_type")."baz_buz"))::text)::text end as "29",
-  __types__."point"::text as "30",
-  __types__."nullablePoint"::text as "31",
-  __types__."inet"::text as "32",
-  __types__."cidr"::text as "33",
-  __types__."macaddr"::text as "34",
-  __types__."regproc"::text as "35",
-  __types__."regprocedure"::text as "36",
-  __types__."regoper"::text as "37",
-  __types__."regoperator"::text as "38",
-  __types__."regclass"::text as "39",
-  __types__."regtype"::text as "40",
-  __types__."regconfig"::text as "41",
-  __types__."regdictionary"::text as "42",
-  __types__."text_array_domain"::text as "43",
-  __types__."int8_array_domain"::text as "44",
-  __types__."bytea"::text as "45",
-  __types__."bytea_array"::text as "46",
-  __types__."ltree"::text as "47",
-  __types__."ltree_array"::text as "48",
-  array(
-    select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry_2
-  )::text as "49"
-from "b"."types" as __types__
-order by __types__."id" asc;
-
-select
-  (count(*))::text as "0"
-from "b"."types" as __types__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
-
-select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
-lateral (
-  select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
-  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
-) as __frmcdc_nested_compound_type_result__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
-
-select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
-lateral (
-  select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
-  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
-) as __frmcdc_nested_compound_type_result__;
-
-select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-) as __post_result__;
-
-select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
-lateral (
-  select
-    __post__."id"::text as "0",
-    __post__."headline" as "1",
-    __post_identifiers__.idx as "2"
-  from "a"."post" as __post__
-  where (
-    __post__."id" = __post_identifiers__."id0"
-  )
-) as __post_result__;
-
-select
-  __frmcdc_compound_type__."a"::text as "0",
-  __frmcdc_compound_type__."b" as "1",
-  __frmcdc_compound_type__."c"::text as "2",
-  __frmcdc_compound_type__."d" as "3",
-  __frmcdc_compound_type__."e"::text as "4",
-  __frmcdc_compound_type__."f"::text as "5",
-  __frmcdc_compound_type__."foo_bar"::text as "6",
-  (not (__frmcdc_compound_type__ is null))::text as "7"
-from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
-
-select
-  case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-  case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "3"
-from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__;
-
-select
-  __frmcdc_compound_type__."a"::text as "0",
-  __frmcdc_compound_type__."b" as "1",
-  __frmcdc_compound_type__."c"::text as "2",
-  __frmcdc_compound_type__."d" as "3",
-  __frmcdc_compound_type__."e"::text as "4",
-  __frmcdc_compound_type__."f"::text as "5",
-  __frmcdc_compound_type__."foo_bar"::text as "6",
-  (not (__frmcdc_compound_type__ is null))::text as "7"
-from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
-
-select
-  case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-  case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "3"
-from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__;
-
-select
-  __post__."id"::text as "0",
-  __post__."headline" as "1"
-from "a"."post" as __post__
-where (
-  __post__."id" = $1::"int4"
-);
-
-select
   __type_function_connection__."id"::text as "0",
   __type_function_connection__."smallint"::text as "1",
   __type_function_connection__."bigint"::text as "2",
@@ -521,6 +314,66 @@ from "b"."type_function_connection"() as __type_function_connection__;
 select
   (count(*))::text as "0"
 from "b"."type_function_connection"() as __type_function_connection__;
+
+select
+  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0",
+  __person__."id"::text as "1"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
+
+select
+  __post__."id"::text as "0",
+  __post__."headline" as "1"
+from "a"."post" as __post__
+where (
+  __post__."id" = $1::"int4"
+);
+
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select
+  case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
+  case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
+  __frmcdc_nested_compound_type__."baz_buz"::text as "2",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "3"
+from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__;
+
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select
+  case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
+  case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
+  __frmcdc_nested_compound_type__."baz_buz"::text as "2",
+  (not (__frmcdc_nested_compound_type__ is null))::text as "3"
+from (select ($1::"b"."nested_compound_type").*) as __frmcdc_nested_compound_type__;
+
+select
+  __post__."id"::text as "0",
+  __post__."headline" as "1"
+from "a"."post" as __post__
+where (
+  __post__."id" = $1::"int4"
+);
 
 select
   __person_type_function__."id"::text as "0",
@@ -771,11 +624,7 @@ select
   __types__."bytea"::text as "45",
   __types__."bytea_array"::text as "46",
   __types__."ltree"::text as "47",
-  __types__."ltree_array"::text as "48",
-  array(
-    select to_char(__entry_2, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry_2
-  )::text as "49"
+  __types__."ltree_array"::text as "48"
 from "b"."types" as __types__
 where (
   __types__."smallint" = $1::"int2"
@@ -789,6 +638,110 @@ where (
   __types__."smallint" = $1::"int2"
 );
 
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select
+  __frmcdc_compound_type__."a"::text as "0",
+  __frmcdc_compound_type__."b" as "1",
+  __frmcdc_compound_type__."c"::text as "2",
+  __frmcdc_compound_type__."d" as "3",
+  __frmcdc_compound_type__."e"::text as "4",
+  __frmcdc_compound_type__."f"::text as "5",
+  __frmcdc_compound_type__."foo_bar"::text as "6",
+  (not (__frmcdc_compound_type__ is null))::text as "7"
+from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
+
+select __frmcdc_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+lateral (
+  select
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
+
+select __frmcdc_nested_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+lateral (
+  select
+    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
+    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
+    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+) as __frmcdc_nested_compound_type_result__;
+
+select __frmcdc_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+lateral (
+  select
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_identifiers__.idx as "8"
+  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
+) as __frmcdc_compound_type_result__;
+
+select __frmcdc_nested_compound_type_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+lateral (
+  select
+    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
+    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
+    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+  from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+) as __frmcdc_nested_compound_type_result__;
+
+select __post_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+) as __post_result__;
+
+select __post_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+) as __post_result__;
+
 select __frmcdc_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
 lateral (
@@ -820,25 +773,3 @@ lateral (
     __frmcdc_compound_type_identifiers__.idx as "8"
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
-
-select
-  __frmcdc_compound_type__."a"::text as "0",
-  __frmcdc_compound_type__."b" as "1",
-  __frmcdc_compound_type__."c"::text as "2",
-  __frmcdc_compound_type__."d" as "3",
-  __frmcdc_compound_type__."e"::text as "4",
-  __frmcdc_compound_type__."f"::text as "5",
-  __frmcdc_compound_type__."foo_bar"::text as "6",
-  (not (__frmcdc_compound_type__ is null))::text as "7"
-from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
-
-select
-  __frmcdc_compound_type__."a"::text as "0",
-  __frmcdc_compound_type__."b" as "1",
-  __frmcdc_compound_type__."c"::text as "2",
-  __frmcdc_compound_type__."d" as "3",
-  __frmcdc_compound_type__."e"::text as "4",
-  __frmcdc_compound_type__."f"::text as "5",
-  __frmcdc_compound_type__."foo_bar"::text as "6",
-  (not (__frmcdc_compound_type__ is null))::text as "7"
-from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;

@@ -9,15 +9,24 @@ graph TD
 
 
     %% plan dependencies
-    Connection26{{"Connection[26∈0] ➊<br />ᐸ21ᐳ"}}:::plan
-    Connection36{{"Connection[36∈0] ➊<br />ᐸ33ᐳ"}}:::plan
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Connection24{{"Connection[24∈0] ➊<br />ᐸ21ᐳ"}}:::plan
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸperson_friends(aggregate)ᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
-    Object10 & Constant42 --> PgSelect7
+    PgFromExpression23{{"PgFromExpression[23∈0] ➊"}}:::plan
+    Object10 & PgFromExpression23 & Connection24 --> PgSelect25
+    Connection34{{"Connection[34∈0] ➊<br />ᐸ31ᐳ"}}:::plan
+    PgSelect35[["PgSelect[35∈0] ➊<br />ᐸperson_friends(aggregate)ᐳ"]]:::plan
+    Object10 & PgFromExpression23 & Connection34 --> PgSelect35
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    Object10 & Constant40 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    List16{{"List[16∈0] ➊<br />ᐸ14,15ᐳ"}}:::plan
+    Constant14{{"Constant[14∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈0] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant14 & PgClassExpression15 --> List16
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -27,49 +36,36 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant14{{"Constant[14∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect27[["PgSelect[27∈1] ➊<br />ᐸperson_friends(aggregate)ᐳ"]]:::plan
-    PgFromExpression25{{"PgFromExpression[25∈1] ➊"}}:::plan
-    Object10 & PgFromExpression25 & Connection26 --> PgSelect27
-    PgSelect37[["PgSelect[37∈1] ➊<br />ᐸperson_friends(aggregate)ᐳ"]]:::plan
-    Object10 & PgFromExpression25 & Connection36 --> PgSelect37
-    List16{{"List[16∈1] ➊<br />ᐸ14,15ᐳ"}}:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant14 & PgClassExpression15 --> List16
     PgSelectSingle13 --> PgClassExpression15
-    Lambda17{{"Lambda[17∈1] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List16 --> Lambda17
-    PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈0] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression18
-    PgClassExpression20{{"PgClassExpression[20∈1] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈0] ➊<br />ᐸ__person__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression20
-    PgClassExpression20 --> PgFromExpression25
-    First28{{"First[28∈1] ➊"}}:::plan
-    PgSelectRows29[["PgSelectRows[29∈1] ➊"]]:::plan
-    PgSelectRows29 --> First28
-    PgSelect27 --> PgSelectRows29
-    PgSelectSingle30{{"PgSelectSingle[30∈1] ➊<br />ᐸperson_friendsᐳ"}}:::plan
-    First28 --> PgSelectSingle30
-    PgClassExpression31{{"PgClassExpression[31∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    First38{{"First[38∈1] ➊"}}:::plan
-    PgSelectRows39[["PgSelectRows[39∈1] ➊"]]:::plan
-    PgSelectRows39 --> First38
-    PgSelect37 --> PgSelectRows39
-    PgSelectSingle40{{"PgSelectSingle[40∈1] ➊<br />ᐸperson_friendsᐳ"}}:::plan
-    First38 --> PgSelectSingle40
-    PgClassExpression41{{"PgClassExpression[41∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression41
+    PgClassExpression20 --> PgFromExpression23
+    First26{{"First[26∈0] ➊"}}:::plan
+    PgSelectRows27[["PgSelectRows[27∈0] ➊"]]:::plan
+    PgSelectRows27 --> First26
+    PgSelect25 --> PgSelectRows27
+    PgSelectSingle28{{"PgSelectSingle[28∈0] ➊<br />ᐸperson_friendsᐳ"}}:::plan
+    First26 --> PgSelectSingle28
+    PgClassExpression29{{"PgClassExpression[29∈0] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression29
+    First36{{"First[36∈0] ➊"}}:::plan
+    PgSelectRows37[["PgSelectRows[37∈0] ➊"]]:::plan
+    PgSelectRows37 --> First36
+    PgSelect35 --> PgSelectRows37
+    PgSelectSingle38{{"PgSelectSingle[38∈0] ➊<br />ᐸperson_friendsᐳ"}}:::plan
+    First36 --> PgSelectSingle38
+    PgClassExpression39{{"PgClassExpression[39∈0] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle38 --> PgClassExpression39
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/v4/longAliases"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 14, 19, 42, 10, 26, 36<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 14, 19, 40, 10, 24, 34<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 15, 16, 17, 18, 20, 23<br />4: PgSelect[25], PgSelect[35]<br />5: PgSelectRows[27], PgSelectRows[37]<br />ᐳ: 26, 28, 29, 36, 38, 39"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant14,Connection26,Connection36,Constant42 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 10, 26, 36<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]<br />1: <br />ᐳ: 15, 18, 20, 16, 17, 25<br />2: PgSelect[27], PgSelect[37]<br />3: PgSelectRows[29], PgSelectRows[39]<br />ᐳ: 28, 30, 31, 38, 40, 41"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,List16,Lambda17,PgClassExpression18,PgClassExpression20,PgFromExpression25,PgSelect27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,PgSelect37,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41 bucket1
-    Bucket0 --> Bucket1
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,PgClassExpression20,PgFromExpression23,Connection24,PgSelect25,First26,PgSelectRows27,PgSelectSingle28,PgClassExpression29,Connection34,PgSelect35,First36,PgSelectRows37,PgSelectSingle38,PgClassExpression39,Constant40 bucket0
     end

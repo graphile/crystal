@@ -35,9 +35,9 @@ graph TD
     __Item15 ==> __Item18
     PgSelectSingle19{{"PgSelectSingle[19∈4]<br />ᐸrandom_user_array_setᐳ"}}:::plan
     __Item18 --> PgSelectSingle19
-    PgClassExpression20{{"PgClassExpression[20∈5]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈5]<br />ᐸ__random_u...vatar_url”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈4]<br />ᐸ__random_u...vatar_url”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression21
 
     %% define steps
@@ -54,11 +54,7 @@ graph TD
     class Bucket2,__Item15 bucket2
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ15ᐳ[18]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item18,PgSelectSingle19 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgSelectSingle{4}ᐸrandom_user_array_setᐳ[19]"):::bucket
-    classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression20,PgClassExpression21 bucket5
+    class Bucket4,__Item18,PgSelectSingle19,PgClassExpression20,PgClassExpression21 bucket4
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket4
-    Bucket4 --> Bucket5
     end

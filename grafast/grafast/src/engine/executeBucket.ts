@@ -1032,7 +1032,6 @@ export function executeBucket(
 
     loop: for (const childLayerPlan of childLayerPlans) {
       switch (childLayerPlan.reason.type) {
-        case "nullableBoundary":
         case "listItem":
         case "polymorphic": {
           const childBucket = childLayerPlan.newBucket(bucket);

@@ -25,33 +25,14 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸrange_testᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__range_test__.”num”ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__range_test__.”num”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    Access15{{"Access[15∈2] ➊<br />ᐸ14.startᐳ"}}:::plan
-    PgClassExpression14 --> Access15
-    Access18{{"Access[18∈2] ➊<br />ᐸ14.endᐳ"}}:::plan
-    PgClassExpression14 --> Access18
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/v4/numeric"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 21, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 21, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant21 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸrange_testᐳ[13]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgClassExpression{1}ᐸ__range_test__.”num”ᐳ[14]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,Access15,Access18 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 14<br /><br />ROOT Access{2}ᐸ14.startᐳ[15]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 14<br /><br />ROOT Access{2}ᐸ14.endᐳ[18]"):::bucket
-    classDef bucket4 stroke:#0000ff
-    class Bucket4 bucket4
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3 & Bucket4
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,Constant21 bucket0
     end

@@ -704,6 +704,8 @@ export const ALL_FLAGS = flag(
 
 /** By default, accept null values as an input */
 export const DEFAULT_ACCEPT_FLAGS = flag(FLAG_NULL);
+export const DEFAULT_ACCEPT_FLAGS_FOR_NULLABLE_BOUNDARY =
+  DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL;
 export const TRAPPABLE_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED);
 export const DEFAULT_FORBIDDEN_FLAGS = flag(ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS);
 export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(
@@ -788,7 +790,7 @@ export interface LocationDetails {
 }
 
 export type UnwrapPlanTuple</* const */ TIn extends readonly Step[]> = {
-  [Index in keyof TIn]: TIn[Index] extends Step<infer U> ? U : never;
+  [Index in keyof TIn]: DataFromStep<TIn[Index]>;
 };
 
 export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
@@ -809,14 +811,21 @@ export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
 
-export interface AddDependencyOptions {
-  step: Step;
+export interface AddDependencyOptions<TStep extends Step = Step> {
+  step: TStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
-  onReject?: null | Error | undefined;
+  onReject?: Maybe<Error>;
   nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
 }
+
+export interface DependencyOptions<TStep extends Step = Step> {
+  step: TStep;
+  acceptFlags: ExecutionEntryFlags;
+  onReject: Maybe<Error>;
+}
+
 /**
  * @internal
  */

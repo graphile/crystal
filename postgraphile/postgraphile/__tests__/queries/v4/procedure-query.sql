@@ -122,6 +122,20 @@ select
 from "b"."compound_type_query"($1::"c"."compound_type") as __compound_type_query__;
 
 select
+  __compound_type_set_query__."a"::text as "0",
+  __compound_type_set_query__."b" as "1",
+  __compound_type_set_query__."c"::text as "2",
+  __compound_type_set_query__."d" as "3",
+  __compound_type_set_query__."e"::text as "4",
+  __compound_type_set_query__."f"::text as "5",
+  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+  __compound_type_set_query__."foo_bar"::text as "7",
+  (not (__compound_type_set_query__ is null))::text as "8",
+  (row_number() over (partition by 1))::text as "9"
+from "c"."compound_type_set_query"() as __compound_type_set_query__
+limit 6;
+
+select
   __compound_type_array_query__."a"::text as "0",
   __compound_type_array_query__."b" as "1",
   __compound_type_array_query__."c"::text as "2",
@@ -138,47 +152,6 @@ select
   __table_query__."headline" as "1",
   __table_query__."author_id"::text as "2"
 from "c"."table_query"($1::"int4") as __table_query__;
-
-select
-  __no_args_query__.v::text as "0"
-from "c"."no_args_query"() as __no_args_query__(v);
-
-select
-  __query_compound_type_array__."a"::text as "0",
-  __query_compound_type_array__."b" as "1",
-  __query_compound_type_array__."c"::text as "2",
-  __query_compound_type_array__."d" as "3",
-  __query_compound_type_array__."e"::text as "4",
-  __query_compound_type_array__."f"::text as "5",
-  to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-  __query_compound_type_array__."foo_bar"::text as "7",
-  (not (__query_compound_type_array__ is null))::text as "8"
-from unnest("a"."query_compound_type_array"($1::"c"."compound_type")) as __query_compound_type_array__;
-
-select
-  __query_text_array__.v::text as "0"
-from "a"."query_text_array"() as __query_text_array__(v);
-
-select
-  (case when (__query_interval_array__.v) is not distinct from null then null::text else array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__query_interval_array__.v) __entry__
-  )::text end) as "0"
-from "a"."query_interval_array"() as __query_interval_array__(v);
-
-select
-  __compound_type_set_query__."a"::text as "0",
-  __compound_type_set_query__."b" as "1",
-  __compound_type_set_query__."c"::text as "2",
-  __compound_type_set_query__."d" as "3",
-  __compound_type_set_query__."e"::text as "4",
-  __compound_type_set_query__."f"::text as "5",
-  to_char(__compound_type_set_query__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-  __compound_type_set_query__."foo_bar"::text as "7",
-  (not (__compound_type_set_query__ is null))::text as "8",
-  (row_number() over (partition by 1))::text as "9"
-from "c"."compound_type_set_query"() as __compound_type_set_query__
-limit 6;
 
 select
   __table_set_query__."person_full_name" as "0",
@@ -295,6 +268,10 @@ from "c"."int_set_query"(
 ) as __int_set_query__(v);
 
 select
+  __no_args_query__.v::text as "0"
+from "c"."no_args_query"() as __no_args_query__(v);
+
+select
   __static_big_integer__.v::text as "0",
   (row_number() over (partition by 1))::text as "1"
 from "a"."static_big_integer"() as __static_big_integer__(v);
@@ -302,6 +279,29 @@ from "a"."static_big_integer"() as __static_big_integer__(v);
 select
   (count(*))::text as "0"
 from "a"."static_big_integer"() as __static_big_integer__(v);
+
+select
+  __query_compound_type_array__."a"::text as "0",
+  __query_compound_type_array__."b" as "1",
+  __query_compound_type_array__."c"::text as "2",
+  __query_compound_type_array__."d" as "3",
+  __query_compound_type_array__."e"::text as "4",
+  __query_compound_type_array__."f"::text as "5",
+  to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+  __query_compound_type_array__."foo_bar"::text as "7",
+  (not (__query_compound_type_array__ is null))::text as "8"
+from unnest("a"."query_compound_type_array"($1::"c"."compound_type")) as __query_compound_type_array__;
+
+select
+  __query_text_array__.v::text as "0"
+from "a"."query_text_array"() as __query_text_array__(v);
+
+select
+  (case when (__query_interval_array__.v) is not distinct from null then null::text else array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest(__query_interval_array__.v) __entry__
+  )::text end) as "0"
+from "a"."query_interval_array"() as __query_interval_array__(v);
 
 select
   to_char(__query_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",

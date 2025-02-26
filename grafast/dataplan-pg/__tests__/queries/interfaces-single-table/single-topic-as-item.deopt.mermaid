@@ -26,34 +26,30 @@ graph TD
     PgSelect8 --> PgSelectRows13
     PgSelectSingle14{{"PgSelectSingle[14∈0] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First12 --> PgSelectSingle14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈0] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈0] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression16
-    PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression17
-    PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__single_t...”position”ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈0] ➊<br />ᐸ__single_t...”position”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈0] ➊<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈1] ➊<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈0] ➊<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈1] ➊<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈0] ➊<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈0] ➊<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈1] ➊<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈0] ➊<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression23
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/interfaces-single-table/single-topic-as-item"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 24, 11<br />2: PgSelect[8]<br />3: PgSelectRows[13]<br />ᐳ: First[12], PgSelectSingle[14]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 24, 11<br />2: PgSelect[8]<br />3: PgSelectRows[13]<br />ᐳ: 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,First12,PgSelectRows13,PgSelectSingle14,Constant24 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgSelectSingleᐸsingle_table_itemsᐳ[14]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket1
-    Bucket0 --> Bucket1
+    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,First12,PgSelectRows13,PgSelectSingle14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23,Constant24 bucket0
     end

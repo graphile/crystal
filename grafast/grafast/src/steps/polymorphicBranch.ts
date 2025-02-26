@@ -7,7 +7,7 @@ import type {
 } from "../index.js";
 import { polymorphicWrap } from "../index.js";
 import type { PolymorphicStep } from "../step.js";
-import { Step } from "../step.js";
+import { $$isNullableBoundary, Step } from "../step.js";
 import { constant } from "./constant.js";
 
 type StepData<TStep extends Step> = TStep extends Step<infer U> ? U : any;
@@ -39,6 +39,7 @@ export class PolymorphicBranchStep<TStep extends Step>
   };
   constructor($step: TStep, matchers: PolymorphicBranchMatchers<TStep>) {
     super();
+    this[$$isNullableBoundary] = true;
     this.addDependency($step);
     this.typeNames = Object.keys(matchers);
     this.matchers = Object.fromEntries(
@@ -54,7 +55,7 @@ export class PolymorphicBranchStep<TStep extends Step>
 
   planForType(objectType: GraphQLObjectType): Step {
     const matcher = this.matchers[objectType.name];
-    const $step = this.getDep<TStep>(0);
+    const $step = this.getDep<TStep>(0, true);
     if (matcher) {
       if (typeof matcher.plan === "function") {
         return matcher.plan($step);

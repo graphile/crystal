@@ -1,4 +1,14 @@
 select
+  __houses__."street_id"::text as "0",
+  __houses__."property_id"::text as "1",
+  __houses__."building_name" as "2",
+  __houses__."property_name_or_number" as "3",
+  __houses__."street_name" as "4",
+  __houses__."building_id"::text as "5"
+from "smart_comment_relations"."houses" as __houses__
+order by __houses__."street_id" asc, __houses__."property_id" asc;
+
+select
   __houses__."building_name" as "0",
   __houses__."property_name_or_number" as "1",
   __houses__."street_name" as "2",
@@ -11,16 +21,6 @@ where
   ) and (
     __houses__."property_id" = $2::"int4"
   );
-
-select
-  __houses__."street_id"::text as "0",
-  __houses__."property_id"::text as "1",
-  __houses__."building_name" as "2",
-  __houses__."property_name_or_number" as "3",
-  __houses__."street_name" as "4",
-  __houses__."building_id"::text as "5"
-from "smart_comment_relations"."houses" as __houses__
-order by __houses__."street_id" asc, __houses__."property_id" asc;
 
 select __streets_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __streets_identifiers__,

@@ -36,18 +36,6 @@ import type { OperationPlan } from "./OperationPlan";
 export interface LayerPlanReasonRoot {
   type: "root";
 }
-/** Non-branching, non-deferred */
-export interface LayerPlanReasonNullableField {
-  type: "nullableBoundary";
-  /**
-   * Can be used such that the same LayerPlan can be used for two selection
-   * sets for the same parent plan. In this case an additional output plan
-   * would be added to the LayerPlan.
-   *
-   * Also needed for execution (see `executeBucket`).
-   */
-  parentStep: Step;
-}
 export interface LayerPlanReasonListItemStream {
   initialCountStepId?: number;
   ifStepId?: number;
@@ -123,7 +111,6 @@ export function isPolymorphicLayerPlan(layerPlan: LayerPlan): boolean {
 
 export type LayerPlanReason =
   | LayerPlanReasonRoot
-  | LayerPlanReasonNullableField
   | LayerPlanReasonListItem
   | LayerPlanReasonSubscription
   | LayerPlanReasonMutationField
@@ -396,10 +383,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   public finalize(): void {
-    if (
-      // this.reason.type === "nullableBoundary" ||
-      this.reason.type === "listItem"
-    ) {
+    if (this.reason.type === "listItem") {
       const u = this.copyStepIds.length;
       const signature = `${this.reason.type[0]}_${u}`;
       withNewBucketFactory(signature, u, this.reason.type, (fn) => {
@@ -429,134 +413,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     let size = 0;
     switch (this.reason.type) {
-      case "nullableBoundary": {
-        if (this.rootStep == null) {
-          throw new Error(
-            "GrafastInternalError<f8136364-46c7-4886-b2ae-51319826f97d>: nullableStepStore layer plan has no rootStepId",
-          );
-        }
-        const itemStepId = this.rootStep.id;
-
-        // PERF: if parent bucket has no nulls/errors in `itemStepId`
-        // then we can just copy everything wholesale rather than building
-        // new arrays and looping.
-        const hasNoNullsOrErrors = false;
-
-        if (this.rootStep._isUnary) {
-          const fieldValue = parentBucket.store.get(
-            itemStepId,
-          )! as UnaryExecutionValue;
-          const forbiddenFlags =
-            fieldValue._entryFlags & FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS;
-          if (forbiddenFlags) {
-            size = 0;
-          } else {
-            store.set(itemStepId, fieldValue);
-            for (const stepId of copyStepIds) {
-              store.set(stepId, parentBucket.store.get(stepId)!);
-            }
-            const parentBucketSize = parentBucket.size;
-            for (
-              let originalIndex = 0;
-              originalIndex < parentBucketSize;
-              originalIndex++
-            ) {
-              if (
-                parentSideEffectValue === null ||
-                !(parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR)
-              ) {
-                const newIndex = size++;
-                map.set(originalIndex, newIndex);
-                polymorphicPathList[newIndex] =
-                  parentBucket.polymorphicPathList[originalIndex];
-                iterators[newIndex] = parentBucket.iterators[originalIndex];
-              }
-            }
-          }
-        } else if (hasNoNullsOrErrors) {
-          const nullableStepStore = parentBucket.store.get(itemStepId);
-          if (!nullableStepStore) {
-            throw new Error(
-              `GrafastInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
-                itemStepId,
-              )}) in store for ${parentBucket.layerPlan}`,
-            );
-          }
-          store.set(itemStepId, nullableStepStore);
-          for (const stepId of copyStepIds) {
-            store.set(stepId, parentBucket.store.get(stepId)!);
-          }
-          for (
-            let originalIndex = 0;
-            originalIndex < parentBucket.size;
-            originalIndex++
-          ) {
-            const newIndex = size++;
-            map.set(originalIndex, newIndex);
-            polymorphicPathList[newIndex] =
-              parentBucket.polymorphicPathList[originalIndex];
-            iterators[newIndex] = parentBucket.iterators[originalIndex];
-          }
-        } else {
-          const itemStepIdList: any[] = [];
-          store.set(itemStepId, batchExecutionValue(itemStepIdList));
-
-          for (const stepId of copyStepIds) {
-            const ev = parentBucket.store.get(stepId)!;
-            if (ev.isBatch) {
-              // Prepare store with an empty list for each copyPlanId
-              store.set(stepId, batchExecutionValue([]));
-            } else {
-              store.set(stepId, ev);
-            }
-          }
-
-          const nullableStepStore = parentBucket.store.get(itemStepId);
-          if (!nullableStepStore) {
-            throw new Error(
-              `GrafastInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
-                itemStepId,
-              )}) in store for ${parentBucket.layerPlan}`,
-            );
-          }
-
-          // We'll typically be creating fewer nullableBoundary bucket entries
-          // than we have parent bucket entries (because we exclude nulls), so
-          // we must "multiply up" (down) the store entries.
-          for (
-            let originalIndex = 0;
-            originalIndex < parentBucket.size;
-            originalIndex++
-          ) {
-            if (
-              (parentSideEffectValue === null ||
-                !(
-                  parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
-                )) &&
-              !(nullableStepStore._flagsAt(originalIndex) & FLAG_NULL)
-            ) {
-              const newIndex = size++;
-              map.set(originalIndex, newIndex);
-              const fieldValue: any[] | null | undefined | Error =
-                nullableStepStore.at(originalIndex);
-              itemStepIdList[newIndex] = fieldValue;
-
-              polymorphicPathList[newIndex] =
-                parentBucket.polymorphicPathList[originalIndex];
-              iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyStepIds) {
-                const ev = store.get(stepId)!;
-                if (ev.isBatch) {
-                  const orig = parentBucket.store.get(stepId)!;
-                  ev._copyResult(newIndex, orig, originalIndex);
-                }
-              }
-            }
-          }
-        }
-
-        break;
-      }
       case "listItem": {
         const listStepId = this.reason.parentStep.id;
         const listStepStore = parentBucket.store.get(listStepId);
@@ -790,7 +646,7 @@ const ref_batchExecutionValue = te.ref(
 
 function makeNewBucketExpression(
   signature: string,
-  reasonType: "nullableBoundary" | "listItem" | "mutationField",
+  reasonType: "listItem" | "mutationField",
   inner: TE,
 ): TE {
   const expr = te`\
@@ -835,73 +691,10 @@ ${inner}
 function newBucketFactoryInnerExpression(
   signature: string,
   copyCount: number,
-  reasonType: "nullableBoundary" | "listItem",
+  reasonType: "listItem",
 ) {
-  if (reasonType === "nullableBoundary") {
-    if (Math.random() < 2) {
-      throw new Error("This code no longer works since we added unary steps.");
-    }
-    // PERF: if parent bucket has no nulls/errors in itemStepId
-    // then we can just copy everything wholesale rather than building
-    // new arrays and looping.
-
-    const blocks: TE[] = [];
-    const copyBlocks: TE[] = [];
-    for (let i = 0; i < copyCount; i++) {
-      const te_source = te.identifier(`source${i}`);
-      const te_target = te.identifier(`target${i}`);
-      const te_i = te.lit(i);
-      blocks.push(
-        te`\
-  const ${te_source} = parentBucket.store.get(copyStepIds[${te_i}]);
-  const ${te_target} = ${te_source}.isBatch ? ${ref_batchExecutionValue}([]) : ${te_source};
-  store.set(copyStepIds[${te_i}], ${te_target});
-`,
-      );
-      copyBlocks.push(
-        te`\
-      if(${te_target}.isBatch) {
-        ${te_target}.entries[newIndex] = ${te_source}.at(originalIndex);
-      }
-`,
-      );
-    }
-
-    return makeNewBucketExpression(
-      signature,
-      reasonType,
-      te`\
-  const itemStepId = this.rootStep.id;
-  const nullableStepStore = parentBucket.store.get(itemStepId);
-
-  const itemStepIdList = [];
-  store.set(itemStepId, ${ref_batchExecutionValue}(itemStepIdList));
-
-  // Prepare store with an empty list for each copyPlanId
-${te.join(blocks, "")}
-
-  // We'll typically be creating fewer nullableBoundary bucket entries
-  // than we have parent bucket entries (because we exclude nulls), so
-  // we must "multiply up" (down) the store entries.
-  for (
-    let originalIndex = 0;
-    originalIndex < parentBucket.size;
-    originalIndex++
-  ) {
-    const fieldValue = nullableStepStore.at(originalIndex);
-    if (fieldValue != null) {
-      const newIndex = size++;
-      map.set(originalIndex, newIndex);
-      itemStepIdList[newIndex] = fieldValue;
-
-      polymorphicPathList[newIndex] = parentBucket.polymorphicPathList[originalIndex];
-      iterators[newIndex] = parentBucket.iterators[originalIndex];
-${te.join(copyBlocks, "")}
-    }
-  }
-`,
-    );
-  } else if (reasonType === "listItem") {
+  // PERF: this check is redundant
+  if (reasonType === "listItem") {
     const blocks: TE[] = [];
     const copyBlocks: TE[] = [];
     for (let i = 0; i < copyCount; i++) {
@@ -968,7 +761,7 @@ ${te.join(copyBlocks, "")}
 function withNewBucketFactory(
   signature: string,
   copyCount: number,
-  reasonType: "nullableBoundary" | "listItem",
+  reasonType: "listItem",
   callback: (factory: Factory) => void,
 ) {
   const fn = makeNewBucketCache.get(signature);

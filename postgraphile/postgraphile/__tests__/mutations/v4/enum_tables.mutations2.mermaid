@@ -29,15 +29,15 @@ graph TD
     Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object16
-    PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
-    Access18{{"Access[18∈3] ➊<br />ᐸ11.tᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
+    Access18{{"Access[18∈1] ➊<br />ᐸ11.tᐳ"}}:::plan
     Access18 --> PgClassExpression17
     PgInsertSingle11 --> Access18
-    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
     Access18 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈1] ➊<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
     Access18 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈1] ➊<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
     Access18 --> PgClassExpression21
 
     %% define steps
@@ -46,16 +46,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant22,Constant23 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: 16, 18, 17, 19, 20, 21"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle11,Object16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11<br /><br />ROOT PgInsertSingle{1}ᐸreferencing_table()ᐳ[11]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression17,Access18,PgClassExpression19,PgClassExpression20,PgClassExpression21 bucket3
+    class Bucket1,PgInsertSingle11,Object16,PgClassExpression17,Access18,PgClassExpression19,PgClassExpression20,PgClassExpression21 bucket1
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
     end
