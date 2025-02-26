@@ -264,9 +264,15 @@ export class StepTracker {
     }
   }
 
-  public getStepById(id: number): Step;
-  public getStepById(id: number, allowUnset: true): Step | null;
-  public getStepById(id: number, allowUnset = false): Step | null {
+  public getStepById<TStep extends Step = Step>(id: number): TStep;
+  public getStepById<TStep extends Step = Step>(
+    id: number,
+    allowUnset: true,
+  ): TStep | null;
+  public getStepById<TStep extends Step = Step>(
+    id: number,
+    allowUnset = false,
+  ): TStep | null {
     const step = this.stepById[id];
     if (!step && !allowUnset) {
       throw new Error(`Illegal step access? Step with id ${id} doesn't exist`);
@@ -278,7 +284,7 @@ export class StepTracker {
         );
       }
     }
-    return step;
+    return step as TStep | null;
   }
 
   public addStepDependency(
