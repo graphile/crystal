@@ -428,19 +428,6 @@ export class PgSelectStep<
   // --------------------
 
   /**
-   * This is the list of SQL fragments in the result that are compared to some
-   * of the above `queryValues` to determine if there's a match or not. Typically
-   * this will be a list of columns (e.g. primary or foreign keys on the
-   * table).
-   */
-  private identifierMatches: readonly {
-    dependencyIndex: number;
-    expression: SQL;
-    codec: PgCodec;
-    _matches: PgSelectIdentifierSpec["matches"];
-  }[];
-
-  /**
    * Set this true if your query includes any `VOLATILE` function (including
    * seemingly innocuous things such as `random()`) otherwise we might only
    * call the relevant function once and re-use the result.
@@ -547,7 +534,6 @@ export class PgSelectStep<
     });
 
     $clone.applyDepIds = [...cloneFrom.applyDepIds];
-    $clone.identifierMatches = [...cloneFrom.identifierMatches];
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
@@ -656,12 +642,6 @@ export class PgSelectStep<
       if (!identifiers) {
         throw new Error("Invalid construction of PgSelectStep");
       }
-      const identifierMatches: {
-        dependencyIndex: number;
-        expression: SQL;
-        codec: PgCodec;
-        _matches: PgSelectIdentifierSpec["matches"];
-      }[] = [];
       identifiers.forEach((identifier) => {
         if (isDev) {
           assertSensible(identifier.step);
@@ -669,14 +649,10 @@ export class PgSelectStep<
         const { step, matches } = identifier;
         const codec =
           identifier.codec || (identifier.step as PgTypedStep<any>).pgCodec;
-        identifierMatches.push({
-          expression: matches(this.alias),
-          dependencyIndex: this.addDependency(step),
-          codec,
-          _matches: matches,
-        });
+        const expression = matches(this.alias);
+        const placeholder = this.placeholder(step, codec);
+        this.where(sql`${expression} = ${placeholder}`);
       });
-      this.identifierMatches = identifierMatches;
 
       const ourFrom = inFrom ?? resource.from;
       this.from = pgFromExpression(this, ourFrom, parameters, inArgs);
@@ -1055,7 +1031,6 @@ export class PgSelectStep<
       isOrderUnique: this.isOrderUnique,
       isUnique: this.isUnique,
       conditions: this.conditions,
-      identifierMatches: this.identifierMatches,
       _symbolSubstitutes: this._symbolSubstitutes,
       from: this.from,
       joins: this.joins,
@@ -1378,20 +1353,6 @@ export class PgSelectStep<
         return false;
       }
 
-      // Check IDENTIFIERs match
-      if (
-        !arraysMatch(
-          this.identifierMatches,
-          p.identifierMatches,
-          (matchA, matchB) =>
-            matchA.codec === matchB.codec &&
-            matchA.dependencyIndex === matchB.dependencyIndex &&
-            sqlIsEquivalent(matchA.expression, matchB.expression),
-        )
-      ) {
-        return false;
-      }
-
       // Check GROUPs match
       if (
         !arraysMatch(this.groups, p.groups, (a, b) =>
@@ -1675,6 +1636,7 @@ export class PgSelectStep<
           `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - single`,
         );
       } else {
+        /*
         const identifierMatchesExpressions = this.identifierMatches
           .map((m) => {
             const $dep = this.getDep(m.dependencyIndex);
@@ -1707,6 +1669,7 @@ export class PgSelectStep<
             `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - many`,
           );
         }
+        */
       }
     }
 
@@ -2338,11 +2301,6 @@ interface PgSelectQueryInfo<
   /** Is the order that was established at planning time unique? */
   readonly isOrderUnique: boolean;
   readonly fixedPlaceholderValues: ReadonlyMap<symbol, SQL>;
-  readonly identifierMatches: readonly {
-    readonly dependencyIndex: number;
-    readonly expression: SQL;
-    readonly codec: PgCodec;
-  }[];
   readonly _symbolSubstitutes: ReadonlyMap<symbol, symbol>;
 
   readonly selects: ReadonlyArray<SQL>;
@@ -2596,7 +2554,6 @@ function buildTheQueryCore<
     hasSideEffects,
     forceIdentity,
     fixedPlaceholderValues,
-    identifierMatches,
 
     first,
     last,
@@ -2605,12 +2562,9 @@ function buildTheQueryCore<
     cursorIndicies,
   } = info;
 
-  const extraWheres: SQL[] = [];
-
   const {
     queryValues,
     placeholderValues,
-    handlePlaceholder,
     identifiersSymbol,
     identifiersAlias,
   } = makeValues(info, name);
@@ -2618,16 +2572,6 @@ function buildTheQueryCore<
   // Handle fixed placeholder values
   for (const [key, value] of fixedPlaceholderValues) {
     placeholderValues.set(key, value);
-  }
-
-  // Handle identifiers
-  for (const identifierMatch of identifierMatches) {
-    const { expression, dependencyIndex } = identifierMatch;
-    const symbol = Symbol(`dep-${dependencyIndex}`);
-    extraWheres.push(sql`${expression} = ${sql.placeholder(symbol)}`);
-    const alreadyEncoded = false;
-    // Now it's essentially a placeholder:
-    handlePlaceholder({ ...identifierMatch, symbol, alreadyEncoded });
   }
   const forceOrder = (stream && info.shouldReverseOrder) || false;
 
@@ -2642,7 +2586,6 @@ function buildTheQueryCore<
     forceOrder,
     trueOrderBySQL,
     info,
-    extraWheres,
     cursorDigest,
     cursorIndicies,
     stream,
@@ -2667,7 +2610,6 @@ function buildTheQuery<
     forceOrder,
     trueOrderBySQL,
     info,
-    extraWheres,
     cursorDigest,
     cursorIndicies,
     stream,
@@ -2709,7 +2651,6 @@ function buildTheQuery<
 
       const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
         extraSelects,
-        extraWheres,
         forceOrder,
       });
       const identifierIndex = extraSelectIndexes[identifierIndexOffset];
@@ -2809,7 +2750,6 @@ ${lateralText};`;
 
       const { sql: baseQuery, extraSelectIndexes } = buildQuery(info, {
         extraSelects,
-        extraWheres,
       });
       const rowNumberIndex =
         rowNumberIndexOffset >= 0
@@ -2851,9 +2791,7 @@ ${lateralText};`;
       );
       return { text, rawSqlValues, identifierIndex: null };
     } else {
-      const { sql: query } = buildQuery(info, {
-        extraWheres,
-      });
+      const { sql: query } = buildQuery(info, {});
       const { text, values: rawSqlValues } = sql.compile(
         sql`${query};`,
         options,
@@ -3128,7 +3066,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   options: {
     withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    extraWheres?: SQL[];
     forceOrder?: boolean;
   } = Object.create(null),
 ) {
@@ -3212,11 +3149,9 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   function buildWhereOrHaving(
     whereOrHaving: SQL,
     baseConditions: ReadonlyArray<SQL>,
-    options: { extraWheres?: ReadonlyArray<SQL> } = Object.create(null),
+    options: {} = Object.create(null),
   ) {
-    const allConditions = options.extraWheres
-      ? [...baseConditions, ...options.extraWheres]
-      : baseConditions;
+    const allConditions = baseConditions;
     const sqlConditions = sql.join(
       allConditions.map((c) => sql.parens(sql.indent(c))),
       " and ",
@@ -3296,7 +3231,6 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
     asJsonAgg?: boolean;
     withIdentifiers?: boolean;
     extraSelects?: SQL[];
-    extraWheres?: SQL[];
     forceOrder?: boolean;
   } = Object.create(null),
 ): {
