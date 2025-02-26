@@ -176,8 +176,11 @@ export /* abstract */ class Step<TData = any> {
   /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
+   *
+   * @internal
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  /** @internal */
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
