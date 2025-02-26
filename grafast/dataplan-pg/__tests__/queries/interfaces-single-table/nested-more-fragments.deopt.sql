@@ -29,9 +29,9 @@ lateral (
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __single_table_items__."author_id" = __single_table_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
   order by __single_table_items__."id" asc
 ) as __single_table_items_result__;
@@ -45,9 +45,9 @@ lateral (
   from interfaces_and_unions.people as __people__
   where
     (
-      true /* authorization checks */
-    ) and (
       __people__."person_id" = __people_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __people_result__;
 
@@ -71,8 +71,8 @@ lateral (
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __single_table_items_result__;

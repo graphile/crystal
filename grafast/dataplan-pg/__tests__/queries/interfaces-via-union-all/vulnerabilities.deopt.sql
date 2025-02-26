@@ -65,9 +65,9 @@ select
 from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
 where
   (
-    true /* authorization checks */
-  ) and (
     __first_party_vulnerabilities__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select __third_party_vulnerabilities_result__.*
@@ -82,8 +82,8 @@ lateral (
   from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
   where
     (
-      true /* authorization checks */
-    ) and (
       __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __third_party_vulnerabilities_result__;

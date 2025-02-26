@@ -17,9 +17,9 @@ select
 from app_public.messages as __messages__
 where
   (
-    (__messages__.archived_at is null) = ($1::"timestamptz" is null)
+    __messages__."forum_id" = $1::"uuid"
   ) and (
-    __messages__."forum_id" = $2::"uuid"
+    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
   )
 order by __messages__."id" asc;
 
@@ -30,9 +30,9 @@ select
 from app_public.messages as __messages__
 where
   (
-    (__messages__.archived_at is null) = ($1::"timestamptz" is null)
+    __messages__."forum_id" = $1::"uuid"
   ) and (
-    __messages__."forum_id" = $2::"uuid"
+    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
   )
 order by __messages__."id" asc;
 
@@ -46,8 +46,8 @@ lateral (
   from app_public.users as __users__
   where
     (
-      true /* authorization checks */
-    ) and (
       __users__."id" = __users_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __users_result__;

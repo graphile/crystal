@@ -72,9 +72,9 @@ lateral (
   from "a"."post" as __post__
   where
     (
-      __post__."headline" = $1::"text"
-    ) and (
       __post__."author_id" = __post_identifiers__."id0"
+    ) and (
+      __post__."headline" = $1::"text"
     )
   order by __post__."id" asc
 ) as __post_result__;

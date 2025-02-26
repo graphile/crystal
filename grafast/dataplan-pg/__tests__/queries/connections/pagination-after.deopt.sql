@@ -34,8 +34,8 @@ lateral (
   from app_public.users as __users__
   where
     (
-      true /* authorization checks */
-    ) and (
       __users__."id" = __users_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __users_result__;
