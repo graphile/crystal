@@ -2970,12 +2970,6 @@ export class OperationPlan {
     // If a step is unary at this point, it must always remain unary.
     if (step._isUnary) {
       step._isUnaryLocked = true;
-
-      // And if a step is unary, it must execute once independent of the polymorphic
-      // data seen.
-      if (step.layerPlan.reason.type === "polymorphic") {
-        step.polymorphicPaths = step.layerPlan.reason.polymorphicPaths;
-      }
     }
 
     if (step.deduplicate == null) return step;
