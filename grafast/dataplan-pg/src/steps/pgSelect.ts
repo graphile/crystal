@@ -19,15 +19,20 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
+  constant,
   ConstantStep,
   exportAs,
   first,
   isAsyncIterable,
   isDev,
   isPromiseLike,
+  list,
+  object,
+  remapKeys,
   reverseArray,
   SafeError,
   Step,
+  stepAMayDependOnStepB,
   stepsAreInSamePhase,
   UnbatchedStep,
 } from "grafast";
@@ -71,6 +76,7 @@ import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
+  PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   ResolvedPgStmtCommonQueryInfo,
@@ -97,6 +103,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const EMPTY_MAP: ReadonlyMap<any, any> = new Map();
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
   hasMore: false,
@@ -1008,36 +1015,21 @@ export class PgSelectStep<
       cursorDetails,
     } = buildTheQuery({
       executionDetails,
-      placeholders: this.placeholders,
-      fixedPlaceholderValues: this.fixedPlaceholderValues,
-      deferreds: this.deferreds,
+
+      // Stuff directly referencing dependency IDs
       firstStepId: this.firstStepId,
       lastStepId: this.lastStepId,
       offsetStepId: this.offsetStepId,
       afterStepId: this.afterStepId,
       beforeStepId: this.beforeStepId,
-      forceIdentity: this.forceIdentity,
-      havingConditions: this.havingConditions,
-      mode: this.mode,
-      hasSideEffects: this.hasSideEffects,
-      name: this.name,
-      alias: this.alias,
-      symbol: this.symbol,
-      resource: this.resource,
-      groups: this.groups,
-      orders: this.orders,
-      selects: this.selects,
-      fetchOneExtra: this.fetchOneExtra,
-      isOrderUnique: this.isOrderUnique,
-      isUnique: this.isUnique,
-      conditions: this.conditions,
-      _symbolSubstitutes: this._symbolSubstitutes,
-      from: this.from,
-      joins: this.joins,
-      needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
-      relationJoins: this.relationJoins,
-      meta: this._meta,
+
+      // Stuff referencing dependency IDs in a nested fashion
+      placeholders: this.placeholders,
+      deferreds: this.deferreds,
+
+      // Fixed stuff that is local to us (aka "StaticInfo")
+      ...PgSelectStep.getStaticInfo(this),
     });
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
@@ -1603,6 +1595,107 @@ export class PgSelectStep<
     }
   }
 
+  private mergeSelectsWith(otherPlan: PgSelectStep<PgResource>): {
+    [desiredIndex: string]: string;
+  } {
+    const actualKeyByDesiredKey = Object.create(null);
+    this.selects.forEach((frag, idx) => {
+      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
+    });
+    return actualKeyByDesiredKey;
+  }
+
+  /**
+   * - Merge placeholders
+   * - Merge fixedPlaceholders
+   * - Merge deferreds
+   * - Merge _symbolSubstitutes
+   */
+  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<PgResource>>(
+    $target: TOtherStep,
+  ): void {
+    for (const placeholder of this.placeholders) {
+      const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
+      const dep = this.getDep(dependencyIndex);
+      /*
+       * We have dependency `dep`. We're attempting to merge ourself into
+       * `otherPlan`. We have two situations we need to handle:
+       *
+       * 1. `dep` is not dependent on `otherPlan`, in which case we can add
+       *    `dep` as a dependency to `otherPlan` without creating a cycle, or
+       * 2. `dep` is dependent on `otherPlan` (for example, it might be the
+       *    result of selecting an expression in the `otherPlan`), in which
+       *    case we should turn it into an SQL expression and inline that.
+       */
+
+      // PERF: we know dep can't depend on otherPlan if
+      // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
+      // `otherPlan`'s layerPlan.
+      if (stepAMayDependOnStepB($target, dep)) {
+        // Either dep is a static input plan (which isn't dependent on anything
+        // else) or otherPlan is deeper than dep; either way we can use the dep
+        // directly within otherPlan.
+        const newPlanIndex = $target.addDependency(dep);
+        $target.placeholders.push({
+          dependencyIndex: newPlanIndex,
+          codec,
+          symbol,
+          alreadyEncoded,
+        });
+      } else if (dep instanceof PgClassExpressionStep) {
+        // Replace with a reference.
+        $target.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
+      } else {
+        throw new Error(
+          `Could not merge placeholder from unsupported plan type: ${dep}`,
+        );
+      }
+    }
+    for (const [
+      sqlPlaceholder,
+      placeholderValue,
+    ] of this.fixedPlaceholderValues.entries()) {
+      if (
+        $target.fixedPlaceholderValues.has(sqlPlaceholder) &&
+        $target.fixedPlaceholderValues.get(sqlPlaceholder) !== placeholderValue
+      ) {
+        throw new Error(
+          `${$target} already has an identical placeholder with a different value when trying to mergePlaceholdersInto it from ${this}`,
+        );
+      }
+      $target.fixedPlaceholderValues.set(sqlPlaceholder, placeholderValue);
+    }
+
+    for (const { symbol, dependencyIndex } of this.deferreds) {
+      const dep = this.getDep(dependencyIndex);
+      if (stepAMayDependOnStepB($target, dep)) {
+        const newPlanIndex = $target.addDependency(dep);
+        $target.deferreds.push({
+          dependencyIndex: newPlanIndex,
+          symbol,
+        });
+      } else {
+        throw new Error(
+          `Could not merge placeholder from unsupported plan type: ${dep}`,
+        );
+      }
+    }
+
+    for (const [a, b] of this._symbolSubstitutes.entries()) {
+      if (isDev) {
+        if (
+          $target._symbolSubstitutes.has(a) &&
+          $target._symbolSubstitutes.get(a) !== b
+        ) {
+          throw new Error(
+            `Conflict when setting a substitute whilst merging ${this} into ${$target}; symbol already has a substitute, and it's different.`,
+          );
+        }
+      }
+      $target._symbolSubstitutes.set(a, b);
+    }
+  }
+
   optimize({ stream }: StepOptimizeOptions): Step {
     // In case we have any lock actions in future:
     this.lock();
@@ -1631,10 +1724,52 @@ export class PgSelectStep<
         !this.fetchOneExtra
       ) {
         // Allow, do it via left join
-        // TODO
-        console.log(
-          `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - single`,
-        );
+        if (this.selects.length > 0) {
+          debugPlanVerbose(
+            "Merging %c into %c (via %c)",
+            this,
+            $pgSelect,
+            $pgSelectSingle,
+          );
+          this.mergePlaceholdersInto($pgSelect);
+          $pgSelect.withLayerPlan(() => {
+            $pgSelect.apply(
+              new PgSelectInlineApplyStep({
+                staticInfo: PgSelectStep.getStaticInfo(this),
+                $first: this.maybeGetDep(this.firstStepId),
+                $last: this.maybeGetDep(this.lastStepId),
+                $offset: this.maybeGetDep(this.offsetStepId),
+                $after: this.maybeGetDep(this.afterStepId),
+                $before: this.maybeGetDep(this.beforeStepId),
+                applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
+              }),
+            );
+          });
+          const actualKeyByDesiredKey = this.mergeSelectsWith($pgSelect);
+          // We return a list here because our children are going to use a
+          // `first` plan on us.
+          // NOTE: we don't need to reverse the list for relay pagination
+          // because it only contains one entry.
+          return object({
+            m: constant(this._meta),
+            hasMore: constant(false),
+            items: list([remapKeys($pgSelectSingle, actualKeyByDesiredKey)]),
+          });
+        } else {
+          debugPlanVerbose(
+            "Skipping merging %c into %c (via %c) due to no attributes being selected",
+            this,
+            $pgSelect,
+            $pgSelectSingle,
+          );
+          // We return a list here because our children are going to use a
+          // `first` plan on us.
+          return object({
+            m: constant(this._meta),
+            hasMore: constant(false),
+            items: list([$pgSelectSingle]),
+          });
+        }
       } else {
         /*
         const identifierMatchesExpressions = this.identifierMatches
@@ -1806,6 +1941,38 @@ export class PgSelectStep<
   }
   setMeta(key: string, value: unknown): void {
     this._meta[key] = value;
+  }
+
+  static getStaticInfo<TResource extends PgResource<any, any, any, any, any>>(
+    $source: PgSelectStep<TResource>,
+  ): StaticInfo<TResource> {
+    return {
+      forceIdentity: $source.forceIdentity,
+      havingConditions: $source.havingConditions,
+      mode: $source.mode,
+      hasSideEffects: $source.hasSideEffects,
+      name: $source.name,
+      alias: $source.alias,
+      symbol: $source.symbol,
+      resource: $source.resource,
+      groups: $source.groups,
+      orders: $source.orders,
+      selects: $source.selects,
+      fetchOneExtra: $source.fetchOneExtra,
+      isOrderUnique: $source.isOrderUnique,
+      isUnique: $source.isUnique,
+      conditions: $source.conditions,
+      from: $source.from,
+      joins: $source.joins,
+      needsCursor: $source.needsCursor,
+      relationJoins: $source.relationJoins,
+      meta: $source._meta,
+      placeholderSymbols: $source.placeholders.map((p) => p.symbol),
+      deferredSymbols: $source.deferreds.map((p) => p.symbol),
+      fixedPlaceholderValues: $source.fixedPlaceholderValues,
+      _symbolSubstitutes: $source._symbolSubstitutes,
+      joinAsLateral: $source.joinAsLateral,
+    };
   }
 }
 
@@ -2292,12 +2459,14 @@ function calculateOrderBySQL(params: {
 
 interface PgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends PgStmtCommonQueryInfo {
+> extends PgStmtCommonQueryInfo,
+    PgStmtCompileQueryInfo {
   readonly name: string;
   readonly resource: TResource;
   readonly mode: PgSelectMode;
   /** Are we fetching just one record? */
   readonly isUnique: boolean;
+  readonly joinAsLateral: boolean;
   /** Is the order that was established at planning time unique? */
   readonly isOrderUnique: boolean;
   readonly fixedPlaceholderValues: ReadonlyMap<symbol, SQL>;
@@ -2314,9 +2483,14 @@ interface PgSelectQueryInfo<
   >;
   readonly meta: { readonly [key: string]: any };
 }
+
+type CoreInfo<TResource extends PgResource<any, any, any, any, any>> = Readonly<
+  Omit<PgSelectQueryInfo<TResource>, "placeholders" | "deferreds">
+>;
+
 interface MutablePgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends PgSelectQueryInfo<TResource>,
+> extends CoreInfo<TResource>,
     MutablePgStmtCommonQueryInfo {
   readonly selects: Array<SQL>;
   readonly joins: Array<PgSelectPlanJoin>;
@@ -2331,7 +2505,7 @@ interface MutablePgSelectQueryInfo<
 
 interface ResolvedPgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends PgSelectQueryInfo<TResource>,
+> extends CoreInfo<TResource>,
     ResolvedPgStmtCommonQueryInfo {
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;
@@ -2339,7 +2513,7 @@ interface ResolvedPgSelectQueryInfo<
 
 function buildTheQueryCore<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
->(rawInfo: Readonly<PgSelectQueryInfo<TResource>>) {
+>(rawInfo: CoreInfo<TResource>) {
   const info: MutablePgSelectQueryInfo<TResource> = {
     ...rawInfo,
 
@@ -2379,6 +2553,9 @@ function buildTheQueryCore<
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
+    },
+    join(spec) {
+      info.joins.push(spec);
     },
     setMeta(key, value) {
       meta[key] = value;
@@ -2549,11 +2726,31 @@ function buildTheQueryCore<
    *                                      *
    ****************************************/
 
+  return {
+    count,
+    trueOrderBySQL,
+    info,
+    stream,
+    meta,
+  };
+}
+
+function buildTheQuery<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+>(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
+  const {
+    placeholders,
+    deferreds,
+    fixedPlaceholderValues,
+    _symbolSubstitutes,
+  } = rawInfo;
+  const { count, trueOrderBySQL, info, stream, meta } =
+    buildTheQueryCore(rawInfo);
+
   const {
     name,
     hasSideEffects,
     forceIdentity,
-    fixedPlaceholderValues,
 
     first,
     last,
@@ -2562,63 +2759,27 @@ function buildTheQueryCore<
     cursorIndicies,
   } = info;
 
+  const combinedInfo = {
+    ...info,
+    // Merge things necessary only for query building back in
+    placeholders,
+    deferreds,
+    fixedPlaceholderValues,
+    _symbolSubstitutes,
+  };
+
   const {
     queryValues,
     placeholderValues,
     identifiersSymbol,
     identifiersAlias,
-  } = makeValues(info, name);
+  } = makeValues(combinedInfo, name);
 
   // Handle fixed placeholder values
   for (const [key, value] of fixedPlaceholderValues) {
     placeholderValues.set(key, value);
   }
   const forceOrder = (stream && info.shouldReverseOrder) || false;
-
-  return {
-    queryValues,
-    count,
-    forceIdentity,
-    hasSideEffects,
-    identifiersAlias,
-    identifiersSymbol,
-    name,
-    forceOrder,
-    trueOrderBySQL,
-    info,
-    cursorDigest,
-    cursorIndicies,
-    stream,
-    placeholderValues,
-    meta,
-    first,
-    last,
-    shouldReverseOrder,
-  };
-}
-function buildTheQuery<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
->(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
-  const {
-    queryValues,
-    count,
-    forceIdentity,
-    hasSideEffects,
-    identifiersAlias,
-    identifiersSymbol,
-    name,
-    forceOrder,
-    trueOrderBySQL,
-    info,
-    cursorDigest,
-    cursorIndicies,
-    stream,
-    placeholderValues,
-    meta,
-    first,
-    last,
-    shouldReverseOrder,
-  } = buildTheQueryCore(rawInfo);
 
   const makeQuery = ({
     limit,
@@ -2911,6 +3072,137 @@ ${lateralText};`;
   }
 }
 
+type StaticKeys =
+  | "forceIdentity"
+  | "havingConditions"
+  | "mode"
+  | "hasSideEffects"
+  | "name"
+  | "alias"
+  | "symbol"
+  | "resource"
+  | "groups"
+  | "orders"
+  | "selects"
+  | "fetchOneExtra"
+  | "isOrderUnique"
+  | "isUnique"
+  | "conditions"
+  | "from"
+  | "joins"
+  | "needsCursor"
+  | "relationJoins"
+  | "meta"
+  | "placeholderSymbols"
+  | "deferredSymbols"
+  | "fixedPlaceholderValues"
+  | "_symbolSubstitutes"
+  | "joinAsLateral";
+
+type StaticInfo<TResource extends PgResource<any, any, any, any, any>> = Pick<
+  CoreInfo<TResource>,
+  StaticKeys
+>;
+
+class PgSelectInlineApplyStep<
+  TResource extends PgResource<any, any, any, any, any>,
+> extends Step {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectInlineApplyStep",
+  };
+  public isSyncAndSafe = true;
+
+  private staticInfo: StaticInfo<TResource>;
+  private firstStepId: number | null;
+  private lastStepId: number | null;
+  private offsetStepId: number | null;
+  private afterStepId: number | null;
+  private beforeStepId: number | null;
+  private applyDepIds: number[];
+
+  constructor(details: {
+    staticInfo: StaticInfo<TResource>;
+    $first: Step | null;
+    $last: Step | null;
+    $offset: Step | null;
+    $after: Step | null;
+    $before: Step | null;
+    applySteps: Step[];
+  }) {
+    super();
+    const { staticInfo, $first, $last, $offset, $after, $before, applySteps } =
+      details;
+    this.staticInfo = staticInfo;
+    this.firstStepId = $first ? this.addUnaryDependency($first) : null;
+    this.lastStepId = $last ? this.addUnaryDependency($last) : null;
+    this.offsetStepId = $offset ? this.addUnaryDependency($offset) : null;
+    this.afterStepId = $after ? this.addUnaryDependency($after) : null;
+    this.beforeStepId = $before ? this.addUnaryDependency($before) : null;
+    this.applyDepIds = applySteps.map(($apply) =>
+      this.addUnaryDependency($apply),
+    );
+  }
+
+  execute(executionDetails: ExecutionDetails) {
+    if (executionDetails.count !== 1) {
+      throw new Error(`PgSelectInlineApplyStep must be unary!`);
+    }
+    return [
+      (queryBuilder: PgSelectQueryBuilder) => {
+        const parts = buildPartsForInlining({
+          executionDetails,
+
+          // My own dependencies
+          firstStepId: this.firstStepId,
+          lastStepId: this.lastStepId,
+          offsetStepId: this.offsetStepId,
+          afterStepId: this.afterStepId,
+          beforeStepId: this.beforeStepId,
+          applyDepIds: this.applyDepIds,
+
+          // Data that's independent of dependencies
+          ...this.staticInfo,
+        });
+
+        const { whereConditions } = parts;
+        const { from, alias, resource, joinAsLateral } = this.staticInfo;
+        const where = buildWhereOrHaving(
+          sql`/* WHERE becoming ON */`,
+          whereConditions,
+        );
+        queryBuilder.join({
+          type: "left",
+          from,
+          alias,
+          attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
+          // Note the WHERE is now part of the JOIN condition (since
+          // it's a LEFT JOIN).
+          conditions: where !== sql.blank ? [where] : [],
+          lateral: joinAsLateral,
+        });
+        for (const join of this.staticInfo.joins) {
+          queryBuilder.join(join);
+        }
+      },
+    ];
+  }
+}
+
+function buildPartsForInlining<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+>(rawInfo: CoreInfo<TResource>) {
+  const {
+    info,
+
+    count,
+    trueOrderBySQL,
+    stream,
+    meta,
+  } = buildTheQueryCore(rawInfo);
+  return buildQueryParts(info, {});
+}
+
 function applyConditionFromCursor<
   TResource extends PgResource<any, any, any, any, any>,
 >(
@@ -3026,8 +3318,8 @@ function getOrderByDigest<
   TResource extends PgResource<any, any, any, any, any>,
 >(info: MutablePgSelectQueryInfo<TResource>) {
   const {
-    placeholders,
-    deferreds,
+    placeholderSymbols,
+    deferredSymbols,
     alias,
     resource,
     fixedPlaceholderValues,
@@ -3045,12 +3337,12 @@ function getOrderByDigest<
       orders.map((o) => {
         const [frag] = getFragmentAndCodecFromOrder(alias, o, resource.codec);
         const placeholderValues = new Map<symbol, SQL>(fixedPlaceholderValues);
-        for (let i = 0; i < placeholders.length; i++) {
-          const { symbol } = placeholders[i];
+        for (let i = 0; i < placeholderSymbols.length; i++) {
+          const symbol = placeholderSymbols[i];
           placeholderValues.set(symbol, sql.identifier(`PLACEHOLDER_${i}`));
         }
-        for (let i = 0; i < deferreds.length; i++) {
-          const { symbol } = deferreds[i];
+        for (let i = 0; i < deferredSymbols.length; i++) {
+          const symbol = deferredSymbols[i];
           placeholderValues.set(symbol, sql.identifier(`DEFERRED_${i}`));
         }
         return sql.compile(frag, { placeholderValues }).text;
@@ -3146,26 +3438,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
   }
 
-  function buildWhereOrHaving(
-    whereOrHaving: SQL,
-    baseConditions: ReadonlyArray<SQL>,
-    options: {} = Object.create(null),
-  ) {
-    const allConditions = baseConditions;
-    const sqlConditions = sql.join(
-      allConditions.map((c) => sql.parens(sql.indent(c))),
-      " and ",
-    );
-    return {
-      sql:
-        allConditions.length === 0
-          ? sql.blank
-          : allConditions.length === 1
-          ? sql`\n${whereOrHaving} ${sqlConditions}`
-          : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`,
-    };
-  }
-
   function buildGroupBy() {
     const groups = info.groups;
     return {
@@ -3196,16 +3468,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   const { sql: select, extraSelectIndexes } = buildSelect(options);
   const { sql: from } = buildFrom();
   const { sql: join } = buildJoin();
-  const { sql: where } = buildWhereOrHaving(
-    sql`where`,
-    info.conditions,
-    options,
-  );
   const { sql: groupBy } = buildGroupBy();
-  const { sql: having } = buildWhereOrHaving(
-    sql`having`,
-    info.havingConditions,
-  );
   const { sql: orderBy } = buildOrderBy(
     info,
     options.forceOrder ? false : info.shouldReverseOrder,
@@ -3216,9 +3479,9 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
     select,
     from,
     join,
-    where,
+    whereConditions: info.conditions,
     groupBy,
-    having,
+    havingConditions: info.havingConditions,
     orderBy,
     limitAndOffset,
     extraSelectIndexes,
@@ -3241,13 +3504,16 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
     select,
     from,
     join,
-    where,
+    whereConditions,
     groupBy,
-    having,
+    havingConditions,
     orderBy,
     limitAndOffset,
     extraSelectIndexes,
   } = buildQueryParts(info, options);
+
+  const where = buildWhereOrHaving(sql`where`, whereConditions);
+  const having = buildWhereOrHaving(sql`having`, havingConditions);
 
   const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   const query = options.asJsonAgg
@@ -3302,7 +3568,23 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   havingBuilder(): PgCondition<this>;
-
   // IMPORTANT: if you add `JOIN` here, **only** allow `LEFT JOIN`, otherwise
   // if we're inlined things may go wrong.
+  join(spec: PgSelectPlanJoin): void;
+}
+
+function buildWhereOrHaving(
+  whereOrHaving: SQL,
+  baseConditions: ReadonlyArray<SQL>,
+) {
+  const allConditions = baseConditions;
+  const sqlConditions = sql.join(
+    allConditions.map((c) => sql.parens(sql.indent(c))),
+    " and ",
+  );
+  return allConditions.length === 0
+    ? sql.blank
+    : allConditions.length === 1
+    ? sql`\n${whereOrHaving} ${sqlConditions}`
+    : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`;
 }
