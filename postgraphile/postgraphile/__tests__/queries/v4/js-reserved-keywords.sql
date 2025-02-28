@@ -15,23 +15,24 @@ where (
 );
 
 select
-  __building__."constructor" as "0",
-  __building__."name" as "1",
-  __building__."id"::text as "2"
+  __building__."name" as "0",
+  __building__."id"::text as "1",
+  array(
+    select array[
+      __machine__."id"::text,
+      __machine__."constructor",
+      __machine__."input"
+    ]::text[]
+    from "js_reserved"."machine" as __machine__
+    where (
+      __machine__."constructor" = __building__."constructor"
+    )
+    order by __machine__."id" asc
+  )::text as "2"
 from "js_reserved"."building" as __building__
 where (
   __building__."id" = $1::"int4"
 );
-
-select
-  __machine__."id"::text as "0",
-  __machine__."constructor" as "1",
-  __machine__."input" as "2"
-from "js_reserved"."machine" as __machine__
-where (
-  __machine__."constructor" = $1::"text"
-)
-order by __machine__."id" asc;
 
 select
   __relational_items__."id"::text as "0",

@@ -113,7 +113,17 @@ from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
+  __person__."person_full_name" as "1",
+  array(
+    select array[
+      __post__."id"::text
+    ]::text[]
+    from "a"."post" as __post__
+    where (
+      __post__."author_id" = __person__."id"
+    )
+    order by __post__."id" asc
+  )::text as "2"
 from (select ($1::"c"."person").*) as __person__;
 
 select
@@ -231,14 +241,6 @@ select
 from (select ($1::"a"."post").*) as __post__;
 
 select
-  __post__."id"::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-)
-order by __post__."id" asc;
-
-select
   __func_out_complex_setof__."x"::text as "0",
   __frmcdc_compound_type__."a"::text as "1",
   __frmcdc_compound_type__."b" as "2",
@@ -257,6 +259,11 @@ left outer join lateral (select (__func_out_complex_setof__."z").*) as __person_
 on TRUE;
 
 select
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1"
+from (select ($1::"c"."person").*) as __person__;
+
+select
   __person__."person_full_name" as "0",
   __person_secret__."sekrit" as "1",
   __person_secret__."person_id"::text as "2"
@@ -283,3 +290,11 @@ on (
 where (
   __person__."id" = $1::"int4"
 );
+
+select
+  __post__."id"::text as "0"
+from "a"."post" as __post__
+where (
+  __post__."author_id" = $1::"int4"
+)
+order by __post__."id" asc;
