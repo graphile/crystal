@@ -13,9 +13,20 @@ order by __forums__."id" asc;
 
 select
   __messages__."body" as "0",
-  __messages__."author_id" as "1",
-  __messages__."id" as "2"
+  __users__."username" as "1",
+  __users__."gravatar_url" as "2",
+  __messages__."author_id" as "3",
+  __messages__."id" as "4"
 from app_public.messages as __messages__
+left outer join app_public.users as __users__
+on (
+/* WHERE becoming ON */
+  (
+    __users__."id" = __messages__."author_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
 where
   (
     __messages__."forum_id" = $1::"uuid"

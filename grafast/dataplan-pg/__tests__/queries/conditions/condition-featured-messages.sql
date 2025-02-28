@@ -16,10 +16,20 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.v
 lateral (
   select
     __messages__."body" as "0",
-    __messages__."author_id" as "1",
-    __messages__."id" as "2",
-    __messages_identifiers__.idx as "3"
+    __users__."username" as "1",
+    __users__."gravatar_url" as "2",
+    __messages__."id" as "3",
+    __messages_identifiers__.idx as "4"
   from app_public.messages as __messages__
+  left outer join app_public.users as __users__
+  on (
+  /* WHERE becoming ON */
+    (
+      __users__."id" = __messages__."author_id"
+    ) and (
+      true /* authorization checks */
+    )
+  )
   where
     (
       __messages__."forum_id" = __messages_identifiers__."id0"
@@ -48,14 +58,3 @@ lateral (
       (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
     )
 ) as __messages_result__;
-
-select
-  __users__."username" as "0",
-  __users__."gravatar_url" as "1"
-from app_public.users as __users__
-where
-  (
-    __users__."id" = $1::"uuid"
-  ) and (
-    true /* authorization checks */
-  );

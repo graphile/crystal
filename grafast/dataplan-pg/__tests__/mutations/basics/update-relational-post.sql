@@ -24,22 +24,21 @@ where (
 
 select
   __relational_items__."is_explicitly_archived"::text as "0",
-  __relational_items__."author_id"::text as "1"
+  __people__."person_id"::text as "1",
+  __people__."username" as "2"
 from interfaces_and_unions.relational_items as __relational_items__
+left outer join interfaces_and_unions.people as __people__
+on (
+/* WHERE becoming ON */
+  (
+    __people__."person_id" = __relational_items__."author_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
 where
   (
     __relational_items__."id" = $1::"int4"
-  ) and (
-    true /* authorization checks */
-  );
-
-select
-  __people__."person_id"::text as "0",
-  __people__."username" as "1"
-from interfaces_and_unions.people as __people__
-where
-  (
-    __people__."person_id" = $1::"int4"
   ) and (
     true /* authorization checks */
   );
@@ -70,22 +69,21 @@ where (
 
 select
   __relational_items__."is_explicitly_archived"::text as "0",
-  __relational_items__."author_id"::text as "1"
+  __people__."person_id"::text as "1",
+  __people__."username" as "2"
 from interfaces_and_unions.relational_items as __relational_items__
+left outer join interfaces_and_unions.people as __people__
+on (
+/* WHERE becoming ON */
+  (
+    __people__."person_id" = __relational_items__."author_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
 where
   (
     __relational_items__."id" = $1::"int4"
-  ) and (
-    true /* authorization checks */
-  );
-
-select
-  __people__."person_id"::text as "0",
-  __people__."username" as "1"
-from interfaces_and_unions.people as __people__
-where
-  (
-    __people__."person_id" = $1::"int4"
   ) and (
     true /* authorization checks */
   );
@@ -116,22 +114,21 @@ where (
 
 select
   __relational_items__."is_explicitly_archived"::text as "0",
-  __relational_items__."author_id"::text as "1"
+  __people__."person_id"::text as "1",
+  __people__."username" as "2"
 from interfaces_and_unions.relational_items as __relational_items__
+left outer join interfaces_and_unions.people as __people__
+on (
+/* WHERE becoming ON */
+  (
+    __people__."person_id" = __relational_items__."author_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
 where
   (
     __relational_items__."id" = $1::"int4"
-  ) and (
-    true /* authorization checks */
-  );
-
-select
-  __people__."person_id"::text as "0",
-  __people__."username" as "1"
-from interfaces_and_unions.people as __people__
-where
-  (
-    __people__."person_id" = $1::"int4"
   ) and (
     true /* authorization checks */
   );

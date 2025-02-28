@@ -15,11 +15,21 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __messages__."author_id" as "1",
+    __users__."username" as "1",
+    __users__."gravatar_url" as "2",
     row_number() over (
       order by __messages__."id" asc
-    ) as "2"
+    ) as "3"
   from app_public.messages as __messages__
+  left outer join app_public.users as __users__
+  on (
+  /* WHERE becoming ON */
+    (
+      __users__."id" = __messages__."author_id"
+    ) and (
+      true /* authorization checks */
+    )
+  )
   where
     (
       __messages__."forum_id" = $1::"uuid"
@@ -28,7 +38,7 @@ from (
     )
   order by __messages__."id" asc
 ) __stream_wrapped__
-order by __stream_wrapped__."2"
+order by __stream_wrapped__."3"
 limit 2;
 
 begin; /*fake*/
@@ -38,11 +48,21 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __messages__."author_id" as "1",
+    __users__."username" as "1",
+    __users__."gravatar_url" as "2",
     row_number() over (
       order by __messages__."id" asc
-    ) as "2"
+    ) as "3"
   from app_public.messages as __messages__
+  left outer join app_public.users as __users__
+  on (
+  /* WHERE becoming ON */
+    (
+      __users__."id" = __messages__."author_id"
+    ) and (
+      true /* authorization checks */
+    )
+  )
   where
     (
       __messages__."forum_id" = $1::"uuid"
@@ -51,7 +71,7 @@ from (
     )
   order by __messages__."id" asc
 ) __stream_wrapped__
-order by __stream_wrapped__."2"
+order by __stream_wrapped__."3"
 offset 2;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
@@ -59,30 +79,3 @@ fetch forward 100 from __SNAPSHOT_CURSOR_0__
 close __SNAPSHOT_CURSOR_0__
 
 commit; /*fake*/
-
-select __users_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,
-lateral (
-  select
-    __users__."username" as "0",
-    __users__."gravatar_url" as "1",
-    __users_identifiers__.idx as "2"
-  from app_public.users as __users__
-  where
-    (
-      __users__."id" = __users_identifiers__."id0"
-    ) and (
-      true /* authorization checks */
-    )
-) as __users_result__;
-
-select
-  __users__."username" as "0",
-  __users__."gravatar_url" as "1"
-from app_public.users as __users__
-where
-  (
-    __users__."id" = $1::"uuid"
-  ) and (
-    true /* authorization checks */
-  );

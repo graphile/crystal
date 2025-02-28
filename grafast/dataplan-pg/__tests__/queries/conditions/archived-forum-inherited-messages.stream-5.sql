@@ -15,11 +15,21 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __messages__."author_id" as "1",
+    __users__."username" as "1",
+    __users__."gravatar_url" as "2",
     row_number() over (
       order by __messages__."id" asc
-    ) as "2"
+    ) as "3"
   from app_public.messages as __messages__
+  left outer join app_public.users as __users__
+  on (
+  /* WHERE becoming ON */
+    (
+      __users__."id" = __messages__."author_id"
+    ) and (
+      true /* authorization checks */
+    )
+  )
   where
     (
       __messages__."forum_id" = $1::"uuid"
@@ -29,7 +39,7 @@ from (
   order by __messages__."id" desc
   limit 2
 ) __stream_wrapped__
-order by __stream_wrapped__."2"
+order by __stream_wrapped__."3"
 limit 1;
 
 begin; /*fake*/
@@ -39,11 +49,21 @@ select *
 from (
   select
     __messages__."body" as "0",
-    __messages__."author_id" as "1",
+    __users__."username" as "1",
+    __users__."gravatar_url" as "2",
     row_number() over (
       order by __messages__."id" asc
-    ) as "2"
+    ) as "3"
   from app_public.messages as __messages__
+  left outer join app_public.users as __users__
+  on (
+  /* WHERE becoming ON */
+    (
+      __users__."id" = __messages__."author_id"
+    ) and (
+      true /* authorization checks */
+    )
+  )
   where
     (
       __messages__."forum_id" = $1::"uuid"
@@ -53,7 +73,7 @@ from (
   order by __messages__."id" desc
   limit 2
 ) __stream_wrapped__
-order by __stream_wrapped__."2"
+order by __stream_wrapped__."3"
 offset 1;
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
@@ -61,25 +81,3 @@ fetch forward 100 from __SNAPSHOT_CURSOR_0__
 close __SNAPSHOT_CURSOR_0__
 
 commit; /*fake*/
-
-select
-  __users__."username" as "0",
-  __users__."gravatar_url" as "1"
-from app_public.users as __users__
-where
-  (
-    __users__."id" = $1::"uuid"
-  ) and (
-    true /* authorization checks */
-  );
-
-select
-  __users__."username" as "0",
-  __users__."gravatar_url" as "1"
-from app_public.users as __users__
-where
-  (
-    __users__."id" = $1::"uuid"
-  ) and (
-    true /* authorization checks */
-  );

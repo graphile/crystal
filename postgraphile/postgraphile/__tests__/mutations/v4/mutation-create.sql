@@ -397,8 +397,13 @@ select
     select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
   )::text end) as "2",
-  __post__."author_id"::text as "3"
+  __person__."person_full_name" as "3"
 from "a"."post" as __post__
+left outer join "c"."person" as __person__
+on (
+/* WHERE becoming ON */ (
+  __person__."id" = __post__."author_id"
+))
 where (
   __post__."id" = $1::"int4"
 )
@@ -409,10 +414,3 @@ select
   __frmcdc_comptype__."is_optimised"::text as "1",
   (not (__frmcdc_comptype__ is null))::text as "2"
 from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
-
-select
-  __person__."person_full_name" as "0"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-);
