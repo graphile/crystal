@@ -756,19 +756,39 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
-    const stepPolymorphicPaths = step.polymorphicPaths;
+    let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
-    let dependencies = step.implicitSideEffectStep
-      ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
-      : dependenciesIncludingSideEffects;
+    const dependenciesIncludingSideEffectsCount =
+      dependenciesIncludingSideEffects.length;
+    let dependencies =
+      dependenciesIncludingSideEffectsCount > legitDepsCount
+        ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
+        : dependenciesIncludingSideEffects;
 
     // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
-    // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
+    let hasPolyMatch = true;
+    if (step._isUnary && stepPolymorphicPaths !== null) {
+      // Check that at least one datapoint matches one of our paths
+      hasPolyMatch = false;
+      for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+        if (
+          stepPolymorphicPaths.has(polymorphicPathList[dataIndex] as string)
+        ) {
+          hasPolyMatch = true;
+          break;
+        }
+      }
+      stepPolymorphicPaths = null;
+    }
     for (let dataIndex = 0; dataIndex < expectedSize; dataIndex++) {
-      let forceIndexValue: Error | null | undefined = undefined;
+      let forceIndexValue: Error | null | undefined = hasPolyMatch
+        ? undefined
+        : null;
       let rejectValue: Error | null | undefined = undefined;
-      let indexFlags: ExecutionEntryFlags = NO_FLAGS;
+      let indexFlags: ExecutionEntryFlags = hasPolyMatch
+        ? NO_FLAGS
+        : FLAG_POLY_SKIPPED;
       if (
         stepPolymorphicPaths !== null &&
         !stepPolymorphicPaths.has(polymorphicPathList[dataIndex] as string)
@@ -776,11 +796,7 @@ export function executeBucket(
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
       } else if (extra._bucket.flagUnion) {
-        for (
-          let i = 0, l = dependenciesIncludingSideEffects.length;
-          i < l;
-          i++
-        ) {
+        for (let i = 0; i < dependenciesIncludingSideEffectsCount; i++) {
           const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
           const onReject = dependencyOnReject[i];
@@ -934,6 +950,11 @@ export function executeBucket(
         forbiddenFlags: ExecutionEntryFlags,
         onReject: Error | null | undefined,
       ) => {
+        if (step._isUnary && !$dep._isUnary) {
+          throw new Error(
+            `GrafastInternalError<58bc38e2-8722-4c19-ba38-fd01a020654b>: unary step ${step} cannot be made dependent on non-unary step ${$dep}!`,
+          );
+        }
         const executionValue = store.get($dep.id);
         if (executionValue === undefined) {
           throw new Error(
@@ -962,7 +983,9 @@ export function executeBucket(
       }
       const $sideEffect = step.implicitSideEffectStep;
       if ($sideEffect) {
-        addDependency($sideEffect, defaultForbiddenFlags, undefined);
+        if ($sideEffect._isUnary || !step._isUnary) {
+          addDependency($sideEffect, defaultForbiddenFlags, undefined);
+        }
       }
       if (
         isDev &&
