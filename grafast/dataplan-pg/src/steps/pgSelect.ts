@@ -3266,9 +3266,12 @@ class PgSelectInlineApplyStep<
 
         if (this.viaSubquery) {
           const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
+          const { sql: baseQuery } = buildQueryFromParts(parts);
           const selectIndex = queryBuilder.selectAndReturnIndex(
-            sql`ARRAY[]::text[]::text`,
+            // 's' for 'subquery'
+            sql`(select json_agg(s) from (${sql.indent(baseQuery)}) s)`,
           );
+
           const details: PgSelectInlineViaSubqueryDetails = {
             cursorDetails,
             shouldReverseOrder,
@@ -3573,7 +3576,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
 function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
-    asJsonAgg?: boolean;
     withIdentifiers?: boolean;
     extraSelects?: SQL[];
     forceOrder?: boolean;
@@ -3582,6 +3584,10 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
   sql: SQL;
   extraSelectIndexes: number[];
 } {
+  return buildQueryFromParts(buildQueryParts(info, options));
+}
+
+function buildQueryFromParts(parts: ReturnType<typeof buildQueryParts>) {
   const {
     select,
     from,
@@ -3592,19 +3598,13 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
     orderBy,
     limitAndOffset,
     extraSelectIndexes,
-  } = buildQueryParts(info, options);
-
+  } = parts;
   const join = buildJoin(joins);
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
   const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
-  const query = options.asJsonAgg
-    ? // 's' for 'subquery'
-      sql`select json_agg(s) from (${sql.indent(baseQuery)}) s`
-    : baseQuery;
-
-  return { sql: query, extraSelectIndexes };
+  return { sql: baseQuery, extraSelectIndexes };
 }
 
 function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
