@@ -1732,9 +1732,10 @@ export class PgSelectStep<
             $pgSelectSingle,
           );
           this.mergePlaceholdersInto($pgSelect);
+          const identifier = `${this.id}`;
           $pgSelect.withLayerPlan(() => {
             $pgSelect.apply(
-              new PgSelectInlineApplyStep({
+              new PgSelectInlineApplyStep(identifier, {
                 staticInfo: PgSelectStep.getStaticInfo(this),
                 $first: this.maybeGetDep(this.firstStepId),
                 $last: this.maybeGetDep(this.lastStepId),
@@ -1751,9 +1752,11 @@ export class PgSelectStep<
           // NOTE: we don't need to reverse the list for relay pagination
           // because it only contains one entry.
           return object({
+            // TODO: this meta is very unclear!
             m: constant(this._meta),
             hasMore: constant(false),
             items: list([remapKeys($pgSelectSingle, actualKeyByDesiredKey)]),
+            // cursorDetails: $pgSelect.getMeta(`cursorDetails${identifier}`),
           });
         } else {
           debugPlanVerbose(
@@ -1768,6 +1771,7 @@ export class PgSelectStep<
             m: constant(this._meta),
             hasMore: constant(false),
             items: list([$pgSelectSingle]),
+            // cursorDetails: null
           });
         }
       } else {
@@ -3121,15 +3125,18 @@ class PgSelectInlineApplyStep<
   private beforeStepId: number | null;
   private applyDepIds: number[];
 
-  constructor(details: {
-    staticInfo: StaticInfo<TResource>;
-    $first: Step | null;
-    $last: Step | null;
-    $offset: Step | null;
-    $after: Step | null;
-    $before: Step | null;
-    applySteps: Step[];
-  }) {
+  constructor(
+    private identifier: string,
+    details: {
+      staticInfo: StaticInfo<TResource>;
+      $first: Step | null;
+      $last: Step | null;
+      $offset: Step | null;
+      $after: Step | null;
+      $before: Step | null;
+      applySteps: Step[];
+    },
+  ) {
     super();
     const { staticInfo, $first, $last, $offset, $after, $before, applySteps } =
       details;
@@ -3150,7 +3157,7 @@ class PgSelectInlineApplyStep<
     }
     return [
       (queryBuilder: PgSelectQueryBuilder) => {
-        const parts = buildPartsForInlining({
+        const { parts, info } = buildPartsForInlining({
           executionDetails,
 
           // My own dependencies
@@ -3184,6 +3191,15 @@ class PgSelectInlineApplyStep<
         for (const join of joins) {
           queryBuilder.join(join);
         }
+        const { cursorDigest, cursorIndicies } = info;
+        const cursorDetails: PgCursorDetails | undefined =
+          cursorDigest != null && cursorIndicies != null
+            ? {
+                digest: cursorDigest,
+                indicies: cursorIndicies,
+              }
+            : undefined;
+        queryBuilder.setMeta(`cursorDetails${this.identifier}`, cursorDetails);
       },
     ];
   }
@@ -3192,15 +3208,11 @@ class PgSelectInlineApplyStep<
 function buildPartsForInlining<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 >(rawInfo: CoreInfo<TResource>) {
-  const {
-    info,
-
-    count,
-    trueOrderBySQL,
-    stream,
-    meta,
-  } = buildTheQueryCore(rawInfo);
-  return buildQueryParts(info, {});
+  const coreResult = buildTheQueryCore(rawInfo);
+  return {
+    ...coreResult,
+    parts: buildQueryParts(coreResult.info, {}),
+  };
 }
 
 function applyConditionFromCursor<
