@@ -59,45 +59,65 @@ order by __types__."id" asc;
 
 select
   __post__."headline" as "0",
-  case when (__post__) is not distinct from null then null::text else json_build_array((((__post__)."id"))::text, ((__post__)."headline"), ((__post__)."body"), (((__post__)."author_id"))::text, (((__post__)."enums"))::text, (case when (((__post__)."comptypes")) is not distinct from null then null::text else array(
-    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
-    from unnest(((__post__)."comptypes")) __comptype__
-  )::text end))::text end as "1",
-  "a"."post_headline_trimmed"(__post__) as "2",
+  "a"."post_headline_trimmed"(__post__) as "1",
   "a"."post_headline_trimmed"(
     __post__,
     $1::"int4"
-  ) as "3",
+  ) as "2",
   "a"."post_headline_trimmed"(
     __post__,
     $2::"int4",
     $3::"text"
-  ) as "4",
-  "a"."post_headline_trimmed_strict"(__post__) as "5",
+  ) as "3",
+  "a"."post_headline_trimmed_strict"(__post__) as "4",
   "a"."post_headline_trimmed_strict"(
     __post__,
     $4::"int4"
-  ) as "6",
+  ) as "5",
   "a"."post_headline_trimmed_strict"(
     __post__,
     $5::"int4",
     $6::"text"
-  ) as "7",
+  ) as "6",
   "a"."post_headline_trimmed_no_defaults"(
     __post__,
     $7::"int4",
     $8::"text"
-  ) as "8",
+  ) as "7",
   "a"."post_headline_trimmed_no_defaults"(
     __post__,
     $9::"int4",
     $10::"text"
-  ) as "9",
-  ("a"."post_computed_text_array"(__post__))::text as "10",
+  ) as "8",
+  ("a"."post_computed_text_array"(__post__))::text as "9",
   (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
     select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
     from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-  )::text end) as "11"
+  )::text end) as "10",
+  array(
+    select array[
+      __post_computed_compound_type_array__."a"::text,
+      __post_computed_compound_type_array__."b",
+      __post_computed_compound_type_array__."c"::text,
+      __post_computed_compound_type_array__."d",
+      __post_computed_compound_type_array__."e"::text,
+      __post_computed_compound_type_array__."f"::text,
+      to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      __post_computed_compound_type_array__."foo_bar"::text,
+      (not (__post_computed_compound_type_array__ is null))::text
+    ]::text[]
+    from unnest("a"."post_computed_compound_type_array"(
+      __post__,
+      $11::"c"."compound_type"
+    )) as __post_computed_compound_type_array__
+  )::text as "11",
+  array(
+    select array[
+      to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      (row_number() over (partition by 1))::text
+    ]::text[]
+    from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
+  )::text as "12"
 from "a"."post" as __post__
 order by __post__."id" asc;
 
@@ -160,54 +180,20 @@ lateral (
   on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
-select __post_computed_compound_type_array_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($2::json) with ordinality as ids) as __post_computed_compound_type_array_identifiers__,
-lateral (
-  select
-    __post_computed_compound_type_array__."a"::text as "0",
-    __post_computed_compound_type_array__."b" as "1",
-    __post_computed_compound_type_array__."c"::text as "2",
-    __post_computed_compound_type_array__."d" as "3",
-    __post_computed_compound_type_array__."e"::text as "4",
-    __post_computed_compound_type_array__."f"::text as "5",
-    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-    __post_computed_compound_type_array__."foo_bar"::text as "7",
-    (not (__post_computed_compound_type_array__ is null))::text as "8",
-    __post_computed_compound_type_array_identifiers__.idx as "9"
-  from unnest("a"."post_computed_compound_type_array"(
-    __post_computed_compound_type_array_identifiers__."id0",
-    $1::"c"."compound_type"
-  )) as __post_computed_compound_type_array__
-) as __post_computed_compound_type_array_result__;
-
-select __post_computed_interval_set_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_computed_interval_set_identifiers__,
-lateral (
-  select
-    to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
-    (row_number() over (partition by 1))::text as "1",
-    __post_computed_interval_set_identifiers__.idx as "2"
-  from "a"."post_computed_interval_set"(__post_computed_interval_set_identifiers__."id0") as __post_computed_interval_set__(v)
-) as __post_computed_interval_set_result__;
-
-select __person_friends_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
-lateral (
-  select
-    __person_friends__."person_full_name" as "0",
-    case when (__person_friends__) is not distinct from null then null::text else json_build_array((((__person_friends__)."id"))::text, ((__person_friends__)."person_full_name"), (((__person_friends__)."aliases"))::text, ((__person_friends__)."about"), ((__person_friends__)."email"), case when (((__person_friends__)."site")) is not distinct from null then null::text else json_build_array(((((__person_friends__)."site"))."url"))::text end, (((__person_friends__)."config"))::text, (((__person_friends__)."last_login_from_ip"))::text, (((__person_friends__)."last_login_from_subnet"))::text, (((__person_friends__)."user_mac"))::text, to_char(((__person_friends__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "1",
-    "c"."person_first_name"(__person_friends__) as "2",
-    __person_friends_identifiers__.idx as "3"
-  from "c"."person_friends"(__person_friends_identifiers__."id0") as __person_friends__
-) as __person_friends_result__;
-
 select __person_friends_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."person" as "id0" from json_array_elements($1::json) with ordinality as ids) as __person_friends_identifiers__,
 lateral (
   select
     __person_friends__."person_full_name" as "0",
     "c"."person_first_name"(__person_friends__) as "1",
-    __person_friends_identifiers__.idx as "2"
+    array(
+      select array[
+        __person_friends_2."person_full_name",
+        "c"."person_first_name"(__person_friends_2)
+      ]::text[]
+      from "c"."person_friends"(__person_friends__) as __person_friends_2
+      limit 1
+    )::text as "2",
+    __person_friends_identifiers__.idx as "3"
   from "c"."person_friends"(__person_friends_identifiers__."id0") as __person_friends__
-  limit 1
 ) as __person_friends_result__;

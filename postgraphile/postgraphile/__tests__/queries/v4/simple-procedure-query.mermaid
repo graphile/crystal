@@ -9,28 +9,30 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect41[["PgSelect[41∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
+    PgSelect67[["PgSelect[67∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant92{{"Constant[92∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    PgFromExpression78{{"PgFromExpression[78∈0] ➊"}}:::plan
+    PgSelectInlineApply85["PgSelectInlineApply[85∈0] ➊"]:::plan
+    Object11 & Constant92 & PgFromExpression78 & PgSelectInlineApply85 --> PgSelect67
+    PgSelect41[["PgSelect[41∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
     PgFromExpression43{{"PgFromExpression[43∈0] ➊"}}:::plan
     Object11 & PgFromExpression43 --> PgSelect41
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_type_set_queryᐳ"]]:::plan
-    Constant85{{"Constant[85∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Object11 & Constant85 --> PgSelect8
+    Constant89{{"Constant[89∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Object11 & Constant89 --> PgSelect8
     PgSelect25[["PgSelect[25∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
     Object11 --> PgSelect25
     PgSelect33[["PgSelect[33∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant90{{"Constant[90∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Object11 --> PgSelect33
-    Constant86 -- 2 --> PgSelect33
-    Constant87{{"Constant[87∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Constant85 & Constant87 --> PgFromExpression43
+    Constant90 -- 2 --> PgSelect33
+    Constant91{{"Constant[91∈0] ➊<br />ᐸ6ᐳ"}}:::plan
+    Constant89 & Constant91 --> PgFromExpression43
     PgSelect48[["PgSelect[48∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
     Object11 --> PgSelect48
     PgSelect54[["PgSelect[54∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
     Object11 --> PgSelect54
-    PgSelect67[["PgSelect[67∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object11 & Constant88 --> PgSelect67
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
@@ -52,7 +54,6 @@ graph TD
     PgSelectRows69[["PgSelectRows[69∈0] ➊"]]:::plan
     PgSelect67 --> PgSelectRows69
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgFromExpression78{{"PgFromExpression[78∈0] ➊"}}:::plan
     __Item13[/"__Item[13∈1]<br />ᐸ12ᐳ"\]:::itemplan
     PgSelectRows12 ==> __Item13
     PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
@@ -101,18 +102,20 @@ graph TD
     __Item57 --> PgSelectSingle58
     PgClassExpression59{{"PgClassExpression[59∈10]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression59
-    PgSelect74[["PgSelect[74∈12]<br />ᐸpost_computed_interval_setᐳ"]]:::plan
-    PgClassExpression73{{"PgClassExpression[73∈12]<br />ᐸ__post__ᐳ"}}:::plan
-    Object11 & PgClassExpression73 & PgFromExpression78 --> PgSelect74
+    List87{{"List[87∈12]<br />ᐸ70,86ᐳ"}}:::plan
     __Item70[/"__Item[70∈12]<br />ᐸ69ᐳ"\]:::itemplan
+    Access86{{"Access[86∈12] ➊<br />ᐸ67.m.subqueryDetailsFor74ᐳ"}}:::plan
+    __Item70 & Access86 --> List87
     PgSelectRows69 ==> __Item70
     PgSelectSingle71{{"PgSelectSingle[71∈12]<br />ᐸpostᐳ"}}:::plan
     __Item70 --> PgSelectSingle71
     PgClassExpression72{{"PgClassExpression[72∈12]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression72
-    PgSelectSingle71 --> PgClassExpression73
     PgSelectRows79[["PgSelectRows[79∈12]"]]:::plan
-    PgSelect74 --> PgSelectRows79
+    Lambda88{{"Lambda[88∈12]"}}:::plan
+    Lambda88 --> PgSelectRows79
+    PgSelect67 --> Access86
+    List87 --> Lambda88
     __Item80[/"__Item[80∈13]<br />ᐸ79ᐳ"\]:::itemplan
     PgSelectRows79 ==> __Item80
     PgSelectSingle81{{"PgSelectSingle[81∈13]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
@@ -123,9 +126,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/simple-procedure-query"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 78, 85, 86, 87, 88, 11, 43<br />2: 8, 25, 33, 41, 48, 54, 67<br />3: 12, 27, 35, 44, 50, 56, 69"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 78, 89, 90, 91, 92, 11, 43<br />2: 8, 25, 33, 41, 48, 54, 85<br />3: 12, 27, 35, 44, 50, 56, 67<br />4: PgSelectRows[69]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,PgSelectRows27,PgSelect33,PgSelectRows35,PgSelect41,PgFromExpression43,PgSelectRows44,PgSelect48,PgSelectRows50,PgSelect54,PgSelectRows56,PgSelect67,PgSelectRows69,PgFromExpression78,Constant85,Constant86,Constant87,Constant88 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,PgSelectRows12,PgSelect25,PgSelectRows27,PgSelect33,PgSelectRows35,PgSelect41,PgFromExpression43,PgSelectRows44,PgSelect48,PgSelectRows50,PgSelect54,PgSelectRows56,PgSelect67,PgSelectRows69,PgFromExpression78,PgSelectInlineApply85,Constant89,Constant90,Constant91,Constant92 bucket0
     Bucket1("Bucket 1 (listItem)<br /><br />ROOT __Item{1}ᐸ12ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
@@ -159,9 +162,9 @@ graph TD
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgClassExpression{10}ᐸ__query_in...al_set__.vᐳ[59]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
-    Bucket12("Bucket 12 (listItem)<br />Deps: 11, 78, 7<br /><br />ROOT __Item{12}ᐸ69ᐳ[70]<br />1: <br />ᐳ: 71, 72, 73<br />2: PgSelect[74]<br />3: PgSelectRows[79]"):::bucket
+    Bucket12("Bucket 12 (listItem)<br />Deps: 67<br /><br />ROOT __Item{12}ᐸ69ᐳ[70]<br />1: <br />ᐳ: 71, 86, 72, 87, 88<br />2: PgSelectRows[79]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,__Item70,PgSelectSingle71,PgClassExpression72,PgClassExpression73,PgSelect74,PgSelectRows79 bucket12
+    class Bucket12,__Item70,PgSelectSingle71,PgClassExpression72,PgSelectRows79,Access86,List87,Lambda88 bucket12
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ79ᐳ[80]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item80,PgSelectSingle81,PgClassExpression82 bucket13

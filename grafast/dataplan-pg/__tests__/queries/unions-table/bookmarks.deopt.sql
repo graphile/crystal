@@ -1,6 +1,24 @@
 select
   __people__."person_id"::text as "0",
-  __people__."username" as "1"
+  __people__."username" as "1",
+  array(
+    select array[
+      __person_bookmarks__."id"::text,
+      __person_bookmarks__."person_id"::text,
+      __person_bookmarks__."bookmarked_entity"::text,
+      ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
+      ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
+      ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
+    ]::text[]
+    from interfaces_and_unions.person_bookmarks as __person_bookmarks__
+    where
+      (
+        __person_bookmarks__."person_id" = __people__."person_id"
+      ) and (
+        true /* authorization checks */
+      )
+    order by __person_bookmarks__."id" asc
+  )::text as "2"
 from interfaces_and_unions.people as __people__
 where
   (
@@ -8,22 +26,6 @@ where
   ) and (
     true /* authorization checks */
   );
-
-select
-  __person_bookmarks__."id"::text as "0",
-  __person_bookmarks__."person_id"::text as "1",
-  __person_bookmarks__."bookmarked_entity"::text as "2",
-  ((__person_bookmarks__."bookmarked_entity")."person_id")::text as "3",
-  ((__person_bookmarks__."bookmarked_entity")."post_id")::text as "4",
-  ((__person_bookmarks__."bookmarked_entity")."comment_id")::text as "5"
-from interfaces_and_unions.person_bookmarks as __person_bookmarks__
-where
-  (
-    __person_bookmarks__."person_id" = $1::"int4"
-  ) and (
-    true /* authorization checks */
-  )
-order by __person_bookmarks__."id" asc;
 
 select __people_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __people_identifiers__,
