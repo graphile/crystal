@@ -212,12 +212,30 @@ select __frmcdc_nested_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
   from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
+  on TRUE
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
+  on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
 select __frmcdc_compound_type_result__.*
@@ -240,12 +258,30 @@ select __frmcdc_nested_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
   from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
+  on TRUE
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
+  on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
@@ -273,38 +309,6 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
 
 select
   __type_function_connection_mutation__."id"::text as "0",
@@ -386,12 +390,30 @@ select __frmcdc_nested_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
   from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
+  on TRUE
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
+  on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
 select __frmcdc_compound_type_result__.*
@@ -414,12 +436,30 @@ select __frmcdc_nested_compound_type_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
-    case when (__frmcdc_nested_compound_type__."a") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."a")."a"))::text, ((__frmcdc_nested_compound_type__."a")."b"), (((__frmcdc_nested_compound_type__."a")."c"))::text, ((__frmcdc_nested_compound_type__."a")."d"), (((__frmcdc_nested_compound_type__."a")."e"))::text, (((__frmcdc_nested_compound_type__."a")."f"))::text, to_char(((__frmcdc_nested_compound_type__."a")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."a")."foo_bar"))::text)::text end as "0",
-    case when (__frmcdc_nested_compound_type__."b") is not distinct from null then null::text else json_build_array((((__frmcdc_nested_compound_type__."b")."a"))::text, ((__frmcdc_nested_compound_type__."b")."b"), (((__frmcdc_nested_compound_type__."b")."c"))::text, ((__frmcdc_nested_compound_type__."b")."d"), (((__frmcdc_nested_compound_type__."b")."e"))::text, (((__frmcdc_nested_compound_type__."b")."f"))::text, to_char(((__frmcdc_nested_compound_type__."b")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__frmcdc_nested_compound_type__."b")."foo_bar"))::text)::text end as "1",
-    __frmcdc_nested_compound_type__."baz_buz"::text as "2",
-    (not (__frmcdc_nested_compound_type__ is null))::text as "3",
-    __frmcdc_nested_compound_type_identifiers__.idx as "4"
+    __frmcdc_compound_type__."a"::text as "0",
+    __frmcdc_compound_type__."b" as "1",
+    __frmcdc_compound_type__."c"::text as "2",
+    __frmcdc_compound_type__."d" as "3",
+    __frmcdc_compound_type__."e"::text as "4",
+    __frmcdc_compound_type__."f"::text as "5",
+    __frmcdc_compound_type__."foo_bar"::text as "6",
+    (not (__frmcdc_compound_type__ is null))::text as "7",
+    __frmcdc_compound_type_2."a"::text as "8",
+    __frmcdc_compound_type_2."b" as "9",
+    __frmcdc_compound_type_2."c"::text as "10",
+    __frmcdc_compound_type_2."d" as "11",
+    __frmcdc_compound_type_2."e"::text as "12",
+    __frmcdc_compound_type_2."f"::text as "13",
+    __frmcdc_compound_type_2."foo_bar"::text as "14",
+    (not (__frmcdc_compound_type_2 is null))::text as "15",
+    __frmcdc_nested_compound_type__."baz_buz"::text as "16",
+    (not (__frmcdc_nested_compound_type__ is null))::text as "17",
+    __frmcdc_nested_compound_type_identifiers__.idx as "18"
   from (select (__frmcdc_nested_compound_type_identifiers__."id0").*) as __frmcdc_nested_compound_type__
+  left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type__
+  on TRUE
+  left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_2
+  on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
 select __post_result__.*
@@ -447,38 +487,6 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
-
-select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
-lateral (
-  select
-    __frmcdc_compound_type__."a"::text as "0",
-    __frmcdc_compound_type__."b" as "1",
-    __frmcdc_compound_type__."c"::text as "2",
-    __frmcdc_compound_type__."d" as "3",
-    __frmcdc_compound_type__."e"::text as "4",
-    __frmcdc_compound_type__."f"::text as "5",
-    __frmcdc_compound_type__."foo_bar"::text as "6",
-    (not (__frmcdc_compound_type__ is null))::text as "7",
-    __frmcdc_compound_type_identifiers__.idx as "8"
-  from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
-) as __frmcdc_compound_type_result__;
 
 update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int8", "numeric" = $3::"numeric", "decimal" = $4::"numeric", "boolean" = $5::"bool", "varchar" = $6::"varchar", "enum" = $7::"b"."color", "enum_array" = $8::"b"."color"[], "domain" = $9::"a"."an_int", "domain2" = $10::"b"."another_int", "text_array" = $11::"text"[], "json" = $12::"json", "jsonb" = $13::"jsonb", "numrange" = $14::"pg_catalog"."numrange", "daterange" = $15::"pg_catalog"."daterange", "an_int_range" = $16::"a"."an_int_range", "timestamp" = $17::"timestamp", "timestamptz" = $18::"timestamptz", "date" = $19::"date", "time" = $20::"time", "timetz" = $21::"timetz", "interval" = $22::"interval", "interval_array" = $23::"interval"[], "money" = $24::"money", "compound_type" = $25::"c"."compound_type", "nested_compound_type" = $26::"b"."nested_compound_type", "point" = $27::"point", "nullablePoint" = $28::"point", "inet" = $29::"inet", "cidr" = $30::"cidr", "macaddr" = $31::"macaddr", "regproc" = $32::"regproc", "regprocedure" = $33::"regprocedure", "regoper" = $34::"regoper", "regoperator" = $35::"regoperator", "regclass" = $36::"regclass", "regtype" = $37::"regtype", "regconfig" = $38::"regconfig", "regdictionary" = $39::"regdictionary", "text_array_domain" = $40::"c"."text_array_domain", "int8_array_domain" = $41::"c"."int8_array_domain", "bytea" = $42::"bytea", "bytea_array" = $43::"bytea"[], "ltree" = $44::ltree, "ltree_array" = $45::ltree[] where (__types__."id" = $46::"int4") returning
   __types__."id"::text as "0",

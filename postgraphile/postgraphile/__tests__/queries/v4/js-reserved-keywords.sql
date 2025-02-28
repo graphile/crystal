@@ -1,8 +1,15 @@
 select
-  __machine__."constructor" as "0",
-  __machine__."input" as "1",
-  __machine__."id"::text as "2"
+  __building__."id"::text as "0",
+  __building__."constructor" as "1",
+  __machine__."constructor" as "2",
+  __machine__."input" as "3",
+  __machine__."id"::text as "4"
 from "js_reserved"."machine" as __machine__
+left outer join "js_reserved"."building" as __building__
+on (
+/* WHERE becoming ON */ (
+  __building__."constructor" = __machine__."constructor"
+))
 where (
   __machine__."id" = $1::"int4"
 );
@@ -14,14 +21,6 @@ select
 from "js_reserved"."building" as __building__
 where (
   __building__."id" = $1::"int4"
-);
-
-select
-  __building__."id"::text as "0",
-  __building__."constructor" as "1"
-from "js_reserved"."building" as __building__
-where (
-  __building__."constructor" = $1::"text"
 );
 
 select

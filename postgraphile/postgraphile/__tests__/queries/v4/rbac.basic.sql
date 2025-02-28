@@ -17,8 +17,15 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select
-  __person__."id"::text as "0"
+  __person_secret__."person_id"::text as "0",
+  __person_secret__."sekrit" as "1",
+  __person__."id"::text as "2"
 from "c"."person" as __person__
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
 where (
   __person__."id" = $1::"int4"
 );
@@ -30,8 +37,15 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select
-  __person__."id"::text as "0"
+  __person_secret__."person_id"::text as "0",
+  __person_secret__."sekrit" as "1",
+  __person__."id"::text as "2"
 from "c"."person" as __person__
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
 where (
   __person__."id" = $1::"int4"
 );
@@ -59,8 +73,17 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select
-  __person__."id"::text as "0"
+  __left_arm__."id"::text as "0",
+  __left_arm__."person_id"::text as "1",
+  __left_arm__."length_in_metres"::text as "2",
+  __left_arm__."mood" as "3",
+  __person__."id"::text as "4"
 from "c"."person" as __person__
+left outer join "c"."left_arm" as __left_arm__
+on (
+/* WHERE becoming ON */ (
+  __left_arm__."person_id" = __person__."id"
+))
 where (
   __person__."id" = $1::"int4"
 );
@@ -124,42 +147,12 @@ begin; /*fake*/
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
 select
-  __person_secret__."person_id"::text as "0",
-  __person_secret__."sekrit" as "1"
-from "c"."person_secret" as __person_secret__
-where (
-  __person_secret__."person_id" = $1::"int4"
-);
-
-commit; /*fake*/
-
-begin; /*fake*/
-
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
-
-select
   __left_arm__."id"::text as "0",
   __left_arm__."person_id"::text as "1",
   __left_arm__."length_in_metres"::text as "2",
   __left_arm__."mood" as "3"
 from "c"."left_arm" as __left_arm__
 order by __left_arm__."id" asc;
-
-commit; /*fake*/
-
-begin; /*fake*/
-
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
-
-select
-  __left_arm__."id"::text as "0",
-  __left_arm__."person_id"::text as "1",
-  __left_arm__."length_in_metres"::text as "2",
-  __left_arm__."mood" as "3"
-from "c"."left_arm" as __left_arm__
-where (
-  __left_arm__."person_id" = $1::"int4"
-);
 
 commit; /*fake*/
 
