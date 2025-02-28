@@ -1767,10 +1767,6 @@ export class PgSelectStep<
           (!$pgSelect.isUnique && relationshipIsBelongsTo);
         if (allowed) {
           // Add a nested select expression
-          // TODO
-          console.log(
-            `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - many`,
-          );
           const $__item = $pgSelectSingle.getItemStep();
           this.mergePlaceholdersInto($pgSelect);
           const identifier = `subqueryDetailsFor${this.id}`;
@@ -1803,7 +1799,8 @@ export class PgSelectStep<
                 last,
                 shouldReverseOrder,
               } = details;
-              const allVals = item[selectIndex] as any[] | null;
+              // We coerce to empty array because `json_agg` of no rows yields null
+              const allVals = (item[selectIndex] ?? []) as any[];
               return createSelectResult({
                 allVals,
                 first,
