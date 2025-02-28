@@ -3699,9 +3699,14 @@ function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
 
 function buildSelect(selects: readonly SQL[], asArray = false) {
   if (asArray) {
-    return sql`select array[\n${sql.indent(
-      sql.join(selects, ",\n"),
-    )}\n]::text[]`;
+    if (selects.length < 1) {
+      // Cannot accumulate empty arrays
+      return sql`select array[null]::text[]`;
+    } else {
+      return sql`select array[\n${sql.indent(
+        sql.join(selects, ",\n"),
+      )}\n]::text[]`;
+    }
   }
   const fragmentsWithAliases = selects.map(
     (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
