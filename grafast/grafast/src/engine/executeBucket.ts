@@ -966,6 +966,7 @@ export function executeBucket(
       }
       if (
         isDev &&
+        !step._isUnary &&
         step.layerPlan.reason.type === "polymorphic" &&
         step.polymorphicPaths === null
       ) {
@@ -975,6 +976,7 @@ export function executeBucket(
       }
       if (!needsFiltering) {
         const isSelectiveStep =
+          !step._isUnary &&
           step.layerPlan.reason.type === "polymorphic" &&
           step.polymorphicPaths!.size !==
             step.layerPlan.reason.polymorphicPaths.size;
