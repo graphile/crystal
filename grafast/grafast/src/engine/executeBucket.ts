@@ -155,9 +155,11 @@ export function executeBucket(
           normalStepIndex < l;
           normalStepIndex++
         ) {
+          const step = normalSteps[normalStepIndex].step;
+          const stepSize = step._isUnary ? 1 : bucket.size;
           const r = timeoutError;
-          const results = arrayOfLength(bucket.size, r);
-          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          const results = arrayOfLength(stepSize, r);
+          const flags = arrayOfLength(stepSize, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
@@ -173,6 +175,7 @@ export function executeBucket(
         normalStepIndex++
       ) {
         const step = normalSteps[normalStepIndex].step;
+        const stepSize = step._isUnary ? 1 : bucket.size;
         try {
           const r = executeStep(step);
           if (isPromiseLike(r)) {
@@ -190,8 +193,8 @@ export function executeBucket(
           }
         } catch (e) {
           const r = e;
-          const results = arrayOfLength(bucket.size, r);
-          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          const results = arrayOfLength(stepSize, r);
+          const flags = arrayOfLength(stepSize, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
@@ -906,6 +909,8 @@ export function executeBucket(
   function executeStep(
     step: Step,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
+    // DELIBERATE SHADOWING!
+    const size = step._isUnary ? 1 : bucket.size;
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
@@ -985,7 +990,7 @@ export function executeBucket(
             extra,
           )
         : reallyExecuteStepWithoutFiltering(
-            step._isUnary ? 1 : size,
+            size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
             extra,
