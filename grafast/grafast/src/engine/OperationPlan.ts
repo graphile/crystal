@@ -2962,7 +2962,22 @@ export class OperationPlan {
   }
 
   private deduplicateStep(step: Step): Step {
+    // Conditions applied to this step are now finalized, though we may still
+    // tell the step to do more stuff (like fetch extra data), it can no longer
+    // change its order, conditions, etc.
     step.isArgumentsFinalized = true;
+
+    // If a step is unary at this point, it must always remain unary.
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+
+      // And if a step is unary, it must execute once independent of the polymorphic
+      // data seen.
+      if (step.layerPlan.reason.type === "polymorphic") {
+        step.polymorphicPaths = step.layerPlan.reason.polymorphicPaths;
+      }
+    }
+
     if (step.deduplicate == null) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
