@@ -63,6 +63,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
+  PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   QueryValue,
@@ -977,7 +978,9 @@ on (${sql.indent(
     } = buildTheQuery<TAttributes, TTypeNames>({
       executionDetails,
       placeholders: this.placeholders,
+      placeholderSymbols: this.placeholders.map((p) => p.symbol),
       deferreds: this.deferreds,
+      deferredSymbols: this.deferreds.map((d) => d.symbol),
       firstStepId: this.firstStepId,
       lastStepId: this.lastStepId,
       offsetStepId: this.offsetStepId,
@@ -1131,7 +1134,8 @@ exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");
 interface PgUnionAllQueryInfo<
   TAttributes extends string = string,
   TTypeNames extends string = string,
-> extends PgStmtCommonQueryInfo {
+> extends PgStmtCommonQueryInfo,
+    PgStmtCompileQueryInfo {
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
   readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;

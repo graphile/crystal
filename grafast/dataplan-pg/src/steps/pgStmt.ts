@@ -441,8 +441,8 @@ export interface PgStmtCommonQueryInfo {
   readonly hasSideEffects: boolean;
 
   readonly executionDetails: ExecutionDetails;
-  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
-  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+  readonly placeholderSymbols: ReadonlyArray<symbol>;
+  readonly deferredSymbols: ReadonlyArray<symbol>;
   readonly fetchOneExtra: boolean;
   readonly forceIdentity: boolean;
   readonly needsCursor: boolean;
@@ -456,6 +456,11 @@ export interface PgStmtCommonQueryInfo {
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;
   readonly applyDepIds: ReadonlyArray<number>;
+}
+
+export interface PgStmtCompileQueryInfo extends PgStmtCommonQueryInfo {
+  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
+  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
 }
 
 export interface MutablePgStmtCommonQueryInfo {
@@ -540,7 +545,10 @@ export function applyCommonPaginationStuff(
     first == null && last != null && cursorLower == null && cursorUpper == null;
 }
 
-export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
+export function makeValues(
+  info: PgStmtCommonQueryInfo & PgStmtCompileQueryInfo,
+  name: string,
+) {
   const { executionDetails, placeholders, deferreds } = info;
   const { values, count } = executionDetails;
   const identifiersSymbol = Symbol(name + "_identifiers");
