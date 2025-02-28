@@ -26,6 +26,7 @@ import {
   isAsyncIterable,
   isDev,
   isPromiseLike,
+  lambda,
   list,
   object,
   remapKeys,
@@ -1070,31 +1071,15 @@ export class PgSelectStep<
           // Must be an error
           return allVals as never;
         }
-        if (allVals == null) {
-          return allVals;
-        }
-        const limit = first ?? last;
-        const firstAndLast = first != null && last != null && last < first;
-        const hasMore =
-          this.fetchOneExtra && limit != null && allVals.length > limit;
-        const trimFromStart =
-          !shouldReverseOrder && last != null && first == null;
-        const limitedRows = hasMore
-          ? trimFromStart
-            ? allVals.slice(Math.max(0, allVals.length - limit!))
-            : allVals.slice(0, limit!)
-          : allVals;
-        const slicedRows =
-          firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
-        const orderedRows = shouldReverseOrder
-          ? reverseArray(slicedRows)
-          : slicedRows;
-        return {
-          m: meta,
-          items: orderedRows,
-          hasMore,
+        return createSelectResult({
+          allVals,
+          first,
+          last,
+          fetchOneExtra: this.fetchOneExtra,
+          shouldReverseOrder,
+          meta,
           cursorDetails,
-        };
+        });
       });
     } else {
       if (shouldReverseOrder !== false) {
@@ -1732,10 +1717,10 @@ export class PgSelectStep<
             $pgSelectSingle,
           );
           this.mergePlaceholdersInto($pgSelect);
-          const identifier = `${this.id}`;
+          const identifier = `joinDetailsFor${this.id}`;
           $pgSelect.withLayerPlan(() => {
             $pgSelect.apply(
-              new PgSelectInlineApplyStep(identifier, {
+              new PgSelectInlineApplyStep(identifier, false, {
                 staticInfo: PgSelectStep.getStaticInfo(this),
                 $first: this.maybeGetDep(this.firstStepId),
                 $last: this.maybeGetDep(this.lastStepId),
@@ -1756,7 +1741,7 @@ export class PgSelectStep<
             m: constant(this._meta),
             hasMore: constant(false),
             items: list([remapKeys($pgSelectSingle, actualKeyByDesiredKey)]),
-            // cursorDetails: $pgSelect.getMeta(`cursorDetails${identifier}`),
+            // cursorDetails: $pgSelect.getMeta(identifier).cursorDetails,
           });
         } else {
           debugPlanVerbose(
@@ -1775,7 +1760,113 @@ export class PgSelectStep<
           });
         }
       } else {
-        /*
+        // TODO
+        const relationshipIsBelongsTo = true;
+        const allowed =
+          $pgSelectSingle.getAndFreezeIsUnary() ||
+          (!$pgSelect.isUnique && relationshipIsBelongsTo);
+        if (allowed) {
+          // Add a nested select expression
+          // TODO
+          console.log(
+            `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - many`,
+          );
+          const $__item = $pgSelectSingle.getItemStep();
+          this.mergePlaceholdersInto($pgSelect);
+          const identifier = `subqueryDetailsFor${this.id}`;
+          $pgSelect.withLayerPlan(() => {
+            $pgSelect.apply(
+              new PgSelectInlineApplyStep(identifier, true, {
+                staticInfo: PgSelectStep.getStaticInfo(this),
+                $first: this.maybeGetDep(this.firstStepId),
+                $last: this.maybeGetDep(this.lastStepId),
+                $offset: this.maybeGetDep(this.offsetStepId),
+                $after: this.maybeGetDep(this.afterStepId),
+                $before: this.maybeGetDep(this.beforeStepId),
+                applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
+              }),
+            );
+          });
+          const $details = $pgSelect.getMeta(
+            identifier,
+          ) as Step<PgSelectInlineViaSubqueryDetails>;
+
+          return lambda(
+            [$__item, $details],
+            ([item, details]) => {
+              const {
+                selectIndex,
+                cursorDetails,
+                meta,
+                fetchOneExtra,
+                first,
+                last,
+                shouldReverseOrder,
+              } = details;
+              const allVals = item[selectIndex] as any[] | null;
+              return createSelectResult({
+                allVals,
+                first,
+                last,
+                fetchOneExtra,
+                shouldReverseOrder,
+                meta,
+                cursorDetails,
+              });
+            },
+            true,
+          );
+
+          /*
+
+        const { sql: query } = this.buildQuery({
+          // No need to do arrays; the json_agg handles this for us - we can
+          // return objects with numeric keys just fine and JS will be fine
+          // with it.
+          asJsonAgg: true,
+        });
+        const selfIndex = $pgSelect.selectAndReturnIndex(sql`(${query})`);
+        debugPlanVerbose(
+          "Optimising %c (via %c and %c)",
+          this,
+          $pgSelect,
+          $__item,
+        );
+        const limit = this.first ?? this.last;
+        const firstAndLast =
+          this.first != null && this.last != null && this.last < this.first;
+        const rowsPlan = access<any[]>($__item, [selfIndex], []);
+        const shouldReverse = this.shouldReverseOrder();
+        if ((this.fetchOneExtra || firstAndLast) && limit != null) {
+          return lambda(
+            rowsPlan,
+            (rows) => {
+              if (!rows) {
+                return rows;
+              }
+              const hasMore = rows.length > limit;
+              const limitedRows = hasMore ? rows.slice(0, limit) : rows;
+              const slicedRows =
+                firstAndLast && this.last != null
+                  ? limitedRows.slice(-this.last)
+                  : limitedRows;
+              const orderedRows = shouldReverse
+                ? reverseArray(slicedRows)
+                : slicedRows;
+              if (hasMore) {
+                (orderedRows as any).hasMore = true;
+              }
+              return orderedRows;
+            },
+            true,
+          );
+        } else {
+          const orderedPlan = shouldReverse ? reverse(rowsPlan) : rowsPlan;
+          return orderedPlan;
+        }
+        */
+
+          /*
         const identifierMatchesExpressions = this.identifierMatches
           .map((m) => {
             const $dep = this.getDep(m.dependencyIndex);
@@ -1797,18 +1888,8 @@ export class PgSelectStep<
             );
           }),
         );
-
-        const allowed =
-          $pgSelectSingle.getAndFreezeIsUnary() ||
-          (!$pgSelect.isUnique && relationshipIsBelongsTo);
-        if (allowed) {
-          // Add a nested select expression
-          // TODO
-          console.log(
-            `Inline ${this} into ${$pgSelect}(${$pgSelectSingle}) - many`,
-          );
-        }
         */
+        }
       }
     }
 
@@ -2558,6 +2639,7 @@ function buildTheQueryCore<
     [$$toSQL]() {
       return info.alias;
     },
+    selectAndReturnIndex,
     join(spec) {
       info.joins.push(spec);
     },
@@ -3127,6 +3209,7 @@ class PgSelectInlineApplyStep<
 
   constructor(
     private identifier: string,
+    private viaSubquery: boolean,
     details: {
       staticInfo: StaticInfo<TResource>;
       $first: Step | null;
@@ -3172,25 +3255,6 @@ class PgSelectInlineApplyStep<
           ...this.staticInfo,
         });
 
-        const { whereConditions, joins } = parts;
-        const { from, alias, resource, joinAsLateral } = this.staticInfo;
-        const where = buildWhereOrHaving(
-          sql`/* WHERE becoming ON */`,
-          whereConditions,
-        );
-        queryBuilder.join({
-          type: "left",
-          from,
-          alias,
-          attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
-          // Note the WHERE is now part of the JOIN condition (since
-          // it's a LEFT JOIN).
-          conditions: where !== sql.blank ? [where] : [],
-          lateral: joinAsLateral,
-        });
-        for (const join of joins) {
-          queryBuilder.join(join);
-        }
         const { cursorDigest, cursorIndicies } = info;
         const cursorDetails: PgCursorDetails | undefined =
           cursorDigest != null && cursorIndicies != null
@@ -3199,10 +3263,57 @@ class PgSelectInlineApplyStep<
                 indicies: cursorIndicies,
               }
             : undefined;
-        queryBuilder.setMeta(`cursorDetails${this.identifier}`, cursorDetails);
+
+        if (this.viaSubquery) {
+          const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
+          const selectIndex = queryBuilder.selectAndReturnIndex(
+            sql`ARRAY[]::text[]::text`,
+          );
+          const details: PgSelectInlineViaSubqueryDetails = {
+            cursorDetails,
+            shouldReverseOrder,
+            fetchOneExtra,
+            selectIndex,
+            first,
+            last,
+            meta,
+          };
+          queryBuilder.setMeta(this.identifier, details);
+        } else {
+          const { whereConditions, joins } = parts;
+          const { from, alias, resource, joinAsLateral } = this.staticInfo;
+          const where = buildWhereOrHaving(
+            sql`/* WHERE becoming ON */`,
+            whereConditions,
+          );
+          queryBuilder.join({
+            type: "left",
+            from,
+            alias,
+            attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
+            // Note the WHERE is now part of the JOIN condition (since
+            // it's a LEFT JOIN).
+            conditions: where !== sql.blank ? [where] : [],
+            lateral: joinAsLateral,
+          });
+          for (const join of joins) {
+            queryBuilder.join(join);
+          }
+          // queryBuilder.setMeta(this.identifier, { cursorDetails });
+        }
       },
     ];
   }
+}
+
+interface PgSelectInlineViaSubqueryDetails {
+  selectIndex: number;
+  cursorDetails: PgCursorDetails | undefined;
+  meta: Record<string, any>;
+  fetchOneExtra: boolean;
+  first: Maybe<number>;
+  last: Maybe<number>;
+  shouldReverseOrder: boolean;
 }
 
 function buildPartsForInlining<
@@ -3543,6 +3654,7 @@ export interface PgSelectQueryBuilder<
   // IMPORTANT: if you add `JOIN` here, **only** allow `LEFT JOIN`, otherwise
   // if we're inlined things may go wrong.
   join(spec: PgSelectPlanJoin): void;
+  selectAndReturnIndex(fragment: SQL): number;
 }
 
 function buildWhereOrHaving(
@@ -3599,4 +3711,46 @@ function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
   });
 
   return joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+}
+
+function createSelectResult({
+  allVals,
+  first,
+  last,
+  fetchOneExtra,
+  shouldReverseOrder,
+  meta,
+  cursorDetails,
+}: {
+  allVals: null | readonly any[];
+  first: Maybe<number> | null;
+  last: Maybe<number> | null;
+  fetchOneExtra: boolean;
+  shouldReverseOrder: boolean;
+  meta: Record<string, any>;
+  cursorDetails: PgCursorDetails | undefined;
+}) {
+  if (allVals == null) {
+    return allVals as never;
+  }
+  const limit = first ?? last;
+  const firstAndLast = first != null && last != null && last < first;
+  const hasMore = fetchOneExtra && limit != null && allVals.length > limit;
+  const trimFromStart = !shouldReverseOrder && last != null && first == null;
+  const limitedRows = hasMore
+    ? trimFromStart
+      ? allVals.slice(Math.max(0, allVals.length - limit!))
+      : allVals.slice(0, limit!)
+    : allVals;
+  const slicedRows =
+    firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+  const orderedRows = shouldReverseOrder
+    ? reverseArray(slicedRows)
+    : slicedRows;
+  return {
+    m: meta,
+    items: orderedRows,
+    hasMore,
+    cursorDetails,
+  };
 }
