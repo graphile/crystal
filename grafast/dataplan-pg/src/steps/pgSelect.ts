@@ -3165,7 +3165,7 @@ class PgSelectInlineApplyStep<
           ...this.staticInfo,
         });
 
-        const { whereConditions } = parts;
+        const { whereConditions, joins } = parts;
         const { from, alias, resource, joinAsLateral } = this.staticInfo;
         const where = buildWhereOrHaving(
           sql`/* WHERE becoming ON */`,
@@ -3181,7 +3181,7 @@ class PgSelectInlineApplyStep<
           conditions: where !== sql.blank ? [where] : [],
           lateral: joinAsLateral,
         });
-        for (const join of this.staticInfo.joins) {
+        for (const join of joins) {
           queryBuilder.join(join);
         }
       },
@@ -3398,46 +3398,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
     };
   }
 
-  function buildJoin() {
-    const joins: SQL[] = info.joins.map((j) => {
-      const conditions: SQL =
-        j.type === "cross"
-          ? sql.blank
-          : j.conditions.length === 0
-          ? sql.true
-          : j.conditions.length === 1
-          ? j.conditions[0]
-          : sql.join(
-              j.conditions.map((c) => sql.parens(sql.indent(c))),
-              " and ",
-            );
-      const joinCondition =
-        j.type !== "cross"
-          ? sql`\non ${sql.parens(
-              sql.indentIf(j.conditions.length > 1, conditions),
-            )}`
-          : sql.blank;
-      const join: SQL =
-        j.type === "inner"
-          ? sql`inner join`
-          : j.type === "left"
-          ? sql`left outer join`
-          : j.type === "right"
-          ? sql`right outer join`
-          : j.type === "full"
-          ? sql`full outer join`
-          : j.type === "cross"
-          ? sql`cross join`
-          : (sql.blank as never);
-
-      return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
-        j.alias
-      }${j.attributeNames ?? sql.blank}${joinCondition}`;
-    });
-
-    return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
-  }
-
   function buildGroupBy() {
     const groups = info.groups;
     return {
@@ -3467,7 +3427,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
 
   const { sql: select, extraSelectIndexes } = buildSelect(options);
   const { sql: from } = buildFrom();
-  const { sql: join } = buildJoin();
   const { sql: groupBy } = buildGroupBy();
   const { sql: orderBy } = buildOrderBy(
     info,
@@ -3478,7 +3437,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   return {
     select,
     from,
-    join,
+    joins: info.joins,
     whereConditions: info.conditions,
     groupBy,
     havingConditions: info.havingConditions,
@@ -3503,7 +3462,7 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
   const {
     select,
     from,
-    join,
+    joins,
     whereConditions,
     groupBy,
     havingConditions,
@@ -3512,6 +3471,7 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
     extraSelectIndexes,
   } = buildQueryParts(info, options);
 
+  const join = buildJoin(joins);
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
@@ -3587,4 +3547,44 @@ function buildWhereOrHaving(
     : allConditions.length === 1
     ? sql`\n${whereOrHaving} ${sqlConditions}`
     : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`;
+}
+
+function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
+  const joins: SQL[] = inJoins.map((j) => {
+    const conditions: SQL =
+      j.type === "cross"
+        ? sql.blank
+        : j.conditions.length === 0
+        ? sql.true
+        : j.conditions.length === 1
+        ? j.conditions[0]
+        : sql.join(
+            j.conditions.map((c) => sql.parens(sql.indent(c))),
+            " and ",
+          );
+    const joinCondition =
+      j.type !== "cross"
+        ? sql`\non ${sql.parens(
+            sql.indentIf(j.conditions.length > 1, conditions),
+          )}`
+        : sql.blank;
+    const join: SQL =
+      j.type === "inner"
+        ? sql`inner join`
+        : j.type === "left"
+        ? sql`left outer join`
+        : j.type === "right"
+        ? sql`right outer join`
+        : j.type === "full"
+        ? sql`full outer join`
+        : j.type === "cross"
+        ? sql`cross join`
+        : (sql.blank as never);
+
+    return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
+      j.alias
+    }${j.attributeNames ?? sql.blank}${joinCondition}`;
+  });
+
+  return joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
 }
