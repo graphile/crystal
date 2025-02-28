@@ -39,6 +39,7 @@ import {
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
+import { parse } from "postgres-array";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
@@ -1800,7 +1801,8 @@ export class PgSelectStep<
                 shouldReverseOrder,
               } = details;
               // We coerce to empty array because `json_agg` of no rows yields null
-              const allVals = (item[selectIndex] ?? []) as any[];
+              const allValsRaw = item[selectIndex] as string;
+              const allVals = parse(allValsRaw) as any[];
               return createSelectResult({
                 allVals,
                 first,
@@ -3263,10 +3265,12 @@ class PgSelectInlineApplyStep<
 
         if (this.viaSubquery) {
           const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
-          const { sql: baseQuery } = buildQueryFromParts(parts);
+          const { sql: baseQuery } = buildQueryFromParts(parts, {
+            asArray: true,
+          });
           const selectIndex = queryBuilder.selectAndReturnIndex(
             // 's' for 'subquery'
-            sql`(select json_agg(s) from (${sql.indent(baseQuery)}) s)`,
+            sql`array(${sql.indent(baseQuery)})::text`,
           );
 
           const details: PgSelectInlineViaSubqueryDetails = {
@@ -3485,33 +3489,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   } = Object.create(null),
 ) {
   const { alias, resource, selects: baseSelects, _symbolSubstitutes } = info;
-  function buildSelect(
-    options: {
-      extraSelects?: readonly SQL[];
-    } = Object.create(null),
-  ) {
-    const { extraSelects = EMPTY_ARRAY } = options;
-    const selects = [...baseSelects, ...extraSelects];
-    const l = baseSelects.length;
-    const extraSelectIndexes = extraSelects.map((_, i) => i + l);
-
-    const fragmentsWithAliases = selects.map(
-      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-    );
-
-    const sqlAliases: SQL[] = [];
-    for (const [a, b] of _symbolSubstitutes.entries()) {
-      sqlAliases.push(sql.symbolAlias(a, b));
-    }
-    const aliases = sql.join(sqlAliases, "");
-
-    const selection =
-      fragmentsWithAliases.length > 0
-        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-        : sql` /* NOTHING?! */`;
-
-    return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
-  }
 
   function buildFrom() {
     return {
@@ -3548,7 +3525,6 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
     };
   }
 
-  const { sql: select, extraSelectIndexes } = buildSelect(options);
   const { sql: from } = buildFrom();
   const { sql: groupBy } = buildGroupBy();
   const { sql: orderBy } = buildOrderBy(
@@ -3557,8 +3533,13 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   );
   const { sql: limitAndOffset } = buildLimitAndOffset();
 
+  const { extraSelects = EMPTY_ARRAY } = options;
+  const selects = [...baseSelects, ...extraSelects];
+  const l = baseSelects.length;
+  const extraSelectIndexes = extraSelects.map((_, i) => i + l);
+
   return {
-    select,
+    selects,
     from,
     joins: info.joins,
     whereConditions: info.conditions,
@@ -3567,6 +3548,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
     orderBy,
     limitAndOffset,
     extraSelectIndexes,
+    _symbolSubstitutes,
   };
 }
 
@@ -3584,9 +3566,12 @@ function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
   return buildQueryFromParts(buildQueryParts(info, options));
 }
 
-function buildQueryFromParts(parts: ReturnType<typeof buildQueryParts>) {
+function buildQueryFromParts(
+  parts: ReturnType<typeof buildQueryParts>,
+  options: { asArray?: boolean } = {},
+) {
   const {
-    select,
+    selects,
     from,
     joins,
     whereConditions,
@@ -3596,11 +3581,13 @@ function buildQueryFromParts(parts: ReturnType<typeof buildQueryParts>) {
     limitAndOffset,
     extraSelectIndexes,
   } = parts;
+  const select = buildSelect(selects, options.asArray);
+  const aliases = buildAliases(parts._symbolSubstitutes);
   const join = buildJoin(joins);
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
-  const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
+  const baseQuery = sql`${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   return { sql: baseQuery, extraSelectIndexes };
 }
 
@@ -3708,6 +3695,32 @@ function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
   });
 
   return joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+}
+
+function buildSelect(selects: readonly SQL[], asArray = false) {
+  if (asArray) {
+    return sql`select array[\n${sql.indent(
+      sql.join(selects, ",\n"),
+    )}\n]::text[]`;
+  }
+  const fragmentsWithAliases = selects.map(
+    (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+  );
+
+  const selection =
+    fragmentsWithAliases.length > 0
+      ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+      : sql` /* NOTHING?! */`;
+
+  return sql`select${selection}`;
+}
+
+function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
+  const sqlAliases: SQL[] = [];
+  for (const [a, b] of _symbolSubstitutes.entries()) {
+    sqlAliases.push(sql.symbolAlias(a, b));
+  }
+  return sql.join(sqlAliases, "");
 }
 
 function createSelectResult({
