@@ -2608,10 +2608,7 @@ export class OperationPlan {
       }
       case "polymorphic": {
         // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
-        if (step._isUnary) {
-          // Probably fine to hoist
-          break;
-        } else if (
+        if (
           step.isSyncAndSafe &&
           step.polymorphicPaths!.size ===
             step.layerPlan.reason.polymorphicPaths.size
@@ -2704,28 +2701,26 @@ export class OperationPlan {
             .polymorphicPaths
         : POLYMORPHIC_ROOT_PATHS;
 
-      if (!step._isUnary) {
-        const myPaths = [...step.polymorphicPaths!];
-        if (parentPolymorphicPaths?.has(myPaths[0])) {
-          // All the others must be valid too
-        } else if (parentPolymorphicPaths === null) {
-          step.polymorphicPaths = null;
-        } else {
-          const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
-          const newPaths = new Set<string>();
-          for (const path of parentPolymorphicPaths) {
-            const prefix = path + ">";
-            const matches = myPaths.filter((p) => p.startsWith(prefix));
-            const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
-            if (matches.length !== layerMatches.length) {
-              // Can't hoist because it's not used for all polymorphicPaths of this type
-              return;
-            } else if (matches.length > 0) {
-              newPaths.add(path);
-            }
+      const myPaths = [...step.polymorphicPaths!];
+      if (parentPolymorphicPaths?.has(myPaths[0])) {
+        // All the others must be valid too
+      } else if (parentPolymorphicPaths === null) {
+        step.polymorphicPaths = null;
+      } else {
+        const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
+        const newPaths = new Set<string>();
+        for (const path of parentPolymorphicPaths) {
+          const prefix = path + ">";
+          const matches = myPaths.filter((p) => p.startsWith(prefix));
+          const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
+          if (matches.length !== layerMatches.length) {
+            // Can't hoist because it's not used for all polymorphicPaths of this type
+            return;
+          } else if (matches.length > 0) {
+            newPaths.add(path);
           }
-          step.polymorphicPaths = newPaths;
         }
+        step.polymorphicPaths = newPaths;
       }
     }
 
@@ -2978,7 +2973,9 @@ export class OperationPlan {
 
       // And if a step is unary, it must execute once independent of the polymorphic
       // data seen.
-      step.polymorphicPaths = null;
+      if (step.layerPlan.reason.type === "polymorphic") {
+        step.polymorphicPaths = step.layerPlan.reason.polymorphicPaths;
+      }
     }
 
     if (step.deduplicate == null) return step;
