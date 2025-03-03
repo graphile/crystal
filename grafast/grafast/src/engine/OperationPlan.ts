@@ -3063,7 +3063,7 @@ export class OperationPlan {
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
-      this.deduplicateStep,
+      this.hoistAndDeduplicate,
       this,
       step,
     );
