@@ -1464,7 +1464,13 @@ export class PgSelectStep<
         // for now.
         continue;
       }
-      const $dep = this.getDep(dependencyIndex);
+      let $dep = this.getDep(dependencyIndex);
+      if ($dep instanceof PgFromExpressionStep) {
+        const digest0 = $dep.getDigest(0);
+        if (digest0?.step && digest0.step instanceof PgClassExpressionStep) {
+          $dep = digest0.step;
+        }
+      }
       if ($dep instanceof PgClassExpressionStep) {
         const $depPgSelectSingle = $dep.getParentStep();
         if (!($depPgSelectSingle instanceof PgSelectSingleStep)) {
@@ -1656,6 +1662,13 @@ export class PgSelectStep<
       const dep = this.getDep(dependencyIndex);
       if (stepAMayDependOnStepB($target, dep)) {
         const newPlanIndex = $target.addDependency(dep);
+        $target.deferreds.push({
+          dependencyIndex: newPlanIndex,
+          symbol,
+        });
+      } else if (dep instanceof PgFromExpressionStep) {
+        const newDep = $target.withLayerPlan(() => dep.inlineInto($target));
+        const newPlanIndex = $target.addDependency(newDep);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
@@ -2290,6 +2303,7 @@ export function pgFromExpression(
   );
 }
 
+/** @internal */
 class PgFromExpressionStep extends UnbatchedStep<SQL> {
   private digests: ReadonlyArray<
     PgSelectArgumentPlaceholder | PgSelectArgumentDepId
@@ -2332,6 +2346,55 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
         return digest;
       }
     });
+  }
+
+  /** @internal */
+  getDigest(index: number) {
+    const digest = this.digests[index];
+    if (!digest) return null;
+    if (digest.depId != null) {
+      const { depId, ...rest } = digest;
+      return {
+        ...rest,
+        step: this.getDepOptions(depId).step,
+      };
+    } else {
+      return digest;
+    }
+  }
+
+  /** @internal */
+  inlineInto($target: PgSelectStep) {
+    return new PgFromExpressionStep(
+      this.from,
+      this.parameters,
+      this.digests.map((d) => {
+        if (d.depId != null) {
+          const { depId, ...rest } = d;
+          const step = this.getDep(depId);
+          if (step instanceof PgClassExpressionStep) {
+            const $parent = step.getParentStep();
+            if ($parent instanceof PgSelectSingleStep) {
+              const $pgSelect = $parent.getClassStep();
+              if ($pgSelect === $target) {
+                const { position, name } = rest;
+                return {
+                  position,
+                  name,
+                  placeholder: step.expression,
+                };
+              }
+            }
+          }
+          return {
+            ...rest,
+            step,
+          };
+        } else {
+          return d;
+        }
+      }),
+    );
   }
 
   public deduplicate(
