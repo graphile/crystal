@@ -37,6 +37,10 @@ test("escaped", () =>
     '"""',
     "\\\\\\",
   ]));
+test("mixed", () =>
+  expect(parseArray('{{3021,663,"PATIENT SISTER",2013}}')).toEqual([
+    ["3021", "663", "PATIENT SISTER", "2013"],
+  ]));
 test("null", () => expect(parseArray("{NULL,NULL}")).toEqual([null, null]));
 
 test("numerics", () => expect(intArray("{1,2,3}")).toEqual([1, 2, 3]));

@@ -45,6 +45,7 @@ export function parseArray(str: string, typdelim = ","): any[] {
       current.push(part === "NULL" ? null : part);
       currentStringStart = position + 1;
     }
+    mode = MODES.EXPECT_DELIM_AFTER_PROCESSED;
   }
 
   for (; position < rbraceIndex; position++) {
@@ -97,9 +98,16 @@ export function parseArray(str: string, typdelim = ","): any[] {
         throw new Error(`Invalid array text - too many '}'`);
       }
       current = arr;
-    } else {
+    } else if (mode === MODES.EXPECT_VALUE) {
+      currentStringStart = position;
       mode = MODES.IN_VALUE;
+    } else if (mode === MODES.IN_VALUE) {
       continue;
+    } else if (mode === MODES.EXPECT_DELIM_AFTER_PROCESSED) {
+      throw new Error("Was expecting delimeter");
+    } else {
+      const never: never = mode;
+      throw new Error(`Was not expecting to be in mode ${never}`);
     }
   }
   delim();
