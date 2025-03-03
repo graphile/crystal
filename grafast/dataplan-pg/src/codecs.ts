@@ -657,6 +657,13 @@ export function listOfCodec<
     typeDelim = `,`,
     name = `${innerCodec.name}[]` as TName,
   } = config ?? ({} as Record<string, never>);
+  const {
+    fromPg: innerCodecFromPg,
+    toPg: innerCodecToPg,
+    listCastFromPg: innerCodecListCastFromPg,
+    notNull: innerCodecNotNull,
+    executor,
+  } = innerCodec;
 
   const listCodec: PgCodec<
     TName,
@@ -670,7 +677,10 @@ export function listOfCodec<
     name,
     sqlType: identifier,
     fromPg: (value) =>
-      parseArray<PgCodecTFromJavaScript<TInnerCodec>>(value, innerCodec.fromPg),
+      parseArray<PgCodecTFromJavaScript<TInnerCodec>>(
+        value,
+        innerCodecFromPg === identity ? undefined : innerCodecFromPg,
+      ),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
@@ -682,7 +692,7 @@ export function listOfCodec<
           result += "NULL";
           continue;
         }
-        const str = innerCodec.toPg(v);
+        const str = innerCodecToPg(v);
         if (str == null) {
           result += "NULL";
           continue;
@@ -706,25 +716,25 @@ export function listOfCodec<
     description,
     extensions,
     arrayOfCodec: innerCodec,
-    ...(innerCodec.listCastFromPg
+    ...(innerCodecListCastFromPg
       ? {
-          castFromPg: innerCodec.listCastFromPg,
+          castFromPg: innerCodecListCastFromPg,
           listCastFromPg(frag, guaranteedNotNull) {
             return listCastViaUnnest(
               `${name}_item`,
               frag,
               (identifier) =>
-                innerCodec.listCastFromPg!.call(
+                innerCodecListCastFromPg.call(
                   this,
                   identifier,
-                  innerCodec.notNull,
+                  innerCodecNotNull,
                 ),
               guaranteedNotNull,
             );
           },
         }
       : null),
-    executor: innerCodec.executor,
+    executor: executor,
     [inspect.custom]: codecInspect,
   };
 

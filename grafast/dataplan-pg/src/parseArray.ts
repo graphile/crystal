@@ -45,7 +45,8 @@ export function parseArray<T = string>(
   const stack: any[][] = [];
 
   let currentStringStart: number = position;
-  let currentStringParts: string[] | null = null;
+  const currentStringParts: string[] = [];
+  let hasStringParts = false;
   let mode: Mode = EXPECT_VALUE;
   const haveTransform = transform != null;
 
@@ -66,19 +67,17 @@ export function parseArray<T = string>(
           } else if (char === BACKSLASH) {
             // We contain escaping, so we have to do it the slow way
             const part = str.slice(currentStringStart, position);
-            if (currentStringParts === null) {
-              currentStringParts = [part];
-            } else {
-              currentStringParts.push(part);
-            }
+            currentStringParts.push(part);
+            hasStringParts = true;
             currentStringStart = ++position;
           }
         }
         const part = str.slice(currentStringStart, position);
-        if (currentStringParts !== null) {
+        if (hasStringParts) {
           const final = currentStringParts.join("") + part;
           current.push(haveTransform ? transform(final) : final);
-          currentStringParts = null;
+          currentStringParts.length = 0;
+          hasStringParts = false;
         } else {
           current.push(haveTransform ? transform(part) : part);
         }
