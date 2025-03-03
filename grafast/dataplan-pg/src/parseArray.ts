@@ -10,14 +10,14 @@ const COMMA = ",";
 const NULL_STRING = "NULL";
 
 const EXPECT_VALUE = 0;
-const IN_QUOTES = 1;
-const IN_VALUE = 2;
-const EXPECT_DELIM_AFTER_PROCESSED = 3;
+const SIMPLE_VALUE = 1;
+const QUOTED_VALUE = 2;
+const EXPECT_DELIM = 3;
 type Mode =
   | typeof EXPECT_VALUE
-  | typeof IN_QUOTES
-  | typeof IN_VALUE
-  | typeof EXPECT_DELIM_AFTER_PROCESSED;
+  | typeof SIMPLE_VALUE
+  | typeof QUOTED_VALUE
+  | typeof EXPECT_DELIM;
 
 /**
  * Parses an array according to
@@ -54,7 +54,7 @@ export function parseArray(str: string): any[] {
     // > they are empty strings, contain curly braces, delimiter characters, double
     // > quotes, backslashes, or white space, or match the word NULL. Double quotes
     // > and backslashes embedded in element values will be backslash-escaped.
-    if (mode === IN_QUOTES) {
+    if (mode === QUOTED_VALUE) {
       if (char === BACKSLASH) {
         // We contain escaping, so we have to do it the slow way
         const part = str.slice(currentStringStart, position);
@@ -72,13 +72,13 @@ export function parseArray(str: string): any[] {
         } else {
           current.push(part);
         }
-        mode = EXPECT_DELIM_AFTER_PROCESSED;
+        mode = EXPECT_DELIM;
       } else {
         continue;
       }
     } else if (char === DQUOT) {
       // It's escaped
-      mode = IN_QUOTES;
+      mode = QUOTED_VALUE;
       currentStringStart = position + 1;
     } else if (char === LBRACE) {
       const newArray: any[] = [];
@@ -89,7 +89,7 @@ export function parseArray(str: string): any[] {
       mode = EXPECT_VALUE;
     } else if (char === COMMA) {
       // delim();
-      if (mode === IN_VALUE) {
+      if (mode === SIMPLE_VALUE) {
         const part = str.slice(currentStringStart, position);
         current.push(part === NULL_STRING ? null : part);
       }
@@ -97,12 +97,12 @@ export function parseArray(str: string): any[] {
       mode = EXPECT_VALUE;
     } else if (char === RBRACE) {
       //delim();
-      if (mode === IN_VALUE) {
+      if (mode === SIMPLE_VALUE) {
         const part = str.slice(currentStringStart, position);
         current.push(part === NULL_STRING ? null : part);
       }
 
-      mode = EXPECT_DELIM_AFTER_PROCESSED;
+      mode = EXPECT_DELIM;
       const arr = stack.pop();
       if (arr === undefined) {
         throw new Error(`Invalid array text - too many '}'`);
@@ -110,10 +110,10 @@ export function parseArray(str: string): any[] {
       current = arr;
     } else if (mode === EXPECT_VALUE) {
       currentStringStart = position;
-      mode = IN_VALUE;
-    } else if (mode === IN_VALUE) {
+      mode = SIMPLE_VALUE;
+    } else if (mode === SIMPLE_VALUE) {
       continue;
-    } else if (mode === EXPECT_DELIM_AFTER_PROCESSED) {
+    } else if (mode === EXPECT_DELIM) {
       throw new Error("Was expecting delimeter");
     } else {
       const never: never = mode;
@@ -122,7 +122,7 @@ export function parseArray(str: string): any[] {
   }
 
   //delim();
-  if (mode === IN_VALUE) {
+  if (mode === SIMPLE_VALUE) {
     const part = str.slice(currentStringStart, position);
     current.push(part === NULL_STRING ? null : part);
   }
