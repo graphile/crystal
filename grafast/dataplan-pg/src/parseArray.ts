@@ -49,9 +49,7 @@ export function parseArray(str: string): any[] {
     if (mode === IN_VALUE) {
       const part = str.slice(currentStringStart, position);
       current.push(part === "NULL" ? null : part);
-      currentStringStart = position + 1;
     }
-    mode = EXPECT_DELIM_AFTER_PROCESSED;
   }
 
   for (; position < rbraceIndex; position++) {
