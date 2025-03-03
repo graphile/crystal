@@ -2263,11 +2263,22 @@ export function pgFromExpression(
       const { step, name } = spec;
 
       const codec = "pgCodec" in spec ? spec.pgCodec : spec.step.pgCodec;
-      const placeholder = $placeholderable.placeholder(step, codec);
-      digests.push({
-        name,
-        placeholder,
-      });
+      if (step.getAndFreezeIsUnary()) {
+        // It's a unary step; depend on it directly because it allows us to do
+        // things like not passing parameters to PostgreSQL functions where
+        // those parameters are optional. (Without this, we'd supply `null`
+        // to these parameters, which would result in a different behavior.)
+        digests.push({
+          name,
+          step,
+        });
+      } else {
+        const placeholder = $placeholderable.placeholder(step, codec);
+        digests.push({
+          name,
+          placeholder,
+        });
+      }
     } else {
       digests.push(spec);
     }
