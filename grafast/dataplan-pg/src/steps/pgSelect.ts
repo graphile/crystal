@@ -1692,13 +1692,13 @@ export class PgSelectStep<
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
       !stream &&
-      this.mode === "normal" &&
       !this.joins.some((j) => j.type !== "left") &&
       (parentDetails = this.getParentForInlining()) !== null &&
       parentDetails.$pgSelect.mode === "normal"
     ) {
       const { $pgSelect, $pgSelectSingle } = parentDetails;
       if (
+        this.mode === "normal" &&
         this.isUnique &&
         this.firstStepId == null &&
         this.lastStepId == null &&
