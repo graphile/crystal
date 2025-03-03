@@ -19,13 +19,16 @@ type Mode =
   | typeof QUOTED_VALUE
   | typeof EXPECT_DELIM;
 
-type Parser<T> = (val: string) => T;
+type Transform<T> = (val: string) => T;
 
 /**
  * Parses an array according to
  * https://www.postgresql.org/docs/17/arrays.html#ARRAYS-IO
  */
-export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
+export function parseArray<T = string>(
+  str: string,
+  transform?: Transform<T>,
+): T[] {
   // If starts with `[`, it is specifying the index boundas. Skip past first `=`.
   let position = 0;
   if (str[position] === LBRACKET) {
@@ -49,7 +52,7 @@ export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
   let currentStringStart: number = position;
   let currentStringParts: string[] | null = null;
   let mode: Mode = EXPECT_VALUE;
-  const haveParser = parser != null;
+  const haveTransform = transform != null;
 
   for (; position < rbraceIndex; position++) {
     const char = str[position];
@@ -71,10 +74,10 @@ export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
         const part = str.slice(currentStringStart, position);
         if (currentStringParts !== null) {
           const final = currentStringParts.join("") + part;
-          current.push(haveParser ? parser(final) : final);
+          current.push(haveTransform ? transform(final) : final);
           currentStringParts = null;
         } else {
-          current.push(haveParser ? parser(part) : part);
+          current.push(haveTransform ? transform(part) : part);
         }
         mode = EXPECT_DELIM;
       } else {
@@ -96,7 +99,7 @@ export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
       if (mode === SIMPLE_VALUE) {
         const part = str.slice(currentStringStart, position);
         current.push(
-          part === NULL_STRING ? null : haveParser ? parser(part) : part,
+          part === NULL_STRING ? null : haveTransform ? transform(part) : part,
         );
       }
 
@@ -106,7 +109,7 @@ export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
       if (mode === SIMPLE_VALUE) {
         const part = str.slice(currentStringStart, position);
         current.push(
-          part === NULL_STRING ? null : haveParser ? parser(part) : part,
+          part === NULL_STRING ? null : haveTransform ? transform(part) : part,
         );
       }
 
@@ -133,7 +136,7 @@ export function parseArray<T = string>(str: string, parser?: Parser<T>): T[] {
   if (mode === SIMPLE_VALUE) {
     const part = str.slice(currentStringStart, position);
     current.push(
-      part === NULL_STRING ? null : haveParser ? parser(part) : part,
+      part === NULL_STRING ? null : haveTransform ? transform(part) : part,
     );
   }
 
