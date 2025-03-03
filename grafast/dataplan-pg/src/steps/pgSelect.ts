@@ -1710,58 +1710,32 @@ export class PgSelectStep<
         !this.fetchOneExtra
       ) {
         // Allow, do it via left join
-        if (this.selects.length > 0) {
-          debugPlanVerbose(
-            "Merging %c into %c (via %c)",
-            this,
-            $pgSelect,
-            $pgSelectSingle,
+        debugPlanVerbose(
+          "Merging %c into %c (via %c)",
+          this,
+          $pgSelect,
+          $pgSelectSingle,
+        );
+        this.mergePlaceholdersInto($pgSelect);
+        const identifier = `joinDetailsFor${this.id}`;
+        $pgSelect.withLayerPlan(() => {
+          $pgSelect.apply(
+            new PgSelectInlineApplyStep(identifier, false, {
+              staticInfo: PgSelectStep.getStaticInfo(this),
+              $first: this.maybeGetDep(this.firstStepId),
+              $last: this.maybeGetDep(this.lastStepId),
+              $offset: this.maybeGetDep(this.offsetStepId),
+              $after: this.maybeGetDep(this.afterStepId),
+              $before: this.maybeGetDep(this.beforeStepId),
+              applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
+            }),
           );
-          this.mergePlaceholdersInto($pgSelect);
-          const identifier = `joinDetailsFor${this.id}`;
-          $pgSelect.withLayerPlan(() => {
-            $pgSelect.apply(
-              new PgSelectInlineApplyStep(identifier, false, {
-                staticInfo: PgSelectStep.getStaticInfo(this),
-                $first: this.maybeGetDep(this.firstStepId),
-                $last: this.maybeGetDep(this.lastStepId),
-                $offset: this.maybeGetDep(this.offsetStepId),
-                $after: this.maybeGetDep(this.afterStepId),
-                $before: this.maybeGetDep(this.beforeStepId),
-                applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
-              }),
-            );
-          });
-          const actualKeyByDesiredKey = this.mergeSelectsWith($pgSelect);
-          // We return a list here because our children are going to use a
-          // `first` plan on us.
-          // NOTE: we don't need to reverse the list for relay pagination
-          // because it only contains one entry.
-          return object({
-            // TODO: this meta is very unclear!
-            m: constant(this._meta),
-            hasMore: constant(false),
-            items: list([remapKeys($pgSelectSingle, actualKeyByDesiredKey)]),
-            // cursorDetails: $pgSelect.getMeta(identifier).cursorDetails,
-          });
-        } else {
-          debugPlanVerbose(
-            "Skipping merging %c into %c (via %c) due to no attributes being selected",
-            this,
-            $pgSelect,
-            $pgSelectSingle,
-          );
-          // We return a list here because our children are going to use a
-          // `first` plan on us.
-          return object({
-            m: constant(this._meta),
-            hasMore: constant(false),
-            items: list([$pgSelectSingle]),
-            // cursorDetails: null
-          });
-        }
+        });
+        const $details = $pgSelect.getMeta(
+          identifier,
+        ) as Step<PgSelectInlineViaJoinDetails>;
+        return pgInlineTransform($details, $pgSelectSingle);
       } else {
-        // TODO
         const relationshipIsBelongsTo = true;
         const allowed =
           $pgSelectSingle.getAndFreezeIsUnary() ||
@@ -2289,19 +2263,11 @@ export function pgFromExpression(
       const { step, name } = spec;
 
       const codec = "pgCodec" in spec ? spec.pgCodec : spec.step.pgCodec;
-      if (step.getAndFreezeIsUnary()) {
-        // It's a unary step
-        digests.push({
-          name,
-          step,
-        });
-      } else {
-        const placeholder = $placeholderable.placeholder(step, codec);
-        digests.push({
-          name,
-          placeholder,
-        });
-      }
+      const placeholder = $placeholderable.placeholder(step, codec);
+      digests.push({
+        name,
+        placeholder,
+      });
     } else {
       digests.push(spec);
     }
@@ -3239,7 +3205,7 @@ class PgSelectInlineApplyStep<
     }
     return [
       (queryBuilder: PgSelectQueryBuilder) => {
-        const { parts, info } = buildPartsForInlining({
+        const { parts, info, meta } = buildPartsForInlining({
           executionDetails,
 
           // My own dependencies
@@ -3284,7 +3250,7 @@ class PgSelectInlineApplyStep<
           };
           queryBuilder.setMeta(this.identifier, details);
         } else {
-          const { whereConditions, joins } = parts;
+          const { whereConditions, joins, selects } = parts;
           const { from, alias, resource, joinAsLateral } = this.staticInfo;
           const where = buildWhereOrHaving(
             sql`/* WHERE becoming ON */`,
@@ -3303,13 +3269,26 @@ class PgSelectInlineApplyStep<
           for (const join of joins) {
             queryBuilder.join(join);
           }
-          // queryBuilder.setMeta(this.identifier, { cursorDetails });
+          const selectIndexes = selects.map((s) =>
+            queryBuilder.selectAndReturnIndex(s),
+          );
+          const details: PgSelectInlineViaJoinDetails = {
+            selectIndexes,
+            cursorDetails,
+            meta,
+          };
+          queryBuilder.setMeta(this.identifier, details);
         }
       },
     ];
   }
 }
 
+interface PgSelectInlineViaJoinDetails {
+  selectIndexes: number[];
+  cursorDetails: PgCursorDetails | undefined;
+  meta: Record<string, any>;
+}
 interface PgSelectInlineViaSubqueryDetails {
   selectIndex: number;
   cursorDetails: PgCursorDetails | undefined;
@@ -3768,4 +3747,27 @@ function createSelectResult({
     hasMore,
     cursorDetails,
   };
+}
+
+function pgInlineTransform(
+  $details: Step<PgSelectInlineViaJoinDetails>,
+  $pgSelectSingle: PgSelectSingleStep,
+) {
+  return lambda(
+    [$details, $pgSelectSingle],
+    function pgInlineViaJoinTransform([details, item]) {
+      const { meta, selectIndexes, cursorDetails } = details;
+      return {
+        m: meta,
+        hasMore: false,
+        // We return a list here because our children are going to use a
+        // `first` plan on us.
+        // NOTE: we don't need to reverse the list for relay pagination
+        // because it only contains one entry.
+        items: [selectIndexes.map((i) => item[i])],
+        cursorDetails,
+      };
+    },
+    true,
+  );
 }
