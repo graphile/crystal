@@ -3749,13 +3749,17 @@ function pgInlineViaJoinTransform([details, item]: readonly [
   any[],
 ]) {
   const { meta, selectIndexes, cursorDetails } = details;
+  const newItem = [];
+  for (let i = 0, l = selectIndexes.length; i < l; i++) {
+    newItem[i] = item[selectIndexes[i]];
+  }
   return {
     hasMore: false,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination
     // because it only contains one entry.
-    items: [selectIndexes.map((i) => item[i])],
+    items: [newItem],
     cursorDetails,
     m: meta,
   };
