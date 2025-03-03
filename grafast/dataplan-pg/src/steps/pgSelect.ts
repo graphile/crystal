@@ -1742,8 +1742,26 @@ export class PgSelectStep<
         const $details = $pgSelect.getMeta(
           identifier,
         ) as Step<PgSelectInlineViaJoinDetails>;
-        return pgInlineTransform($details, $pgSelectSingle);
+        return lambda(
+          [$details, $pgSelectSingle],
+          pgInlineViaJoinTransform,
+          true,
+        );
       } else {
+        /*
+        // TODO: this isn't really accurate plus it's expensive to calculate; fix it properly!
+        // An approximation of "belongs to" is: we're referencing a unique combination of columns on the parent.
+        const relationshipIsBelongsTo = $pgSelect.resource.uniques.some((u) =>
+          u.attributes.every((remoteColumn) => {
+            const remoteColumnExpression = sql`${
+              $pgSelect.alias
+            }.${sql.identifier(String(remoteColumn))}`;
+            return identifierMatchesExpressions.some((e) =>
+              sql.isEquivalent(e, remoteColumnExpression),
+            );
+          }),
+        );
+        */
         const relationshipIsBelongsTo = true;
         const allowed =
           $pgSelectSingle.getAndFreezeIsUnary() ||
@@ -1771,105 +1789,10 @@ export class PgSelectStep<
           ) as Step<PgSelectInlineViaSubqueryDetails>;
 
           return lambda(
-            [$__item, $details],
-            ([item, details]) => {
-              const {
-                selectIndex,
-                cursorDetails,
-                meta,
-                fetchOneExtra,
-                first,
-                last,
-                shouldReverseOrder,
-              } = details;
-              // We coerce to empty array because `json_agg` of no rows yields null
-              const allValsRaw = item[selectIndex] as string;
-              const allVals = parse(allValsRaw) as any[];
-              return createSelectResult({
-                allVals,
-                first,
-                last,
-                fetchOneExtra,
-                shouldReverseOrder,
-                meta,
-                cursorDetails,
-              });
-            },
+            [$details, $__item],
+            pgInlineViaSubqueryTransform,
             true,
           );
-
-          /*
-
-        const { sql: query } = this.buildQuery({
-          // No need to do arrays; the json_agg handles this for us - we can
-          // return objects with numeric keys just fine and JS will be fine
-          // with it.
-          asJsonAgg: true,
-        });
-        const selfIndex = $pgSelect.selectAndReturnIndex(sql`(${query})`);
-        debugPlanVerbose(
-          "Optimising %c (via %c and %c)",
-          this,
-          $pgSelect,
-          $__item,
-        );
-        const limit = this.first ?? this.last;
-        const firstAndLast =
-          this.first != null && this.last != null && this.last < this.first;
-        const rowsPlan = access<any[]>($__item, [selfIndex], []);
-        const shouldReverse = this.shouldReverseOrder();
-        if ((this.fetchOneExtra || firstAndLast) && limit != null) {
-          return lambda(
-            rowsPlan,
-            (rows) => {
-              if (!rows) {
-                return rows;
-              }
-              const hasMore = rows.length > limit;
-              const limitedRows = hasMore ? rows.slice(0, limit) : rows;
-              const slicedRows =
-                firstAndLast && this.last != null
-                  ? limitedRows.slice(-this.last)
-                  : limitedRows;
-              const orderedRows = shouldReverse
-                ? reverseArray(slicedRows)
-                : slicedRows;
-              if (hasMore) {
-                (orderedRows as any).hasMore = true;
-              }
-              return orderedRows;
-            },
-            true,
-          );
-        } else {
-          const orderedPlan = shouldReverse ? reverse(rowsPlan) : rowsPlan;
-          return orderedPlan;
-        }
-        */
-
-          /*
-        const identifierMatchesExpressions = this.identifierMatches
-          .map((m) => {
-            const $dep = this.getDep(m.dependencyIndex);
-            if (!($dep instanceof PgClassExpressionStep)) return null;
-            if ($dep.getParentStep() !== $pgSelectSingle) return null;
-            return $dep.expression;
-          })
-          .filter((e): e is SQL => e !== null);
-
-        // TODO: this isn't really accurate plus it's expensive to calculate; fix it properly!
-        // An approximation of "belongs to" is: we're referencing a unique combination of columns on the parent.
-        const relationshipIsBelongsTo = $pgSelect.resource.uniques.some((u) =>
-          u.attributes.every((remoteColumn) => {
-            const remoteColumnExpression = sql`${
-              $pgSelect.alias
-            }.${sql.identifier(String(remoteColumn))}`;
-            return identifierMatchesExpressions.some((e) =>
-              sql.isEquivalent(e, remoteColumnExpression),
-            );
-          }),
-        );
-        */
         }
       }
     }
@@ -3818,25 +3741,46 @@ function createSelectResult({
   };
 }
 
-function pgInlineTransform(
-  $details: Step<PgSelectInlineViaJoinDetails>,
-  $pgSelectSingle: PgSelectSingleStep,
-) {
-  return lambda(
-    [$details, $pgSelectSingle],
-    function pgInlineViaJoinTransform([details, item]) {
-      const { meta, selectIndexes, cursorDetails } = details;
-      return {
-        m: meta,
-        hasMore: false,
-        // We return a list here because our children are going to use a
-        // `first` plan on us.
-        // NOTE: we don't need to reverse the list for relay pagination
-        // because it only contains one entry.
-        items: [selectIndexes.map((i) => item[i])],
-        cursorDetails,
-      };
-    },
-    true,
-  );
+function pgInlineViaJoinTransform([details, item]: readonly [
+  PgSelectInlineViaJoinDetails,
+  any[],
+]) {
+  const { meta, selectIndexes, cursorDetails } = details;
+  return {
+    m: meta,
+    hasMore: false,
+    // We return a list here because our children are going to use a
+    // `first` plan on us.
+    // NOTE: we don't need to reverse the list for relay pagination
+    // because it only contains one entry.
+    items: [selectIndexes.map((i) => item[i])],
+    cursorDetails,
+  };
+}
+
+function pgInlineViaSubqueryTransform([details, item]: readonly [
+  PgSelectInlineViaSubqueryDetails,
+  any[],
+]) {
+  const {
+    selectIndex,
+    cursorDetails,
+    meta,
+    fetchOneExtra,
+    first,
+    last,
+    shouldReverseOrder,
+  } = details;
+  // We coerce to empty array because `json_agg` of no rows yields null
+  const allValsRaw = item[selectIndex] as string;
+  const allVals = parse(allValsRaw) as any[];
+  return createSelectResult({
+    allVals,
+    first,
+    last,
+    fetchOneExtra,
+    shouldReverseOrder,
+    meta,
+    cursorDetails,
+  });
 }
