@@ -995,7 +995,7 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   };
 };
 
-const parseAsInt = (n: string) => parseInt(n, 10);
+const parseAsTrustedInt = (n: string) => +n;
 const jsonParse = (s: string) => JSON.parse(s);
 const jsonStringify = (o: JSONValue) => JSON.stringify(o);
 
@@ -1026,8 +1026,8 @@ export const TYPES = {
       }
     },
   }),
-  int2: t<number>()("21", "int2", { fromPg: parseAsInt }),
-  int: t<number>()("23", "int4", { fromPg: parseAsInt }),
+  int2: t<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
+  int: t<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
   bigint: t<string>()("20", "int8"),
   float4: t<number>()("700", "float4", { fromPg: parseFloat }),
   float: t<number>()("701", "float8", { fromPg: parseFloat }),
