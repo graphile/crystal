@@ -35,7 +35,6 @@ import {
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
-import { parse } from "postgres-array";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
@@ -59,6 +58,7 @@ import type {
   PgTypedStep,
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
+import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
@@ -3773,7 +3773,7 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   } = details;
   // We coerce to empty array because `json_agg` of no rows yields null
   const allValsRaw = item[selectIndex] as string;
-  const allVals = parse(allValsRaw) as any[];
+  const allVals = parseArray(allValsRaw) as any[];
   return createSelectResult({
     allVals,
     first,

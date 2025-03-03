@@ -2,7 +2,6 @@ import type { JSONValue } from "grafast";
 import { exportAs } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
-import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
 import type { CustomInspectFunction } from "util";
 
@@ -47,6 +46,7 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
+import { parseArray } from "./parseArray";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -668,7 +668,7 @@ export function listOfCodec<
     name,
     sqlType: identifier,
     fromPg: (value) =>
-      arrayParse(value)
+      parseArray(value)
         .flat(100)
         .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
     toPg: (value) => {
