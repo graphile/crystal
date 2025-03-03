@@ -4,6 +4,7 @@ const LBRACE = "{";
 const RBRACE = "}";
 const LBRACKET = "[";
 const EQUALS = "=";
+const COMMA = ",";
 
 const EXPECT_VALUE = 0;
 const IN_QUOTES = 1;
@@ -19,7 +20,7 @@ type Mode =
  * Parses an array according to
  * https://www.postgresql.org/docs/17/arrays.html#ARRAYS-IO
  */
-export function parseArray(str: string, typdelim = ","): any[] {
+export function parseArray(str: string): any[] {
   // If starts with `[`, it is specifying the index boundas. Skip past first `=`.
   let position = 0;
   if (str[position] === LBRACKET) {
@@ -92,7 +93,7 @@ export function parseArray(str: string, typdelim = ","): any[] {
       current = newArray;
       currentStringStart = position + 1;
       mode = EXPECT_VALUE;
-    } else if (char === typdelim) {
+    } else if (char === COMMA) {
       delim();
       mode = EXPECT_VALUE;
     } else if (char === RBRACE) {
