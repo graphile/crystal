@@ -46,7 +46,7 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
-import { parseArray } from "./parseArray";
+import { parseArray, makeParseArrayWithTransform } from "./parseArray";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -676,11 +676,10 @@ export function listOfCodec<
   > = {
     name,
     sqlType: identifier,
-    fromPg: (value) =>
-      parseArray<PgCodecTFromJavaScript<TInnerCodec>>(
-        value,
-        innerCodecFromPg === identity ? undefined : innerCodecFromPg,
-      ),
+    fromPg:
+      innerCodecFromPg === identity
+        ? parseArray
+        : makeParseArrayWithTransform(innerCodecFromPg),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
