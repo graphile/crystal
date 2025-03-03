@@ -11,13 +11,8 @@ const NULL_STRING = "NULL";
 
 const EXPECT_VALUE = 0;
 const SIMPLE_VALUE = 1;
-const QUOTED_VALUE = 2;
 const EXPECT_DELIM = 3;
-type Mode =
-  | typeof EXPECT_VALUE
-  | typeof SIMPLE_VALUE
-  | typeof QUOTED_VALUE
-  | typeof EXPECT_DELIM;
+type Mode = typeof EXPECT_VALUE | typeof SIMPLE_VALUE | typeof EXPECT_DELIM;
 
 type Transform<T> = (val: string) => T;
 
@@ -54,23 +49,31 @@ export function parseArray<T = string>(
   let mode: Mode = EXPECT_VALUE;
   const haveTransform = transform != null;
 
-  for (; position < rbraceIndex; position++) {
+  for (; position < rbraceIndex; ++position) {
     const char = str[position];
     // > The array output routine will put double quotes around element values if
     // > they are empty strings, contain curly braces, delimiter characters, double
     // > quotes, backslashes, or white space, or match the word NULL. Double quotes
     // > and backslashes embedded in element values will be backslash-escaped.
-    if (mode === QUOTED_VALUE) {
-      if (char === BACKSLASH) {
-        // We contain escaping, so we have to do it the slow way
-        const part = str.slice(currentStringStart, position);
-        if (currentStringParts === null) {
-          currentStringParts = [part];
-        } else {
-          currentStringParts.push(part);
-        }
+    switch (char) {
+      case DQUOT: {
+        // It's escaped
         currentStringStart = ++position;
-      } else if (char === DQUOT) {
+        for (; position < rbraceIndex; ++position) {
+          const char = str[position];
+          if (char === DQUOT) {
+            break;
+          } else if (char === BACKSLASH) {
+            // We contain escaping, so we have to do it the slow way
+            const part = str.slice(currentStringStart, position);
+            if (currentStringParts === null) {
+              currentStringParts = [part];
+            } else {
+              currentStringParts.push(part);
+            }
+            currentStringStart = ++position;
+          }
+        }
         const part = str.slice(currentStringStart, position);
         if (currentStringParts !== null) {
           const final = currentStringParts.join("") + part;
@@ -80,55 +83,73 @@ export function parseArray<T = string>(
           current.push(haveTransform ? transform(part) : part);
         }
         mode = EXPECT_DELIM;
-      } else {
-        continue;
+        break;
       }
-    } else if (char === DQUOT) {
-      // It's escaped
-      mode = QUOTED_VALUE;
-      currentStringStart = position + 1;
-    } else if (char === LBRACE) {
-      const newArray: any[] = [];
-      current.push(newArray);
-      stack.push(current);
-      current = newArray;
-      currentStringStart = position + 1;
-      mode = EXPECT_VALUE;
-    } else if (char === COMMA) {
-      // delim();
-      if (mode === SIMPLE_VALUE) {
-        const part = str.slice(currentStringStart, position);
-        current.push(
-          part === NULL_STRING ? null : haveTransform ? transform(part) : part,
-        );
+      case LBRACE: {
+        const newArray: any[] = [];
+        current.push(newArray);
+        stack.push(current);
+        current = newArray;
+        currentStringStart = position + 1;
+        mode = EXPECT_VALUE;
+        break;
       }
+      case COMMA: {
+        // delim();
+        if (mode === SIMPLE_VALUE) {
+          const part = str.slice(currentStringStart, position);
+          current.push(
+            part === NULL_STRING
+              ? null
+              : haveTransform
+              ? transform(part)
+              : part,
+          );
+        }
 
-      mode = EXPECT_VALUE;
-    } else if (char === RBRACE) {
-      //delim();
-      if (mode === SIMPLE_VALUE) {
-        const part = str.slice(currentStringStart, position);
-        current.push(
-          part === NULL_STRING ? null : haveTransform ? transform(part) : part,
-        );
+        mode = EXPECT_VALUE;
+        break;
       }
+      case RBRACE: {
+        //delim();
+        if (mode === SIMPLE_VALUE) {
+          const part = str.slice(currentStringStart, position);
+          current.push(
+            part === NULL_STRING
+              ? null
+              : haveTransform
+              ? transform(part)
+              : part,
+          );
+        }
 
-      mode = EXPECT_DELIM;
-      const arr = stack.pop();
-      if (arr === undefined) {
-        throw new Error(`Invalid array text - too many '}'`);
+        mode = EXPECT_DELIM;
+        const arr = stack.pop();
+        if (arr === undefined) {
+          throw new Error(`Invalid array text - too many '}'`);
+        }
+        current = arr;
+        break;
       }
-      current = arr;
-    } else if (mode === EXPECT_VALUE) {
-      currentStringStart = position;
-      mode = SIMPLE_VALUE;
-    } else if (mode === SIMPLE_VALUE) {
-      continue;
-    } else if (mode === EXPECT_DELIM) {
-      throw new Error("Was expecting delimeter");
-    } else {
-      const never: never = mode;
-      throw new Error(`Was not expecting to be in mode ${never}`);
+      default: {
+        switch (mode) {
+          case EXPECT_VALUE: {
+            currentStringStart = position;
+            mode = SIMPLE_VALUE;
+            break;
+          }
+          case SIMPLE_VALUE: {
+            continue;
+          }
+          case EXPECT_DELIM: {
+            throw new Error("Was expecting delimeter");
+          }
+          default: {
+            const never: never = mode;
+            throw new Error(`Was not expecting to be in mode ${never}`);
+          }
+        }
+      }
     }
   }
 
