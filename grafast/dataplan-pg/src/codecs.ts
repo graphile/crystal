@@ -586,6 +586,20 @@ type CodecWithListCodec<
   >;
 };
 
+type PgCodecTFromJavaScript<
+  TInnerCodec extends PgCodec<any, any, any, any, any, any, any>,
+> = TInnerCodec extends PgCodec<
+  any,
+  any,
+  any,
+  infer UFromJs,
+  undefined,
+  any,
+  any
+>
+  ? UFromJs
+  : any;
+
 /**
  * Given a PgCodec, this returns a new PgCodec that represents a list
  * of the former.
@@ -625,9 +639,7 @@ export function listOfCodec<
   TName,
   undefined, // Array has no attributes
   string,
-  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
-    ? UFromJs[]
-    : any[],
+  PgCodecTFromJavaScript<TInnerCodec>[],
   TInnerCodec,
   undefined,
   undefined
@@ -650,17 +662,7 @@ export function listOfCodec<
     TName,
     undefined, // Array has no attributes
     string,
-    TInnerCodec extends PgCodec<
-      any,
-      any,
-      any,
-      infer UFromJs,
-      undefined,
-      any,
-      any
-    >
-      ? UFromJs[]
-      : any[],
+    PgCodecTFromJavaScript<TInnerCodec>[],
     TInnerCodec,
     undefined,
     undefined
@@ -668,9 +670,7 @@ export function listOfCodec<
     name,
     sqlType: identifier,
     fromPg: (value) =>
-      parseArray(value)
-        .flat(100)
-        .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
+      parseArray<PgCodecTFromJavaScript<TInnerCodec>>(value, innerCodec.fromPg),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
