@@ -150,13 +150,17 @@ graph TD
     Object59{{"Object[59∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle58 --> Object59
     Connection92{{"Connection[92∈8] ➊<br />ᐸ88ᐳ"}}:::plan
+    PgSelectInlineApply317["PgSelectInlineApply[317∈8] ➊"]:::plan
     PgSelect75[["PgSelect[75∈9] ➊<br />ᐸpersonᐳ"]]:::plan
     PgFromExpression77{{"PgFromExpression[77∈9] ➊"}}:::plan
-    PgSelectInlineApply317["PgSelectInlineApply[317∈9] ➊"]:::plan
     Object54 & PgFromExpression77 & PgSelectInlineApply317 --> PgSelect75
     PgSelect63[["PgSelect[63∈9] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
     PgFromExpression67{{"PgFromExpression[67∈9] ➊"}}:::plan
     Object54 & PgFromExpression67 --> PgSelect63
+    List319{{"List[319∈9] ➊<br />ᐸ78,318ᐳ"}}:::plan
+    First78{{"First[78∈9] ➊"}}:::plan
+    Access318{{"Access[318∈9] ➊<br />ᐸ75.m.subqueryDetailsFor94ᐳ"}}:::plan
+    First78 & Access318 --> List319
     PgClassExpression61{{"PgClassExpression[61∈9] ➊<br />ᐸ__mutation...plex__.”x”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression61
     PgClassExpression62{{"PgClassExpression[62∈9] ➊<br />ᐸ__mutation...plex__.”y”ᐳ"}}:::plan
@@ -171,12 +175,14 @@ graph TD
     PgClassExpression74{{"PgClassExpression[74∈9] ➊<br />ᐸ__mutation...plex__.”z”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression74
     PgClassExpression74 --> PgFromExpression77
-    First78{{"First[78∈9] ➊"}}:::plan
     PgSelectRows79[["PgSelectRows[79∈9] ➊"]]:::plan
     PgSelectRows79 --> First78
     PgSelect75 --> PgSelectRows79
     PgSelectSingle80{{"PgSelectSingle[80∈9] ➊<br />ᐸpersonᐳ"}}:::plan
     First78 --> PgSelectSingle80
+    PgSelect75 --> Access318
+    Lambda320{{"Lambda[320∈9] ➊"}}:::plan
+    List319 --> Lambda320
     PgClassExpression71{{"PgClassExpression[71∈10] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression71
     PgClassExpression72{{"PgClassExpression[72∈10] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -186,19 +192,13 @@ graph TD
     List83{{"List[83∈11] ➊<br />ᐸ81,82ᐳ"}}:::plan
     PgClassExpression82{{"PgClassExpression[82∈11] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant81 & PgClassExpression82 --> List83
-    List319{{"List[319∈11] ➊<br />ᐸ78,318ᐳ"}}:::plan
-    Access318{{"Access[318∈11] ➊<br />ᐸ75.m.subqueryDetailsFor94ᐳ"}}:::plan
-    First78 & Access318 --> List319
     PgSelectSingle80 --> PgClassExpression82
     Lambda84{{"Lambda[84∈11] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List83 --> Lambda84
     PgClassExpression85{{"PgClassExpression[85∈11] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle80 --> PgClassExpression85
     PgSelectRows95[["PgSelectRows[95∈11] ➊"]]:::plan
-    Lambda320{{"Lambda[320∈11] ➊"}}:::plan
     Lambda320 --> PgSelectRows95
-    PgSelect75 --> Access318
-    List319 --> Lambda320
     __Item96[/"__Item[96∈12]<br />ᐸ95ᐳ"\]:::itemplan
     PgSelectRows95 ==> __Item96
     PgSelectSingle97{{"PgSelectSingle[97∈12]<br />ᐸpostᐳ"}}:::plan
@@ -552,16 +552,16 @@ graph TD
     class Bucket7,PgSelect51,Access52,Access53,Object54,PgFromExpression55,First56,PgSelectRows57,PgSelectSingle58,Object59 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 7, 59, 58, 54, 81, 98<br /><br />ROOT Object{7}ᐸ{result}ᐳ[59]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,Connection92 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 58, 54, 7, 81, 98, 92<br /><br />ROOT PgSelectSingle{7}ᐸmutation_out_complexᐳ[58]<br />1: PgSelectInlineApply[317]<br />ᐳ: 61, 62, 74, 67, 77<br />2: PgSelect[63], PgSelect[75]<br />3: PgSelectRows[69], PgSelectRows[79]<br />ᐳ: 68, 70, 78, 80"):::bucket
+    class Bucket8,Connection92,PgSelectInlineApply317 bucket8
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 58, 54, 317, 81, 98, 92<br /><br />ROOT PgSelectSingle{7}ᐸmutation_out_complexᐳ[58]<br />1: <br />ᐳ: 61, 62, 74, 67, 77<br />2: PgSelect[63], PgSelect[75]<br />ᐳ: Access[318]<br />3: PgSelectRows[69], PgSelectRows[79]<br />ᐳ: 68, 70, 78, 80, 319, 320"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgClassExpression61,PgClassExpression62,PgSelect63,PgFromExpression67,First68,PgSelectRows69,PgSelectSingle70,PgClassExpression74,PgSelect75,PgFromExpression77,First78,PgSelectRows79,PgSelectSingle80,PgSelectInlineApply317 bucket9
+    class Bucket9,PgClassExpression61,PgClassExpression62,PgSelect63,PgFromExpression67,First68,PgSelectRows69,PgSelectSingle70,PgClassExpression74,PgSelect75,PgFromExpression77,First78,PgSelectRows79,PgSelectSingle80,Access318,List319,Lambda320 bucket9
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 70<br /><br />ROOT PgSelectSingle{9}ᐸfrmcdc_compoundTypeᐳ[70]"):::bucket
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgClassExpression71,PgClassExpression72,PgClassExpression73 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 80, 81, 75, 78, 98, 92<br /><br />ROOT PgSelectSingle{9}ᐸpersonᐳ[80]<br />1: <br />ᐳ: 82, 85, 318, 83, 84, 319, 320<br />2: PgSelectRows[95]"):::bucket
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 80, 81, 320, 98, 92<br /><br />ROOT PgSelectSingle{9}ᐸpersonᐳ[80]"):::bucket
     classDef bucket11 stroke:#00ffff
-    class Bucket11,PgClassExpression82,List83,Lambda84,PgClassExpression85,PgSelectRows95,Access318,List319,Lambda320 bucket11
+    class Bucket11,PgClassExpression82,List83,Lambda84,PgClassExpression85,PgSelectRows95 bucket11
     Bucket12("Bucket 12 (listItem)<br />Deps: 98<br /><br />ROOT __Item{12}ᐸ95ᐳ[96]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,__Item96,PgSelectSingle97 bucket12
