@@ -6,6 +6,9 @@ const LBRACKET = "[";
 const EQUALS = "=";
 const COMMA = ",";
 
+/** When the raw value is this, it means a literal `null` */
+const NULL_STRING = "NULL";
+
 const EXPECT_VALUE = 0;
 const IN_QUOTES = 1;
 const IN_VALUE = 2;
@@ -44,13 +47,6 @@ export function parseArray(str: string): any[] {
   let currentStringStart: number = position;
   let currentStringParts: string[] | null = null;
   let mode: Mode = EXPECT_VALUE;
-
-  function delim() {
-    if (mode === IN_VALUE) {
-      const part = str.slice(currentStringStart, position);
-      current.push(part === "NULL" ? null : part);
-    }
-  }
 
   for (; position < rbraceIndex; position++) {
     const char = str[position];
@@ -92,10 +88,20 @@ export function parseArray(str: string): any[] {
       currentStringStart = position + 1;
       mode = EXPECT_VALUE;
     } else if (char === COMMA) {
-      delim();
+      // delim();
+      if (mode === IN_VALUE) {
+        const part = str.slice(currentStringStart, position);
+        current.push(part === NULL_STRING ? null : part);
+      }
+
       mode = EXPECT_VALUE;
     } else if (char === RBRACE) {
-      delim();
+      //delim();
+      if (mode === IN_VALUE) {
+        const part = str.slice(currentStringStart, position);
+        current.push(part === NULL_STRING ? null : part);
+      }
+
       mode = EXPECT_DELIM_AFTER_PROCESSED;
       const arr = stack.pop();
       if (arr === undefined) {
@@ -114,7 +120,12 @@ export function parseArray(str: string): any[] {
       throw new Error(`Was not expecting to be in mode ${never}`);
     }
   }
-  delim();
+
+  //delim();
+  if (mode === IN_VALUE) {
+    const part = str.slice(currentStringStart, position);
+    current.push(part === NULL_STRING ? null : part);
+  }
 
   if (stack.length !== 0) {
     throw new Error(`Invalid array text - mismatched braces`);
