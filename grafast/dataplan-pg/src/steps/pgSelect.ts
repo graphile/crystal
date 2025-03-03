@@ -102,9 +102,10 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
-  m: Object.create(null),
   hasMore: false,
   items: [],
+  cursorDetails: undefined,
+  m: Object.create(null),
 } as PgSelectStepResult);
 
 type PgSelectPlanJoin =
@@ -311,10 +312,10 @@ interface QueryBuildResult {
 }
 
 interface PgSelectStepResult {
-  hasMore?: boolean;
+  hasMore: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
-  cursorDetails?: PgCursorDetails;
+  cursorDetails: PgCursorDetails | undefined;
   m: Record<string, unknown>;
 }
 
@@ -1144,10 +1145,10 @@ export class PgSelectStep<
         }
         if (!initialFetchResult) {
           return {
-            m: meta,
-            items: iterable,
             hasMore: false,
+            items: iterable,
             cursorDetails,
+            m: meta,
           };
         }
 
@@ -1193,10 +1194,10 @@ export class PgSelectStep<
           },
         };
         return {
-          m: meta,
-          items: mergedGenerator,
           hasMore: false,
+          items: mergedGenerator,
           cursorDetails,
+          m: meta,
         };
       });
     }
@@ -3734,10 +3735,10 @@ function createSelectResult({
     ? reverseArray(slicedRows)
     : slicedRows;
   return {
-    m: meta,
-    items: orderedRows,
     hasMore,
+    items: orderedRows,
     cursorDetails,
+    m: meta,
   };
 }
 
@@ -3747,7 +3748,6 @@ function pgInlineViaJoinTransform([details, item]: readonly [
 ]) {
   const { meta, selectIndexes, cursorDetails } = details;
   return {
-    m: meta,
     hasMore: false,
     // We return a list here because our children are going to use a
     // `first` plan on us.
@@ -3755,6 +3755,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     // because it only contains one entry.
     items: [selectIndexes.map((i) => item[i])],
     cursorDetails,
+    m: meta,
   };
 }
 
