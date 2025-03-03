@@ -1068,8 +1068,7 @@ export class PgSelectStep<
           // Must be an error
           return allVals as never;
         }
-        return createSelectResult({
-          allVals,
+        return createSelectResult(allVals, {
           first,
           last,
           fetchOneExtra: this.fetchOneExtra,
@@ -3700,23 +3699,24 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
   return sql.join(sqlAliases, "");
 }
 
-function createSelectResult({
-  allVals,
-  first,
-  last,
-  fetchOneExtra,
-  shouldReverseOrder,
-  meta,
-  cursorDetails,
-}: {
-  allVals: null | readonly any[];
-  first: Maybe<number> | null;
-  last: Maybe<number> | null;
-  fetchOneExtra: boolean;
-  shouldReverseOrder: boolean;
-  meta: Record<string, any>;
-  cursorDetails: PgCursorDetails | undefined;
-}) {
+function createSelectResult(
+  allVals: null | readonly any[],
+  {
+    first,
+    last,
+    fetchOneExtra,
+    shouldReverseOrder,
+    meta,
+    cursorDetails,
+  }: {
+    first: Maybe<number> | null;
+    last: Maybe<number> | null;
+    fetchOneExtra: boolean;
+    shouldReverseOrder: boolean;
+    meta: Record<string, any>;
+    cursorDetails: PgCursorDetails | undefined;
+  },
+) {
   if (allVals == null) {
     return allVals as never;
   }
@@ -3730,7 +3730,9 @@ function createSelectResult({
       : allVals.slice(0, limit!)
     : allVals;
   const slicedRows =
-    firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+    firstAndLast && limitedRows.length > last
+      ? limitedRows.slice(-last)
+      : limitedRows;
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
@@ -3763,25 +3765,6 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
   any[],
 ]) {
-  const {
-    selectIndex,
-    cursorDetails,
-    meta,
-    fetchOneExtra,
-    first,
-    last,
-    shouldReverseOrder,
-  } = details;
-  // We coerce to empty array because `json_agg` of no rows yields null
-  const allValsRaw = item[selectIndex] as string;
-  const allVals = parseArray(allValsRaw) as any[];
-  return createSelectResult({
-    allVals,
-    first,
-    last,
-    fetchOneExtra,
-    shouldReverseOrder,
-    meta,
-    cursorDetails,
-  });
+  const allVals = parseArray(item[details.selectIndex]);
+  return createSelectResult(allVals, details);
 }
