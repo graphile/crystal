@@ -19,7 +19,6 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
-  constant,
   ConstantStep,
   exportAs,
   first,
@@ -27,9 +26,6 @@ import {
   isDev,
   isPromiseLike,
   lambda,
-  list,
-  object,
-  remapKeys,
   reverseArray,
   SafeError,
   Step,
@@ -105,7 +101,6 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
-const EMPTY_MAP: ReadonlyMap<any, any> = new Map();
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
   hasMore: false,
