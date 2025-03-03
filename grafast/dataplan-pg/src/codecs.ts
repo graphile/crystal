@@ -46,7 +46,7 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
-import { parseArray, makeParseArrayWithTransform } from "./parseArray";
+import { makeParseArrayWithTransform, parseArray } from "./parseArray";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
