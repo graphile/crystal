@@ -271,9 +271,9 @@ where (
 
 select
   __post__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."id"::text as "2",
-  __post__."headline" as "3"
+  __post__."headline" as "1",
+  __person__."person_full_name" as "2",
+  __person__."id"::text as "3"
 from "a"."post" as __post__
 left outer join "c"."person" as __person__
 on (

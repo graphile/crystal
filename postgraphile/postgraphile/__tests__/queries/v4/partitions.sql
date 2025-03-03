@@ -1,8 +1,4 @@
 select
-  (count(*))::text as "0"
-from "partitions"."measurements" as __measurements__;
-
-select
   to_char(__measurements__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
   __measurements__."key" as "1",
   __measurements__."value"::text as "2",
@@ -15,3 +11,7 @@ on (
   __users__."id" = __measurements__."user_id"
 ))
 order by __measurements__."timestamp" asc, __measurements__."key" asc;
+
+select
+  (count(*))::text as "0"
+from "partitions"."measurements" as __measurements__;

@@ -1,8 +1,4 @@
 select
-  (count(*))::text as "0"
-from "pg11"."types" as __types__;
-
-select
   __types__."id"::text as "0",
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
@@ -29,3 +25,7 @@ on TRUE
 left outer join lateral (select (__types__."domain_constrained_compound_type").*) as __frmcdc_domain_constrained_compound_type_2
 on TRUE
 order by __types__."id" asc;
+
+select
+  (count(*))::text as "0"
+from "pg11"."types" as __types__;

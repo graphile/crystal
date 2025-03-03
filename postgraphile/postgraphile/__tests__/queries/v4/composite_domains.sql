@@ -1,16 +1,16 @@
 select
   __posts__."id"::text as "0",
   __posts__."user_id"::text as "1",
-  __frmcdc_user_update_content__."img_url" as "2",
+  to_char(__posts__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "2",
+  __frmcdc_user_update_content__."img_url" as "3",
   (case when (__frmcdc_user_update_content__."lines") is not distinct from null then null::text else array(
     select array(
       select case when (__base_user_update_content_line_node__) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node__)."line_node_type"))::text, ((__base_user_update_content_line_node__)."line_node_text"))::text end
       from unnest(__user_update_content_line_node_array_item__) __base_user_update_content_line_node__
     )::text
     from unnest(__frmcdc_user_update_content__."lines") __user_update_content_line_node_array_item__
-  )::text end) as "3",
-  (not (__frmcdc_user_update_content__ is null))::text as "4",
-  to_char(__posts__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "5",
+  )::text end) as "4",
+  (not (__frmcdc_user_update_content__ is null))::text as "5",
   array(
     select array[
       __frmcdc_user_update_content_2."img_url",

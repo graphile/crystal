@@ -1,9 +1,9 @@
 select
-  __building__."id"::text as "0",
-  __building__."constructor" as "1",
-  __machine__."constructor" as "2",
-  __machine__."input" as "3",
-  __machine__."id"::text as "4"
+  __machine__."constructor" as "0",
+  __machine__."input" as "1",
+  __machine__."id"::text as "2",
+  __building__."id"::text as "3",
+  __building__."constructor" as "4"
 from "js_reserved"."machine" as __machine__
 left outer join "js_reserved"."building" as __building__
 on (

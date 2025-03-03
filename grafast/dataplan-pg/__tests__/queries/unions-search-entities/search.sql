@@ -21,8 +21,8 @@ where
 
 select
   __posts__."post_id"::text as "0",
-  __people__."username" as "1",
-  __posts__."body" as "2"
+  __posts__."body" as "1",
+  __people__."username" as "2"
 from interfaces_and_unions.posts as __posts__
 left outer join interfaces_and_unions.people as __people__
 on (
@@ -42,10 +42,10 @@ where
 
 select
   __comments__."comment_id"::text as "0",
-  __people__."username" as "1",
-  __posts__."post_id"::text as "2",
-  __posts__."body" as "3",
-  __comments__."body" as "4"
+  __comments__."body" as "1",
+  __people__."username" as "2",
+  __posts__."post_id"::text as "3",
+  __posts__."body" as "4"
 from interfaces_and_unions.comments as __comments__
 left outer join interfaces_and_unions.people as __people__
 on (

@@ -12,7 +12,19 @@ select
         (__messages__.archived_at is null) = (__forums__."archived_at" is null)
       )
     order by __messages__."id" asc
-  )::text as "3"
+  )::text as "3",
+  array(
+    select array[
+      (count(*))::text
+    ]::text[]
+    from app_public.messages as __messages__
+    where
+      (
+        __messages__."forum_id" = __forums__."id"
+      ) and (
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+      )
+  )::text as "4"
 from app_public.forums as __forums__
 where
   (
@@ -84,13 +96,3 @@ fetch forward 100 from __SNAPSHOT_CURSOR_1__
 close __SNAPSHOT_CURSOR_1__
 
 commit; /*fake*/
-
-select
-  (count(*))::text as "0"
-from app_public.messages as __messages__
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  );

@@ -1,7 +1,7 @@
 select
-  __person__."id"::text as "0",
-  __post__."body" as "1",
-  __post__."id"::text as "2"
+  __post__."body" as "0",
+  __post__."id"::text as "1",
+  __person__."id"::text as "2"
 from "d"."post" as __post__
 left outer join "d"."person" as __person__
 on (
@@ -11,9 +11,9 @@ on (
 order by __post__."id" asc;
 
 select
-  __person__."id"::text as "0",
-  __post__."body" as "1",
-  __post__."id"::text as "2"
+  __post__."body" as "0",
+  __post__."id"::text as "1",
+  __person__."id"::text as "2"
 from "d"."post" as __post__
 left outer join "d"."person" as __person__
 on (
@@ -26,9 +26,9 @@ where (
 order by __post__."id" asc;
 
 select
-  __person__."id"::text as "0",
-  __post__."body" as "1",
-  __post__."id"::text as "2"
+  __post__."body" as "0",
+  __post__."id"::text as "1",
+  __person__."id"::text as "2"
 from "d"."post" as __post__
 left outer join "d"."person" as __person__
 on (
