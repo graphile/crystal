@@ -1,4 +1,4 @@
-/**
+/*
  * This test suite originally based on https://github.com/bendrucker/postgres-array/blob/d29dbdfe86404be7592688b8968906d366f0efd8/test.js
  *
  * License follows:
@@ -48,8 +48,9 @@ test("mixed", () =>
   ]));
 test("null", () => expect(parseArray("{NULL,NULL}")).toEqual([null, null]));
 
-test("numerics", () => expect(intArray("{1,2,3}")).toEqual([1, 2, 3]));
-test("numerics", () => expect(intArray("[0:2]={1,2,3}")).toEqual([1, 2, 3]));
+test("numerics parsed", () => expect(intArray("{1,2,3}")).toEqual([1, 2, 3]));
+test("numerics parsed with indicies", () =>
+  expect(intArray("[0:2]={1,2,3}")).toEqual([1, 2, 3]));
 
 function intArray(string: string) {
   return parseArray(string).map((value) => parseInt(value, 10));
