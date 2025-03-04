@@ -384,6 +384,7 @@ export {
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
+  InputObjectFieldApplyResolver,
   inputObjectFieldSpec,
   InputObjectPlans,
   InputObjectTypeBakedInfo,
