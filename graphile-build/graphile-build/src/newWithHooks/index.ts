@@ -463,16 +463,16 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
 
-                    const ext = finalArgSpec.extensions?.grafast;
-
                     // TODO: remove this code
+                    const ext = finalArgSpec.extensions?.grafast;
                     if (
                       ext &&
-                      (ext.autoApplyAfterParentPlan ||
-                        ext.autoApplyAfterParentSubscriptionPlan)
+                      (ext.inputPlan ||
+                        ext.autoApplyAfterParentPlan ||
+                        ext.autoApplyAfterParentSubscribePlan)
                     ) {
-                      console.warn(
-                        `Argument ${typeName}.${fieldName}(${argName}:) has autoApplyAfterParentPlan or autoApplyAfterParentSubscriptionPlan set; these properties no longer do anything and should be removed.`,
+                      throw new Error(
+                        `Argument ${typeName}.${fieldName}(${argName}:) has inputPlan or autoApplyAfterParentPlan or autoApplyAfterParentSubscribePlan set; these properties no longer do anything and should be removed.`,
                       );
                     }
 
@@ -666,8 +666,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     fieldContext,
                     `|${typeName}.fields.${fieldName}`,
                   );
-                  const ext = newSpec.extensions?.grafast;
+
                   // TODO: remove this code
+                  const ext = newSpec.extensions?.grafast;
                   if (
                     ext &&
                     (ext.applyPlan ||
@@ -675,7 +676,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       ext.autoApplyAfterParentApplyPlan ||
                       ext.autoApplyAfterParentInputPlan)
                   ) {
-                    console.warn(
+                    throw new Error(
                       `Input field ${typeName}.${fieldName} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
                     );
                   }
@@ -860,6 +861,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     valueContext,
                     `|${typeName}|${valueName}`,
                   );
+
+                  // TODO: remove this code
+                  const ext = newValue.extensions?.grafast;
+                  if (ext && ext.applyPlan) {
+                    throw new Error(
+                      `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
+                    );
+                  }
 
                   memo[valueName] = newValue;
                   return memo;

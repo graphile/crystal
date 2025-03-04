@@ -687,8 +687,9 @@ declare global {
       applySubscribePlan?: ArgumentApplyPlanResolver;
 
       // Legacy fields, no longer supported
+      inputPlan?: never;
       autoApplyAfterParentPlan?: never;
-      autoApplyAfterParentSubscriptionPlan?: never;
+      autoApplyAfterParentSubscribePlan?: never;
     }
 
     interface InputObjectTypeExtensions {
@@ -699,10 +700,10 @@ declare global {
       apply?: InputObjectFieldApplyResolver<any>;
 
       // Legacy fields, no longer supported
-      applyPlan?: never;
       inputPlan?: never;
-      autoApplyAfterParentApplyPlan?: never;
+      applyPlan?: never;
       autoApplyAfterParentInputPlan?: never;
+      autoApplyAfterParentApplyPlan?: never;
     }
 
     interface ObjectTypeExtensions {
@@ -721,6 +722,9 @@ declare global {
        * @experimental
        */
       apply?: EnumValueApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      applyPlan?: never;
     }
 
     interface ScalarTypeExtensions {
