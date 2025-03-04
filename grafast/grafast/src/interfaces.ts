@@ -270,11 +270,11 @@ export type FieldArgs = {
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
     path?: string | ReadonlyArray<string | number>,
-    getTargetFromParent?: (parent: TArg) => object,
+    getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
-    getTargetFromParent: (parent: TArg) => object,
+    getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
   ): void;
@@ -288,11 +288,11 @@ export type FieldArg = {
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
     path?: string | ReadonlyArray<string | number>,
-    getTargetFromParent?: (parent: TArg) => object,
+    getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
-    getTargetFromParent: (parent: TArg) => object,
+    getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
   ): void;
