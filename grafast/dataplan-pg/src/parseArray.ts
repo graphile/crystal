@@ -25,6 +25,7 @@ type Transform<T> = (val: string) => T;
 export function makeParseArrayWithTransform<T = string>(
   transform?: Transform<T>,
 ): (str: string) => T[] {
+  const haveTransform = transform != null;
   return function parseArray(str) {
     // If starts with `[`, it is specifying the index boundas. Skip past first `=`.
     let position = 0;
@@ -47,7 +48,6 @@ export function makeParseArrayWithTransform<T = string>(
     const currentStringParts: string[] = [];
     let hasStringParts = false;
     let mode: Mode = EXPECT_VALUE;
-    const haveTransform = transform != null;
 
     for (; position < rbraceIndex; ++position) {
       const char = str[position];
