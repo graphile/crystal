@@ -9,11 +9,6 @@ const COMMA = ",";
 /** When the raw value is this, it means a literal `null` */
 const NULL_STRING = "NULL";
 
-const EXPECT_VALUE = 0;
-const SIMPLE_VALUE = 1;
-const EXPECT_DELIM = 3;
-type Mode = typeof EXPECT_VALUE | typeof SIMPLE_VALUE | typeof EXPECT_DELIM;
-
 type Transform<T> = (val: string) => T;
 
 /**
@@ -34,11 +29,11 @@ export function makeParseArrayWithTransform<T = string>(
     }
 
     if (str[position++] !== LBRACE) {
-      throw new Error(`Invalid array text - must start with {`);
+      throw new Error("Invalid array text - must start with {");
     }
     const rbraceIndex = str.length - 1;
     if (str[rbraceIndex] !== RBRACE) {
-      throw new Error(`Invalid array text - must end with }`);
+      throw new Error("Invalid array text - must end with }");
     }
     const output: any[] = [];
     let current = output;
@@ -47,10 +42,10 @@ export function makeParseArrayWithTransform<T = string>(
     let currentStringStart: number = position;
     const currentStringParts: string[] = [];
     let hasStringParts = false;
-    let mode: Mode = EXPECT_VALUE;
+    let expectValue = true;
 
     for (; position < rbraceIndex; ++position) {
-      const char = str[position];
+      let char = str[position];
       // > The array output routine will put double quotes around element values if
       // > they are empty strings, contain curly braces, delimiter characters, double
       // > quotes, backslashes, or white space, or match the word NULL. Double quotes
@@ -83,66 +78,41 @@ export function makeParseArrayWithTransform<T = string>(
         } else {
           current.push(haveTransform ? transform(part) : part);
         }
-        mode = EXPECT_DELIM;
+        expectValue = false;
       } else if (char === LBRACE) {
         const newArray: any[] = [];
         current.push(newArray);
         stack.push(current);
         current = newArray;
         currentStringStart = position + 1;
-        mode = EXPECT_VALUE;
+        expectValue = true;
       } else if (char === COMMA) {
-        // delim();
-        if (mode === SIMPLE_VALUE) {
-          const part = str.slice(currentStringStart, position);
-          current.push(
-            part === NULL_STRING
-              ? null
-              : haveTransform
-              ? transform(part)
-              : part,
-          );
-        }
-
-        mode = EXPECT_VALUE;
+        expectValue = true;
       } else if (char === RBRACE) {
-        //delim();
-        if (mode === SIMPLE_VALUE) {
-          const part = str.slice(currentStringStart, position);
-          current.push(
-            part === NULL_STRING
-              ? null
-              : haveTransform
-              ? transform(part)
-              : part,
-          );
-        }
-
-        mode = EXPECT_DELIM;
+        expectValue = false;
         const arr = stack.pop();
         if (arr === undefined) {
-          throw new Error(`Invalid array text - too many '}'`);
+          throw new Error("Invalid array text - too many '}'");
         }
         current = arr;
-      } else if (mode === EXPECT_VALUE) {
+      } else if (expectValue) {
         currentStringStart = position;
-        mode = SIMPLE_VALUE;
-      } else if (mode === SIMPLE_VALUE) {
-        continue;
-      } else if (mode === EXPECT_DELIM) {
-        throw new Error("Was expecting delimeter");
-      } else {
-        const never: never = mode;
-        throw new Error(`Was not expecting to be in mode ${never}`);
-      }
-    }
+        while (
+          (char = str[position]) !== COMMA &&
+          char !== RBRACE &&
+          position < rbraceIndex
+        ) {
+          ++position;
+        }
 
-    //delim();
-    if (mode === SIMPLE_VALUE) {
-      const part = str.slice(currentStringStart, position);
-      current.push(
-        part === NULL_STRING ? null : haveTransform ? transform(part) : part,
-      );
+        const part = str.slice(currentStringStart, position--);
+        current.push(
+          part === NULL_STRING ? null : haveTransform ? transform(part) : part,
+        );
+        expectValue = false;
+      } else {
+        throw new Error("Was expecting delimeter");
+      }
     }
 
     return output;
