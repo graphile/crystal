@@ -463,19 +463,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
 
-                    // TODO: remove this code
-                    const ext = finalArgSpec.extensions?.grafast;
-                    if (
-                      ext &&
-                      (ext.inputPlan ||
-                        ext.autoApplyAfterParentPlan ||
-                        ext.autoApplyAfterParentSubscribePlan)
-                    ) {
-                      throw new Error(
-                        `Argument ${typeName}.${fieldName}(${argName}:) has inputPlan or autoApplyAfterParentPlan or autoApplyAfterParentSubscribePlan set; these properties no longer do anything and should be removed.`,
-                      );
-                    }
-
                     finalFieldSpec.args![argName] = finalArgSpec;
                   }
 
@@ -666,20 +653,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     fieldContext,
                     `|${typeName}.fields.${fieldName}`,
                   );
-
-                  // TODO: remove this code
-                  const ext = newSpec.extensions?.grafast;
-                  if (
-                    ext &&
-                    (ext.applyPlan ||
-                      ext.inputPlan ||
-                      ext.autoApplyAfterParentApplyPlan ||
-                      ext.autoApplyAfterParentInputPlan)
-                  ) {
-                    throw new Error(
-                      `Input field ${typeName}.${fieldName} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
-                    );
-                  }
 
                   const finalSpec = newSpec;
                   processedFields.push(finalSpec);

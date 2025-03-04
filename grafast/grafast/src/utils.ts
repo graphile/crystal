@@ -435,7 +435,19 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const { applyPlan, applySubscribePlan, ...argSpec } = args[argName];
+        const grafastArgSpec = args[argName];
+        // TODO: remove this code
+        if (
+          grafastArgSpec.inputPlan ||
+          grafastArgSpec.autoApplyAfterParentPlan ||
+          grafastArgSpec.autoApplyAfterParentSubscribePlan
+        ) {
+          throw new Error(
+            `Argument at ${path} has inputPlan or autoApplyAfterParentPlan or autoApplyAfterParentSubscribePlan set; these properties no longer do anything and should be removed.`,
+          );
+        }
+
+        const { applyPlan, applySubscribePlan, ...argSpec } = grafastArgSpec;
         assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
         assertNotAsync(
           applySubscribePlan,
@@ -544,6 +556,18 @@ export function inputObjectFieldSpec<TParent>(
   grafastSpec: GrafastInputFieldConfig<TParent, GraphQLInputType>,
   path: string,
 ): GraphQLInputFieldConfig {
+  // TODO: remove this code
+  if (
+    grafastSpec.applyPlan ||
+    grafastSpec.inputPlan ||
+    grafastSpec.autoApplyAfterParentApplyPlan ||
+    grafastSpec.autoApplyAfterParentInputPlan
+  ) {
+    throw new Error(
+      `Input field at ${path} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
+    );
+  }
+
   const { apply, ...spec } = grafastSpec;
   assertNotAsync(apply, `${path ?? "?"}.apply`);
   return apply

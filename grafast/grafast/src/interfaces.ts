@@ -467,6 +467,11 @@ export type GrafastArgumentConfig<
   type: TInputType;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
   applySubscribePlan?: ArgumentApplyPlanResolver<any, any>;
+
+  // No longer supported properties
+  inputPlan?: never;
+  autoApplyAfterParentPlan?: never;
+  autoApplyAfterParentSubscribePlan?: never;
 };
 
 /**
@@ -478,6 +483,12 @@ export type GrafastInputFieldConfig<
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
   apply?: InputObjectFieldApplyResolver<TParent>;
+
+  // No longer supported properties
+  inputPlan?: never;
+  applyPlan?: never;
+  autoApplyAfterParentInputPlan?: never;
+  autoApplyAfterParentApplyPlan?: never;
 };
 
 /**
