@@ -55,103 +55,85 @@ export function makeParseArrayWithTransform<T = string>(
       // > they are empty strings, contain curly braces, delimiter characters, double
       // > quotes, backslashes, or white space, or match the word NULL. Double quotes
       // > and backslashes embedded in element values will be backslash-escaped.
-      switch (char) {
-        case DQUOT: {
-          // It's escaped
-          currentStringStart = ++position;
-          let dquot = str.indexOf(DQUOT, currentStringStart);
-          let backSlash = str.indexOf(BACKSLASH, currentStringStart);
-          while (backSlash !== -1 && backSlash < dquot) {
-            position = backSlash;
-            const part = str.slice(currentStringStart, position);
-            currentStringParts.push(part);
-            hasStringParts = true;
-            currentStringStart = ++position;
-            if (dquot === position++) {
-              // This was an escaped doublequote; find the next one!
-              dquot = str.indexOf(DQUOT, position);
-            }
-            // Either way, find the next backslash
-            backSlash = str.indexOf(BACKSLASH, position);
-          }
-          position = dquot;
+      if (char === DQUOT) {
+        // It's escaped
+        currentStringStart = ++position;
+        let dquot = str.indexOf(DQUOT, currentStringStart);
+        let backSlash = str.indexOf(BACKSLASH, currentStringStart);
+        while (backSlash !== -1 && backSlash < dquot) {
+          position = backSlash;
           const part = str.slice(currentStringStart, position);
-          if (hasStringParts) {
-            const final = currentStringParts.join("") + part;
-            current.push(haveTransform ? transform(final) : final);
-            currentStringParts.length = 0;
-            hasStringParts = false;
-          } else {
-            current.push(haveTransform ? transform(part) : part);
+          currentStringParts.push(part);
+          hasStringParts = true;
+          currentStringStart = ++position;
+          if (dquot === position++) {
+            // This was an escaped doublequote; find the next one!
+            dquot = str.indexOf(DQUOT, position);
           }
-          mode = EXPECT_DELIM;
-          break;
+          // Either way, find the next backslash
+          backSlash = str.indexOf(BACKSLASH, position);
         }
-        case LBRACE: {
-          const newArray: any[] = [];
-          current.push(newArray);
-          stack.push(current);
-          current = newArray;
-          currentStringStart = position + 1;
-          mode = EXPECT_VALUE;
-          break;
+        position = dquot;
+        const part = str.slice(currentStringStart, position);
+        if (hasStringParts) {
+          const final = currentStringParts.join("") + part;
+          current.push(haveTransform ? transform(final) : final);
+          currentStringParts.length = 0;
+          hasStringParts = false;
+        } else {
+          current.push(haveTransform ? transform(part) : part);
         }
-        case COMMA: {
-          // delim();
-          if (mode === SIMPLE_VALUE) {
-            const part = str.slice(currentStringStart, position);
-            current.push(
-              part === NULL_STRING
-                ? null
-                : haveTransform
-                ? transform(part)
-                : part,
-            );
-          }
+        mode = EXPECT_DELIM;
+      } else if (char === LBRACE) {
+        const newArray: any[] = [];
+        current.push(newArray);
+        stack.push(current);
+        current = newArray;
+        currentStringStart = position + 1;
+        mode = EXPECT_VALUE;
+      } else if (char === COMMA) {
+        // delim();
+        if (mode === SIMPLE_VALUE) {
+          const part = str.slice(currentStringStart, position);
+          current.push(
+            part === NULL_STRING
+              ? null
+              : haveTransform
+              ? transform(part)
+              : part,
+          );
+        }
 
-          mode = EXPECT_VALUE;
-          break;
+        mode = EXPECT_VALUE;
+      } else if (char === RBRACE) {
+        //delim();
+        if (mode === SIMPLE_VALUE) {
+          const part = str.slice(currentStringStart, position);
+          current.push(
+            part === NULL_STRING
+              ? null
+              : haveTransform
+              ? transform(part)
+              : part,
+          );
         }
-        case RBRACE: {
-          //delim();
-          if (mode === SIMPLE_VALUE) {
-            const part = str.slice(currentStringStart, position);
-            current.push(
-              part === NULL_STRING
-                ? null
-                : haveTransform
-                ? transform(part)
-                : part,
-            );
-          }
 
-          mode = EXPECT_DELIM;
-          const arr = stack.pop();
-          if (arr === undefined) {
-            throw new Error(`Invalid array text - too many '}'`);
-          }
-          current = arr;
-          break;
+        mode = EXPECT_DELIM;
+        const arr = stack.pop();
+        if (arr === undefined) {
+          throw new Error(`Invalid array text - too many '}'`);
         }
-        default: {
-          switch (mode) {
-            case EXPECT_VALUE: {
-              currentStringStart = position;
-              mode = SIMPLE_VALUE;
-              break;
-            }
-            case SIMPLE_VALUE: {
-              continue;
-            }
-            case EXPECT_DELIM: {
-              throw new Error("Was expecting delimeter");
-            }
-            default: {
-              const never: never = mode;
-              throw new Error(`Was not expecting to be in mode ${never}`);
-            }
-          }
-        }
+        current = arr;
+      } else if (mode === EXPECT_VALUE) {
+        currentStringStart = position;
+        mode = SIMPLE_VALUE;
+      } else if (mode === SIMPLE_VALUE) {
+        continue;
+      } else if (mode === EXPECT_DELIM) {
+        throw new Error("Was expecting delimeter");
+      } else {
+        const never: never = mode;
+        throw new Error(`Was not expecting to be in mode ${never}`);
       }
     }
 
