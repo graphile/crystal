@@ -266,41 +266,6 @@ export function assertModifier<TParent>(
   }
 }
 
-/*
-type ApplyAfterMode = "autoApplyAfterParentApply" | "autoApplyAfterParentInput";
-
-function processAfter(
-  rootFieldArgs: InputValue,
-  path: ReadonlyArray<string | number>,
-  result: Modifier | null | undefined | void,
-  fields: Record<string, GraphQLInputField>,
-  applyAfterMode: ApplyAfterMode,
-) {
-  if (result != null) {
-    if (applyAfterMode === "autoApplyAfterParentApplyPlan" && result != null) {
-      // `applyPlan` returned a step, so auto-apply every subfield to it
-      for (const name of Object.keys(fields)) {
-        rootFieldArgs.apply(result, [...path, name]);
-      }
-    } else {
-      for (const [name, spec] of Object.entries(fields)) {
-        const autoApply =
-          applyAfterMode === "autoApplyAfterParentInputPlan"
-            ? (spec as GraphQLInputField).extensions.grafast
-                ?.autoApplyAfterParentInputPlan
-            : applyAfterMode === "autoApplyAfterParentApplyPlan"
-            ? (spec as GraphQLInputField).extensions.grafast
-                ?.autoApplyAfterParentApplyPlan
-            : null;
-        if (autoApply) {
-          rootFieldArgs.apply(result, [...path, name]);
-        }
-      }
-    }
-  }
-}
-*/
-
 export type ApplyableExecutableStep<
   TArg extends object = any,
   TData = any,
