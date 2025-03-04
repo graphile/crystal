@@ -5217,25 +5217,29 @@ const pgClassFilterWhere = EXPORTABLE(
 function pgWhere(qb: PgSelectQueryBuilder | PgUnionAllQueryBuilder) {
   return qb.whereBuilder();
 }
-function includeArchivedCondition([sqlParentArchivedAt, value]: readonly [
-  SQL | undefined,
-  Maybe<string>,
-]): PgSelectQueryBuilderCallback {
-  return (queryBuilder) => {
-    if (value === "YES") {
-      // No restriction
-    } else if (value === "EXCLUSIVELY") {
-      queryBuilder.where(sql`${queryBuilder}.archived_at is not null`);
-    } else if (
-      value === "INHERIT" &&
-      // INHERIT only works if the parent has an archived_at attribute.
-      sqlParentArchivedAt !== undefined
-    ) {
-      queryBuilder.where(
-        sql`(${queryBuilder.alias}.archived_at is null) = (${sqlParentArchivedAt} is null)`,
-      );
-    } else {
-      queryBuilder.where(sql`${queryBuilder}.archived_at is null`);
-    }
-  };
-}
+const includeArchivedCondition = EXPORTABLE(
+  (sql) =>
+    function includeArchivedCondition([sqlParentArchivedAt, value]: readonly [
+      SQL | undefined,
+      Maybe<string>,
+    ]): PgSelectQueryBuilderCallback {
+      return (queryBuilder) => {
+        if (value === "YES") {
+          // No restriction
+        } else if (value === "EXCLUSIVELY") {
+          queryBuilder.where(sql`${queryBuilder}.archived_at is not null`);
+        } else if (
+          value === "INHERIT" &&
+          // INHERIT only works if the parent has an archived_at attribute.
+          sqlParentArchivedAt !== undefined
+        ) {
+          queryBuilder.where(
+            sql`(${queryBuilder.alias}.archived_at is null) = (${sqlParentArchivedAt} is null)`,
+          );
+        } else {
+          queryBuilder.where(sql`${queryBuilder}.archived_at is null`);
+        }
+      };
+    },
+  [sql],
+);
