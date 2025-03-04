@@ -455,13 +455,28 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       },
                     };
 
-                    finalFieldSpec.args![argName] = builder.applyHooks(
+                    const finalArgSpec = builder.applyHooks(
                       "GraphQLInterfaceType_fields_field_args_arg",
                       argSpec,
                       build,
                       argContext,
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
+
+                    const ext = finalArgSpec.extensions?.grafast;
+
+                    // TODO: remove this code
+                    if (
+                      ext &&
+                      (ext.autoApplyAfterParentPlan ||
+                        ext.autoApplyAfterParentSubscriptionPlan)
+                    ) {
+                      console.warn(
+                        `Argument ${typeName}.${fieldName}(${argName}:) has autoApplyAfterParentPlan or autoApplyAfterParentSubscriptionPlan set; these properties no longer do anything and should be removed.`,
+                      );
+                    }
+
+                    finalFieldSpec.args![argName] = finalArgSpec;
                   }
 
                   processedFields.push(finalFieldSpec);
@@ -651,6 +666,19 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     fieldContext,
                     `|${typeName}.fields.${fieldName}`,
                   );
+                  const ext = newSpec.extensions?.grafast;
+                  // TODO: remove this code
+                  if (
+                    ext &&
+                    (ext.applyPlan ||
+                      ext.inputPlan ||
+                      ext.autoApplyAfterParentApplyPlan ||
+                      ext.autoApplyAfterParentInputPlan)
+                  ) {
+                    console.warn(
+                      `Input field ${typeName}.${fieldName} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
+                    );
+                  }
 
                   const finalSpec = newSpec;
                   processedFields.push(finalSpec);

@@ -685,6 +685,10 @@ declare global {
       // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
       applyPlan?: ArgumentApplyPlanResolver;
       applySubscribePlan?: ArgumentApplyPlanResolver;
+
+      // Legacy fields, no longer supported
+      autoApplyAfterParentPlan?: never;
+      autoApplyAfterParentSubscriptionPlan?: never;
     }
 
     interface InputObjectTypeExtensions {
@@ -693,6 +697,12 @@ declare global {
 
     interface InputFieldExtensions {
       apply?: InputObjectFieldApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      applyPlan?: never;
+      inputPlan?: never;
+      autoApplyAfterParentApplyPlan?: never;
+      autoApplyAfterParentInputPlan?: never;
     }
 
     interface ObjectTypeExtensions {
