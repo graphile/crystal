@@ -37,7 +37,7 @@ export function makeParseArrayWithTransform<T = string>(
     }
     const output: any[] = [];
     let current = output;
-    const stack: any[][] = [];
+    let stack: any[][] | null = null;
 
     let currentStringStart: number = position;
     const currentStringParts: string[] = [];
@@ -82,7 +82,11 @@ export function makeParseArrayWithTransform<T = string>(
       } else if (char === LBRACE) {
         const newArray: any[] = [];
         current.push(newArray);
-        stack.push(current);
+        if (stack === null) {
+          stack = [current];
+        } else {
+          stack.push(current);
+        }
         current = newArray;
         currentStringStart = position + 1;
         expectValue = true;
@@ -90,7 +94,7 @@ export function makeParseArrayWithTransform<T = string>(
         expectValue = true;
       } else if (char === RBRACE) {
         expectValue = false;
-        const arr = stack.pop();
+        const arr = stack!.pop();
         if (arr === undefined) {
           throw new Error("Invalid array text - too many '}'");
         }
