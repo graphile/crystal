@@ -2399,7 +2399,7 @@ export function generatePgParameterAnalysis(
   }
   return {
     /** DO NOT GENERATE THIS OBJECT YOURSELF! Use generateParameterAnalysis(parameters) */
-    [$$generationCheck]: true,
+    [$$generationCheck]: parameters,
     parameterByName,
     indexAfterWhichAllArgsAreNamed,
   };
@@ -2418,6 +2418,11 @@ export function pgFromExpressionRuntime(
   if (!parameterAnalysis[$$generationCheck]) {
     throw new Error(
       `You must not generate the parameter analysis yourself; use generateParameterAnalysis(parameters)`,
+    );
+  }
+  if (parameterAnalysis[$$generationCheck] !== parameters) {
+    throw new Error(
+      `This parameter analysis was produced for a different set of parameters; perhaps you sliced the array?`,
     );
   }
   const { parameterByName, indexAfterWhichAllArgsAreNamed } = parameterAnalysis;
