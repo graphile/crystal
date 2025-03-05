@@ -453,7 +453,7 @@ export interface PgCodecRelationBase<
   /**
    * The attributes locally used in this relationship.
    */
-  localAttributes: readonly (keyof TLocalCodec["attributes"])[];
+  localAttributes: readonly (keyof TLocalCodec["attributes"] & string)[];
 
   /**
    * The remote attributes that are joined against.
