@@ -151,6 +151,7 @@ import {
 } from "./steps/pgPolymorphic.js";
 import {
   pgFromExpression,
+  pgFromExpressionRuntime,
   PgGroupDetails,
   pgSelect,
   PgSelectArgumentDigest,
@@ -286,6 +287,7 @@ export {
   PgExecutorMutationOptions,
   PgExecutorOptions,
   pgFromExpression,
+  pgFromExpressionRuntime,
   PgFunctionResourceOptions,
   PgGroupDetails,
   PgGroupSpec,
@@ -413,6 +415,7 @@ exportAsMany("@dataplan/pg", {
   pgPolymorphic,
   PgPolymorphicStep,
   pgSelect,
+  pgFromExpressionRuntime,
   pgFromExpression,
   pgSelectFromRecords,
   PgSelectStep,

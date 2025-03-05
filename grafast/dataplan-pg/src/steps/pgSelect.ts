@@ -176,6 +176,10 @@ interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
   placeholder?: never;
   depId: number;
 }
+interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
+  placeholder?: never;
+  value: unknown;
+}
 
 interface QueryValue {
   dependencyIndex: number;
@@ -2248,10 +2252,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   private digests: ReadonlyArray<
     PgSelectArgumentPlaceholder | PgSelectArgumentDepId
   >;
-  private parameterByName: {
-    [argName: string]: PgResourceParameter;
-  };
-  private indexAfterWhichAllArgsAreNamed: number;
+  private parameterAnalysis: ReturnType<typeof analyzeParameters>;
   public isSyncAndSafe = true;
   constructor(
     private from: (...args: PgSelectArgumentDigest[]) => SQL,
@@ -2264,19 +2265,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     if (this.getAndFreezeIsUnary() !== true) {
       throw new Error(`PgFromExpressionStep must be unary`);
     }
-    this.parameterByName = Object.create(null);
-    let indexAfterWhichAllArgsAreNamed = 0;
-    for (let i = 0, l = parameters.length; i < l; i++) {
-      const param = parameters[i];
-      if (param.name != null) {
-        this.parameterByName[param.name] = param;
-      }
-      // Note that `name = ''` counts as having no name.
-      if (!param.name) {
-        indexAfterWhichAllArgsAreNamed = i + 1;
-      }
-    }
-    this.indexAfterWhichAllArgsAreNamed = indexAfterWhichAllArgsAreNamed;
+    this.parameterAnalysis = analyzeParameters(this.parameters);
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
@@ -2375,74 +2364,116 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, ...deps: any[]): SQL {
-    /**
-     * If true, we can only use named parameters now. Set this if we skip an
-     * entry, or if the input has a name that doesn't match the parameter name.
-     */
-    let namedOnly = false;
-    let argIndex = 0;
+    const digests = this.digests.map((d) =>
+      d.depId != null ? { ...d, value: deps[d.depId] } : d,
+    );
+    return pgFromExpressionRuntime(
+      this.from,
+      this.parameters,
+      digests,
+      this.parameterAnalysis,
+    );
+  }
+}
 
-    const args: PgSelectArgumentDigest[] = [];
-    for (
-      let digestIndex = 0, digestsCount = this.digests.length;
-      digestIndex < digestsCount;
-      digestIndex++
+function analyzeParameters(parameters: readonly PgResourceParameter[]) {
+  const parameterByName = Object.create(null);
+  let indexAfterWhichAllArgsAreNamed = 0;
+  for (let i = 0, l = parameters.length; i < l; i++) {
+    const param = parameters[i];
+    if (param.name != null) {
+      parameterByName[param.name] = param;
+    }
+    // Note that `name = ''` counts as having no name.
+    if (!param.name) {
+      indexAfterWhichAllArgsAreNamed = i + 1;
+    }
+  }
+  return {
+    parameterByName,
+    indexAfterWhichAllArgsAreNamed,
+  };
+}
+
+export function pgFromExpressionRuntime(
+  from: (...args: PgSelectArgumentDigest[]) => SQL,
+  parameters: readonly PgResourceParameter[],
+  digests: ReadonlyArray<
+    PgSelectArgumentPlaceholder | PgSelectArgumentRuntimeValue
+  >,
+  paramAnalysis: {
+    parameterByName: Record<string, PgResourceParameter>;
+    indexAfterWhichAllArgsAreNamed: number;
+  } = analyzeParameters(parameters),
+) {
+  const { parameterByName, indexAfterWhichAllArgsAreNamed } = paramAnalysis;
+  /**
+   * If true, we can only use named parameters now. Set this if we skip an
+   * entry, or if the input has a name that doesn't match the parameter name.
+   */
+  let namedOnly = false;
+  let argIndex = 0;
+
+  const args: PgSelectArgumentDigest[] = [];
+  for (
+    let digestIndex = 0, digestsCount = digests.length;
+    digestIndex < digestsCount;
+    digestIndex++
+  ) {
+    const digest = digests[digestIndex];
+    if (
+      !namedOnly &&
+      // Note that name can be the empty string, we treat that as "no name"
+      digest.name &&
+      parameters[digestIndex].name !== digest.name
     ) {
-      const digest = this.digests[digestIndex];
+      namedOnly = true;
+    }
+    if (namedOnly && !digest.name) {
+      throw new Error(
+        `Cannot have unnamed argument after named arguments at index ${digestIndex}`,
+      );
+    }
+    const parameter = namedOnly
+      ? parameterByName[digest.name!]
+      : parameters[digestIndex];
+    if (!parameter) {
+      throw new Error(
+        `Could not determine parameter for argument at index ${digestIndex}${
+          digest.name ? ` (${digest.name})` : ""
+        }`,
+      );
+    }
+    let sqlValue: SQL;
+    if (digest.placeholder) {
+      // It's a placeholder, always use it
+      sqlValue = digest.placeholder;
+    } else {
+      const dep = digest.value;
       if (
-        !namedOnly &&
-        // Note that name can be the empty string, we treat that as "no name"
-        digest.name &&
-        this.parameters[digestIndex].name !== digest.name
+        dep === undefined &&
+        (namedOnly ||
+          (!parameter.required &&
+            digestIndex >= indexAfterWhichAllArgsAreNamed - 1))
       ) {
         namedOnly = true;
+        continue;
       }
-      if (namedOnly && !digest.name) {
-        throw new Error(
-          `Cannot have unnamed argument after named arguments at index ${digestIndex}`,
-        );
-      }
-      const parameter = namedOnly
-        ? this.parameterByName[digest.name!]
-        : this.parameters[digestIndex];
-      if (!parameter) {
-        throw new Error(
-          `Could not determine parameter for argument at index ${digestIndex}${
-            digest.name ? ` (${digest.name})` : ""
-          }`,
-        );
-      }
-      let sqlValue: SQL;
-      if (digest.depId != null) {
-        const dep = deps[digest.depId];
-        if (
-          dep === undefined &&
-          (namedOnly ||
-            (!parameter.required &&
-              digestIndex >= this.indexAfterWhichAllArgsAreNamed - 1))
-        ) {
-          namedOnly = true;
-          continue;
-        }
-        sqlValue = sqlValueWithCodec(dep ?? null, parameter.codec);
-      } else {
-        // It's a placeholder, always use it
-        sqlValue = digest.placeholder;
-      }
-      if (namedOnly) {
-        args.push({
-          placeholder: sqlValue,
-          name: parameter.name!,
-        });
-      } else {
-        args.push({
-          placeholder: sqlValue,
-          position: argIndex++,
-        });
-      }
+      sqlValue = sqlValueWithCodec(dep ?? null, parameter.codec);
     }
-    return this.from(...args);
+    if (namedOnly) {
+      args.push({
+        placeholder: sqlValue,
+        name: parameter.name!,
+      });
+    } else {
+      args.push({
+        placeholder: sqlValue,
+        position: argIndex++,
+      });
+    }
   }
+  return from(...args);
 }
 
 exportAs("@dataplan/pg", pgFromExpression, "pgFromExpression");
