@@ -151,6 +151,7 @@ import {
 } from "./steps/pgPolymorphic.js";
 import {
   pgFromExpression,
+  PgGroupDetails,
   pgSelect,
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
@@ -286,6 +287,7 @@ export {
   PgExecutorOptions,
   pgFromExpression,
   PgFunctionResourceOptions,
+  PgGroupDetails,
   PgGroupSpec,
   PgHavingConditionSpec,
   PgHStore,

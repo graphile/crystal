@@ -105,6 +105,7 @@ const NO_ROWS = Object.freeze({
   hasMore: false,
   items: [],
   cursorDetails: undefined,
+  groupDetails: undefined,
   m: Object.create(null),
 } as PgSelectStepResult);
 
@@ -309,6 +310,7 @@ interface QueryBuildResult {
   first: Maybe<number>;
   last: Maybe<number>;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
 }
 
 interface PgSelectStepResult {
@@ -316,7 +318,15 @@ interface PgSelectStepResult {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   m: Record<string, unknown>;
+}
+
+export interface PgGroupDetails {
+  readonly indicies: ReadonlyArray<{
+    index: number;
+    codec: PgCodec;
+  }>;
 }
 
 /**
@@ -975,6 +985,12 @@ export class PgSelectStep<
     return access(this, "cursorDetails");
   }
 
+  private needsGroups = false;
+  public getGroupDetails(): Step<PgGroupDetails> {
+    this.needsGroups = true;
+    return access(this, "groupDetails");
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -1011,6 +1027,7 @@ export class PgSelectStep<
       first,
       last,
       cursorDetails,
+      groupDetails,
     } = buildTheQuery({
       executionDetails,
 
@@ -1075,6 +1092,7 @@ export class PgSelectStep<
           shouldReverseOrder,
           meta,
           cursorDetails,
+          groupDetails,
         });
       });
     } else {
@@ -1147,6 +1165,7 @@ export class PgSelectStep<
             hasMore: false,
             items: iterable,
             cursorDetails,
+            groupDetails,
             m: meta,
           };
         }
@@ -1196,6 +1215,7 @@ export class PgSelectStep<
           hasMore: false,
           items: mergedGenerator,
           cursorDetails,
+          groupDetails,
           m: meta,
         };
       });
@@ -1954,6 +1974,7 @@ export class PgSelectStep<
       from: $source.from,
       joins: $source.joins,
       needsCursor: $source.needsCursor,
+      needsGroups: $source.needsGroups,
       relationJoins: $source.relationJoins,
       meta: $source._meta,
       placeholderSymbols: $source.placeholders.map((p) => p.symbol),
@@ -2513,6 +2534,7 @@ interface PgSelectQueryInfo<
   readonly isOrderUnique: boolean;
   readonly fixedPlaceholderValues: ReadonlyMap<symbol, SQL>;
   readonly _symbolSubstitutes: ReadonlyMap<symbol, symbol>;
+  readonly needsGroups: boolean;
 
   readonly selects: ReadonlyArray<SQL>;
   readonly from: SQL;
@@ -2543,6 +2565,10 @@ interface MutablePgSelectQueryInfo<
   isOrderUnique: boolean;
   readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
   readonly meta: Record<string, any>;
+  readonly groupIndicies: Array<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
 }
 
 interface ResolvedPgSelectQueryInfo<
@@ -2574,6 +2600,7 @@ function buildTheQueryCore<
     cursorUpper: null,
     cursorDigest: null,
     cursorIndicies: rawInfo.needsCursor ? [] : null,
+    groupIndicies: rawInfo.needsGroups ? [] : null,
 
     // Will be populated by applyCommonPaginationStuff
     first: null,
@@ -2757,6 +2784,26 @@ function buildTheQueryCore<
     }
   }
 
+  if (info.groupIndicies) {
+    if (info.groups.length > 0) {
+      const codec = TYPES.text;
+      const guaranteedNonNull = false;
+      for (const o of info.groups) {
+        const frag = sql`(${o.fragment})::text`;
+        info.groupIndicies.push({
+          index: selectAndReturnIndex(
+            codec.castFromPg
+              ? codec.castFromPg(frag, guaranteedNonNull)
+              : sql`${frag}::text`,
+          ),
+          codec,
+        });
+      }
+    } else {
+      // No grouping
+    }
+  }
+
   // apply conditions from the cursor
   applyConditionFromCursor(info, "after", after);
   applyConditionFromCursor(info, "before", before);
@@ -2800,6 +2847,7 @@ function buildTheQuery<
     shouldReverseOrder,
     cursorDigest,
     cursorIndicies,
+    groupIndicies,
   } = info;
 
   const combinedInfo = {
@@ -3006,11 +3054,11 @@ ${lateralText};`;
 
   const cursorDetails: PgCursorDetails | undefined =
     cursorDigest != null && cursorIndicies != null
-      ? {
-          digest: cursorDigest,
-          indicies: cursorIndicies,
-        }
+      ? { digest: cursorDigest, indicies: cursorIndicies }
       : undefined;
+  const groupDetails: PgGroupDetails | undefined = groupIndicies
+    ? { indicies: groupIndicies }
+    : undefined;
 
   if (stream) {
     // PERF: should use the queryForSingle optimization in here too
@@ -3058,6 +3106,7 @@ ${lateralText};`;
         first,
         last,
         cursorDetails,
+        groupDetails,
       };
     } else {
       /*
@@ -3092,6 +3141,7 @@ ${lateralText};`;
         first,
         last,
         cursorDetails,
+        groupDetails,
       };
     }
   } else {
@@ -3111,6 +3161,7 @@ ${lateralText};`;
       first,
       last,
       cursorDetails,
+      groupDetails,
     };
   }
 }
@@ -3134,6 +3185,7 @@ type StaticKeys =
   | "from"
   | "joins"
   | "needsCursor"
+  | "needsGroups"
   | "relationJoins"
   | "meta"
   | "placeholderSymbols"
@@ -3212,14 +3264,13 @@ class PgSelectInlineApplyStep<
           ...this.staticInfo,
         });
 
-        const { cursorDigest, cursorIndicies } = info;
+        const { cursorDigest, cursorIndicies, groupIndicies } = info;
         const cursorDetails: PgCursorDetails | undefined =
           cursorDigest != null && cursorIndicies != null
-            ? {
-                digest: cursorDigest,
-                indicies: cursorIndicies,
-              }
+            ? { digest: cursorDigest, indicies: cursorIndicies }
             : undefined;
+        const groupDetails: PgGroupDetails | undefined =
+          groupIndicies != null ? { indicies: groupIndicies } : undefined;
 
         if (this.viaSubquery) {
           const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
@@ -3233,6 +3284,7 @@ class PgSelectInlineApplyStep<
 
           const details: PgSelectInlineViaSubqueryDetails = {
             cursorDetails,
+            groupDetails,
             shouldReverseOrder,
             fetchOneExtra,
             selectIndex,
@@ -3267,6 +3319,7 @@ class PgSelectInlineApplyStep<
           const details: PgSelectInlineViaJoinDetails = {
             selectIndexes,
             cursorDetails,
+            groupDetails,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3279,11 +3332,13 @@ class PgSelectInlineApplyStep<
 interface PgSelectInlineViaJoinDetails {
   selectIndexes: number[];
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   meta: Record<string, any>;
 }
 interface PgSelectInlineViaSubqueryDetails {
   selectIndex: number;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   meta: Record<string, any>;
   fetchOneExtra: boolean;
   first: Maybe<number>;
@@ -3708,6 +3763,7 @@ function createSelectResult(
     shouldReverseOrder,
     meta,
     cursorDetails,
+    groupDetails,
   }: {
     first: Maybe<number> | null;
     last: Maybe<number> | null;
@@ -3715,6 +3771,7 @@ function createSelectResult(
     shouldReverseOrder: boolean;
     meta: Record<string, any>;
     cursorDetails: PgCursorDetails | undefined;
+    groupDetails: PgGroupDetails | undefined;
   },
 ) {
   if (allVals == null) {
@@ -3740,6 +3797,7 @@ function createSelectResult(
     hasMore,
     items: orderedRows,
     cursorDetails,
+    groupDetails,
     m: meta,
   };
 }
@@ -3748,7 +3806,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
   PgSelectInlineViaJoinDetails,
   any[],
 ]) {
-  const { meta, selectIndexes, cursorDetails } = details;
+  const { meta, selectIndexes, cursorDetails, groupDetails } = details;
   const newItem = [];
   for (let i = 0, l = selectIndexes.length; i < l; i++) {
     newItem[i] = item[selectIndexes[i]];
@@ -3761,6 +3819,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     // because it only contains one entry.
     items: [newItem],
     cursorDetails,
+    groupDetails,
     m: meta,
   };
 }
