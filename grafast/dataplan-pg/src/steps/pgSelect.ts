@@ -2712,6 +2712,9 @@ function buildTheQueryCore<
         }
       }
     },
+    groupBy(spec) {
+      info.groups.push(spec);
+    },
     having(condition) {
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
@@ -3656,6 +3659,7 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   whereBuilder(): PgCondition<this>;
+  groupBy(group: PgGroupSpec): void;
   having(
     condition: PgHavingConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
