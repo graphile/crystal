@@ -2069,6 +2069,8 @@ function joinMatches(
 function makeOrderUniqueIfPossible<
   TResource extends PgResource<any, any, any, any, any>,
 >(info: MutablePgSelectQueryInfo<TResource>): void {
+  // Never re-order aggregates
+  if (info.mode === "aggregate") return;
   // If we're already uniquely ordered, no need to order
   if (info.isOrderUnique) return;
   // No need to order a unique record
