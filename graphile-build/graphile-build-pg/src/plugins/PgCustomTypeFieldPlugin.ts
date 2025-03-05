@@ -14,6 +14,7 @@ import type {
   PgResource,
   PgResourceParameter,
   PgSelectArgumentDigest,
+  PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
   PgSelectQueryBuilder,
   PgUpdateSingleStep,
@@ -41,12 +42,17 @@ import type {
 import {
   __ListTransformStep,
   bakedInput,
+  bakedInputRuntime,
   connection,
   object,
   ObjectStep,
   stepAMayDependOnStepB,
 } from "grafast";
-import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
+import type {
+  GraphQLInputType,
+  GraphQLOutputType,
+  GraphQLSchema,
+} from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
 import { exportNameHint, tagToString } from "../utils.js";
@@ -89,6 +95,12 @@ declare global {
           };
         };
         makeArgs(args: FieldArgs, path?: string[]): PgSelectArgumentSpec[];
+        makeArgsRuntime(
+          schema: GraphQLSchema,
+          /** Suitable for input object fields, or arguments */
+          fieldsOrArgs: Record<string, { type: GraphQLInputType }>,
+          input: Record<string, any>,
+        ): PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
@@ -564,12 +576,25 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   ),
               [argDetailsSimple, makeArg],
             );
+            const makeArgsRuntime = EXPORTABLE(
+              (argDetailsSimple, makeArgRuntime) =>
+                (
+                  schema: GraphQLSchema,
+                  fields: Record<string, { type: GraphQLInputType }>,
+                  input: Record<string, any>,
+                ) =>
+                  argDetailsSimple.map((details) =>
+                    makeArgRuntime(schema, fields, input, details),
+                  ),
+              [argDetailsSimple, makeArgRuntime],
+            );
 
             exportNameHint(makeArgs, `makeArgs_${resource.name}`);
 
             return {
               argDetails,
               makeArgs,
+              makeArgsRuntime,
               makeFieldArgs,
               parameterAnalysis: generatePgParameterAnalysis(parameters),
             };
@@ -1460,4 +1485,39 @@ const makeArg = EXPORTABLE(
       };
     },
   [bakedInput],
+);
+
+const makeArgRuntime = EXPORTABLE(
+  (bakedInputRuntime) =>
+    function makeArgRuntime(
+      schema: GraphQLSchema,
+      fields: Record<string, { type: GraphQLInputType }>,
+      input: Record<string, any>,
+      details: {
+        graphqlArgName: string;
+        postgresArgName: string | null;
+        pgCodec: PgCodec;
+        fetcher:
+          | null
+          | ((
+              $nodeId: ExecutableStep<Maybe<string>>,
+            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+      },
+    ): PgSelectArgumentRuntimeValue {
+      const { graphqlArgName, postgresArgName, /*pgCodec,*/ fetcher } = details;
+      if (fetcher) {
+        throw new Error(
+          `Sorry, functions with arguments that require a fetcher are not supported in this position at this time`,
+        );
+      }
+      const raw = input[graphqlArgName];
+      const name = postgresArgName ?? undefined;
+      if (raw == null) {
+        return { name, value: raw };
+      } else {
+        const inputType = fields[graphqlArgName].type;
+        return { name, value: bakedInputRuntime(schema, inputType, raw) };
+      }
+    },
+  [bakedInputRuntime],
 );

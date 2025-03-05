@@ -176,7 +176,7 @@ interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
   placeholder?: never;
   depId: number;
 }
-interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
+export interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
   placeholder?: never;
   value: unknown;
 }
