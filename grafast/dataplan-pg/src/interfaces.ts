@@ -370,7 +370,8 @@ export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
  */
 export interface PgGroupSpec {
   fragment: SQL;
-  // codec: PgCodec<string, any, any, any>;
+  codec: PgCodec<string, any, any, any>;
+  guaranteedNotNull?: boolean;
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 

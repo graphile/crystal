@@ -2840,15 +2840,13 @@ function buildTheQueryCore<
 
   if (info.groupIndicies) {
     if (info.groups.length > 0) {
-      const codec = TYPES.text;
-      const guaranteedNonNull = false;
       for (const o of info.groups) {
-        const frag = sql`(${o.fragment})::text`;
+        const { codec, fragment, guaranteedNotNull = false } = o;
         info.groupIndicies.push({
           index: selectAndReturnIndex(
             codec.castFromPg
-              ? codec.castFromPg(frag, guaranteedNonNull)
-              : sql`${frag}::text`,
+              ? codec.castFromPg(fragment, guaranteedNotNull)
+              : sql`${fragment}::text`,
           ),
           codec,
         });
