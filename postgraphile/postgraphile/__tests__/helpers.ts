@@ -827,7 +827,7 @@ export const assertResultsMatch = async (
     uuid: new Map<string, number>(),
     uuidCounter: 1,
   });
-  const data2a = makeResultSnapshotSafe(data1, {
+  const data2a = makeResultSnapshotSafe(data2, {
     uuid: new Map<string, number>(),
     uuidCounter: 1,
   });
