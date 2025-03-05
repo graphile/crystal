@@ -226,7 +226,7 @@ export interface PgSelectOptions<
    */
   forceIdentity?: boolean;
 
-  parameters?: PgResourceParameter[];
+  parameters?: readonly PgResourceParameter[];
 
   /**
    * If your `from` (or resource.from if omitted) is a function, the arguments
@@ -2154,7 +2154,7 @@ export function pgFromExpression(
     };
   },
   baseFrom: SQL | ((...args: readonly PgSelectArgumentDigest[]) => SQL),
-  inParameters: PgResourceParameter[] | undefined = undefined,
+  inParameters: readonly PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
@@ -2172,19 +2172,19 @@ export function pgFromExpression(
     return baseFrom(...specs);
   }
   const $placeholderable = $target.getPgRoot();
-  let parameters: PgResourceParameter[];
+  let parameters: readonly PgResourceParameter[];
   if (!inParameters) {
-    parameters = [];
+    const params = [];
     for (const spec of specs) {
       if (spec.step) {
         if (spec.pgCodec) {
-          parameters.push({
+          params.push({
             name: spec.name ?? null,
             codec: spec.pgCodec,
             required: false,
           });
         } else {
-          parameters.push({
+          params.push({
             name: spec.name ?? null,
             codec: spec.step.pgCodec,
             required: false,
@@ -2196,6 +2196,7 @@ export function pgFromExpression(
         );
       }
     }
+    parameters = params;
   } else {
     parameters = inParameters;
   }
@@ -2254,7 +2255,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   public isSyncAndSafe = true;
   constructor(
     private from: (...args: PgSelectArgumentDigest[]) => SQL,
-    private parameters: PgResourceParameter[],
+    private parameters: readonly PgResourceParameter[],
     digests: ReadonlyArray<
       PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
     >,
