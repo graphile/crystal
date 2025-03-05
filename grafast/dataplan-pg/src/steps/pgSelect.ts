@@ -2252,7 +2252,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   private digests: ReadonlyArray<
     PgSelectArgumentPlaceholder | PgSelectArgumentDepId
   >;
-  private parameterAnalysis: ReturnType<typeof analyzeParameters>;
+  private parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
   public isSyncAndSafe = true;
   constructor(
     private from: (...args: PgSelectArgumentDigest[]) => SQL,
@@ -2265,7 +2265,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     if (this.getAndFreezeIsUnary() !== true) {
       throw new Error(`PgFromExpressionStep must be unary`);
     }
-    this.parameterAnalysis = analyzeParameters(this.parameters);
+    this.parameterAnalysis = generatePgParameterAnalysis(this.parameters);
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
@@ -2376,8 +2376,14 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   }
 }
 
-function analyzeParameters(parameters: readonly PgResourceParameter[]) {
-  const parameterByName = Object.create(null);
+const $$generationCheck = Symbol("Used parameterAnalysis()");
+export function generatePgParameterAnalysis(
+  parameters: readonly PgResourceParameter[],
+) {
+  const parameterByName = Object.create(null) as Record<
+    string,
+    PgResourceParameter
+  >;
   let indexAfterWhichAllArgsAreNamed = 0;
   for (let i = 0, l = parameters.length; i < l; i++) {
     const param = parameters[i];
@@ -2390,6 +2396,8 @@ function analyzeParameters(parameters: readonly PgResourceParameter[]) {
     }
   }
   return {
+    /** DO NOT GENERATE THIS OBJECT YOURSELF! Use generateParameterAnalysis(parameters) */
+    [$$generationCheck]: true,
     parameterByName,
     indexAfterWhichAllArgsAreNamed,
   };
@@ -2401,12 +2409,16 @@ export function pgFromExpressionRuntime(
   digests: ReadonlyArray<
     PgSelectArgumentPlaceholder | PgSelectArgumentRuntimeValue
   >,
-  paramAnalysis: {
-    parameterByName: Record<string, PgResourceParameter>;
-    indexAfterWhichAllArgsAreNamed: number;
-  } = analyzeParameters(parameters),
+  parameterAnalysis: ReturnType<
+    typeof generatePgParameterAnalysis
+  > = generatePgParameterAnalysis(parameters),
 ) {
-  const { parameterByName, indexAfterWhichAllArgsAreNamed } = paramAnalysis;
+  if (!parameterAnalysis[$$generationCheck]) {
+    throw new Error(
+      `You must not generate the parameter analysis yourself; use generateParameterAnalysis(parameters)`,
+    );
+  }
+  const { parameterByName, indexAfterWhichAllArgsAreNamed } = parameterAnalysis;
   /**
    * If true, we can only use named parameters now. Set this if we skip an
    * entry, or if the input has a name that doesn't match the parameter name.

@@ -150,6 +150,7 @@ import {
   PgPolymorphicTypeMap,
 } from "./steps/pgPolymorphic.js";
 import {
+  generatePgParameterAnalysis,
   pgFromExpression,
   pgFromExpressionRuntime,
   PgGroupDetails,
@@ -211,6 +212,7 @@ export {
   assertPgClassSingleStep,
   domainOfCodec,
   enumCodec,
+  generatePgParameterAnalysis,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   GetPgCodecAttributes,
@@ -417,6 +419,7 @@ exportAsMany("@dataplan/pg", {
   pgSelect,
   pgFromExpressionRuntime,
   pgFromExpression,
+  generatePgParameterAnalysis,
   pgSelectFromRecords,
   PgSelectStep,
   PgSelectRowsStep,

@@ -19,6 +19,7 @@ import type {
   PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
+  generatePgParameterAnalysis,
   pgClassExpression,
   pgFromExpression,
   pgSelectSingleFromRecord,
@@ -95,6 +96,7 @@ declare global {
           inputType: GraphQLInputType;
           required: boolean;
         }>;
+        parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
       };
     }
 
@@ -569,6 +571,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               argDetails,
               makeArgs,
               makeFieldArgs,
+              parameterAnalysis: generatePgParameterAnalysis(parameters),
             };
           };
 
