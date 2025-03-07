@@ -369,6 +369,9 @@ export class PgUpdateSingleStep<
         setMeta(key, value) {
           meta[key] = value;
         },
+        getMetaRaw(key) {
+          return meta[key];
+        },
         set(name, attVal) {
           const pgCodec = resource.codec.attributes[name]?.codec;
           if (!pgCodec) {

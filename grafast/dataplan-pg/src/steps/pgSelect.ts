@@ -1955,6 +1955,9 @@ export class PgSelectStep<
   setMeta(key: string, value: unknown): void {
     this._meta[key] = value;
   }
+  getMetaRaw(key: string): unknown {
+    return this._meta[key];
+  }
 
   static getStaticInfo<TResource extends PgResource<any, any, any, any, any>>(
     $source: PgSelectStep<TResource>,
@@ -2680,6 +2683,9 @@ function buildTheQueryCore<
     },
     setMeta(key, value) {
       meta[key] = value;
+    },
+    getMetaRaw(key) {
+      return meta[key];
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
