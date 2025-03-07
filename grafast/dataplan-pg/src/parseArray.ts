@@ -9,6 +9,8 @@ const COMMA = ",";
 /** When the raw value is this, it means a literal `null` */
 const NULL_STRING = "NULL";
 
+const EMPTY_ARRAY = Object.freeze([]);
+
 type Transform<T> = (val: string) => T;
 
 /**
@@ -22,6 +24,14 @@ export function makeParseArrayWithTransform<T = string>(
 ): (str: string) => T[] {
   const haveTransform = transform != null;
   return function parseArray(str) {
+    const rbraceIndex = str.length - 1;
+    if (rbraceIndex === 1) {
+      return EMPTY_ARRAY;
+    }
+    if (str[rbraceIndex] !== RBRACE) {
+      throw new Error("Invalid array text - must end with }");
+    }
+
     // If starts with `[`, it is specifying the index boundas. Skip past first `=`.
     let position = 0;
     if (str[position] === LBRACKET) {
@@ -31,17 +41,13 @@ export function makeParseArrayWithTransform<T = string>(
     if (str[position++] !== LBRACE) {
       throw new Error("Invalid array text - must start with {");
     }
-    const rbraceIndex = str.length - 1;
-    if (str[rbraceIndex] !== RBRACE) {
-      throw new Error("Invalid array text - must end with }");
-    }
     const output: any[] = [];
     let current = output;
-    let stack: any[][] | null = null;
+    const stack: any[][] = [];
 
     let currentStringStart: number = position;
-    const currentStringParts: string[] = [];
-    let hasStringParts = false;
+    // Allocate on first assignment
+    let currentString = "";
     let expectValue = true;
 
     for (; position < rbraceIndex; ++position) {
@@ -58,8 +64,7 @@ export function makeParseArrayWithTransform<T = string>(
         while (backSlash !== -1 && backSlash < dquot) {
           position = backSlash;
           const part = str.slice(currentStringStart, position);
-          currentStringParts.push(part);
-          hasStringParts = true;
+          currentString += part;
           currentStringStart = ++position;
           if (dquot === position++) {
             // This was an escaped doublequote; find the next one!
@@ -70,23 +75,14 @@ export function makeParseArrayWithTransform<T = string>(
         }
         position = dquot;
         const part = str.slice(currentStringStart, position);
-        if (hasStringParts) {
-          const final = currentStringParts.join("") + part;
-          current.push(haveTransform ? transform(final) : final);
-          currentStringParts.length = 0;
-          hasStringParts = false;
-        } else {
-          current.push(haveTransform ? transform(part) : part);
-        }
+        currentString += part;
+        current.push(haveTransform ? transform(currentString) : currentString);
+        currentString = "";
         expectValue = false;
       } else if (char === LBRACE) {
         const newArray: any[] = [];
         current.push(newArray);
-        if (stack === null) {
-          stack = [current];
-        } else {
-          stack.push(current);
-        }
+        stack.push(current);
         current = newArray;
         currentStringStart = position + 1;
         expectValue = true;
@@ -94,7 +90,7 @@ export function makeParseArrayWithTransform<T = string>(
         expectValue = true;
       } else if (char === RBRACE) {
         expectValue = false;
-        const arr = stack!.pop();
+        const arr = stack.pop();
         if (arr === undefined) {
           throw new Error("Invalid array text - too many '}'");
         }
