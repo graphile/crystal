@@ -1650,13 +1650,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RenamedTable\`."""
-    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RenamedTableCondition
+
+    """The method to use when ordering \`RenamedTable\`."""
+    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
   ): RenamedTablesConnection
 
   """Reads and enables pagination through a set of \`Film\`."""
@@ -1679,13 +1679,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Film\`."""
-    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: FilmCondition
+
+    """The method to use when ordering \`Film\`."""
+    orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): FilmsConnection
 
   """Reads and enables pagination through a set of \`Studio\`."""
@@ -1708,13 +1708,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Studio\`."""
-    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: StudioCondition
+
+    """The method to use when ordering \`Studio\`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
   ): StudiosConnection
 
   """Reads and enables pagination through a set of \`Post\`."""
@@ -1737,13 +1737,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
   """Reads and enables pagination through a set of \`TvEpisode\`."""
@@ -1766,13 +1766,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TvEpisode\`."""
-    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TvEpisodeCondition
+
+    """The method to use when ordering \`TvEpisode\`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TvEpisodesConnection
 
   """Reads and enables pagination through a set of \`TvShow\`."""
@@ -1795,13 +1795,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TvShow\`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TvShowCondition
+
+    """The method to use when ordering \`TvShow\`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
   ): TvShowsConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -1824,13 +1824,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 }
 
@@ -1905,27 +1905,18 @@ type Person implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection!
 }
 
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
-
-"""Methods to use when ordering \`Post\`."""
-enum PostsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  BODY_ASC
-  BODY_DESC
-}
 
 """
 A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
@@ -1934,6 +1925,15 @@ input PostCondition {
   """Checks for equality with the object’s \`body\` field."""
   body: String
   author: ID
+}
+
+"""Methods to use when ordering \`Post\`."""
+enum PostsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  BODY_ASC
+  BODY_DESC
 }
 
 """A \`Post\` edge in the connection."""
@@ -1995,13 +1995,13 @@ type Studio implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TvShow\`."""
-    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TvShowCondition
+
+    """The method to use when ordering \`TvShow\`."""
+    orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
   ): TvShowsConnection!
 }
 
@@ -2052,13 +2052,13 @@ type TvShow implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TvEpisode\`."""
-    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TvEpisodeCondition
+
+    """The method to use when ordering \`TvEpisode\`."""
+    orderBy: [TvEpisodesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TvEpisodesConnection!
 }
 
@@ -2099,15 +2099,6 @@ type TvEpisodesEdge {
   node: TvEpisode
 }
 
-"""Methods to use when ordering \`TvEpisode\`."""
-enum TvEpisodesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-}
-
 """
 A condition to be used against \`TvEpisode\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -2116,6 +2107,15 @@ input TvEpisodeCondition {
   """Checks for equality with the object’s \`title\` field."""
   title: String
   tvShowByShowId: ID
+}
+
+"""Methods to use when ordering \`TvEpisode\`."""
+enum TvEpisodesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
 }
 
 """A \`TvShow\` edge in the connection."""
@@ -2127,15 +2127,6 @@ type TvShowsEdge {
   node: TvShow
 }
 
-"""Methods to use when ordering \`TvShow\`."""
-enum TvShowsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-}
-
 """
 A condition to be used against \`TvShow\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -2143,6 +2134,15 @@ input TvShowCondition {
   """Checks for equality with the object’s \`title\` field."""
   title: String
   studioByStudioId: ID
+}
+
+"""Methods to use when ordering \`TvShow\`."""
+enum TvShowsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
 }
 
 """A connection to a list of \`RenamedTable\` values."""
@@ -2175,13 +2175,6 @@ type RenamedTablesEdge {
   node: RenamedTable
 }
 
-"""Methods to use when ordering \`RenamedTable\`."""
-enum RenamedTablesOrderBy {
-  NATURAL
-  COL_A_ASC
-  COL_A_DESC
-}
-
 """
 A condition to be used against \`RenamedTable\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -2189,6 +2182,13 @@ tested for equality and combined with a logical ‘and.’
 input RenamedTableCondition {
   """Checks for equality with the object’s \`colA\` field."""
   colA: Int
+}
+
+"""Methods to use when ordering \`RenamedTable\`."""
+enum RenamedTablesOrderBy {
+  NATURAL
+  COL_A_ASC
+  COL_A_DESC
 }
 
 """A connection to a list of \`Film\` values."""
@@ -2217,6 +2217,14 @@ type FilmsEdge {
   node: Film
 }
 
+"""
+A condition to be used against \`Film\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input FilmCondition {
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+}
+
 """Methods to use when ordering \`Film\`."""
 enum FilmsOrderBy {
   NATURAL
@@ -2224,14 +2232,6 @@ enum FilmsOrderBy {
   PRIMARY_KEY_DESC
   TITLE_ASC
   TITLE_DESC
-}
-
-"""
-A condition to be used against \`Film\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input FilmCondition {
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
 }
 
 """A connection to a list of \`Studio\` values."""
@@ -2260,6 +2260,14 @@ type StudiosEdge {
   node: Studio
 }
 
+"""
+A condition to be used against \`Studio\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input StudioCondition {
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+}
+
 """Methods to use when ordering \`Studio\`."""
 enum StudiosOrderBy {
   NATURAL
@@ -2267,14 +2275,6 @@ enum StudiosOrderBy {
   PRIMARY_KEY_DESC
   NAME_ASC
   NAME_DESC
-}
-
-"""
-A condition to be used against \`Studio\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input StudioCondition {
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
 }
 
 """A connection to a list of \`Person\` values."""
@@ -2303,25 +2303,6 @@ type PeopleEdge {
   node: Person
 }
 
-"""Methods to use when ordering \`Person\`."""
-enum PeopleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  FIRST_NAME_ASC
-  FIRST_NAME_DESC
-  LAST_NAME_ASC
-  LAST_NAME_DESC
-  COL_NO_CREATE_ASC
-  COL_NO_CREATE_DESC
-  COL_NO_UPDATE_ASC
-  COL_NO_UPDATE_DESC
-  COL_NO_FILTER_ASC
-  COL_NO_FILTER_DESC
-  COL_NO_CREATE_UPDATE_ASC
-  COL_NO_CREATE_UPDATE_DESC
-}
-
 """
 A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -2343,6 +2324,25 @@ input PersonCondition {
 
   """Checks for equality with the object’s \`colNoCreateUpdate\` field."""
   colNoCreateUpdate: String
+}
+
+"""Methods to use when ordering \`Person\`."""
+enum PeopleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
+  LAST_NAME_ASC
+  LAST_NAME_DESC
+  COL_NO_CREATE_ASC
+  COL_NO_CREATE_DESC
+  COL_NO_UPDATE_ASC
+  COL_NO_UPDATE_DESC
+  COL_NO_FILTER_ASC
+  COL_NO_FILTER_DESC
+  COL_NO_CREATE_UPDATE_ASC
+  COL_NO_CREATE_UPDATE_DESC
 }
 
 """
@@ -3530,21 +3530,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3595,21 +3595,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3660,21 +3660,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3725,21 +3725,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3790,21 +3790,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3855,21 +3855,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -3920,21 +3920,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4088,21 +4088,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4117,6 +4117,77 @@ export const plans = {
         throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
       }
       return ast.value;
+    }
+  },
+  PostCondition: {
+    body: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "body",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "body",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    author: {
+      apply(condition, nodeId) {
+        if (nodeId === undefined) {
+          return;
+        } else if (nodeId === null) {
+          for (const localName of registryConfig.pgRelations.post.author.localAttributes) {
+            condition.where({
+              type: "attribute",
+              attribute: localName,
+              callback(expression) {
+                return sql`${expression} is null`;
+              }
+            });
+          }
+          return;
+        } else if (typeof nodeId !== "string") {
+          throw new Error(`Invalid node identifier for '${"Person"}'; expected string`);
+        } else {
+          const identifiers = getIdentifiers(nodeId);
+          if (identifiers == null) {
+            throw new Error(`Invalid node identifier for '${"Person"}'`);
+          }
+          for (let i = 0; i < 1; i++) {
+            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
+            const value = identifiers[i];
+            if (value == null) {
+              condition.where({
+                type: "attribute",
+                attribute: localName,
+                callback(expression) {
+                  return sql`${expression} is null`;
+                }
+              });
+            } else {
+              const codec = localAttributeCodecs[i];
+              const sqlRemoteValue = sqlValueWithCodec(value, codec);
+              condition.where({
+                type: "attribute",
+                attribute: localName,
+                callback(expression) {
+                  return sql`${expression} = ${sqlRemoteValue}`;
+                }
+              });
+            }
+          }
+        }
+      }
     }
   },
   PostsOrderBy: {
@@ -4191,77 +4262,6 @@ export const plans = {
             });
             if (false) {
               queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    }
-  },
-  PostCondition: {
-    body: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    author: {
-      apply(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.post.author.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Person"}'; expected string`);
-        } else {
-          const identifiers = getIdentifiers(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Person"}'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
             }
           }
         }
@@ -4359,21 +4359,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4458,21 +4458,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4517,6 +4517,77 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  TvEpisodeCondition: {
+    title: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "title",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "title",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+            }
+          });
+        }
+      }
+    },
+    tvShowByShowId: {
+      apply(condition, nodeId) {
+        if (nodeId === undefined) {
+          return;
+        } else if (nodeId === null) {
+          for (const localName of registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes) {
+            condition.where({
+              type: "attribute",
+              attribute: localName,
+              callback(expression) {
+                return sql`${expression} is null`;
+              }
+            });
+          }
+          return;
+        } else if (typeof nodeId !== "string") {
+          throw new Error(`Invalid node identifier for '${"TvShow"}'; expected string`);
+        } else {
+          const identifiers = getIdentifiers2(nodeId);
+          if (identifiers == null) {
+            throw new Error(`Invalid node identifier for '${"TvShow"}'`);
+          }
+          for (let i = 0; i < 1; i++) {
+            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
+            const value = identifiers[i];
+            if (value == null) {
+              condition.where({
+                type: "attribute",
+                attribute: localName,
+                callback(expression) {
+                  return sql`${expression} is null`;
+                }
+              });
+            } else {
+              const codec = localAttributeCodecs2[i];
+              const sqlRemoteValue = sqlValueWithCodec(value, codec);
+              condition.where({
+                type: "attribute",
+                attribute: localName,
+                callback(expression) {
+                  return sql`${expression} = ${sqlRemoteValue}`;
+                }
+              });
+            }
+          }
+        }
+      }
     }
   },
   TvEpisodesOrderBy: {
@@ -4597,7 +4668,16 @@ export const plans = {
       }
     }
   },
-  TvEpisodeCondition: {
+  TvShowsEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  TvShowCondition: {
     title: {
       apply($condition, val) {
         if (val === null) {
@@ -4619,12 +4699,12 @@ export const plans = {
         }
       }
     },
-    tvShowByShowId: {
+    studioByStudioId: {
       apply(condition, nodeId) {
         if (nodeId === undefined) {
           return;
         } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes) {
+          for (const localName of registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes) {
             condition.where({
               type: "attribute",
               attribute: localName,
@@ -4635,14 +4715,14 @@ export const plans = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"TvShow"}'; expected string`);
+          throw new Error(`Invalid node identifier for '${"Studio"}'; expected string`);
         } else {
-          const identifiers = getIdentifiers2(nodeId);
+          const identifiers = getIdentifiers3(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"TvShow"}'`);
+            throw new Error(`Invalid node identifier for '${"Studio"}'`);
           }
           for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
+            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
             const value = identifiers[i];
             if (value == null) {
               condition.where({
@@ -4653,7 +4733,7 @@ export const plans = {
                 }
               });
             } else {
-              const codec = localAttributeCodecs2[i];
+              const codec = localAttributeCodecs3[i];
               const sqlRemoteValue = sqlValueWithCodec(value, codec);
               condition.where({
                 type: "attribute",
@@ -4666,15 +4746,6 @@ export const plans = {
           }
         }
       }
-    }
-  },
-  TvShowsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
     }
   },
   TvShowsOrderBy: {
@@ -4755,77 +4826,6 @@ export const plans = {
       }
     }
   },
-  TvShowCondition: {
-    title: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
-      }
-    },
-    studioByStudioId: {
-      apply(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Studio"}'; expected string`);
-        } else {
-          const identifiers = getIdentifiers3(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Studio"}'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs3[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-  },
   RenamedTablesConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -4855,6 +4855,29 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  RenamedTableCondition: {
+    colA: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "col1",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "col1",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
     }
   },
   RenamedTablesOrderBy: {
@@ -4897,29 +4920,6 @@ export const plans = {
       }
     }
   },
-  RenamedTableCondition: {
-    colA: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   FilmsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -4943,6 +4943,29 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  FilmCondition: {
+    title: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "title",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "title",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+            }
+          });
+        }
+      }
     }
   },
   FilmsOrderBy: {
@@ -5023,29 +5046,6 @@ export const plans = {
       }
     }
   },
-  FilmCondition: {
-    title: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   StudiosConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -5069,6 +5069,29 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  StudioCondition: {
+    name: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   StudiosOrderBy: {
@@ -5149,29 +5172,6 @@ export const plans = {
       }
     }
   },
-  StudioCondition: {
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   PeopleConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -5195,6 +5195,134 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  PersonCondition: {
+    firstName: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "first_name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "first_name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+            }
+          });
+        }
+      }
+    },
+    lastName: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+            }
+          });
+        }
+      }
+    },
+    colNoCreate: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_create",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_create",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    colNoUpdate: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_update",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_update",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    colNoOrder: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_order",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_order",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    colNoCreateUpdate: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_create_update",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "col_no_create_update",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   PeopleOrderBy: {
@@ -5461,134 +5589,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  PersonCondition: {
-    firstName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "first_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "first_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
-      }
-    },
-    lastName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
-      }
-    },
-    colNoCreate: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_create",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_create",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    colNoUpdate: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_update",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_update",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    colNoOrder: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_order",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_order",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    colNoCreateUpdate: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_create_update",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col_no_create_update",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
         }
       }
     }

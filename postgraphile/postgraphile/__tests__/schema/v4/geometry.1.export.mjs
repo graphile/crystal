@@ -354,13 +354,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Geom\`."""
-    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: GeomCondition
+
+    """The method to use when ordering \`Geom\`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
   ): GeomsConnection
 }
 
@@ -475,31 +475,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Geom\`."""
-enum GeomsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POINT_ASC
-  POINT_DESC
-  LINE_ASC
-  LINE_DESC
-  LSEG_ASC
-  LSEG_DESC
-  BOX_ASC
-  BOX_DESC
-  OPEN_PATH_ASC
-  OPEN_PATH_DESC
-  CLOSED_PATH_ASC
-  CLOSED_PATH_DESC
-  POLYGON_ASC
-  POLYGON_DESC
-  CIRCLE_ASC
-  CIRCLE_DESC
-}
-
 """
 A condition to be used against \`Geom\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -573,6 +548,31 @@ input PolygonInput {
 input CircleInput {
   center: PointInput!
   radius: Float!
+}
+
+"""Methods to use when ordering \`Geom\`."""
+enum GeomsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  POINT_ASC
+  POINT_DESC
+  LINE_ASC
+  LINE_DESC
+  LSEG_ASC
+  LSEG_DESC
+  BOX_ASC
+  BOX_DESC
+  OPEN_PATH_ASC
+  OPEN_PATH_DESC
+  CLOSED_PATH_ASC
+  CLOSED_PATH_DESC
+  POLYGON_ASC
+  POLYGON_DESC
+  CIRCLE_ASC
+  CIRCLE_DESC
 }
 
 """
@@ -854,21 +854,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -965,6 +965,224 @@ export const plans = {
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
     }
+  },
+  GeomCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    point: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "point",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "point",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
+            }
+          });
+        }
+      }
+    },
+    line: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "line",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "line",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
+            }
+          });
+        }
+      }
+    },
+    lseg: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "lseg",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "lseg",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
+            }
+          });
+        }
+      }
+    },
+    box: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "box",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "box",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
+            }
+          });
+        }
+      }
+    },
+    openPath: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "open_path",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "open_path",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
+            }
+          });
+        }
+      }
+    },
+    closedPath: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "closed_path",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "closed_path",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
+            }
+          });
+        }
+      }
+    },
+    polygon: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "polygon",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "polygon",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
+            }
+          });
+        }
+      }
+    },
+    circle: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "circle",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "circle",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
+            }
+          });
+        }
+      }
+    }
+  },
+  PointInput: {
+    x: undefined,
+    y: undefined
+  },
+  LineInput: {
+    a: undefined,
+    b: undefined
+  },
+  LineSegmentInput: {
+    a: undefined,
+    b: undefined
+  },
+  BoxInput: {
+    a: undefined,
+    b: undefined
+  },
+  PathInput: {
+    points: undefined,
+    isOpen: undefined
+  },
+  PolygonInput: {
+    points: undefined
+  },
+  CircleInput: {
+    center: undefined,
+    radius: undefined
   },
   GeomsOrderBy: {
     PRIMARY_KEY_ASC: {
@@ -1347,224 +1565,6 @@ export const plans = {
         }
       }
     }
-  },
-  GeomCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    point: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-            }
-          });
-        }
-      }
-    },
-    line: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
-            }
-          });
-        }
-      }
-    },
-    lseg: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
-            }
-          });
-        }
-      }
-    },
-    box: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
-            }
-          });
-        }
-      }
-    },
-    openPath: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-            }
-          });
-        }
-      }
-    },
-    closedPath: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-            }
-          });
-        }
-      }
-    },
-    polygon: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
-            }
-          });
-        }
-      }
-    },
-    circle: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
-            }
-          });
-        }
-      }
-    }
-  },
-  PointInput: {
-    x: undefined,
-    y: undefined
-  },
-  LineInput: {
-    a: undefined,
-    b: undefined
-  },
-  LineSegmentInput: {
-    a: undefined,
-    b: undefined
-  },
-  BoxInput: {
-    a: undefined,
-    b: undefined
-  },
-  PathInput: {
-    points: undefined,
-    isOpen: undefined
-  },
-  PolygonInput: {
-    points: undefined
-  },
-  CircleInput: {
-    center: undefined,
-    radius: undefined
   },
   Mutation: {
     __assertStep: __ValueStep,
