@@ -32,6 +32,7 @@ import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
 import type { ListCapableStep, Step } from "./step.js";
+import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { ApplyableExecutableStep } from "./steps/applyInput.js";
 import type {
@@ -304,6 +305,7 @@ export type AnyInputStep =
   | __InputStaticLeafStep // .eval(), .evalIs()
   | __InputDynamicScalarStep // .eval(), .evalIs()
   | __InputObjectStepWithDollars<GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
+  | __InputDefaultStep // .eval(), .evalIs(), .evalLength()
   | ConstantStep<any>; // .eval(), .evalIs(), .evalIsEmpty()
 
 export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;

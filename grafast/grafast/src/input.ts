@@ -12,6 +12,7 @@ import * as graphql from "graphql";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import type { AnyInputStep } from "./interfaces.js";
+import { __InputDefaultStep } from "./steps/__inputDefault.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
@@ -126,12 +127,16 @@ export function inputStep(
     if (!isInputType(variableType)) {
       throw new Error(`Expected varible type to be an input type`);
     }
+    const variableWillDefinitelyBeSet =
+      variableType instanceof GraphQLNonNull ||
+      variableDefinition.defaultValue != null;
     return inputVariablePlan(
       operationPlan,
       variableName,
       variableType,
       inputType,
       defaultValue,
+      variableWillDefinitelyBeSet,
     );
   } else if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
@@ -202,12 +207,20 @@ function doTypesMatch(
   }
 }
 
+/**
+ *
+ * @param variableWillDefinitelyBeSet If {true} the variable is either non-null
+ * _or_ it has a default value (including null). In this case, the variable
+ * will never be `undefined` and thus an input position's defaultValue will
+ * never be invoked where it is used.
+ */
 function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
-  defaultValue: ConstValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined,
+  variableWillDefinitelyBeSet: boolean,
 ): AnyInputStep {
   if (
     variableType instanceof GraphQLNonNull &&
@@ -220,6 +233,7 @@ function inputVariablePlan(
       unwrappedVariableType,
       inputType,
       defaultValue,
+      variableWillDefinitelyBeSet,
     );
   }
   const typesMatch = doTypesMatch(variableType, inputType);
@@ -235,9 +249,13 @@ function inputVariablePlan(
         variableType,
         inputType.ofType,
         defaultValue,
+        variableWillDefinitelyBeSet,
       );
       // TODO: find a way to do this without doing eval. For example: track list of variables that may not be nullish.
-      if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
+      if (
+        variablePlan.evalIs(null) ||
+        (!variableWillDefinitelyBeSet && variablePlan.evalIs(undefined))
+      ) {
         throw new GraphQLError(
           `Expected non-null value of type ${inputType.ofType.toString()}`,
           // FIXME: The error here needs more details to make it conform to spec (AST nodes, etc). At least I think so?
@@ -247,16 +265,22 @@ function inputVariablePlan(
     }
     throw new Error("Expected variable and input types to match");
   }
-  const variableValuePlan =
+  const $variableValue =
     operationPlan.trackedVariableValuesStep.get(variableName);
   if (defaultValue === undefined) {
     // There's no default value and thus the default will not be used; use the variable.
-    return variableValuePlan;
+    return $variableValue;
+  } else if (variableWillDefinitelyBeSet) {
+    // The variable will DEFINITELY be set (even if it is set to null, possibly
+    // by a default), so the input position's default value will never apply.
+    return $variableValue;
   } else {
-    // `defaultValue` is NOT undefined, and we know variableValue is
-    // `undefined` (and always will be); we're going to loop back and pretend
-    // that no value was passed in the first place (instead of the variable):
-    return inputStep(operationPlan, inputType, undefined, defaultValue);
+    // Here:
+    // - the variable is nullable, optional, and has no default value
+    // - the input position has a default value
+    // We thus need a step that results in variableValue ?? defaultValue
+    const runtimeDefaultValue = valueNodeToStaticValue(defaultValue, inputType);
+    return new __InputDefaultStep($variableValue, runtimeDefaultValue);
   }
 }
 
