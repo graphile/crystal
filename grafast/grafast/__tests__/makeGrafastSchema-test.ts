@@ -24,6 +24,9 @@ it("can create a schema with an input", async () => {
     `,
   });
   const result = await grafast({ schema, source: `{ a(a: {str: "hello!"})}` });
+  if ("next" in result) {
+    throw new Error("Iterator not expected");
+  }
   expect(result.errors).to.be.undefined;
-  expect(result.data.a).to.eq('{"str":"hello!"}');
+  expect(result.data?.a).to.eq('{"str":"hello!"}');
 });
