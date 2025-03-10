@@ -34,12 +34,12 @@ graph TD
     PgSelectRows18 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
-    List36{{"List[36∈3]<br />ᐸ19,35ᐳ"}}:::plan
-    __Item19 & Access35 --> List36
+    List36{{"List[36∈3]<br />ᐸ35,19ᐳ"}}:::plan
+    Access35 & __Item19 --> List36
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression22
     PgSelectRows28[["PgSelectRows[28∈3]"]]:::plan
-    Lambda37{{"Lambda[37∈3]"}}:::plan
+    Lambda37{{"Lambda[37∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda37 --> PgSelectRows28
     PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression33
@@ -65,7 +65,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 35<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 19, 35<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 33, 36, 37<br />2: PgSelectRows[28]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 35, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 33, 36, 37<br />2: PgSelectRows[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression22,PgSelectRows28,PgClassExpression33,List36,Lambda37 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ28ᐳ[29]"):::bucket

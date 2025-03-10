@@ -1240,10 +1240,10 @@ graph TD
     PgSelectSingle980{{"PgSelectSingle[980∈108] ➊<br />ᐸpostᐳ"}}:::plan
     Connection977{{"Connection[977∈108] ➊<br />ᐸ972ᐳ"}}:::plan
     PgSelectSingle980 & Connection977 --> Edge1021
-    List1025{{"List[1025∈108] ➊<br />ᐸ978,1024ᐳ"}}:::plan
-    First978{{"First[978∈108] ➊"}}:::plan
+    List1025{{"List[1025∈108] ➊<br />ᐸ1024,978ᐳ"}}:::plan
     Access1024{{"Access[1024∈108] ➊<br />ᐸ972.m.subqueryDetailsFor987ᐳ"}}:::plan
-    First978 & Access1024 --> List1025
+    First978{{"First[978∈108] ➊"}}:::plan
+    Access1024 & First978 --> List1025
     Access971{{"Access[971∈108] ➊<br />ᐸ935.tᐳ"}}:::plan
     Access971 --> PgClassExpression941
     PgClassExpression943{{"PgClassExpression[943∈108] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
@@ -1266,7 +1266,7 @@ graph TD
     PgSelect972 --> PgSelectRows979
     First978 --> PgSelectSingle980
     PgSelect972 --> Access1024
-    Lambda1026{{"Lambda[1026∈108] ➊"}}:::plan
+    Lambda1026{{"Lambda[1026∈108] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List1025 --> Lambda1026
     Access1028{{"Access[1028∈108] ➊<br />ᐸ972.m.joinDetailsFor998ᐳ"}}:::plan
     PgSelect972 --> Access1028

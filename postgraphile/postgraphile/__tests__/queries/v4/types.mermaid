@@ -288,10 +288,10 @@ graph TD
     PgSelectInlineApply4223["PgSelectInlineApply[4223∈0] ➊"]:::plan
     PgSelectInlineApply4227["PgSelectInlineApply[4227∈0] ➊"]:::plan
     PgSelectInlineApply4223 & PgSelectInlineApply4227 --> PgSelectInlineApply4231
-    List4238{{"List[4238∈0] ➊<br />ᐸ2246,4237ᐳ"}}:::plan
-    First2246{{"First[2246∈0] ➊"}}:::plan
+    List4238{{"List[4238∈0] ➊<br />ᐸ4237,2246ᐳ"}}:::plan
     Access4237{{"Access[4237∈0] ➊<br />ᐸ2244.m.subqueryDetailsFor2470ᐳ"}}:::plan
-    First2246 & Access4237 --> List4238
+    First2246{{"First[2246∈0] ➊"}}:::plan
+    Access4237 & First2246 --> List4238
     PgSelectInlineApply4244["PgSelectInlineApply[4244∈0] ➊"]:::plan
     PgSelectInlineApply4248["PgSelectInlineApply[4248∈0] ➊"]:::plan
     PgSelectInlineApply4244 & PgSelectInlineApply4248 --> PgSelectInlineApply4252
@@ -304,12 +304,12 @@ graph TD
     PgSelectInlineApply4293["PgSelectInlineApply[4293∈0] ➊"]:::plan
     PgSelectInlineApply4297["PgSelectInlineApply[4297∈0] ➊"]:::plan
     PgSelectInlineApply4293 & PgSelectInlineApply4297 --> PgSelectInlineApply4301
-    List4308{{"List[4308∈0] ➊<br />ᐸ2246,4307ᐳ"}}:::plan
+    List4308{{"List[4308∈0] ➊<br />ᐸ4307,2246ᐳ"}}:::plan
     Access4307{{"Access[4307∈0] ➊<br />ᐸ2244.m.subqueryDetailsFor2691ᐳ"}}:::plan
-    First2246 & Access4307 --> List4308
-    List4313{{"List[4313∈0] ➊<br />ᐸ2246,4312ᐳ"}}:::plan
+    Access4307 & First2246 --> List4308
+    List4313{{"List[4313∈0] ➊<br />ᐸ4312,2246ᐳ"}}:::plan
     Access4312{{"Access[4312∈0] ➊<br />ᐸ2244.m.subqueryDetailsFor3125ᐳ"}}:::plan
-    First2246 & Access4312 --> List4313
+    Access4312 & First2246 --> List4313
     PgSelectInlineApply4329["PgSelectInlineApply[4329∈0] ➊"]:::plan
     PgSelectInlineApply4334["PgSelectInlineApply[4334∈0] ➊"]:::plan
     PgSelectInlineApply4329 & PgSelectInlineApply4334 --> PgSelectInlineApply4339
@@ -328,13 +328,13 @@ graph TD
     PgSelectInlineApply4427["PgSelectInlineApply[4427∈0] ➊"]:::plan
     PgSelectInlineApply4431["PgSelectInlineApply[4431∈0] ➊"]:::plan
     PgSelectInlineApply4427 & PgSelectInlineApply4431 --> PgSelectInlineApply4435
-    List4441{{"List[4441∈0] ➊<br />ᐸ3155,4440ᐳ"}}:::plan
-    First3155{{"First[3155∈0] ➊"}}:::plan
+    List4441{{"List[4441∈0] ➊<br />ᐸ4440,3155ᐳ"}}:::plan
     Access4440{{"Access[4440∈0] ➊<br />ᐸ3153.m.subqueryDetailsFor3382ᐳ"}}:::plan
-    First3155 & Access4440 --> List4441
-    List4445{{"List[4445∈0] ➊<br />ᐸ3155,4444ᐳ"}}:::plan
+    First3155{{"First[3155∈0] ➊"}}:::plan
+    Access4440 & First3155 --> List4441
+    List4445{{"List[4445∈0] ➊<br />ᐸ4444,3155ᐳ"}}:::plan
     Access4444{{"Access[4444∈0] ➊<br />ᐸ3153.m.subqueryDetailsFor3706ᐳ"}}:::plan
-    First3155 & Access4444 --> List4445
+    Access4444 & First3155 --> List4445
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -447,21 +447,21 @@ graph TD
     Access4192{{"Access[4192∈0] ➊<br />ᐸ2244.m.joinDetailsFor2251ᐳ"}}:::plan
     PgSelect2244 --> Access4192
     PgSelect2244 --> Access4237
-    Lambda4239{{"Lambda[4239∈0] ➊"}}:::plan
+    Lambda4239{{"Lambda[4239∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List4238 --> Lambda4239
     PgSelect2244 --> Access4307
-    Lambda4309{{"Lambda[4309∈0] ➊"}}:::plan
+    Lambda4309{{"Lambda[4309∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List4308 --> Lambda4309
     PgSelect2244 --> Access4312
-    Lambda4314{{"Lambda[4314∈0] ➊"}}:::plan
+    Lambda4314{{"Lambda[4314∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List4313 --> Lambda4314
     Access4364{{"Access[4364∈0] ➊<br />ᐸ3153.m.joinDetailsFor3160ᐳ"}}:::plan
     PgSelect3153 --> Access4364
     PgSelect3153 --> Access4440
-    Lambda4442{{"Lambda[4442∈0] ➊"}}:::plan
+    Lambda4442{{"Lambda[4442∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List4441 --> Lambda4442
     PgSelect3153 --> Access4444
-    Lambda4446{{"Lambda[4446∈0] ➊"}}:::plan
+    Lambda4446{{"Lambda[4446∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List4445 --> Lambda4446
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgFromExpression88{{"PgFromExpression[88∈0] ➊"}}:::plan

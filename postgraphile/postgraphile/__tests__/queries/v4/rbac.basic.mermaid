@@ -47,10 +47,10 @@ graph TD
     PgSelect160[["PgSelect[160∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Constant249{{"Constant[249∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     Object10 & Constant249 --> PgSelect160
-    List241{{"List[241∈0] ➊<br />ᐸ191,240ᐳ"}}:::plan
-    First191{{"First[191∈0] ➊"}}:::plan
+    List241{{"List[241∈0] ➊<br />ᐸ240,191ᐳ"}}:::plan
     Access240{{"Access[240∈0] ➊<br />ᐸ189.m.subqueryDetailsFor205ᐳ"}}:::plan
-    First191 & Access240 --> List241
+    First191{{"First[191∈0] ➊"}}:::plan
+    Access240 & First191 --> List241
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -126,7 +126,7 @@ graph TD
     Access236{{"Access[236∈0] ➊<br />ᐸ136.m.joinDetailsFor145ᐳ"}}:::plan
     PgSelect136 --> Access236
     PgSelect189 --> Access240
-    Lambda242{{"Lambda[242∈0] ➊"}}:::plan
+    Lambda242{{"Lambda[242∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List241 --> Lambda242
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant14{{"Constant[14∈0] ➊<br />ᐸ'person_secrets'ᐳ"}}:::plan

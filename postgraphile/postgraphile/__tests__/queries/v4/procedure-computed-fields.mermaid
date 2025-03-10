@@ -256,19 +256,19 @@ graph TD
     PgSelect107 --> Access351
     Access355{{"Access[355∈10] ➊<br />ᐸ107.m.subqueryDetailsFor192ᐳ"}}:::plan
     PgSelect107 --> Access355
-    List356{{"List[356∈11]<br />ᐸ109,355ᐳ"}}:::plan
+    List356{{"List[356∈11]<br />ᐸ355,109ᐳ"}}:::plan
     __Item109[/"__Item[109∈11]<br />ᐸ108ᐳ"\]:::itemplan
-    __Item109 & Access355 --> List356
+    Access355 & __Item109 --> List356
     PgSelectRows108 ==> __Item109
     PgSelectSingle110{{"PgSelectSingle[110∈11]<br />ᐸpostᐳ"}}:::plan
     __Item109 --> PgSelectSingle110
-    Lambda357{{"Lambda[357∈11]"}}:::plan
+    Lambda357{{"Lambda[357∈11]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List356 --> Lambda357
     __ListTransform204[["__ListTransform[204∈12]<br />ᐸeach:203ᐳ"]]:::plan
     PgSelectRows193[["PgSelectRows[193∈12]"]]:::plan
     PgSelectRows193 & Lambda357 --> __ListTransform204
-    List352{{"List[352∈12]<br />ᐸ109,351ᐳ"}}:::plan
-    __Item109 & Access351 --> List352
+    List352{{"List[352∈12]<br />ᐸ351,109ᐳ"}}:::plan
+    Access351 & __Item109 --> List352
     PgClassExpression111{{"PgClassExpression[111∈12]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression111
     PgClassExpression114{{"PgClassExpression[114∈12]<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
@@ -288,7 +288,7 @@ graph TD
     PgClassExpression144{{"PgClassExpression[144∈12]<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression144
     PgSelectRows161[["PgSelectRows[161∈12]"]]:::plan
-    Lambda353{{"Lambda[353∈12]"}}:::plan
+    Lambda353{{"Lambda[353∈12]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda353 --> PgSelectRows161
     PgClassExpression176{{"PgClassExpression[176∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression176
@@ -352,13 +352,13 @@ graph TD
     PgSelect223 --> Access363
     Access367{{"Access[367∈25] ➊<br />ᐸ223.m.joinDetailsFor260ᐳ"}}:::plan
     PgSelect223 --> Access367
-    List364{{"List[364∈26]<br />ᐸ225,363ᐳ"}}:::plan
+    List364{{"List[364∈26]<br />ᐸ363,225ᐳ"}}:::plan
     __Item225[/"__Item[225∈26]<br />ᐸ224ᐳ"\]:::itemplan
-    __Item225 & Access363 --> List364
+    Access363 & __Item225 --> List364
     PgSelectRows224 ==> __Item225
     PgSelectSingle226{{"PgSelectSingle[226∈26]<br />ᐸpersonᐳ"}}:::plan
     __Item225 --> PgSelectSingle226
-    Lambda365{{"Lambda[365∈26]"}}:::plan
+    Lambda365{{"Lambda[365∈26]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List364 --> Lambda365
     List368{{"List[368∈27]<br />ᐸ367,226ᐳ"}}:::plan
     Access367 & PgSelectSingle226 --> List368
@@ -382,14 +382,14 @@ graph TD
     __Item239 --> PgSelectSingle240
     Access359{{"Access[359∈28]<br />ᐸ365.m.subqueryDetailsFor252ᐳ"}}:::plan
     Lambda365 --> Access359
-    List360{{"List[360∈29]<br />ᐸ239,359ᐳ"}}:::plan
-    __Item239 & Access359 --> List360
+    List360{{"List[360∈29]<br />ᐸ359,239ᐳ"}}:::plan
+    Access359 & __Item239 --> List360
     PgClassExpression241{{"PgClassExpression[241∈29]<br />ᐸ__person_f...full_name”ᐳ"}}:::plan
     PgSelectSingle240 --> PgClassExpression241
     PgClassExpression243{{"PgClassExpression[243∈29]<br />ᐸ”c”.”perso...friends__)ᐳ"}}:::plan
     PgSelectSingle240 --> PgClassExpression243
     PgSelectRows253[["PgSelectRows[253∈29]"]]:::plan
-    Lambda361{{"Lambda[361∈29]"}}:::plan
+    Lambda361{{"Lambda[361∈29]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda361 --> PgSelectRows253
     List360 --> Lambda361
     __Item254[/"__Item[254∈30]<br />ᐸ253ᐳ"\]:::itemplan
@@ -470,7 +470,7 @@ graph TD
     Bucket11("Bucket 11 (listItem)<br />Deps: 355, 351, 191<br /><br />ROOT __Item{11}ᐸ108ᐳ[109]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11,__Item109,PgSelectSingle110,List356,Lambda357 bucket11
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 110, 357, 109, 351, 191<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[110]<br />1: PgSelectRows[193]<br />ᐳ: 111, 114, 118, 123, 126, 130, 135, 139, 144, 176, 179, 352, 353<br />2: PgSelectRows[161], __ListTransform[204]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 110, 357, 351, 109, 191<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[110]<br />1: PgSelectRows[193]<br />ᐳ: 111, 114, 118, 123, 126, 130, 135, 139, 144, 176, 179, 352, 353<br />2: PgSelectRows[161], __ListTransform[204]"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression111,PgClassExpression114,PgClassExpression118,PgClassExpression123,PgClassExpression126,PgClassExpression130,PgClassExpression135,PgClassExpression139,PgClassExpression144,PgSelectRows161,PgClassExpression176,PgClassExpression179,PgSelectRows193,__ListTransform204,List352,Lambda353 bucket12
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ161ᐳ[162]"):::bucket
@@ -521,7 +521,7 @@ graph TD
     Bucket28("Bucket 28 (listItem)<br />Deps: 365, 251<br /><br />ROOT __Item{28}ᐸ238ᐳ[239]"):::bucket
     classDef bucket28 stroke:#00ffff
     class Bucket28,__Item239,PgSelectSingle240,Access359 bucket28
-    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 240, 239, 359, 251<br /><br />ROOT PgSelectSingle{28}ᐸperson_friendsᐳ[240]<br />1: <br />ᐳ: 241, 243, 360, 361<br />2: PgSelectRows[253]"):::bucket
+    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 240, 359, 239, 251<br /><br />ROOT PgSelectSingle{28}ᐸperson_friendsᐳ[240]<br />1: <br />ᐳ: 241, 243, 360, 361<br />2: PgSelectRows[253]"):::bucket
     classDef bucket29 stroke:#4169e1
     class Bucket29,PgClassExpression241,PgClassExpression243,PgSelectRows253,List360,Lambda361 bucket29
     Bucket30("Bucket 30 (listItem)<br /><br />ROOT __Item{30}ᐸ253ᐳ[254]"):::bucket

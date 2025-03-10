@@ -18,10 +18,10 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    List30{{"List[30∈0] ➊<br />ᐸ11,29ᐳ"}}:::plan
-    First11{{"First[11∈0] ➊"}}:::plan
+    List30{{"List[30∈0] ➊<br />ᐸ29,11ᐳ"}}:::plan
     Access29{{"Access[29∈0] ➊<br />ᐸ7.m.subqueryDetailsFor19ᐳ"}}:::plan
-    First11 & Access29 --> List30
+    First11{{"First[11∈0] ➊"}}:::plan
+    Access29 & First11 --> List30
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -35,7 +35,7 @@ graph TD
     __InputObject15 --> BakedInput17
     BakedInput17 --> PgFromExpression27
     PgSelect7 --> Access29
-    Lambda31{{"Lambda[31∈0] ➊"}}:::plan
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List30 --> Lambda31
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan

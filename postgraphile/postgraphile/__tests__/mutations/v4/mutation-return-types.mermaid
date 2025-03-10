@@ -157,10 +157,10 @@ graph TD
     PgSelect63[["PgSelect[63∈9] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
     PgFromExpression67{{"PgFromExpression[67∈9] ➊"}}:::plan
     Object54 & PgFromExpression67 --> PgSelect63
-    List319{{"List[319∈9] ➊<br />ᐸ78,318ᐳ"}}:::plan
-    First78{{"First[78∈9] ➊"}}:::plan
+    List319{{"List[319∈9] ➊<br />ᐸ318,78ᐳ"}}:::plan
     Access318{{"Access[318∈9] ➊<br />ᐸ75.m.subqueryDetailsFor94ᐳ"}}:::plan
-    First78 & Access318 --> List319
+    First78{{"First[78∈9] ➊"}}:::plan
+    Access318 & First78 --> List319
     PgClassExpression61{{"PgClassExpression[61∈9] ➊<br />ᐸ__mutation...plex__.”x”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression61
     PgClassExpression62{{"PgClassExpression[62∈9] ➊<br />ᐸ__mutation...plex__.”y”ᐳ"}}:::plan
@@ -181,7 +181,7 @@ graph TD
     PgSelectSingle80{{"PgSelectSingle[80∈9] ➊<br />ᐸpersonᐳ"}}:::plan
     First78 --> PgSelectSingle80
     PgSelect75 --> Access318
-    Lambda320{{"Lambda[320∈9] ➊"}}:::plan
+    Lambda320{{"Lambda[320∈9] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List319 --> Lambda320
     PgClassExpression71{{"PgClassExpression[71∈10] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression71

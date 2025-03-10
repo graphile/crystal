@@ -50,10 +50,10 @@ graph TD
     Access65{{"Access[65∈1] ➊<br />ᐸ72.m.joinDetailsFor26ᐳ"}}:::plan
     Lambda72 --> Access65
     List71 --> Lambda72
-    List61{{"List[61∈2] ➊<br />ᐸ31,60ᐳ"}}:::plan
-    First31{{"First[31∈2] ➊"}}:::plan
+    List61{{"List[61∈2] ➊<br />ᐸ60,31ᐳ"}}:::plan
     Access60{{"Access[60∈2] ➊<br />ᐸ67.m.subqueryDetailsFor46ᐳ"}}:::plan
-    First31 & Access60 --> List61
+    First31{{"First[31∈2] ➊"}}:::plan
+    Access60 & First31 --> List61
     List66{{"List[66∈2] ➊<br />ᐸ65,22ᐳ"}}:::plan
     Access65 & PgSelectSingle22 --> List66
     PgClassExpression23{{"PgClassExpression[23∈2] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
@@ -69,7 +69,7 @@ graph TD
     Access55{{"Access[55∈2] ➊<br />ᐸ67.m.joinDetailsFor36ᐳ"}}:::plan
     Lambda67 --> Access55
     Lambda67 --> Access60
-    Lambda62{{"Lambda[62∈2] ➊"}}:::plan
+    Lambda62{{"Lambda[62∈2] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List61 --> Lambda62
     List66 --> Lambda67
     List56{{"List[56∈3] ➊<br />ᐸ55,33ᐳ"}}:::plan

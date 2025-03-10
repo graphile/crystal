@@ -45,15 +45,15 @@ graph TD
     Access70{{"Access[70∈0] ➊<br />ᐸ7.m.subqueryDetailsFor43ᐳ"}}:::plan
     PgSelect7 --> Access70
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    List59{{"List[59∈1]<br />ᐸ12,58ᐳ"}}:::plan
+    List59{{"List[59∈1]<br />ᐸ58,12ᐳ"}}:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    __Item12 & Access58 --> List59
-    List63{{"List[63∈1]<br />ᐸ12,62ᐳ"}}:::plan
-    __Item12 & Access62 --> List63
-    List67{{"List[67∈1]<br />ᐸ12,66ᐳ"}}:::plan
-    __Item12 & Access66 --> List67
-    List71{{"List[71∈1]<br />ᐸ12,70ᐳ"}}:::plan
-    __Item12 & Access70 --> List71
+    Access58 & __Item12 --> List59
+    List63{{"List[63∈1]<br />ᐸ62,12ᐳ"}}:::plan
+    Access62 & __Item12 --> List63
+    List67{{"List[67∈1]<br />ᐸ66,12ᐳ"}}:::plan
+    Access66 & __Item12 --> List67
+    List71{{"List[71∈1]<br />ᐸ70,12ᐳ"}}:::plan
+    Access70 & __Item12 --> List71
     PgSelectRows11 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸpersonᐳ"}}:::plan
     __Item12 --> PgSelectSingle13
@@ -62,16 +62,16 @@ graph TD
     PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression15
     PgSelectRows21[["PgSelectRows[21∈1]"]]:::plan
-    Lambda60{{"Lambda[60∈1]"}}:::plan
+    Lambda60{{"Lambda[60∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda60 --> PgSelectRows21
     PgSelectRows31[["PgSelectRows[31∈1]"]]:::plan
-    Lambda64{{"Lambda[64∈1]"}}:::plan
+    Lambda64{{"Lambda[64∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda64 --> PgSelectRows31
     PgSelectRows38[["PgSelectRows[38∈1]"]]:::plan
-    Lambda68{{"Lambda[68∈1]"}}:::plan
+    Lambda68{{"Lambda[68∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda68 --> PgSelectRows38
     PgSelectRows45[["PgSelectRows[45∈1]"]]:::plan
-    Lambda72{{"Lambda[72∈1]"}}:::plan
+    Lambda72{{"Lambda[72∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda72 --> PgSelectRows45
     List59 --> Lambda60
     List63 --> Lambda64

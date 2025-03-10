@@ -38,8 +38,8 @@ graph TD
     __Item16 --> PgSelectSingle17
     List69{{"List[69∈3]<br />ᐸ68,17ᐳ"}}:::plan
     Access68 & PgSelectSingle17 --> List69
-    List73{{"List[73∈3]<br />ᐸ16,72ᐳ"}}:::plan
-    __Item16 & Access72 --> List73
+    List73{{"List[73∈3]<br />ᐸ72,16ᐳ"}}:::plan
+    Access72 & __Item16 --> List73
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__posts__.”id”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__posts__.”user_id”ᐳ"}}:::plan
@@ -56,7 +56,7 @@ graph TD
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__frmcdc_u...__.”lines”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression30
     PgSelectRows48[["PgSelectRows[48∈3]"]]:::plan
-    Lambda74{{"Lambda[74∈3]"}}:::plan
+    Lambda74{{"Lambda[74∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda74 --> PgSelectRows48
     PgClassExpression66{{"PgClassExpression[66∈3]<br />ᐸ__posts__.”created_at”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression66
@@ -111,7 +111,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 68, 72, 11, 38, 60<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 68, 16, 72, 11, 38, 60<br /><br />ROOT PgSelectSingle{2}ᐸpostsᐳ[17]<br />1: <br />ᐳ: 18, 19, 66, 69, 73, 70, 74<br />2: PgSelectRows[27], PgSelectRows[48]<br />ᐳ: 26, 28, 29, 30"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 68, 72, 16, 11, 38, 60<br /><br />ROOT PgSelectSingle{2}ᐸpostsᐳ[17]<br />1: <br />ᐳ: 18, 19, 66, 69, 73, 70, 74<br />2: PgSelectRows[27], PgSelectRows[48]<br />ᐳ: 26, 28, 29, 30"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgClassExpression19,First26,PgSelectRows27,PgSelectSingle28,PgClassExpression29,PgClassExpression30,PgSelectRows48,PgClassExpression66,List69,Lambda70,List73,Lambda74 bucket3
     Bucket5("Bucket 5 (listItem)<br />Deps: 11, 38<br /><br />ROOT __Item{5}ᐸ30ᐳ[33]<br />1: PgSelect[34]<br />2: PgSelectRows[39]"):::bucket

@@ -54,29 +54,29 @@ graph TD
     PgSelectRows15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈2]<br />ᐸpersonᐳ"}}:::plan
     __Item16 --> PgSelectSingle17
-    List97{{"List[97∈3]<br />ᐸ16,96ᐳ"}}:::plan
-    __Item16 & Access96 --> List97
-    List101{{"List[101∈3]<br />ᐸ16,100ᐳ"}}:::plan
-    __Item16 & Access100 --> List101
-    List105{{"List[105∈3]<br />ᐸ16,104ᐳ"}}:::plan
-    __Item16 & Access104 --> List105
-    List109{{"List[109∈3]<br />ᐸ16,108ᐳ"}}:::plan
-    __Item16 & Access108 --> List109
+    List97{{"List[97∈3]<br />ᐸ96,16ᐳ"}}:::plan
+    Access96 & __Item16 --> List97
+    List101{{"List[101∈3]<br />ᐸ100,16ᐳ"}}:::plan
+    Access100 & __Item16 --> List101
+    List105{{"List[105∈3]<br />ᐸ104,16ᐳ"}}:::plan
+    Access104 & __Item16 --> List105
+    List109{{"List[109∈3]<br />ᐸ108,16ᐳ"}}:::plan
+    Access108 & __Item16 --> List109
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression19
     PgSelectRows29[["PgSelectRows[29∈3]"]]:::plan
-    Lambda98{{"Lambda[98∈3]"}}:::plan
+    Lambda98{{"Lambda[98∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda98 --> PgSelectRows29
     PgSelectRows43[["PgSelectRows[43∈3]"]]:::plan
-    Lambda102{{"Lambda[102∈3]"}}:::plan
+    Lambda102{{"Lambda[102∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda102 --> PgSelectRows43
     PgSelectRows54[["PgSelectRows[54∈3]"]]:::plan
-    Lambda106{{"Lambda[106∈3]"}}:::plan
+    Lambda106{{"Lambda[106∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda106 --> PgSelectRows54
     PgSelectRows65[["PgSelectRows[65∈3]"]]:::plan
-    Lambda110{{"Lambda[110∈3]"}}:::plan
+    Lambda110{{"Lambda[110∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda110 --> PgSelectRows65
     List97 --> Lambda98
     List101 --> Lambda102
@@ -124,14 +124,14 @@ graph TD
     PgSelectRows76 ==> __Item77
     PgSelectSingle78{{"PgSelectSingle[78∈13]<br />ᐸcompound_keyᐳ"}}:::plan
     __Item77 --> PgSelectSingle78
-    List113{{"List[113∈14]<br />ᐸ77,112ᐳ"}}:::plan
-    __Item77 & Access112 --> List113
+    List113{{"List[113∈14]<br />ᐸ112,77ᐳ"}}:::plan
+    Access112 & __Item77 --> List113
     PgClassExpression79{{"PgClassExpression[79∈14]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle78 --> PgClassExpression79
     PgClassExpression80{{"PgClassExpression[80∈14]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle78 --> PgClassExpression80
     PgSelectRows89[["PgSelectRows[89∈14]"]]:::plan
-    Lambda114{{"Lambda[114∈14]"}}:::plan
+    Lambda114{{"Lambda[114∈14]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda114 --> PgSelectRows89
     List113 --> Lambda114
     __Item90[/"__Item[90∈15]<br />ᐸ89ᐳ"\]:::itemplan
@@ -157,7 +157,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 96, 100, 104, 108, 26, 39, 51, 62<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 16, 96, 100, 104, 108, 26, 39, 51, 62<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[17]<br />1: <br />ᐳ: 18, 19, 97, 101, 105, 109, 98, 102, 106, 110<br />2: 29, 43, 54, 65"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 96, 16, 100, 104, 108, 26, 39, 51, 62<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[17]<br />1: <br />ᐳ: 18, 19, 97, 101, 105, 109, 98, 102, 106, 110<br />2: 29, 43, 54, 65"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgClassExpression19,PgSelectRows29,PgSelectRows43,PgSelectRows54,PgSelectRows65,List97,Lambda98,List101,Lambda102,List105,Lambda106,List109,Lambda110 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ29ᐳ[30]"):::bucket
@@ -190,7 +190,7 @@ graph TD
     Bucket13("Bucket 13 (listItem)<br />Deps: 112, 86<br /><br />ROOT __Item{13}ᐸ76ᐳ[77]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item77,PgSelectSingle78 bucket13
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 78, 77, 112, 86<br /><br />ROOT PgSelectSingle{13}ᐸcompound_keyᐳ[78]<br />1: <br />ᐳ: 79, 80, 113, 114<br />2: PgSelectRows[89]"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 78, 112, 77, 86<br /><br />ROOT PgSelectSingle{13}ᐸcompound_keyᐳ[78]<br />1: <br />ᐳ: 79, 80, 113, 114<br />2: PgSelectRows[89]"):::bucket
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgClassExpression79,PgClassExpression80,PgSelectRows89,List113,Lambda114 bucket14
     Bucket15("Bucket 15 (listItem)<br /><br />ROOT __Item{15}ᐸ89ᐳ[90]"):::bucket

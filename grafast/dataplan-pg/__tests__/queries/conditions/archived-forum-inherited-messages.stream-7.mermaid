@@ -36,13 +36,13 @@ graph TD
     Constant29{{"Constant[29∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     Constant30{{"Constant[30∈0] ➊<br />ᐸtrueᐳ"}}:::plan
     PgSelectInlineApply77["PgSelectInlineApply[77∈0] ➊"]:::plan
-    List87{{"List[87∈1]<br />ᐸ15,86ᐳ"}}:::plan
+    List87{{"List[87∈1]<br />ᐸ86,15ᐳ"}}:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
-    __Item15 & Access86 --> List87
+    Access86 & __Item15 --> List87
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    Lambda88{{"Lambda[88∈1]"}}:::plan
+    Lambda88{{"Lambda[88∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List87 --> Lambda88
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17

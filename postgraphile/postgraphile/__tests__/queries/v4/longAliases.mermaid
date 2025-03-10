@@ -22,13 +22,13 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    List45{{"List[45∈0] ➊<br />ᐸ11,44ᐳ"}}:::plan
-    First11{{"First[11∈0] ➊"}}:::plan
+    List45{{"List[45∈0] ➊<br />ᐸ44,11ᐳ"}}:::plan
     Access44{{"Access[44∈0] ➊<br />ᐸ7.m.subqueryDetailsFor27ᐳ"}}:::plan
-    First11 & Access44 --> List45
-    List50{{"List[50∈0] ➊<br />ᐸ11,49ᐳ"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
+    Access44 & First11 --> List45
+    List50{{"List[50∈0] ➊<br />ᐸ49,11ᐳ"}}:::plan
     Access49{{"Access[49∈0] ➊<br />ᐸ7.m.subqueryDetailsFor37ᐳ"}}:::plan
-    First11 & Access49 --> List50
+    Access49 & First11 --> List50
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -38,10 +38,10 @@ graph TD
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First11 --> PgSelectSingle13
     PgSelect7 --> Access44
-    Lambda46{{"Lambda[46∈0] ➊"}}:::plan
+    Lambda46{{"Lambda[46∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List45 --> Lambda46
     PgSelect7 --> Access49
-    Lambda51{{"Lambda[51∈0] ➊"}}:::plan
+    Lambda51{{"Lambda[51∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List50 --> Lambda51
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant14{{"Constant[14∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan

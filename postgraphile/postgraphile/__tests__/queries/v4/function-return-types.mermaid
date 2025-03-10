@@ -258,10 +258,10 @@ graph TD
     PgSelectInlineApply554["PgSelectInlineApply[554∈0] ➊"]:::plan
     List539{{"List[539∈1] ➊<br />ᐸ538,38ᐳ"}}:::plan
     Access538 & PgSelectSingle38 --> List539
-    List543{{"List[543∈1] ➊<br />ᐸ56,542ᐳ"}}:::plan
-    First56{{"First[56∈1] ➊"}}:::plan
+    List543{{"List[543∈1] ➊<br />ᐸ542,56ᐳ"}}:::plan
     Access542{{"Access[542∈1] ➊<br />ᐸ549.m.subqueryDetailsFor72ᐳ"}}:::plan
-    First56 & Access542 --> List543
+    First56{{"First[56∈1] ➊"}}:::plan
+    Access542 & First56 --> List543
     List548{{"List[548∈1] ➊<br />ᐸ547,38ᐳ"}}:::plan
     Access547 & PgSelectSingle38 --> List548
     PgClassExpression39{{"PgClassExpression[39∈1] ➊<br />ᐸ__func_out...plex__.”x”ᐳ"}}:::plan
@@ -281,7 +281,7 @@ graph TD
     First56 --> PgSelectSingle58
     List539 --> Lambda540
     Lambda549 --> Access542
-    Lambda544{{"Lambda[544∈1] ➊"}}:::plan
+    Lambda544{{"Lambda[544∈1] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List543 --> Lambda544
     List548 --> Lambda549
     PgClassExpression49{{"PgClassExpression[49∈2] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
@@ -598,10 +598,10 @@ graph TD
     List605 --> Lambda606
     List566{{"List[566∈33] ➊<br />ᐸ565,287ᐳ"}}:::plan
     Access565 & PgSelectSingle287 --> List566
-    List570{{"List[570∈33] ➊<br />ᐸ305,569ᐳ"}}:::plan
-    First305{{"First[305∈33] ➊"}}:::plan
+    List570{{"List[570∈33] ➊<br />ᐸ569,305ᐳ"}}:::plan
     Access569{{"Access[569∈33] ➊<br />ᐸ576.m.subqueryDetailsFor320ᐳ"}}:::plan
-    First305 & Access569 --> List570
+    First305{{"First[305∈33] ➊"}}:::plan
+    Access569 & First305 --> List570
     List575{{"List[575∈33] ➊<br />ᐸ574,287ᐳ"}}:::plan
     Access574 & PgSelectSingle287 --> List575
     PgClassExpression288{{"PgClassExpression[288∈33] ➊<br />ᐸ__person_c...plex__.”x”ᐳ"}}:::plan
@@ -621,7 +621,7 @@ graph TD
     First305 --> PgSelectSingle307
     List566 --> Lambda567
     Lambda576 --> Access569
-    Lambda571{{"Lambda[571∈33] ➊"}}:::plan
+    Lambda571{{"Lambda[571∈33] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List570 --> Lambda571
     List575 --> Lambda576
     PgClassExpression298{{"PgClassExpression[298∈34] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan

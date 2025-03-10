@@ -33,13 +33,13 @@ graph TD
     Access48{{"Access[48∈0] ➊<br />ᐸ8.m.subqueryDetailsFor21ᐳ"}}:::plan
     PgSelect8 --> Access48
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    List49{{"List[49∈1]<br />ᐸ15,48ᐳ"}}:::plan
+    List49{{"List[49∈1]<br />ᐸ48,15ᐳ"}}:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
-    __Item15 & Access48 --> List49
+    Access48 & __Item15 --> List49
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    Lambda50{{"Lambda[50∈1]"}}:::plan
+    Lambda50{{"Lambda[50∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List49 --> Lambda50
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17

@@ -104,16 +104,16 @@ graph TD
     __Item57 --> PgSelectSingle58
     PgClassExpression59{{"PgClassExpression[59∈10]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression59
-    List87{{"List[87∈12]<br />ᐸ70,86ᐳ"}}:::plan
+    List87{{"List[87∈12]<br />ᐸ86,70ᐳ"}}:::plan
     __Item70[/"__Item[70∈12]<br />ᐸ69ᐳ"\]:::itemplan
-    __Item70 & Access86 --> List87
+    Access86 & __Item70 --> List87
     PgSelectRows69 ==> __Item70
     PgSelectSingle71{{"PgSelectSingle[71∈12]<br />ᐸpostᐳ"}}:::plan
     __Item70 --> PgSelectSingle71
     PgClassExpression72{{"PgClassExpression[72∈12]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression72
     PgSelectRows79[["PgSelectRows[79∈12]"]]:::plan
-    Lambda88{{"Lambda[88∈12]"}}:::plan
+    Lambda88{{"Lambda[88∈12]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda88 --> PgSelectRows79
     List87 --> Lambda88
     __Item80[/"__Item[80∈13]<br />ᐸ79ᐳ"\]:::itemplan

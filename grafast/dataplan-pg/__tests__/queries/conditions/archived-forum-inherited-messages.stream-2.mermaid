@@ -44,15 +44,15 @@ graph TD
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    List89{{"List[89∈2]<br />ᐸ15,88ᐳ"}}:::plan
-    __Item15 & Access88 --> List89
-    List93{{"List[93∈2]<br />ᐸ15,92ᐳ"}}:::plan
-    __Item15 & Access92 --> List93
+    List89{{"List[89∈2]<br />ᐸ88,15ᐳ"}}:::plan
+    Access88 & __Item15 --> List89
+    List93{{"List[93∈2]<br />ᐸ92,15ᐳ"}}:::plan
+    Access92 & __Item15 --> List93
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
-    Lambda90{{"Lambda[90∈2]"}}:::plan
+    Lambda90{{"Lambda[90∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List89 --> Lambda90
-    Lambda94{{"Lambda[94∈2]"}}:::plan
+    Lambda94{{"Lambda[94∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List93 --> Lambda94
     PgSelect31[["PgSelect[31∈3@s]<br />ᐸmessagesᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
@@ -144,7 +144,7 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 88, 92, 11, 28, 24, 6, 79, 83, 29, 30<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 15, 88, 92, 11, 28, 24, 6, 79, 83, 29, 30<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 88, 15, 92, 11, 28, 24, 6, 79, 83, 29, 30<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,List89,Lambda90,List93,Lambda94 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 28, 24, 6, 79, 83, 90, 94, 29, 30<br /><br />ROOT Connectionᐸ20ᐳ[24]<br />1: PgSelectRows[76]<br />ᐳ: 19, 25, 64, 66, 67, 68, 72, 73, 75, 77, 78<br />2: PgSelect[31], PgSelect[46]<br />3: PgSelectRows[32], PgSelectRows[47]"):::bucket

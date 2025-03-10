@@ -23,10 +23,10 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    List80{{"List[80∈0] ➊<br />ᐸ28,79ᐳ"}}:::plan
-    First28{{"First[28∈0] ➊"}}:::plan
+    List80{{"List[80∈0] ➊<br />ᐸ79,28ᐳ"}}:::plan
     Access79{{"Access[79∈0] ➊<br />ᐸ26.m.subqueryDetailsFor40ᐳ"}}:::plan
-    First28 & Access79 --> List80
+    First28{{"First[28∈0] ➊"}}:::plan
+    Access79 & First28 --> List80
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -44,7 +44,7 @@ graph TD
     Access75{{"Access[75∈0] ➊<br />ᐸ7.m.joinDetailsFor15ᐳ"}}:::plan
     PgSelect7 --> Access75
     PgSelect26 --> Access79
-    Lambda81{{"Lambda[81∈0] ➊"}}:::plan
+    Lambda81{{"Lambda[81∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List80 --> Lambda81
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     List76{{"List[76∈1] ➊<br />ᐸ75,13ᐳ"}}:::plan

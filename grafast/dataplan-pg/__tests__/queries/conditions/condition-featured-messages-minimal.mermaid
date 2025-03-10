@@ -47,13 +47,13 @@ graph TD
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    List44{{"List[44∈2]<br />ᐸ15,43ᐳ"}}:::plan
-    __Item15 & Access43 --> List44
-    List48{{"List[48∈2]<br />ᐸ15,47ᐳ"}}:::plan
-    __Item15 & Access47 --> List48
-    Lambda45{{"Lambda[45∈2]"}}:::plan
+    List44{{"List[44∈2]<br />ᐸ43,15ᐳ"}}:::plan
+    Access43 & __Item15 --> List44
+    List48{{"List[48∈2]<br />ᐸ47,15ᐳ"}}:::plan
+    Access47 & __Item15 --> List48
+    Lambda45{{"Lambda[45∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List44 --> Lambda45
-    Lambda49{{"Lambda[49∈2]"}}:::plan
+    Lambda49{{"Lambda[49∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List48 --> Lambda49
     Object35{{"Object[35∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access34{{"Access[34∈3]<br />ᐸ45.hasMoreᐳ"}}:::plan
@@ -81,7 +81,7 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 43, 47, 25, 52, 6<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 43, 47, 16, 25, 52, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 43, 15, 47, 16, 25, 52, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,List44,Lambda45,List48,Lambda49 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 45, 52, 6, 49<br /><br />ROOT Connectionᐸ21ᐳ[25]"):::bucket

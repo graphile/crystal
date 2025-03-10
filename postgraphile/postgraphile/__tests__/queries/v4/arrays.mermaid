@@ -29,11 +29,11 @@ graph TD
     Access70{{"Access[70∈0] ➊<br />ᐸ7.m.subqueryDetailsFor48ᐳ"}}:::plan
     PgSelect7 --> Access70
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    List67{{"List[67∈1]<br />ᐸ12,66ᐳ"}}:::plan
+    List67{{"List[67∈1]<br />ᐸ66,12ᐳ"}}:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    __Item12 & Access66 --> List67
-    List71{{"List[71∈1]<br />ᐸ12,70ᐳ"}}:::plan
-    __Item12 & Access70 --> List71
+    Access66 & __Item12 --> List67
+    List71{{"List[71∈1]<br />ᐸ70,12ᐳ"}}:::plan
+    Access70 & __Item12 --> List71
     PgSelectRows11 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸlistsᐳ"}}:::plan
     __Item12 --> PgSelectSingle13
@@ -56,10 +56,10 @@ graph TD
     PgClassExpression29{{"PgClassExpression[29∈1]<br />ᐸ__lists__...._array_nn”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression29
     PgSelectRows37[["PgSelectRows[37∈1]"]]:::plan
-    Lambda68{{"Lambda[68∈1]"}}:::plan
+    Lambda68{{"Lambda[68∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda68 --> PgSelectRows37
     PgSelectRows51[["PgSelectRows[51∈1]"]]:::plan
-    Lambda72{{"Lambda[72∈1]"}}:::plan
+    Lambda72{{"Lambda[72∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda72 --> PgSelectRows51
     PgClassExpression61{{"PgClassExpression[61∈1]<br />ᐸ__lists__.”bytea_array”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression61

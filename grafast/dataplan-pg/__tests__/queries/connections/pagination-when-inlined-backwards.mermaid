@@ -39,19 +39,19 @@ graph TD
     Access92{{"Access[92∈0] ➊<br />ᐸ9.m.subqueryDetailsFor78ᐳ"}}:::plan
     PgSelect9 --> Access92
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    List89{{"List[89∈1]<br />ᐸ16,88ᐳ"}}:::plan
+    List89{{"List[89∈1]<br />ᐸ88,16ᐳ"}}:::plan
     __Item16[/"__Item[16∈1]<br />ᐸ15ᐳ"\]:::itemplan
-    __Item16 & Access88 --> List89
+    Access88 & __Item16 --> List89
     PgSelectRows15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item16 --> PgSelectSingle17
-    Lambda90{{"Lambda[90∈1]"}}:::plan
+    Lambda90{{"Lambda[90∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List89 --> Lambda90
-    List93{{"List[93∈2]<br />ᐸ16,92ᐳ"}}:::plan
-    __Item16 & Access92 --> List93
+    List93{{"List[93∈2]<br />ᐸ92,16ᐳ"}}:::plan
+    Access92 & __Item16 --> List93
     PgClassExpression18{{"PgClassExpression[18∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
-    Lambda94{{"Lambda[94∈2]"}}:::plan
+    Lambda94{{"Lambda[94∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List93 --> Lambda94
     Object64{{"Object[64∈3]<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access58{{"Access[58∈3]<br />ᐸ90.hasMoreᐳ"}}:::plan
@@ -123,7 +123,7 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 88, 92, 26, 8, 95<br /><br />ROOT __Item{1}ᐸ15ᐳ[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item16,PgSelectSingle17,List89,Lambda90 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 16, 92, 90, 26, 8, 95<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[17]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 92, 16, 90, 26, 8, 95<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression18,List93,Lambda94 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 90, 26, 8, 95, 94<br /><br />ROOT Connectionᐸ22ᐳ[26]"):::bucket
