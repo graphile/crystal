@@ -208,11 +208,17 @@ function doTypesMatch(
 }
 
 /**
+ * Returns a step representing a variable's value.
  *
- * @param variableWillDefinitelyBeSet If {true} the variable is either non-null
- * _or_ it has a default value (including null). In this case, the variable
- * will never be `undefined` and thus an input position's defaultValue will
- * never be invoked where it is used.
+ * @param operationPlan -
+ * @param variableName -
+ * @param variableType -
+ * @param inputType -
+ * @param defaultValue -
+ * @param variableWillDefinitelyBeSet - If `true` the variable is either
+ * non-null _or_ it has a default value (including null). In this case, the
+ * variable will never be `undefined` and thus an input position's defaultValue
+ * will never be invoked where it is used.
  */
 function inputVariablePlan(
   operationPlan: OperationPlan,

@@ -1,13 +1,6 @@
-import * as graphql from "graphql";
-
-import { assertInputStep } from "../input.js";
-import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
-import { Step, UnbatchedExecutableStep, UnbatchedStep } from "../step.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
+import { UnbatchedStep } from "../step.js";
 import type { __TrackedValueStep } from "./__trackedValue.js";
-import { constant } from "./constant.js";
-import { list } from "./list.js";
-
-const { GraphQLList, Kind } = graphql;
 
 export class __InputDefaultStep extends UnbatchedStep {
   static $$export = {
