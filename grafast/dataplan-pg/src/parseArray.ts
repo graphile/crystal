@@ -21,7 +21,7 @@ type Transform<T> = (val: string) => T;
  */
 export function makeParseArrayWithTransform<T = string>(
   transform?: Transform<T>,
-): (str: string) => T[] {
+): (str: string) => readonly T[] {
   const haveTransform = transform != null;
   return function parseArray(str) {
     const rbraceIndex = str.length - 1;

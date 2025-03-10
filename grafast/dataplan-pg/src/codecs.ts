@@ -639,7 +639,7 @@ export function listOfCodec<
   TName,
   undefined, // Array has no attributes
   string,
-  PgCodecTFromJavaScript<TInnerCodec>[],
+  readonly PgCodecTFromJavaScript<TInnerCodec>[],
   TInnerCodec,
   undefined,
   undefined
@@ -669,7 +669,7 @@ export function listOfCodec<
     TName,
     undefined, // Array has no attributes
     string,
-    PgCodecTFromJavaScript<TInnerCodec>[],
+    readonly PgCodecTFromJavaScript<TInnerCodec>[],
     TInnerCodec,
     undefined,
     undefined
