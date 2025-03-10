@@ -59,7 +59,7 @@ export class PgCondition<
   public readonly alias: SQL;
 
   public extensions: DataplanPg.PgConditionExtensions = Object.create(null);
-  private mode: PgConditionResolvedMode;
+  public readonly resolvedMode: PgConditionResolvedMode;
 
   constructor(
     parent: TParent,
@@ -68,11 +68,11 @@ export class PgCondition<
   ) {
     super(parent);
     if (typeof mode === "string") {
-      this.mode = { mode };
+      this.resolvedMode = { mode };
     } else {
-      this.mode = mode;
+      this.resolvedMode = mode;
     }
-    switch (this.mode.mode) {
+    switch (this.resolvedMode.mode) {
       case "PASS_THRU":
       case "AND":
       case "OR":
@@ -81,14 +81,16 @@ export class PgCondition<
         break;
       }
       case "EXISTS": {
-        this.alias = sql.identifier(Symbol(this.mode.alias ?? "exists"));
+        this.alias = sql.identifier(
+          Symbol(this.resolvedMode.alias ?? "exists"),
+        );
         break;
       }
     }
   }
 
   public toStringMeta(): string {
-    return `${(this.parent as any).id}/${this.mode.mode}`;
+    return `${(this.parent as any).id}/${this.resolvedMode.mode}`;
   }
 
   orPlan() {
@@ -132,8 +134,8 @@ export class PgCondition<
     const sqlCondition = pgWhereConditionSpecListToSQL(
       this.alias,
       conditions,
-      this.mode.mode === "OR" ? "or" : "and",
-      this.mode.mode === "NOT"
+      this.resolvedMode.mode === "OR" ? "or" : "and",
+      this.resolvedMode.mode === "NOT"
         ? (frag) => sql.parens(sql`not ${sql.parens(frag)}`)
         : (frag) => frag,
     );
@@ -141,7 +143,7 @@ export class PgCondition<
       return null;
     }
 
-    switch (this.mode.mode) {
+    switch (this.resolvedMode.mode) {
       case "PASS_THRU": {
         throw new Error("Should never reach here");
       }
@@ -153,17 +155,19 @@ export class PgCondition<
       case "EXISTS": {
         const sqlExists = sql`exists(${sql.indent`\
 select 1
-from ${this.mode.tableExpression} as ${this.alias}
+from ${this.resolvedMode.tableExpression} as ${this.alias}
 where ${sqlCondition}`})`;
-        if (this.mode.equals != null) {
-          return sql`${sqlExists} = ${this.mode.equals ? sql.true : sql.false}`;
+        if (this.resolvedMode.equals != null) {
+          return sql`${sqlExists} = ${
+            this.resolvedMode.equals ? sql.true : sql.false
+          }`;
         } else {
           // Assume true
           return sqlExists;
         }
       }
       default: {
-        const never: never = this.mode;
+        const never: never = this.resolvedMode;
         throw new Error(`Unhandled mode: ${(never as any).mode}`);
       }
     }
@@ -174,7 +178,7 @@ where ${sqlCondition}`})`;
       if (!this.parent.having) {
         throw new Error(`${this.parent} doesn't support 'having'`);
       }
-      if (this.mode.mode === "PASS_THRU") {
+      if (this.resolvedMode.mode === "PASS_THRU") {
         this.havingConditions.forEach((condition) => {
           this.parent.having!(condition);
         });
@@ -185,7 +189,7 @@ where ${sqlCondition}`})`;
         }
       }
     } else {
-      if (this.mode.mode === "PASS_THRU") {
+      if (this.resolvedMode.mode === "PASS_THRU") {
         this.conditions.forEach((condition) => {
           this.parent.where(condition);
         });
