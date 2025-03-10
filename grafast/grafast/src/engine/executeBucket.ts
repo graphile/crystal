@@ -1026,9 +1026,13 @@ export function executeBucket(
      * Ensures that callback is only called once all other enqueued callbacks
      * are called.
      */
-    const enqueue = <T>(callback: () => PromiseOrDirect<T>): PromiseLike<T> => {
-      const result = (mutationQueue ?? Promise.resolve()).then(callback);
-      mutationQueue = result.then(noop, noop);
+    const enqueue = <T>(
+      callback: () => PromiseOrDirect<T>,
+    ): PromiseOrDirect<T> => {
+      const result = mutationQueue ? mutationQueue.then(callback) : callback();
+      if (isPromiseLike(result)) {
+        mutationQueue = result.then(noop, noop);
+      }
       return result;
     };
 
@@ -1054,7 +1058,9 @@ export function executeBucket(
             const promise = enqueue(() =>
               executeBucket(childBucket, requestContext),
             );
-            childPromises.push(promise);
+            if (isPromiseLike(promise)) {
+              childPromises.push(promise);
+            }
           }
 
           break;
