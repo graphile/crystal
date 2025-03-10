@@ -17920,9 +17920,9 @@ __metadata:
   linkType: hard
 
 "prismjs@npm:^1.23.0, prismjs@npm:^1.28.0":
-  version: 1.29.0
-  resolution: "prismjs@npm:1.29.0"
-  checksum: 9d15875f071a2495c3ca75e77c6e1149229e073262e960655c41c85a2cd9b76ac45b698c79570ffb76cdf388d8c19d8cbcc49bbbed175c36401e153708fde7d7
+  version: 1.30.0
+  resolution: "prismjs@npm:1.30.0"
+  checksum: ecafc21d1e66072e646af3d3c23ee82f963ffb67784673e38caa2951dde1f26fd80e20dff5fbe1ea10ced86277ab47272217d196a3c30740552bd0e617357f27
   languageName: node
   linkType: hard
 
