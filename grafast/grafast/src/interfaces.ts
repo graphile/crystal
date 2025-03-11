@@ -767,6 +767,10 @@ export interface BatchExecutionValue<TData = any>
   entries: ReadonlyArray<TData>;
   /** Always throws, since this should only be called on unary execution values */
   unaryValue(): never;
+  /** @internal */
+  readonly _flags: Array<ExecutionEntryFlags>;
+  /** @internal */
+  _cachedStateUnion: ExecutionEntryFlags | null;
 }
 export interface UnaryExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {
@@ -774,6 +778,8 @@ export interface UnaryExecutionValue<TData = any>
   value: TData;
   /** Same as getting .value */
   unaryValue(): TData;
+  /** @internal */
+  _entryFlags: ExecutionEntryFlags;
 }
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
