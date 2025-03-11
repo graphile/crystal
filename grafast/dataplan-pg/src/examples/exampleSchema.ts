@@ -4799,7 +4799,7 @@ export function makeExampleSchema(
             relationalItemsResource,
             relationalPostsResource,
           ) =>
-            function plan(_$root, fieldArgs, info) {
+            function plan(_$root, fieldArgs) {
               const $item = pgInsertSingle(relationalItemsResource, {
                 type: constant`POST`,
                 author_id: constant(2, false),
@@ -4808,9 +4808,7 @@ export function makeExampleSchema(
               const $post = pgInsertSingle(relationalPostsResource, {
                 id: $itemId,
               });
-              const inputArgType = info.field.args.find(
-                (a) => a.name === "input",
-              )!.type;
+              const inputArgType = fieldArgs.typeAt("input");
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsResource.codec.attributes
               >) {
@@ -4942,13 +4940,11 @@ export function makeExampleSchema(
             pgUpdateSingle,
             relationalPostsResource,
           ) =>
-            function plan(_$root, fieldArgs, info) {
+            function plan(_$root, fieldArgs) {
               const $post = pgUpdateSingle(relationalPostsResource, {
                 id: fieldArgs.$input.$id as ExecutableStep<number>,
               });
-              const inputArgType = info.field.args.find(
-                (a) => a.name === "input",
-              )!.type;
+              const inputArgType = fieldArgs.typeAt("input");
               for (const key of ["title", "description", "note"] as Array<
                 keyof typeof relationalPostsResource.codec.attributes
               >) {
