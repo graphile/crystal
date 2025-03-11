@@ -1261,7 +1261,6 @@ export function batchExecutionValue<TData>(
   entries: TData[],
   _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
 ): BatchExecutionValue<TData> {
-  let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
     at: batchEntriesAt,
     isBatch: true,
@@ -1269,15 +1268,18 @@ export function batchExecutionValue<TData>(
     unaryValue: throwNotUnary,
     _flags,
     _flagsAt: batchFlagsAt,
-    _getStateUnion() {
-      if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce(bitwiseOr, NO_FLAGS);
-      }
-      return cachedStateUnion;
-    },
+    _cachedStateUnion: null,
+    _getStateUnion: batchGetStateUnion,
     _setResult: batchSetResult,
     _copyResult,
   };
+}
+
+function batchGetStateUnion(this: BatchExecutionValue) {
+  if (this._cachedStateUnion === null) {
+    this._cachedStateUnion = this._flags.reduce(bitwiseOr, NO_FLAGS);
+  }
+  return this._cachedStateUnion;
 }
 
 function batchEntriesAt(this: BatchExecutionValue, i: number) {
@@ -1324,13 +1326,17 @@ export function unaryExecutionValue<TData>(
     at: unaryAt,
     isBatch: false,
     value,
-    unaryValue: () => value,
+    unaryValue: thisDotValue,
     _entryFlags,
     _flagsAt: unaryFlagsAt,
     _getStateUnion: unaryGetStateUnion,
     _setResult: unarySetResult,
     _copyResult,
   };
+}
+
+function thisDotValue(this: UnaryExecutionValue) {
+  return this.value;
 }
 
 function unaryAt(this: UnaryExecutionValue) {
