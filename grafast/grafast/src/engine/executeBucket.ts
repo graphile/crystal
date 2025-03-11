@@ -874,8 +874,11 @@ export function executeBucket(
             const depList = dependencies[depListIndex];
             if (depList.isBatch) {
               const depVal = dependenciesIncludingSideEffects[depListIndex];
-              (depList.entries as any[]).push(depVal.at(dataIndex));
-              depList._flags.push(depVal._flagsAt(dataIndex));
+              depList._setResult(
+                depList.entries.length,
+                depVal.at(dataIndex),
+                depVal._flagsAt(dataIndex),
+              );
             }
           }
         }
@@ -1250,71 +1253,69 @@ export function bucketToString(this: Bucket) {
   return `Bucket<${this.layerPlan}>`;
 }
 
-function throwNotUnary(): never {
-  throw new Error(
-    `This is not a unary value so we cannot get the single value - there may be more than one!`,
-  );
-}
-
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
   _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
 ): BatchExecutionValue<TData> {
-  return {
-    at: batchEntriesAt,
-    isBatch: true,
-    entries,
-    unaryValue: throwNotUnary,
-    _flags,
-    _flagsAt: batchFlagsAt,
-    _cachedStateUnion: null,
-    _getStateUnion: batchGetStateUnion,
-    _setResult: batchSetResult,
-    _copyResult,
-  };
+  return new _BatchExecutionValue<TData>(entries, _flags);
 }
 
-function batchGetStateUnion(this: BatchExecutionValue) {
-  if (this._cachedStateUnion === null) {
-    this._cachedStateUnion = this._flags.reduce(bitwiseOr, NO_FLAGS);
+class _BatchExecutionValue<TData> implements BatchExecutionValue<TData> {
+  public readonly isBatch: true;
+  public entries: readonly TData[];
+  private _flags: ExecutionEntryFlags[];
+  private _cachedStateUnion: ExecutionEntryFlags | null;
+  constructor(
+    entries: readonly TData[],
+    _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
+  ) {
+    this.isBatch = true;
+    this.entries = entries;
+    this._flags = _flags;
+    this._cachedStateUnion = null;
   }
-  return this._cachedStateUnion;
-}
+  at(this: BatchExecutionValue, i: number) {
+    return this.entries[i];
+  }
 
-function batchEntriesAt(this: BatchExecutionValue, i: number) {
-  return this.entries[i];
-}
+  unaryValue(): never {
+    throw new Error(
+      `This is not a unary value so we cannot get the single value - there may be more than one!`,
+    );
+  }
 
-function batchFlagsAt(this: BatchExecutionValue, i: number) {
-  return this._flags[i];
-}
+  _flagsAt(i: number) {
+    return this._flags[i];
+  }
 
-function batchSetResult(
-  this: BatchExecutionValue,
-  i: number,
-  value: any,
-  flags: ExecutionEntryFlags,
-) {
-  (this.entries as any[])[i] = value;
-  this._flags[i] = flags;
+  _getStateUnion() {
+    if (this._cachedStateUnion === null) {
+      this._cachedStateUnion = this._flags.reduce(bitwiseOr, NO_FLAGS);
+    }
+    return this._cachedStateUnion;
+  }
+
+  _setResult(i: number, value: any, flags: ExecutionEntryFlags) {
+    (this.entries as any[])[i] = value;
+    this._flags[i] = flags;
+  }
+
+  _copyResult(
+    targetIndex: number,
+    source: ExecutionValue,
+    sourceIndex: number,
+  ): void {
+    this._setResult(
+      targetIndex,
+      source.at(sourceIndex),
+      source._flagsAt(sourceIndex),
+    );
+  }
 }
 
 function bitwiseOr(memo: number, a: number) {
   return memo | a;
-}
-
-function _copyResult(
-  this: ExecutionValue,
-  targetIndex: number,
-  source: ExecutionValue,
-  sourceIndex: number,
-): void {
-  this._setResult(
-    targetIndex,
-    source.at(sourceIndex),
-    source._flagsAt(sourceIndex),
-  );
 }
 
 // TODO: memoize?
@@ -1322,46 +1323,48 @@ export function unaryExecutionValue<TData>(
   value: TData,
   _entryFlags: ExecutionEntryFlags = 0,
 ): UnaryExecutionValue<TData> {
-  return {
-    at: unaryAt,
-    isBatch: false,
-    value,
-    unaryValue: thisDotValue,
-    _entryFlags,
-    _flagsAt: unaryFlagsAt,
-    _getStateUnion: unaryGetStateUnion,
-    _setResult: unarySetResult,
-    _copyResult,
-  };
+  return new _UnaryExecutionValue<TData>(value, _entryFlags);
 }
 
-function thisDotValue(this: UnaryExecutionValue) {
-  return this.value;
-}
-
-function unaryAt(this: UnaryExecutionValue) {
-  return this.value;
-}
-
-function unaryFlagsAt(this: UnaryExecutionValue) {
-  return this._entryFlags;
-}
-
-function unaryGetStateUnion(this: UnaryExecutionValue) {
-  return this._entryFlags;
-}
-
-function unarySetResult(
-  this: UnaryExecutionValue,
-  i: number,
-  value: any,
-  flags: any,
-) {
-  if (i !== 0) {
-    throw new Error(`Unary step only expects one result`);
+class _UnaryExecutionValue<TData> implements UnaryExecutionValue<TData> {
+  public isBatch: false;
+  public value: TData;
+  private _entryFlags: ExecutionEntryFlags;
+  constructor(value: TData, _entryFlags: ExecutionEntryFlags = 0) {
+    this.isBatch = false;
+    this.value = value;
+    this._entryFlags = _entryFlags;
   }
-  this.value = value;
-  this._entryFlags = flags;
+  at() {
+    return this.value;
+  }
+  unaryValue() {
+    return this.value;
+  }
+  _flagsAt() {
+    return this._entryFlags;
+  }
+  _getStateUnion() {
+    return this._entryFlags;
+  }
+  _setResult(i: number, value: any, flags: any) {
+    if (i !== 0) {
+      throw new Error(`Unary step only expects one result`);
+    }
+    this.value = value;
+    this._entryFlags = flags;
+  }
+  _copyResult(
+    targetIndex: number,
+    source: ExecutionValue,
+    sourceIndex: number,
+  ): void {
+    this._setResult(
+      targetIndex,
+      source.at(sourceIndex),
+      source._flagsAt(sourceIndex),
+    );
+  }
 }
 
 const indexMapCache = new Map<number, IndexMap>();
