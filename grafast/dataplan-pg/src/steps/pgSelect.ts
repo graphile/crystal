@@ -2746,7 +2746,6 @@ function buildTheQueryCore<
       info.relationJoins.set(relationIdentifier, alias);
       return alias;
     },
-    // TODO: where, whereBuilder, having, havingBuilder
     where(condition) {
       if (sql.isSQL(condition)) {
         info.conditions.push(condition);
