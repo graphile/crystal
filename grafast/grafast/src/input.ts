@@ -284,7 +284,7 @@ function inputVariablePlan(
     // Here:
     // - the variable is nullable, optional, and has no default value
     // - the input position has a default value
-    // We thus need a step that results in variableValue ?? defaultValue
+    // We thus need a step that results in `variableValue === undefined ? defaultValue : variableValue`
     const runtimeDefaultValue = valueNodeToStaticValue(defaultValue, inputType);
     return new __InputDefaultStep($variableValue, runtimeDefaultValue);
   }
