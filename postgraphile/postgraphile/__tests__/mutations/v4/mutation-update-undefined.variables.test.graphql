@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy();
+# Though we pass a variable, we don't pass a value, so the previous value must be retained.
+## expect(data.updateSimilarTable1ById.similarTable1.col2).toEqual(4);
+#> schema: ["a"]
+#> variableValues: { nnValue: 999 }
+mutation ($nnValue: Int, $nullValue: Int) {
+  updateSimilarTable1ById(
+    input: { id: 3, similarTable1Patch: { col1: $nnValue, col2: $nullValue } }
+  ) {
+    similarTable1 {
+      id
+      col1
+      col2
+      col3
+    }
+  }
+}
