@@ -251,7 +251,17 @@ select
   __frmcdc_compound_type__."c"::text as "4",
   (not (__frmcdc_compound_type__ is null))::text as "5",
   __person__."id"::text as "6",
-  __person__."person_full_name" as "7"
+  __person__."person_full_name" as "7",
+  array(
+    select array[
+      __post__."id"::text
+    ]::text[]
+    from "a"."post" as __post__
+    where (
+      __post__."author_id" = __person__."id"
+    )
+    order by __post__."id" asc
+  )::text as "8"
 from "c"."func_out_complex_setof"(
   $1::"int4",
   $2::"text"
@@ -311,11 +321,3 @@ from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_co
 select
   (count(*))::text as "0"
 from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
-
-select
-  __post__."id"::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-)
-order by __post__."id" asc;
