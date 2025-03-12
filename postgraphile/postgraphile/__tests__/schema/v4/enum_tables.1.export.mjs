@@ -1268,13 +1268,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LetterDescription\`."""
-    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LetterDescriptionCondition
+
+    """The method to use when ordering \`LetterDescription\`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LetterDescriptionsConnection
 
   """Reads and enables pagination through a set of \`ReferencingTable\`."""
@@ -1297,13 +1297,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`ReferencingTable\`."""
-    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: ReferencingTableCondition
+
+    """The method to use when ordering \`ReferencingTable\`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ReferencingTablesConnection
 }
 
@@ -1464,21 +1464,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`LetterDescription\`."""
-enum LetterDescriptionsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  LETTER_ASC
-  LETTER_DESC
-  LETTER_VIA_VIEW_ASC
-  LETTER_VIA_VIEW_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-}
-
 """
 A condition to be used against \`LetterDescription\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -1495,6 +1480,21 @@ input LetterDescriptionCondition {
 
   """Checks for equality with the object’s \`description\` field."""
   description: String
+}
+
+"""Methods to use when ordering \`LetterDescription\`."""
+enum LetterDescriptionsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  LETTER_ASC
+  LETTER_DESC
+  LETTER_VIA_VIEW_ASC
+  LETTER_VIA_VIEW_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
 }
 
 """A connection to a list of \`ReferencingTable\` values."""
@@ -1525,23 +1525,6 @@ type ReferencingTablesEdge {
   node: ReferencingTable
 }
 
-"""Methods to use when ordering \`ReferencingTable\`."""
-enum ReferencingTablesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ENUM_1_ASC
-  ENUM_1_DESC
-  ENUM_2_ASC
-  ENUM_2_DESC
-  ENUM_3_ASC
-  ENUM_3_DESC
-  SIMPLE_ENUM_ASC
-  SIMPLE_ENUM_DESC
-}
-
 """
 A condition to be used against \`ReferencingTable\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -1561,6 +1544,23 @@ input ReferencingTableCondition {
 
   """Checks for equality with the object’s \`simpleEnum\` field."""
   simpleEnum: SimpleEnum
+}
+
+"""Methods to use when ordering \`ReferencingTable\`."""
+enum ReferencingTablesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  ENUM_1_ASC
+  ENUM_1_DESC
+  ENUM_2_ASC
+  ENUM_2_DESC
+  ENUM_3_ASC
+  ENUM_3_DESC
+  SIMPLE_ENUM_ASC
+  SIMPLE_ENUM_DESC
 }
 
 """
@@ -2171,21 +2171,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -2236,21 +2236,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -2402,6 +2402,92 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  LetterDescriptionCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    letter: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "letter",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "letter",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum)}`;
+            }
+          });
+        }
+      }
+    },
+    letterViaView: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "letter_via_view",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "letter_via_view",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum)}`;
+            }
+          });
+        }
+      }
+    },
+    description: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "description",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "description",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   LetterDescriptionsOrderBy: {
@@ -2596,92 +2682,6 @@ export const plans = {
       }
     }
   },
-  LetterDescriptionCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    letter: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum)}`;
-            }
-          });
-        }
-      }
-    },
-    letterViaView: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter_via_view",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter_via_view",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum)}`;
-            }
-          });
-        }
-      }
-    },
-    description: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   ReferencingTablesConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -2705,6 +2705,113 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  ReferencingTableCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    enum1: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_1",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_1",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum)}`;
+            }
+          });
+        }
+      }
+    },
+    enum2: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_2",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_2",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum)}`;
+            }
+          });
+        }
+      }
+    },
+    enum3: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_3",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "enum_3",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum)}`;
+            }
+          });
+        }
+      }
+    },
+    simpleEnum: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "simple_enum",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "simple_enum",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum)}`;
+            }
+          });
+        }
+      }
     }
   },
   ReferencingTablesOrderBy: {
@@ -2933,113 +3040,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  ReferencingTableCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    enum1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum)}`;
-            }
-          });
-        }
-      }
-    },
-    enum2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum)}`;
-            }
-          });
-        }
-      }
-    },
-    enum3: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_3",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_3",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum)}`;
-            }
-          });
-        }
-      }
-    },
-    simpleEnum: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "simple_enum",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "simple_enum",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum)}`;
-            }
-          });
         }
       }
     }

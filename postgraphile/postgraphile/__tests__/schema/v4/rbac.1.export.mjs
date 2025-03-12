@@ -10113,13 +10113,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`PersonSecret\`."""
-    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PersonSecretCondition
+
+    """The method to use when ordering \`PersonSecret\`."""
+    orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
   """Reads and enables pagination through a set of \`LeftArm\`."""
@@ -10142,13 +10142,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LeftArm\`."""
-    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LeftArmCondition
+
+    """The method to use when ordering \`LeftArm\`."""
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
   """Reads and enables pagination through a set of \`Post\`."""
@@ -10171,13 +10171,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -10200,13 +10200,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 }
 
@@ -10275,13 +10275,13 @@ type Person implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection!
 
   """This \`Person\`'s \`PersonSecret\`."""
@@ -10374,23 +10374,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Post\`."""
-enum PostsOrderBy {
-  NATURAL
-  COMPUTED_WITH_OPTIONAL_ARG_ASC
-  COMPUTED_WITH_OPTIONAL_ARG_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  HEADLINE_ASC
-  HEADLINE_DESC
-  BODY_ASC
-  BODY_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-}
-
 """
 A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -10409,6 +10392,23 @@ input PostCondition {
 
   """Checks for equality with the object’s \`computedWithOptionalArg\` field."""
   computedWithOptionalArg: Int
+}
+
+"""Methods to use when ordering \`Post\`."""
+enum PostsOrderBy {
+  NATURAL
+  COMPUTED_WITH_OPTIONAL_ARG_ASC
+  COMPUTED_WITH_OPTIONAL_ARG_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+  BODY_ASC
+  BODY_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
 }
 
 """Tracks metadata about the left arms of various people"""
@@ -10464,17 +10464,6 @@ type PersonSecretsEdge {
   node: PersonSecret
 }
 
-"""Methods to use when ordering \`PersonSecret\`."""
-enum PersonSecretsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  SECRET_ASC
-  SECRET_DESC
-}
-
 """
 A condition to be used against \`PersonSecret\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -10485,6 +10474,17 @@ input PersonSecretCondition {
 
   """Checks for equality with the object’s \`secret\` field."""
   secret: String
+}
+
+"""Methods to use when ordering \`PersonSecret\`."""
+enum PersonSecretsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  SECRET_ASC
+  SECRET_DESC
 }
 
 """A connection to a list of \`LeftArm\` values."""
@@ -10513,21 +10513,6 @@ type LeftArmsEdge {
   node: LeftArm
 }
 
-"""Methods to use when ordering \`LeftArm\`."""
-enum LeftArmsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  LENGTH_IN_METRES_ASC
-  LENGTH_IN_METRES_DESC
-  MOOD_ASC
-  MOOD_DESC
-}
-
 """
 A condition to be used against \`LeftArm\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -10543,6 +10528,21 @@ input LeftArmCondition {
 
   """Checks for equality with the object’s \`mood\` field."""
   mood: String
+}
+
+"""Methods to use when ordering \`LeftArm\`."""
+enum LeftArmsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  LENGTH_IN_METRES_ASC
+  LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
 }
 
 """A connection to a list of \`Person\` values."""
@@ -10569,37 +10569,6 @@ type PeopleEdge {
 
   """The \`Person\` at the end of the edge."""
   node: Person
-}
-
-"""Methods to use when ordering \`Person\`."""
-enum PeopleOrderBy {
-  NATURAL
-  COMPUTED_OUT_ASC
-  COMPUTED_OUT_DESC
-  FIRST_NAME_ASC
-  FIRST_NAME_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ABOUT_ASC
-  ABOUT_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  SITE_ASC
-  SITE_DESC
-  CONFIG_ASC
-  CONFIG_DESC
-  LAST_LOGIN_FROM_IP_ASC
-  LAST_LOGIN_FROM_IP_DESC
-  LAST_LOGIN_FROM_SUBNET_ASC
-  LAST_LOGIN_FROM_SUBNET_DESC
-  USER_MAC_ASC
-  USER_MAC_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
 }
 
 """
@@ -10646,6 +10615,37 @@ input PersonCondition {
 """An input for mutations affecting \`WrappedUrl\`"""
 input WrappedUrlInput {
   url: NotNullUrl!
+}
+
+"""Methods to use when ordering \`Person\`."""
+enum PeopleOrderBy {
+  NATURAL
+  COMPUTED_OUT_ASC
+  COMPUTED_OUT_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ABOUT_ASC
+  ABOUT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  SITE_ASC
+  SITE_DESC
+  CONFIG_ASC
+  CONFIG_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
+  LAST_LOGIN_FROM_SUBNET_ASC
+  LAST_LOGIN_FROM_SUBNET_DESC
+  USER_MAC_ASC
+  USER_MAC_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
 }
 
 """
@@ -11423,21 +11423,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -11488,21 +11488,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -11553,21 +11553,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -11618,21 +11618,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -11750,21 +11750,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -11928,6 +11928,108 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  PostCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    headline: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "headline",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "headline",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    body: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "body",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "body",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    authorId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "author_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "author_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    computedWithOptionalArg: {
+      apply($condition, val) {
+        if (val === undefined) return;
+        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+          placeholder: $condition.alias
+        })}`;
+        if (val === null) {
+          $condition.where(sql`${expression} is null`);
+        } else {
+          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
+        }
+      }
     }
   },
   PostsOrderBy: {
@@ -12162,108 +12264,6 @@ export const plans = {
       }
     }
   },
-  PostCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    headline: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "headline",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "headline",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    body: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    authorId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    computedWithOptionalArg: {
-      apply($condition, val) {
-        if (val === undefined) return;
-        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        if (val === null) {
-          $condition.where(sql`${expression} is null`);
-        } else {
-          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
-        }
-      }
-    }
-  },
   LeftArm: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
@@ -12333,6 +12333,50 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  PersonSecretCondition: {
+    personId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    secret: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "sekrit",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "sekrit",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   PersonSecretsOrderBy: {
@@ -12451,50 +12495,6 @@ export const plans = {
       }
     }
   },
-  PersonSecretCondition: {
-    personId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    secret: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "sekrit",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "sekrit",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   LeftArmsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -12518,6 +12518,92 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  LeftArmCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    personId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    lengthInMetres: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "length_in_metres",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "length_in_metres",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+            }
+          });
+        }
+      }
+    },
+    mood: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "mood",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "mood",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   LeftArmsOrderBy: {
@@ -12712,92 +12798,6 @@ export const plans = {
       }
     }
   },
-  LeftArmCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    personId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    lengthInMetres: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "length_in_metres",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "length_in_metres",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-            }
-          });
-        }
-      }
-    },
-    mood: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "mood",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "mood",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   PeopleConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -12821,6 +12821,266 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  PersonCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    name: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_full_name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "person_full_name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+            }
+          });
+        }
+      }
+    },
+    aliases: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "aliases",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "aliases",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+            }
+          });
+        }
+      }
+    },
+    about: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "about",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "about",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    email: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "email",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "email",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
+            }
+          });
+        }
+      }
+    },
+    site: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "site",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "site",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
+            }
+          });
+        }
+      }
+    },
+    config: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "config",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "config",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
+            }
+          });
+        }
+      }
+    },
+    lastLoginFromIp: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_login_from_ip",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_login_from_ip",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+            }
+          });
+        }
+      }
+    },
+    lastLoginFromSubnet: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_login_from_subnet",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "last_login_from_subnet",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+            }
+          });
+        }
+      }
+    },
+    userMac: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "user_mac",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "user_mac",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+            }
+          });
+        }
+      }
+    },
+    createdAt: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "created_at",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "created_at",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+            }
+          });
+        }
+      }
+    },
+    computedOut: {
+      apply($condition, val) {
+        if (val === undefined) return;
+        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
+          placeholder: $condition.alias
+        })}`;
+        if (val === null) {
+          $condition.where(sql`${expression} is null`);
+        } else {
+          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
+        }
+      }
+    }
+  },
+  WrappedUrlInput: {
+    "__baked": createObjectAndApplyChildren,
+    url: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("url", bakedInputRuntime(schema, field.type, val));
+      }
     }
   },
   PeopleOrderBy: {
@@ -13320,266 +13580,6 @@ export const plans = {
             }
           }
         }
-      }
-    }
-  },
-  PersonCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_full_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_full_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
-      }
-    },
-    aliases: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "aliases",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "aliases",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-            }
-          });
-        }
-      }
-    },
-    about: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "about",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "about",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    email: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "email",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "email",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-            }
-          });
-        }
-      }
-    },
-    site: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "site",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "site",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-            }
-          });
-        }
-      }
-    },
-    config: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "config",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "config",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-            }
-          });
-        }
-      }
-    },
-    lastLoginFromIp: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_ip",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_ip",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-            }
-          });
-        }
-      }
-    },
-    lastLoginFromSubnet: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_subnet",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_subnet",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-            }
-          });
-        }
-      }
-    },
-    userMac: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_mac",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_mac",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-            }
-          });
-        }
-      }
-    },
-    createdAt: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-            }
-          });
-        }
-      }
-    },
-    computedOut: {
-      apply($condition, val) {
-        if (val === undefined) return;
-        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        if (val === null) {
-          $condition.where(sql`${expression} is null`);
-        } else {
-          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
-        }
-      }
-    }
-  },
-  WrappedUrlInput: {
-    "__baked": createObjectAndApplyChildren,
-    url: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("url", bakedInputRuntime(schema, field.type, val));
       }
     }
   },

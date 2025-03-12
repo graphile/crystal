@@ -32,7 +32,10 @@ export class ApplyInputStep<
     private inputType: GraphQLInputType,
     $value: AnyInputStep,
     private getTargetFromParent:
-      | ((parent: TParent) => TTarget | (() => TTarget))
+      | ((
+          parent: TParent,
+          inputValue: any,
+        ) => TTarget | undefined | (() => TTarget))
       | undefined,
   ) {
     super();
@@ -68,7 +71,7 @@ export class ApplyInputStep<
     return this;
   }
 
-  unbatchedExecute(extra: UnbatchedExecutionExtra, value: unknown) {
+  unbatchedExecute(extra: UnbatchedExecutionExtra, value: any) {
     const { getTargetFromParent } = this;
     return (parentThing: TParent) =>
       inputArgsApply(
@@ -90,16 +93,17 @@ export function inputArgsApply<
   parent: TArg,
   inputValue: unknown,
   getTargetFromParent:
-    | ((parent: TArg) => TTarget | (() => TTarget))
+    | ((parent: TArg, inputValue: any) => TTarget | undefined | (() => TTarget))
     | undefined,
 ): void {
   try {
     inputArgsApplyDepth++;
     const target = getTargetFromParent
-      ? getTargetFromParent(parent)
+      ? getTargetFromParent(parent, inputValue)
       : (parent as unknown as TTarget);
-
-    _inputArgsApply<TTarget>(schema, inputType, target, inputValue);
+    if (target != null) {
+      _inputArgsApply<TTarget>(schema, inputType, target, inputValue);
+    }
   } finally {
     inputArgsApplyDepth--;
   }
@@ -123,7 +127,10 @@ export function applyInput<
 >(
   inputType: GraphQLInputType,
   $value: AnyInputStep,
-  getTargetFromParent?: (parent: TParent) => TTarget,
+  getTargetFromParent?: (
+    parent: TParent,
+    inputValue: any,
+  ) => TTarget | undefined,
 ) {
   const opPlan = operationPlan();
   const { schema } = opPlan;

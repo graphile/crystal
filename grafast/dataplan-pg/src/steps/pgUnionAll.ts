@@ -1244,6 +1244,9 @@ function buildTheQuery<
     setMeta(key, value) {
       meta[key] = value;
     },
+    getMetaRaw(key) {
+      return meta[key];
+    },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
         info.orderSpecs.push(spec);

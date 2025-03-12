@@ -88,10 +88,11 @@ export class __InputObjectStep<
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
+        const teVal = te.identifier(`val${dependencyIndex}`);
         return te`\
-  resultValues${te.set(inputFieldName, true)} = ${te.identifier(
-    `val${dependencyIndex}`,
-  )};`;
+  if (${teVal} !== undefined) {
+    resultValues${te.set(inputFieldName, true)} = ${teVal};
+  }`;
       },
     ),
     "\n",
@@ -113,7 +114,9 @@ export class __InputObjectStep<
         throw new Error("inputFieldPlan has gone missing.");
       }
       const value = values[dependencyIndex];
-      resultValues[inputFieldName] = value;
+      if (value !== undefined) {
+        resultValues[inputFieldName] = value;
+      }
     }
     return resultValues;
   }

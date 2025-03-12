@@ -305,13 +305,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Network\`."""
-    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: NetworkCondition
+
+    """The method to use when ordering \`Network\`."""
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
   ): NetworksConnection
 }
 
@@ -387,21 +387,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Network\`."""
-enum NetworksOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  INET_ASC
-  INET_DESC
-  CIDR_ASC
-  CIDR_DESC
-  MACADDR_ASC
-  MACADDR_DESC
-}
-
 """
 A condition to be used against \`Network\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -417,6 +402,21 @@ input NetworkCondition {
 
   """Checks for equality with the object’s \`macaddr\` field."""
   macaddr: MacAddress
+}
+
+"""Methods to use when ordering \`Network\`."""
+enum NetworksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  INET_ASC
+  INET_DESC
+  CIDR_ASC
+  CIDR_DESC
+  MACADDR_ASC
+  MACADDR_DESC
 }
 
 """
@@ -690,21 +690,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -808,6 +808,92 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  NetworkCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    inet: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "inet",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "inet",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+            }
+          });
+        }
+      }
+    },
+    cidr: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "cidr",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "cidr",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+            }
+          });
+        }
+      }
+    },
+    macaddr: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "macaddr",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "macaddr",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+            }
+          });
+        }
+      }
     }
   },
   NetworksOrderBy: {
@@ -998,92 +1084,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  NetworkCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    inet: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "inet",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "inet",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-            }
-          });
-        }
-      }
-    },
-    cidr: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cidr",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cidr",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-            }
-          });
-        }
-      }
-    },
-    macaddr: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "macaddr",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "macaddr",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-            }
-          });
         }
       }
     }

@@ -1,8 +1,15 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
-#> variableValues: {"cursor2": "WyIwOGUwZDM0MmRlIiwyXQ==", "cursor6": "WyIwOGUwZDM0MmRlIiw2XQ==", "null": null, "two": 2}
-query Q($cursor2: Cursor, $cursor6: Cursor, $unset: Cursor, $null: Cursor, $two: Int!) {
+#> variableValues: {"cursor2": "WyIwOGUwZDM0MmRlIiwyXQ==", "cursor6": "WyIwOGUwZDM0MmRlIiw2XQ==", "null": null, "two": 2, "orderBy": ["AUTHOR_ID_DESC", "HEADLINE_DESC"]}
+query Q(
+  $cursor2: Cursor
+  $cursor6: Cursor
+  $unset: Cursor
+  $null: Cursor
+  $two: Int!
+  $orderBy: [PostsOrderBy!]!
+) {
   a: allPeople {
     ...personConnection
   }
@@ -76,7 +83,7 @@ query Q($cursor2: Cursor, $cursor6: Cursor, $unset: Cursor, $null: Cursor, $two:
   s: allPeople(condition: { about: null }) {
     ...personConnection
   }
-  t: allPosts(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], first: 3) {
+  t: allPosts(orderBy: $orderBy, first: 3) {
     ...postConnection
   }
   u: allPeople(condition: { lastLoginFromIp: "192.168.0.1" }) {

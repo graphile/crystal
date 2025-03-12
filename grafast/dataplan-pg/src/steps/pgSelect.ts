@@ -105,6 +105,7 @@ const NO_ROWS = Object.freeze({
   hasMore: false,
   items: [],
   cursorDetails: undefined,
+  groupDetails: undefined,
   m: Object.create(null),
 } as PgSelectStepResult);
 
@@ -175,6 +176,10 @@ interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
   placeholder?: never;
   depId: number;
 }
+export interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
+  placeholder?: never;
+  value: unknown;
+}
 
 interface QueryValue {
   dependencyIndex: number;
@@ -225,7 +230,7 @@ export interface PgSelectOptions<
    */
   forceIdentity?: boolean;
 
-  parameters?: PgResourceParameter[];
+  parameters?: readonly PgResourceParameter[];
 
   /**
    * If your `from` (or resource.from if omitted) is a function, the arguments
@@ -309,6 +314,7 @@ interface QueryBuildResult {
   first: Maybe<number>;
   last: Maybe<number>;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
 }
 
 interface PgSelectStepResult {
@@ -316,7 +322,15 @@ interface PgSelectStepResult {
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   m: Record<string, unknown>;
+}
+
+export interface PgGroupDetails {
+  readonly indicies: ReadonlyArray<{
+    index: number;
+    codec: PgCodec;
+  }>;
 }
 
 /**
@@ -975,6 +989,12 @@ export class PgSelectStep<
     return access(this, "cursorDetails");
   }
 
+  private needsGroups = false;
+  public getGroupDetails(): Step<PgGroupDetails> {
+    this.needsGroups = true;
+    return access(this, "groupDetails");
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -1011,6 +1031,7 @@ export class PgSelectStep<
       first,
       last,
       cursorDetails,
+      groupDetails,
     } = buildTheQuery({
       executionDetails,
 
@@ -1075,6 +1096,7 @@ export class PgSelectStep<
           shouldReverseOrder,
           meta,
           cursorDetails,
+          groupDetails,
         });
       });
     } else {
@@ -1147,6 +1169,7 @@ export class PgSelectStep<
             hasMore: false,
             items: iterable,
             cursorDetails,
+            groupDetails,
             m: meta,
           };
         }
@@ -1196,6 +1219,7 @@ export class PgSelectStep<
           hasMore: false,
           items: mergedGenerator,
           cursorDetails,
+          groupDetails,
           m: meta,
         };
       });
@@ -1931,6 +1955,9 @@ export class PgSelectStep<
   setMeta(key: string, value: unknown): void {
     this._meta[key] = value;
   }
+  getMetaRaw(key: string): unknown {
+    return this._meta[key];
+  }
 
   static getStaticInfo<TResource extends PgResource<any, any, any, any, any>>(
     $source: PgSelectStep<TResource>,
@@ -1954,6 +1981,7 @@ export class PgSelectStep<
       from: $source.from,
       joins: $source.joins,
       needsCursor: $source.needsCursor,
+      needsGroups: $source.needsGroups,
       relationJoins: $source.relationJoins,
       meta: $source._meta,
       placeholderSymbols: $source.placeholders.map((p) => p.symbol),
@@ -2044,6 +2072,8 @@ function joinMatches(
 function makeOrderUniqueIfPossible<
   TResource extends PgResource<any, any, any, any, any>,
 >(info: MutablePgSelectQueryInfo<TResource>): void {
+  // Never re-order aggregates
+  if (info.mode === "aggregate") return;
   // If we're already uniquely ordered, no need to order
   if (info.isOrderUnique) return;
   // No need to order a unique record
@@ -2133,7 +2163,7 @@ export function pgFromExpression(
     };
   },
   baseFrom: SQL | ((...args: readonly PgSelectArgumentDigest[]) => SQL),
-  inParameters: PgResourceParameter[] | undefined = undefined,
+  inParameters: readonly PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
@@ -2151,19 +2181,19 @@ export function pgFromExpression(
     return baseFrom(...specs);
   }
   const $placeholderable = $target.getPgRoot();
-  let parameters: PgResourceParameter[];
+  let parameters: readonly PgResourceParameter[];
   if (!inParameters) {
-    parameters = [];
+    const params = [];
     for (const spec of specs) {
       if (spec.step) {
         if (spec.pgCodec) {
-          parameters.push({
+          params.push({
             name: spec.name ?? null,
             codec: spec.pgCodec,
             required: false,
           });
         } else {
-          parameters.push({
+          params.push({
             name: spec.name ?? null,
             codec: spec.step.pgCodec,
             required: false,
@@ -2175,6 +2205,7 @@ export function pgFromExpression(
         );
       }
     }
+    parameters = params;
   } else {
     parameters = inParameters;
   }
@@ -2226,14 +2257,11 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   private digests: ReadonlyArray<
     PgSelectArgumentPlaceholder | PgSelectArgumentDepId
   >;
-  private parameterByName: {
-    [argName: string]: PgResourceParameter;
-  };
-  private indexAfterWhichAllArgsAreNamed: number;
+  private parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
   public isSyncAndSafe = true;
   constructor(
     private from: (...args: PgSelectArgumentDigest[]) => SQL,
-    private parameters: PgResourceParameter[],
+    private parameters: readonly PgResourceParameter[],
     digests: ReadonlyArray<
       PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
     >,
@@ -2242,19 +2270,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     if (this.getAndFreezeIsUnary() !== true) {
       throw new Error(`PgFromExpressionStep must be unary`);
     }
-    this.parameterByName = Object.create(null);
-    let indexAfterWhichAllArgsAreNamed = 0;
-    for (let i = 0, l = parameters.length; i < l; i++) {
-      const param = parameters[i];
-      if (param.name != null) {
-        this.parameterByName[param.name] = param;
-      }
-      // Note that `name = ''` counts as having no name.
-      if (!param.name) {
-        indexAfterWhichAllArgsAreNamed = i + 1;
-      }
-    }
-    this.indexAfterWhichAllArgsAreNamed = indexAfterWhichAllArgsAreNamed;
+    this.parameterAnalysis = generatePgParameterAnalysis(this.parameters);
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
@@ -2353,74 +2369,133 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, ...deps: any[]): SQL {
-    /**
-     * If true, we can only use named parameters now. Set this if we skip an
-     * entry, or if the input has a name that doesn't match the parameter name.
-     */
-    let namedOnly = false;
-    let argIndex = 0;
+    const digests = this.digests.map((d) =>
+      d.depId != null ? { ...d, value: deps[d.depId] } : d,
+    );
+    return pgFromExpressionRuntime(
+      this.from,
+      this.parameters,
+      digests,
+      this.parameterAnalysis,
+    );
+  }
+}
 
-    const args: PgSelectArgumentDigest[] = [];
-    for (
-      let digestIndex = 0, digestsCount = this.digests.length;
-      digestIndex < digestsCount;
-      digestIndex++
+const $$generationCheck = Symbol("Used parameterAnalysis()");
+export function generatePgParameterAnalysis(
+  parameters: readonly PgResourceParameter[],
+) {
+  const parameterByName = Object.create(null) as Record<
+    string,
+    PgResourceParameter
+  >;
+  let indexAfterWhichAllArgsAreNamed = 0;
+  for (let i = 0, l = parameters.length; i < l; i++) {
+    const param = parameters[i];
+    if (param.name != null) {
+      parameterByName[param.name] = param;
+    }
+    // Note that `name = ''` counts as having no name.
+    if (!param.name) {
+      indexAfterWhichAllArgsAreNamed = i + 1;
+    }
+  }
+  return {
+    /** DO NOT GENERATE THIS OBJECT YOURSELF! Use generateParameterAnalysis(parameters) */
+    [$$generationCheck]: parameters,
+    parameterByName,
+    indexAfterWhichAllArgsAreNamed,
+  };
+}
+
+export function pgFromExpressionRuntime(
+  from: (...args: PgSelectArgumentDigest[]) => SQL,
+  parameters: readonly PgResourceParameter[],
+  digests: ReadonlyArray<
+    PgSelectArgumentPlaceholder | PgSelectArgumentRuntimeValue
+  >,
+  parameterAnalysis: ReturnType<
+    typeof generatePgParameterAnalysis
+  > = generatePgParameterAnalysis(parameters),
+) {
+  if (!parameterAnalysis[$$generationCheck]) {
+    throw new Error(
+      `You must not generate the parameter analysis yourself; use generateParameterAnalysis(parameters)`,
+    );
+  }
+  if (parameterAnalysis[$$generationCheck] !== parameters) {
+    throw new Error(
+      `This parameter analysis was produced for a different set of parameters; perhaps you sliced the array?`,
+    );
+  }
+  const { parameterByName, indexAfterWhichAllArgsAreNamed } = parameterAnalysis;
+  /**
+   * If true, we can only use named parameters now. Set this if we skip an
+   * entry, or if the input has a name that doesn't match the parameter name.
+   */
+  let namedOnly = false;
+  let argIndex = 0;
+
+  const args: PgSelectArgumentDigest[] = [];
+  for (
+    let digestIndex = 0, digestsCount = digests.length;
+    digestIndex < digestsCount;
+    digestIndex++
+  ) {
+    const digest = digests[digestIndex];
+    if (
+      !namedOnly &&
+      // Note that name can be the empty string, we treat that as "no name"
+      digest.name &&
+      parameters[digestIndex].name !== digest.name
     ) {
-      const digest = this.digests[digestIndex];
+      namedOnly = true;
+    }
+    if (namedOnly && !digest.name) {
+      throw new Error(
+        `Cannot have unnamed argument after named arguments at index ${digestIndex}`,
+      );
+    }
+    const parameter = namedOnly
+      ? parameterByName[digest.name!]
+      : parameters[digestIndex];
+    if (!parameter) {
+      throw new Error(
+        `Could not determine parameter for argument at index ${digestIndex}${
+          digest.name ? ` (${digest.name})` : ""
+        }`,
+      );
+    }
+    let sqlValue: SQL;
+    if (digest.placeholder) {
+      // It's a placeholder, always use it
+      sqlValue = digest.placeholder;
+    } else {
+      const dep = digest.value;
       if (
-        !namedOnly &&
-        // Note that name can be the empty string, we treat that as "no name"
-        digest.name &&
-        this.parameters[digestIndex].name !== digest.name
+        dep === undefined &&
+        (namedOnly ||
+          (!parameter.required &&
+            digestIndex >= indexAfterWhichAllArgsAreNamed - 1))
       ) {
         namedOnly = true;
+        continue;
       }
-      if (namedOnly && !digest.name) {
-        throw new Error(
-          `Cannot have unnamed argument after named arguments at index ${digestIndex}`,
-        );
-      }
-      const parameter = namedOnly
-        ? this.parameterByName[digest.name!]
-        : this.parameters[digestIndex];
-      if (!parameter) {
-        throw new Error(
-          `Could not determine parameter for argument at index ${digestIndex}${
-            digest.name ? ` (${digest.name})` : ""
-          }`,
-        );
-      }
-      let sqlValue: SQL;
-      if (digest.depId != null) {
-        const dep = deps[digest.depId];
-        if (
-          dep === undefined &&
-          (namedOnly ||
-            (!parameter.required &&
-              digestIndex >= this.indexAfterWhichAllArgsAreNamed - 1))
-        ) {
-          namedOnly = true;
-          continue;
-        }
-        sqlValue = sqlValueWithCodec(dep ?? null, parameter.codec);
-      } else {
-        // It's a placeholder, always use it
-        sqlValue = digest.placeholder;
-      }
-      if (namedOnly) {
-        args.push({
-          placeholder: sqlValue,
-          name: parameter.name!,
-        });
-      } else {
-        args.push({
-          placeholder: sqlValue,
-          position: argIndex++,
-        });
-      }
+      sqlValue = sqlValueWithCodec(dep ?? null, parameter.codec);
     }
-    return this.from(...args);
+    if (namedOnly) {
+      args.push({
+        placeholder: sqlValue,
+        name: parameter.name!,
+      });
+    } else {
+      args.push({
+        placeholder: sqlValue,
+        position: argIndex++,
+      });
+    }
   }
+  return from(...args);
 }
 
 exportAs("@dataplan/pg", pgFromExpression, "pgFromExpression");
@@ -2513,6 +2588,7 @@ interface PgSelectQueryInfo<
   readonly isOrderUnique: boolean;
   readonly fixedPlaceholderValues: ReadonlyMap<symbol, SQL>;
   readonly _symbolSubstitutes: ReadonlyMap<symbol, symbol>;
+  readonly needsGroups: boolean;
 
   readonly selects: ReadonlyArray<SQL>;
   readonly from: SQL;
@@ -2543,6 +2619,10 @@ interface MutablePgSelectQueryInfo<
   isOrderUnique: boolean;
   readonly relationJoins: Map<keyof GetPgResourceRelations<TResource>, SQL>;
   readonly meta: Record<string, any>;
+  readonly groupIndicies: Array<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
 }
 
 interface ResolvedPgSelectQueryInfo<
@@ -2574,6 +2654,7 @@ function buildTheQueryCore<
     cursorUpper: null,
     cursorDigest: null,
     cursorIndicies: rawInfo.needsCursor ? [] : null,
+    groupIndicies: rawInfo.needsGroups ? [] : null,
 
     // Will be populated by applyCommonPaginationStuff
     first: null,
@@ -2602,6 +2683,9 @@ function buildTheQueryCore<
     },
     setMeta(key, value) {
       meta[key] = value;
+    },
+    getMetaRaw(key) {
+      return meta[key];
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
@@ -2684,6 +2768,9 @@ function buildTheQueryCore<
         }
       }
     },
+    groupBy(spec) {
+      info.groups.push(spec);
+    },
     having(condition) {
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
@@ -2757,6 +2844,24 @@ function buildTheQueryCore<
     }
   }
 
+  if (info.groupIndicies) {
+    if (info.groups.length > 0) {
+      for (const o of info.groups) {
+        const { codec, fragment, guaranteedNotNull = false } = o;
+        info.groupIndicies.push({
+          index: selectAndReturnIndex(
+            codec.castFromPg
+              ? codec.castFromPg(fragment, guaranteedNotNull)
+              : sql`${fragment}::text`,
+          ),
+          codec,
+        });
+      }
+    } else {
+      // No grouping
+    }
+  }
+
   // apply conditions from the cursor
   applyConditionFromCursor(info, "after", after);
   applyConditionFromCursor(info, "before", before);
@@ -2800,6 +2905,7 @@ function buildTheQuery<
     shouldReverseOrder,
     cursorDigest,
     cursorIndicies,
+    groupIndicies,
   } = info;
 
   const combinedInfo = {
@@ -3006,11 +3112,11 @@ ${lateralText};`;
 
   const cursorDetails: PgCursorDetails | undefined =
     cursorDigest != null && cursorIndicies != null
-      ? {
-          digest: cursorDigest,
-          indicies: cursorIndicies,
-        }
+      ? { digest: cursorDigest, indicies: cursorIndicies }
       : undefined;
+  const groupDetails: PgGroupDetails | undefined = groupIndicies
+    ? { indicies: groupIndicies }
+    : undefined;
 
   if (stream) {
     // PERF: should use the queryForSingle optimization in here too
@@ -3058,6 +3164,7 @@ ${lateralText};`;
         first,
         last,
         cursorDetails,
+        groupDetails,
       };
     } else {
       /*
@@ -3092,6 +3199,7 @@ ${lateralText};`;
         first,
         last,
         cursorDetails,
+        groupDetails,
       };
     }
   } else {
@@ -3111,6 +3219,7 @@ ${lateralText};`;
       first,
       last,
       cursorDetails,
+      groupDetails,
     };
   }
 }
@@ -3134,6 +3243,7 @@ type StaticKeys =
   | "from"
   | "joins"
   | "needsCursor"
+  | "needsGroups"
   | "relationJoins"
   | "meta"
   | "placeholderSymbols"
@@ -3212,14 +3322,13 @@ class PgSelectInlineApplyStep<
           ...this.staticInfo,
         });
 
-        const { cursorDigest, cursorIndicies } = info;
+        const { cursorDigest, cursorIndicies, groupIndicies } = info;
         const cursorDetails: PgCursorDetails | undefined =
           cursorDigest != null && cursorIndicies != null
-            ? {
-                digest: cursorDigest,
-                indicies: cursorIndicies,
-              }
+            ? { digest: cursorDigest, indicies: cursorIndicies }
             : undefined;
+        const groupDetails: PgGroupDetails | undefined =
+          groupIndicies != null ? { indicies: groupIndicies } : undefined;
 
         if (this.viaSubquery) {
           const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
@@ -3233,6 +3342,7 @@ class PgSelectInlineApplyStep<
 
           const details: PgSelectInlineViaSubqueryDetails = {
             cursorDetails,
+            groupDetails,
             shouldReverseOrder,
             fetchOneExtra,
             selectIndex,
@@ -3267,6 +3377,7 @@ class PgSelectInlineApplyStep<
           const details: PgSelectInlineViaJoinDetails = {
             selectIndexes,
             cursorDetails,
+            groupDetails,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3279,11 +3390,13 @@ class PgSelectInlineApplyStep<
 interface PgSelectInlineViaJoinDetails {
   selectIndexes: number[];
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   meta: Record<string, any>;
 }
 interface PgSelectInlineViaSubqueryDetails {
   selectIndex: number;
   cursorDetails: PgCursorDetails | undefined;
+  groupDetails: PgGroupDetails | undefined;
   meta: Record<string, any>;
   fetchOneExtra: boolean;
   first: Maybe<number>;
@@ -3600,6 +3713,7 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   whereBuilder(): PgCondition<this>;
+  groupBy(group: PgGroupSpec): void;
   having(
     condition: PgHavingConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
@@ -3708,6 +3822,7 @@ function createSelectResult(
     shouldReverseOrder,
     meta,
     cursorDetails,
+    groupDetails,
   }: {
     first: Maybe<number> | null;
     last: Maybe<number> | null;
@@ -3715,6 +3830,7 @@ function createSelectResult(
     shouldReverseOrder: boolean;
     meta: Record<string, any>;
     cursorDetails: PgCursorDetails | undefined;
+    groupDetails: PgGroupDetails | undefined;
   },
 ) {
   if (allVals == null) {
@@ -3740,6 +3856,7 @@ function createSelectResult(
     hasMore,
     items: orderedRows,
     cursorDetails,
+    groupDetails,
     m: meta,
   };
 }
@@ -3748,7 +3865,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
   PgSelectInlineViaJoinDetails,
   any[],
 ]) {
-  const { meta, selectIndexes, cursorDetails } = details;
+  const { meta, selectIndexes, cursorDetails, groupDetails } = details;
   const newItem = [];
   for (let i = 0, l = selectIndexes.length; i < l; i++) {
     newItem[i] = item[selectIndexes[i]];
@@ -3761,6 +3878,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     // because it only contains one entry.
     items: [newItem],
     cursorDetails,
+    groupDetails,
     m: meta,
   };
 }

@@ -477,13 +477,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`T\`."""
-    orderBy: [TsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TCondition
+
+    """The method to use when ordering \`T\`."""
+    orderBy: [TsOrderBy!] = [PRIMARY_KEY_ASC]
   ): TSConnection
 }
 
@@ -563,15 +563,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`T\`."""
-enum TsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  K_ASC
-  K_DESC
-}
-
 """
 A condition to be used against \`T\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -581,6 +572,15 @@ input TCondition {
 
   """Checks for equality with the object’s \`v\` field."""
   v: [[WorkHourInput]]
+}
+
+"""Methods to use when ordering \`T\`."""
+enum TsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  K_ASC
+  K_DESC
 }
 
 """
@@ -848,21 +848,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -987,6 +987,50 @@ export const plans = {
       return $pageInfo.endCursor();
     }
   },
+  TCondition: {
+    k: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "k",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "k",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    v: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "v",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "v",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, workingHoursCodec)}`;
+            }
+          });
+        }
+      }
+    }
+  },
   TsOrderBy: {
     PRIMARY_KEY_ASC: {
       extensions: {
@@ -1061,50 +1105,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  TCondition: {
-    k: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "k",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "k",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    v: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "v",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "v",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, workingHoursCodec)}`;
-            }
-          });
         }
       }
     }

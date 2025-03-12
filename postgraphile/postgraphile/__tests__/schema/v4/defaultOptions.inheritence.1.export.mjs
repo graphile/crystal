@@ -570,13 +570,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`File\`."""
-    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: FileCondition
+
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): FilesConnection
 
   """Reads and enables pagination through a set of \`User\`."""
@@ -599,13 +599,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`User\`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserCondition
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsersConnection
 
   """Reads and enables pagination through a set of \`UserFile\`."""
@@ -628,13 +628,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`UserFile\`."""
-    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserFileCondition
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection
 }
 
@@ -683,13 +683,13 @@ type User implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`UserFile\`."""
-    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserFileCondition
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection!
 }
 
@@ -750,19 +750,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`UserFile\`."""
-enum UserFilesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  FILENAME_ASC
-  FILENAME_DESC
-  USER_ID_ASC
-  USER_ID_DESC
-}
-
 """
 A condition to be used against \`UserFile\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -776,6 +763,19 @@ input UserFileCondition {
 
   """Checks for equality with the object’s \`userId\` field."""
   userId: Int
+}
+
+"""Methods to use when ordering \`UserFile\`."""
+enum UserFilesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  FILENAME_ASC
+  FILENAME_DESC
+  USER_ID_ASC
+  USER_ID_DESC
 }
 
 """A connection to a list of \`File\` values."""
@@ -804,17 +804,6 @@ type FilesEdge {
   node: File
 }
 
-"""Methods to use when ordering \`File\`."""
-enum FilesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  FILENAME_ASC
-  FILENAME_DESC
-}
-
 """
 A condition to be used against \`File\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -824,6 +813,17 @@ input FileCondition {
 
   """Checks for equality with the object’s \`filename\` field."""
   filename: String
+}
+
+"""Methods to use when ordering \`File\`."""
+enum FilesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  FILENAME_ASC
+  FILENAME_DESC
 }
 
 """A connection to a list of \`User\` values."""
@@ -852,17 +852,6 @@ type UsersEdge {
   node: User
 }
 
-"""Methods to use when ordering \`User\`."""
-enum UsersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
 """
 A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -872,6 +861,17 @@ input UserCondition {
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UsersOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """
@@ -1554,21 +1554,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -1619,21 +1619,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -1684,21 +1684,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -1778,21 +1778,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -1868,6 +1868,71 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  UserFileCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    filename: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "filename",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "filename",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    userId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "user_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "user_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
     }
   },
   UserFilesOrderBy: {
@@ -2024,7 +2089,32 @@ export const plans = {
       }
     }
   },
-  UserFileCondition: {
+  FilesConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  FilesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  FileCondition: {
     id: {
       apply($condition, val) {
         if (val === null) {
@@ -2066,52 +2156,6 @@ export const plans = {
           });
         }
       }
-    },
-    userId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    }
-  },
-  FilesConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  FilesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
     }
   },
   FilesOrderBy: {
@@ -2230,50 +2274,6 @@ export const plans = {
       }
     }
   },
-  FileCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    filename: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   UsersConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -2297,6 +2297,50 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  UserCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    name: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   UsersOrderBy: {
@@ -2411,50 +2455,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  UserCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
         }
       }
     }

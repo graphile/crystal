@@ -370,7 +370,8 @@ export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
  */
 export interface PgGroupSpec {
   fragment: SQL;
-  // codec: PgCodec<string, any, any, any>;
+  codec: PgCodec<string, any, any, any>;
+  guaranteedNotNull?: boolean;
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
@@ -453,7 +454,7 @@ export interface PgCodecRelationBase<
   /**
    * The attributes locally used in this relationship.
    */
-  localAttributes: readonly (keyof TLocalCodec["attributes"])[];
+  localAttributes: readonly (keyof TLocalCodec["attributes"] & string)[];
 
   /**
    * The remote attributes that are joined against.
@@ -743,6 +744,7 @@ export interface PgQueryBuilder {
   alias: SQL;
   [$$toSQL](): SQL;
   setMeta(key: string, value: unknown): void;
+  getMetaRaw(key: string): unknown;
 }
 
 export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;

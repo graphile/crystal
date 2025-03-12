@@ -41,6 +41,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
     "Adds the 'orderBy' argument to connections and simple collections",
   version: version,
 
+  after: ["PgConditionArgumentPlugin"],
+
   inflection: {
     add: {
       orderByType(options, typeName) {

@@ -296,6 +296,9 @@ export class PgDeleteSingleStep<
         setMeta(key, value) {
           meta[key] = value;
         },
+        getMetaRaw(key) {
+          return meta[key];
+        },
       };
 
       for (const applyDepId of this.applyDepIds) {

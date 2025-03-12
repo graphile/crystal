@@ -1644,13 +1644,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
   """Reads and enables pagination through a set of \`Offer\`."""
@@ -1673,13 +1673,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Offer\`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: OfferCondition
+
+    """The method to use when ordering \`Offer\`."""
+    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
   ): OffersConnection
 
   """Reads and enables pagination through a set of \`Street\`."""
@@ -1702,13 +1702,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Street\`."""
-    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: StreetCondition
+
+    """The method to use when ordering \`Street\`."""
+    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
   ): StreetsConnection
 
   """Reads and enables pagination through a set of \`Property\`."""
@@ -1731,13 +1731,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Property\`."""
-    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PropertyCondition
+
+    """The method to use when ordering \`Property\`."""
+    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): PropertiesConnection
 
   """Reads and enables pagination through a set of \`StreetProperty\`."""
@@ -1760,13 +1760,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`StreetProperty\`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: StreetPropertyCondition
+
+    """The method to use when ordering \`StreetProperty\`."""
+    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): StreetPropertiesConnection
 
   """Reads and enables pagination through a set of \`House\`."""
@@ -1789,13 +1789,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: HouseCondition
+
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
   ): HousesConnection
 
   """Reads and enables pagination through a set of \`Building\`."""
@@ -1818,13 +1818,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Building\`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: BuildingCondition
+
+    """The method to use when ordering \`Building\`."""
+    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BuildingsConnection
 }
 
@@ -1863,13 +1863,13 @@ type Post implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Offer\`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: OfferCondition
+
+    """The method to use when ordering \`Offer\`."""
+    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
   ): OffersConnection!
 }
 
@@ -1929,17 +1929,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Offer\`."""
-enum OffersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POST_ID_ASC
-  POST_ID_DESC
-}
-
 """
 A condition to be used against \`Offer\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -1949,6 +1938,17 @@ input OfferCondition {
 
   """Checks for equality with the object’s \`postId\` field."""
   postId: String
+}
+
+"""Methods to use when ordering \`Offer\`."""
+enum OffersOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  POST_ID_ASC
+  POST_ID_DESC
 }
 
 type Street implements Node {
@@ -1979,13 +1979,13 @@ type Street implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Property\`."""
-    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PropertyCondition
+
+    """The method to use when ordering \`Property\`."""
+    orderBy: [PropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): PropertiesConnection!
 
   """Reads and enables pagination through a set of \`StreetProperty\`."""
@@ -2008,13 +2008,13 @@ type Street implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`StreetProperty\`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: StreetPropertyCondition
+
+    """The method to use when ordering \`StreetProperty\`."""
+    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): StreetPropertiesConnection!
 
   """Reads and enables pagination through a set of \`Building\`."""
@@ -2037,13 +2037,13 @@ type Street implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Building\`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: BuildingCondition
+
+    """The method to use when ordering \`Building\`."""
+    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BuildingsConnection!
 
   """Reads and enables pagination through a set of \`House\`."""
@@ -2066,13 +2066,13 @@ type Street implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: HouseCondition
+
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
   ): HousesConnection!
 }
 
@@ -2125,13 +2125,13 @@ type Property implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`StreetProperty\`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: StreetPropertyCondition
+
+    """The method to use when ordering \`StreetProperty\`."""
+    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): StreetPropertiesConnection!
 
   """Reads and enables pagination through a set of \`Building\`."""
@@ -2154,13 +2154,13 @@ type Property implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Building\`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: BuildingCondition
+
+    """The method to use when ordering \`Building\`."""
+    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BuildingsConnection!
 
   """Reads and enables pagination through a set of \`House\`."""
@@ -2183,13 +2183,13 @@ type Property implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: HouseCondition
+
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
   ): HousesConnection!
 }
 
@@ -2292,13 +2292,13 @@ type Building implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: HouseCondition
+
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
   ): HousesConnection!
 }
 
@@ -2328,27 +2328,6 @@ type HousesEdge {
   node: House
 }
 
-"""Methods to use when ordering \`House\`."""
-enum HousesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  BUILDING_NAME_ASC
-  BUILDING_NAME_DESC
-  PROPERTY_NAME_OR_NUMBER_ASC
-  PROPERTY_NAME_OR_NUMBER_DESC
-  STREET_NAME_ASC
-  STREET_NAME_DESC
-  STREET_ID_ASC
-  STREET_ID_DESC
-  BUILDING_ID_ASC
-  BUILDING_ID_DESC
-  PROPERTY_ID_ASC
-  PROPERTY_ID_DESC
-  FLOORS_ASC
-  FLOORS_DESC
-}
-
 """
 A condition to be used against \`House\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -2375,6 +2354,27 @@ input HouseCondition {
   floors: Int
 }
 
+"""Methods to use when ordering \`House\`."""
+enum HousesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  BUILDING_NAME_ASC
+  BUILDING_NAME_DESC
+  PROPERTY_NAME_OR_NUMBER_ASC
+  PROPERTY_NAME_OR_NUMBER_DESC
+  STREET_NAME_ASC
+  STREET_NAME_DESC
+  STREET_ID_ASC
+  STREET_ID_DESC
+  BUILDING_ID_ASC
+  BUILDING_ID_DESC
+  PROPERTY_ID_ASC
+  PROPERTY_ID_DESC
+  FLOORS_ASC
+  FLOORS_DESC
+}
+
 """A \`StreetProperty\` edge in the connection."""
 type StreetPropertiesEdge {
   """A cursor for use in pagination."""
@@ -2382,19 +2382,6 @@ type StreetPropertiesEdge {
 
   """The \`StreetProperty\` at the end of the edge."""
   node: StreetProperty
-}
-
-"""Methods to use when ordering \`StreetProperty\`."""
-enum StreetPropertiesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  STR_ID_ASC
-  STR_ID_DESC
-  PROP_ID_ASC
-  PROP_ID_DESC
-  CURRENT_OWNER_ASC
-  CURRENT_OWNER_DESC
 }
 
 """
@@ -2410,6 +2397,19 @@ input StreetPropertyCondition {
 
   """Checks for equality with the object’s \`currentOwner\` field."""
   currentOwner: String
+}
+
+"""Methods to use when ordering \`StreetProperty\`."""
+enum StreetPropertiesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  STR_ID_ASC
+  STR_ID_DESC
+  PROP_ID_ASC
+  PROP_ID_DESC
+  CURRENT_OWNER_ASC
+  CURRENT_OWNER_DESC
 }
 
 """A connection to a list of \`Building\` values."""
@@ -2438,23 +2438,6 @@ type BuildingsEdge {
   node: Building
 }
 
-"""Methods to use when ordering \`Building\`."""
-enum BuildingsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PROPERTY_ID_ASC
-  PROPERTY_ID_DESC
-  NAME_ASC
-  NAME_DESC
-  FLOORS_ASC
-  FLOORS_DESC
-  IS_PRIMARY_ASC
-  IS_PRIMARY_DESC
-}
-
 """
 A condition to be used against \`Building\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -2476,6 +2459,23 @@ input BuildingCondition {
   isPrimary: Boolean
 }
 
+"""Methods to use when ordering \`Building\`."""
+enum BuildingsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PROPERTY_ID_ASC
+  PROPERTY_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  FLOORS_ASC
+  FLOORS_DESC
+  IS_PRIMARY_ASC
+  IS_PRIMARY_DESC
+}
+
 """A \`Property\` edge in the connection."""
 type PropertiesEdge {
   """A cursor for use in pagination."""
@@ -2483,19 +2483,6 @@ type PropertiesEdge {
 
   """The \`Property\` at the end of the edge."""
   node: Property
-}
-
-"""Methods to use when ordering \`Property\`."""
-enum PropertiesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  STREET_ID_ASC
-  STREET_ID_DESC
-  NAME_OR_NUMBER_ASC
-  NAME_OR_NUMBER_DESC
 }
 
 """
@@ -2511,6 +2498,19 @@ input PropertyCondition {
 
   """Checks for equality with the object’s \`nameOrNumber\` field."""
   nameOrNumber: String
+}
+
+"""Methods to use when ordering \`Property\`."""
+enum PropertiesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  STREET_ID_ASC
+  STREET_ID_DESC
+  NAME_OR_NUMBER_ASC
+  NAME_OR_NUMBER_DESC
 }
 
 """A connection to a list of \`Post\` values."""
@@ -2539,6 +2539,14 @@ type PostsEdge {
   node: Post
 }
 
+"""
+A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: String
+}
+
 """Methods to use when ordering \`Post\`."""
 enum PostsOrderBy {
   NATURAL
@@ -2546,14 +2554,6 @@ enum PostsOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-}
-
-"""
-A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PostCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: String
 }
 
 """A connection to a list of \`Street\` values."""
@@ -2582,17 +2582,6 @@ type StreetsEdge {
   node: Street
 }
 
-"""Methods to use when ordering \`Street\`."""
-enum StreetsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
 """
 A condition to be used against \`Street\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -2602,6 +2591,17 @@ input StreetCondition {
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
+}
+
+"""Methods to use when ordering \`Street\`."""
+enum StreetsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """
@@ -4007,21 +4007,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4072,21 +4072,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4137,21 +4137,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4202,21 +4202,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4267,21 +4267,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4332,21 +4332,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4397,21 +4397,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4475,21 +4475,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4562,6 +4562,50 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  OfferCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    postId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "post_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "post_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   OffersOrderBy: {
@@ -4680,50 +4724,6 @@ export const plans = {
       }
     }
   },
-  OfferCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    postId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "post_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "post_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   Street: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
@@ -4784,21 +4784,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4852,21 +4852,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4920,21 +4920,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -4988,21 +4988,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -5093,21 +5093,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -5161,21 +5161,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -5229,21 +5229,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -5426,21 +5426,21 @@ export const plans = {
             }
           }
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
-        },
         condition: {
           __proto__: null,
           grafast: {
             applyPlan(_condition, $connection, arg) {
               const $select = $connection.getSubplan();
               arg.apply($select, qbWhereBuilder);
+            }
+          }
+        },
+        orderBy: {
+          __proto__: null,
+          grafast: {
+            applyPlan(parent, $connection, value) {
+              const $select = $connection.getSubplan();
+              value.apply($select);
             }
           }
         }
@@ -5470,6 +5470,155 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  HouseCondition: {
+    buildingName: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "building_name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "building_name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    propertyNameOrNumber: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_name_or_number",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_name_or_number",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    streetName: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "street_name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "street_name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    streetId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "street_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "street_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    buildingId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "building_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "building_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    propertyId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    floors: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "floors",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "floors",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
     }
   },
   HousesOrderBy: {
@@ -5778,155 +5927,6 @@ export const plans = {
       }
     }
   },
-  HouseCondition: {
-    buildingName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    propertyNameOrNumber: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_name_or_number",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_name_or_number",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    streetName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    },
-    streetId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    buildingId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    propertyId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    floors: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   StreetPropertiesEdge: {
     __assertStep: assertEdgeCapableStep,
     cursor($edge) {
@@ -5934,6 +5934,71 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  StreetPropertyCondition: {
+    strId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "str_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "str_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    propId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "prop_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "prop_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    currentOwner: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "current_owner",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "current_owner",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   StreetPropertiesOrderBy: {
@@ -6090,71 +6155,6 @@ export const plans = {
       }
     }
   },
-  StreetPropertyCondition: {
-    strId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "str_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "str_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    propId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "prop_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "prop_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    currentOwner: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "current_owner",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "current_owner",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   BuildingsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -6178,6 +6178,113 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  BuildingCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    propertyId: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "property_id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    name: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
+    },
+    floors: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "floors",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "floors",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    isPrimary: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "is_primary",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "is_primary",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+            }
+          });
+        }
+      }
     }
   },
   BuildingsOrderBy: {
@@ -6410,7 +6517,16 @@ export const plans = {
       }
     }
   },
-  BuildingCondition: {
+  PropertiesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  PropertyCondition: {
     id: {
       apply($condition, val) {
         if (val === null) {
@@ -6432,12 +6548,12 @@ export const plans = {
         }
       }
     },
-    propertyId: {
+    streetId: {
       apply($condition, val) {
         if (val === null) {
           $condition.where({
             type: "attribute",
-            attribute: "property_id",
+            attribute: "street_id",
             callback(expression) {
               return sql`${expression} is null`;
             }
@@ -6445,7 +6561,7 @@ export const plans = {
         } else {
           $condition.where({
             type: "attribute",
-            attribute: "property_id",
+            attribute: "street_id",
             callback(expression) {
               return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
             }
@@ -6453,12 +6569,12 @@ export const plans = {
         }
       }
     },
-    name: {
+    nameOrNumber: {
       apply($condition, val) {
         if (val === null) {
           $condition.where({
             type: "attribute",
-            attribute: "name",
+            attribute: "name_or_number",
             callback(expression) {
               return sql`${expression} is null`;
             }
@@ -6466,64 +6582,13 @@ export const plans = {
         } else {
           $condition.where({
             type: "attribute",
-            attribute: "name",
+            attribute: "name_or_number",
             callback(expression) {
               return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
             }
           });
         }
       }
-    },
-    floors: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    isPrimary: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_primary",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_primary",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-            }
-          });
-        }
-      }
-    }
-  },
-  PropertiesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
     }
   },
   PropertiesOrderBy: {
@@ -6680,71 +6745,6 @@ export const plans = {
       }
     }
   },
-  PropertyCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    streetId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    nameOrNumber: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name_or_number",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name_or_number",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   PostsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -6768,6 +6768,29 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  PostCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   PostsOrderBy: {
@@ -6848,29 +6871,6 @@ export const plans = {
       }
     }
   },
-  PostCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
-      }
-    }
-  },
   StreetsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -6894,6 +6894,50 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  StreetCondition: {
+    id: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+            }
+          });
+        }
+      }
+    },
+    name: {
+      apply($condition, val) {
+        if (val === null) {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+            }
+          });
+        }
+      }
     }
   },
   StreetsOrderBy: {
@@ -7008,50 +7052,6 @@ export const plans = {
               queryBuilder.setOrderIsUnique();
             }
           }
-        }
-      }
-    }
-  },
-  StreetCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
-      }
-    },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
         }
       }
     }

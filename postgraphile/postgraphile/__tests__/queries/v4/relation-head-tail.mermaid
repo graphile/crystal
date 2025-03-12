@@ -10,8 +10,8 @@ graph TD
 
     %% plan dependencies
     PgSelectInlineApply99["PgSelectInlineApply[99∈0] ➊"]:::plan
-    ApplyInput41{{"ApplyInput[41∈0] ➊"}}:::plan
-    ApplyInput41 --> PgSelectInlineApply99
+    ApplyInput40{{"ApplyInput[40∈0] ➊"}}:::plan
+    ApplyInput40 --> PgSelectInlineApply99
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Connection26{{"Connection[26∈0] ➊<br />ᐸ22ᐳ"}}:::plan
     Constant115{{"Constant[115∈0] ➊<br />ᐸ2ᐳ"}}:::plan
@@ -30,13 +30,13 @@ graph TD
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    __InputObject35{{"__InputObject[35∈0] ➊"}}:::plan
+    __InputObject34{{"__InputObject[34∈0] ➊"}}:::plan
     Constant116{{"Constant[116∈0] ➊<br />ᐸ'Large bet on myself in round one.'ᐳ"}}:::plan
-    Constant116 --> __InputObject35
+    Constant116 --> __InputObject34
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __InputObject35 --> ApplyInput41
+    __InputObject34 --> ApplyInput40
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Object11 & Connection12 & PgSelectInlineApply95 & PgSelectInlineApply99 & PgSelectInlineApply103 & PgSelectInlineApply107 --> PgSelect14
@@ -148,9 +148,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/relation-head-tail"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 115, 116, 11, 12, 26, 35, 39, 41, 51, 62, 73, 86<br />2: 95, 99, 103, 107, 111"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 115, 116, 11, 12, 26, 34, 39, 40, 51, 62, 73, 86<br />2: 95, 99, 103, 107, 111"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection26,__InputObject35,Connection39,ApplyInput41,Connection51,Connection62,Connection73,Connection86,PgSelectInlineApply95,PgSelectInlineApply99,PgSelectInlineApply103,PgSelectInlineApply107,PgSelectInlineApply111,Constant115,Constant116 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection26,__InputObject34,Connection39,ApplyInput40,Connection51,Connection62,Connection73,Connection86,PgSelectInlineApply95,PgSelectInlineApply99,PgSelectInlineApply103,PgSelectInlineApply107,PgSelectInlineApply111,Constant115,Constant116 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 95, 99, 103, 107, 26, 39, 51, 62<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: 96, 100, 104, 108<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access96,Access100,Access104,Access108 bucket1
