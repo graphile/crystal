@@ -35,7 +35,6 @@ import {
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
-import { parse } from "postgres-array";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
@@ -59,6 +58,7 @@ import type {
   PgTypedStep,
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
+import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
@@ -102,9 +102,10 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
-  m: Object.create(null),
   hasMore: false,
   items: [],
+  cursorDetails: undefined,
+  m: Object.create(null),
 } as PgSelectStepResult);
 
 type PgSelectPlanJoin =
@@ -311,10 +312,10 @@ interface QueryBuildResult {
 }
 
 interface PgSelectStepResult {
-  hasMore?: boolean;
+  hasMore: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
-  cursorDetails?: PgCursorDetails;
+  cursorDetails: PgCursorDetails | undefined;
   m: Record<string, unknown>;
 }
 
@@ -1067,8 +1068,7 @@ export class PgSelectStep<
           // Must be an error
           return allVals as never;
         }
-        return createSelectResult({
-          allVals,
+        return createSelectResult(allVals, {
           first,
           last,
           fetchOneExtra: this.fetchOneExtra,
@@ -1144,10 +1144,10 @@ export class PgSelectStep<
         }
         if (!initialFetchResult) {
           return {
-            m: meta,
-            items: iterable,
             hasMore: false,
+            items: iterable,
             cursorDetails,
+            m: meta,
           };
         }
 
@@ -1193,10 +1193,10 @@ export class PgSelectStep<
           },
         };
         return {
-          m: meta,
-          items: mergedGenerator,
           hasMore: false,
+          items: mergedGenerator,
           cursorDetails,
+          m: meta,
         };
       });
     }
@@ -3699,23 +3699,24 @@ function buildAliases(_symbolSubstitutes: ReadonlyMap<symbol, symbol>) {
   return sql.join(sqlAliases, "");
 }
 
-function createSelectResult({
-  allVals,
-  first,
-  last,
-  fetchOneExtra,
-  shouldReverseOrder,
-  meta,
-  cursorDetails,
-}: {
-  allVals: null | readonly any[];
-  first: Maybe<number> | null;
-  last: Maybe<number> | null;
-  fetchOneExtra: boolean;
-  shouldReverseOrder: boolean;
-  meta: Record<string, any>;
-  cursorDetails: PgCursorDetails | undefined;
-}) {
+function createSelectResult(
+  allVals: null | readonly any[],
+  {
+    first,
+    last,
+    fetchOneExtra,
+    shouldReverseOrder,
+    meta,
+    cursorDetails,
+  }: {
+    first: Maybe<number> | null;
+    last: Maybe<number> | null;
+    fetchOneExtra: boolean;
+    shouldReverseOrder: boolean;
+    meta: Record<string, any>;
+    cursorDetails: PgCursorDetails | undefined;
+  },
+) {
   if (allVals == null) {
     return allVals as never;
   }
@@ -3729,15 +3730,17 @@ function createSelectResult({
       : allVals.slice(0, limit!)
     : allVals;
   const slicedRows =
-    firstAndLast && last != null ? limitedRows.slice(-last) : limitedRows;
+    firstAndLast && limitedRows.length > last
+      ? limitedRows.slice(-last)
+      : limitedRows;
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
   return {
-    m: meta,
-    items: orderedRows,
     hasMore,
+    items: orderedRows,
     cursorDetails,
+    m: meta,
   };
 }
 
@@ -3746,15 +3749,19 @@ function pgInlineViaJoinTransform([details, item]: readonly [
   any[],
 ]) {
   const { meta, selectIndexes, cursorDetails } = details;
+  const newItem = [];
+  for (let i = 0, l = selectIndexes.length; i < l; i++) {
+    newItem[i] = item[selectIndexes[i]];
+  }
   return {
-    m: meta,
     hasMore: false,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination
     // because it only contains one entry.
-    items: [selectIndexes.map((i) => item[i])],
+    items: [newItem],
     cursorDetails,
+    m: meta,
   };
 }
 
@@ -3762,25 +3769,6 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
   any[],
 ]) {
-  const {
-    selectIndex,
-    cursorDetails,
-    meta,
-    fetchOneExtra,
-    first,
-    last,
-    shouldReverseOrder,
-  } = details;
-  // We coerce to empty array because `json_agg` of no rows yields null
-  const allValsRaw = item[selectIndex] as string;
-  const allVals = parse(allValsRaw) as any[];
-  return createSelectResult({
-    allVals,
-    first,
-    last,
-    fetchOneExtra,
-    shouldReverseOrder,
-    meta,
-    cursorDetails,
-  });
+  const allVals = parseArray(item[details.selectIndex]);
+  return createSelectResult(allVals, details);
 }

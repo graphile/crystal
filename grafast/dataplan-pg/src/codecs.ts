@@ -2,7 +2,6 @@ import type { JSONValue } from "grafast";
 import { exportAs } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
-import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
 import type { CustomInspectFunction } from "util";
 
@@ -47,6 +46,7 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
+import { makeParseArrayWithTransform, parseArray } from "./parseArray.js";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -586,6 +586,20 @@ type CodecWithListCodec<
   >;
 };
 
+type PgCodecTFromJavaScript<
+  TInnerCodec extends PgCodec<any, any, any, any, any, any, any>,
+> = TInnerCodec extends PgCodec<
+  any,
+  any,
+  any,
+  infer UFromJs,
+  undefined,
+  any,
+  any
+>
+  ? UFromJs
+  : any;
+
 /**
  * Given a PgCodec, this returns a new PgCodec that represents a list
  * of the former.
@@ -625,9 +639,7 @@ export function listOfCodec<
   TName,
   undefined, // Array has no attributes
   string,
-  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
-    ? UFromJs[]
-    : any[],
+  readonly PgCodecTFromJavaScript<TInnerCodec>[],
   TInnerCodec,
   undefined,
   undefined
@@ -645,32 +657,29 @@ export function listOfCodec<
     typeDelim = `,`,
     name = `${innerCodec.name}[]` as TName,
   } = config ?? ({} as Record<string, never>);
+  const {
+    fromPg: innerCodecFromPg,
+    toPg: innerCodecToPg,
+    listCastFromPg: innerCodecListCastFromPg,
+    notNull: innerCodecNotNull,
+    executor,
+  } = innerCodec;
 
   const listCodec: PgCodec<
     TName,
     undefined, // Array has no attributes
     string,
-    TInnerCodec extends PgCodec<
-      any,
-      any,
-      any,
-      infer UFromJs,
-      undefined,
-      any,
-      any
-    >
-      ? UFromJs[]
-      : any[],
+    readonly PgCodecTFromJavaScript<TInnerCodec>[],
     TInnerCodec,
     undefined,
     undefined
   > = {
     name,
     sqlType: identifier,
-    fromPg: (value) =>
-      arrayParse(value)
-        .flat(100)
-        .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
+    fromPg:
+      innerCodecFromPg === identity
+        ? parseArray
+        : makeParseArrayWithTransform(innerCodecFromPg),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
@@ -682,7 +691,7 @@ export function listOfCodec<
           result += "NULL";
           continue;
         }
-        const str = innerCodec.toPg(v);
+        const str = innerCodecToPg(v);
         if (str == null) {
           result += "NULL";
           continue;
@@ -706,25 +715,25 @@ export function listOfCodec<
     description,
     extensions,
     arrayOfCodec: innerCodec,
-    ...(innerCodec.listCastFromPg
+    ...(innerCodecListCastFromPg
       ? {
-          castFromPg: innerCodec.listCastFromPg,
+          castFromPg: innerCodecListCastFromPg,
           listCastFromPg(frag, guaranteedNotNull) {
             return listCastViaUnnest(
               `${name}_item`,
               frag,
               (identifier) =>
-                innerCodec.listCastFromPg!.call(
+                innerCodecListCastFromPg.call(
                   this,
                   identifier,
-                  innerCodec.notNull,
+                  innerCodecNotNull,
                 ),
               guaranteedNotNull,
             );
           },
         }
       : null),
-    executor: innerCodec.executor,
+    executor: executor,
     [inspect.custom]: codecInspect,
   };
 
@@ -986,7 +995,7 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   };
 };
 
-const parseAsInt = (n: string) => parseInt(n, 10);
+const parseAsTrustedInt = (n: string) => +n;
 const jsonParse = (s: string) => JSON.parse(s);
 const jsonStringify = (o: JSONValue) => JSON.stringify(o);
 
@@ -1017,8 +1026,8 @@ export const TYPES = {
       }
     },
   }),
-  int2: t<number>()("21", "int2", { fromPg: parseAsInt }),
-  int: t<number>()("23", "int4", { fromPg: parseAsInt }),
+  int2: t<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
+  int: t<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
   bigint: t<string>()("20", "int8"),
   float4: t<number>()("700", "float4", { fromPg: parseFloat }),
   float: t<number>()("701", "float8", { fromPg: parseFloat }),
