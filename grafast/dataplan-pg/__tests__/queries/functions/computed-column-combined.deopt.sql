@@ -4,9 +4,9 @@ select
 from app_public.forums as __forums__
 where
   (
-    true /* authorization checks */
-  ) and (
     __forums__."id" = $1::"uuid"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -20,18 +20,14 @@ where (
 
 select
   case when (__users_most_recent_forum__) is not distinct from null then null::text else json_build_array(((__users_most_recent_forum__)."id"), ((__users_most_recent_forum__)."name"), to_char(((__users_most_recent_forum__)."archived_at"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text))::text end as "0",
-  __users_most_recent_forum__."id" as "1"
-from app_public.users_most_recent_forum($1::app_public.users) as __users_most_recent_forum__;
-
-select
-  __forums_unique_author_count__.v::text as "0"
-from app_public.forums_unique_author_count(
-  $1::app_public.forums,
-  $2::"bool"
-) as __forums_unique_author_count__(v)
-where (
+  __users_most_recent_forum__."id" as "1",
+  __forums_unique_author_count__.v::text as "2"
+from app_public.users_most_recent_forum($1::app_public.users) as __users_most_recent_forum__
+left outer join app_public.forums_unique_author_count(__users_most_recent_forum__) as __forums_unique_author_count__(v)
+on (
+/* WHERE becoming ON */ (
   true /* authorization checks */
-);
+));
 
 select
   __forums_featured_messages__."body" as "0"

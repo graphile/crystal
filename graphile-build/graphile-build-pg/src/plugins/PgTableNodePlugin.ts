@@ -213,6 +213,7 @@ return function (access, inhibitOnNull) {
                   },
                   [access, inhibitOnNull, pk],
                 ),
+            getIdentifiers: EXPORTABLE(() => (value) => value.slice(1), []),
             get: EXPORTABLE(
               (pgResource) => (spec: any) => pgResource.get(spec),
               [pgResource],

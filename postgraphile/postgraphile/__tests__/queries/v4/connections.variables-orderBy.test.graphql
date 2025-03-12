@@ -1,0 +1,22 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> variableValues: {"orderBy": ["AUTHOR_ID_DESC", "HEADLINE_DESC"]}
+query Q($orderBy: [PostsOrderBy!]!) {
+  t: allPosts(orderBy: $orderBy, first: 3) {
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+    totalCount
+    edges {
+      cursor
+      node {
+        headline
+        authorId
+      }
+    }
+  }
+}

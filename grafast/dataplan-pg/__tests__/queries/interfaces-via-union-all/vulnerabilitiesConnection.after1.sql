@@ -92,9 +92,9 @@ select
 from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
 where
   (
-    true /* authorization checks */
-  ) and (
     __first_party_vulnerabilities__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -105,7 +105,7 @@ select
 from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
 where
   (
-    true /* authorization checks */
-  ) and (
     __third_party_vulnerabilities__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );

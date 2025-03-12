@@ -43,15 +43,20 @@ import type {
   $$cacheByOperation,
   $$hooked,
   $$queryCache,
+  ArgumentApplyPlanResolver,
   BatchExecutionValue,
   CacheByOperationEntry,
   DataFromStep,
+  EnumValueApplyResolver,
   EstablishOperationPlanEvent,
   ExecuteEvent,
   ExecuteStepEvent,
   ExecutionValue,
   GrafastExecutionArgs,
   GrafastTimeouts,
+  InputObjectFieldApplyResolver,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
   ParseAndValidateEvent,
   PrepareArgsEvent,
   ScalarInputPlanResolver,
@@ -64,13 +69,10 @@ import {
   $$extensions,
   $$idempotent,
   $$verbatim,
-  ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  EnumValueApplyPlanResolver,
   EventCallback,
   EventMapKey,
   ExecutionDetails,
@@ -80,6 +82,7 @@ import {
   ExecutionExtra,
   ExecutionResults,
   ExecutionResultValue,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -92,10 +95,6 @@ import {
   GrafastResultStreamList,
   GrafastSubscriber,
   GrafastValuesList,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
-  InputObjectTypeInputPlanResolver,
-  InputStep,
   JSONArray,
   JSONObject,
   JSONValue,
@@ -114,24 +113,23 @@ import {
 import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";
+import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
-  assertModifierStep,
-  BaseStep,
-  ExecutableStep,
+  assertStep,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
-  isModifierStep,
   isObjectLikeStep,
+  isStep,
   ListCapableStep,
   ListLikeStep,
-  ModifierStep,
   ObjectLikeStep,
   PolymorphicStep,
-  UnbatchedExecutableStep,
+  Step,
+  UnbatchedStep,
 } from "./step.js";
 import {
   __FlagStep,
@@ -147,11 +145,17 @@ import {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
+  applyInput,
+  ApplyInputStep,
   applyTransforms,
   ApplyTransformsStep,
   assertEdgeCapableStep,
+  assertModifier,
   assertNotNull,
   assertPageInfoCapableStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
   condition,
   ConditionStep,
   connection,
@@ -160,6 +164,7 @@ import {
   constant,
   ConstantStep,
   context,
+  createObjectAndApplyChildren,
   debugPlans,
   each,
   EdgeCapableStep,
@@ -177,6 +182,7 @@ import {
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
+  isModifier,
   lambda,
   LambdaStep,
   last,
@@ -199,6 +205,8 @@ import {
   LoadOptions,
   LoadStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
+  Modifier,
   node,
   nodeIdFromNode,
   NodeStep,
@@ -220,9 +228,9 @@ import {
   reverseArray,
   ReverseStep,
   rootValue,
+  Setter,
   setter,
-  SetterCapableStep,
-  SetterStep,
+  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
@@ -240,6 +248,7 @@ import {
   arrayOfLength,
   arraysMatch,
   getEnumValueConfig,
+  getEnumValueConfigs,
   GrafastInputFieldConfigMap,
   GrafastInputObjectType,
   GrafastObjectType,
@@ -279,23 +288,26 @@ export {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
+  applyInput,
+  ApplyInputStep,
   applyTransforms,
   ApplyTransformsStep,
-  ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   arrayOfLength,
   arraysMatch,
   assertEdgeCapableStep,
   assertExecutableStep,
   assertListCapableStep,
-  assertModifierStep,
+  assertModifier,
   assertNotNull,
   assertPageInfoCapableStep,
+  assertStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  BaseStep,
   BatchExecutionValue,
   condition,
   ConditionStep,
@@ -305,6 +317,7 @@ export {
   constant,
   ConstantStep,
   context,
+  createObjectAndApplyChildren,
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
@@ -315,12 +328,11 @@ export {
   EdgeCapableStep,
   EdgeStep,
   EnumPlans,
-  EnumValueApplyPlanResolver,
   error,
   ErrorStep,
   EventCallback,
   EventMapKey,
-  ExecutableStep,
+  Step as ExecutableStep,
   execute,
   ExecutionDetails,
   ExecutionDetailsStream,
@@ -332,6 +344,7 @@ export {
   ExecutionValue,
   exportAs,
   exportAsMany,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -342,7 +355,9 @@ export {
   FirstStep,
   flagError,
   getEnumValueConfig,
+  getEnumValueConfigs,
   getGrafastMiddleware,
+  getNullableInputTypeAtPath,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -369,22 +384,22 @@ export {
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
+  InputObjectFieldApplyResolver,
   inputObjectFieldSpec,
   InputObjectPlans,
-  InputObjectTypeInputPlanResolver,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
   InputObjectTypeSpec,
-  InputStep,
   InterfaceOrUnionPlans,
   isDev,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
-  isModifierStep,
+  isModifier,
   isObjectLikeStep,
   isPromiseLike,
   isSafeError,
+  isStep,
   isUnaryStep,
   JSONArray,
   JSONObject,
@@ -413,9 +428,10 @@ export {
   LoadOptions,
   LoadStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   makeGrafastSchema,
   Maybe,
-  ModifierStep,
+  Modifier,
   Multistep,
   multistep,
   newGrafastFieldConfigBuilder,
@@ -460,12 +476,13 @@ export {
   SafeError,
   ScalarPlanResolver,
   ScalarPlans,
+  Setter,
   setter,
-  SetterCapableStep,
-  SetterStep,
+  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
+  Step,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   StepOptimizeOptions,
@@ -482,8 +499,9 @@ export {
   TRAP_INHIBITED,
   TypedEventEmitter,
   UnaryExecutionValue,
-  UnbatchedExecutableStep,
+  UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
+  UnbatchedStep,
   UnwrapMultistep,
 };
 
@@ -495,6 +513,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getNullableInputTypeAtPath,
   getGrafastMiddleware,
   grafast,
   grafastSync,
@@ -504,11 +523,12 @@ exportAsMany("grafast", {
   __InputObjectStep,
   __InputStaticLeafStep,
   assertExecutableStep,
+  assertStep,
   assertListCapableStep,
-  assertModifierStep,
-  isExecutableStep,
+  assertModifier,
+  isStep,
   isListCapableStep,
-  isModifierStep,
+  isModifier,
   isObjectLikeStep,
   isListLikeStep,
   __ItemStep,
@@ -517,6 +537,11 @@ exportAsMany("grafast", {
   __ValueStep,
   access,
   AccessStep,
+  applyInput,
+  ApplyInputStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
   operationPlan,
   connection,
   assertEdgeCapableStep,
@@ -553,6 +578,7 @@ exportAsMany("grafast", {
   polymorphicBranch,
   PolymorphicBranchStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   proxy,
   applyTransforms,
   ApplyTransformsStep,
@@ -579,7 +605,8 @@ exportAsMany("grafast", {
   reverseArray,
   ReverseStep,
   setter,
-  SetterStep,
+  createObjectAndApplyChildren,
+  Setter,
   listen,
   ListenStep,
   polymorphicWrap,
@@ -599,6 +626,7 @@ exportAsMany("grafast", {
   isDev,
   noop,
   getEnumValueConfig,
+  getEnumValueConfigs,
   loadOne,
   loadMany,
   loadOneCallback,
@@ -658,28 +686,33 @@ declare global {
 
     interface ArgumentExtensions {
       // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-      inputPlan?: ArgumentInputPlanResolver;
       applyPlan?: ArgumentApplyPlanResolver;
-      autoApplyAfterParentPlan?: boolean;
-      autoApplyAfterParentSubscribePlan?: boolean;
+      applySubscribePlan?: ArgumentApplyPlanResolver;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      autoApplyAfterParentPlan?: never;
+      autoApplyAfterParentSubscribePlan?: never;
     }
 
     interface InputObjectTypeExtensions {
-      inputPlan?: InputObjectTypeInputPlanResolver;
+      baked?: InputObjectTypeBakedResolver;
     }
 
     interface InputFieldExtensions {
-      // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
-      inputPlan?: InputObjectFieldInputPlanResolver;
-      applyPlan?: InputObjectFieldApplyPlanResolver;
-      autoApplyAfterParentInputPlan?: boolean;
-      autoApplyAfterParentApplyPlan?: boolean;
+      apply?: InputObjectFieldApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      applyPlan?: never;
+      autoApplyAfterParentInputPlan?: never;
+      autoApplyAfterParentApplyPlan?: never;
     }
 
     interface ObjectTypeExtensions {
       assertStep?:
-        | ((step: ExecutableStep) => asserts step is ExecutableStep)
-        | { new (...args: any[]): ExecutableStep }
+        | ((step: Step) => asserts step is Step)
+        | { new (...args: any[]): Step }
         | null;
     }
 
@@ -691,7 +724,10 @@ declare global {
        *
        * @experimental
        */
-      applyPlan?: EnumValueApplyPlanResolver<any>;
+      apply?: EnumValueApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      applyPlan?: never;
     }
 
     interface ScalarTypeExtensions {

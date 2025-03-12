@@ -3,9 +3,8 @@ import * as graphql from "graphql";
 
 import * as assert from "../assert.js";
 import { assertInputStep, inputStep } from "../input.js";
-import type { InputStep, NotVariableValueNode } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
-import type { ConstantStep } from "./constant.js";
+import type { AnyInputStep, NotVariableValueNode } from "../interfaces.js";
+import { Step } from "../step.js";
 import { constant } from "./constant.js";
 import { list } from "./list.js";
 
@@ -17,7 +16,7 @@ const { GraphQLList, Kind } = graphql;
 export class __InputListStep<
   TInputType extends
     graphql.GraphQLList<GraphQLInputType> = graphql.GraphQLList<GraphQLInputType>,
-> extends ExecutableStep {
+> extends Step {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputListStep",
@@ -64,12 +63,12 @@ export class __InputListStep<
     }
   }
 
-  optimize(): ExecutableStep {
+  optimize(): Step {
     const { inputValues } = this;
     if (inputValues?.kind === "NullValue") {
       return constant(null);
     } else {
-      const arr: ExecutableStep[] = [];
+      const arr: Step[] = [];
       for (let idx = 0; idx < this.itemCount; idx++) {
         const itemPlan = this.getDep(idx);
         arr[idx] = itemPlan;
@@ -89,13 +88,14 @@ export class __InputListStep<
     );
   };
 
-  at(index: number): InputStep | ConstantStep<undefined> {
+  at(index: number): AnyInputStep {
     const itemPlan =
       index < this.itemCount ? this.getDep(index) : constant(undefined);
     assertInputStep(itemPlan);
     return itemPlan;
   }
 
+  /** @internal */
   eval(): any[] | null {
     if (this.inputValues?.kind === "NullValue") {
       return null;
@@ -114,6 +114,7 @@ export class __InputListStep<
     return list;
   }
 
+  /** @internal */
   evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
@@ -126,6 +127,7 @@ export class __InputListStep<
     }
   }
 
+  /** @internal */
   evalLength(): number | null {
     if (this.inputValues === undefined) {
       return null;

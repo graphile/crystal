@@ -11,17 +11,15 @@ interface CommonOptions {
 }
 
 const KNOWN_IMPORTS: Array<[string, string]> = [
-  ["grafast", "BaseStep"],
-  ["grafast", "ExecutableStep"],
-  ["grafast", "ModifierStep"],
+  ["grafast", "Step"],
+  ["grafast", "Modifier"],
 ];
 
 export const ExportSubclasses: Rule.RuleModule = {
   meta: {
     type: "suggestion",
     docs: {
-      description:
-        "Looks for classes that extend BaseStep, ExecutableStep or ModifierStep.",
+      description: "Looks for classes that extend Step or Modifier.",
       recommended: true,
       url: "TODO",
     },

@@ -33,7 +33,7 @@ import {
   FLAG_STOPPED,
   NO_FLAGS,
 } from "../interfaces.js";
-import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import type { Step, UnbatchedStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -96,7 +96,7 @@ export function executeBucket(
    */
   function reallyExecuteStepWithoutFiltering(
     size: number,
-    step: ExecutableStep,
+    step: Step,
     dependencies: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
@@ -155,9 +155,11 @@ export function executeBucket(
           normalStepIndex < l;
           normalStepIndex++
         ) {
+          const step = normalSteps[normalStepIndex].step;
+          const stepSize = step._isUnary ? 1 : bucket.size;
           const r = timeoutError;
-          const results = arrayOfLength(bucket.size, r);
-          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          const results = arrayOfLength(stepSize, r);
+          const flags = arrayOfLength(stepSize, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
@@ -173,6 +175,7 @@ export function executeBucket(
         normalStepIndex++
       ) {
         const step = normalSteps[normalStepIndex].step;
+        const stepSize = step._isUnary ? 1 : bucket.size;
         try {
           const r = executeStep(step);
           if (isPromiseLike(r)) {
@@ -190,8 +193,8 @@ export function executeBucket(
           }
         } catch (e) {
           const r = e;
-          const results = arrayOfLength(bucket.size, r);
-          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          const results = arrayOfLength(stepSize, r);
+          const flags = arrayOfLength(stepSize, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
@@ -270,7 +273,7 @@ export function executeBucket(
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
       const success = (
-        finishedStep: ExecutableStep,
+        finishedStep: Step,
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
@@ -502,9 +505,7 @@ export function executeBucket(
           allStepsIndex < allStepsLength;
           allStepsIndex++
         ) {
-          const step = sudo(
-            _allSteps[allStepsIndex] as UnbatchedExecutableStep,
-          );
+          const step = sudo(_allSteps[allStepsIndex] as UnbatchedStep);
 
           // Unary steps only need to be processed once
           if (step._isUnary && dataIndex !== 0) {
@@ -694,7 +695,7 @@ export function executeBucket(
 
   function executeOrStream(
     count: number,
-    step: ExecutableStep,
+    step: Step,
     values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): ExecutionResults<any> {
@@ -734,7 +735,7 @@ export function executeBucket(
    * back out at the end.
    */
   function reallyExecuteStepWithFiltering(
-    step: ExecutableStep,
+    step: Step,
     dependenciesIncludingSideEffects: ReadonlyArray<ExecutionValue>,
     dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
     dependencyOnReject: ReadonlyArray<Error | null | undefined>,
@@ -755,19 +756,39 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
-    const stepPolymorphicPaths = step.polymorphicPaths;
+    let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
-    let dependencies = step.implicitSideEffectStep
-      ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
-      : dependenciesIncludingSideEffects;
+    const dependenciesIncludingSideEffectsCount =
+      dependenciesIncludingSideEffects.length;
+    let dependencies =
+      dependenciesIncludingSideEffectsCount > legitDepsCount
+        ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
+        : dependenciesIncludingSideEffects;
 
     // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
-    // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
+    let hasPolyMatch = true;
+    if (step._isUnary && stepPolymorphicPaths !== null) {
+      // Check that at least one datapoint matches one of our paths
+      hasPolyMatch = false;
+      for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+        if (
+          stepPolymorphicPaths.has(polymorphicPathList[dataIndex] as string)
+        ) {
+          hasPolyMatch = true;
+          break;
+        }
+      }
+      stepPolymorphicPaths = null;
+    }
     for (let dataIndex = 0; dataIndex < expectedSize; dataIndex++) {
-      let forceIndexValue: Error | null | undefined = undefined;
+      let forceIndexValue: Error | null | undefined = hasPolyMatch
+        ? undefined
+        : null;
       let rejectValue: Error | null | undefined = undefined;
-      let indexFlags: ExecutionEntryFlags = NO_FLAGS;
+      let indexFlags: ExecutionEntryFlags = hasPolyMatch
+        ? NO_FLAGS
+        : FLAG_POLY_SKIPPED;
       if (
         stepPolymorphicPaths !== null &&
         !stepPolymorphicPaths.has(polymorphicPathList[dataIndex] as string)
@@ -775,11 +796,7 @@ export function executeBucket(
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
       } else if (extra._bucket.flagUnion) {
-        for (
-          let i = 0, l = dependenciesIncludingSideEffects.length;
-          i < l;
-          i++
-        ) {
+        for (let i = 0; i < dependenciesIncludingSideEffectsCount; i++) {
           const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
           const onReject = dependencyOnReject[i];
@@ -906,8 +923,10 @@ export function executeBucket(
    * This function MIGHT throw or reject, so be sure to handle that.
    */
   function executeStep(
-    step: ExecutableStep,
+    step: Step,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
+    // DELIBERATE SHADOWING!
+    const size = step._isUnary ? 1 : bucket.size;
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
@@ -927,10 +946,15 @@ export function executeBucket(
       let needsFiltering = false;
       const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
       const addDependency = (
-        $dep: ExecutableStep,
+        $dep: Step,
         forbiddenFlags: ExecutionEntryFlags,
         onReject: Error | null | undefined,
       ) => {
+        if (step._isUnary && !$dep._isUnary) {
+          throw new Error(
+            `GrafastInternalError<58bc38e2-8722-4c19-ba38-fd01a020654b>: unary step ${step} cannot be made dependent on non-unary step ${$dep}!`,
+          );
+        }
         const executionValue = store.get($dep.id);
         if (executionValue === undefined) {
           throw new Error(
@@ -959,7 +983,9 @@ export function executeBucket(
       }
       const $sideEffect = step.implicitSideEffectStep;
       if ($sideEffect) {
-        addDependency($sideEffect, defaultForbiddenFlags, undefined);
+        if ($sideEffect._isUnary || !step._isUnary) {
+          addDependency($sideEffect, defaultForbiddenFlags, undefined);
+        }
       }
       if (
         isDev &&
@@ -987,7 +1013,7 @@ export function executeBucket(
             extra,
           )
         : reallyExecuteStepWithoutFiltering(
-            step._isUnary ? 1 : size,
+            size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
             extra,
@@ -1224,34 +1250,70 @@ export function bucketToString(this: Bucket) {
   return `Bucket<${this.layerPlan}>`;
 }
 
-function throwNotUnary(): never {
-  throw new Error(
-    `This is not a unary value so we cannot get the single value - there may be more than one!`,
-  );
-}
+// NOTE: I evaluated using `__proto__: batchExecutionValueProto` to extract the
+// shared properties of these objects to see if performance was improved, but
+// this was actually a net loss in performance.
+//
+// This is also evidence that you shouldn't trust ChatGPT for performance
+// advice, and should always run your own benchmarks instead:
+// https://chatgpt.com/share/67d1746f-4da8-8012-bdf8-707e54a4238e
 
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
   _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
 ): BatchExecutionValue<TData> {
-  let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
-    at: batchEntriesAt,
+    // Try and keep these properties in the same order as unaryExecutionValue
     isBatch: true,
-    entries,
-    unaryValue: throwNotUnary,
-    _flags,
+    at: batchEntriesAt,
+    unaryValue: batchThrowNotUnary,
     _flagsAt: batchFlagsAt,
-    _getStateUnion() {
-      if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce(bitwiseOr, NO_FLAGS);
-      }
-      return cachedStateUnion;
-    },
+    _getStateUnion: batchGetStateUnion,
     _setResult: batchSetResult,
-    _copyResult,
+    _copyResult: batchCopyResult,
+
+    entries,
+    _flags,
+    _cachedStateUnion: null,
   };
+}
+
+// TODO: memoize?
+export function unaryExecutionValue<TData>(
+  value: TData,
+  _entryFlags: ExecutionEntryFlags = 0,
+): UnaryExecutionValue<TData> {
+  return {
+    // Try and keep these properties in the same order as batchExecutionValue
+    isBatch: false,
+    at: unaryAt,
+    unaryValue: unaryThisDotValue,
+    _flagsAt: unaryFlagsAt,
+    _getStateUnion: unaryGetStateUnion,
+    _setResult: unarySetResult,
+    _copyResult: unaryCopyResult,
+
+    value,
+    _entryFlags,
+  };
+}
+
+function batchThrowNotUnary(): never {
+  throw new Error(
+    `This is not a unary value so we cannot get the single value - there may be more than one!`,
+  );
+}
+
+function batchGetStateUnion(this: BatchExecutionValue) {
+  if (this._cachedStateUnion === null) {
+    let u = NO_FLAGS;
+    for (const flag of this._flags) {
+      u = u | flag;
+    }
+    this._cachedStateUnion = u;
+  }
+  return this._cachedStateUnion;
 }
 
 function batchEntriesAt(this: BatchExecutionValue, i: number) {
@@ -1272,12 +1334,22 @@ function batchSetResult(
   this._flags[i] = flags;
 }
 
-function bitwiseOr(memo: number, a: number) {
-  return memo | a;
+// NOTE: batchCopyResult and unaryCopyResult are **identical**, but we don't
+// want a single megamorphic function so we define it twice.
+function batchCopyResult(
+  this: BatchExecutionValue,
+  targetIndex: number,
+  source: ExecutionValue,
+  sourceIndex: number,
+): void {
+  this._setResult(
+    targetIndex,
+    source.at(sourceIndex),
+    source._flagsAt(sourceIndex),
+  );
 }
-
-function _copyResult(
-  this: ExecutionValue,
+function unaryCopyResult(
+  this: UnaryExecutionValue,
   targetIndex: number,
   source: ExecutionValue,
   sourceIndex: number,
@@ -1289,22 +1361,8 @@ function _copyResult(
   );
 }
 
-// TODO: memoize?
-export function unaryExecutionValue<TData>(
-  value: TData,
-  _entryFlags: ExecutionEntryFlags = 0,
-): UnaryExecutionValue<TData> {
-  return {
-    at: unaryAt,
-    isBatch: false,
-    value,
-    unaryValue: () => value,
-    _entryFlags,
-    _flagsAt: unaryFlagsAt,
-    _getStateUnion: unaryGetStateUnion,
-    _setResult: unarySetResult,
-    _copyResult,
-  };
+function unaryThisDotValue(this: UnaryExecutionValue) {
+  return this.value;
 }
 
 function unaryAt(this: UnaryExecutionValue) {
@@ -1372,7 +1430,7 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
 
 function evaluateStream(
   bucket: Bucket,
-  step: ExecutableStep,
+  step: Step,
 ): ExecutionDetailsStream | null {
   const stream = step._stepOptions.stream;
   if (!stream) return null;

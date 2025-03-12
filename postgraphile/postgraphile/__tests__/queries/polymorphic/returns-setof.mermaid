@@ -9,6 +9,7 @@ graph TD
 
 
     %% plan dependencies
+    Connection11{{"Connection[11∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -17,7 +18,6 @@ graph TD
     __Value2 --> Access8
     __Value2 --> Access9
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Connection11{{"Connection[11∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
     Object10 & Connection11 --> PgSelect12
     First13{{"First[13∈1] ➊"}}:::plan

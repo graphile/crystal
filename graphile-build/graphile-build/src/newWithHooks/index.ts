@@ -1,8 +1,8 @@
 import type {
   BaseGraphQLArguments,
-  ExecutableStep,
   GrafastFieldConfig,
   OutputPlanForType,
+  Step,
 } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
@@ -135,10 +135,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawObjectSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
-            any,
-            any
-          >;
+          const rawObjectSpec =
+            inSpec as GraphileBuild.GrafastObjectTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeObject;
 
@@ -187,45 +185,26 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GrafastFieldConfig<
-                any,
-                any,
-                any,
-                any,
-                any
-              >[] = [];
+              const processedFields: GrafastFieldConfig<any, any, any, any>[] =
+                [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
-                TContext extends Grafast.Context,
-                TParentStep extends ExecutableStep,
+                TParentStep extends Step,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
                 fieldSpec:
-                  | GrafastFieldConfig<
-                      TType,
-                      TContext,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >
+                  | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
                   | ((
                       context: GraphileBuild.ContextObjectFieldsField,
                     ) => GrafastFieldConfig<
                       TType,
-                      TContext,
                       TParentStep,
                       TFieldStep,
                       TArgs
                     >),
-              ): GrafastFieldConfig<
-                TType,
-                TContext,
-                TParentStep,
-                TFieldStep,
-                TArgs
-              > => {
+              ): GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs> => {
                 if (!isString(fieldScope.fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
@@ -272,9 +251,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
-                  {
-                    ...fieldContext,
-                  };
+                  { ...fieldContext };
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
                   args: builder.applyHooks(
@@ -368,7 +345,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInterfaceType: {
           const rawInterfaceSpec =
-            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any, any>;
+            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInterface;
 
@@ -478,13 +455,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       },
                     };
 
-                    finalFieldSpec.args![argName] = builder.applyHooks(
+                    const finalArgSpec = builder.applyHooks(
                       "GraphQLInterfaceType_fields_field_args_arg",
                       argSpec,
                       build,
                       argContext,
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
+
+                    finalFieldSpec.args![argName] = finalArgSpec;
                   }
 
                   processedFields.push(finalFieldSpec);
@@ -555,10 +534,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawUnionSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
-            any,
-            any
-          >;
+          const rawUnionSpec =
+            inSpec as GraphileBuild.GrafastUnionTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeUnion;
 
@@ -857,6 +834,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     valueContext,
                     `|${typeName}|${valueName}`,
                   );
+
+                  // TODO: remove this code
+                  const ext = newValue.extensions?.grafast;
+                  if (ext && ext.applyPlan) {
+                    throw new Error(
+                      `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
+                    );
+                  }
 
                   memo[valueName] = newValue;
                   return memo;
