@@ -1,5 +1,6 @@
 ---
 title: Library/middleware
+toc_max_heading_level: 4
 ---
 
 # Using PostGraphile as a Library
@@ -59,8 +60,8 @@ import { pgl } from "./pgl.js";
 const serv = pgl.createServ(grafserv);
 
 const server = createServer();
-server.on("error", (e) => {
-  console.error(e);
+server.once("listening", () => {
+  server.on("error", (e) => void console.error(e));
 });
 
 serv.addTo(server).catch((e) => {
@@ -85,7 +86,9 @@ const serv = pgl.createServ(grafserv);
 
 const app = express();
 const server = createServer(app);
-server.on("error", () => {});
+server.once("listening", () => {
+  server.on("error", (e) => void console.error(e));
+});
 serv.addTo(app, server).catch((e) => {
   console.error(e);
   process.exit(1);
@@ -124,83 +127,138 @@ release any resources it holds (for example schema watching, etc).
 
 [grafserv]: https://grafast.org/grafserv/
 
-## Express Server With Postgraphile In a Single JavaScript File
+## Example 1: single JS file, express
 
-### Steps to Create a Simple Express Server
+In this example we'll set up a PostGraphile server using ExpressJS all in a
+single JS file that we can run directly with `node`.
 
-Create a directory for the project and initialize the project
+To start, create a directory for the project and initialize a Node.js project
+in that folder:
 
-```bash
+```bash title="Create and initialize the project directory"
 mkdir postgraphile_express
 cd postgraphile_express
 npm init -y
 ```
 
-Install the required packages
+### Installing dependencies
 
-```bash
-npm install express postgraphile@beta
+Install the required packages:
+
+```bash npm2yarn
+npm install --save express postgraphile@beta
 ```
 
-Create a `.env` file with the database connection string, database schema, and GRAPHILE_ENV set to start Postgraphile in development mode
+### Environment variables
 
-```
-DB_CONNECTION=postgres://[username]:[password]@localhost:5432/[database]
-DB_SCHEMA=public
+It's bad practice to store credentials directly into source code, so instead we
+use an environment variable `DATABASE_URL` to to store the database connection
+string.
+
+Additionally, we want PostGraphile to behave slightly differently in
+development versus production: in development we want better error messages and
+easier to read SQL; whereas, in production, we don't want to reveal more
+information to potential attackers than we need to, and we want to execute as
+fast as possible. Since we're in development, we'll use the
+`GRAPHILE_ENV=development` envvar to indicate this.
+
+To save us from having to pass the environment variables every time we run the server,
+we can add them to a convenient `.env` file:
+
+```ini title=".env"
+DATABASE_URL=postgres://[username]:[password]@[host]:[port]/[database]
 GRAPHILE_ENV=development
 ```
 
-Create a server.js file
+Be sure to replace the square brackets with the relevant settings for your own
+database connection!
 
-```JavaScript
-/* server.js */
-import express from 'express'
-import { createServer } from 'node:http'
-import { postgraphile } from 'postgraphile'
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber'
-import { makePgService } from 'postgraphile/adaptors/pg'
-import { grafserv } from 'postgraphile/grafserv/express/v4'
+Critically, we must ensure that this file is not tracked by git:
 
+```bash title="Ensure the .env file is ignored by git"
+echo .env >> .gitignore
+```
+
+### The code
+
+Create a `server.js` file with the following contents:
+
+```js title="server.js"
+import express from "express";
+import { createServer } from "node:http";
+import { postgraphile } from "postgraphile";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+
+// Which port do we want to listen for requests on?
+const PORT = 5050;
+
+// Our PostGraphile configuration, we're going (mostly) with the defaults:
+/** @type {GraphileConfig.Preset} */
 const preset = {
-  extends: [
-    PostGraphileAmberPreset
-  ],
+  extends: [PostGraphileAmberPreset],
   pgServices: [
     makePgService({
-      connectionString: process.env.DB_CONNECTION,
-      schemas: [process.env.DB_SCHEMA || 'public'],
+      connectionString: process.env.DATABASE_URL,
+      schemas: ["public"],
     }),
   ],
   grafast: {
     explain: true,
   },
+};
+
+// Create our PostGraphile instance, `pgl`:
+const pgl = postgraphile(preset);
+
+// Create our PostGraphile grafserv instance, `serv`:
+const serv = pgl.createServ(grafserv);
+
+async function main() {
+  // Create an express app:
+  const app = express();
+
+  // Create a Node HTTP server, and have the express app handle requests:
+  const server = createServer(app);
+
+  // If the server were to produce any errors after it has been successfully
+  // set up, log them:
+  server.once("listening", () => {
+    server.on("error", (e) => void console.error(e));
+  });
+
+  // Mount our grafserv instance inside of the Express app, also passing the
+  // reference to the Node.js server for use with websockets (for GraphQL
+  // subscriptions):
+  await serv.addTo(app, server);
+
+  // Start listening for HTTP requests:
+  server.listen(PORT, () => {
+    console.log(`Server listening at http://localhost:${PORT}`);
+  });
 }
-;(async () => {
-  const app = express()
-  const server = createServer(app)
-  server.on('error', (e) => {
-    console.dir(e)
-  })
-  const pgl = postgraphile(preset)
-  const serv = pgl.createServ(grafserv)
-  await serv.addTo(app, server)
-  server.listen(5050, () => {
-    console.log('Server listening at http://localhost:5050')
-  })
-})()
+
+// Start the main process, exiting if an error occurs during setup.
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 ```
 
 The project is now complete, listing the project directory should show
 
 ```bash
-server.js
-.env
-package.json
-package-lock.json
-node_modules
+postgraphile_express/
+ ├── .env
+ ├── node_modules/
+ ├── package-lock.json
+ ├── package.json
+ └── server.js
 ```
 
-The `package.json` file should have the following content (with the versions of `express` and `postgraphile` being the most recent).
+The `package.json` file should have the content similar to the following (with
+the versions of `express` and `postgraphile` being the most recent):
 
 ```json
 {
@@ -222,15 +280,55 @@ The `package.json` file should have the following content (with the versions of 
 }
 ```
 
-### Running The Server
+To tidy up, let's make the following changes to the `package.json` file:
 
-To run the server from a command line we will used the `node` command, and pass in the environment variables stored in the `.env` file
+```diff
+ {
+   "name": "postgraphile_express",
+   "version": "1.0.0",
+-  "main": "index.js",
++  "private": true,
+   "type": "module",
+   "scripts": {
++    "start": "node --env-file=./.env server.js",
+     "test": "echo \"Error: no test specified\" && exit 1"
+   },
+-  "keywords": [],
+-  "author": "",
+-  "license": "ISC",
+-  "description": "",
+   "dependencies": {
+     "express": "^4.21.2",
+     "postgraphile": "^5.0.0-beta.38"
+   }
+ }
+```
+
+The main things we've done here are:
+
+- Remove the reference to a non-existant index.js file
+- Mark the project as "private" such that we can't attempt to `npm publish` it to the npm repository
+- Deleted unnecessary metadata
+- Added our `start` script, which runs the server contained in `server.js` using the `node` command, passing the environment variables stored in the `.env` file
+
+### Running the server
+
+Thanks to the `start` script we added above, running our server is as simple as:
+
+```bash
+npm start
+```
+
+Alternatively you can run the command from the start script directly:
 
 ```bash
 node --env-file=./.env server.js
 ```
 
-This will start a server at `http://localhost:5050`, opening the url in a browser will show a user interface where a GraphQL query can be entered, for example
+Either way, this will start a server at `http://localhost:5050`. Opening the
+URL in a browser will show a user interface where a GraphQL query can be
+entered. The following query is valid against any GraphQL schema and tells you
+the fields that are available to be queried at the `Query` root:
 
 ```gql
 query {
@@ -246,107 +344,180 @@ query {
 }
 ```
 
+## Example 2: TypeScript project, express
 
-## Express Server With Postgraphile Using TypeScript (Three TypeScript Files)
+To get the most out of PostGraphile (and the modern npm ecosystem in general),
+you'll want to be running TypeScript. This will give you much better
+auto-complete in your editor, type safety of your code, help with refactoring,
+and so much more.
 
-This example will have three files in a `src` directory, `server.ts`, `pgl.ts`, `graphile.config.ts`.  It will also show how to include the [`simple-inflection preset`](https://www.npmjs.com/package/@graphile/simplify-inflection), included as `PgSimplifyInflectionPreset` in `graphile.config.ts`
+This example will have three files in a `src` directory: `graphile.config.ts`,
+`pgl.ts` and `server.ts`. It will also demonstrate including the
+[`simple-inflection
+preset`](https://www.npmjs.com/package/@graphile/simplify-inflection), included
+as `PgSimplifyInflectionPreset` in `graphile.config.ts`
 
-### Steps to Create a TypeScript Express Server
+To start, create a directory for the project and initialize a Node.js project
+in that folder:
 
-Create a directory for the project and initialize the project
-
-```bash
+```bash title="Create and initialize the project directory"
 mkdir postgraphile_express_typescript
 cd postgraphile_express_typescript
 npm init -y
 ```
 
-#### Install the Required Packages
+### Installing dependencies
 
-```bash
-npm install express postgraphile@beta @graphile/simplify-inflection@beta
-```
-#### Create the TypeScript Files
+Install the required packages:
 
-In the `postgraphile_express_typescript` directory, create a src dirctory and create three TypeScript files in the src folder, `server.ts`, `pg.ts`, and `graphile.config.ts`
-
-### `src/server.ts`
-
-```TypeScript
-/* src/server.ts */
-import 'dotenv/config'
-import { createServer } from 'node:http'
-import express from 'express'
-import { grafserv } from 'postgraphile/grafserv/express/v4'
-import { pgl } from './pgl.js'
-
-const app = express()
-const server = createServer(app)
-server.on('error', () => {})
-const serv = pgl.createServ(grafserv)
-serv.addTo(app, server).catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
-server.listen(5050)
-
-console.log('Server listening at http://localhost:5050')
+```bash npm2yarn
+npm install --save express postgraphile@beta @graphile/simplify-inflection@beta
+npm install --save-dev typescript @tsconfig/node22 @types/express @types/node
 ```
 
-### `src/pgl.ts`
+### Environment variables
 
-```TypeScript
-/* src/pgl.ts */
-import preset from './graphile.config.js'
-import { postgraphile } from 'postgraphile'
+As before, create a `.env` file containing your database connection string and
+development/production environment setting:
 
-export const pgl = postgraphile(preset)
+```ini title=".env"
+DATABASE_URL=postgres://[username]:[password]@[host]:[port]/[database]
+GRAPHILE_ENV=development
 ```
 
-### `src/graphile.config.ts`
+And ensure that it is not tracked by git:
 
-```TypeScript
-/* src/graphile.config.ts */
-import 'graphile-config'
-import 'postgraphile'
-import { PostGraphileAmberPreset } from 'postgraphile/presets/amber'
-import { makePgService } from 'postgraphile/adaptors/pg'
-import { PgSimplifyInflectionPreset } from '@graphile/simplify-inflection'
-import { PgManyToManyPreset } from '@graphile-contrib/pg-many-to-many'
+```bash title="Ensure the .env file is ignored by git"
+echo .env >> .gitignore
+```
+
+### TypeScript configuration
+
+Create a `tsconfig.json` file that extends from the relevant @tsconfig for your
+Node.js version; e.g. if you're using Node v22 that would be
+[`@tsconfig/node22`](https://www.npmjs.com/package/@tsconfig/node22):
+
+```json title="tsconfig.json"
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "erasableSyntaxOnly": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
+  }
+}
+```
+
+### The code
+
+In the `postgraphile_express_typescript` directory, create a `src` dirctory and
+create three TypeScript files in the src folder: `graphile.config.ts`, `pgl.ts`
+and `server.ts` with the contents shown below:
+
+#### `src/graphile.config.ts`
+
+```ts title="src/graphile.config.ts"
+import type {} from "graphile-config";
+import "postgraphile";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
 
 const preset: GraphileConfig.Preset = {
-  extends: [
-    PostGraphileAmberPreset,
-    PgSimplifyInflectionPreset,
-    PgManyToManyPreset,
-  ],
+  extends: [PostGraphileAmberPreset, PgSimplifyInflectionPreset],
   pgServices: [
     makePgService({
-      connectionString: process.env.DB_CONNECTION,
-      schemas: [process.env.DB_SCHEMA || 'public'],
+      connectionString: process.env.DATABASE_URL,
+      schemas: ["public"],
     }),
   ],
   grafast: {
     explain: true,
   },
+};
+
+export default preset;
+```
+
+#### `src/pgl.ts`
+
+```ts title="src/pgl.ts"
+import preset from "./graphile.config.js";
+import { postgraphile } from "postgraphile";
+
+export const pgl = postgraphile(preset);
+```
+
+:::note TypeScript files reference each other via `.js`
+
+You might think the reference to `graphile.config.js` above is a typo, but it
+is not. When writing TypeScript files that reference other TypeScript files,
+you need to replace the `.ts` extensions with `.js` because TypeScript compiles
+to JavaScript, and it's the resulting JavaScript files that are actually
+executed at runtime. TypeScript does not change the content of the input path,
+so we must write what needs to be seen at runtime, even if it looks silly to us
+when writing the code!
+
+:::
+
+#### `src/server.ts`
+
+```ts title="src/server.ts"
+import { createServer } from "node:http";
+import express from "express";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+import { pgl } from "./pgl.js";
+
+const app = express();
+const server = createServer(app);
+server.once("listening", () => {
+  server.on("error", (e) => void console.error(e));
+});
+server.on("error", () => {});
+const serv = pgl.createServ(grafserv);
+serv.addTo(app, server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
+server.listen(5050);
+
+console.log("Server listening at http://localhost:5050");
+```
+
+### Contents of `package.json`
+
+After making similar changes to `package.json` as we did with Example 1 above, we should
+end up with a `package.json` file that looks something like:
+
+```json title="package.json"
+{
+  "name": "simple_node_project",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=./.env src/server.ts",
+    "build": "tsc",
+    "prod": "node dist/server.js"
+  },
+  "dependencies": {
+    "@graphile/simplify-inflection": "^8.0.0-beta.6",
+    "express": "^4.21.2",
+    "postgraphile": "^5.0.0-beta.38"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.11.24",
+    "typescript": "^5.7.3"
+  }
 }
-
-export default preset
 ```
 
-### Create a `.env` File
+Note that we have three scripts:
 
-In the `postgraphile_express_typescript` directory create a `.env` file with the database connection string, database schema, and GRAPHILE_ENV set to start Postgraphile in development mode
-
-```
-DB_CONNECTION=postgres://[username]:[password]@localhost:5432/[database]
-DB_SCHEMA=public
-GRAPHILE_ENV=development 
-```
-
-Replace `[username]` and `[password]` with the credentials for your PostgreSQL server.  Replace `[database]` with the name of your database
-
-
+- `start` runs our source files directly using Node 22's type stripping
+- `build` compiles our `.ts` files to `.js` files to run in production
+- `prod` runs the compiled `.js` files in production, and expects the environment variables to already be set in the environment rather than reading them from a file
 
 ### Project Structure
 
@@ -354,78 +525,23 @@ The project structure should be
 
 ```
 postgraphile_express_typescript/
-  - src/
-    - server.tsx
-    - pgl.tsx
-    - graphile.config.ts
-  - .env
-  - tsconfig.json
-  - package.json
-  - package-lock.json
-  - node_modules/
+ ├── .env
+ ├── node_modules/
+ ├── package-lock.json
+ ├── package.json
+ ├── src/
+ │    ├── graphile.config.ts
+ │    ├── pgl.ts
+ │    └── server.ts
+ └── tsconfig.json
 ```
 
-### Create a `tsconfig.json` File
+### Development
 
-Create a `tsconfig.json` file with the following
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "moduleResolution": "NodeNext",
-    "resolveJsonModule": true,
-    "baseUrl": "."
-  }
-}
-```
-### Contents of package.json
-
-The package.json file should have the following (with the versions of `express`, `postgraphile`, and `simiplify-inflection` being the most recent).
-
-```json
-{
-  "name": "simple_node_project",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "NODE_OPTIONS='--loader ts-node/esm' node --no-warnings=ExperimentalWarning  src/server.ts"
-  },
-  "dependencies": {
-    "@graphile-contrib/pg-many-to-many": "^2.0.0-beta.6",
-    "@graphile/simplify-inflection": "^8.0.0-beta.6",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "postgraphile": "^5.0.0-beta.38"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "@tsconfig/node20": "^20.1.4",
-    "@types/express": "^5.0.0",
-    "@types/node": "^20.11.24",
-    "eslint": "^9.20.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1"
-  }
-}
-```
-
-### Running and Building
-
-The `build`, `start`, and `dev` commands have been added.  To run in development mode enter `npm run dev` from the command line.
-
-As is typical for node projects like this to build the project, which will create a `dist` directory, `npm run build`.  To start the project after building `npm run start`.
-
-This will start a server at `http://localhost:5050`, opening the url in a browser will show a user interface where a GraphQL query can be entered, for example
+In development, run `npm start` as before. This will run the source code
+directly using Node's native type stripping feature. This will start a server
+at `http://localhost:5050`, opening the url in a browser will show a user
+interface where a GraphQL query can be entered, for example
 
 ```gql
 query {
@@ -441,4 +557,19 @@ query {
 }
 ```
 
+:::danger Errors running `npm start`?
 
+If you get errors when running `npm start` it might be because you are not
+running a sufficiently up to date version of Node.js, lacking the type
+stripping features. If this is the case, you'll want to run TypeScript in watch
+mode (`yarn tsc --watch`) in one terminal, and then execute the compiled JS
+code directly: `npde --env-file=./.env dist/server.js`.
+
+:::
+
+### Production
+
+In production, we want to minimize overhead. To do so, we compile the
+TypeScript to JavaScript up front by running the `yarn build` command. Then we
+ship the resulting files (including the `dist/` folder) to production and we
+run the `npm run prod` command which executes the compiled code directly.
