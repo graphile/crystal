@@ -14,7 +14,7 @@ import type {
   InputObjectTypeBakedResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
-import type { ExecutableStep } from "./step.js";
+import type { Step } from "./step.js";
 import { exportNameHint } from "./utils.js";
 
 const {
@@ -51,8 +51,8 @@ export type FieldPlans =
  */
 export type ObjectPlans = {
   __assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep };
+    | ((step: Step) => asserts step is Step)
+    | { new (...args: any[]): Step };
 } & {
   [fieldName: string]: FieldPlans;
 };

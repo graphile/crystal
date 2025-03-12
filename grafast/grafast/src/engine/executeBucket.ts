@@ -33,7 +33,7 @@ import {
   FLAG_STOPPED,
   NO_FLAGS,
 } from "../interfaces.js";
-import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import type { Step, UnbatchedStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -96,7 +96,7 @@ export function executeBucket(
    */
   function reallyExecuteStepWithoutFiltering(
     size: number,
-    step: ExecutableStep,
+    step: Step,
     dependencies: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
@@ -270,7 +270,7 @@ export function executeBucket(
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
       const success = (
-        finishedStep: ExecutableStep,
+        finishedStep: Step,
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
@@ -502,9 +502,7 @@ export function executeBucket(
           allStepsIndex < allStepsLength;
           allStepsIndex++
         ) {
-          const step = sudo(
-            _allSteps[allStepsIndex] as UnbatchedExecutableStep,
-          );
+          const step = sudo(_allSteps[allStepsIndex] as UnbatchedStep);
 
           // Unary steps only need to be processed once
           if (step._isUnary && dataIndex !== 0) {
@@ -694,7 +692,7 @@ export function executeBucket(
 
   function executeOrStream(
     count: number,
-    step: ExecutableStep,
+    step: Step,
     values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): ExecutionResults<any> {
@@ -734,7 +732,7 @@ export function executeBucket(
    * back out at the end.
    */
   function reallyExecuteStepWithFiltering(
-    step: ExecutableStep,
+    step: Step,
     dependenciesIncludingSideEffects: ReadonlyArray<ExecutionValue>,
     dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
     dependencyOnReject: ReadonlyArray<Error | null | undefined>,
@@ -906,7 +904,7 @@ export function executeBucket(
    * This function MIGHT throw or reject, so be sure to handle that.
    */
   function executeStep(
-    step: ExecutableStep,
+    step: Step,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     try {
       const meta =
@@ -927,7 +925,7 @@ export function executeBucket(
       let needsFiltering = false;
       const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
       const addDependency = (
-        $dep: ExecutableStep,
+        $dep: Step,
         forbiddenFlags: ExecutionEntryFlags,
         onReject: Error | null | undefined,
       ) => {
@@ -1372,7 +1370,7 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
 
 function evaluateStream(
   bucket: Bucket,
-  step: ExecutableStep,
+  step: Step,
 ): ExecutionDetailsStream | null {
   const stream = step._stepOptions.stream;
   if (!stream) return null;

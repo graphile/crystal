@@ -15,7 +15,7 @@ A modest range of [standard step classes][standard steps] are available for you
 to use; but when these aren't enough you are encouraged to write your own (or
 pull down third party step classes from npm or similar).
 
-Step classes extend the `ExecutableStep` class, the only required method to
+Step classes extend the `Step` class, the only required method to
 define is `execute`, but you may also implement the various lifecycle methods,
 or add methods of your own to make it easier for you to write [plan
 resolvers][].
@@ -23,7 +23,7 @@ resolvers][].
 <!-- prettier-ignore -->
 ```ts
 /** XKCD-221 step class @ref https://xkcd.com/221/ */
-class GetRandomNumberStep extends ExecutableStep {
+class GetRandomNumberStep extends Step {
   execute({ count }) {
     return new Array(count).fill(4); // chosen by fair dice roll.
                                      // guaranteed to be random.
@@ -46,7 +46,7 @@ conflicts occurring.
 :::warning Don't subclass steps.
 
 Don't subclass steps, this will make things very confusing for you. Always
-inherit directly from `ExecutableStep`.
+inherit directly from `Step`.
 
 :::
 
@@ -209,8 +209,8 @@ _This method is optional._
 
 ```ts
 deduplicate(
-  peers: readonly ExecutableStep[]
-): readonly ExecutableStep[]
+  peers: readonly Step[]
+): readonly Step[]
 ```
 
 After a field has been fully planned, <grafast /> will call this method on each
@@ -232,7 +232,7 @@ _This method is optional._
 
 ```ts
 deduplicatedWith(
-  replacement: ExecutableStep
+  replacement: Step
 ): void
 ```
 
@@ -272,7 +272,7 @@ _This method is optional._
 ```ts
 optimize(
   options: { stream: StepStreamOptions | null }
-): ExecutableStep
+): Step
 ```
 
 This method is called on each step during the optimize lifecycle event. It
@@ -380,7 +380,7 @@ Usage:
 ```ts
 import { access } from "grafast";
 
-class MyListStep extends ExecutableStep {
+class MyListStep extends Step {
   // ...
 
   at(index) {
@@ -407,7 +407,7 @@ string, which represents an attribute to access an object-like value.
 ```ts
 import { access } from "grafast";
 
-class MyObjectStep extends ExecutableStep {
+class MyObjectStep extends Step {
   // ...
 
   get(key) {
@@ -439,7 +439,7 @@ zero or more times.
 ```ts
 import { access } from "grafast";
 
-class MyCollectionStep extends ExecutableStep /* implements ConnectionCapableStep */ {
+class MyCollectionStep extends Step /* implements ConnectionCapableStep */ {
   // ...
 
   items() {
@@ -473,12 +473,7 @@ look like:
 <!-- TODO: should we move this example somewhere else, it's a bit long! -->
 
 ```ts
-import {
-  ExecutableStep,
-  ExecutionDetails,
-  GrafastResultsList,
-  Maybe,
-} from "grafast";
+import { Step, ExecutionDetails, GrafastResultsList, Maybe } from "grafast";
 
 interface QueryBuilder {
   orderBy(columnName: string, ascending?: boolean): void;
@@ -486,16 +481,16 @@ interface QueryBuilder {
 
 type Callback = (queryBuilder: QueryBuilder) => void;
 
-class MyQueryStep extends ExecutableStep {
+class MyQueryStep extends Step {
   private applyDepIds: number[] = [];
 
   // [...]
   //   this.foreignKeyDepId = this.addDependency($fkey);
   // [...]
 
-  // Handling `ExecutableStep<Callback>` is enough for some use cases, but
+  // Handling `Step<Callback>` is enough for some use cases, but
   // handling this combination is the most flexible.
-  apply($step: ExecutableStep<Maybe<Callback | ReadonlyArray<Callback>>>) {
+  apply($step: Step<Maybe<Callback | ReadonlyArray<Callback>>>) {
     this.applyDepIds.push(this.addUnaryDependency($step));
   }
 
@@ -547,7 +542,7 @@ class MyQueryStep extends ExecutableStep {
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come
-as part of `ExecutableStep`.
+as part of `Step`.
 
 ### addDependency
 
@@ -564,7 +559,7 @@ In the [getting started][] guide we saw the constructor for the `AddStep` step
 class added two dependencies:
 
 ```ts
-class AddStep extends ExecutableStep {
+class AddStep extends Step {
   constructor($a, $b) {
     super();
     this.addDependency($a); // Returns 0

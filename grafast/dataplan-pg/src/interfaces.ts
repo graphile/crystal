@@ -1,4 +1,4 @@
-import type { ExecutableStep, Modifier } from "grafast";
+import type { Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";
@@ -320,11 +320,10 @@ export interface PgEnumCodec<
 }
 
 /**
- * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
+ * A PgTypedStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<TCodec extends PgCodec>
-  extends ExecutableStep {
+export interface PgTypedStep<TCodec extends PgCodec> extends Step {
   pgCodec: TCodec;
 }
 
@@ -381,21 +380,20 @@ export type TuplePlanMap<
 > = {
   [Index in keyof TTuple]: {
     // Optional attributes
-    [key in keyof TAttributes as Exclude<
-      key,
-      keyof TTuple[number]
-    >]?: ExecutableStep<ReturnType<TAttributes[key]["codec"]["fromPg"]>>;
+    [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
+      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+    >;
   } & {
     // Required unique combination of attributes
-    [key in TTuple[number]]: ExecutableStep<
+    [key in TTuple[number]]: Step<
       ReturnType<TAttributes[key]["codec"]["fromPg"]>
     >;
   };
 };
 
 /**
- * Represents a spec like `{user_id: ExecutableStep}` or
- * `{organization_id: ExecutableStep, item_id: ExecutableStep}`. The keys in
+ * Represents a spec like `{user_id: Step}` or
+ * `{organization_id: Step, item_id: Step}`. The keys in
  * the spec can be any of the attributes in TAttributes, however there must be at
  * least one of the unique sets of attributes represented (as specified in
  * TUniqueAttributes) - you can then add arbitrary additional attributes if you need
@@ -736,7 +734,7 @@ export type GetPgResourceUniques<
 > = TResource["uniques"];
 
 export type PgSQLCallback<TResult> = (
-  sql: PgSQL<PgTypedExecutableStep<PgCodec>>,
+  sql: PgSQL<PgTypedStep<PgCodec>>,
 ) => TResult;
 export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
 

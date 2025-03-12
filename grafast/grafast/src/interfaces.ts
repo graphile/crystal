@@ -31,7 +31,7 @@ import type { Constraint } from "./constraints.js";
 import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
-import type { ExecutableStep, ListCapableStep } from "./step.js";
+import type { ListCapableStep, Step } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { ApplyableExecutableStep } from "./steps/applyInput.js";
 import type {
@@ -343,8 +343,8 @@ export interface FieldInfo {
  */
 export type FieldPlanResolver<
   _TArgs extends BaseGraphQLArguments,
-  TParentStep extends ExecutableStep | null,
-  TResultStep extends ExecutableStep | null,
+  TParentStep extends Step | null,
+  TResultStep extends Step | null,
 > = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
 export type InputObjectFieldApplyResolver<TParent> = (
@@ -368,8 +368,8 @@ export type InputObjectTypeBakedResolver = (
 ) => any;
 
 export type ArgumentApplyPlanResolver<
-  TParentStep extends ExecutableStep = ExecutableStep,
-  TFieldStep extends ExecutableStep = ExecutableStep,
+  TParentStep extends Step = Step,
+  TFieldStep extends Step = Step,
 > = (
   $parentPlan: TParentStep,
   $fieldPlan: TFieldStep,
@@ -386,8 +386,8 @@ export type ArgumentApplyPlanResolver<
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentStep extends ExecutableStep = ExecutableStep,
-  TResultStep extends ExecutableStep = ExecutableStep,
+  TParentStep extends Step = Step,
+  TResultStep extends Step = Step,
 > = ($parentPlan: TParentStep, info: { schema: GraphQLSchema }) => TResultStep;
 
 // TODO: is this still implemented?
@@ -395,9 +395,7 @@ export type ScalarPlanResolver<
  * GraphQLScalarTypes can have plans, these are passed the field plan and must
  * return an executable plan.
  */
-export type ScalarInputPlanResolver<
-  TResultStep extends ExecutableStep = ExecutableStep,
-> = (
+export type ScalarInputPlanResolver<TResultStep extends Step = Step> = (
   $inputValue: AnyInputStep,
   /*
     | __InputListStep
@@ -421,25 +419,17 @@ export type EnumValueApplyResolver<TParent = any> = (parent: TParent) => void;
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
 type OutputPlanForNamedType<TType extends GraphQLType> =
-  TType extends GrafastObjectType<infer TStep, any> ? TStep : ExecutableStep;
+  TType extends GrafastObjectType<infer TStep, any> ? TStep : Step;
 
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ?
-        | ListCapableStep<any, OutputPlanForNamedType<U>>
-        | ExecutableStep<ReadonlyArray<any>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ?
-        | ListCapableStep<any, OutputPlanForNamedType<U>>
-        | ExecutableStep<ReadonlyArray<any>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
     : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ?
-        | ListCapableStep<any, OutputPlanForNamedType<U>>
-        | ExecutableStep<ReadonlyArray<any>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
     : TType extends GraphQLList<infer U>
-    ?
-        | ListCapableStep<any, OutputPlanForNamedType<U>>
-        | ExecutableStep<ReadonlyArray<any>>
+    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<infer U>
     ? OutputPlanForNamedType<U>
     : OutputPlanForNamedType<TType>;
@@ -449,8 +439,8 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
  */
 export type GrafastFieldConfig<
   TType extends GraphQLOutputType,
-  TParentStep extends ExecutableStep | null,
-  TFieldStep extends ExecutableStep, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
+  TParentStep extends Step | null,
+  TFieldStep extends Step, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
@@ -472,7 +462,7 @@ export type GrafastFieldConfigArgumentMap = {
 export type GrafastArgumentConfig<
   TInputType extends GraphQLInputType = GraphQLInputType,
   _TContext extends Grafast.Context = Grafast.Context,
-  _TParentStep extends ExecutableStep | null = ExecutableStep | null,
+  _TParentStep extends Step | null = Step | null,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   applyPlan?: ArgumentApplyPlanResolver<any, any>;
@@ -558,7 +548,7 @@ export interface NodeIdCodec<T = any> {
 export type NodeIdHandler<
   TIdentifiers extends readonly any[] = readonly any[],
   TCodec extends NodeIdCodec<any> = NodeIdCodec<any>,
-  TNodeStep extends ExecutableStep = ExecutableStep,
+  TNodeStep extends Step = Step,
   TSpec = any,
 > = {
   /**
@@ -591,9 +581,7 @@ export type NodeIdHandler<
    * Returns a plan that returns the value ready to be encoded. When the result
    * of this plan is fed into `match`, it should return `true`.
    */
-  plan(
-    $thing: TNodeStep,
-  ): ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>;
+  plan($thing: TNodeStep): Step<TCodec extends NodeIdCodec<infer U> ? U : any>;
 
   /**
    * Returns a specification based on the Node ID, this can be in any format
@@ -602,9 +590,7 @@ export type NodeIdHandler<
    * referencing a node without actually fetching it - e.g. allowing you to
    * delete a node by its ID without first fetching it.)
    */
-  getSpec(
-    plan: ExecutableStep<TCodec extends NodeIdCodec<infer U> ? U : any>,
-  ): TSpec;
+  getSpec(plan: Step<TCodec extends NodeIdCodec<infer U> ? U : any>): TSpec;
 
   /**
    * Combined with `getSpec`, this forms the recprocal of `plan`; i.e.
@@ -801,12 +787,9 @@ export interface LocationDetails {
   fieldName: string | null;
 }
 
-export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
-  {
-    [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U>
-      ? U
-      : never;
-  };
+export type UnwrapPlanTuple</* const */ TIn extends readonly Step[]> = {
+  [Index in keyof TIn]: TIn[Index] extends Step<infer U> ? U : never;
+};
 
 export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
 
@@ -827,23 +810,21 @@ export type Maybe<T> = T | null | undefined;
 export * from "./planJSONInterfaces.js";
 
 export interface AddDependencyOptions {
-  step: ExecutableStep;
+  step: Step;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: null | Error | undefined;
-  nonUnaryMessage?: (
-    $dependent: ExecutableStep,
-    $dependency: ExecutableStep,
-  ) => string;
+  nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
 }
 /**
  * @internal
  */
 export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 
-export type DataFromStep<TStep extends ExecutableStep> =
-  TStep extends ExecutableStep<infer TData> ? TData : never;
+export type DataFromStep<TStep extends Step> = TStep extends Step<infer TData>
+  ? TData
+  : never;
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
@@ -882,6 +863,6 @@ export interface EstablishOperationPlanEvent {
 }
 export interface ExecuteStepEvent {
   args: GrafastExecutionArgs;
-  step: ExecutableStep;
+  step: Step;
   executeDetails: ExecutionDetails;
 }

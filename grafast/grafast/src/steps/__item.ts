@@ -2,15 +2,15 @@ import chalk from "chalk";
 
 import type { GrafastResultsList, JSONValue } from "../index.js";
 import { $$deepDepSkip } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { $$noExec, UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { $$noExec, UnbatchedStep } from "../step.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
  * themselves!) that Grafast uses to refer to an individual item within a list
  * or stream.
  */
-export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
+export class __ItemStep<TData> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ItemStep",
@@ -24,7 +24,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   public transformStepId?: number;
 
   constructor(
-    parentPlan: ExecutableStep<TData> | ExecutableStep<TData[]>,
+    parentPlan: Step<TData> | Step<TData[]>,
     public readonly depth = 0,
   ) {
     super();
@@ -43,10 +43,10 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
     };
   }
 
-  getParentStep(): ExecutableStep {
+  getParentStep(): Step {
     return this.getDep(0);
   }
-  [$$deepDepSkip](): ExecutableStep {
+  [$$deepDepSkip](): Step {
     return this.getDep(0);
   }
 

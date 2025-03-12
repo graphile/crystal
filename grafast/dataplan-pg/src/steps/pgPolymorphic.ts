@@ -9,7 +9,7 @@ import {
   isDev,
   polymorphicWrap,
   SafeError,
-  UnbatchedExecutableStep,
+  UnbatchedStep,
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
@@ -45,7 +45,7 @@ export class PgPolymorphicStep<
     TTypeSpecifierStep extends
       ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
   >
-  extends UnbatchedExecutableStep<any>
+  extends UnbatchedStep<any>
   implements PolymorphicStep
 {
   static $$export = {

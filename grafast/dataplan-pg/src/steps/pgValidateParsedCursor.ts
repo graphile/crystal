@@ -1,5 +1,5 @@
 import type { ExecutableStep, ExecutionExtra, Maybe } from "grafast";
-import { isDev, SafeError, UnbatchedExecutableStep } from "grafast";
+import { isDev, SafeError, UnbatchedStep } from "grafast";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda
@@ -8,7 +8,7 @@ import { isDev, SafeError, UnbatchedExecutableStep } from "grafast";
  *
  * @internal
  */
-export class PgValidateParsedCursorStep extends UnbatchedExecutableStep<undefined> {
+export class PgValidateParsedCursorStep extends UnbatchedStep<undefined> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgValidateParsedCursorStep",
@@ -96,7 +96,7 @@ export function validateParsedCursor(
     }
     // TODO: in all likelihood this is called in a unary position, so the
     // following TODO is most likely dismissable. We should assert such via
-    // `addUnaryDependency`? Should also make the above a UnbatchedExecutableStep?
+    // `addUnaryDependency`? Should also make the above a UnbatchedStep?
     // TODO: we should push this error to `results`; but doing so would make it
     // not syncAndSafe.
     throw new SafeError(

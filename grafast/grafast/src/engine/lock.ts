@@ -1,4 +1,4 @@
-import type { ExecutableStep } from "..";
+import type { Step } from "..";
 
 /**
  * Used internally to prevent steps using other steps' optimize/finalize/etc
@@ -8,13 +8,11 @@ import type { ExecutableStep } from "..";
  */
 export const $$unlock = Symbol("unlock");
 
-function isLocked(
-  $step: ExecutableStep,
-): $step is ExecutableStep & { [$$unlock](): void } {
+function isLocked($step: Step): $step is Step & { [$$unlock](): void } {
   return $step[$$unlock] !== undefined;
 }
 
-export function lock($step: ExecutableStep): void {
+export function lock($step: Step): void {
   if (!isLocked($step)) {
     const { optimize, finalize, deduplicate, deduplicatedWith } = $step;
     if (optimize) {
@@ -66,7 +64,7 @@ export function lock($step: ExecutableStep): void {
   }
 }
 
-export function unlock($step: ExecutableStep): boolean {
+export function unlock($step: Step): boolean {
   if (isLocked($step)) {
     $step[$$unlock]();
     return true;

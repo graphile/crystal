@@ -11,7 +11,7 @@ import {
   first,
   lambda,
   last,
-  UnbatchedExecutableStep,
+  UnbatchedStep,
 } from "grafast";
 
 import type { PgCursorStep } from "./pgCursor.js";
@@ -38,7 +38,7 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 export class PgPageInfoStep<
     TStep extends PgSelectStep<any> | PgUnionAllStep<any, any>,
   >
-  extends UnbatchedExecutableStep<any>
+  extends UnbatchedStep<any>
   implements PageInfoCapableStep
 {
   static $$export = {
