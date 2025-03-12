@@ -5,6 +5,8 @@ select
 from app_public.forums as __forums__
 where
   (
+    true /* authorization checks */
+  ) and (
     __forums__.archived_at is null
   ) and (
     exists(
@@ -17,8 +19,6 @@ where
           __messages_filter__.featured = $1::"bool"
         )
     )
-  ) and (
-    true /* authorization checks */
   )
 order by __forums__."id" asc;
 

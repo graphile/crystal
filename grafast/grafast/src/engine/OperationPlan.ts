@@ -24,7 +24,7 @@ import {
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON, ModifierStep } from "../index.js";
+import type { GrafastPlanJSON } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
@@ -41,6 +41,7 @@ import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
+  AnyInputStep,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -228,15 +229,8 @@ export class OperationPlan {
    */
   public rootOutputPlan!: OutputPlan;
 
-  private modifierStepCount = 0;
-  private modifierDepthCount = 0;
-  private modifierSteps: ModifierStep[] = [];
-
   /** @internal */
   public readonly stepTracker = new StepTracker(this);
-
-  private maxDeduplicatedStepId = -1;
-  private maxValidatedStepId = -1;
 
   /** Constraints based on evaluating variables. @internal */
   public readonly variableValuesConstraints: Constraint[];
@@ -290,6 +284,12 @@ export class OperationPlan {
   >();
 
   private scalarPlanInfo: { schema: GraphQLSchema };
+
+  /** @internal */
+  public valueNodeToStaticValueCache = new Map<
+    graphql.ValueNode,
+    AnyInputStep
+  >();
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -561,24 +561,6 @@ export class OperationPlan {
     return this.stepTracker.addStep(plan);
   }
 
-  /**
-   * Adds a plan to the known steps and returns the number to use as the plan
-   * id. ONLY to be used from Step, user code should never call this directly.
-   *
-   * @internal
-   */
-  public _addModifierStep(step: ModifierStep<any>): string {
-    if (!["plan", "validate", "optimize"].includes(this.phase)) {
-      throw new Error(
-        `Creating a step during the '${this.phase}' phase is forbidden.`,
-      );
-    }
-    const modifierStepId = `${this.modifierDepthCount}-${this
-      .modifierStepCount++}`;
-    this.modifierSteps.push(step);
-    return modifierStepId;
-  }
-
   /** @internal Use plan.getStep(id) instead. */
   public getStep: (
     id: number,
@@ -812,11 +794,11 @@ export class OperationPlan {
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
+        rootType.name,
         fieldName,
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
-        fields,
         subscriptionPlanResolver,
         "autoApplyAfterParentSubscribePlan",
         this.trackedRootValueStep,
@@ -1264,11 +1246,11 @@ export class OperationPlan {
         }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
+            objectType.name,
             fieldName,
             fieldLayerPlan,
             fieldPath,
             polymorphicPaths,
-            fieldNodes,
             planResolver,
             "autoApplyAfterParentPlan",
             parentStep,
@@ -1939,11 +1921,11 @@ export class OperationPlan {
   }
 
   private planField(
+    typeName: string,
     fieldName: string,
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
-    fieldNodes: FieldNode[],
     planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
     applyAfterMode: ApplyAfterModeArg,
     rawParentStep: ExecutableStep,
@@ -1956,6 +1938,8 @@ export class OperationPlan {
     streamDetails: StreamDetails | true | false | null,
     deduplicate = true,
   ): { haltTree: boolean; step: ExecutableStep } {
+    const coordinate = `${typeName}.${fieldName}`;
+
     // The step may have been de-duped whilst sibling steps were planned
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
@@ -1971,10 +1955,11 @@ export class OperationPlan {
         withFieldArgsForArguments,
         null,
         this,
-        parentStep,
         trackedArguments,
         field,
+        parentStep,
         applyAfterMode,
+        coordinate,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
             fieldName,
@@ -2058,7 +2043,6 @@ export class OperationPlan {
         e,
       );
       const haltTree = true;
-      this.modifierSteps = [];
       // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
@@ -2107,41 +2091,6 @@ export class OperationPlan {
         return trackedArgumentValues[name];
       },
     };
-  }
-
-  public withModifiers<T>(cb: () => T): T {
-    // Stash previous modifiers
-    const previousModifierDepthCount = this.modifierDepthCount++;
-    const previousCount = this.modifierStepCount;
-    const previousStack = this.modifierSteps.splice(
-      0,
-      this.modifierSteps.length,
-    );
-    this.modifierStepCount = 0;
-    let result;
-    let plansToApply;
-    try {
-      result = cb();
-    } finally {
-      // Remove the modifier plans from operationPlan and sort them ready for application.
-      plansToApply = this.modifierSteps
-        .splice(0, this.modifierSteps.length)
-        .reverse();
-      // Restore previous modifiers
-      this.modifierStepCount = previousCount;
-      for (const mod of previousStack) {
-        this.modifierSteps.push(mod);
-      }
-      // Restore previous depth
-      this.modifierDepthCount = previousModifierDepthCount;
-    }
-
-    // Apply the plans.
-    for (let i = 0, l = plansToApply.length; i < l; i++) {
-      plansToApply[i].apply();
-    }
-
-    return result;
   }
 
   /**
@@ -3333,11 +3282,6 @@ export class OperationPlan {
   /** Finalizes each step */
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
-    assert.strictEqual(
-      this.modifierSteps.length,
-      0,
-      "No modifier steps expected when performing finalizeSteps",
-    );
     for (const step of this.stepTracker.activeSteps) {
       const wasLocked = isDev && unlock(step);
       step.finalize();

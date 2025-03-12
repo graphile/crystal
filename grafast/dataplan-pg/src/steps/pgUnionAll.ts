@@ -52,7 +52,7 @@ import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
@@ -93,6 +93,7 @@ const digestSpecificExpressionFromAttributeName = (
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
+  m: Object.create(null),
   hasMore: false,
   items: [],
 } as PgUnionAllStepResult);
@@ -261,6 +262,10 @@ export class PgUnionAllSingleStep
     return $pgUnionAll;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   public node() {
     return this;
   }
@@ -367,6 +372,8 @@ export type PgUnionAllMode = "normal" | "aggregate";
  * the relevant queryValues. This saves repeating this work at execution time.
  */
 interface QueryBuildResult {
+  meta: Record<string, unknown>;
+
   // The SQL query text
   text: string;
 
@@ -400,6 +407,7 @@ interface QueryBuildResult {
 }
 
 interface PgUnionAllStepResult {
+  m: Record<string, unknown>;
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
@@ -761,6 +769,10 @@ on (${sql.indent(
     return index;
   }
 
+  public getMeta(key: string) {
+    return access(this, ["m", key]);
+  }
+
   /**
    * If this plan may only return one record, you can use `.singleAsRecord()`
    * to return a plan that resolves to that record (rather than a list of
@@ -836,33 +848,12 @@ on (${sql.indent(
     }
   }
 
-  wherePlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
-      );
-    }
-    return new PgConditionStep(this);
-  }
-
   groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(this.scopedSQL(group));
-  }
-
-  havingPlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
-      );
-    }
-    if (this.mode !== "aggregate") {
-      throw new SafeError(`Cannot add having to a non-aggregate query`);
-    }
-    return new PgConditionStep(this, true);
   }
 
   having(
@@ -921,16 +912,6 @@ on (${sql.indent(
   }
 
   optimize() {
-    if (this._limitToTypes) {
-      this.memberDigests = this.memberDigests.filter((d) =>
-        this._limitToTypes!.includes(d.member.typeName),
-      );
-    }
-    if (this.memberDigests.length === 0) {
-      // We have no implementations, we'll never return anything
-      return constant(NO_ROWS, false);
-    }
-
     // TODO: validate the parsed cursor and throw error in connection if it
     // fails. I'm not sure, but perhaps we can add this step itself (or a
     // derivative thereof) as a dependency of the connection - that way, if
@@ -985,6 +966,7 @@ on (${sql.indent(
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
+      meta,
       text,
       rawSqlValues,
       identifierIndex,
@@ -1007,6 +989,7 @@ on (${sql.indent(
       havingConditions: this.havingConditions,
       mode: this.mode,
       alias: this.alias,
+      symbol: this.symbol,
       hasSideEffects: this.hasSideEffects,
       groups: this.groups,
       orderSpecs: this.orderSpecs,
@@ -1014,6 +997,7 @@ on (${sql.indent(
       typeIdx: this.typeIdx,
       attributes: this.spec.attributes,
       memberDigests: this.memberDigests,
+      limitToTypes: this._limitToTypes,
       fetchOneExtra,
       needsCursor: this.needsCursor,
       applyDepIds: this.applyDepIds,
@@ -1083,6 +1067,7 @@ on (${sql.indent(
         ? reverseArray(slicedRows)
         : slicedRows;
       return {
+        m: meta,
         hasMore,
         items: orderedRows,
         cursorDetails,
@@ -1152,6 +1137,7 @@ interface PgUnionAllQueryInfo<
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
   readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;
+  readonly limitToTypes: ReadonlyArray<string> | undefined;
   readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
 
   readonly selects: ReadonlyArray<PgUnionAllStepSelect<TAttributes>>;
@@ -1162,7 +1148,8 @@ interface MutablePgUnionAllQueryInfo<
   TTypeNames extends string = string,
 > extends PgUnionAllQueryInfo<TAttributes, TTypeNames>,
     MutablePgStmtCommonQueryInfo {
-  readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  limitToTypes: Array<string> | undefined;
   readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
 
   readonly orderSpecs: Array<PgUnionAllStepOrder<TAttributes>>;
@@ -1172,6 +1159,7 @@ interface MutablePgUnionAllQueryInfo<
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
   typeIdx: number | null;
   isOrderUnique: boolean;
+  readonly havingConditions: Array<SQL>;
 }
 
 function buildTheQuery<
@@ -1189,6 +1177,7 @@ function buildTheQuery<
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
     memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
+    limitToTypes: rawInfo.limitToTypes?.slice(),
 
     // Will be populated below
     ordersForCursor: undefined as never,
@@ -1205,6 +1194,7 @@ function buildTheQuery<
     offset: null,
     shouldReverseOrder: false,
   };
+
   const { values, count } = info.executionDetails;
 
   function selectAndReturnIndex(expression: SQL): number {
@@ -1243,12 +1233,14 @@ function buildTheQuery<
     return info.selects.push({ type: "pk" }) - 1;
   }
 
-  // TODO: evaluate runtime orders, conditions, etc here
-
+  const meta = Object.create(null);
   const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
+    },
+    setMeta(key, value) {
+      meta[key] = value;
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
@@ -1257,6 +1249,51 @@ function buildTheQuery<
     },
     setOrderIsUnique() {
       info.isOrderUnique = true;
+    },
+    where(whereSpec) {
+      for (const digest of info.memberDigests) {
+        const { alias: tableAlias, symbol } = digest;
+        if (sql.isSQL(whereSpec)) {
+          // Merge the global where into this sub-where.
+          digest.conditions.push(
+            // TODO: do we require that info.symbol is a symbol?
+            typeof info.symbol === "symbol"
+              ? sql.replaceSymbol(whereSpec, info.symbol, symbol)
+              : whereSpec,
+          );
+        } else {
+          const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+            digest,
+            whereSpec.attribute,
+          )}`;
+          digest.conditions.push(whereSpec.callback(ident));
+        }
+      }
+    },
+    having(condition) {
+      if (info.mode !== "aggregate") {
+        throw new SafeError(`Cannot add having to a non-aggregate query`);
+      }
+      if (sql.isSQL(condition)) {
+        info.havingConditions.push(condition);
+      } else {
+        const never: never = condition;
+        console.error("Unsupported condition: ", never);
+        throw new Error(`Unsupported condition`);
+      }
+    },
+    whereBuilder() {
+      return new PgCondition(this);
+    },
+    havingBuilder() {
+      return new PgCondition(this, true);
+    },
+    limitToTypes(types) {
+      if (!info.limitToTypes) {
+        info.limitToTypes = [...types];
+      } else {
+        info.limitToTypes = info.limitToTypes.filter((t) => types.includes(t));
+      }
     },
   };
 
@@ -1269,7 +1306,28 @@ function buildTheQuery<
     }
   }
 
+  // Apply type limits
+  if (info.limitToTypes) {
+    info.memberDigests = info.memberDigests.filter((d) =>
+      info.limitToTypes!.includes(d.member.typeName),
+    );
+  }
+
   // Now turn order specs into orders
+  if (info.memberDigests.length === 0) {
+    // We have no implementations, we'll never return anything
+    return {
+      meta,
+      text: `select null;`,
+      rawSqlValues: [],
+      identifierIndex: null,
+      first: 0,
+      last: 0,
+      queryValues: [],
+      cursorDetails: undefined,
+      shouldReverseOrder: false,
+    };
+  }
 
   for (const orderSpec of info.orderSpecs) {
     if (!info.attributes) {
@@ -1729,6 +1787,7 @@ ${lateralText};`;
       : undefined;
 
   return {
+    meta,
     text,
     rawSqlValues,
     identifierIndex,
@@ -1971,6 +2030,7 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     conditions: [...memberDigest.conditions],
   };
 }
+
 export interface PgUnionAllQueryBuilder<
   TAttributes extends string = string,
   _TTypeNames extends string = string,
@@ -1979,4 +2039,10 @@ export interface PgUnionAllQueryBuilder<
   orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
+  where(whereSpec: PgWhereConditionSpec<TAttributes>): void;
+  whereBuilder(): PgCondition<this>;
+  having(rawCondition: PgHavingConditionSpec<string>): void;
+  havingBuilder(): PgCondition<this>;
+  /** Only return values of the given types */
+  limitToTypes(types: readonly string[]): void;
 }

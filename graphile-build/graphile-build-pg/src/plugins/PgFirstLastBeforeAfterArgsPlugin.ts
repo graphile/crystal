@@ -49,7 +49,7 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
 };
 
 function commonFn(
-  args: GrafastFieldConfigArgumentMap<any, any, any, any>,
+  args: GrafastFieldConfigArgumentMap,
   build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFieldsFieldArgs
@@ -104,7 +104,6 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -129,7 +128,6 @@ function commonFn(
                 "arg",
               ),
               type: GraphQLInt,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -156,7 +154,6 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        autoApplyAfterParentPlan: true,
         applyPlan: EXPORTABLE(
           () =>
             function plan(
@@ -181,7 +178,6 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -208,7 +204,6 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              autoApplyAfterParentPlan: true,
               applyPlan: EXPORTABLE(
                 () =>
                   function plan(
@@ -227,7 +222,7 @@ function commonFn(
             },
           }
         : null),
-    } as GrafastFieldConfigArgumentMap<any, any, any, any>,
+    } as GrafastFieldConfigArgumentMap,
     isPgFieldConnection
       ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
       : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`,

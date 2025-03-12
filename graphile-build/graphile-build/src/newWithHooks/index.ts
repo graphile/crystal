@@ -4,7 +4,7 @@ import type {
   GrafastFieldConfig,
   OutputPlanForType,
 } from "grafast";
-import { defaultPlanResolver, inputObjectFieldSpec, objectSpec } from "grafast";
+import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -30,9 +30,8 @@ import {
 import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";
-import type { PostPlanResolver } from "../interfaces.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
-import { EXPORTABLE, exportNameHint } from "../utils.js";
+import { EXPORTABLE } from "../utils.js";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 
@@ -136,10 +135,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawObjectSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
-            any,
-            any
-          >;
+          const rawObjectSpec =
+            inSpec as GraphileBuild.GrafastObjectTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeObject;
 
@@ -188,45 +185,26 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GrafastFieldConfig<
-                any,
-                any,
-                any,
-                any,
-                any
-              >[] = [];
+              const processedFields: GrafastFieldConfig<any, any, any, any>[] =
+                [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
                 TType extends GraphQLOutputType,
-                TContext extends Grafast.Context,
                 TParentStep extends ExecutableStep,
                 TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
                 fieldSpec:
-                  | GrafastFieldConfig<
-                      TType,
-                      TContext,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >
+                  | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
                   | ((
                       context: GraphileBuild.ContextObjectFieldsField,
                     ) => GrafastFieldConfig<
                       TType,
-                      TContext,
                       TParentStep,
                       TFieldStep,
                       TArgs
                     >),
-              ): GrafastFieldConfig<
-                TType,
-                TContext,
-                TParentStep,
-                TFieldStep,
-                TArgs
-              > => {
+              ): GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs> => {
                 if (!isString(fieldScope.fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
@@ -272,18 +250,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
-                const postPlanResolvers: PostPlanResolver<any, any, any>[] = [];
-                exportNameHint(
-                  postPlanResolvers,
-                  `${Self.name}_${fieldName}_postPlanResolvers`,
-                );
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
-                  {
-                    ...fieldContext,
-                    addToPlanResolver(cb) {
-                      postPlanResolvers.push(cb);
-                    },
-                  };
+                  { ...fieldContext };
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
                   args: builder.applyHooks(
@@ -317,24 +285,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     build,
                     argContext,
                     `|${typeName}.fields.${fieldName}.args.${argName}`,
-                  );
-                }
-
-                if (postPlanResolvers.length > 0) {
-                  const basePlan = finalFieldSpec.plan ?? defaultPlanResolver;
-                  if (basePlan !== defaultPlanResolver) {
-                    exportNameHint(basePlan, `${Self.name}_${fieldName}_plan`);
-                  }
-                  finalFieldSpec.plan = EXPORTABLE(
-                    (basePlan, postPlanResolvers) =>
-                      ($parent, fieldArgs, info) => {
-                        let $result = basePlan($parent, fieldArgs, info);
-                        for (const ppr of postPlanResolvers) {
-                          $result = ppr($result, $parent, fieldArgs, info);
-                        }
-                        return $result;
-                      },
-                    [basePlan, postPlanResolvers],
                   );
                 }
 
@@ -395,7 +345,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInterfaceType: {
           const rawInterfaceSpec =
-            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any, any>;
+            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInterface;
 
@@ -582,10 +532,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawUnionSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
-            any,
-            any
-          >;
+          const rawUnionSpec =
+            inSpec as GraphileBuild.GrafastUnionTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeUnion;
 
