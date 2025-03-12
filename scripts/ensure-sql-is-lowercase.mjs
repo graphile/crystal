@@ -1,8 +1,9 @@
 // @ts-check
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const { dirname: __dirname } = import.meta;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const regex = /^```sql\n([\s\S]*?)\n```$/gm;
 const keywords = [
