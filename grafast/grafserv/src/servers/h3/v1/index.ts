@@ -278,7 +278,6 @@ export class H3Grafserv extends GrafservBase {
           { socket: peer.websocket, request: peer.request },
         );
         client.closed = async (code, reason) => {
-          // @ts-expect-error fixed in unreleased https://github.com/enisdenjo/graphql-ws/pull/573
           onClose(code, reason);
         };
       },
