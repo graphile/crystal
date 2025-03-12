@@ -50,7 +50,12 @@ async function walkDir(dir) {
  * @param segment {string} - the segment of text to check
  */
 function wrongSQLCheck(segment) {
-  return keywords.some((keyword) => segment.includes(keyword));
+  return keywords.some((keyword) =>
+    segment
+      .replace(/\/\*[^*]+\*\//g, "")
+      .replace(/--.*$/gm, "")
+      .includes(keyword),
+  );
 }
 
 async function main() {
