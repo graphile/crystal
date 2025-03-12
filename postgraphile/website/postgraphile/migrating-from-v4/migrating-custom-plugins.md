@@ -797,9 +797,7 @@ As we read earlier, there's no look-ahead system in PostGraphile V5; instead we
 use Gra*fast*'s planning system.
 
 Where you used to use `addArgDataGenerator` you should now give your argument
-an `applyPlan` and set `autoApplyAfterParentPlan: true` so that the plan is
-automatically applied (without the parent field having to call
-`fieldArgs.apply($target, 'argName')`).
+an `applyPlan`.
 
 Typically where you'd use a `QueryBuilder` (`queryBuilder`) in V4, you'll be
 dealing with a `PgSelectStep` (`$pgSelect`) in V5. Note that these are

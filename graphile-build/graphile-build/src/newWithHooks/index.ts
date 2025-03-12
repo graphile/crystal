@@ -455,13 +455,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       },
                     };
 
-                    finalFieldSpec.args![argName] = builder.applyHooks(
+                    const finalArgSpec = builder.applyHooks(
                       "GraphQLInterfaceType_fields_field_args_arg",
                       argSpec,
                       build,
                       argContext,
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
+
+                    finalFieldSpec.args![argName] = finalArgSpec;
                   }
 
                   processedFields.push(finalFieldSpec);
@@ -832,6 +834,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     valueContext,
                     `|${typeName}|${valueName}`,
                   );
+
+                  // TODO: remove this code
+                  const ext = newValue.extensions?.grafast;
+                  if (ext && ext.applyPlan) {
+                    throw new Error(
+                      `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
+                    );
+                  }
 
                   memo[valueName] = newValue;
                   return memo;

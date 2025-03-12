@@ -82,6 +82,7 @@ import {
   ExecutionExtra,
   ExecutionResults,
   ExecutionResultValue,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -343,6 +344,7 @@ export {
   ExecutionValue,
   exportAs,
   exportAsMany,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -685,6 +687,11 @@ declare global {
       // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
       applyPlan?: ArgumentApplyPlanResolver;
       applySubscribePlan?: ArgumentApplyPlanResolver;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      autoApplyAfterParentPlan?: never;
+      autoApplyAfterParentSubscribePlan?: never;
     }
 
     interface InputObjectTypeExtensions {
@@ -693,6 +700,12 @@ declare global {
 
     interface InputFieldExtensions {
       apply?: InputObjectFieldApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      applyPlan?: never;
+      autoApplyAfterParentInputPlan?: never;
+      autoApplyAfterParentApplyPlan?: never;
     }
 
     interface ObjectTypeExtensions {
@@ -711,6 +724,9 @@ declare global {
        * @experimental
        */
       apply?: EnumValueApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      applyPlan?: never;
     }
 
     interface ScalarTypeExtensions {

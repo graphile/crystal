@@ -27,9 +27,7 @@ import { assertNotPromise } from "./utils.js";
 
 const { getNullableType, isInputObjectType, isListType } = graphql;
 
-export type ApplyAfterModeArg =
-  | "autoApplyAfterParentPlan"
-  | "autoApplyAfterParentSubscribePlan";
+export type ApplyAfterModeArg = "plan" | "subscribePlan";
 
 function assertNotRuntime(operationPlan: OperationPlan, description: string) {
   if (operationPlan.phase === "ready") {
@@ -232,9 +230,9 @@ function processAfter(
   const schema = $parent.operationPlan.schema;
   for (const [argName, arg] of Object.entries(args)) {
     const autoApply =
-      applyAfterMode === "autoApplyAfterParentPlan"
+      applyAfterMode === "plan"
         ? arg.extensions.grafast?.applyPlan
-        : applyAfterMode === "autoApplyAfterParentSubscribePlan"
+        : applyAfterMode === "subscribePlan"
         ? arg.extensions.grafast?.applySubscribePlan
         : null;
     if (autoApply) {
