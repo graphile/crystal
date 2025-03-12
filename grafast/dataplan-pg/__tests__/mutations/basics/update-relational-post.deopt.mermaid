@@ -17,14 +17,13 @@ graph TD
     __Value2 --> Access12
     __Value2 --> Access13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant9{{"Constant[9∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Constant112{{"Constant[112∈0] ➊<br />ᐸnullᐳ"}}:::plan
     Constant210{{"Constant[210∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant211{{"Constant[211∈0] ➊<br />ᐸ'A description'ᐳ"}}:::plan
     Constant212{{"Constant[212∈0] ➊<br />ᐸ'A note'ᐳ"}}:::plan
     Constant213{{"Constant[213∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgUpdateSingle11[["PgUpdateSingle[11∈1] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
-    Object14 & Constant210 & Constant9 & Constant211 --> PgUpdateSingle11
+    Object14 & Constant210 & Constant211 --> PgUpdateSingle11
     PgSelect18[["PgSelect[18∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
     PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Object14 & PgClassExpression15 --> PgSelect18
@@ -83,7 +82,7 @@ graph TD
     PgSelectSingle54 --> PgClassExpression56
     PgUpdateSingle62[["PgUpdateSingle[62∈5] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object65{{"Object[65∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object65 & Constant210 & Constant9 & Constant212 --> PgUpdateSingle62
+    Object65 & Constant210 & Constant212 --> PgUpdateSingle62
     Access63{{"Access[63∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access64{{"Access[64∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access63 & Access64 --> Object65
@@ -147,7 +146,7 @@ graph TD
     PgSelectSingle105 --> PgClassExpression107
     PgUpdateSingle113[["PgUpdateSingle[113∈9] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object116{{"Object[116∈9] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object116 & Constant210 & Constant9 & Constant112 --> PgUpdateSingle113
+    Object116 & Constant210 & Constant112 --> PgUpdateSingle113
     Access114{{"Access[114∈9] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access115{{"Access[115∈9] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access114 & Access115 --> Object116
@@ -211,7 +210,7 @@ graph TD
     PgSelectSingle156 --> PgClassExpression158
     PgUpdateSingle164[["PgUpdateSingle[164∈13] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
     Object167{{"Object[167∈13] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object167 & Constant213 & Constant9 & Constant112 --> PgUpdateSingle164
+    Object167 & Constant213 & Constant112 --> PgUpdateSingle164
     Access165{{"Access[165∈13] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access166{{"Access[166∈13] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access165 & Access166 --> Object167
@@ -279,7 +278,7 @@ graph TD
     subgraph "Buckets for mutations/basics/update-relational-post"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant9,Access12,Access13,Object14,Constant112,Constant210,Constant211,Constant212,Constant213 bucket0
+    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant112,Constant210,Constant211,Constant212,Constant213 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 210, 9, 211"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle11 bucket1

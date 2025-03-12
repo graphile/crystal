@@ -10,7 +10,6 @@ graph TD
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
     __InputObject12{{"__InputObject[12∈0] ➊"}}:::plan
     __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
@@ -19,9 +18,9 @@ graph TD
     __InputObject36{{"__InputObject[36∈0] ➊"}}:::plan
     __InputObject39{{"__InputObject[39∈0] ➊"}}:::plan
     __InputObject41{{"__InputObject[41∈0] ➊"}}:::plan
-    Constant7 & __InputObject9 & __InputObject12 & __InputObject19 & __InputObject26 & __InputObject33 & __InputObject36 & __InputObject39 & __InputObject41 --> __InputObject8
+    __InputObject9 & __InputObject12 & __InputObject19 & __InputObject26 & __InputObject33 & __InputObject36 & __InputObject39 & __InputObject41 --> __InputObject8
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant7 & __InputObject8 --> __InputObject6
+    __InputObject8 --> __InputObject6
     Constant100{{"Constant[100∈0] ➊<br />ᐸ99ᐳ"}}:::plan
     Constant101{{"Constant[101∈0] ➊<br />ᐸ1234ᐳ"}}:::plan
     Constant100 & Constant101 --> __InputObject9
@@ -117,7 +116,7 @@ graph TD
     subgraph "Buckets for mutations/v4/geometry.mutations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Constant7,__InputObject8,__InputObject9,__InputObject12,__InputObject13,__InputObject16,__InputObject19,__InputObject20,__InputObject23,__InputObject26,__InputObject27,__InputObject30,__InputObject33,Constant34,__InputObject36,Constant37,__InputObject39,Constant40,__InputObject41,__InputObject42,Access47,Access48,Object49,ApplyInput50,Constant100,Constant101,Constant102,Constant103,Constant104,Constant105,Constant106,Constant107,Constant108,Constant109,Constant110,Constant111,Constant112,Constant113,Constant114,Constant115,Constant116,Constant117 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,__InputObject9,__InputObject12,__InputObject13,__InputObject16,__InputObject19,__InputObject20,__InputObject23,__InputObject26,__InputObject27,__InputObject30,__InputObject33,Constant34,__InputObject36,Constant37,__InputObject39,Constant40,__InputObject41,__InputObject42,Access47,Access48,Object49,ApplyInput50,Constant100,Constant101,Constant102,Constant103,Constant104,Constant105,Constant106,Constant107,Constant108,Constant109,Constant110,Constant111,Constant112,Constant113,Constant114,Constant115,Constant116,Constant117 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 49, 50<br /><br />1: PgInsertSingle[46]<br />2: <br />ᐳ: Object[51]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle46,Object51 bucket1

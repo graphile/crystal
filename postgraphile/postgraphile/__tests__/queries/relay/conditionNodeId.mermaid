@@ -10,30 +10,25 @@ graph TD
 
     %% plan dependencies
     Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant6{{"Constant[6∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection15
     Connection41{{"Connection[41∈0] ➊<br />ᐸ39ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection41
     Connection66{{"Connection[66∈0] ➊<br />ᐸ64ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection66
     Connection92{{"Connection[92∈0] ➊<br />ᐸ90ᐳ"}}:::plan
-    Constant6 & Constant6 & Constant6 --> Connection92
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ0.undefinedᐳ"}}:::plan
-    Constant6 & Access9 --> __InputObject8
+    Access9 --> __InputObject8
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
     __InputObject36{{"__InputObject[36∈0] ➊"}}:::plan
     Access37{{"Access[37∈0] ➊<br />ᐸ0.aliceᐳ"}}:::plan
-    Constant6 & Access37 --> __InputObject36
+    Access37 --> __InputObject36
     __InputObject62{{"__InputObject[62∈0] ➊"}}:::plan
     Constant63{{"Constant[63∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant6 & Constant63 --> __InputObject62
+    Constant63 --> __InputObject62
     __InputObject87{{"__InputObject[87∈0] ➊"}}:::plan
     Access88{{"Access[88∈0] ➊<br />ᐸ0.post3ᐳ"}}:::plan
-    Constant6 & Access88 --> __InputObject87
+    Access88 --> __InputObject87
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access9
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
@@ -52,7 +47,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant30{{"Constant[30∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgSelect18[["PgSelect[18∈1] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput17 & Connection15 & Constant6 & Constant6 & Constant6 --> PgSelect18
+    Object14 & ApplyInput17 & Connection15 --> PgSelect18
     PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
     PgSelect18 --> PgSelectRows19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
@@ -78,7 +73,7 @@ graph TD
     Lambda33{{"Lambda[33∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List32 --> Lambda33
     PgSelect44[["PgSelect[44∈5] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput43 & Connection41 & Constant6 & Constant6 & Constant6 --> PgSelect44
+    Object14 & ApplyInput43 & Connection41 --> PgSelect44
     PgSelectRows45[["PgSelectRows[45∈5] ➊"]]:::plan
     PgSelect44 --> PgSelectRows45
     __Item46[/"__Item[46∈6]<br />ᐸ45ᐳ"\]:::itemplan
@@ -104,7 +99,7 @@ graph TD
     Lambda59{{"Lambda[59∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List58 --> Lambda59
     PgSelect69[["PgSelect[69∈9] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput68 & Connection66 & Constant6 & Constant6 & Constant6 --> PgSelect69
+    Object14 & ApplyInput68 & Connection66 --> PgSelect69
     PgSelectRows70[["PgSelectRows[70∈9] ➊"]]:::plan
     PgSelect69 --> PgSelectRows70
     __Item71[/"__Item[71∈10]<br />ᐸ70ᐳ"\]:::itemplan
@@ -130,7 +125,7 @@ graph TD
     Lambda84{{"Lambda[84∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List83 --> Lambda84
     PgSelect95[["PgSelect[95∈13] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput94 & Connection92 & Constant6 & Constant6 & Constant6 --> PgSelect95
+    Object14 & ApplyInput94 & Connection92 --> PgSelect95
     PgSelectRows96[["PgSelectRows[96∈13] ➊"]]:::plan
     PgSelect95 --> PgSelectRows96
     __Item97[/"__Item[97∈14]<br />ᐸ96ᐳ"\]:::itemplan
@@ -161,7 +156,7 @@ graph TD
     subgraph "Buckets for queries/relay/conditionNodeId"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Constant6,__InputObject8,Access9,Access12,Access13,Object14,Connection15,ApplyInput17,Constant30,__InputObject36,Access37,Connection41,ApplyInput43,__InputObject62,Constant63,Connection66,ApplyInput68,__InputObject87,Access88,Connection92,ApplyInput94 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,__InputObject8,Access9,Access12,Access13,Object14,Connection15,ApplyInput17,Constant30,__InputObject36,Access37,Connection41,ApplyInput43,__InputObject62,Constant63,Connection66,ApplyInput68,__InputObject87,Access88,Connection92,ApplyInput94 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 6, 30<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[18]<br />2: PgSelectRows[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect18,PgSelectRows19 bucket1
