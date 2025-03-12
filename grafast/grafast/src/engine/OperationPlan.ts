@@ -1496,20 +1496,23 @@ export class OperationPlan {
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
-        let $item = isListCapableStep($list)
-          ? withGlobalLayerPlan(
-              $__item.layerPlan,
-              $__item.polymorphicPaths,
-              $list.listItem,
-              $list,
-              $__item,
-            )
-          : $__item;
+        let $item: Step;
+        if (isListCapableStep($list)) {
+          $item = withGlobalLayerPlan(
+            $__item.layerPlan,
+            $__item.polymorphicPaths,
+            $list.listItem,
+            $list,
+            $__item,
+          );
 
-        this.deduplicateSteps();
-        // Refetch steps following deduplicate
-        $__item = this.stepTracker.getStepById<typeof $__item>($__item.id);
-        $item = this.stepTracker.getStepById<typeof $item>($item.id);
+          this.deduplicateSteps();
+          // Refetch steps following deduplicate
+          $__item = this.stepTracker.getStepById<typeof $__item>($__item.id);
+          $item = this.stepTracker.getStepById<typeof $item>($item.id);
+        } else {
+          $item = $__item;
+        }
 
         this.planIntoOutputPlan(
           listOutputPlan,

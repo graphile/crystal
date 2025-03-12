@@ -769,6 +769,8 @@ export interface BatchExecutionValue<TData = any>
   unaryValue(): never;
   /** @internal */
   readonly _flags: Array<ExecutionEntryFlags>;
+  /** @internal */
+  _cachedStateUnion: ExecutionEntryFlags | null;
 }
 export interface UnaryExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {

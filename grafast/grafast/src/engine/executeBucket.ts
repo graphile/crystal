@@ -1250,34 +1250,70 @@ export function bucketToString(this: Bucket) {
   return `Bucket<${this.layerPlan}>`;
 }
 
-function throwNotUnary(): never {
-  throw new Error(
-    `This is not a unary value so we cannot get the single value - there may be more than one!`,
-  );
-}
+// NOTE: I evaluated using `__proto__: batchExecutionValueProto` to extract the
+// shared properties of these objects to see if performance was improved, but
+// this was actually a net loss in performance.
+//
+// This is also evidence that you shouldn't trust ChatGPT for performance
+// advice, and should always run your own benchmarks instead:
+// https://chatgpt.com/share/67d1746f-4da8-8012-bdf8-707e54a4238e
 
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
   _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
 ): BatchExecutionValue<TData> {
-  let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
-    at: batchEntriesAt,
+    // Try and keep these properties in the same order as unaryExecutionValue
     isBatch: true,
-    entries,
-    unaryValue: throwNotUnary,
-    _flags,
+    at: batchEntriesAt,
+    unaryValue: batchThrowNotUnary,
     _flagsAt: batchFlagsAt,
-    _getStateUnion() {
-      if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce(bitwiseOr, NO_FLAGS);
-      }
-      return cachedStateUnion;
-    },
+    _getStateUnion: batchGetStateUnion,
     _setResult: batchSetResult,
-    _copyResult,
+    _copyResult: batchCopyResult,
+
+    entries,
+    _flags,
+    _cachedStateUnion: null,
   };
+}
+
+// TODO: memoize?
+export function unaryExecutionValue<TData>(
+  value: TData,
+  _entryFlags: ExecutionEntryFlags = 0,
+): UnaryExecutionValue<TData> {
+  return {
+    // Try and keep these properties in the same order as batchExecutionValue
+    isBatch: false,
+    at: unaryAt,
+    unaryValue: unaryThisDotValue,
+    _flagsAt: unaryFlagsAt,
+    _getStateUnion: unaryGetStateUnion,
+    _setResult: unarySetResult,
+    _copyResult: unaryCopyResult,
+
+    value,
+    _entryFlags,
+  };
+}
+
+function batchThrowNotUnary(): never {
+  throw new Error(
+    `This is not a unary value so we cannot get the single value - there may be more than one!`,
+  );
+}
+
+function batchGetStateUnion(this: BatchExecutionValue) {
+  if (this._cachedStateUnion === null) {
+    let u = NO_FLAGS;
+    for (const flag of this._flags) {
+      u = u | flag;
+    }
+    this._cachedStateUnion = u;
+  }
+  return this._cachedStateUnion;
 }
 
 function batchEntriesAt(this: BatchExecutionValue, i: number) {
@@ -1298,12 +1334,22 @@ function batchSetResult(
   this._flags[i] = flags;
 }
 
-function bitwiseOr(memo: number, a: number) {
-  return memo | a;
+// NOTE: batchCopyResult and unaryCopyResult are **identical**, but we don't
+// want a single megamorphic function so we define it twice.
+function batchCopyResult(
+  this: BatchExecutionValue,
+  targetIndex: number,
+  source: ExecutionValue,
+  sourceIndex: number,
+): void {
+  this._setResult(
+    targetIndex,
+    source.at(sourceIndex),
+    source._flagsAt(sourceIndex),
+  );
 }
-
-function _copyResult(
-  this: ExecutionValue,
+function unaryCopyResult(
+  this: UnaryExecutionValue,
   targetIndex: number,
   source: ExecutionValue,
   sourceIndex: number,
@@ -1315,22 +1361,8 @@ function _copyResult(
   );
 }
 
-// TODO: memoize?
-export function unaryExecutionValue<TData>(
-  value: TData,
-  _entryFlags: ExecutionEntryFlags = 0,
-): UnaryExecutionValue<TData> {
-  return {
-    at: unaryAt,
-    isBatch: false,
-    value,
-    unaryValue: () => value,
-    _entryFlags,
-    _flagsAt: unaryFlagsAt,
-    _getStateUnion: unaryGetStateUnion,
-    _setResult: unarySetResult,
-    _copyResult,
-  };
+function unaryThisDotValue(this: UnaryExecutionValue) {
+  return this.value;
 }
 
 function unaryAt(this: UnaryExecutionValue) {

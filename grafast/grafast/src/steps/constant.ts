@@ -49,8 +49,14 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
   public planJSONExtra(): undefined | Record<string, JSONValue> {
     if (this.isSensitive) return;
     const data = this.data as unknown;
-    if (
-      data == null ||
+    if (data === null) {
+      return {
+        constant: {
+          type: "null",
+        },
+      };
+    } else if (
+      data === undefined ||
       typeof data === "boolean" ||
       typeof data === "number" ||
       typeof data === "string"
