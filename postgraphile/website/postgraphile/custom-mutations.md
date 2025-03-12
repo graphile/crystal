@@ -26,7 +26,7 @@ that is compatible with the
 For example the function
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS text AS $$ … $$ LANGUAGE sql VOLATILE;
+create function my_function(a int, b int) returns text as $$ … $$ language sql volatile;
 ```
 
 could be called from GraphQL like this:
@@ -47,16 +47,16 @@ Here’s an example of a custom mutation, which will generate the GraphQL
 `acceptTeamInvite` mutation:
 
 ```sql
-CREATE FUNCTION app_public.accept_team_invite(team_id integer)
-RETURNS app_public.team_members
-AS $$
-  UPDATE app_public.team_members
-    SET accepted_at = now()
-    WHERE accepted_at IS NULL
-    AND team_members.team_id = accept_team_invite.team_id
-    AND member_id = app_public.current_user_id()
-    RETURNING *;
-$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+create function app_public.accept_team_invite(team_id integer)
+returns app_public.team_members
+as $$
+  update app_public.team_members
+    set accepted_at = now()
+    where accepted_at is null
+    and team_members.team_id = accept_team_invite.team_id
+    and member_id = app_public.current_user_id()
+    returning *;
+$$ language sql volatile strict security definer;
 ```
 
 Notes on the above function:
@@ -95,7 +95,7 @@ This is similar to marking the function as `STRICT` but with the subtle
 difference that arguments with defaults may be specified as `NULL` without
 necessitating that the function returns null. With this setting enabled,
 arguments without default value will be set mandatory while arguments with
-default value will be optional. For example: `CREATE FUNCTION foo(a int, b int,
+default value will be optional. For example: `create function foo(a int, b int,
 c int = 0, d int = null)...` would give a mutation `foo(a: Int!, b: Int!, c:
 Int, d: Int)`.
 
@@ -105,14 +105,14 @@ Here’s an example of a custom mutation that performs a “bulk insert” — i
 and returning a set of records:
 
 ```sql
-CREATE FUNCTION app_public.create_documents(num integer, type text, location text)
-RETURNS SETOF app_public.document
-AS $$
-  INSERT INTO app_public.document (type, location)
-    SELECT create_documents.type, create_documents.location
-    FROM generate_series(1, num) i
-    RETURNING *;
-$$ LANGUAGE sql STRICT VOLATILE;
+create function app_public.create_documents(num integer, type text, location text)
+returns setof app_public.document
+as $$
+  insert into app_public.document (type, location)
+    select create_documents.type, create_documents.location
+    from generate_series(1, num) i
+    returning *;
+$$ language sql strict volatile;
 ```
 
 <!--

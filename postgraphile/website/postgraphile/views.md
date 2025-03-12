@@ -18,17 +18,17 @@ GraphQL. For example, say we want just the `Comedy` films from our `films`
 table, we can create a view that contains this specific film type.
 
 ```sql
-CREATE TABLE app_public.films (
-  id serial PRIMARY KEY,
+create table app_public.films (
+  id serial primary key,
   name text,
   release_year int,
   kind text
 );
 
-CREATE VIEW comedies AS
-    SELECT *
-    FROM app_public.films
-    WHERE kind = 'Comedy';
+create view comedies as
+    select *
+    from app_public.films
+    where kind = 'Comedy';
 ```
 
 And query this view as if it were a normal table:
@@ -48,21 +48,21 @@ Views enable you to expose a simple "flattened" object built from multiple
 tables.
 
 ```sql
-CREATE TABLE app_public.person (
-  id serial PRIMARY KEY
+create table app_public.person (
+  id serial primary key
 );
 
-CREATE TABLE app_public.address (
-  person_id int PRIMARY KEY REFERENCES app_public.person,
+create table app_public.address (
+  person_id int primary key references app_public.person,
   country text,
   street text,
 );
 
-CREATE VIEW person_view AS
-  SELECT person.id, address.country, address.street
-  FROM app_public.person person
-  INNER JOIN app_public.address
-  ON person.id = address.person_id;
+create view person_view as
+  select person.id, address.country, address.street
+  from app_public.person person
+  inner join app_public.address
+  on person.id = address.person_id;
 ```
 
 The GraphQL query using this view is flatter than the query using the underlying
@@ -101,23 +101,23 @@ Authorization can be enforced using `views` as well, for example, exposing some
 data only to authenticated users:
 
 ```sql
-CREATE TABLE app_public.person (
-  id serial PRIMARY KEY
+create table app_public.person (
+  id serial primary key
 );
 
-CREATE TABLE app_public.personal_data (
-  id serial PRIMARY KEY,
+create table app_public.personal_data (
+  id serial primary key,
   secret1 text,
   secret2 int,
   person_id references app_public.person (id)
 );
 
-CREATE VIEW personal_data_view
-  WITH (security_barrier, check_option = 'cascaded')
-  AS
-    SELECT personal_data.*
-    FROM app_public.personal_data personal_data
-    WHERE person_id = current_user_id()
+create view personal_data_view
+  with (security_barrier, check_option = 'cascaded')
+  as
+    select personal_data.*
+    from app_public.personal_data personal_data
+    where person_id = current_user_id()
 ```
 
 (`current_user_id()` here is a function that might return something like
