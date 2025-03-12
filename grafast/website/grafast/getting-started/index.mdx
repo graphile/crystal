@@ -177,7 +177,7 @@ We could then [serve this schema over HTTP][servers] using a server such as
 The building blocks of an operation plan are "steps." Steps are instances of
 "step classes," and <grafast /> makes available a modest range of [standard steps][]
 that you can use; but when these aren't enough you can write your own.
-Step classes extend the `ExecutableStep` class. The only required method to
+Step classes extend the `Step` class. The only required method to
 define is `execute`, however most steps will also have a `constructor` in which
 they accept their arguments (some of which may be dependencies) and may also
 have the various lifecycle methods.
@@ -186,9 +186,9 @@ Full details for doing so can be found in [Step classes][], but let's build
 ourselves a simple one now to replace the `lambda` usage above:
 
 ```ts
-const { ExecutableStep } = require("grafast");
+const { Step } = require("grafast");
 
-class AddStep extends ExecutableStep {
+class AddStep extends Step {
   constructor($a, $b) {
     super();
     this.addDependency($a);

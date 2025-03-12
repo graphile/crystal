@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/make-wrap-plans-plugin/
 title: makeWrapPlansPlugin
 ---
 

@@ -47,10 +47,6 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "name",
 
   "assertStep",
-  "autoApplyAfterParentInputPlan",
-  "autoApplyAfterParentApplyPlan",
-  "autoApplyAfterParentPlan",
-  "autoApplyAfterParentSubscribePlan",
   "idempotent",
   "inputPlan",
   "applyPlan",

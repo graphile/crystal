@@ -1,6 +1,7 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
+## expect(queries.length).toEqual(1)
 {
   allPosts {
     edges {

@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/tables/
 title: PostgreSQL Tables
 ---
 
@@ -10,16 +8,16 @@ schema based on the tables and columns found in the inspected schema.
 An example of a PostgreSQL table is:
 
 ```sql
-CREATE TABLE app_public.users (
-  id serial PRIMARY KEY,
-  username citext NOT NULL unique,
-  name text NOT NULL,
+create table app_public.users (
+  id serial primary key,
+  username citext not null unique,
+  name text not null,
   about text,
-  organization_id int NOT NULL
-    REFERENCES app_public.organizations ON DELETE CASCADE,
-  is_admin boolean NOT NULL DEFAULT false,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+  organization_id int not null
+    references app_public.organizations on delete cascade,
+  is_admin boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 ```
 

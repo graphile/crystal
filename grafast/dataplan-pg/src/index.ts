@@ -18,6 +18,7 @@ import {
   PgRecordTypeCodecSpec,
   rangeOfCodec,
   recordCodec,
+  sqlValueWithCodec,
   TYPES,
 } from "./codecs.js";
 import {
@@ -61,10 +62,14 @@ import {
   PgExecutorOptions,
   WithPgClient,
 } from "./executor.js";
-import { PgBooleanFilterStep } from "./filters/pgBooleanFilter.js";
-import { PgClassFilterStep } from "./filters/pgClassFilter.js";
-import { PgManyFilterStep } from "./filters/pgManyFilter.js";
-import { PgOrFilterStep } from "./filters/pgOrFilter.js";
+import { PgBooleanFilter } from "./filters/pgBooleanFilter.js";
+import { PgClassFilter } from "./filters/pgClassFilter.js";
+import { PgManyFilter } from "./filters/pgManyFilter.js";
+import { PgOrFilter } from "./filters/pgOrFilter.js";
+import type {
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
+} from "./interfaces.js";
 import {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
@@ -93,7 +98,7 @@ import {
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   PgCodecWithAttributes,
-  PgConditionLikeStep,
+  PgConditionLike,
   PgDecode,
   PgEncode,
   PgEnumCodec,
@@ -104,7 +109,7 @@ import {
   PgRefDefinitionExtensions,
   PgRefDefinitions,
   PgRegistry,
-  PgTypedExecutableStep,
+  PgTypedStep,
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
@@ -121,16 +126,23 @@ import {
   PgClassExpressionStep,
 } from "./steps/pgClassExpression.js";
 import {
-  PgConditionCapableParentStep,
-  PgConditionStep,
-  PgConditionStepExtensions,
+  PgCondition,
+  PgConditionCapableParent,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
   pgWhereConditionSpecListToSQL,
 } from "./steps/pgCondition.js";
 import { PgCursorStep } from "./steps/pgCursor.js";
-import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+import {
+  pgDeleteSingle,
+  PgDeleteSingleQueryBuilder,
+  PgDeleteSingleStep,
+} from "./steps/pgDeleteSingle.js";
+import {
+  pgInsertSingle,
+  PgInsertSingleQueryBuilder,
+  PgInsertSingleStep,
+} from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
   pgPolymorphic,
@@ -138,15 +150,21 @@ import {
   PgPolymorphicTypeMap,
 } from "./steps/pgPolymorphic.js";
 import {
-  digestsFromArgumentSpecs,
+  generatePgParameterAnalysis,
+  pgFromExpression,
+  pgFromExpressionRuntime,
+  PgGroupDetails,
   pgSelect,
   PgSelectArgumentDigest,
+  PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
   pgSelectFromRecords,
   PgSelectIdentifierSpec,
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
+  PgSelectRowsStep,
   PgSelectStep,
   sqlFromArgDigests,
 } from "./steps/pgSelect.js";
@@ -160,9 +178,11 @@ import {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
 } from "./steps/pgSingleTablePolymorphic.js";
-import { PgTempTableStep } from "./steps/pgTempTable.js";
+import { PgTempTable } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
+  PgUnionAllQueryBuilder,
+  PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
   PgUnionAllStepCondition,
@@ -171,7 +191,11 @@ import {
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
 } from "./steps/pgUnionAll.js";
-import { pgUpdateSingle, PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+import {
+  pgUpdateSingle,
+  PgUpdateSingleQueryBuilder,
+  PgUpdateSingleStep,
+} from "./steps/pgUpdateSingle.js";
 import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
@@ -187,9 +211,9 @@ import { assertPgClassSingleStep } from "./utils.js";
 
 export {
   assertPgClassSingleStep,
-  digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
+  generatePgParameterAnalysis,
   getCodecByPgCatalogTypeName,
   getInnerCodec,
   GetPgCodecAttributes,
@@ -211,12 +235,12 @@ export {
   makeRegistryBuilder,
   ObjectFromPgCodecAttributes,
   PgAdaptor,
-  PgBooleanFilterStep,
+  PgBooleanFilter,
   PgBox,
   PgCircle,
   pgClassExpression,
   PgClassExpressionStep,
-  PgClassFilterStep,
+  PgClassFilter,
   PgClassSingleStep,
   PgClient,
   PgClientQuery,
@@ -246,14 +270,14 @@ export {
   PgCodecRelationConfig,
   PgCodecRelationExtensions,
   PgCodecWithAttributes,
-  PgConditionCapableParentStep,
-  PgConditionLikeStep,
-  PgConditionStep,
-  PgConditionStepExtensions,
+  PgCondition,
+  PgConditionCapableParent,
+  PgConditionLike,
   PgContextPlugin,
   PgCursorStep,
   PgDecode,
   pgDeleteSingle,
+  PgDeleteSingleQueryBuilder,
   PgDeleteSingleStep,
   PgEncode,
   PgEnumCodec,
@@ -265,20 +289,24 @@ export {
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
+  pgFromExpression,
+  pgFromExpressionRuntime,
   PgFunctionResourceOptions,
+  PgGroupDetails,
   PgGroupSpec,
   PgHavingConditionSpec,
   PgHStore,
   pgInsertSingle,
+  PgInsertSingleQueryBuilder,
   PgInsertSingleStep,
   PgInterval,
   PgLine,
   PgLockableParameter,
   PgLockCallback,
   PgLseg,
-  PgManyFilterStep,
+  PgManyFilter,
   PgOrderSpec,
-  PgOrFilterStep,
+  PgOrFilter,
   pgPageInfo,
   PgPageInfoStep,
   PgPath,
@@ -301,6 +329,7 @@ export {
   PgResourceUniqueExtensions,
   pgSelect,
   PgSelectArgumentDigest,
+  PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
   pgSelectFromRecord,
   pgSelectFromRecords,
@@ -308,15 +337,21 @@ export {
   PgSelectMode,
   PgSelectOptions,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
+  PgSelectQueryBuilderCallback,
+  PgSelectRowsStep,
   pgSelectSingleFromRecord,
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
   PgSelectStep,
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicStep,
-  PgTempTableStep,
-  PgTypedExecutableStep,
+  PgTempTable,
+  PgTypedStep,
   pgUnionAll,
+  PgUnionAllQueryBuilder,
+  PgUnionAllQueryBuilderCallback,
+  PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
   PgUnionAllStepCondition,
@@ -325,6 +360,7 @@ export {
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
   pgUpdateSingle,
+  PgUpdateSingleQueryBuilder,
   PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
@@ -334,6 +370,7 @@ export {
   rangeOfCodec,
   recordCodec,
   sqlFromArgDigests,
+  sqlValueWithCodec,
   toPg,
   ToPgStep,
   TuplePlanMap,
@@ -357,19 +394,20 @@ exportAsMany("@dataplan/pg", {
   listOfCodec,
   rangeOfCodec,
   recordCodec,
+  sqlValueWithCodec,
   makeRegistryBuilder,
   makeRegistry,
   makePgResourceOptions,
   TYPES,
   PgResource,
   PgExecutor,
-  PgBooleanFilterStep,
-  PgClassFilterStep,
-  PgManyFilterStep,
-  PgOrFilterStep,
+  PgBooleanFilter,
+  PgClassFilter,
+  PgManyFilter,
+  PgOrFilter,
   pgClassExpression,
   PgClassExpressionStep,
-  PgConditionStep,
+  PgCondition,
   pgWhereConditionSpecListToSQL,
   PgCursorStep,
   pgDeleteSingle,
@@ -381,9 +419,12 @@ exportAsMany("@dataplan/pg", {
   pgPolymorphic,
   PgPolymorphicStep,
   pgSelect,
-  digestsFromArgumentSpecs,
+  pgFromExpressionRuntime,
+  pgFromExpression,
+  generatePgParameterAnalysis,
   pgSelectFromRecords,
   PgSelectStep,
+  PgSelectRowsStep,
   sqlFromArgDigests,
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
@@ -391,13 +432,14 @@ exportAsMany("@dataplan/pg", {
   pgSingleTablePolymorphic,
   pgUnionAll,
   PgUnionAllSingleStep,
+  PgUnionAllRowsStep,
   PgUnionAllStep,
   PgSingleTablePolymorphicStep,
   pgUpdateSingle,
   PgUpdateSingleStep,
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
-  PgTempTableStep,
+  PgTempTable,
   toPg,
   ToPgStep,
   withPgClient,
@@ -408,19 +450,6 @@ exportAsMany("@dataplan/pg", {
   withSuperuserPgClientFromPgService,
   PgContextPlugin,
 });
-
-export {
-  /** @deprecated Use Pg prefix */
-  PgBooleanFilterStep as BooleanFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgClassFilterStep as ClassFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgManyFilterStep as ManyFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgOrFilterStep as OrFilterStep,
-  /** @deprecated Use Pg prefix */
-  PgTempTableStep as TempTableStep,
-};
 
 export { version } from "./version.js";
 
@@ -499,7 +528,7 @@ declare global {
     }
   }
   namespace DataplanPg {
-    interface PgConditionStepExtensions {}
+    interface PgConditionExtensions {}
     /**
      * Custom metadata for a codec
      */

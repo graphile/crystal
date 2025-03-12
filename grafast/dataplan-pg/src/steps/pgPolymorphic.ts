@@ -9,7 +9,7 @@ import {
   isDev,
   polymorphicWrap,
   SafeError,
-  UnbatchedExecutableStep,
+  UnbatchedStep,
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
@@ -45,7 +45,7 @@ export class PgPolymorphicStep<
     TTypeSpecifierStep extends
       ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
   >
-  extends UnbatchedExecutableStep<any>
+  extends UnbatchedStep<any>
   implements PolymorphicStep
 {
   static $$export = {
@@ -82,14 +82,13 @@ export class PgPolymorphicStep<
     }) as any;
   }
 
-  itemPlan(): TItemStep {
-    const plan = this.getDep(this.itemStepId);
-    return plan as any;
+  private itemPlan(): TItemStep {
+    return this.getDepOptions<TItemStep>(this.itemStepId).step;
   }
 
-  typeSpecifierPlan(): TTypeSpecifierStep {
-    const plan = this.getDep(this.typeSpecifierStepId) as TTypeSpecifierStep;
-    return plan;
+  private typeSpecifierPlan(): TTypeSpecifierStep {
+    return this.getDepOptions<TTypeSpecifierStep>(this.typeSpecifierStepId)
+      .step;
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
@@ -103,7 +102,9 @@ export class PgPolymorphicStep<
         ).join("', '")}'`,
       );
     }
-    return spec.plan(this.typeSpecifierPlan(), this.itemPlan());
+    const $typeSpecifier = this.typeSpecifierPlan();
+    const $item = this.itemPlan();
+    return spec.plan($typeSpecifier, $item);
   }
 
   private getTypeNameFromSpecifier(specifier: TTypeSpecifier) {

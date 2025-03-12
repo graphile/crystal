@@ -1,8 +1,8 @@
 ---
-layout: page
-path: /postgraphile/realtime/
-title: PostGraphile Realtime
+title: Realtime
 ---
+
+# PostGraphile Realtime
 
 Every application is different, and no more so than when it comes to their
 realtime requirements. Some applications are read-heavy, others write-heavy, and
@@ -12,7 +12,7 @@ multiple people editing the same things at the same time (e.g. Google Docs).
 PostGraphile focusses on customisability and extensibility; rather than giving a
 one-size-fits-all solution, we provide the baseline subscription
 functionality in core, and the rest is achieved by adding and combining
-plugins - the official ones, ones made by the community, or ones you've
+plugins — the official ones, ones made by the community, or ones you've
 developed in-house. This enables you to use whatever technology best suits your
 requirements to provide the realtime features to PostGraphile.
 
@@ -41,7 +41,7 @@ subscription {
 
 This example subscription would result in a new response whenever a new message
 is added to channel `27`. Note that a normal subscription such as this one only
-triggers when the event occurs (i.e. chat message added) - it does not trigger
+triggers when the event occurs (i.e. chat message added) — it does not trigger
 when the message is edited, or if the author changes their avatar.
 
 Subscriptions are part of the latest GraphQL specification, and are well

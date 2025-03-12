@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "5.0.0-beta.37",
+  "version": "5.0.0-beta.38",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -168,7 +168,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "yarn test:jest && yarn test:schema-exports && yarn test:operations-exports",
+    "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
     "test:operations-exports": "yarn test:operations-exports:typeDefs",
@@ -217,7 +217,7 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.11.3",
+    "pg": "^8.13.3",
     "pg-sql2": "workspace:^",
     "tamedevil": "workspace:^",
     "tslib": "^2.6.2",

@@ -12,14 +12,12 @@ import type { FlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, flagError, SafeError } from "../index.js";
 import type {
-  ExecutionExtra,
   GrafastResultsList,
-  GrafastResultStreamList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
-import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
 const {
@@ -82,7 +80,7 @@ function dcr(
  *
  * @internal
  */
-export class GraphQLResolverStep extends UnbatchedExecutableStep {
+export class GraphQLResolverStep extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLResolverStep",
@@ -106,7 +104,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       | (GraphQLFieldResolver<any, any> & { displayName?: string })
       | null
       | undefined,
-    $plan: ExecutableStep,
+    $plan: Step,
     $args: ObjectStep,
     private resolveInfoBase: ResolveInfoBase,
     private returnContextAndResolveInfo = false,
@@ -137,96 +135,68 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
+    extra: UnbatchedExecutionExtra,
     source: any,
     args: any,
     context: any,
     variableValues: any,
     rootValue: any,
   ): any {
-    if (this.isNotRoot && source == null) {
-      return source;
-    }
-    const resolveInfo: GraphQLResolveInfo = Object.assign(
-      Object.create(this.resolveInfoBase),
-      {
-        variableValues,
-        rootValue,
-        path: {
-          typename: this.resolveInfoBase.parentType.name,
-          key: this.resolveInfoBase.fieldName,
-          // ENHANCE: add full support for path (requires runtime indexes)
-          prev: undefined,
+    if (!extra.stream) {
+      if (this.isNotRoot && source == null) {
+        return source;
+      }
+      const resolveInfo: GraphQLResolveInfo = Object.assign(
+        Object.create(this.resolveInfoBase),
+        {
+          variableValues,
+          rootValue,
+          path: {
+            typename: this.resolveInfoBase.parentType.name,
+            key: this.resolveInfoBase.fieldName,
+            // ENHANCE: add full support for path (requires runtime indexes)
+            prev: undefined,
+          },
         },
-      },
-    );
-    const data = this.resolver?.(source, args, context, resolveInfo);
-    if (this.returnContextAndResolveInfo) {
-      return dcr(data, context, resolveInfo);
+      );
+      const data = this.resolver?.(source, args, context, resolveInfo);
+      if (this.returnContextAndResolveInfo) {
+        return dcr(data, context, resolveInfo);
+      } else {
+        return flagErrorIfErrorAsync(data);
+      }
     } else {
+      if (this.isNotRoot) {
+        return Promise.reject(new Error(`Invalid non-root subscribe`));
+      }
+      if (this.subscriber == null) {
+        return Promise.reject(new Error(`Cannot subscribe to field`));
+      }
+      if (this.returnContextAndResolveInfo) {
+        return Promise.reject(
+          new Error(
+            `Subscription with returnContextAndResolveInfo is not supported`,
+          ),
+        );
+      }
+      const resolveInfo: GraphQLResolveInfo = Object.assign(
+        Object.create(this.resolveInfoBase),
+        {
+          // ENHANCE: add support for path
+          variableValues,
+          rootValue,
+        },
+      );
+      // TODO: we also need to call the resolver on each result?
+      const data = this.subscriber(source, args, context, resolveInfo);
+      // TODO: should apply flagErrorIfError to each value data yields
       return flagErrorIfErrorAsync(data);
     }
-  }
-
-  unbatchedStream(
-    _extra: ExecutionExtra,
-    source: any,
-    args: any,
-    context: any,
-    variableValues: any,
-    rootValue: any,
-  ): any {
-    if (this.isNotRoot) {
-      return Promise.reject(new Error(`Invalid non-root subscribe`));
-    }
-    if (this.subscriber == null) {
-      return Promise.reject(new Error(`Cannot subscribe to field`));
-    }
-    if (this.returnContextAndResolveInfo) {
-      return Promise.reject(
-        new Error(
-          `Subscription with returnContextAndResolveInfo is not supported`,
-        ),
-      );
-    }
-    const resolveInfo: GraphQLResolveInfo = Object.assign(
-      Object.create(this.resolveInfoBase),
-      {
-        // ENHANCE: add support for path
-        variableValues,
-        rootValue,
-      },
-    );
-    const data = this.subscriber(source, args, context, resolveInfo);
-    // TODO: should apply flagErrorIfError to each value data yields
-    return flagErrorIfErrorAsync(data);
-  }
-
-  async stream({
-    indexMap,
-    values,
-    extra,
-  }: ExecutionDetails): Promise<GrafastResultStreamList<any>> {
-    const depCount = this.dependencies.length;
-    return indexMap((i) => {
-      try {
-        const tuple = [];
-        for (let j = 0; j < depCount; j++) {
-          tuple[j] = values[j].at(i);
-        }
-        return (this.unbatchedStream as any)(extra, ...tuple);
-      } catch (e) {
-        return flagError(e);
-      }
-    });
   }
 }
 
 /** @internal */
-export class GraphQLItemHandler
-  extends ExecutableStep
-  implements PolymorphicStep
-{
+export class GraphQLItemHandler extends Step implements PolymorphicStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLItemHandler",
@@ -236,7 +206,7 @@ export class GraphQLItemHandler
     null;
   public isSyncAndSafe = false;
   constructor(
-    $parent: ExecutableStep,
+    $parent: Step,
     nullableType: GraphQLNullableType & GraphQLOutputType,
   ) {
     super();
@@ -382,7 +352,7 @@ export class GraphQLItemHandler
 }
 
 export function graphqlItemHandler(
-  $item: ExecutableStep,
+  $item: Step,
   nullableType: GraphQLNullableType & GraphQLOutputType,
 ) {
   return new GraphQLItemHandler($item, nullableType);
@@ -397,10 +367,10 @@ export function graphqlItemHandler(
 export function graphqlResolver(
   resolver: GraphQLFieldResolver<any, any> | null | undefined,
   subscriber: GraphQLFieldResolver<any, any> | null | undefined,
-  $step: ExecutableStep,
+  $step: Step,
   $args: ObjectStep,
   resolveInfoBase: ResolveInfoBase,
-): ExecutableStep {
+): Step {
   const { returnType } = resolveInfoBase;
   const namedType = getNamedType(returnType);
   const isAbstract = isAbstractType(namedType);

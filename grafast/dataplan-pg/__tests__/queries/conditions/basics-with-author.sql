@@ -1,30 +1,30 @@
 select
   __forums__."name" as "0",
-  (select json_agg(s) from (
-    select
-      __messages__."body" as "0",
-      __users__."username" as "1",
-      __users__."gravatar_url" as "2"
+  array(
+    select array[
+      __messages__."body",
+      __users__."username",
+      __users__."gravatar_url"
+    ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (
+    /* WHERE becoming ON */
       (
-        __messages__."author_id"::"uuid" = __users__."id"
+        __users__."id" = __messages__."author_id"
       ) and (
-        /* WHERE becoming ON */ (
-          true /* authorization checks */
-        )
+        true /* authorization checks */
       )
     )
     where
       (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        __messages__."forum_id" = __forums__."id"
       ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
       )
     order by __messages__."id" asc
     limit 2
-  ) s) as "1"
+  )::text as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

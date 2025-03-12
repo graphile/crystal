@@ -1,5 +1,15 @@
 # ruru
 
+## 2.0.0-beta.20
+
+### Patch Changes
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`ba2847f3e`](https://github.com/graphile/crystal/commit/ba2847f3e87b3c081e4b9fc4e62a81cc8bd8bb15)
+  Thanks [@benjie](https://github.com/benjie)! - `ruru/server` no longer uses
+  `fs` module to read data/version from disk, instead data is bundled in source
+  files. This may aid people attempting to bundle ruru.
+
 ## 2.0.0-beta.19
 
 ### Patch Changes

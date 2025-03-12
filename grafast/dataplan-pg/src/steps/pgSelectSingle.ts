@@ -1,14 +1,5 @@
-import type {
-  EdgeCapableStep,
-  ExecutableStep,
-  UnbatchedExecutionExtra,
-} from "grafast";
-import {
-  exportAs,
-  list,
-  polymorphicWrap,
-  UnbatchedExecutableStep,
-} from "grafast";
+import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
+import { exportAs, polymorphicWrap, UnbatchedStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -25,14 +16,17 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
+  PgQueryRootStep,
   PgRegistry,
-  PgTypedExecutableStep,
+  PgSQLCallbackOrDirect,
+  PgTypedStep,
 } from "../interfaces.js";
+import { makeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
-import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
+import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");
@@ -70,11 +64,11 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
 export class PgSelectSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends UnbatchedExecutableStep<
+  extends UnbatchedStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
-    PgTypedExecutableStep<
+    PgTypedStep<
       TResource extends PgResource<any, infer UCodec, any, any, any>
         ? UCodec
         : never
@@ -99,7 +93,7 @@ export class PgSelectSingleStep<
 
   constructor(
     $class: PgSelectStep<TResource>,
-    $item: ExecutableStep<unknown[]>,
+    $item: Step<unknown[]>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
@@ -133,7 +127,7 @@ export class PgSelectSingleStep<
   }
 
   /** @internal */
-  public getItemStep(): ExecutableStep<unknown[]> {
+  public getItemStep(): Step<unknown[]> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
@@ -285,11 +279,15 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   /**
    * Returns a plan representing the result of an expression.
    */
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -298,7 +296,7 @@ export class PgSelectSingleStep<
       codec,
       guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   /**
@@ -307,19 +305,31 @@ export class PgSelectSingleStep<
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
-    return this.getClassStep().selectAndReturnIndex(fragment);
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+    return this.getClassStep().selectAndReturnIndex(this.scopedSQL(fragment));
   }
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public scopedSQL = makeScopedSQL(this);
+
+  public getPgRoot(): PgQueryRootStep {
+    return this.getClassStep();
+  }
+
+  /** @deprecated Use .getPgRoot().placeholder() */
+  public placeholder($step: PgTypedStep<any>): SQL;
+  /** @deprecated Use .getPgRoot().placeholder() */
+  public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    $step: Step | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
-      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+      : this.getClassStep().placeholder($step as PgTypedStep<any>);
+  }
+
+  public deferredSQL($step: Step<SQL>): SQL {
+    return this.getClassStep().deferredSQL($step);
   }
 
   private existingSingleRelation<
@@ -424,42 +434,15 @@ export class PgSelectSingleStep<
   }
 
   /**
-   * @internal
-   * For use by PgCursorStep
-   */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
-    const classPlan = this.getClassStep();
-    const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderBy();
-    const step = list(
-      orders.length > 0
-        ? orders.map((o) => {
-            const [frag, codec] = getFragmentAndCodecFromOrder(
-              this.getClassStep().alias,
-              o,
-              this.getClassStep().resource.codec,
-            );
-            return this.select(frag, codec, o.nullable === false);
-          })
-        : // No ordering; so use row number
-          [
-            this.select(
-              sql`row_number() over (partition by 1)`,
-              TYPES.int,
-              true,
-            ),
-          ],
-    );
-    return [digest, step];
-  }
-
-  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
   public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(this);
+    const cursorPlan = new PgCursorStep<this>(
+      this,
+      this.getClassStep().getCursorDetails(),
+    );
     return cursorPlan;
   }
 
@@ -489,7 +472,7 @@ export class PgSelectSingleStep<
     });
   }
 
-  planForType(type: GraphQLObjectType): ExecutableStep {
+  planForType(type: GraphQLObjectType): Step {
     const poly = (this.resource.codec as PgCodec).polymorphism;
     if (poly?.mode === "single") {
       return this;
@@ -659,8 +642,8 @@ export function pgSelectFromRecord<
   resource: TResource,
   $record:
     | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
-    | ExecutableStep<{
-        [Attr in keyof TResource["codec"]["attributes"]]: ExecutableStep;
+    | Step<{
+        [Attr in keyof TResource["codec"]["attributes"]]: Step;
       }>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({

@@ -1,0 +1,45 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+# NOTE: because this is hardcoded, as compared to our neighbouring
+# single-variables test, we can determine that the orders are equivalent and
+# thus we only need to perform one fetch across both edges.
+
+mutation CreateMutation {
+  createPerson(
+    input: {
+      person: {
+        id: 9000
+        name: "John Smith Jr."
+        email: "johnny.boy.smith@email.com"
+        about: "Son of Sara and John Smith."
+        config: {}
+        lastLoginFromIp: "172.16.1.2"
+        lastLoginFromSubnet: "172.16.0.0/12"
+        userMac: "00:00:00:00:00:00"
+      }
+    }
+  ) {
+    ...createPersonPayload
+  }
+}
+
+fragment createPersonPayload on CreatePersonPayload {
+  clientMutationId
+  edge1: personEdge(orderBy: [PRIMARY_KEY_ASC]) {
+    ...peopleEdge
+  }
+  edge2: personEdge(orderBy: [ID_ASC]) {
+    ...peopleEdge
+  }
+  query {
+    nodeId
+  }
+}
+
+fragment peopleEdge on PeopleEdge {
+  cursor
+  node {
+    nodeId
+    name
+  }
+}

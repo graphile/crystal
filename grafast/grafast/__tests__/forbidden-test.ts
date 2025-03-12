@@ -6,22 +6,20 @@ import { it } from "mocha";
 import type { ExecutionDetails } from "../dist/index.js";
 import {
   arrayOfLength,
-  ExecutableStep,
   grafast,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 
 if (process.env.NODE_ENV !== "test") {
   throw new Error(`Tests must run with NODE_ENV=test`);
 }
 
-class SomeStep extends ExecutableStep {
-  deduplicate(
-    _peers: readonly ExecutableStep<any>[],
-  ): readonly ExecutableStep<any>[] {
+class SomeStep extends Step {
+  deduplicate(_peers: readonly Step<any>[]): readonly Step<any>[] {
     return _peers;
   }
-  deduplicatedWith(replacement: ExecutableStep<any>): void {}
+  deduplicatedWith(replacement: Step<any>): void {}
   optimize() {
     return this;
   }
@@ -33,8 +31,8 @@ class SomeStep extends ExecutableStep {
   }
 }
 
-class BadOptimizeStep extends ExecutableStep {
-  constructor($parent: ExecutableStep) {
+class BadOptimizeStep extends Step {
+  constructor($parent: Step) {
     super();
     this.addDependency($parent);
   }
@@ -48,8 +46,8 @@ class BadOptimizeStep extends ExecutableStep {
   }
 }
 
-class BadFinalizeStep extends ExecutableStep {
-  constructor($parent: ExecutableStep) {
+class BadFinalizeStep extends Step {
+  constructor($parent: Step) {
     super();
     this.addDependency($parent);
   }

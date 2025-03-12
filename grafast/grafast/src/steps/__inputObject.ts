@@ -4,11 +4,11 @@ import te from "tamedevil";
 
 import { inputStep } from "../input.js";
 import type {
-  InputStep,
+  AnyInputStep,
   NotVariableValueNode,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
 
@@ -19,7 +19,7 @@ const { Kind } = graphql;
  */
 export class __InputObjectStep<
   TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
-> extends UnbatchedExecutableStep {
+> extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputObjectStep",
@@ -27,7 +27,7 @@ export class __InputObjectStep<
   isSyncAndSafe = true;
 
   private inputFields: {
-    [fieldName: string]: { dependencyIndex: number; step: InputStep };
+    [fieldName: string]: { dependencyIndex: number; step: AnyInputStep };
   } = Object.create(null);
   constructor(
     private inputObjectType: TInputType,
@@ -88,10 +88,11 @@ export class __InputObjectStep<
         if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
+        const teVal = te.identifier(`val${dependencyIndex}`);
         return te`\
-  resultValues${te.set(inputFieldName, true)} = ${te.identifier(
-    `val${dependencyIndex}`,
-  )};`;
+  if (${teVal} !== undefined) {
+    resultValues${te.set(inputFieldName, true)} = ${teVal};
+  }`;
       },
     ),
     "\n",
@@ -113,12 +114,14 @@ export class __InputObjectStep<
         throw new Error("inputFieldPlan has gone missing.");
       }
       const value = values[dependencyIndex];
-      resultValues[inputFieldName] = value;
+      if (value !== undefined) {
+        resultValues[inputFieldName] = value;
+      }
     }
     return resultValues;
   }
 
-  get(attrName: string): InputStep {
+  get(attrName: string): AnyInputStep {
     const step = this.inputFields[attrName]?.step;
     if (step === undefined) {
       throw new Error(
@@ -128,6 +131,7 @@ export class __InputObjectStep<
     return step;
   }
 
+  /** @internal */
   eval(): any {
     if (this.inputValues?.kind === "NullValue") {
       return null;
@@ -140,6 +144,7 @@ export class __InputObjectStep<
     return resultValues;
   }
 
+  /** @internal */
   evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
@@ -156,6 +161,7 @@ export class __InputObjectStep<
     }
   }
 
+  /** @internal */
   evalIsEmpty(): boolean {
     return (
       this.inputValues?.kind === "ObjectValue" &&
@@ -164,6 +170,7 @@ export class __InputObjectStep<
   }
 
   // Written without consulting spec.
+  /** @internal */
   evalHas(attrName: string): boolean {
     if (!this.inputValues) {
       return false;
@@ -177,6 +184,7 @@ export class __InputObjectStep<
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
 
+  /** @internal */
   evalKeys(): ReadonlyArray<keyof TInputType & string> | null {
     if (this.inputValues === undefined) {
       return null;
@@ -218,7 +226,5 @@ export type __InputObjectStepWithDollars<
   TInputType extends GraphQLInputObjectType = GraphQLInputObjectType,
 > = __InputObjectStep<TInputType> & {
   [key in keyof ReturnType<TInputType["getFields"]> &
-    string as `$${key}`]: InputStep<
-    ReturnType<TInputType["getFields"]>[key]["type"]
-  >;
+    string as `$${key}`]: AnyInputStep;
 };

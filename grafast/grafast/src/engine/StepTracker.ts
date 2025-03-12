@@ -3,7 +3,7 @@ import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { Step } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
@@ -29,10 +29,10 @@ export class StepTracker {
   /** @internal */
   public lockedStepCount = 0;
   /** @internal */
-  public activeSteps = new Set<ExecutableStep>();
+  public activeSteps = new Set<Step>();
   /** @internal */
   public stepById: {
-    [stepId: number]: ExecutableStep | null;
+    [stepId: number]: Step | null;
   } = [];
   /** @internal */
   private aliasesById: {
@@ -42,16 +42,18 @@ export class StepTracker {
   public stepsWithNoDependenciesByConstructor = new Map<
     // eslint-disable-next-line @typescript-eslint/ban-types
     Function,
-    Set<ExecutableStep>
+    Set<Step>
   >();
 
   /** @internal */
-  public outputPlansByRootStep = new Map<ExecutableStep, Set<OutputPlan>>();
+  public internalDependencies = new Set<Step>();
   /** @internal */
-  public layerPlansByRootStep = new Map<ExecutableStep, Set<LayerPlan>>();
+  public outputPlansByRootStep = new Map<Step, Set<OutputPlan>>();
+  /** @internal */
+  public layerPlansByRootStep = new Map<Step, Set<LayerPlan>>();
   /** @internal */
   public layerPlansByParentStep = new Map<
-    ExecutableStep,
+    Step,
     Set<LayerPlan<LayerPlanReasonsWithParentStep>>
   >();
 
@@ -70,7 +72,7 @@ export class StepTracker {
   constructor(private readonly operationPlan: OperationPlan) {}
 
   public newStepsSince(oldStepCount: number) {
-    return (this.stepById as ExecutableStep[]).slice(oldStepCount);
+    return (this.stepById as Step[]).slice(oldStepCount);
   }
 
   private forbid(
@@ -103,7 +105,7 @@ export class StepTracker {
     this.forbid("setOutputPlanRootStep");
   }
 
-  public addStep($step: ExecutableStep): number {
+  public addStep($step: Step): number {
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     const ctor = $step.constructor;
@@ -243,8 +245,8 @@ export class StepTracker {
       }
     }
     // Remove all plans in this layer
-    const handled = new Set<ExecutableStep>();
-    const handle = (step: ExecutableStep) => {
+    const handled = new Set<Step>();
+    const handle = (step: Step) => {
       if (handled.has(step)) return;
       handled.add(step);
       // Handle dependents first
@@ -262,9 +264,15 @@ export class StepTracker {
     }
   }
 
-  public getStepById(id: number): ExecutableStep;
-  public getStepById(id: number, allowUnset: true): ExecutableStep | null;
-  public getStepById(id: number, allowUnset = false): ExecutableStep | null {
+  public getStepById<TStep extends Step = Step>(id: number): TStep;
+  public getStepById<TStep extends Step = Step>(
+    id: number,
+    allowUnset: true,
+  ): TStep | null;
+  public getStepById<TStep extends Step = Step>(
+    id: number,
+    allowUnset = false,
+  ): TStep | null {
     const step = this.stepById[id];
     if (!step && !allowUnset) {
       throw new Error(`Illegal step access? Step with id ${id} doesn't exist`);
@@ -276,11 +284,11 @@ export class StepTracker {
         );
       }
     }
-    return step;
+    return step as TStep | null;
   }
 
   public addStepDependency(
-    raw$dependent: ExecutableStep,
+    raw$dependent: Step,
     options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
@@ -300,7 +308,7 @@ export class StepTracker {
         "You cannot add a dependency after the step is finalized.",
       );
     }
-    if (!($dependency instanceof ExecutableStep)) {
+    if (!($dependency instanceof Step)) {
       throw new Error(
         `Error occurred when adding dependency for '${$dependent}', value passed was not a step, it was '${inspect(
           $dependency,
@@ -367,23 +375,19 @@ export class StepTracker {
   }
 
   public addStepUnaryDependency(
-    $dependent: ExecutableStep,
+    $dependent: Step,
     options: AddDependencyOptions,
   ): number {
     const $dependency = options.step;
     if (!$dependency._isUnary) {
-      throw new Error(
-        `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
-      );
+      const { nonUnaryMessage = defaultNonUnaryMessage } = options;
+      throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
     return this.addStepDependency($dependent, options);
   }
 
-  public setOutputPlanRootStep(
-    outputPlan: OutputPlan,
-    $dependency: ExecutableStep,
-  ) {
+  public setOutputPlanRootStep(outputPlan: OutputPlan, $dependency: Step) {
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${outputPlan} because it's deleted`,
@@ -413,10 +417,7 @@ export class StepTracker {
     }
   }
 
-  public setLayerPlanRootStep(
-    layerPlan: LayerPlan,
-    $dependency: ExecutableStep,
-  ) {
+  public setLayerPlanRootStep(layerPlan: LayerPlan, $dependency: Step) {
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
         `Cannot add ${$dependency} to ${layerPlan} because it's deleted`,
@@ -448,10 +449,7 @@ export class StepTracker {
   }
 
   /** @internal */
-  public replaceStep(
-    $original: ExecutableStep,
-    $replacement: ExecutableStep,
-  ): void {
+  public replaceStep($original: Step, $replacement: Step): void {
     if (!this.activeSteps.has($original)) {
       // OPTIMIZE: seems like there's unnecessary work being done here.
       // console.trace(`${$original} should be replaced with ${$replacement} but it's no longer alive`);
@@ -578,9 +576,12 @@ export class StepTracker {
   /**
    * Return true if this step can be tree-shaken.
    */
-  private isNotNeeded($step: ExecutableStep): boolean {
+  private isNotNeeded($step: Step): boolean {
     if ($step.dependents.length !== 0) return false;
     if ($step.hasSideEffects) return false;
+    if (this.internalDependencies.has($step)) {
+      return false;
+    }
     const s1 = this.outputPlansByRootStep.get($step);
     if (s1 && s1.size !== 0) return false;
     const s2 = this.layerPlansByRootStep.get($step);
@@ -595,14 +596,14 @@ export class StepTracker {
    */
   public purgeBackTo(count: number): void {
     const upper = this.stepCount;
-    const toRemove = new Set<ExecutableStep>();
+    const toRemove = new Set<Step>();
     for (let i = count; i < upper; i++) {
       const step = this.stepById[i];
       if (step) {
         toRemove.add(step);
       }
     }
-    const remove = (step: ExecutableStep): void => {
+    const remove = (step: Step): void => {
       if (this.stepById[step.id] !== step) {
         return;
       }
@@ -630,7 +631,7 @@ export class StepTracker {
    * steps no longer have any dependents (steps, layer plans or output plans)
    * then they can also be eradicated _except_ during the 'plan' phase.
    */
-  private eradicate($original: ExecutableStep) {
+  private eradicate($original: Step) {
     if ($original[$$subroutine] !== null) {
       this.deleteLayerPlan($original[$$subroutine]);
     }
@@ -715,13 +716,13 @@ export class StepTracker {
     $original.destroy();
   }
 
-  moveStepToLayerPlan(step: ExecutableStep, targetLayerPlan: LayerPlan) {
+  moveStepToLayerPlan(step: Step, targetLayerPlan: LayerPlan) {
     this.removeStepFromItsLayerPlan(step);
     (step.layerPlan as any) = targetLayerPlan;
     this.addStepToItsLayerPlan(step);
   }
 
-  addStepToItsLayerPlan(step: ExecutableStep) {
+  addStepToItsLayerPlan(step: Step) {
     const {
       layerPlan: { stepsByConstructor },
       constructor,
@@ -734,7 +735,7 @@ export class StepTracker {
     set.add(step);
   }
 
-  removeStepFromItsLayerPlan(step: ExecutableStep) {
+  removeStepFromItsLayerPlan(step: Step) {
     step.layerPlan.stepsByConstructor.get(step.constructor)!.delete(step);
   }
 
@@ -748,4 +749,8 @@ export class StepTracker {
     }
     this.lockedStepCount = this.stepCount;
   }
+}
+
+function defaultNonUnaryMessage($dependent: Step, $dependency: Step) {
+  return `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. See https://err.red/gud`;
 }

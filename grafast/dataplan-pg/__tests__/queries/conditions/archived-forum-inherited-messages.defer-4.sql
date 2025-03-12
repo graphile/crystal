@@ -1,48 +1,49 @@
 select
   __forums__."name" as "0",
-  (select json_agg(s) from (
-    select
-      __messages__."body" as "0",
-      __messages__."author_id" as "1",
-      __messages__."id" as "2",
-      __users__."username" as "3",
-      __users__."gravatar_url" as "4"
+  array(
+    select array[
+      __messages__."body",
+      __messages__."author_id",
+      __messages__."id",
+      __users__."username",
+      __users__."gravatar_url"
+    ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (
+    /* WHERE becoming ON */
       (
-        __messages__."author_id"::"uuid" = __users__."id"
+        __users__."id" = __messages__."author_id"
       ) and (
-        /* WHERE becoming ON */ (
-          true /* authorization checks */
-        )
+        true /* authorization checks */
       )
     )
     where
       (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        __messages__."forum_id" = __forums__."id"
       ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
       )
     order by __messages__."id" asc
-  ) s) as "1",
-  (select json_agg(s) from (
-    select
-      (count(*))::text as "0"
+  )::text as "1",
+  array(
+    select array[
+      (count(*))::text
+    ]::text[]
     from app_public.messages as __messages__
     where
       (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        __messages__."forum_id" = __forums__."id"
       ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
       )
-  ) s) as "2"
+  )::text as "2"
 from app_public.forums as __forums__
 where
   (
-    __forums__.archived_at is not null
-  ) and (
     true /* authorization checks */
+  ) and (
+    __forums__.archived_at is not null
   )
 order by __forums__."id" asc;
 
@@ -56,8 +57,8 @@ lateral (
   from app_public.users as __users__
   where
     (
-      true /* authorization checks */
-    ) and (
       __users__."id" = __users_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __users_result__;

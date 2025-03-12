@@ -51,3 +51,24 @@ $ GIT_USER=<Your GitHub username> yarn deploy
 
 If you are using GitHub pages for hosting, this command is a convenient way to
 build the website and push to the `gh-pages` branch.
+
+### Versioning
+
+In order to render the latest documentation at pleasant URLs whilst still allowing permalinking to a major revision's documentation, we have utilized symlinks in the `versioned_*` directories.
+
+#### Pre-release
+
+When work begins on a new major version of the software, create a new versioned pre-release of the documentation: run the [docusaurus command](https://docusaurus.io/docs/versioning):
+
+```
+yarn docusaurus docs:version 6
+```
+
+then update the banners, found in `docusaurus.config.js` config.presets[0].docs.versions, to one of 'none', 'unreleased', or 'unmaintained'.
+
+#### Release
+
+When a major version of the software is released, the following should occur:
+
+- update the two symlinks (`versioned_docs/version-latest` and `versioned_sidebars/version-latest-sidebars.json`) to point to the new latest version docs
+- update the config.presets[0].docs.versions labels in `docusaurus.config.js` to accurately reflect the new state

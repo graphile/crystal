@@ -37,7 +37,7 @@ function HomepageHeader() {
                   "button button--primary button--lg margin-left--none margin-right--md",
                   styles.buttonHero,
                 )}
-                to="/postgraphile/next"
+                to="/postgraphile/5"
               >
                 Documentation
               </Link>
@@ -47,7 +47,7 @@ function HomepageHeader() {
                   styles.buttonHero,
                   styles.buttonHeroOutline,
                 )}
-                to="/postgraphile/next"
+                to="/postgraphile/5"
               >
                 Overview - 5min ⏱
               </Link>
@@ -88,7 +88,7 @@ export default function Home() {
         }
         primaryLink={`/news/2023-08-03-version-5-beta/`}
         primaryButtonText={`Beta Announcement`}
-        secondaryLink={`/postgraphile/next/migrating-from-v4/`}
+        secondaryLink={`/postgraphile/5/migrating-from-v4/`}
         secondaryButtonText={`V4 Migration Guide`}
       />
       <HomepageHeader />

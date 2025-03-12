@@ -1,0 +1,82 @@
+{
+  allVulnerabilities: {
+    nodes: [
+      {
+        __typename: "ThirdPartyVulnerability",
+        id: 3,
+        name: "SQL injection",
+        cvssScore: 10,
+        vendorName: "Eval-Sequel-Corp",
+        cvssScoreInt: 1000,
+      },
+      {
+        __typename: "ThirdPartyVulnerability",
+        id: 2,
+        name: "XSS",
+        cvssScore: 9.1,
+        vendorName: "Frog-Render-Lib",
+        cvssScoreInt: 910,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 3,
+        name: "Exponential backtracking",
+        cvssScore: 7.7,
+      },
+      {
+        __typename: "ThirdPartyVulnerability",
+        id: 1,
+        name: "CSRF",
+        cvssScore: 7.5,
+        vendorName: "98-Factor-Login",
+        cvssScoreInt: 750,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 2,
+        name: "Index-out-of-bounds",
+        cvssScore: 7.2,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 4,
+        name: "Information disclosure",
+        cvssScore: 7.2,
+      },
+      {
+        __typename: "ThirdPartyVulnerability",
+        id: 5,
+        name: "License",
+        cvssScore: 7.2,
+        vendorName: "Frog-Render-Lib",
+        cvssScoreInt: 720,
+      },
+      {
+        __typename: "ThirdPartyVulnerability",
+        id: 4,
+        name: "Malware",
+        cvssScore: 7.2,
+        vendorName: "Frog-Render-Lib",
+        cvssScoreInt: 720,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 5,
+        name: "Timing attack",
+        cvssScore: 7.2,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 6,
+        name: "Race condition",
+        cvssScore: 5,
+      },
+      {
+        __typename: "FirstPartyVulnerability",
+        id: 1,
+        name: "Off-by-one",
+        cvssScore: 3,
+      },
+    ],
+  },
+}

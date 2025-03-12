@@ -1,9 +1,13 @@
 import "graphile-config";
 
-import type { PgInsertSingleStep, PgResource } from "@dataplan/pg";
+import type {
+  PgInsertSingleQueryBuilder,
+  PgInsertSingleStep,
+  PgResource,
+} from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
-import { assertExecutableStep, constant, object } from "grafast";
+import { assertExecutableStep, object } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -123,7 +127,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const {
           inflection,
-          graphql: { GraphQLString, GraphQLNonNull },
+          graphql: { GraphQLString, GraphQLNonNull, isInputType },
         } = build;
         const insertableResources = Object.values(
           build.input.pgRegistry.pgResources,
@@ -147,16 +151,15 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   return {
                     clientMutationId: {
                       type: GraphQLString,
-                      autoApplyAfterParentApplyPlan: true,
-                      applyPlan: EXPORTABLE(
+                      apply: EXPORTABLE(
                         () =>
-                          function plan($input: ObjectStep<any>, val) {
-                            $input.set("clientMutationId", val.get());
+                          function apply(qb: PgInsertSingleQueryBuilder, val) {
+                            qb.setMeta("clientMutationId", val);
                           },
                         [],
                       ),
                     },
-                    ...(TableInput
+                    ...(isInputType(TableInput)
                       ? {
                           [tableFieldName]: fieldWithHooks(
                             {
@@ -169,17 +172,15 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TableInput),
-                              autoApplyAfterParentApplyPlan: true,
-                              applyPlan: EXPORTABLE(
+                              apply: EXPORTABLE(
                                 () =>
                                   function plan(
-                                    $object: ObjectStep<{
-                                      result: PgInsertSingleStep;
-                                    }>,
+                                    qb: PgInsertSingleQueryBuilder,
+                                    arg,
                                   ) {
-                                    const $record =
-                                      $object.getStepForKey("result");
-                                    return $record.setPlan();
+                                    if (arg != null) {
+                                      return qb.setBuilder();
+                                    }
                                   },
                                 [],
                               ),
@@ -214,16 +215,16 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     clientMutationId: {
                       type: GraphQLString,
                       plan: EXPORTABLE(
-                        (constant) =>
-                          function plan($mutation: ObjectStep<any>) {
-                            return (
-                              $mutation.getStepForKey(
-                                "clientMutationId",
-                                true,
-                              ) ?? constant(null)
-                            );
+                        () =>
+                          function plan(
+                            $mutation: ObjectStep<{
+                              result: PgInsertSingleStep;
+                            }>,
+                          ) {
+                            const $insert = $mutation.getStepForKey("result");
+                            return $insert.getMeta("clientMutationId");
                           },
-                        [constant],
+                        [],
                       ),
                     },
                     ...(TableType &&
@@ -306,7 +307,6 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(mutationInputType),
-                        autoApplyAfterParentPlan: true,
                         applyPlan: EXPORTABLE(
                           () =>
                             function plan(
@@ -331,13 +331,14 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     plan: EXPORTABLE(
                       (object, pgInsertSingle, resource) =>
                         function plan(_: any, args: FieldArgs) {
+                          const $insert = pgInsertSingle(
+                            resource,
+                            Object.create(null),
+                          );
+                          args.apply($insert);
                           const plan = object({
-                            result: pgInsertSingle(
-                              resource,
-                              Object.create(null),
-                            ),
+                            result: $insert,
                           });
-                          args.apply(plan);
                           return plan;
                         },
                       [object, pgInsertSingle, resource],

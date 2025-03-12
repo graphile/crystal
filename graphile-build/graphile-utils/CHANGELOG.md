@@ -1,5 +1,19 @@
 # graphile-utils
 
+## 5.0.0-beta.37
+
+### Patch Changes
+
+- Updated dependencies
+  [[`fc9d64eb8`](https://github.com/graphile/crystal/commit/fc9d64eb8002d3b72625bc505ed76c07f4296d68),
+  [`a2dbad945`](https://github.com/graphile/crystal/commit/a2dbad9457195bec797d72e4e6d45f45278f9f69),
+  [`31078842a`](https://github.com/graphile/crystal/commit/31078842ad0eeaa7111491fa9eb5e3bd026fb38a),
+  [`5a0ec31de`](https://github.com/graphile/crystal/commit/5a0ec31deae91f1dd17a77a4bb7c1a911a27e26a)]:
+  - @dataplan/pg@0.0.1-beta.31
+  - grafast@0.1.1-beta.20
+  - graphile-build-pg@5.0.0-beta.37
+  - graphile-build@5.0.0-beta.32
+
 ## 5.0.0-beta.36
 
 ### Patch Changes

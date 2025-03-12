@@ -16,7 +16,7 @@ Under the hood, PostGraphile polymorphism is powered by
 [@dataplan/pg's polymorphism](https://grafast.org/grafast/step-library/dataplan-pg/polymorphism);
 some restrictions may apply to what PostGraphile generates for polymorphic
 types and fields based on what `@dataplan/pg` supports. For example, CRUD
-mutations are not generated for polymorphic types at this time - see instead
+mutations are not generated for polymorphic types at this time — see instead
 [Custom Mutations](./custom-mutations).
 
 :::

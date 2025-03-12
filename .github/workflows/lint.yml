@@ -71,7 +71,10 @@ jobs:
       - run: yarn --immutable
 
       - name: "Build Code"
-        run: yarn prepack:all
+        run: yarn build && yarn prepack:all
 
       - name: "Run depcheck script"
         run: node scripts/benjies-depcheck.mjs
+
+      - name: "Ensure SQL is lowercase"
+        run: node scripts/ensure-sql-is-lowercase.mjs

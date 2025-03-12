@@ -62,26 +62,13 @@ export const QueryPlugin: GraphileConfig.Plugin = {
 
       GraphQLSchema: {
         callback: (schema, build, _context) => {
-          const { getTypeByName, extend, inflection, handleRecoverableError } =
-            build;
+          const { getTypeByName, extend, inflection } = build;
 
-          // IIFE to get the mutation type, handling errors occurring during
-          // validation.
-          const Query = (() => {
-            try {
-              const Type = getTypeByName(inflection.builtin("Query"));
-
-              if (isValidObjectType(Type)) {
-                return Type;
-              }
-            } catch (e) {
-              handleRecoverableError(e);
-            }
-            return null;
-          })();
-
-          if (Query == null) {
-            return schema;
+          const Query = getTypeByName(inflection.builtin("Query"));
+          if (!isValidObjectType(Query)) {
+            throw new Error(
+              `Returned type ${Query} is not suitable for use as root query operation type`,
+            );
           }
 
           // Errors thrown here (e.g. due to naming conflicts) should be raised,

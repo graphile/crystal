@@ -14,11 +14,7 @@ import {
   NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
-import type {
-  ExecutableStep,
-  ModifierStep,
-  UnbatchedExecutableStep,
-} from "../step";
+import type { Step, UnbatchedStep } from "../step";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -50,7 +46,12 @@ export interface LayerPlanReasonNullableField {
    *
    * Also needed for execution (see `executeBucket`).
    */
-  parentStep: ExecutableStep;
+  parentStep: Step;
+}
+export interface LayerPlanReasonListItemStream {
+  initialCountStepId?: number;
+  ifStepId?: number;
+  labelStepId?: number;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
@@ -62,13 +63,12 @@ export interface LayerPlanReasonListItem {
    *
    * Also needed for execution (see `executeBucket`).
    */
-  parentStep: ExecutableStep;
+  parentStep: Step;
 
-  /** If this listItem is to be streamed, the configuration for that streaming */
-  stream?: {
-    initialCount: number;
-    label?: string;
-  };
+  /**
+   * If this listItem is to be streamed, the configuration for that streaming.
+   */
+  stream?: LayerPlanReasonListItemStream;
 }
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
@@ -82,6 +82,8 @@ export interface LayerPlanReasonMutationField {
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
+  // TODO: change to labelStepId, also add ifStepId. See listItem.stream for
+  // examples.
   label?: string;
 }
 /** Branching, non-deferred */
@@ -91,7 +93,7 @@ export interface LayerPlanReasonPolymorphic {
   /**
    * Needed for execution (see `executeBucket`).
    */
-  parentStep: ExecutableStep;
+  parentStep: Step;
   polymorphicPaths: Set<string>;
 }
 /** Non-branching, non-deferred */
@@ -99,22 +101,22 @@ export interface LayerPlanReasonSubroutine {
   // NOTE: the plan that has a subroutine should call executeBucket from within
   // `execute`.
   type: "subroutine";
-  parentStep: ExecutableStep;
+  parentStep: Step;
 }
 
-export function isBranchingLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
   return layerPlan.reason.type === "polymorphic";
 }
-export function isDeferredLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return (
-    t === "stream" ||
+    (t === "listItem" && layerPlan.reason.stream != null) ||
     t === "subscription" ||
     t === "mutationField" ||
     t === "defer"
   );
 }
-export function isPolymorphicLayerPlan(layerPlan: LayerPlan<any>): boolean {
+export function isPolymorphicLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return t === "polymorphic";
 }
@@ -132,7 +134,7 @@ export type LayerPlanReason =
 // The `A extends any ? ... : never` tells TypeScript to make this
 // distributive. TypeScript can be a bit arcane.
 export type HasParent<A extends LayerPlanReason> = A extends any
-  ? A extends { parentStep: ExecutableStep }
+  ? A extends { parentStep: Step }
     ? A
     : never
   : never;
@@ -155,7 +157,7 @@ export interface LayerPlanPhase {
    */
   normalSteps:
     | Array<{
-        step: ExecutableStep;
+        step: Step;
       }>
     | undefined;
 
@@ -167,7 +169,7 @@ export interface LayerPlanPhase {
    */
   unbatchedSyncAndSafeSteps:
     | Array<{
-        step: UnbatchedExecutableStep;
+        step: UnbatchedStep;
 
         /**
          * Store the result of the step here if you want - useful to avoid lookups
@@ -182,7 +184,7 @@ export interface LayerPlanPhase {
    *
    * @internal
    */
-  _allSteps: ExecutableStep[];
+  _allSteps: Step[];
 }
 
 /**
@@ -222,7 +224,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * - root: the `operationPlan.rootValue`
    * - listItem: the `__ItemStep`
-   * - stream: also the `__ItemStep`
    * - subscription: also the `__ItemStep`
    * - mutationField: the result plan of the mutation field
    * - defer: the parent layer's rootStep (defer always results in an object, unless an error occurs)
@@ -231,7 +232,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  public readonly rootStep: ExecutableStep | null = null;
+  public readonly rootStep: Step | null = null;
 
   /**
    * Which steps the results for which are available in a parent bucket need to
@@ -246,9 +247,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   public children: LayerPlan[] = [];
 
   /** @internal */
-  steps: ExecutableStep[] = [];
+  steps: Step[] = [];
   /** @internal */
-  pendingSteps: ExecutableStep[] = [];
+  pendingSteps: Step[] = [];
 
   /**
    * This goes along with `parentStep` in the reason, except it applies to all
@@ -258,7 +259,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  public parentSideEffectStep: ExecutableStep | null = null;
+  public parentSideEffectStep: Step | null = null;
 
   /**
    * This tracks the latest seen side effect at the current point in planning
@@ -267,7 +268,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  public latestSideEffectStep: ExecutableStep | null = null;
+  public latestSideEffectStep: Step | null = null;
 
   /**
    * Describes the order in which the steps within this LayerPlan are executed.
@@ -300,7 +301,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    * layer plan, grouped by their step class.
    */
   // eslint-disable-next-line @typescript-eslint/ban-types
-  stepsByConstructor: Map<Function, Set<ExecutableStep>>;
+  stepsByConstructor: Map<Function, Set<Step>>;
 
   constructor(
     public readonly operationPlan: OperationPlan,
@@ -371,7 +372,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   _hasSetRootStep = false;
-  setRootStep($root: ExecutableStep): void {
+  setRootStep($root: Step): void {
     if (this._hasSetRootStep) {
       throw new Error(`Set root step on ${this} more than once`);
     }
@@ -385,18 +386,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   /** @internal Use plan.getStep(id) instead. */
-  public getStep(id: number, requestingStep: ExecutableStep): ExecutableStep {
+  public getStep(id: number, requestingStep: Step): Step {
     return this.operationPlan.getStep(id, requestingStep);
   }
 
   /** @internal */
-  public _addStep(step: ExecutableStep): number {
+  public _addStep(step: Step): number {
     return this.operationPlan._addStep(step);
-  }
-
-  /** @internal */
-  public _addModifierStep(step: ModifierStep<any>): string {
-    return this.operationPlan._addModifierStep(step);
   }
 
   public finalize(): void {

@@ -1,8 +1,9 @@
 import chalk from "chalk";
 
-import type { ExecutableStep, ListCapableStep } from "../step.js";
+import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
+import type { ConnectionCapableStep, ItemsStep } from "./connection.js";
 import type {
   __ListTransformStep,
   ListTransformItemPlanCallback,
@@ -30,11 +31,14 @@ const initialState = (): FilterPlanMemo => [];
  * plan results in a truthy value.
  */
 export function filter<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TItemStep extends ExecutableStep<boolean>,
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TItemStep extends Step<boolean>,
 >(
   listStep: TListStep,
-  filterCallback: ListTransformItemPlanCallback<TListStep, TItemStep>,
+  filterCallback: ListTransformItemPlanCallback<
+    ItemsStep<TListStep>,
+    TItemStep
+  >,
 ): __ListTransformStep<
   TListStep,
   TItemStep,

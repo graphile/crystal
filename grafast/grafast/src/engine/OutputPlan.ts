@@ -22,7 +22,7 @@ import type {
 } from "../interfaces.js";
 import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
-import type { ExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
@@ -167,12 +167,12 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * The step that represents the root value. How this is used depends on the
    * OutputPlanMode.
    */
-  public readonly rootStep: ExecutableStep;
+  public readonly rootStep: Step;
   /**
    * If this output plan should resolve to an error if a side effect step
    * raises an error, this is that side effect.
    */
-  public readonly sideEffectStep: ExecutableStep | null;
+  public readonly sideEffectStep: Step | null;
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
@@ -232,7 +232,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
      *
      * For `introspection`, `null` it's irrelevant. Use `constant(null)` or whatever.
      */
-    rootStep: ExecutableStep,
+    rootStep: Step,
     public readonly type: TType,
     locationDetails: LocationDetails,
   ) {
@@ -466,7 +466,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
       if (expressionDetails !== undefined) {
         // @ts-ignore
-        const $parent: ExecutableStep = $root.getDep(0);
+        const { step: $parent } = $root.getDepOptions(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
@@ -492,7 +492,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         stepADependsOnStepB($root, $sideEffect)
       ) {
         // It's marked readonly, but we override it anyway
-        (this.sideEffectStep as ExecutableStep | null) = null;
+        (this.sideEffectStep as Step | null) = null;
       }
     }
 
@@ -645,7 +645,7 @@ export function coerceError(
     }
   } else {
     return new GraphQLError(
-      error.message,
+      error?.message ?? String(error),
       locationDetails.node,
       null,
       null,
@@ -888,6 +888,13 @@ function makeExecutor<
         }
       }
     }
+    if (bucketRootFlags & FLAG_ERROR) {
+      throw coerceError(
+        rawBucketRootValue,
+        this.locationDetails,
+        mutablePath.slice(1),
+      );
+    }
     const bucketRootValue =
       this.processRoot !== null
         ? this.processRoot(rawBucketRootValue, bucketRootFlags)
@@ -898,13 +905,6 @@ function makeExecutor<
     );
     if (earlyReturn !== undefined) {
       return earlyReturn as any;
-    }
-    if (bucketRootFlags & FLAG_ERROR) {
-      throw coerceError(
-        bucketRootValue,
-        this.locationDetails,
-        mutablePath.slice(1),
-      );
     }
     if (!skipNullHandling) {
       if (bucketRootValue == null)
@@ -1359,15 +1359,19 @@ function makeArrayExecutor<TAsString extends boolean>(
           | AsyncIterableIterator<any>
           | undefined;
         if (stream !== undefined) {
+          const labelStepId = (
+            childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
+          ).reason.stream?.labelStepId;
           root.streams.push({
             root,
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
             outputPlan: childOutputPlan,
-            label: (
-              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
-            ).reason.stream?.label,
+            label:
+              labelStepId != null
+                ? bucket.store.get(labelStepId)?.unaryValue()
+                : undefined,
             stream,
             startIndex: bucketRootValue.length,
           });

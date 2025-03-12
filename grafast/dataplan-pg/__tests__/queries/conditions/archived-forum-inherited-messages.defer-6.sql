@@ -1,25 +1,26 @@
 select
   __forums__."name" as "0",
-  (select json_agg(s) from (
-    select
-      __messages__."body" as "0",
-      __messages__."author_id" as "1",
-      __messages__."id" as "2"
+  array(
+    select array[
+      __messages__."body",
+      __messages__."author_id",
+      __messages__."id"
+    ]::text[]
     from app_public.messages as __messages__
     where
       (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        __messages__."forum_id" = __forums__."id"
       ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
       )
     order by __messages__."id" asc
-  ) s) as "1"
+  )::text as "1"
 from app_public.forums as __forums__
 where
   (
-    __forums__.archived_at is not null
-  ) and (
     true /* authorization checks */
+  ) and (
+    __forums__.archived_at is not null
   )
 order by __forums__."id" asc;
 
@@ -33,8 +34,8 @@ lateral (
   from app_public.users as __users__
   where
     (
-      true /* authorization checks */
-    ) and (
       __users__."id" = __users_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __users_result__;

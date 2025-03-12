@@ -216,6 +216,8 @@ type what the step actually is, you can use `__assertStep: ExecutableStep` or
 
 ## Argument and input field plan resolvers
 
+**THIS CONTENT IS WRONG!** TODO: update this to reflect the beta2 changes.
+
 :::tip
 
 This section is very advanced and rarely used, so feel free to skip to the next
@@ -298,9 +300,11 @@ TODO: expand this section with examples of why you might do these things.
 
 :::warning
 
-This section is now _wrong_. We changed this behavior, and now you need to add
+~~This section is now _wrong_. We changed this behavior, and now you need to add
 `autoApplyAfterParentApplyPlan` or similar in order to trigger your field to
-auto-apply (or `autoApplyAfterParentPlan` for an argument).
+auto-apply (or `autoApplyAfterParentPlan` for an argument).~~
+
+Now even the statement this is wrong, is itself wrong...
 
 TODO: fix this documentation.
 

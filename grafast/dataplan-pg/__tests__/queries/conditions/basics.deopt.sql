@@ -17,9 +17,9 @@ lateral (
   from app_public.messages as __messages__
   where
     (
-      (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
-    ) and (
       __messages__."forum_id" = __messages_identifiers__."id0"
+    ) and (
+      (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
     )
   order by __messages__."id" asc
   limit 2

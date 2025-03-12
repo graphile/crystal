@@ -2,7 +2,7 @@
 set -e
 
 # Build everything in the relevant order according to TypeScript project references
-tsc -b
+yarn build
 
 # Now run `prepack` on each package (slightly parallelised)
 yarn workspaces foreach --parallel --topological run prepack

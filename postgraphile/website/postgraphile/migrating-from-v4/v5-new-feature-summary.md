@@ -10,7 +10,7 @@ with something much more pleasant and powerful. After many iterations, we ultima
 
 Since the lookahead system underpinned everything in Version 4 of PostGraphile, replacing it
 meant rebuilding everything from the ground up, so we took the opportunity to fix a huge number
-of other snags and suboptimal experiences in Version 4 - also adding in many capabilities which
+of other snags and suboptimal experiences in Version 4 — also adding in many capabilities which
 weren't possible, and changing some of the default behaviors.
 
 Ultimately, Version 5 brings a number of new paradigms to PostGraphile, and along with that many
@@ -28,7 +28,7 @@ new features. The following list is a summary of those new features but is by no
 
 <figure>
 
-[![A Grafast plan diagram for an AllPosts query](../../static/img/news/2023-04-26-mermaid-diagram.png)](../../static/img/news/2023-04-26-mermaid-diagram.png)
+[![A Grafast plan diagram for an AllPosts query](@site/static/img/news/2023-04-26-mermaid-diagram.png)](@site/static/img/news/2023-04-26-mermaid-diagram.png)
 
 <figcaption>
 
@@ -49,7 +49,7 @@ Massively improved SQL query generation: smaller, simpler, easier to understand,
 
 <figure>
 
-[![A GraphQL query for AllPosts](../../static/img/news/2023-04-26-v4-v5-comparison.png)](../../static/img/news/2023-04-26-v4-v5-comparison.png)
+[![A GraphQL query for AllPosts](@site/static/img/news/2023-04-26-v4-v5-comparison.png)](@site/static/img/news/2023-04-26-v4-v5-comparison.png)
 
 <figcaption>
 
@@ -216,7 +216,7 @@ Now generated from Postgres documentation and strongly typed (view postgres docs
 - Optionally define your resources (tables, functions, views, etc) manually and generate the schema from them (enables generation from DDL or model objects)
 - Better capabilities for allowing changes to your underlying Postgres tables without causing breaking changes to GraphQL API
 - Use your choice of Postgres client
-- Change your PostgreSQL connection string at runtime (assuming you have multiple identical databases - sometimes used for multitenancy)
+- Change your PostgreSQL connection string at runtime (assuming you have multiple identical databases - sometimes used for multi-tenancy)
 - Optionally use alternative authorization techniques (don't need to use RLS) [experimental]
 - Better support for various Postgres types
 - Don't convert unknown types to `String`, instead omit them

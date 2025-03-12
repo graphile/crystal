@@ -1,5 +1,6 @@
-import type { ExecutableStep, UnbatchedExecutionExtra } from "..";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 
 const unaryOperators = ["null", "not null", "exists", "not exists"] as const;
 type UnaryOperator = (typeof unaryOperators)[number];
@@ -7,7 +8,7 @@ const binaryOperators = ["===", "!=="] as const;
 type BinaryOperator = (typeof binaryOperators)[number];
 type Operator = UnaryOperator | BinaryOperator;
 
-export class ConditionStep extends UnbatchedExecutableStep<boolean> {
+export class ConditionStep extends UnbatchedStep<boolean> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConditionStep",
@@ -113,8 +114,7 @@ function isNotEqual(
   return value1 !== value2;
 }
 
-type Step<T = any> = ExecutableStep<T>;
-type $Boolean = ExecutableStep<boolean>;
+type $Boolean = Step<boolean>;
 function condition(op: "null", step: Step): $Boolean;
 function condition(op: "not null", step: Step): $Boolean;
 function condition(op: "exists", step: Step): $Boolean;

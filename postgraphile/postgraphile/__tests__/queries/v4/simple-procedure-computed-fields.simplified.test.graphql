@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allPeople {
+    nodes {
+      name
+      postsByAuthorId(last: 2) {
+        nodes {
+          headline
+          headlineTrimmed
+        }
+      }
+    }
+  }
+}

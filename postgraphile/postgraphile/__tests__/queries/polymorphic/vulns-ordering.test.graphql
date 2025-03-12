@@ -1,0 +1,18 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allVulnerabilities(orderBy: [CVSS_SCORE_DESC, NAME_ASC]) {
+    nodes {
+      __typename
+      id
+      name
+      cvssScore
+      ... on ThirdPartyVulnerability {
+        vendorName
+        cvssScoreInt
+      }
+    }
+  }
+}

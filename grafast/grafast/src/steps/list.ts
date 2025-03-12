@@ -4,8 +4,8 @@ import type {
   UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { constant, ConstantStep } from "./constant.js";
 
 const DEFAULT_CACHE_SIZE = 100;
@@ -16,8 +16,8 @@ interface ListStepCacheConfig {
 }
 
 export class ListStep<
-  const TPlanTuple extends readonly ExecutableStep[],
-> extends UnbatchedExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
+  const TPlanTuple extends readonly Step[],
+> extends UnbatchedStep<UnwrapPlanTuple<TPlanTuple>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ListStep",
@@ -137,18 +137,18 @@ export class ListStep<
   /**
    * Get the original plan at the given index back again.
    */
-  public at<TIndex extends keyof TPlanTuple>(
+  public at<TIndex extends keyof TPlanTuple & number>(
     index: TIndex,
   ): TPlanTuple[TIndex] {
-    return this.getDep(index as number) as TPlanTuple[TIndex];
+    return this.getDep<TPlanTuple[TIndex]>(index as number);
   }
 
   public first() {
-    return this.getDep(0) as TPlanTuple[0];
+    return this.getDep<TPlanTuple[0]>(0);
   }
 
   public last() {
-    return this.getDep(this.dependencies.length - 1) as TPlanTuple[number];
+    return this.getDep<TPlanTuple[number]>(this.dependencies.length - 1);
   }
 }
 
@@ -156,7 +156,7 @@ export class ListStep<
  * Takes a list of plans and turns it into a single plan that represents the
  * list of their values.
  */
-export function list<const TPlanTuple extends readonly ExecutableStep[]>(
+export function list<const TPlanTuple extends readonly Step[]>(
   list: TPlanTuple,
   cacheConfig?: ListStepCacheConfig,
 ): ListStep<TPlanTuple> {

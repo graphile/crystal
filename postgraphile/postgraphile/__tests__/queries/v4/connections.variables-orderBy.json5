@@ -1,0 +1,34 @@
+{
+  t: {
+    pageInfo: {
+      startCursor: "WyJkNTY3OGM4NjBmIiw1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV0=",
+      endCursor: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0=",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 11,
+    edges: [
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiw1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV0=",
+        node: {
+          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          authorId: 5,
+        },
+      },
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiwzLCJZb3Uga25vdyBob3cgSSBzb21ldGltZXMgaGF2ZSByZWFsbHkgYnJpbGxpYW50IGlkZWFzPyIsOV0=",
+        node: {
+          headline: "You know how I sometimes have really brilliant ideas?",
+          authorId: 3,
+        },
+      },
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0=",
+        node: {
+          headline: "They’re not aliens, they’re Earth…liens!",
+          authorId: 3,
+        },
+      },
+    ],
+  },
+}

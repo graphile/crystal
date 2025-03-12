@@ -1,6 +1,6 @@
 // import type { GraphQLScalarType } from "graphql";
 
-import type { ExecutableStep, GrafastExecutionArgs } from ".";
+import type { GrafastExecutionArgs, Step } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
 import type {
@@ -102,7 +102,7 @@ export interface Bucket {
   store: Map<number, ExecutionValue>;
 
   setResult(
-    step: ExecutableStep,
+    step: Step,
     index: number,
     value: any,
     flags: ExecutionEntryFlags,

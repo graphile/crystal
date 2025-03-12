@@ -1,0 +1,105 @@
+---
+title: Command-line (CLI) usage
+---
+
+# Command Line Interface
+
+The easiest way to get up and running with PostGraphile is to use the Command
+Line Interface.
+
+To try without installing, run the `pgl` command via the `npx` command that
+comes bundled with Node.js:
+
+```
+npx pgl@beta -P pgl/amber -e -c postgres:///mydb
+```
+
+:::info
+
+You should replace `postgres:///mydb` with a PostgreSQL connection string
+pointing at your database, and if you use a non-standard PostgreSQL schema you
+should indicate the schema name via `-s my_schema_name_here`.
+
+:::
+
+For a more permanent installation we suggest you create yourself a new
+directory for your project, we'll refer to this as `~/postgraphile`. Open a
+terminal in this directory and install PostGraphile:
+
+```bash npm2yarn
+cd ~/postgraphile
+npm install postgraphile@beta
+```
+
+You can then run PostGraphile equivalent to above via:
+
+```bash npm2yarn
+npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
+```
+
+:::caution
+
+The `-e` option should only be used in development.
+
+:::
+
+### CLI flags
+
+The CLI accepts a small number of configuration options to get you started. It
+also reads [options from a `graphile.config.js`](./config.mdx) file from the
+current working directory (if it exists); by specifying all options in this file
+you can run PostGraphile with no (or minimal) CLI flags.
+
+- `--version`  
+  output the version number
+- `--help`  
+  output usage information
+- `--preset <string>` (alias: `-P`)
+  <equivalent>{`{ extends: [...] }`}</equivalent>
+  can be used to specify a comma-separated list of presets to add to the configuration
+- `--allow-explain` (alias: `-e`)
+  <equivalent>{`{ grafast: { explain: true } }`}</equivalent>
+  enables "explain" mode, you won't want this in production but it's very helpful
+  in development to know what's going on
+- `--connection <string>` (alias: `-c`)
+  <equivalent>{`{ pgServices: [makePgService({ connectionString: '...' })] }`}</equivalent>
+  the PostgreSQL connection string. If omitted, inferred from <a href="https://www.postgresql.org/docs/current/static/libpq-envars.html">
+    environmental variables
+  </a>
+  .<br />
+  Examples: <code>db</code>, <code>postgres:///db</code>, <code>postgres://user:password@domain:port/db?ssl=true</code>
+- `--superuser-connection <string>` (alias: `-S`)
+  <equivalent>{`{ pgServices: [makePgService({ superuserConnectionString:'...' })] }`}</equivalent>
+  the PostgreSQL superuser connection string to use for installing watch fixtures
+  (if <code>--watch</code> is enabled). If omitted, the regular connection string
+  will be used.
+- `--schema <string>` (alias: `-s`)
+  <equivalent>{`{ pgServices: [makePgService({ schemas: ['...'] })] }`}</equivalent>
+  a comma-separated list of PostgreSQL schemas to be introspected.
+- `--watch` (alias: `-w`)
+  <equivalent>{`{ grafserv: { watch: true } }`}</equivalent>
+  automatically updates your GraphQL schema when your database schema changes (NOTE:
+  requires DB superuser to install <code>postgraphile_watch</code> schema)
+- `--host <string>` (alias: `-n`)
+  <equivalent>{`{ grafserv: { host: 'localhost' } }`}</equivalent>
+  the hostname to be used. Defaults to <code>localhost</code>
+- `--port <number>` (alias: `-p`)
+  <equivalent>{`{ grafserv: { port: 5678 } }`}</equivalent>
+  the port to be used. Defaults to 5678
+
+## `pgl` vs `postgraphile`
+
+New to V5 if PostGraphile is the `pgl` command. This is almost identical to the
+`postgraphile` command (it actually defers to `postgraphile` under the hood),
+with the following differences:
+
+- `pgl` has no `peerDependencies` - as soon as you start installing plugins that need peerDependencies you should consider moving to `postgraphile`
+- `pgl` exposes `postgraphile/presets/amber` as `pgl/amber` (and similar for `pgl/v4` and `pgl/relay`), so it's more concise
+
+:::tip
+
+`pgl` is most suitable for running from `npx` without the need to permanently
+install anything. If you want to start using PostGraphile in your project you
+should install `postgraphile` instead.
+
+:::

@@ -33,6 +33,7 @@ grafast/dataplan-pg/__tests__/**/*.mermaid.png
 /graphile-build/graphile-build-pg/webpacked
 /graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 /graphile-build/graphile-build-pg/schema-export-output.mjs
+/postgraphile/postgraphile/.tests_tmp/
 /postgraphile/postgraphile/latestSchema.graphql
 /postgraphile/postgraphile/latestSchema.json
 /postgraphile/postgraphile/exported-schema.mjs

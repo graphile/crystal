@@ -10,12 +10,18 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { ConnectionCapableStep, ExecutionDetails } from "../index.js";
+import type {
+  __FlagStep,
+  ConnectionCapableStep,
+  ExecutionDetails,
+} from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
 import { $$deepDepSkip } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
+import type { ItemsStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,
@@ -24,33 +30,38 @@ export type ListTransformReduce<TMemo, TItemPlanData> = (
 ) => TMemo;
 
 export type ListTransformItemPlanCallback<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TDepsStep extends ExecutableStep,
+  TListStep extends Step<readonly any[]>,
+  TDepsStep extends Step,
 > = (
-  listItemPlan: TListStep extends ListCapableStep<any, any>
-    ? ReturnType<TListStep["listItem"]>
+  listItemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
+    ? ReturnType<ItemsStep<TListStep>["listItem"]>
     : __ItemStep<any>,
 ) => TDepsStep;
 
 export interface ListTransformOptions<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TDepsStep extends ExecutableStep,
+  TListStep extends
+    | Step<readonly any[]>
+    | ConnectionCapableStep<Step<any>, any>,
+  TDepsStep extends Step,
   TMemo,
-  TItemStep extends ExecutableStep | undefined = undefined,
+  TItemStep extends Step | undefined = undefined,
 > {
   listStep: TListStep;
-  itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
+  itemPlanCallback: ListTransformItemPlanCallback<
+    ItemsStep<TListStep>,
+    TDepsStep
+  >;
   initialState(): TMemo;
   reduceCallback: ListTransformReduce<
     TMemo,
-    TDepsStep extends ExecutableStep<infer U> ? U : never
+    TDepsStep extends Step<infer U> ? U : never
   >;
-  listItem?(itemPlan: ExecutableStep): TItemStep;
+  listItem?(itemPlan: Step): TItemStep;
   finalizeCallback?(data: TMemo): TMemo;
   meta?: string;
   optimize?: (
     this: __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>,
-  ) => ExecutableStep;
+  ) => Step;
   connectionClone?: ConnectionCapableStep<TListStep, any>["connectionClone"];
 }
 
@@ -64,13 +75,13 @@ export interface ListTransformOptions<
  * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformStep<
-  TListStep extends ExecutableStep<readonly any[]> = ExecutableStep<
-    readonly any[]
-  >,
-  TDepsStep extends ExecutableStep = ExecutableStep,
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any> =
+    | Step<readonly any[]>
+    | ConnectionCapableStep<any, any>,
+  TDepsStep extends Step = Step,
   TMemo = any,
-  TItemStep extends ExecutableStep | undefined = ExecutableStep | undefined,
-> extends ExecutableStep<TMemo> {
+  TItemStep extends Step | undefined = Step | undefined,
+> extends Step<TMemo> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ListTransformStep",
@@ -79,11 +90,15 @@ export class __ListTransformStep<
   isSyncAndSafe = false;
 
   private listStepDepId: number;
-  public itemPlanCallback: ListTransformItemPlanCallback<TListStep, TDepsStep>;
+  private rawListStepDepId: number;
+  public itemPlanCallback: ListTransformItemPlanCallback<
+    ItemsStep<TListStep>,
+    TDepsStep
+  >;
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
     TMemo,
-    TDepsStep extends ExecutableStep<infer U> ? U : never
+    TDepsStep extends Step<infer U> ? U : never
   >;
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemStep<this>) => TItemStep;
@@ -106,7 +121,7 @@ export class __ListTransformStep<
   ) {
     super();
     const {
-      listStep,
+      listStep: rawListStep,
       itemPlanCallback,
       initialState,
       reduceCallback,
@@ -116,7 +131,15 @@ export class __ListTransformStep<
       optimize,
       connectionClone,
     } = options;
+    const listStep = itemsOrStep(rawListStep);
     this.listStepDepId = this.addDependency(listStep);
+
+    // PERF: This is just so we can populate getListStep() correctly... Ideally we could mark this as a "plan-time-only" dependency.
+    this.rawListStepDepId =
+      rawListStep === listStep
+        ? this.listStepDepId
+        : this.addDependency(rawListStep);
+
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -167,7 +190,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDep(this.listStepDepId) as TListStep;
+    return this.getDepOptions<TListStep>(this.rawListStepDepId).step;
   }
 
   [$$deepDepSkip]() {
@@ -175,7 +198,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.dependencies[this.listStepDepId] as TListStep;
+    return this.dependencies[this.rawListStepDepId] as TListStep;
   }
 
   deduplicate(
@@ -193,7 +216,7 @@ export class __ListTransformStep<
 
   // ListTransform plans must _NOT_ optimize away. They must persist (unless
   // the options overrides this)
-  optimize(): ExecutableStep {
+  optimize(): Step {
     return this;
   }
 
@@ -231,7 +254,7 @@ export class __ListTransformStep<
     const listStepValue = values[this.listStepDepId];
 
     if (itemStep._isUnary) {
-      const list = listStepValue.at(0);
+      const list = listStepValue.unaryValue();
       store.set(
         itemStepId,
         unaryExecutionValue(Array.isArray(list) ? list[0] : list),
@@ -352,10 +375,10 @@ export class __ListTransformStep<
  * {@page ~grafast/steps/listTransform.md}
  */
 export function listTransform<
-  TListStep extends ExecutableStep<readonly any[]>,
-  TDepsStep extends ExecutableStep,
+  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TDepsStep extends Step,
   TMemo,
-  TItemStep extends ExecutableStep | undefined = undefined,
+  TItemStep extends Step | undefined = undefined,
 >(
   options: ListTransformOptions<TListStep, TDepsStep, TMemo, TItemStep>,
 ): __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep> {

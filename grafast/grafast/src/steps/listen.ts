@@ -1,13 +1,11 @@
 import { isDev } from "../dev.js";
 import { SafeError } from "../index.js";
 import type {
-  GrafastResultsList,
+  ExecutionDetails,
   GrafastResultStreamList,
   GrafastSubscriber,
-  StreamDetails,
 } from "../interfaces.js";
-import type { StreamableStep } from "../step.js";
-import { ExecutableStep, isExecutableStep } from "../step.js";
+import { isExecutableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 
@@ -17,13 +15,10 @@ import { constant } from "./constant.js";
  * callback.
  */
 export class ListenStep<
-    TTopics extends { [topic: string]: any },
-    TTopic extends keyof TTopics,
-    TPayloadStep extends ExecutableStep,
-  >
-  extends ExecutableStep<TTopics[TTopic]>
-  implements StreamableStep<TTopics[TTopic]>
-{
+  TTopics extends { [topic: string]: any },
+  TTopic extends keyof TTopics,
+  TPayloadStep extends Step,
+> extends Step<TTopics[TTopic][]> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ListenStep",
@@ -42,10 +37,10 @@ export class ListenStep<
 
   constructor(
     pubsubOrPlan:
-      | ExecutableStep<GrafastSubscriber<TTopics> | null>
+      | Step<GrafastSubscriber<TTopics> | null>
       | GrafastSubscriber<TTopics>
       | null,
-    topicOrPlan: ExecutableStep<TTopic> | string,
+    topicOrPlan: Step<TTopic> | string,
     public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
       $item,
     ) => $item as any,
@@ -60,16 +55,16 @@ export class ListenStep<
     this.topicDep = this.addDependency($topic);
   }
 
-  execute(): GrafastResultsList<TTopics[TTopic]> {
-    throw new Error("ListenStep cannot be executed, it can only be streamed");
-  }
-
-  stream({
+  execute({
     indexMap,
     values,
-  }: StreamDetails<
+    stream,
+  }: ExecutionDetails<
     readonly [GrafastSubscriber<TTopics>, TTopic]
   >): GrafastResultStreamList<TTopics[TTopic]> {
+    if (!stream) {
+      throw new Error("ListenStep must be streamed, never merely executed");
+    }
     const pubsubValue = values[this.pubsubDep as 0];
     const topicValue = values[this.topicDep as 1];
     return indexMap((i) => {
@@ -100,13 +95,13 @@ export class ListenStep<
 export function listen<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,
-  TPayloadStep extends ExecutableStep,
+  TPayloadStep extends Step,
 >(
   pubsubOrPlan:
-    | ExecutableStep<GrafastSubscriber<TTopics> | null>
+    | Step<GrafastSubscriber<TTopics> | null>
     | GrafastSubscriber<TTopics>
     | null,
-  topicOrPlan: ExecutableStep<TTopic> | string,
+  topicOrPlan: Step<TTopic> | string,
   itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
   return new ListenStep<TTopics, TTopic, TPayloadStep>(

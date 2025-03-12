@@ -16,13 +16,8 @@ begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
-select __frmcdc_wrapped_url_result__.*
-from (select 0 as idx, $1::"b"."wrapped_url" as "id0") as __frmcdc_wrapped_url_identifiers__,
-lateral (
-  select
-    __frmcdc_wrapped_url__."url" as "0",
-    __frmcdc_wrapped_url_identifiers__.idx as "1"
-  from (select (__frmcdc_wrapped_url_identifiers__."id0").*) as __frmcdc_wrapped_url__
-) as __frmcdc_wrapped_url_result__;
+select
+  __frmcdc_wrapped_url__."url" as "0"
+from (select ($1::"b"."wrapped_url").*) as __frmcdc_wrapped_url__;
 
 commit; /*fake*/

@@ -108,11 +108,9 @@ export type PgExecutorInput<TInput> = {
 
 export type PgExecutorOptions = {
   text: string;
-  textForSingle?: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
   name?: string;
-  nameForSingle?: string;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
@@ -466,24 +464,11 @@ ${duration}
             }
 
             if (remaining.length) {
-              const singleMode =
-                identifierIndex != null &&
-                remaining.length === 1 &&
-                common.textForSingle != null;
-              const text =
-                singleMode && common.textForSingle
-                  ? common.textForSingle
-                  : common.text;
-              const name =
-                singleMode && common.textForSingle
-                  ? common.nameForSingle
-                  : common.name;
+              const { text, name } = common;
 
               const sqlValues =
                 identifierIndex == null
                   ? rawSqlValues
-                  : singleMode
-                  ? [...rawSqlValues, ...JSON.parse(remaining[0])]
                   : [
                       ...rawSqlValues,
                       // Manual JSON-ing
@@ -566,7 +551,7 @@ ${duration}
     values: GrafastValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    streams: Array<AsyncIterable<TOutput> | PromiseLike<never> | null>;
+    streams: Array<AsyncIterable<TOutput> | PromiseLike<never>>;
   }> {
     const { text, rawSqlValues, identifierIndex } = common;
 
@@ -645,13 +630,9 @@ ${duration}
 
         // PERF: batchIndexesByIdentifiersJSON = null;
 
-        // PERF: implement singleMode using textForSingle
-        const singleMode = false;
         const sqlValues =
           identifierIndex == null
             ? rawSqlValues
-            : singleMode
-            ? [...rawSqlValues, ...JSON.parse(remaining[0])]
             : [
                 ...rawSqlValues,
                 // Manual JSON-ing

@@ -1,20 +1,21 @@
 select
   __people__."username" as "0",
-  (select json_agg(s) from (
-    select
-      __single_table_items__."type"::text as "0",
-      __single_table_items__."parent_id"::text as "1",
-      __single_table_items__."id"::text as "2",
-      __single_table_items__."type2"::text as "3"
+  array(
+    select array[
+      __single_table_items__."type"::text,
+      __single_table_items__."parent_id"::text,
+      __single_table_items__."id"::text,
+      __single_table_items__."type2"::text
+    ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items__
     where
       (
-        true /* authorization checks */
+        __single_table_items__."author_id" = __people__."person_id"
       ) and (
-        __people__."person_id"::"int4" = __single_table_items__."author_id"
+        true /* authorization checks */
       )
     order by __single_table_items__."id" asc
-  ) s) as "1"
+  )::text as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
@@ -31,8 +32,8 @@ lateral (
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
-      true /* authorization checks */
-    ) and (
       __single_table_items__."id" = __single_table_items_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __single_table_items_result__;

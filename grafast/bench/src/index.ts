@@ -7,6 +7,7 @@ import type {
   GraphQLSchema,
 } from "grafast/graphql";
 import { parse, validate } from "grafast/graphql";
+import JSON5 from "json5";
 
 import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";
 export { GrafastBenchConfig } from "./interfaces.js";
@@ -59,6 +60,12 @@ export async function bench(
         const errorsAllowed = !/expect\(errors\)\.toBeFalsy\(\)/.test(
           operation.source,
         );
+        const variableValuesMatch = operation.source.match(
+          /^#> variableValues: ([^\n]+)$/m,
+        );
+        const variableValues = variableValuesMatch
+          ? JSON5.parse(variableValuesMatch[1])
+          : {};
         const checkForErrors = (
           result: ExecutionResult | ExecutionPatchResult,
         ) => {
@@ -84,6 +91,7 @@ export async function bench(
             ...contextFactory(operation, setupResult),
             grafastMetricsEmitter,
           },
+          variableValues,
         });
         const payloads: Array<ExecutionResult | ExecutionPatchResult> = [];
         if (isAsyncIterable(result)) {

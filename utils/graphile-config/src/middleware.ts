@@ -45,14 +45,14 @@ export class Middleware<TActivities extends FunctionalityObject<TActivities>> {
   } = Object.create(null);
 
   register<TActivityName extends keyof TActivities>(
-    event: TActivityName,
+    activityName: TActivityName,
     fn: RealActivityFn<TActivities, TActivityName>,
   ): void {
-    const list = this.middleware[event];
+    const list = this.middleware[activityName];
     if (list !== undefined) {
       list.push(fn);
     } else {
-      this.middleware[event] = [fn];
+      this.middleware[activityName] = [fn];
     }
   }
 

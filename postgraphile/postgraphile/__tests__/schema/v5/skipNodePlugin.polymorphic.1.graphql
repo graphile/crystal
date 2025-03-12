@@ -1819,6 +1819,7 @@ type FirstPartyVulnerability implements Vulnerability {
     orderBy: [AwsApplicationFirstPartyVulnerabilityOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationFirstPartyVulnerabilityConnection!
   cvssScore: Float!
+  cvssScoreInt: Int
 
   """
   Reads and enables pagination through a set of `GcpApplicationFirstPartyVulnerability`.
@@ -7544,6 +7545,7 @@ type ThirdPartyVulnerability implements Vulnerability {
     orderBy: [AwsApplicationThirdPartyVulnerabilityOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationThirdPartyVulnerabilityConnection!
   cvssScore: Float!
+  cvssScoreInt: Int
 
   """
   Reads and enables pagination through a set of `GcpApplicationThirdPartyVulnerability`.

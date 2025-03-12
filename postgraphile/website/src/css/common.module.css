@@ -144,3 +144,24 @@
   text-transform: uppercase;
   font-weight: bold;
 }
+
+tt {
+  font-size: 1rem;
+}
+
+.graphileHeart {
+  width: 33%;
+  margin: auto;
+  padding: none;
+}
+
+.intro {
+  color: var(--ifm-color-primary-darker);
+  font-style: italic;
+  font-size: 1.25rem;
+  padding-bottom: 1rem;
+}
+
+[data-theme="dark"] .intro {
+  color: var(--ifm-color-primary-lighter);
+}

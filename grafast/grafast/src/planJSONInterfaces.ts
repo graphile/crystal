@@ -18,6 +18,7 @@ export interface GrafastPlanStepJSONv1 {
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;
   hasSideEffects: boolean | undefined;
+  stream: { initialCountStepId?: number } | undefined;
   extra?: Record<string, JSONValue | undefined>;
 }
 
@@ -51,8 +52,9 @@ export interface GrafastPlanBucketReasonListItemJSONv1 {
 
   /** If this listItem is to be streamed, the configuration for that streaming */
   stream?: {
-    initialCount: number;
-    label?: string;
+    initialCountStepId?: number;
+    ifStepId?: number;
+    labelStepId?: number;
   };
 }
 /** Non-branching, deferred */
