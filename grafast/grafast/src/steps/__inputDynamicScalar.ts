@@ -132,7 +132,7 @@ export class __InputDynamicScalarStep<
   /** @internal */
   eval(): TLeaf {
     const variableValues = this.variableNames.map((variableName, i) =>
-      this.getDep<__TrackedValueStep>(i).eval(),
+      this.getDep<__TrackedValueStep>(i, true).eval(),
     );
     return this.valueFromValues(variableValues);
   }
