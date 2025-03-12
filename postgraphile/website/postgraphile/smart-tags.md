@@ -814,14 +814,14 @@ sort and/or filter by. For example:
 
 ```sql
 -- non scalar function
-CREATE OR REPLACE FUNCTION user_object(user user) RETURNS object AS $$
-SELECT * FROM object where id = user.object_id;
-$$ language SQL STABLE;
+create or replace function user_object(user user) returns object as $$
+select * from object where id = user.object_id;
+$$ language sql stable;
 
 -- wrapper. Note the () for notation. Failing to use them will throw an error
-CREATE OR REPLACE FUNCTION user_object_field(user user) RETURNS varchar AS $$
-SELECT (user_object(user)).field;
-$$ language SQL STABLE;
+create or replace function user_object_field(user user) returns varchar as $$
+select (user_object(user)).field;
+$$ language sql stable;
 
 -- don't forget the comments...
 comment on function user_object_field() is E'@sortable';
@@ -834,14 +834,14 @@ the
 
 ```sql
 -- non scalar setof function
-CREATE OR REPLACE FUNCTION user_objects(user user) RETURNS SETOF object AS $$
-SELECT * FROM object where owner_id = user.id; -- one user, many objects
-$$ language SQL STABLE;
+create or replace function user_objects(user user) returns setof object as $$
+select * from object where owner_id = user.id; -- one user, many objects
+$$ language sql stable;
 
 -- wrapper. Note the () for notation. Failing to use them will throw an error
-CREATE OR REPLACE FUNCTION user_object_fields(user user) RETURNS varchar[] AS $$
-SELECT ARRAY_AGG((user_objects(user)).field);
-$$ language SQL STABLE;
+create or replace function user_object_fields(user user) returns varchar[] as $$
+select array_agg((user_objects(user)).field);
+$$ language sql stable;
 
 -- don't forget the comments...
 comment on function user_object_fields() is E'@sortable';

@@ -186,13 +186,13 @@ populate the database with some dummy data.
 \connect forum_example;
 
 /*Create some dummy users*/
-INSERT INTO public.user (username) VALUES
+insert into public.user (username) values
 ('Benjie'),
 ('Singingwolfboy'),
 ('Lexius');
 
 /*Create some dummy posts*/
-INSERT INTO public.post (title, body, author_id) VALUES
+insert into public.post (title, body, author_id) values
 ('First post example', 'Lorem ipsum dolor sit amet', 1),
 ('Second post example', 'Consectetur adipiscing elit', 2),
 ('Third post example', 'Aenean blandit felis sodales', 3);

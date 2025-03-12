@@ -72,7 +72,7 @@ Graphile Worker stores tasks into its own schema within PostgreSQL, and offers a
 simple SQL API to create jobs. Queueing a job might look like:
 
 ```sql
-SELECT graphile_worker.add_job('hello', json_build_object('name', 'Bobby Tables'));
+select graphile_worker.add_job('hello', json_build_object('name', 'Bobby Tables'));
 ```
 
 Tasks are created in JavaScript/TypeScript, so it fits directly into your

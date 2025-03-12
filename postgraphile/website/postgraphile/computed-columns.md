@@ -39,9 +39,9 @@ must obey the following rules:
 For example, assuming a table called `person` exists, the function:
 
 ```sql
-CREATE FUNCTION person_full_name(person person) RETURNS text AS $$
-  SELECT person.given_name || ' ' || person.family_name
-$$ LANGUAGE sql STABLE;
+create function person_full_name(person person) returns text as $$
+  select person.given_name || ' ' || person.family_name
+$$ language sql stable;
 ```
 
 Will create a computed column for your table named `person`, which can be
