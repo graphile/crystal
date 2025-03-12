@@ -1062,11 +1062,19 @@ export function arraysMatch<T>(
   if (l !== array2.length) {
     return false;
   }
-  for (let i = 0; i < l; i++) {
-    if (
-      comparator ? !comparator(array1[i]!, array2[i]!) : array1[i] !== array2[i]
-    ) {
-      return false;
+  if (comparator != null) {
+    for (let i = 0; i < l; i++) {
+      const a = array1[i]!;
+      const b = array2[i]!;
+      if (a !== b && !comparator(a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (let i = 0; i < l; i++) {
+      if (array1[i]! !== array2[i]!) {
+        return false;
+      }
     }
   }
   return true;

@@ -10,6 +10,7 @@ import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { inputArgsApply } from "./applyInput.js";
+import { operationPlan } from "./index.js";
 
 export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
   static $$export = {
@@ -61,7 +62,9 @@ export function bakedInput<TArg = any>(
       typeof nullableInputType.extensions?.grafast?.baked === "function")
   ) {
     // Ooo, we're fancy! Do the thing!
-    return new BakedInputStep<TArg>(nullableInputType, $value);
+    return operationPlan().withRootLayerPlan(
+      () => new BakedInputStep<TArg>(nullableInputType, $value),
+    );
   } else {
     // Nothing special, we just return the input.
     return $value;

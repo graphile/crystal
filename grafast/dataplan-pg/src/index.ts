@@ -150,7 +150,7 @@ import {
   PgPolymorphicTypeMap,
 } from "./steps/pgPolymorphic.js";
 import {
-  digestsFromArgumentSpecs,
+  pgFromExpression,
   pgSelect,
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
@@ -207,7 +207,6 @@ import { assertPgClassSingleStep } from "./utils.js";
 
 export {
   assertPgClassSingleStep,
-  digestsFromArgumentSpecs,
   domainOfCodec,
   enumCodec,
   getCodecByPgCatalogTypeName,
@@ -285,6 +284,7 @@ export {
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
+  pgFromExpression,
   PgFunctionResourceOptions,
   PgGroupSpec,
   PgHavingConditionSpec,
@@ -411,7 +411,7 @@ exportAsMany("@dataplan/pg", {
   pgPolymorphic,
   PgPolymorphicStep,
   pgSelect,
-  digestsFromArgumentSpecs,
+  pgFromExpression,
   pgSelectFromRecords,
   PgSelectStep,
   PgSelectRowsStep,

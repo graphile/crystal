@@ -11,10 +11,7 @@ where
 
 select
   __forums_unique_author_count__.v::text as "0"
-from app_public.forums_unique_author_count(
-  $1::app_public.forums,
-  $2::"bool"
-) as __forums_unique_author_count__(v)
+from app_public.forums_unique_author_count($1::app_public.forums) as __forums_unique_author_count__(v)
 where (
   true /* authorization checks */
 );

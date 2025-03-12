@@ -3,7 +3,7 @@ select
   __entity_search__."post_id"::text as "1",
   __entity_search__."comment_id"::text as "2",
   (not (__entity_search__ is null))::text as "3"
-from interfaces_and_unions.search("query" := $1::"text") as __entity_search__
+from interfaces_and_unions.search($1::"text") as __entity_search__
 where (
   true /* authorization checks */
 );
