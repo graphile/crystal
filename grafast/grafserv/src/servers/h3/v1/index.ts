@@ -278,7 +278,7 @@ export class H3Grafserv extends GrafservBase {
           { socket: peer.websocket, request: peer.request },
         );
         client.closed = async (code, reason) => {
-          onClose(code as number, reason as string);
+          onClose(code, reason);
         };
       },
       message(peer, message) {
