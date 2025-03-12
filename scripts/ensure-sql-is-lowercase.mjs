@@ -36,6 +36,8 @@ async function walkDir(dir) {
   let result = [];
 
   for (let file of files) {
+    // Skip over versioned docs
+    if (file.name === "versioned_docs") continue;
     const fullPath = path.join(dir, file.name);
     if (file.isDirectory()) {
       result = result.concat(await walkDir(fullPath));
