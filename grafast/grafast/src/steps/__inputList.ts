@@ -95,6 +95,7 @@ export class __InputListStep<
     return itemPlan;
   }
 
+  /** @internal */
   eval(): any[] | null {
     if (this.inputValues?.kind === "NullValue") {
       return null;
@@ -113,6 +114,7 @@ export class __InputListStep<
     return list;
   }
 
+  /** @internal */
   evalIs(value: null | undefined | 0): boolean {
     if (value === undefined) {
       return this.inputValues === value;
@@ -125,6 +127,7 @@ export class __InputListStep<
     }
   }
 
+  /** @internal */
   evalLength(): number | null {
     if (this.inputValues === undefined) {
       return null;
