@@ -76,5 +76,23 @@ jobs:
       - name: "Run depcheck script"
         run: node scripts/benjies-depcheck.mjs
 
+  doccheck:
+    name: Documentation checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - run: yarn --immutable
+
       - name: "Ensure SQL is lowercase"
         run: node scripts/ensure-sql-is-lowercase.mjs
+
+      - name: "Ensure links don't end in /"
+        run: node scripts/ensure-no-slashes-on-internal-links.mjs
