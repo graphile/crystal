@@ -5,40 +5,21 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const regex = /^```sql\n([\s\S]*?)\n```$/gm;
-const keywords = [
-  "SELECT",
-  "UPDATE",
-  "INSERT",
-  "DELETE",
-  "WITH",
-  "FROM",
-  "WHERE",
-  "ORDER BY",
-  "GROUP BY",
-  "HAVING",
-  "AS",
-  "VALUES",
-];
-
 const WEBSITE_FOLDERS = [
   `${__dirname}/../postgraphile/website`,
   `${__dirname}/../grafast/website`,
   `${__dirname}/../graphile-build/website`,
   `${__dirname}/../utils/website`,
 ];
+const regex = /\[(.*?)\]\((.*?)\)/g;
 
-/**
- * @param dir {string} - the directory to walk
- */
+/** @param dir {string} */
 async function walkDir(dir) {
   const files = await readdir(dir, { withFileTypes: true });
   /** @type {string[]} */
   let result = [];
 
-  for (let file of files) {
-    // Skip over versioned docs
-    if (file.name === "versioned_docs") continue;
+  for (const file of files) {
     const fullPath = path.join(dir, file.name);
     if (file.isDirectory()) {
       result = result.concat(await walkDir(fullPath));
@@ -49,21 +30,20 @@ async function walkDir(dir) {
   return result;
 }
 
-/**
- * @param segment {string} - the segment of text to check
- */
-function wrongSQLCheck(segment) {
-  return keywords.some((keyword) =>
-    segment
-      .replace(/\/\*[^*]+\*\//g, "")
-      .replace(/--.*$/gm, "")
-      // We also need to keep things like `'INSERT'` as they are
-      .replace(/'[^\\']+'/gm, "''")
-      .includes(keyword),
-  );
+/** @param link {string} */
+function wrongLinkCheck(link) {
+  const href = link.includes("#") ? link.substring(0, link.indexOf("#")) : link;
+  if (href.startsWith("http")) {
+    return false;
+  } else if (href.endsWith("/")) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 async function main() {
+  /** @type {string[]} */
   let allFiles = [];
   for (const directory of WEBSITE_FOLDERS) {
     const fileStructure = await walkDir(directory);
@@ -73,41 +53,41 @@ async function main() {
     allFiles = allFiles.concat(fileStructureFiltered);
   }
 
-  let wrongSQL = {};
+  /** @type {Record<string, string[]>} */
+  const wrongLinks = {};
   for (const file of allFiles) {
     const data = await readFile(file, "utf8");
     const matches = [...data.matchAll(regex)];
 
     /** @type {string[]} */
-    let sqlSegments = [];
+    const links = [];
 
     matches.forEach((match) => {
-      sqlSegments.push(match[1]);
+      links.push(match[2]);
     });
-    /** @type {string[]} */
-    let localwrongSQL = [];
-    for (const segment of sqlSegments) {
-      if (wrongSQLCheck(segment)) {
-        localwrongSQL.push(segment);
+    const localwrongLinks = [];
+    for (const link of links) {
+      if (wrongLinkCheck(link)) {
+        localwrongLinks.push(link);
       }
     }
-    if (localwrongSQL.length >= 1) {
-      wrongSQL[file] = localwrongSQL;
+    if (localwrongLinks.length >= 1) {
+      wrongLinks[file] = localwrongLinks;
     }
   }
 
-  if (Object.keys(wrongSQL).length === 0) {
+  if (Object.keys(wrongLinks).length === 0) {
     console.log("All files pass checks");
   } else {
     console.log(
       `Found ${
-        Object.keys(wrongSQL).length
-      } files containing capitalized SQL; the Graphile style guide encourages the use of lower case SQL. Please lowercase the SQL in the following files:`,
+        Object.keys(wrongLinks).length
+      } files containing links ending in a slash; this will likely cause issues with navigation when deployed. Please remove the trailing slash from the following URLs:`,
     );
-    for (const [filename, failures] of Object.entries(wrongSQL)) {
+    for (const [filename, failures] of Object.entries(wrongLinks)) {
       console.log(
         `${path.relative(`${__dirname}/..`, filename)}:\n\n    ${failures
-          .join("\n\n---\n\n")
+          .join("\n")
           .replace(/\n/g, "\n    ")}\n`,
       );
     }
