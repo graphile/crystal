@@ -166,7 +166,7 @@ To save us from having to pass the environment variables every time we run the s
 we can add them to a convenient `.env` file:
 
 ```ini title=".env"
-# Replace the contents of the square brackets with the relevant settings
+# Replace the contents of the square brackets with the details of your database
 DATABASE_URL=postgres://[username]:[password]@[host]:[port]/[database]
 GRAPHILE_ENV=development
 ```
@@ -310,7 +310,7 @@ The main things we've done here are:
 
 - Remove the reference to a non-existant index.js file
 - Mark the project as "private" such that we can't attempt to `npm publish` it to the npm repository
-- Declare that `.js` files are ES modules, enabling the `import` statements to function
+- Declare that `.js` files are ES modules, enabling the use of `import` statements
 - Delete unnecessary metadata
 - Add our `start` script, which runs the server contained in `server.js` using the `node` command, passing the environment variables stored in the `.env` file
 
@@ -397,7 +397,7 @@ echo .env >> .gitignore
 ### TypeScript configuration
 
 Create a `tsconfig.json` file that extends from the relevant @tsconfig for your
-Node.js major version; e.g. if you're using Node v22.10.0 that would be
+Node.js major version; e.g. if you're using Node v22.14.0 that would be
 [`@tsconfig/node22`](https://www.npmjs.com/package/@tsconfig/node22):
 
 ```json title="tsconfig.json"
@@ -452,9 +452,18 @@ import preset from "./graphile.config.ts";
 export const pgl = postgraphile(preset);
 ```
 
-:::note The `rewriteRelativeImportExtensions` flag
+:::note Import from `.ts` along with `rewriteRelativeImportExtensions`
 
-With node's new `rewriteRelativeImportExtensions` flag, TypeScript syntax is removed from files but the files still need to be able to reference each other. Typescript has added the configuration option `rewriteRelativeImportExtensions` to ensure that you can use `.ts` to reference TypeScript files in your sourcecode whilst still ensuring that these imports are changed to `.js` when compiled for production usage.
+With Node's new `--experimental-strip-types` flag, TypeScript syntax is removed
+so that the TS can be executed directly as if it were JS. However, the files
+still need to be able to reference each other. In the source code, that means
+referencing the `.ts` file; but when TypeScript compiles the code for
+production the output will be `.js` files.
+
+Fortunately, TypeScript has added the configuration option
+`rewriteRelativeImportExtensions` to ensure that you can use `.ts` to reference
+TypeScript files in your source code whilst still ensuring that these imports
+are output as `.js` when compiled for production usage.
 
 :::
 
@@ -488,29 +497,28 @@ After making similar changes to `package.json` as we did with Example 1 above, w
 end up with a `package.json` file that looks something like:
 
 ```diff title="package.json"
-{
-  "name": "simple_node_project",
-  "version": "1.0.0",
-- "main": "index.js",
-+ "private": true,
-+ "type": "module",
-  "scripts": {
-+   "start": "node --env-file=./.env src/server.ts",
-+   "build": "tsc",
-+   "prod": "node dist/server.js"
-  },
-  "dependencies": {
-    "@graphile/simplify-inflection": "^8.0.0-beta.6",
-    "express": "^4.21.2",
-    "postgraphile": "^5.0.0-beta.38"
-  },
-  "devDependencies": {
-    "@tsconfig/node22": "^22.0.0",
-    "@types/express": "^5.0.0",
-    "@types/node": "^20.11.24",
-    "typescript": "^5.7.3"
-  }
-}
+ {
+   "name": "simple_node_project",
+   "version": "1.0.0",
++  "private": true,
++  "type": "module",
+   "scripts": {
++    "start": "node --env-file=./.env src/server.ts",
++    "build": "tsc",
++    "prod": "node dist/server.js"
+   },
+   "dependencies": {
+     "@graphile/simplify-inflection": "^8.0.0-beta.6",
+     "express": "^4.21.2",
+     "postgraphile": "^5.0.0-beta.38"
+   },
+   "devDependencies": {
+     "@tsconfig/node22": "^22.0.0",
+     "@types/express": "^5.0.0",
+     "@types/node": "^20.11.24",
+     "typescript": "^5.7.3"
+   }
+ }
 ```
 
 Note that we have three scripts:
