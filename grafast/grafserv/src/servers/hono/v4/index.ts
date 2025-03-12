@@ -184,9 +184,24 @@ export class HonoGrafserv extends GrafservBase {
         ctx.status(statusCode as StatusCode);
         return ctx.body(null);
       }
-      // TODO : handle bufferStream ?
+      case "bufferStream": {
+        // TODO : handle bufferStream?
+        console.log("bufferStream is not handled yet");
+
+        // Force the iterator to close
+        const { bufferIterator } = result;
+        if (bufferIterator.return) {
+          bufferIterator.return();
+        } else if (bufferIterator.throw) {
+          bufferIterator.throw(new Error("Unimplemented"));
+        }
+
+        this.setResponseHeaders(ctx, { "Content-Type": "text/plain" });
+        ctx.status(501);
+        return ctx.text("Server hasn't implemented this yet");
+      }
       default: {
-        const never = result;
+        const never: never = result;
         console.log("Unhandled:");
         console.dir(never);
         this.setResponseHeaders(ctx, { "Content-Type": "text/plain" });
