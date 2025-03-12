@@ -649,6 +649,22 @@ declare module "graphql" {
 }
 
 const $$valueConfigByValue = Symbol("valueConfigByValue");
+export function getEnumValueConfigs(enumType: graphql.GraphQLEnumType): {
+  [outputValue: string]: GraphQLEnumValueConfig | undefined;
+} {
+  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
+  if (enumType[$$valueConfigByValue] === undefined) {
+    const config = enumType.toConfig();
+    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
+      (memo, value) => {
+        memo[value.value] = value;
+        return memo;
+      },
+      Object.create(null),
+    );
+  }
+  return enumType[$$valueConfigByValue]!;
+}
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
  * that's not a public API so we have to do a bit of heavy lifting here. Since
@@ -659,18 +675,7 @@ export function getEnumValueConfig(
   enumType: graphql.GraphQLEnumType,
   outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
-  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
-  if (!enumType[$$valueConfigByValue]) {
-    const config = enumType.toConfig();
-    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
-      (memo, value) => {
-        memo[value.value] = value;
-        return memo;
-      },
-      Object.create(null),
-    );
-  }
-  return enumType[$$valueConfigByValue]![outputValue];
+  return getEnumValueConfigs(enumType)[outputValue];
 }
 
 /**

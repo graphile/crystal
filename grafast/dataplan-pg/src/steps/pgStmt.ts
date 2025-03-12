@@ -462,6 +462,7 @@ export interface PgStmtCommonQueryInfo {
 
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;
+  readonly applyDepIds: ReadonlyArray<number>;
 }
 
 export interface MutablePgStmtCommonQueryInfo {

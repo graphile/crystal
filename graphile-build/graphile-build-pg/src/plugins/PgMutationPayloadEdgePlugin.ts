@@ -4,8 +4,14 @@ import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
   PgResourceUnique,
+  PgSelectQueryBuilderCallback,
+  PgUnionAllQueryBuilderCallback,
 } from "@dataplan/pg";
-import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
+import {
+  extractEnumExtensionValue,
+  PgDeleteSingleStep,
+  pgSelectFromRecord,
+} from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep, first } from "grafast";
 import type { GraphQLEnumType, GraphQLObjectType } from "grafast/graphql";
@@ -13,7 +19,6 @@ import { EXPORTABLE } from "graphile-build";
 
 import { tagToString } from "../utils.js";
 import { version } from "../version.js";
-import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 
 declare global {
   namespace GraphileConfig {
@@ -163,21 +168,20 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   (
                     EdgeStep,
                     PgDeleteSingleStep,
-                    applyOrderToPlan,
                     connection,
                     constant,
+                    extractEnumExtensionValue,
                     first,
                     pgSelectFromRecord,
                     pkAttributes,
                     resource,
-                    tableOrderByTypeName,
                   ) =>
                     function plan(
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
-                      args: FieldArgs,
-                      info: FieldInfo,
+                      { $orderBy }: FieldArgs,
+                      { field }: FieldInfo,
                     ) {
                       const $result = $mutation.getStepForKey("result", true);
                       if (!$result) {
@@ -203,13 +207,14 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       })();
 
                       // Perform ordering
-                      const $value = args.getRaw("orderBy");
-                      applyOrderToPlan(
-                        $select,
-                        $value,
-                        info.schema.getType(
-                          tableOrderByTypeName,
-                        ) as GraphQLEnumType,
+                      const orderByArg = field.args.find(
+                        (a) => a.name === "orderBy",
+                      );
+                      $select.apply(
+                        extractEnumExtensionValue<
+                          | PgSelectQueryBuilderCallback
+                          | PgUnionAllQueryBuilderCallback
+                        >(orderByArg!.type, ["grafast", "apply"], $orderBy),
                       );
 
                       const $connection = connection($select) as any;
@@ -222,14 +227,13 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   [
                     EdgeStep,
                     PgDeleteSingleStep,
-                    applyOrderToPlan,
                     connection,
                     constant,
+                    extractEnumExtensionValue,
                     first,
                     pgSelectFromRecord,
                     pkAttributes,
                     resource,
-                    tableOrderByTypeName,
                   ],
                 ),
               }),
