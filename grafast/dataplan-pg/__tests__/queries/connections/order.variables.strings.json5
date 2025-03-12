@@ -1,0 +1,63 @@
+{
+  allMessagesConnection: {
+    edges: [
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIkNhdHMgPSBhd2Vzb21lIC0tIENlY2lsaWEiLCJjYTcwY2E3MC0wMDAwLTAwMDAtMDAwMC1jZWMxMTFhMGNhNzAiXQ==",
+        node: {
+          body: "Cats = awesome -- Cecilia",
+          author: {
+            username: "Cecilia",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIlBvc3RncmVzID0gYXdlc29tZSAtLSBDZWNpbGlhIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBmMTcwIl0=",
+        node: {
+          body: "Postgres = awesome -- Cecilia",
+          author: {
+            username: "Cecilia",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQm9iIiwiQ2F0cyA9IGF3ZXNvbWUgLS0gQm9iIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
+        node: {
+          body: "Cats = awesome -- Bob",
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQm9iIiwiUG9zdGdyZXMgPSBhd2Vzb21lIC0tIEJvYiIsImYxNzBmMTcwLTAwMDAtMDAwMC0wMDAwLWIwYjAwMDAwZjE3MCJd",
+        node: {
+          body: "Postgres = awesome -- Bob",
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJDYXRzID0gYXdlc29tZSAtLSBBbGljZSIsImNhNzBjYTcwLTAwMDAtMDAwMC0wMDAwLWExMWNlMDAwY2E3MCJd",
+        node: {
+          body: "Cats = awesome -- Alice",
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+    ],
+    pageInfo: {
+      hasNextPage: true,
+      hasPreviousPage: false,
+      startCursor: "WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIkNhdHMgPSBhd2Vzb21lIC0tIENlY2lsaWEiLCJjYTcwY2E3MC0wMDAwLTAwMDAtMDAwMC1jZWMxMTFhMGNhNzAiXQ==",
+      endCursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJDYXRzID0gYXdlc29tZSAtLSBBbGljZSIsImNhNzBjYTcwLTAwMDAtMDAwMC0wMDAwLWExMWNlMDAwY2E3MCJd",
+    },
+    totalCount: 6,
+  },
+}

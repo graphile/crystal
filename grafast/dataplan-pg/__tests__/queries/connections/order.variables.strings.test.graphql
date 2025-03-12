@@ -1,0 +1,34 @@
+## expect(queries).toHaveLength(2);
+## expect(data.allMessagesConnection.edges).toHaveLength(5);
+## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIkNhdHMgPSBhd2Vzb21lIC0tIENlY2lsaWEiLCJjYTcwY2E3MC0wMDAwLTAwMDAtMDAwMC1jZWMxMTFhMGNhNzAiXQ==");
+## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Cecilia");
+## expect(data.allMessagesConnection.edges[0].node.body).toMatch("Cats");
+## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Cecilia");
+## expect(data.allMessagesConnection.edges[1].node.body).toMatch("Postgres");
+# See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+# 'last' is not set, so hasPreviousPage is false.
+## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+# 'first' is set, so hasNextPage is true if a larger `first` would return additional nodes.
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
+#> variableValues: {"string1": "AUTHOR_USERNAME_DESC", "string2": "BODY_ASC"}
+query Q($string1: MessagesOrderBy!, $string2: MessagesOrderBy!) {
+  allMessagesConnection(orderBy: [$string1, $string2], first: 5) {
+    edges {
+      cursor
+      node {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
