@@ -1,5 +1,8 @@
-import fs from "fs";
-import path from "path";
+// @ts-check
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
+
+const { dirname: __dirname } = import.meta;
 
 const regex = /^```sql\n([\s\S]*?)\n```$/gm;
 const keywords = [
@@ -24,8 +27,12 @@ const WEBSITE_FOLDERS = [
   `${__dirname}/../utils/website`,
 ];
 
+/**
+ * @param dir {string} - the directory to walk
+ */
 async function walkDir(dir) {
-  const files = await fs.promises.readdir(dir, { withFileTypes: true });
+  const files = await readdir(dir, { withFileTypes: true });
+  /** @type {string[]} */
   let result = [];
 
   for (let file of files) {
@@ -39,22 +46,11 @@ async function walkDir(dir) {
   return result;
 }
 
-async function readFileAsync(filePath) {
-  try {
-    const data = await fs.promises.readFile(filePath, "utf-8");
-    return data;
-  } catch (error) {
-    console.error(`Error reading file ${filePath}:`, error);
-    throw error;
-  }
-}
-
+/**
+ * @param segment {string} - the segment of text to check
+ */
 function wrongSQLCheck(segment) {
-  if (keywords.some((keyword) => segment.includes(keyword))) {
-    return true;
-  } else {
-    return false;
-  }
+  return keywords.some((keyword) => segment.includes(keyword));
 }
 
 async function main() {
@@ -69,14 +65,16 @@ async function main() {
 
   let wrongSQL = {};
   for (const file of allFiles) {
-    const data = await readFileAsync(file);
+    const data = await readFile(file, "utf8");
     const matches = [...data.matchAll(regex)];
 
+    /** @type {string[]} */
     let sqlSegments = [];
 
     matches.forEach((match) => {
       sqlSegments.push(match[1]);
     });
+    /** @type {string[]} */
     let localwrongSQL = [];
     for (const segment of sqlSegments) {
       if (wrongSQLCheck(segment)) {
@@ -92,14 +90,16 @@ async function main() {
     console.log("All files pass checks");
   } else {
     console.log(
-      `Found ${Object.keys(wrongSQL).length} files containing capitalized SQL; the Graphile style guide encourages the use of lower case SQL. Please lowercase the SQL in the following files:`,
+      `Found ${
+        Object.keys(wrongSQL).length
+      } files containing capitalized SQL; the Graphile style guide encourages the use of lower case SQL. Please lowercase the SQL in the following files:`,
     );
     console.dir(wrongSQL);
     process.exitCode = 1;
   }
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
