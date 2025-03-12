@@ -419,8 +419,8 @@ and `server.ts` with the contents shown below:
 ```ts title="src/graphile.config.ts"
 import type {} from "graphile-config";
 import "postgraphile";
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
 
 const preset: GraphileConfig.Preset = {
@@ -442,8 +442,8 @@ export default preset;
 #### `src/pgl.ts`
 
 ```ts title="src/pgl.ts"
-import preset from "./graphile.config.js";
 import { postgraphile } from "postgraphile";
+import preset from "./graphile.config.js";
 
 export const pgl = postgraphile(preset);
 ```
@@ -468,13 +468,13 @@ import express from "express";
 import { grafserv } from "postgraphile/grafserv/express/v4";
 import { pgl } from "./pgl.js";
 
+const serv = pgl.createServ(grafserv);
+
 const app = express();
 const server = createServer(app);
 server.once("listening", () => {
   server.on("error", (e) => void console.error(e));
 });
-server.on("error", () => {});
-const serv = pgl.createServ(grafserv);
 serv.addTo(app, server).catch((e) => {
   console.error(e);
   process.exit(1);
