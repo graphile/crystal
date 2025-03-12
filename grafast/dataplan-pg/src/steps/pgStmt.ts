@@ -441,8 +441,8 @@ export interface PgStmtCommonQueryInfo {
   readonly hasSideEffects: boolean;
 
   readonly executionDetails: ExecutionDetails;
-  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
-  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+  readonly placeholderSymbols: ReadonlyArray<symbol>;
+  readonly deferredSymbols: ReadonlyArray<symbol>;
   readonly fetchOneExtra: boolean;
   readonly forceIdentity: boolean;
   readonly needsCursor: boolean;
@@ -458,6 +458,11 @@ export interface PgStmtCommonQueryInfo {
   readonly applyDepIds: ReadonlyArray<number>;
 }
 
+export interface PgStmtCompileQueryInfo extends PgStmtCommonQueryInfo {
+  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
+  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+}
+
 export interface MutablePgStmtCommonQueryInfo {
   // New properties
   cursorLower: Maybe<number>;
@@ -469,7 +474,26 @@ export interface MutablePgStmtCommonQueryInfo {
   offset: Maybe<number>;
 
   cursorDigest: string | null;
-  readonly cursorIndicies: Array<{ index: number; codec: PgCodec }> | null;
+  readonly cursorIndicies: Array<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
+}
+
+export interface ResolvedPgStmtCommonQueryInfo {
+  readonly cursorLower: Maybe<number>;
+  readonly cursorUpper: Maybe<number>;
+
+  readonly first: Maybe<number>;
+  readonly last: Maybe<number>;
+  readonly shouldReverseOrder: boolean;
+  readonly offset: Maybe<number>;
+
+  readonly cursorDigest: string | null;
+  readonly cursorIndicies: ReadonlyArray<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
 }
 
 export function calculateLimitAndOffsetSQLFromInfo(
@@ -521,7 +545,10 @@ export function applyCommonPaginationStuff(
     first == null && last != null && cursorLower == null && cursorUpper == null;
 }
 
-export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
+export function makeValues(
+  info: PgStmtCommonQueryInfo & PgStmtCompileQueryInfo,
+  name: string,
+) {
   const { executionDetails, placeholders, deferreds } = info;
   const { values, count } = executionDetails;
   const identifiersSymbol = Symbol(name + "_identifiers");

@@ -25,6 +25,7 @@ import type {
   GrafastFieldConfig,
   GrafastSubscriber,
   ListStep,
+  Maybe,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -64,6 +65,7 @@ import {
   GraphQLUnionType,
   printSchema,
 } from "grafast/graphql";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 //import prettier from "prettier";
@@ -2208,7 +2210,13 @@ export function makeExampleSchema(
     return {
       type: IncludeArchived,
       applyPlan: EXPORTABLE(
-        (PgSelectSingleStep, getClassStep, lambda, sql) =>
+        (
+          PgSelectSingleStep,
+          constant,
+          getClassStep,
+          includeArchivedCondition,
+          lambda,
+        ) =>
           function plan($parent: ExecutableStep, $field: TFieldStep, val) {
             const $messages = getClassStep($field);
             const $value = val.getRaw();
@@ -2221,36 +2229,19 @@ export function makeExampleSchema(
               ? $messages.placeholder($parentPgSelectSingle.get("archived_at"))
               : undefined;
             const $condition = lambda(
-              $value,
-              function includeArchivedCondition(
-                value,
-              ): PgSelectQueryBuilderCallback {
-                return (queryBuilder) => {
-                  if (value === "YES") {
-                    // No restriction
-                  } else if (value === "EXCLUSIVELY") {
-                    queryBuilder.where(
-                      sql`${queryBuilder}.archived_at is not null`,
-                    );
-                  } else if (
-                    value === "INHERIT" &&
-                    // INHERIT only works if the parent has an archived_at attribute.
-                    sqlParentArchivedAt !== undefined
-                  ) {
-                    queryBuilder.where(
-                      sql`(${queryBuilder.alias}.archived_at is null) = (${sqlParentArchivedAt} is null)`,
-                    );
-                  } else {
-                    queryBuilder.where(
-                      sql`${queryBuilder}.archived_at is null`,
-                    );
-                  }
-                };
-              },
+              [constant(sqlParentArchivedAt), $value],
+              includeArchivedCondition,
+              true,
             );
             $messages.apply($condition);
           },
-        [PgSelectSingleStep, getClassStep, lambda, sql],
+        [
+          PgSelectSingleStep,
+          constant,
+          getClassStep,
+          includeArchivedCondition,
+          lambda,
+        ],
       ),
       defaultValue: "INHERIT",
     };
@@ -5226,3 +5217,29 @@ const pgClassFilterWhere = EXPORTABLE(
 function pgWhere(qb: PgSelectQueryBuilder | PgUnionAllQueryBuilder) {
   return qb.whereBuilder();
 }
+const includeArchivedCondition = EXPORTABLE(
+  (sql) =>
+    function includeArchivedCondition([sqlParentArchivedAt, value]: readonly [
+      SQL | undefined,
+      Maybe<string>,
+    ]): PgSelectQueryBuilderCallback {
+      return (queryBuilder) => {
+        if (value === "YES") {
+          // No restriction
+        } else if (value === "EXCLUSIVELY") {
+          queryBuilder.where(sql`${queryBuilder}.archived_at is not null`);
+        } else if (
+          value === "INHERIT" &&
+          // INHERIT only works if the parent has an archived_at attribute.
+          sqlParentArchivedAt !== undefined
+        ) {
+          queryBuilder.where(
+            sql`(${queryBuilder.alias}.archived_at is null) = (${sqlParentArchivedAt} is null)`,
+          );
+        } else {
+          queryBuilder.where(sql`${queryBuilder}.archived_at is null`);
+        }
+      };
+    },
+  [sql],
+);

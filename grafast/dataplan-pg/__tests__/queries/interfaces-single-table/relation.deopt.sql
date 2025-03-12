@@ -5,9 +5,9 @@ select
 from interfaces_and_unions.single_table_items as __single_table_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __single_table_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -16,9 +16,9 @@ select
 from interfaces_and_unions.single_table_items as __single_table_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __single_table_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -26,7 +26,7 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );

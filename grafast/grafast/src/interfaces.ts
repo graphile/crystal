@@ -514,6 +514,18 @@ export interface StepOptions {
  * Options passed to the `optimize` method of a plan to give more context.
  */
 export interface StepOptimizeOptions {
+  /**
+   * If null, this step will not stream. If non-null, this step _might_ stream,
+   * but it's not guaranteed - it may be dependent on user variables, e.g. the
+   * `if` parameter.
+   */
+  stream:
+    | null
+    | {
+        // if?: Step<Maybe<boolean>>;
+        // initialCount?: Step<Maybe<number>>;
+        // label?: Step<Maybe<string>>;
+      };
   meta: Record<string, unknown> | undefined;
 }
 

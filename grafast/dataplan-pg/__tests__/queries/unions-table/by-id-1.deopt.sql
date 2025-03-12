@@ -4,9 +4,9 @@ select
 from interfaces_and_unions.union_items as __union_items__
 where
   (
-    true /* authorization checks */
-  ) and (
     __union_items__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -15,7 +15,7 @@ select
 from interfaces_and_unions.union_topics as __union_topics__
 where
   (
-    true /* authorization checks */
-  ) and (
     __union_topics__."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
