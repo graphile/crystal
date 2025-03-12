@@ -17,7 +17,7 @@ import type {
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
-import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
 const {
@@ -80,7 +80,7 @@ function dcr(
  *
  * @internal
  */
-export class GraphQLResolverStep extends UnbatchedExecutableStep {
+export class GraphQLResolverStep extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLResolverStep",
@@ -104,7 +104,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       | (GraphQLFieldResolver<any, any> & { displayName?: string })
       | null
       | undefined,
-    $plan: ExecutableStep,
+    $plan: Step,
     $args: ObjectStep,
     private resolveInfoBase: ResolveInfoBase,
     private returnContextAndResolveInfo = false,
@@ -196,10 +196,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
 }
 
 /** @internal */
-export class GraphQLItemHandler
-  extends ExecutableStep
-  implements PolymorphicStep
-{
+export class GraphQLItemHandler extends Step implements PolymorphicStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLItemHandler",
@@ -209,7 +206,7 @@ export class GraphQLItemHandler
     null;
   public isSyncAndSafe = false;
   constructor(
-    $parent: ExecutableStep,
+    $parent: Step,
     nullableType: GraphQLNullableType & GraphQLOutputType,
   ) {
     super();
@@ -355,7 +352,7 @@ export class GraphQLItemHandler
 }
 
 export function graphqlItemHandler(
-  $item: ExecutableStep,
+  $item: Step,
   nullableType: GraphQLNullableType & GraphQLOutputType,
 ) {
   return new GraphQLItemHandler($item, nullableType);
@@ -370,10 +367,10 @@ export function graphqlItemHandler(
 export function graphqlResolver(
   resolver: GraphQLFieldResolver<any, any> | null | undefined,
   subscriber: GraphQLFieldResolver<any, any> | null | undefined,
-  $step: ExecutableStep,
+  $step: Step,
   $args: ObjectStep,
   resolveInfoBase: ResolveInfoBase,
-): ExecutableStep {
+): Step {
   const { returnType } = resolveInfoBase;
   const namedType = getNamedType(returnType);
   const isAbstract = isAbstractType(namedType);

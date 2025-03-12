@@ -17,7 +17,7 @@ import {
   type GrafastResultsList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type { ConnectionCapableStep } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
@@ -25,7 +25,7 @@ import { itemsOrStep } from "./connection.js";
 /**
  * @internal
  */
-export class ApplyTransformsStep extends ExecutableStep {
+export class ApplyTransformsStep extends Step {
   static $$export = {
     moduleName: "grafast",
     exportName: "ApplyTransformsStep",
@@ -222,7 +222,7 @@ export class ApplyTransformsStep extends ExecutableStep {
  * send the result to an external service) rather than processing them through
  * the GraphQL response, then you may need to call `applyTransforms` on it.
  */
-export function applyTransforms($step: ExecutableStep) {
+export function applyTransforms($step: Step) {
   if (isListCapableStep($step)) {
     return $step.operationPlan.cacheStep(
       $step,
