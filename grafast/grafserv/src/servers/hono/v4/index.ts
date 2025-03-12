@@ -30,7 +30,6 @@ declare global {
 
 function getDigest(ctx: Ctx): RequestDigest {
   const req = ctx.req;
-  const res = ctx.res;
   return {
     httpVersionMajor: 1, // Hono uses Fetch API, which doesn't expose HTTP version
     httpVersionMinor: 1,
@@ -54,11 +53,6 @@ function getDigest(ctx: Ctx): RequestDigest {
     requestContext: {
       honov4: {
         ctx: ctx,
-      },
-      node: {
-        // @ts-expect-error type imports
-        req,
-        res,
       },
     },
   };
