@@ -56,6 +56,8 @@ function wrongSQLCheck(segment) {
     segment
       .replace(/\/\*[^*]+\*\//g, "")
       .replace(/--.*$/gm, "")
+      // We also need to keep things like `'INSERT'` as they are
+      .replace(/'[^\\']+'/gm, "''")
       .includes(keyword),
   );
 }
@@ -93,7 +95,7 @@ async function main() {
     }
   }
 
-  if (wrongSQL.length === 0) {
+  if (Object.keys(wrongSQL).length === 0) {
     console.log("All files pass checks");
   } else {
     console.log(
@@ -101,7 +103,13 @@ async function main() {
         Object.keys(wrongSQL).length
       } files containing capitalized SQL; the Graphile style guide encourages the use of lower case SQL. Please lowercase the SQL in the following files:`,
     );
-    console.dir(wrongSQL);
+    for (const [filename, failures] of Object.entries(wrongSQL)) {
+      console.log(
+        `${path.relative(`${__dirname}/..`, filename)}:\n\n  ${failures
+          .join("\n\n---\n\n")
+          .replace(/\n/g, "\n    ")}\n`,
+      );
+    }
     process.exitCode = 1;
   }
 }
