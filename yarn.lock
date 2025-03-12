@@ -3496,22 +3496,23 @@ __metadata:
   linkType: hard
 
 "@hono/node-server@npm:^1.13.7":
-  version: 1.13.7
-  resolution: "@hono/node-server@npm:1.13.7"
+  version: 1.13.8
+  resolution: "@hono/node-server@npm:1.13.8"
   peerDependencies:
     hono: ^4
-  checksum: 314671906b6a89f4611f7c7949c262287feff4a39c654c6831f78af7e8286537a97926849a7acdda654bea72b6a0d533b6df3f13a2b75325516a94393f8a6c8d
+  checksum: 812b4849bd1f0dad4553187aade0ba3eb60f1f72400e239fe1ad81368723833f2978cf05b947ebd14055da1f07db40ff02cdc15879365d34e6b602ec16aca3db
   languageName: node
   linkType: hard
 
 "@hono/node-ws@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "@hono/node-ws@npm:1.0.5"
+  version: 1.1.0
+  resolution: "@hono/node-ws@npm:1.1.0"
   dependencies:
     ws: "npm:^8.17.0"
   peerDependencies:
     "@hono/node-server": ^1.11.1
-  checksum: 0126850d73984ab71211c3841731fc493abaf92a8d15a17e36d5ddda8d85d04efcd29c0cff894cad19dc69c6bcca8ebdae9ed0bc43e3782322474231db5dc604
+    hono: ^4.6.0
+  checksum: 20c40826811cc61465980413a2b7b358b1f028b5836a0caf417df3b0f54d1c191c22a548f372bd72809710d5d7ae914ca84dbade353ccfbde90724aa291dc329
   languageName: node
   linkType: hard
 
@@ -6057,11 +6058,11 @@ __metadata:
   linkType: hard
 
 "@types/ws@npm:^8":
-  version: 8.5.13
-  resolution: "@types/ws@npm:8.5.13"
+  version: 8.18.0
+  resolution: "@types/ws@npm:8.18.0"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 8604665cd238ae0aae420fbdbb8065d8cefb5eb461a5108022102ace01eac662bf29a0a440bd6caf8f135d5ffac470e668705d44140e6b6a9d43cf561dff5a36
+  checksum: ea6b7dcfc2b78188fed399276c72923f40adc2373dfccea017eb29ce3482f06ab29089d7eb2f45eff84e28a8b09c01ce1b03d58959137640b6ebaf3ddff082e5
   languageName: node
   linkType: hard
 
@@ -12616,9 +12617,9 @@ __metadata:
   linkType: hard
 
 "hono@npm:^4.6.15":
-  version: 4.6.15
-  resolution: "hono@npm:4.6.15"
-  checksum: 3c9c4be676e90929eeec97cbea48786c4c76bc32c3a5fcc445db877acecd030c0091bfecd9b7463b9a38cf418c9c7745b37d92c9a2094250c8d7c3babe03f4e6
+  version: 4.7.4
+  resolution: "hono@npm:4.7.4"
+  checksum: 2124ea8c83576dffd7686ee732e3067efaa1765020ab21845b1beffc010469a71783ec914c3738ab8a0f0c2852a0f5d1d4ff7ba2df642d7b0950786b87fdbd60
   languageName: node
   linkType: hard
 
@@ -22436,7 +22437,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.0.0, ws@npm:^8.12.1, ws@npm:^8.13.0, ws@npm:^8.17.0, ws@npm:^8.17.1, ws@npm:^8.18.0":
+"ws@npm:^8.0.0, ws@npm:^8.13.0, ws@npm:^8.17.1":
   version: 8.18.0
   resolution: "ws@npm:8.18.0"
   peerDependencies:
@@ -22448,6 +22449,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 14a08117aa8615f098d168b3ac7a8fd24e4d21b43d3fc2e06e5cbf94ac5f3ad3e8e0c1ecd048b7e705d81e4f64ee6f723ae3c1961e0bd7b4bf84eda4e7f38ea0
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.12.1, ws@npm:^8.17.0, ws@npm:^8.18.0":
+  version: 8.18.1
+  resolution: "ws@npm:8.18.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 58d24c0b15ea589307cf5d5d7042cc7e67f25cb2d62207154dd0ca5346aa10cb5ae2cc66800d2f58e4d7f49f1fc0b7c174cd9e05e722ba983a976ab2ec8901fe
   languageName: node
   linkType: hard
 
