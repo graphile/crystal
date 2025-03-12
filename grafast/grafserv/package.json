@@ -122,7 +122,7 @@
     "h3": "^1.13.0",
     "jest": "^29.6.4",
     "jest-serializer-graphql-schema": "workspace:^",
-    "koa": "^2.14.2",
+    "koa": "^2.15.4",
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
