@@ -1,0 +1,31 @@
+## expect(data.vulnerabilitiesConnection.edges[0].node.__typename).toEqual("FirstPartyVulnerability")
+## expect(data.vulnerabilitiesConnection.edges[0].node.id).toEqual(5)
+## expect(data.vulnerabilitiesConnection.edges[1].node.__typename).toEqual("ThirdPartyVulnerability")
+## expect(data.vulnerabilitiesConnection.edges[1].node.id).toEqual(4)
+## expect(errors).toBeFalsy()
+#> variableValues: {"value": "WyJkMTg1OWM4N2RhIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0="}
+query Q($value: String) {
+  vulnerabilitiesConnection(
+    orderBy: [CVSS_SCORE_ASC]
+    before: $value # id = 5
+    last: 2
+  ) {
+    edges {
+      cursor
+      node {
+        __typename
+        cvssScore
+        ... on FirstPartyVulnerability {
+          id
+          name
+          teamName
+        }
+        ... on ThirdPartyVulnerability {
+          id
+          name
+          vendorName
+        }
+      }
+    }
+  }
+}

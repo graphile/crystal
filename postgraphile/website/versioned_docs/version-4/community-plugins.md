@@ -11,7 +11,7 @@ the community and is not an endorsement by the project.
 
 If you have written a PostGraphile plugin (or have found one that is not listed
 here), then please feel free to add it, you can
-[edit this page in GitHub](https://github.com/graphile/crystal/tree/main/postgraphile/website/versioned_docs/version-4.x/community-plugins.md).
+use the “edit this page” link below to do so.
 
 See the [CLI](./usage-cli) or [library](./usage-library) docs for how to load
 plugins.

@@ -45,32 +45,32 @@ The following are fine:
 
 ```sql
 -- ✅ Fine
-GRANT SELECT ON users TO graphql_role;
+grant select on users to graphql_role;
 -- ✅ Fine
-GRANT INSERT (column_1, column_2, ...) ON users TO graphql_role;
+grant insert (column_1, column_2, ...) on users to graphql_role;
 -- ✅ Fine
-GRANT UPDATE (column_a, column_b, ...) ON users TO graphql_role;
+grant update (column_a, column_b, ...) on users to graphql_role;
 -- ✅ Fine
-GRANT DELETE ON users TO graphql_role;
+grant delete on users to graphql_role;
 ```
 
 The following should be avoided:
 
 ```sql
 -- 🛑 DO NOT USE
-GRANT SELECT (column_a, column_b) ON users TO graphql_role;
+grant select (column_a, column_b) on users to graphql_role;
 -- 🛑 DO NOT USE
-GRANT INSERT ON users TO graphql_role;
+grant insert on users to graphql_role;
 -- 🛑 DO NOT USE
-GRANT UPDATE ON users TO graphql_role;
+grant update on users to graphql_role;
 ```
 
 Column-level SELECT grants
 [cause a lot of issues](./requirements#your-postgresql-database)
 not just for PostGraphile:
 
-- Cannot `SELECT * FROM`
-- Cannot use `RETURNING *` on mutations
+- Cannot `select * from`
+- Cannot use `returning *` on mutations
 - Cannot pass a row type into a function (like we do for computed columns)
 
 Table-level INSERT/UPDATE grants are not advisable because they lack the
@@ -89,7 +89,7 @@ practice.
 
 See [Production Considerations](./production).
 
-### Use `LANGUAGE sql` Over `LANGUAGE plpgsql` Where Possible
+### Use `language sql` Over `language plpgsql` Where Possible
 
 Performance reasons. Specifically, under many circumstances, functions in `SQL`
 (but not `plpgsql`) can be inlined into the call-site and are thereby

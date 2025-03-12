@@ -78,6 +78,7 @@ export {
 } from "./listTransform.js";
 export {
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   node,
   nodeIdFromNode,
   NodeStep,
@@ -91,7 +92,12 @@ export {
   RemapKeysStep,
 } from "./remapKeys.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
-export { setter, SetterCapableStep, SetterStep } from "./setter.js";
+export {
+  createObjectAndApplyChildren,
+  Setter,
+  setter,
+  SetterCapable,
+} from "./setter.js";
 export { sideEffect, SideEffectStep } from "./sideEffect.js";
 
 // Internal plans
@@ -107,7 +113,15 @@ export {
   __TrackedValueStepWithDollars,
 } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
+export {
+  applyInput,
+  ApplyInputStep,
+  assertModifier,
+  isModifier,
+  Modifier,
+} from "./applyInput.js";
 export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
+export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
 export { condition, ConditionStep } from "./condition.js";
 export {
   GraphQLItemHandler,

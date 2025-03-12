@@ -319,11 +319,11 @@ In general it’s better to prevent a field being added in the first place than
 to remove it after it has been added to the schema. To avoid a field being
 added to the schema, either remove the corresponding object from your database,
 revoke the permissions granted on it, or add a `@behavior -*` [smart
-tag](smart-tags). (Note you can also remove specific behaviors (e.g. `@behavior
+tag](./smart-tags). (Note you can also remove specific behaviors (e.g. `@behavior
 -update`).)
 
 Should this not work, you can also [explicitly delete fields from your
-schema](./extending-raw/#removing-things-from-the-schema).
+schema](./extending-raw#removing-things-from-the-schema).
 
 ### Adding documentation
 

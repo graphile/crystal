@@ -75,3 +75,6 @@ jobs:
 
       - name: "Run depcheck script"
         run: node scripts/benjies-depcheck.mjs
+
+      - name: "Ensure SQL is lowercase"
+        run: node scripts/ensure-sql-is-lowercase.mjs

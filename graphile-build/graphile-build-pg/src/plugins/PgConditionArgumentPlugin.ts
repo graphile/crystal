@@ -4,10 +4,11 @@ import "graphile-config";
 import type {
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
+  PgSelectQueryBuilder,
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import type { ConnectionStep } from "grafast";
+import type { ConnectionStep, GrafastArgumentConfig } from "grafast";
 import type { GraphQLInputObjectType } from "grafast/graphql";
 
 import { version } from "../version.js";
@@ -113,6 +114,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
       },
 
       GraphQLObjectType_fields_field_args(args, build, context) {
+        const { EXPORTABLE } = build;
         const { scope, Self } = context;
 
         const {
@@ -172,23 +174,31 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 "arg",
               ),
               type: tableConditionType,
-              autoApplyAfterParentPlan: true,
               applyPlan: isPgFieldConnection
-                ? (
-                    _condition,
-                    $connection: ConnectionStep<
-                      PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
-                      PgSelectStep
-                    >,
-                  ) => {
-                    const $select = $connection.getSubplan();
-                    return $select.wherePlan();
-                  }
-                : (_condition, $select: PgSelectStep) => {
-                    return $select.wherePlan();
-                  },
-            },
+                ? EXPORTABLE(
+                    (qbWhereBuilder) =>
+                      (
+                        _condition,
+                        $connection: ConnectionStep<
+                          PgSelectSingleStep,
+                          PgSelectParsedCursorStep,
+                          PgSelectStep
+                        >,
+                        arg,
+                      ) => {
+                        const $select = $connection.getSubplan();
+                        arg.apply($select, qbWhereBuilder);
+                      },
+                    [qbWhereBuilder],
+                  )
+                : EXPORTABLE(
+                    (qbWhereBuilder) =>
+                      (_condition, $select: PgSelectStep, arg) => {
+                        arg.apply($select, qbWhereBuilder);
+                      },
+                    [qbWhereBuilder],
+                  ),
+            } as GrafastArgumentConfig,
           },
           `Adding condition to connection field '${fieldName}' of '${Self.name}'`,
         );
@@ -196,3 +206,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+function qbWhereBuilder(qb: PgSelectQueryBuilder) {
+  return qb.whereBuilder();
+}

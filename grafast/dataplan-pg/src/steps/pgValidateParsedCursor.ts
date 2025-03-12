@@ -1,5 +1,5 @@
 import type { ExecutableStep, ExecutionExtra, Maybe } from "grafast";
-import { isDev, SafeError, UnbatchedExecutableStep } from "grafast";
+import { isDev, SafeError, UnbatchedStep } from "grafast";
 
 /**
  * Lightweight plan to validate cursor. We couldn't do this with a lambda
@@ -8,7 +8,7 @@ import { isDev, SafeError, UnbatchedExecutableStep } from "grafast";
  *
  * @internal
  */
-export class PgValidateParsedCursorStep extends UnbatchedExecutableStep<undefined> {
+export class PgValidateParsedCursorStep extends UnbatchedStep<undefined> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgValidateParsedCursorStep",
@@ -24,6 +24,11 @@ export class PgValidateParsedCursorStep extends UnbatchedExecutableStep<undefine
   ) {
     super();
     this.addDependency($parsedCursorPlan);
+    if (this.getAndFreezeIsUnary() !== true) {
+      throw new Error(
+        `PgValidateParsedCursorStep must be unary, you should only use it with input variables`,
+      );
+    }
   }
 
   deduplicate(
@@ -94,11 +99,6 @@ export function validateParsedCursor(
       console.error("Invalid cursor:");
       console.error(e);
     }
-    // TODO: in all likelihood this is called in a unary position, so the
-    // following TODO is most likely dismissable. We should assert such via
-    // `addUnaryDependency`? Should also make the above a UnbatchedExecutableStep?
-    // TODO: we should push this error to `results`; but doing so would make it
-    // not syncAndSafe.
     throw new SafeError(
       `Invalid '${beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
     );

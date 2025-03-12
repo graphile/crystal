@@ -1,5 +1,5 @@
-import type { UnbatchedExecutionExtra } from "grafast";
-import { access, exportAs, UnbatchedExecutableStep } from "grafast";
+import type { AccessStep, UnbatchedExecutionExtra } from "grafast";
+import { access, exportAs, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -8,7 +8,7 @@ import type {
   GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
-  PgTypedExecutableStep,
+  PgTypedStep,
 } from "../interfaces.js";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.js";
 import { PgInsertSingleStep } from "./pgInsertSingle.js";
@@ -31,8 +31,8 @@ export class PgClassExpressionStep<
     TExpressionCodec extends PgCodec,
     TResource extends PgResource<any, any, any, any, any>,
   >
-  extends UnbatchedExecutableStep<any>
-  implements PgTypedExecutableStep<TExpressionCodec>
+  extends UnbatchedStep<any>
+  implements PgTypedStep<TExpressionCodec>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -58,19 +58,25 @@ export class PgClassExpressionStep<
   public readonly expression: SQL;
 
   private needsPolymorphicUnwrap: boolean;
+  private needsTupleAccess: boolean;
 
   constructor(
     $table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
     public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
-    dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL> = [],
+    dependencies: ReadonlyArray<PgTypedStep<any> | SQL> = [],
     private guaranteedNotNull?: boolean,
   ) {
     super();
     this.needsPolymorphicUnwrap =
       $table instanceof PgUnionAllSingleStep &&
       $table.getClassStep().mode === "normal";
-    this.rowDependencyId = this.addDependency($table);
+    this.needsTupleAccess =
+      $table instanceof PgInsertSingleStep ||
+      $table instanceof PgUpdateSingleStep ||
+      $table instanceof PgDeleteSingleStep;
+    const $row = this.needsTupleAccess ? access($table, "t") : $table;
+    this.rowDependencyId = this.addDependency($row);
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
         `Invalid call to PgClassExpressionStep; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgClassExpression.`,
@@ -219,7 +225,10 @@ export class PgClassExpressionStep<
   }
 
   public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
-    const step = this.getDep(this.rowDependencyId);
+    const $row = this.getDep(this.rowDependencyId);
+    const step = this.needsTupleAccess
+      ? ($row as AccessStep<any>).getParentStep()
+      : $row;
     if (
       !(step instanceof PgSelectSingleStep) &&
       !(step instanceof PgInsertSingleStep) &&
@@ -232,6 +241,9 @@ export class PgClassExpressionStep<
       );
     }
     return step;
+  }
+  public getMeta(key: string) {
+    return this.getParentStep().getMeta(key);
   }
 
   public optimize(): this {
@@ -294,7 +306,7 @@ function pgClassExpression<
   guaranteedNotNull?: boolean,
 ): (
   strings: TemplateStringsArray,
-  ...dependencies: ReadonlyArray<PgTypedExecutableStep<any> | SQL>
+  ...dependencies: ReadonlyArray<PgTypedStep<any> | SQL>
 ) => PgClassExpressionStep<TExpressionCodec, TResource> {
   return (strings, ...dependencies) => {
     return new PgClassExpressionStep(

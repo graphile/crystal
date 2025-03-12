@@ -20,7 +20,7 @@ import type {
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
 import type { AccessStep } from "./access.js";
 
@@ -49,7 +49,7 @@ export class __TrackedValueStep<
     | GraphQLInputType
     | ReadonlyArray<VariableDefinitionNode>
     | undefined = undefined,
-> extends UnbatchedExecutableStep<TData> {
+> extends UnbatchedStep<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__TrackedValueStep",
@@ -166,7 +166,7 @@ export class __TrackedValueStep<
   }
 
   private getValuePlan() {
-    return this.getDep<__ValueStep<TData> | AccessStep<TData>>(0);
+    return this.getDep<__ValueStep<TData> | AccessStep<TData>>(0, true);
   }
 
   /**
@@ -292,6 +292,8 @@ export class __TrackedValueStep<
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    *
    * **WARNING**: this is the most expensive eval, if you need to eval, prefer evalIs, evalHas, etc instead.
+   *
+   * @internal
    */
   eval(): TData | undefined {
     const { path, value } = this;
@@ -311,6 +313,8 @@ export class __TrackedValueStep<
    * Should only be used on scalars.
    *
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   *
+   * @internal
    */
   evalIs(expectedValue: unknown): boolean {
     const { value, path } = this;
@@ -324,6 +328,7 @@ export class __TrackedValueStep<
     return pass;
   }
 
+  /** @internal */
   evalIsEmpty() {
     const { value, path } = this;
     const isEmpty =
@@ -344,6 +349,8 @@ export class __TrackedValueStep<
    * check will always return the same (boolean) result.
    *
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   *
+   * @internal
    */
   evalHas(key: string): boolean {
     const { value, path } = this;
@@ -372,6 +379,8 @@ export class __TrackedValueStep<
    * check will always return the same result.
    *
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   *
+   * @internal
    */
   evalKeys(): ReadonlyArray<keyof TData & string> | null {
     const { value, path } = this;
@@ -417,6 +426,8 @@ export class __TrackedValueStep<
    * the same length.
    *
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   *
+   * @internal
    */
   evalLength(): number | null {
     const { value, path } = this;

@@ -1,0 +1,1075 @@
+{
+  a: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  b: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+    ],
+  },
+  c: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  d: {
+    pageInfo: {
+      startCursor: "WyI2ODdjM2M2M2U0IiwiQnVkZCBEZWV5IiwzXQ==",
+      endCursor: "WyI2ODdjM2M2M2U0IiwiVHdlbnR5IFNldmVudHdvIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiQnVkZCBEZWV5IiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiSm9lIFR1Y2tlciIsNV0=",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiSm9obiBTbWl0aCIsMV0=",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiS2F0aHJ5biBSYW1pcmV6Iiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiU2FyYSBTbWl0aCIsMl0=",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiVHdlbnR5IFNldmVudHdvIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  e: {
+    pageInfo: {
+      startCursor: "WyI2ODdjM2M2M2U0IiwiVHdlbnR5IFNldmVudHdvIiw2XQ==",
+      endCursor: "WyI2ODdjM2M2M2U0IiwiQnVkZCBEZWV5IiwzXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiVHdlbnR5IFNldmVudHdvIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiU2FyYSBTbWl0aCIsMl0=",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiS2F0aHJ5biBSYW1pcmV6Iiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiSm9obiBTbWl0aCIsMV0=",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiSm9lIFR1Y2tlciIsNV0=",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyI2ODdjM2M2M2U0IiwiQnVkZCBEZWV5IiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+    ],
+  },
+  f: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+    ],
+  },
+  g: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  h: {
+    edges: [
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiwxXQ==",
+        node: {
+          x: 1,
+          name: "John Smith",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiwyXQ==",
+        node: {
+          x: 2,
+          name: "Sara Smith",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiwzXQ==",
+        node: {
+          x: 3,
+          name: "Budd Deey",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiw0XQ==",
+        node: {
+          x: 4,
+          name: "Kathryn Ramirez",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiw1XQ==",
+        node: {
+          x: 5,
+          name: "Joe Tucker",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyJjNDk2OWMxM2NjIiw2XQ==",
+        node: {
+          x: 6,
+          name: "Twenty Seventwo",
+          constant: 2,
+        },
+      },
+    ],
+  },
+  i: {
+    edges: [
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDFd",
+        node: {
+          x: 1,
+          name: "John Smith",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDJd",
+        node: {
+          x: 2,
+          name: "Sara Smith",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDNd",
+        node: {
+          x: 3,
+          name: "Budd Deey",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDRd",
+        node: {
+          x: 4,
+          name: "Kathryn Ramirez",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDVd",
+        node: {
+          x: 5,
+          name: "Joe Tucker",
+          constant: 2,
+        },
+      },
+      {
+        cursor: "WyIzMWI3OWFkNmE0IiwyLDZd",
+        node: {
+          x: 6,
+          name: "Twenty Seventwo",
+          constant: 2,
+        },
+      },
+    ],
+  },
+  j: {
+    pageInfo: {
+      startCursor: "WyI2Nzc2ZDM3ZjcwIiwxXQ==",
+      endCursor: "WyI2Nzc2ZDM3ZjcwIiwxMF0=",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 3,
+    edges: [
+      {
+        cursor: "WyI2Nzc2ZDM3ZjcwIiwxXQ==",
+        node: {
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          authorId: 2,
+        },
+      },
+      {
+        cursor: "WyI2Nzc2ZDM3ZjcwIiw4XQ==",
+        node: {
+          headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+          authorId: 2,
+        },
+      },
+      {
+        cursor: "WyI2Nzc2ZDM3ZjcwIiwxMF0=",
+        node: {
+          headline: "What’s with you kids? Every other day it’s food, food, food.",
+          authorId: 2,
+        },
+      },
+    ],
+  },
+  k: {
+    pageInfo: {
+      startCursor: "WyI2Nzc2ZDM3ZjcwIiwxXQ==",
+      endCursor: "WyI2Nzc2ZDM3ZjcwIiw4XQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 3,
+    edges: [
+      {
+        cursor: "WyI2Nzc2ZDM3ZjcwIiwxXQ==",
+        node: {
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          authorId: 2,
+        },
+      },
+      {
+        cursor: "WyI2Nzc2ZDM3ZjcwIiw4XQ==",
+        node: {
+          headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+          authorId: 2,
+        },
+      },
+    ],
+  },
+  l: {
+    pageInfo: {
+      startCursor: "WyJmOTkxNGJlOTM5IiwiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XQ==",
+      endCursor: "WyJmOTkxNGJlOTM5IiwiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XQ==",
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+    totalCount: 4,
+    edges: [
+      {
+        cursor: "WyJmOTkxNGJlOTM5IiwiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XQ==",
+        node: {
+          headline: "You hit me with a cricket bat.",
+          authorId: 1,
+        },
+      },
+    ],
+  },
+  m: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+      hasNextPage: true,
+      hasPreviousPage: true,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+    ],
+  },
+  n: {
+    pageInfo: {
+      startCursor: null,
+      endCursor: null,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [],
+  },
+  o: {
+    nodes: [
+      {
+        rowId: 2,
+      },
+    ],
+  },
+  p: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+    ],
+  },
+  q: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwzXQ==",
+        node: {
+          id: 3,
+          name: "Budd Deey",
+          email: "budd.deey@email.com",
+          config: {
+            b: "2",
+          },
+          lastLoginFromIp: "172.21.22.23",
+          lastLoginFromSubnet: "172.16.0.0/12",
+          userMac: "77:88:99:aa:bb:cc",
+        },
+      },
+    ],
+  },
+  r: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  s: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 5,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwyXQ==",
+        node: {
+          id: 2,
+          name: "Sara Smith",
+          email: "sara.smith@email.com",
+          config: {
+            a: "1",
+          },
+          lastLoginFromIp: "10.1.2.3",
+          lastLoginFromSubnet: "10.0.0.0/8",
+          userMac: "11:22:33:44:55:66",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw0XQ==",
+        node: {
+          id: 4,
+          name: "Kathryn Ramirez",
+          email: "kathryn.ramirez@email.com",
+          config: {
+            a: "3",
+            b: "4",
+          },
+          lastLoginFromIp: "192.168.1.2",
+          lastLoginFromSubnet: "192.168.0.0/16",
+          userMac: "dd:ee:ff:00:11:22",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw1XQ==",
+        node: {
+          id: 5,
+          name: "Joe Tucker",
+          email: "joe.tucker@email.com",
+          config: {
+            a: "5",
+            b: "6",
+            null_string: "null",
+            actually_null: null,
+            "_\"_$@£$)(@*£$": "_\"_$@£$)(@*£$",
+          },
+          lastLoginFromIp: "192.168.0.2",
+          lastLoginFromSubnet: "192.168.0.0/23",
+          userMac: "33:44:55:66:77:88",
+        },
+      },
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiw2XQ==",
+        node: {
+          id: 6,
+          name: "Twenty Seventwo",
+          email: "graphile-build.issue.27.exists@example.com",
+          config: {
+            null_1: null,
+            null_2: null,
+          },
+          lastLoginFromIp: "10.1.2.254",
+          lastLoginFromSubnet: "10.0.0.0/9",
+          userMac: "99:aa:bb:cc:dd:ee",
+        },
+      },
+    ],
+  },
+  t: {
+    pageInfo: {
+      startCursor: "WyJkNTY3OGM4NjBmIiw1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV0=",
+      endCursor: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0=",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 11,
+    edges: [
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiw1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV0=",
+        node: {
+          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          authorId: 5,
+        },
+      },
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiwzLCJZb3Uga25vdyBob3cgSSBzb21ldGltZXMgaGF2ZSByZWFsbHkgYnJpbGxpYW50IGlkZWFzPyIsOV0=",
+        node: {
+          headline: "You know how I sometimes have really brilliant ideas?",
+          authorId: 3,
+        },
+      },
+      {
+        cursor: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0=",
+        node: {
+          headline: "They’re not aliens, they’re Earth…liens!",
+          authorId: 3,
+        },
+      },
+    ],
+  },
+  u: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 1,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+    ],
+  },
+  v: {
+    e1: [
+      {
+        n1: {
+          id: 1,
+          personByAuthorId: {
+            name: "Sara Smith",
+          },
+        },
+        n2: {
+          headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
+          personByAuthorId: {
+            id: 2,
+          },
+        },
+      },
+      {
+        n1: {
+          id: 2,
+          personByAuthorId: {
+            name: "John Smith",
+          },
+        },
+        n2: {
+          headline: "I hate yogurt. It’s just stuff with bits in.",
+          personByAuthorId: {
+            id: 1,
+          },
+        },
+      },
+    ],
+    e2: [
+      {
+        node: {
+          nodeId: "WyJwb3N0cyIsMV0=",
+        },
+      },
+      {
+        node: {
+          nodeId: "WyJwb3N0cyIsMl0=",
+        },
+      },
+    ],
+  },
+  w: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 1,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+    ],
+  },
+  x: {
+    pageInfo: {
+      startCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      endCursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    totalCount: 1,
+    edges: [
+      {
+        cursor: "WyIwOGUwZDM0MmRlIiwxXQ==",
+        node: {
+          id: 1,
+          name: "John Smith",
+          email: "john.smith@email.com",
+          config: {},
+          lastLoginFromIp: "192.168.0.1",
+          lastLoginFromSubnet: "192.168.0.0/24",
+          userMac: "00:00:00:00:00:00",
+        },
+      },
+    ],
+  },
+  nullTest1: {
+    nodes: [
+      {
+        nullableText: "Hello",
+        nullableInt: 99,
+      },
+      {
+        nullableText: null,
+        nullableInt: 98,
+      },
+      {
+        nullableText: null,
+        nullableInt: null,
+      },
+      {
+        nullableText: "Hey",
+        nullableInt: null,
+      },
+      {
+        nullableText: "Hey",
+        nullableInt: 95,
+      },
+    ],
+  },
+}

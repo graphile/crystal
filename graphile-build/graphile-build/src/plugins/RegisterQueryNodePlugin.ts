@@ -32,6 +32,9 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
             },
             [],
           ),
+          getIdentifiers(_value) {
+            return [];
+          },
           getSpec: () => "irrelevant",
           get: EXPORTABLE(
             (rootValue) => () => {

@@ -1,12 +1,10 @@
 import { flagError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
-export class ErrorStep<
-  TError extends Error,
-> extends UnbatchedExecutableStep<never> {
+export class ErrorStep<TError extends Error> extends UnbatchedStep<never> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ErrorStep",

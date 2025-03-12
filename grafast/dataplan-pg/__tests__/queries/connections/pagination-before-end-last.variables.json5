@@ -1,0 +1,43 @@
+{
+  allMessagesConnection: {
+    edges: [
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
+        node: {
+          body: "Cats = awesome -- Cecilia",
+          author: {
+            username: "Cecilia",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBmMTcwIl0=",
+        node: {
+          body: "Postgres = awesome -- Alice",
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0=",
+        node: {
+          body: "Postgres = awesome -- Bob",
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
+        },
+      },
+    ],
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: true,
+      startCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
+      endCursor: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0=",
+    },
+    totalCount: 6,
+  },
+}

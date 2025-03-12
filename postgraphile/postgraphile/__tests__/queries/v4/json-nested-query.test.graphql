@@ -1,0 +1,7 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> dynamicJson: true
+#> variableValues: {"value": 42}
+query Q($value: Int!) {
+  jsonIdentity(json: { someValue: { ohnoavariable: $value } })
+}
