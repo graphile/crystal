@@ -1,3 +1,5 @@
+/* eslint-disable graphile-export/export-methods */
+import type { ServerType } from "@hono/node-server";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { error } from "console";
@@ -9,6 +11,8 @@ import { WebSocket } from "ws";
 
 import type { GrafservConfig } from "../src/interfaces.js";
 import { grafserv } from "../src/servers/hono/v4/index.js";
+
+const PORT = 7777;
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
@@ -32,7 +36,6 @@ const schema = makeGrafastSchema({
     },
     Subscription: {
       subscriptionTest: {
-        // eslint-disable-next-line graphile-export/export-methods
         subscribe: async function* () {
           yield { subscriptionTest: "test1" };
           yield { subscriptionTest: "test2" };
@@ -43,32 +46,42 @@ const schema = makeGrafastSchema({
 });
 
 describe("Hono Adapter", () => {
-  // setup test server
-  const app = new Hono();
-  const config: GrafservConfig = {
-    schema, // Mock schema for testing
-    preset: {
-      grafserv: {
-        graphqlOverGET: true,
-        graphqlPath: "/graphql",
-        dangerouslyAllowAllCORSRequests: true,
+  let server: ServerType | null = null;
+  beforeEach(() => {
+    // setup test server
+    const app = new Hono();
+    const config: GrafservConfig = {
+      schema, // Mock schema for testing
+      preset: {
+        grafserv: {
+          graphqlOverGET: true,
+          graphqlPath: "/graphql",
+          dangerouslyAllowAllCORSRequests: true,
+        },
       },
-    },
-  };
-  const honoGrafserv = grafserv(config);
-  honoGrafserv.addTo(app);
+    };
+    const honoGrafserv = grafserv(config);
+    honoGrafserv.addTo(app);
 
-  const server = serve({
-    fetch: app.fetch,
-    port: 7777,
+    server = serve({
+      fetch: app.fetch,
+      port: PORT,
+    });
   });
-  const url = `http://0.0.0.0:7777/graphql`;
+
+  afterEach(() => {
+    server?.close();
+    server = null;
+  });
+
+  const url = `http://0.0.0.0:${PORT}/graphql`;
 
   it("SHOULD work for a simple request", async () => {
     const res = await fetch(url, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({ query: "{ __typename }" }),
     });
@@ -104,29 +117,38 @@ describe("Hono Adapter", () => {
 });
 
 describe("Hono Adapter with websockets", () => {
-  // setup test server
-  const app = new Hono();
-  const config: GrafservConfig = {
-    schema, // Mock schema for testing
-    preset: {
-      grafserv: {
-        graphqlOverGET: true,
-        websockets: true,
+  let server: ServerType | null = null;
+  let app!: Hono;
+  beforeEach(() => {
+    // setup test server
+    app = new Hono();
+    const config: GrafservConfig = {
+      schema, // Mock schema for testing
+      preset: {
+        grafserv: {
+          graphqlOverGET: true,
+          websockets: true,
+        },
       },
-    },
-  };
-  const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
+    };
+    const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
-  const honoGrafserv = grafserv(config, upgradeWebSocket);
-  honoGrafserv.addTo(app);
+    const honoGrafserv = grafserv(config, upgradeWebSocket);
+    honoGrafserv.addTo(app);
 
-  const server = serve({
-    fetch: app.fetch,
-    port: 7778,
+    server = serve({
+      fetch: app.fetch,
+      port: PORT,
+    });
+    injectWebSocket(server);
   });
-  injectWebSocket(server);
 
-  const url = `ws://0.0.0.0:7778/graphql`;
+  afterEach(() => {
+    server?.close();
+    server = null;
+  });
+
+  const url = `ws://0.0.0.0:${PORT}/graphql`;
 
   it("SHOULD work for a simple subscription", async () => {
     // make a graphql subscription
