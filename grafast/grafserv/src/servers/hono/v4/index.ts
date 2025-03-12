@@ -116,13 +116,6 @@ export class HonoGrafserv extends GrafservBase {
     });
   }
 
-  /**
-   * @deprecated use handleGraphQLEvent instead
-   */
-  public async handleEvent(ctx: Ctx) {
-    return this.handleGraphQLEvent(ctx);
-  }
-
   public async handleGraphQLEvent(ctx: Ctx) {
     const digest = getDigest(ctx);
 
