@@ -166,6 +166,7 @@ To save us from having to pass the environment variables every time we run the s
 we can add them to a convenient `.env` file:
 
 ```ini title=".env"
+# Replace the contents of the square brackets with the relevant settings
 DATABASE_URL=postgres://[username]:[password]@[host]:[port]/[database]
 GRAPHILE_ENV=development
 ```
@@ -251,6 +252,7 @@ The project is now complete, listing the project directory should show
 ```bash
 postgraphile_express/
  ├── .env
+ ├── .gitignore
  ├── node_modules/
  ├── package-lock.json
  ├── package.json
@@ -288,7 +290,7 @@ To tidy up, let's make the following changes to the `package.json` file:
    "version": "1.0.0",
 -  "main": "index.js",
 +  "private": true,
-   "type": "module",
++  "type": "module",
    "scripts": {
 +    "start": "node --env-file=./.env server.js",
      "test": "echo \"Error: no test specified\" && exit 1"
@@ -308,8 +310,9 @@ The main things we've done here are:
 
 - Remove the reference to a non-existant index.js file
 - Mark the project as "private" such that we can't attempt to `npm publish` it to the npm repository
-- Deleted unnecessary metadata
-- Added our `start` script, which runs the server contained in `server.js` using the `node` command, passing the environment variables stored in the `.env` file
+- Declare that `.js` files are ES modules, enabling the `import` statements to function
+- Delete unnecessary metadata
+- Add our `start` script, which runs the server contained in `server.js` using the `node` command, passing the environment variables stored in the `.env` file
 
 ### Running the server
 
@@ -394,7 +397,7 @@ echo .env >> .gitignore
 ### TypeScript configuration
 
 Create a `tsconfig.json` file that extends from the relevant @tsconfig for your
-Node.js version; e.g. if you're using Node v22 that would be
+Node.js major version; e.g. if you're using Node v22.10.0 that would be
 [`@tsconfig/node22`](https://www.npmjs.com/package/@tsconfig/node22):
 
 ```json title="tsconfig.json"
@@ -402,6 +405,7 @@ Node.js version; e.g. if you're using Node v22 that would be
   "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "erasableSyntaxOnly": true,
+    "rewriteRelativeImportExtensions": true,
     "rootDir": "./src",
     "outDir": "./dist"
   }
@@ -410,7 +414,7 @@ Node.js version; e.g. if you're using Node v22 that would be
 
 ### The code
 
-In the `postgraphile_express_typescript` directory, create a `src` dirctory and
+In the `postgraphile_express_typescript` directory, create a `src` directory and
 create three TypeScript files in the src folder: `graphile.config.ts`, `pgl.ts`
 and `server.ts` with the contents shown below:
 
@@ -443,20 +447,14 @@ export default preset;
 
 ```ts title="src/pgl.ts"
 import { postgraphile } from "postgraphile";
-import preset from "./graphile.config.js";
+import preset from "./graphile.config.ts";
 
 export const pgl = postgraphile(preset);
 ```
 
-:::note TypeScript files reference each other via `.js`
+:::note The `rewriteRelativeImportExtensions` flag
 
-You might think the reference to `graphile.config.js` above is a typo, but it
-is not. When writing TypeScript files that reference other TypeScript files,
-you need to replace the `.ts` extensions with `.js` because TypeScript compiles
-to JavaScript, and it's the resulting JavaScript files that are actually
-executed at runtime. TypeScript does not change the content of the input path,
-so we must write what needs to be seen at runtime, even if it looks silly to us
-when writing the code!
+With node's new `rewriteRelativeImportExtensions` flag, TypeScript syntax is removed from files but the files still need to be able to reference each other. Typescript has added the configuration option `rewriteRelativeImportExtensions` to ensure that you can use `.ts` to reference TypeScript files in your sourcecode whilst still ensuring that these imports are changed to `.js` when compiled for production usage.
 
 :::
 
@@ -466,7 +464,7 @@ when writing the code!
 import { createServer } from "node:http";
 import express from "express";
 import { grafserv } from "postgraphile/grafserv/express/v4";
-import { pgl } from "./pgl.js";
+import { pgl } from "./pgl.ts";
 
 const serv = pgl.createServ(grafserv);
 
@@ -489,15 +487,17 @@ console.log("Server listening at http://localhost:5050");
 After making similar changes to `package.json` as we did with Example 1 above, we should
 end up with a `package.json` file that looks something like:
 
-```json title="package.json"
+```diff title="package.json"
 {
   "name": "simple_node_project",
   "version": "1.0.0",
-  "type": "module",
+- "main": "index.js",
++ "private": true,
++ "type": "module",
   "scripts": {
-    "start": "node --env-file=./.env src/server.ts",
-    "build": "tsc",
-    "prod": "node dist/server.js"
++   "start": "node --env-file=./.env src/server.ts",
++   "build": "tsc",
++   "prod": "node dist/server.js"
   },
   "dependencies": {
     "@graphile/simplify-inflection": "^8.0.0-beta.6",
@@ -526,6 +526,7 @@ The project structure should be
 ```
 postgraphile_express_typescript/
  ├── .env
+ ├── .gitignore
  ├── node_modules/
  ├── package-lock.json
  ├── package.json
