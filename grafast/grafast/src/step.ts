@@ -118,8 +118,9 @@ export /* abstract */ class Step<TData = any> {
   /** @internal */
   public _isUnaryLocked: boolean;
   /**
-   * For input values, set {true} if it comes from variables/arguments since
-   * they cannot be modified (even by mutations), set false otherwise.
+   * For input values, set `true` if it comes from variables/arguments since
+   * they cannot be modified (even by mutations), set `false` otherwise.
+   *
    * @internal
    */
   public _isImmutable = false;
