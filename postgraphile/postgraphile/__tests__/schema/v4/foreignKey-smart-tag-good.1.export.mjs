@@ -2409,6 +2409,21 @@ const floatrangeCodec = rangeOfCodec(TYPES.float, "floatrange", sql.identifier("
     }
   }
 });
+const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "_compound_type"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "compoundTypeArray"
+});
 const current_user_idFunctionIdentifer = sql.identifier("c", "current_user_id");
 const func_outFunctionIdentifer = sql.identifier("c", "func_out");
 const func_out_setofFunctionIdentifer = sql.identifier("c", "func_out_setof");
@@ -2615,8 +2630,31 @@ const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_ou
 const mutation_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "mutation_out_out_compound_type");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
+const resourceConfig_compound_type = {
+  executor: executor,
+  name: "compound_type",
+  identifier: "main.c.compound_type",
+  from: compoundTypeIdentifier,
+  codec: compoundTypeCodec,
+  uniques: [],
+  isVirtual: true,
+  description: "Awesome feature!",
+  extensions: {
+    description: "Awesome feature!",
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "compound_type"
+    },
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
+  }
+};
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
 const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
+const list_of_compound_types_mutationFunctionIdentifer = sql.identifier("c", "list_of_compound_types_mutation");
 const person_computed_outFunctionIdentifer = sql.identifier("c", "person_computed_out");
 const person_first_nameFunctionIdentifer = sql.identifier("c", "person_first_name");
 const person_computed_out_outFunctionIdentifer = sql.identifier("c", "person_computed_out_out");
@@ -2814,6 +2852,7 @@ const registry = makeRegistry({
     }),
     int4Array: int4ArrayCodec,
     floatrange: floatrangeCodec,
+    compoundTypeArray: compoundTypeArrayCodec,
     int8Array: int8ArrayCodec
   },
   pgResources: {
@@ -4186,28 +4225,7 @@ const registry = makeRegistry({
       },
       description: undefined
     },
-    compound_type_set_query: PgResource.functionResourceOptions({
-      executor: executor,
-      name: "compound_type",
-      identifier: "main.c.compound_type",
-      from: compoundTypeIdentifier,
-      codec: compoundTypeCodec,
-      uniques: [],
-      isVirtual: true,
-      description: "Awesome feature!",
-      extensions: {
-        description: "Awesome feature!",
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "compound_type"
-        },
-        isInsertable: false,
-        isUpdatable: false,
-        isDeletable: false,
-        tags: {}
-      }
-    }, {
+    compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_compound_type, {
       name: "compound_type_set_query",
       identifier: "main.c.compound_type_set_query()",
       from(...args) {
@@ -4281,6 +4299,32 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "table_query"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
+    list_of_compound_types_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+      name: "list_of_compound_types_mutation",
+      identifier: "main.c.list_of_compound_types_mutation(c._compound_type)",
+      from(...args) {
+        return sql`${list_of_compound_types_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "records",
+        required: true,
+        notNull: false,
+        codec: compoundTypeArrayCodec
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "list_of_compound_types_mutation"
         },
         tags: {}
       },
@@ -6505,6 +6549,15 @@ const argDetailsSimple_table_mutation = [{
 }];
 const makeArgs_table_mutation = (args, path = []) => argDetailsSimple_table_mutation.map(details => makeArg(path, args, details));
 const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
+const argDetailsSimple_list_of_compound_types_mutation = [{
+  graphqlArgName: "records",
+  postgresArgName: "records",
+  pgCodec: compoundTypeArrayCodec,
+  required: true,
+  fetcher: null
+}];
+const makeArgs_list_of_compound_types_mutation = (args, path = []) => argDetailsSimple_list_of_compound_types_mutation.map(details => makeArg(path, args, details));
+const resource_list_of_compound_types_mutationPgResource = registry.pgResources["list_of_compound_types_mutation"];
 const argDetailsSimple_mutation_out_complex = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -8739,6 +8792,12 @@ type Mutation {
     """
     input: TableMutationInput!
   ): TableMutationPayload
+  listOfCompoundTypesMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ListOfCompoundTypesMutationInput!
+  ): ListOfCompoundTypesMutationPayload
   mutationOutComplex(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -9738,6 +9797,70 @@ input TableMutationInput {
   """
   clientMutationId: String
   id: Int
+}
+
+"""The output of our \`listOfCompoundTypesMutation\` mutation."""
+type ListOfCompoundTypesMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`listOfCompoundTypesMutation\` mutation."""
+input ListOfCompoundTypesMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  records: [CompoundTypeInput]
+}
+
+"""An input for mutations affecting \`CompoundType\`"""
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  g: IntervalInput
+  fooBar: Int
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """A quantity of years."""
+  years: Int
 }
 
 """The output of our \`mutationOutComplex\` mutation."""
@@ -17841,6 +17964,35 @@ export const plans = {
         }
       }
     },
+    listOfCompoundTypesMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs_list_of_compound_types_mutation(args, ["input"]);
+        const $result = resource_list_of_compound_types_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
+            }
+          }
+        }
+      }
+    },
     mutationOutComplex: {
       plan($root, args, _info) {
         const selectArgs = makeArgs_mutation_out_complex(args, ["input"]);
@@ -19466,6 +19618,102 @@ export const plans = {
       }
     },
     id: undefined
+  },
+  ListOfCompoundTypesMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+    compoundTypes($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
+  },
+  ListOfCompoundTypesMutationInput: {
+    clientMutationId: {
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    },
+    records: undefined
+  },
+  CompoundTypeInput: {
+    "__baked": createObjectAndApplyChildren,
+    a: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    b: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    c: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    d: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    e: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    f: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    g: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      }
+    },
+    fooBar: {
+      apply(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  IntervalInput: {
+    seconds: undefined,
+    minutes: undefined,
+    hours: undefined,
+    days: undefined,
+    months: undefined,
+    years: undefined
   },
   MutationOutComplexPayload: {
     __assertStep: ObjectStep,
