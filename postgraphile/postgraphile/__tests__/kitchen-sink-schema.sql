@@ -412,6 +412,10 @@ begin
   return ARRAY[]::uuid[];
 end;
 $$ language plpgsql volatile;
+create function c.list_of_compound_types_mutation(records c.compound_type[]) returns setof c.compound_type as $$
+  select r.*
+  from unnest(list_of_compound_types_mutation.records) as r;
+$$ language sql volatile;
 
 create function c.person_first_name(person c.person) returns text as $$ select split_part(person.person_full_name, ' ', 1) $$ language sql stable;
 comment on function c.person_first_name(c.person) is E'@sortable\nThe first name of the person.';
