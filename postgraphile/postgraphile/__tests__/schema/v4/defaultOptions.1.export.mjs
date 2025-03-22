@@ -24041,79 +24041,56 @@ export const plans = {
   },
   CompoundTypeInput: {
     "__baked": createObjectAndApplyChildren,
-    a: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      }
+    a(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("a", bakedInputRuntime(schema, field.type, val));
     },
-    b: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      }
+    b(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("b", bakedInputRuntime(schema, field.type, val));
     },
-    c: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("c", bakedInputRuntime(schema, field.type, val));
-      }
+    c(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("c", bakedInputRuntime(schema, field.type, val));
     },
-    d: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("d", bakedInputRuntime(schema, field.type, val));
-      }
+    d(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("d", bakedInputRuntime(schema, field.type, val));
     },
-    e: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("e", bakedInputRuntime(schema, field.type, val));
-      }
+    e(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("e", bakedInputRuntime(schema, field.type, val));
     },
-    f: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("f", bakedInputRuntime(schema, field.type, val));
-      }
+    f(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("f", bakedInputRuntime(schema, field.type, val));
     },
-    g: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("g", bakedInputRuntime(schema, field.type, val));
-      }
+    g(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("g", bakedInputRuntime(schema, field.type, val));
     },
-    fooBar: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
-      }
+    fooBar(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
     }
   },
-  IntervalInput: {
-    seconds: undefined,
-    minutes: undefined,
-    hours: undefined,
-    days: undefined,
-    months: undefined,
-    years: undefined
-  },
+  IntervalInput: {},
   AnEnum: {
     AWAITING: {
       value: "awaiting"
@@ -24482,1049 +24459,928 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   TypeCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    smallint: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "smallint",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "smallint",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-            }
-          });
-        }
+    smallint($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "smallint",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "smallint",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
+          }
+        });
       }
     },
-    bigint: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "bigint",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "bigint",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-            }
-          });
-        }
+    bigint($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "bigint",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "bigint",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+          }
+        });
       }
     },
-    numeric: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "numeric",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "numeric",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-            }
-          });
-        }
+    numeric($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "numeric",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "numeric",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
+          }
+        });
       }
     },
-    decimal: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "decimal",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "decimal",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-            }
-          });
-        }
+    decimal($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "decimal",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "decimal",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
+          }
+        });
       }
     },
-    boolean: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "boolean",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "boolean",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-            }
-          });
-        }
+    boolean($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "boolean",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "boolean",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+          }
+        });
       }
     },
-    varchar: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "varchar",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "varchar",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
+    varchar($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "varchar",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "varchar",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
       }
     },
-    enum: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
-            }
-          });
-        }
+    enum($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
+          }
+        });
       }
     },
-    enumArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-            }
-          });
-        }
+    enumArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+          }
+        });
       }
     },
-    domain: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "domain",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "domain",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
-            }
-          });
-        }
+    domain($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "domain",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "domain",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
+          }
+        });
       }
     },
-    domain2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "domain2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "domain2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
-            }
-          });
-        }
+    domain2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "domain2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "domain2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
+          }
+        });
       }
     },
-    textArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "text_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "text_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-            }
-          });
-        }
+    textArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "text_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "text_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+          }
+        });
       }
     },
-    json: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "json",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "json",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
-            }
-          });
-        }
+    json($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "json",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "json",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
+          }
+        });
       }
     },
-    jsonb: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "jsonb",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "jsonb",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-            }
-          });
-        }
+    jsonb($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "jsonb",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "jsonb",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+          }
+        });
       }
     },
-    nullableRange: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_range",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_range",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-            }
-          });
-        }
+    nullableRange($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_range",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_range",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
+          }
+        });
       }
     },
-    numrange: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "numrange",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "numrange",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-            }
-          });
-        }
+    numrange($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "numrange",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "numrange",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
+          }
+        });
       }
     },
-    daterange: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "daterange",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "daterange",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
-            }
-          });
-        }
+    daterange($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "daterange",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "daterange",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
+          }
+        });
       }
     },
-    anIntRange: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "an_int_range",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "an_int_range",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
-            }
-          });
-        }
+    anIntRange($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "an_int_range",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "an_int_range",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
+          }
+        });
       }
     },
-    timestamp: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamp",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamp",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-            }
-          });
-        }
+    timestamp($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamp",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamp",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+          }
+        });
       }
     },
-    timestamptz: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-            }
-          });
-        }
+    timestamptz($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+          }
+        });
       }
     },
-    date: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "date",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "date",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
-            }
-          });
-        }
+    date($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "date",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "date",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
+          }
+        });
       }
     },
-    time: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "time",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "time",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
-            }
-          });
-        }
+    time($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "time",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "time",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
+          }
+        });
       }
     },
-    timetz: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "timetz",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "timetz",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
-            }
-          });
-        }
+    timetz($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timetz",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "timetz",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
+          }
+        });
       }
     },
-    interval: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "interval",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "interval",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
-            }
-          });
-        }
+    interval($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "interval",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "interval",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
+          }
+        });
       }
     },
-    intervalArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "interval_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "interval_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
-            }
-          });
-        }
+    intervalArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "interval_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "interval_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
+          }
+        });
       }
     },
-    money: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "money",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "money",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
-            }
-          });
-        }
+    money($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "money",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "money",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
+          }
+        });
       }
     },
-    compoundType: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-            }
-          });
-        }
+    compoundType($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
+          }
+        });
       }
     },
-    nestedCompoundType: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nested_compound_type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nested_compound_type",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-            }
-          });
-        }
+    nestedCompoundType($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nested_compound_type",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nested_compound_type",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
+          }
+        });
       }
     },
-    nullableCompoundType: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_compound_type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_compound_type",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-            }
-          });
-        }
+    nullableCompoundType($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_compound_type",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_compound_type",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
+          }
+        });
       }
     },
-    nullableNestedCompoundType: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_nested_compound_type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_nested_compound_type",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-            }
-          });
-        }
+    nullableNestedCompoundType($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_nested_compound_type",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_nested_compound_type",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
+          }
+        });
       }
     },
-    point: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-            }
-          });
-        }
+    point($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "point",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "point",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
+          }
+        });
       }
     },
-    nullablePoint: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullablePoint",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullablePoint",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-            }
-          });
-        }
+    nullablePoint($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullablePoint",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullablePoint",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
+          }
+        });
       }
     },
-    inet: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "inet",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "inet",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-            }
-          });
-        }
+    inet($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "inet",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "inet",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+          }
+        });
       }
     },
-    cidr: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cidr",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cidr",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-            }
-          });
-        }
+    cidr($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "cidr",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "cidr",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+          }
+        });
       }
     },
-    macaddr: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "macaddr",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "macaddr",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-            }
-          });
-        }
+    macaddr($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "macaddr",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "macaddr",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+          }
+        });
       }
     },
-    regproc: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regproc",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regproc",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
-            }
-          });
-        }
+    regproc($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regproc",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regproc",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
+          }
+        });
       }
     },
-    regprocedure: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regprocedure",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regprocedure",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
-            }
-          });
-        }
+    regprocedure($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regprocedure",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regprocedure",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
+          }
+        });
       }
     },
-    regoper: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regoper",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regoper",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
-            }
-          });
-        }
+    regoper($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regoper",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regoper",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
+          }
+        });
       }
     },
-    regoperator: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regoperator",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regoperator",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
-            }
-          });
-        }
+    regoperator($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regoperator",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regoperator",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
+          }
+        });
       }
     },
-    regclass: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regclass",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regclass",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
-            }
-          });
-        }
+    regclass($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regclass",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regclass",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
+          }
+        });
       }
     },
-    regtype: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regtype",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regtype",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
-            }
-          });
-        }
+    regtype($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regtype",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regtype",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
+          }
+        });
       }
     },
-    regconfig: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regconfig",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regconfig",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
-            }
-          });
-        }
+    regconfig($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regconfig",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regconfig",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
+          }
+        });
       }
     },
-    regdictionary: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "regdictionary",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "regdictionary",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
-            }
-          });
-        }
+    regdictionary($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "regdictionary",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "regdictionary",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
+          }
+        });
       }
     },
-    textArrayDomain: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "text_array_domain",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "text_array_domain",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
-            }
-          });
-        }
+    textArrayDomain($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "text_array_domain",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "text_array_domain",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
+          }
+        });
       }
     },
-    int8ArrayDomain: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "int8_array_domain",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "int8_array_domain",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
-            }
-          });
-        }
+    int8ArrayDomain($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "int8_array_domain",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "int8_array_domain",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
+          }
+        });
       }
     },
-    ltree: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "ltree",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "ltree",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
-            }
-          });
-        }
+    ltree($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "ltree",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "ltree",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
+          }
+        });
       }
     },
-    ltreeArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "ltree_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "ltree_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
-            }
-          });
-        }
+    ltreeArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "ltree_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "ltree_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
+          }
+        });
       }
     }
   },
-  BigFloatRangeInput: {
-    start: undefined,
-    end: undefined
-  },
-  BigFloatRangeBoundInput: {
-    value: undefined,
-    inclusive: undefined
-  },
-  DateRangeInput: {
-    start: undefined,
-    end: undefined
-  },
-  DateRangeBoundInput: {
-    value: undefined,
-    inclusive: undefined
-  },
-  AnIntRangeInput: {
-    start: undefined,
-    end: undefined
-  },
-  AnIntRangeBoundInput: {
-    value: undefined,
-    inclusive: undefined
-  },
+  BigFloatRangeInput: {},
+  BigFloatRangeBoundInput: {},
+  DateRangeInput: {},
+  DateRangeBoundInput: {},
+  AnIntRangeInput: {},
+  AnIntRangeBoundInput: {},
   NestedCompoundTypeInput: {
     "__baked": createObjectAndApplyChildren,
-    a: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      }
+    a(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("a", bakedInputRuntime(schema, field.type, val));
     },
-    b: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      }
+    b(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("b", bakedInputRuntime(schema, field.type, val));
     },
-    bazBuz: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("baz_buz", bakedInputRuntime(schema, field.type, val));
-      }
+    bazBuz(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("baz_buz", bakedInputRuntime(schema, field.type, val));
     }
   },
-  PointInput: {
-    x: undefined,
-    y: undefined
-  },
+  PointInput: {},
   TypesOrderBy: {
     PRIMARY_KEY_ASC: {
       extensions: {
@@ -27273,166 +27129,148 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   PostCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    headline: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "headline",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "headline",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    headline($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "headline",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "headline",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     },
-    body: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "body",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    body($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "body",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "body",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     },
-    authorId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    authorId($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "author_id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "author_id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    enums: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enums",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enums",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, anEnumArrayCodec)}`;
-            }
-          });
-        }
+    enums($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "enums",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "enums",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, anEnumArrayCodec)}`;
+          }
+        });
       }
     },
-    comptypes: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "comptypes",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "comptypes",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, comptypeArrayCodec)}`;
-            }
-          });
-        }
+    comptypes($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "comptypes",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "comptypes",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, comptypeArrayCodec)}`;
+          }
+        });
       }
     },
-    computedWithOptionalArg: {
-      apply($condition, val) {
-        if (val === undefined) return;
-        if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        if (val === null) {
-          $condition.where(sql`${expression} is null`);
-        } else {
-          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_post_computed_with_optional_argPgResource.codec)}`);
-        }
+    computedWithOptionalArg($condition, val) {
+      if (val === undefined) return;
+      if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
+        placeholder: $condition.alias
+      })}`;
+      if (val === null) {
+        $condition.where(sql`${expression} is null`);
+      } else {
+        $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_post_computed_with_optional_argPgResource.codec)}`);
       }
     }
   },
   ComptypeInput: {
     "__baked": createObjectAndApplyChildren,
-    schedule: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("schedule", bakedInputRuntime(schema, field.type, val));
-      }
+    schedule(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("schedule", bakedInputRuntime(schema, field.type, val));
     },
-    isOptimised: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("is_optimised", bakedInputRuntime(schema, field.type, val));
-      }
+    isOptimised(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("is_optimised", bakedInputRuntime(schema, field.type, val));
     }
   },
   PostsOrderBy: {
@@ -27682,67 +27520,61 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ForeignKeyCondition: {
-    personId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    personId($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    compoundKey1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_key_1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_key_1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    compoundKey1($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_key_1",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_key_1",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    compoundKey2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_key_2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_key_2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    compoundKey2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_key_2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_key_2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -27890,67 +27722,61 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   CompoundKeyCondition: {
-    personId2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id_2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id_2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    personId2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    personId1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id_1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id_1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    personId1($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_1",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_1",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    extra: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "extra",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "extra",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-            }
-          });
-        }
+    extra($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "extra",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "extra",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+          }
+        });
       }
     }
   },
@@ -28311,14 +28137,8 @@ export const plans = {
   FuncReturnsTableMultiColEdge: {
     __assertStep: assertEdgeCapableStep
   },
-  FloatRangeInput: {
-    start: undefined,
-    end: undefined
-  },
-  FloatRangeBoundInput: {
-    value: undefined,
-    inclusive: undefined
-  },
+  FloatRangeInput: {},
+  FloatRangeBoundInput: {},
   FuncOutOutCompoundTypeRecord: {
     __assertStep: assertPgClassSingleStep,
     o2($record) {
@@ -28392,263 +28212,237 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   PersonCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_full_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_full_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
+    name($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_full_name",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_full_name",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
       }
     },
-    aliases: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "aliases",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "aliases",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-            }
-          });
-        }
+    aliases($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "aliases",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "aliases",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+          }
+        });
       }
     },
-    about: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "about",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "about",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    about($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "about",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "about",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     },
-    email: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "email",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "email",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-            }
-          });
-        }
+    email($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "email",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "email",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
+          }
+        });
       }
     },
-    site: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "site",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "site",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-            }
-          });
-        }
+    site($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "site",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "site",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
+          }
+        });
       }
     },
-    config: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "config",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "config",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-            }
-          });
-        }
+    config($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "config",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "config",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
+          }
+        });
       }
     },
-    lastLoginFromIp: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_ip",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_ip",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-            }
-          });
-        }
+    lastLoginFromIp($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_ip",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_ip",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+          }
+        });
       }
     },
-    lastLoginFromSubnet: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_subnet",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_login_from_subnet",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-            }
-          });
-        }
+    lastLoginFromSubnet($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_subnet",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_subnet",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+          }
+        });
       }
     },
-    userMac: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_mac",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_mac",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-            }
-          });
-        }
+    userMac($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "user_mac",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "user_mac",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+          }
+        });
       }
     },
-    createdAt: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-            }
-          });
-        }
+    createdAt($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "created_at",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "created_at",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+          }
+        });
       }
     },
-    computedOut: {
-      apply($condition, val) {
-        if (val === undefined) return;
-        if (typeof resource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_person_computed_outPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        if (val === null) {
-          $condition.where(sql`${expression} is null`);
-        } else {
-          $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
-        }
+    computedOut($condition, val) {
+      if (val === undefined) return;
+      if (typeof resource_person_computed_outPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_person_computed_outPgResource.from({
+        placeholder: $condition.alias
+      })}`;
+      if (val === null) {
+        $condition.where(sql`${expression} is null`);
+      } else {
+        $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
       }
     }
   },
   WrappedUrlInput: {
     "__baked": createObjectAndApplyChildren,
-    url: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("url", bakedInputRuntime(schema, field.type, val));
-      }
+    url(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("url", bakedInputRuntime(schema, field.type, val));
     }
   },
   NonUpdatableViewsConnection: {
@@ -28667,25 +28461,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   NonUpdatableViewCondition: {
-    column: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "?column?",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "?column?",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    column($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "?column?",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "?column?",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -28733,25 +28525,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   InputCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -28843,25 +28633,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   PatchCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -28953,25 +28741,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ReservedCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -29063,25 +28849,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ReservedPatchRecordCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -29173,25 +28957,23 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ReservedInputRecordCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -29283,46 +29065,42 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   DefaultValueCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    nullValue: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "null_value",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "null_value",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    nullValue($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "null_value",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "null_value",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     }
   },
@@ -29446,46 +29224,42 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   NoPrimaryKeyCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    str: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "str",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "str",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    str($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "str",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "str",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     }
   },
@@ -29574,67 +29348,61 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   TestviewCondition: {
-    testviewid: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "testviewid",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "testviewid",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    testviewid($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "testviewid",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "testviewid",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col1($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -29746,46 +29514,42 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   MyTableCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    jsonData: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "json_data",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "json_data",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-            }
-          });
-        }
+    jsonData($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "json_data",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "json_data",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+          }
+        });
       }
     }
   },
@@ -29909,46 +29673,42 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   PersonSecretCondition: {
-    personId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    personId($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    secret: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "sekrit",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "sekrit",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    secret($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "sekrit",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "sekrit",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     }
   },
@@ -30072,67 +29832,61 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ViewTableCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col1($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -30288,88 +30042,80 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   SimilarTable1Condition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col1: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col1",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col1($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col2: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col2",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col2($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col3: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col3",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col3",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col3($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col3",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col3",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -30557,88 +30303,80 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   SimilarTable2Condition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col3: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col3",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col3",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col3($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col3",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col3",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col4: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col4",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col4",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col4($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col4",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col4",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    col5: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "col5",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "col5",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    col5($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col5",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "col5",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -30829,88 +30567,80 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   UpdatableViewCondition: {
-    x: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "x",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "x",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    x($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "x",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "x",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-            }
-          });
-        }
+    name($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
       }
     },
-    description: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    description($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "description",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "description",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     },
-    constant: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "constant",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "constant",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    constant($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "constant",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "constant",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -31060,88 +30790,80 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   NullTestRecordCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    nullableText: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_text",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_text",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    nullableText($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_text",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_text",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     },
-    nullableInt: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_int",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "nullable_int",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    nullableInt($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_int",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_int",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    nonNullText: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "non_null_text",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "non_null_text",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    nonNullText($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "non_null_text",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "non_null_text",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     }
   },
@@ -31349,67 +31071,61 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   EdgeCaseCondition: {
-    notNullHasDefault: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "not_null_has_default",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "not_null_has_default",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-            }
-          });
-        }
+    notNullHasDefault($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "not_null_has_default",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "not_null_has_default",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+          }
+        });
       }
     },
-    wontCastEasy: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "wont_cast_easy",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "wont_cast_easy",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-            }
-          });
-        }
+    wontCastEasy($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "wont_cast_easy",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "wont_cast_easy",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
+          }
+        });
       }
     },
-    rowId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "row_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "row_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    rowId($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "row_id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "row_id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -31521,88 +31237,80 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   LeftArmCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    personId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    personId($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    lengthInMetres: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "length_in_metres",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "length_in_metres",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-            }
-          });
-        }
+    lengthInMetres($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "length_in_metres",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "length_in_metres",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+          }
+        });
       }
     },
-    mood: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "mood",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "mood",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
-        }
+    mood($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "mood",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "mood",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
       }
     }
   },
@@ -31796,46 +31504,42 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   Issue756Condition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    ts: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "ts",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "ts",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
-            }
-          });
-        }
+    ts($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "ts",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "ts",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
+          }
+        });
       }
     }
   },
@@ -31959,235 +31663,213 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   ListCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
-        }
+    id($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     },
-    intArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "int_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "int_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-            }
-          });
-        }
+    intArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "int_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "int_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
+          }
+        });
       }
     },
-    intArrayNn: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "int_array_nn",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "int_array_nn",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-            }
-          });
-        }
+    intArrayNn($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "int_array_nn",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "int_array_nn",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
+          }
+        });
       }
     },
-    enumArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-            }
-          });
-        }
+    enumArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+          }
+        });
       }
     },
-    enumArrayNn: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array_nn",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_array_nn",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-            }
-          });
-        }
+    enumArrayNn($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array_nn",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "enum_array_nn",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+          }
+        });
       }
     },
-    dateArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "date_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "date_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-            }
-          });
-        }
+    dateArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "date_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "date_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
+          }
+        });
       }
     },
-    dateArrayNn: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "date_array_nn",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "date_array_nn",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-            }
-          });
-        }
+    dateArrayNn($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "date_array_nn",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "date_array_nn",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
+          }
+        });
       }
     },
-    timestamptzArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-            }
-          });
-        }
+    timestamptzArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
+          }
+        });
       }
     },
-    timestamptzArrayNn: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz_array_nn",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "timestamptz_array_nn",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-            }
-          });
-        }
+    timestamptzArrayNn($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz_array_nn",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamptz_array_nn",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
+          }
+        });
       }
     },
-    compoundTypeArray: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type_array",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type_array",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-            }
-          });
-        }
+    compoundTypeArray($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type_array",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type_array",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
+          }
+        });
       }
     },
-    compoundTypeArrayNn: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type_array_nn",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "compound_type_array_nn",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-            }
-          });
-        }
+    compoundTypeArrayNn($condition, val) {
+      if (val === null) {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type_array_nn",
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        $condition.where({
+          type: "attribute",
+          attribute: "compound_type_array_nn",
+          callback(expression) {
+            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
+          }
+        });
       }
     }
   },
@@ -35252,10 +34934,8 @@ export const plans = {
     }
   },
   MutationOutInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationOutSetofPayload: {
@@ -35272,10 +34952,8 @@ export const plans = {
     }
   },
   MutationOutSetofInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationOutUnnamedPayload: {
@@ -35292,10 +34970,8 @@ export const plans = {
     }
   },
   MutationOutUnnamedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   NoArgsMutationPayload: {
@@ -35312,10 +34988,8 @@ export const plans = {
     }
   },
   NoArgsMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   ReturnVoidMutationPayload: {
@@ -35329,10 +35003,8 @@ export const plans = {
     }
   },
   ReturnVoidMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationIntervalSetPayload: {
@@ -35349,10 +35021,8 @@ export const plans = {
     }
   },
   MutationIntervalSetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationInOutPayload: {
@@ -35369,12 +35039,9 @@ export const plans = {
     }
   },
   MutationInOutInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    i: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationReturnsTableOneColPayload: {
     __assertStep: ObjectStep,
@@ -35390,12 +35057,9 @@ export const plans = {
     }
   },
   MutationReturnsTableOneColInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    i: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   JsonIdentityMutationPayload: {
     __assertStep: ObjectStep,
@@ -35411,12 +35075,9 @@ export const plans = {
     }
   },
   JsonIdentityMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    json: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   JsonbIdentityMutationPayload: {
     __assertStep: ObjectStep,
@@ -35432,12 +35093,9 @@ export const plans = {
     }
   },
   JsonbIdentityMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    json: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   JsonbIdentityMutationPlpgsqlPayload: {
     __assertStep: ObjectStep,
@@ -35453,12 +35111,9 @@ export const plans = {
     }
   },
   JsonbIdentityMutationPlpgsqlInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    _theJson: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   JsonbIdentityMutationPlpgsqlWithDefaultPayload: {
     __assertStep: ObjectStep,
@@ -35474,12 +35129,9 @@ export const plans = {
     }
   },
   JsonbIdentityMutationPlpgsqlWithDefaultInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    _theJson: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Add1MutationPayload: {
     __assertStep: ObjectStep,
@@ -35495,13 +35147,9 @@ export const plans = {
     }
   },
   Add1MutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Add2MutationPayload: {
     __assertStep: ObjectStep,
@@ -35517,13 +35165,9 @@ export const plans = {
     }
   },
   Add2MutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Add3MutationPayload: {
     __assertStep: ObjectStep,
@@ -35539,13 +35183,9 @@ export const plans = {
     }
   },
   Add3MutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Add4MutationPayload: {
     __assertStep: ObjectStep,
@@ -35561,13 +35201,9 @@ export const plans = {
     }
   },
   Add4MutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    b: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Add4MutationErrorPayload: {
     __assertStep: ObjectStep,
@@ -35583,13 +35219,9 @@ export const plans = {
     }
   },
   Add4MutationErrorInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    b: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Mult1Payload: {
     __assertStep: ObjectStep,
@@ -35605,13 +35237,9 @@ export const plans = {
     }
   },
   Mult1Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Mult2Payload: {
     __assertStep: ObjectStep,
@@ -35627,13 +35255,9 @@ export const plans = {
     }
   },
   Mult2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Mult3Payload: {
     __assertStep: ObjectStep,
@@ -35649,13 +35273,9 @@ export const plans = {
     }
   },
   Mult3Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   Mult4Payload: {
     __assertStep: ObjectStep,
@@ -35671,13 +35291,9 @@ export const plans = {
     }
   },
   Mult4Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    arg0: undefined,
-    arg1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationInInoutPayload: {
     __assertStep: ObjectStep,
@@ -35693,13 +35309,9 @@ export const plans = {
     }
   },
   MutationInInoutInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    i: undefined,
-    ino: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutOutPayload: {
     __assertStep: ObjectStep,
@@ -35724,10 +35336,8 @@ export const plans = {
     }
   },
   MutationOutOutInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationOutOutSetofPayload: {
@@ -35747,10 +35357,8 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   MutationOutOutSetofInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationOutOutUnnamedPayload: {
@@ -35776,10 +35384,8 @@ export const plans = {
     }
   },
   MutationOutOutUnnamedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   IntSetMutationPayload: {
@@ -35796,14 +35402,9 @@ export const plans = {
     }
   },
   IntSetMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    x: undefined,
-    y: undefined,
-    z: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutUnnamedOutOutUnnamedPayload: {
     __assertStep: ObjectStep,
@@ -35828,10 +35429,8 @@ export const plans = {
     }
   },
   MutationOutUnnamedOutOutUnnamedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationReturnsTableMultiColPayload: {
@@ -35851,12 +35450,9 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   MutationReturnsTableMultiColInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    i: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   GuidFnPayload: {
     __assertStep: ObjectStep,
@@ -35877,12 +35473,9 @@ export const plans = {
     parseLiteral: GraphQLString.parseLiteral
   },
   GuidFnInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    g: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationIntervalArrayPayload: {
     __assertStep: ObjectStep,
@@ -35898,10 +35491,8 @@ export const plans = {
     }
   },
   MutationIntervalArrayInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationTextArrayPayload: {
@@ -35918,10 +35509,8 @@ export const plans = {
     }
   },
   MutationTextArrayInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   ListBdeMutationPayload: {
@@ -35938,14 +35527,9 @@ export const plans = {
     }
   },
   ListBdeMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    b: undefined,
-    d: undefined,
-    e: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   AuthenticateFailPayload: {
     __assertStep: ObjectStep,
@@ -35964,10 +35548,8 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   AuthenticateFailInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   AuthenticatePayload: {
@@ -35984,14 +35566,9 @@ export const plans = {
     }
   },
   AuthenticateInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined,
-    c: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   LeftArmIdentityPayload: {
     __assertStep: ObjectStep,
@@ -36036,46 +35613,35 @@ export const plans = {
     }
   },
   LeftArmIdentityInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    leftArm: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   LeftArmBaseInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    lengthInMetres: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      }
+    lengthInMetres(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
     },
-    mood: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      }
+    mood(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("mood", bakedInputRuntime(schema, field.type, val));
     }
   },
   Issue756MutationPayload: {
@@ -36116,10 +35682,8 @@ export const plans = {
     }
   },
   Issue756MutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   Issue756SetMutationPayload: {
@@ -36136,10 +35700,8 @@ export const plans = {
     }
   },
   Issue756SetMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   AuthenticateManyPayload: {
@@ -36156,14 +35718,9 @@ export const plans = {
     }
   },
   AuthenticateManyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined,
-    c: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   AuthenticatePayloadPayload: {
     __assertStep: ObjectStep,
@@ -36198,14 +35755,9 @@ export const plans = {
     }
   },
   AuthenticatePayloadInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined,
-    c: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   TypesMutationPayload: {
     __assertStep: ObjectStep,
@@ -36221,17 +35773,9 @@ export const plans = {
     }
   },
   TypesMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined,
-    c: undefined,
-    d: undefined,
-    e: undefined,
-    f: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutOutCompoundTypePayload: {
     __assertStep: ObjectStep,
@@ -36256,12 +35800,9 @@ export const plans = {
     }
   },
   MutationOutOutCompoundTypeInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    i1: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   CompoundTypeMutationPayload: {
     __assertStep: ObjectStep,
@@ -36277,12 +35818,9 @@ export const plans = {
     }
   },
   CompoundTypeMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    object: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   CompoundTypeSetMutationPayload: {
     __assertStep: ObjectStep,
@@ -36298,12 +35836,9 @@ export const plans = {
     }
   },
   CompoundTypeSetMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    object: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   ListOfCompoundTypesMutationPayload: {
     __assertStep: ObjectStep,
@@ -36319,12 +35854,9 @@ export const plans = {
     }
   },
   ListOfCompoundTypesMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    records: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   TableMutationPayload: {
     __assertStep: ObjectStep,
@@ -36369,12 +35901,9 @@ export const plans = {
     }
   },
   TableMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   PostWithSuffixPayload: {
     __assertStep: ObjectStep,
@@ -36419,63 +35948,47 @@ export const plans = {
     }
   },
   PostWithSuffixInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    post: undefined,
-    suffix: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   PostInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    headline: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      }
+    headline(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("headline", bakedInputRuntime(schema, field.type, val));
     },
-    body: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      }
+    body(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("body", bakedInputRuntime(schema, field.type, val));
     },
-    authorId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      }
+    authorId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("author_id", bakedInputRuntime(schema, field.type, val));
     },
-    enums: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      }
+    enums(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enums", bakedInputRuntime(schema, field.type, val));
     },
-    comptypes: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      }
+    comptypes(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
     }
   },
   MutationCompoundTypeArrayPayload: {
@@ -36492,12 +36005,9 @@ export const plans = {
     }
   },
   MutationCompoundTypeArrayInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    object: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   CompoundTypeArrayMutationPayload: {
     __assertStep: ObjectStep,
@@ -36513,12 +36023,9 @@ export const plans = {
     }
   },
   CompoundTypeArrayMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    object: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   PostManyPayload: {
     __assertStep: ObjectStep,
@@ -36534,12 +36041,9 @@ export const plans = {
     }
   },
   PostManyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    posts: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutComplexPayload: {
     __assertStep: ObjectStep,
@@ -36570,13 +36074,9 @@ export const plans = {
     }
   },
   MutationOutComplexInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutComplexSetofPayload: {
     __assertStep: ObjectStep,
@@ -36607,13 +36107,9 @@ export const plans = {
     }
   },
   MutationOutComplexSetofInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    a: undefined,
-    b: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   MutationOutTablePayload: {
     __assertStep: ObjectStep,
@@ -36653,10 +36149,8 @@ export const plans = {
     }
   },
   MutationOutTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   MutationOutTableSetofPayload: {
@@ -36673,10 +36167,8 @@ export const plans = {
     }
   },
   MutationOutTableSetofInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   TableSetMutationPayload: {
@@ -36693,10 +36185,8 @@ export const plans = {
     }
   },
   TableSetMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   TypeFunctionConnectionMutationPayload: {
@@ -36713,10 +36203,8 @@ export const plans = {
     }
   },
   TypeFunctionConnectionMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   TypeFunctionMutationPayload: {
@@ -36767,12 +36255,9 @@ export const plans = {
     }
   },
   TypeFunctionMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   TypeFunctionListMutationPayload: {
     __assertStep: ObjectStep,
@@ -36788,10 +36273,8 @@ export const plans = {
     }
   },
   TypeFunctionListMutationInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     }
   },
   CreateInputPayload: {
@@ -36832,28 +36315,22 @@ export const plans = {
     }
   },
   CreateInputInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    input: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    input(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   InputInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePatchPayload: {
@@ -36894,28 +36371,22 @@ export const plans = {
     }
   },
   CreatePatchInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PatchInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateReservedPayload: {
@@ -36956,28 +36427,22 @@ export const plans = {
     }
   },
   CreateReservedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    reserved: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reserved(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateReservedPatchRecordPayload: {
@@ -37018,28 +36483,22 @@ export const plans = {
     }
   },
   CreateReservedPatchRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    reservedPatchRecord: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedPatchRecord(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedPatchRecordInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateReservedInputRecordPayload: {
@@ -37080,28 +36539,22 @@ export const plans = {
     }
   },
   CreateReservedInputRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    reservedInputRecord: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedInputRecord(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedInputRecordInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateDefaultValuePayload: {
@@ -37142,36 +36595,28 @@ export const plans = {
     }
   },
   CreateDefaultValueInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    defaultValue: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    defaultValue(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   DefaultValueInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    nullValue: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      }
+    nullValue(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("null_value", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateForeignKeyPayload: {
@@ -37199,44 +36644,34 @@ export const plans = {
     }
   },
   CreateForeignKeyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    foreignKey: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    foreignKey(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ForeignKeyInput: {
     "__baked": createObjectAndApplyChildren,
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    compoundKey1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundKey1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
     },
-    compoundKey2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundKey2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateNoPrimaryKeyPayload: {
@@ -37253,36 +36688,28 @@ export const plans = {
     }
   },
   CreateNoPrimaryKeyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    noPrimaryKey: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    noPrimaryKey(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   NoPrimaryKeyInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    str: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+    str(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("str", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateTestviewPayload: {
@@ -37299,44 +36726,34 @@ export const plans = {
     }
   },
   CreateTestviewInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    testview: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    testview(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   TestviewInput: {
     "__baked": createObjectAndApplyChildren,
-    testviewid: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("testviewid", bakedInputRuntime(schema, field.type, val));
-      }
+    testviewid(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("testviewid", bakedInputRuntime(schema, field.type, val));
     },
-    col1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      }
+    col1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col1", bakedInputRuntime(schema, field.type, val));
     },
-    col2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      }
+    col2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col2", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateMyTablePayload: {
@@ -37377,36 +36794,28 @@ export const plans = {
     }
   },
   CreateMyTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    myTable: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    myTable(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   MyTableInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    jsonData: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+    jsonData(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("json_data", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePersonSecretPayload: {
@@ -37452,36 +36861,28 @@ export const plans = {
     }
   },
   CreatePersonSecretInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    personSecret: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personSecret(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonSecretInput: {
     "__baked": createObjectAndApplyChildren,
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    secret: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+    secret(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateViewTablePayload: {
@@ -37522,44 +36923,34 @@ export const plans = {
     }
   },
   CreateViewTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    viewTable: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    viewTable(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ViewTableInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      }
+    col1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col1", bakedInputRuntime(schema, field.type, val));
     },
-    col2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      }
+    col2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col2", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateCompoundKeyPayload: {
@@ -37610,44 +37001,34 @@ export const plans = {
     }
   },
   CreateCompoundKeyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    compoundKey: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    compoundKey(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   CompoundKeyInput: {
     "__baked": createObjectAndApplyChildren,
-    personId2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+    personId2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
     },
-    personId1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      }
+    personId1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
     },
-    extra: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      }
+    extra(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("extra", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateSimilarTable1Payload: {
@@ -37688,52 +37069,40 @@ export const plans = {
     }
   },
   CreateSimilarTable1Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    similarTable1: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable1(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SimilarTable1Input: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      }
+    col1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col1", bakedInputRuntime(schema, field.type, val));
     },
-    col2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      }
+    col2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col2", bakedInputRuntime(schema, field.type, val));
     },
-    col3: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      }
+    col3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col3", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateSimilarTable2Payload: {
@@ -37774,52 +37143,40 @@ export const plans = {
     }
   },
   CreateSimilarTable2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    similarTable2: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable2(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SimilarTable2Input: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col3: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      }
+    col3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col3", bakedInputRuntime(schema, field.type, val));
     },
-    col4: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      }
+    col4(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col4", bakedInputRuntime(schema, field.type, val));
     },
-    col5: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      }
+    col5(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col5", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateUpdatableViewPayload: {
@@ -37836,52 +37193,40 @@ export const plans = {
     }
   },
   CreateUpdatableViewInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    updatableView: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    updatableView(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdatableViewInput: {
     "__baked": createObjectAndApplyChildren,
-    x: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("x", bakedInputRuntime(schema, field.type, val));
-      }
+    x(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("x", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    description: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("description", bakedInputRuntime(schema, field.type, val));
-      }
+    description(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("description", bakedInputRuntime(schema, field.type, val));
     },
-    constant: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("constant", bakedInputRuntime(schema, field.type, val));
-      }
+    constant(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("constant", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateNullTestRecordPayload: {
@@ -37922,52 +37267,40 @@ export const plans = {
     }
   },
   CreateNullTestRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nullTestRecord: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    nullTestRecord(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   NullTestRecordInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    nullableText: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableText(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
     },
-    nullableInt: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableInt(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
     },
-    nonNullText: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      }
+    nonNullText(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateEdgeCasePayload: {
@@ -37984,44 +37317,34 @@ export const plans = {
     }
   },
   CreateEdgeCaseInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    edgeCase: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    edgeCase(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   EdgeCaseInput: {
     "__baked": createObjectAndApplyChildren,
-    notNullHasDefault: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("not_null_has_default", bakedInputRuntime(schema, field.type, val));
-      }
+    notNullHasDefault(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("not_null_has_default", bakedInputRuntime(schema, field.type, val));
     },
-    wontCastEasy: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("wont_cast_easy", bakedInputRuntime(schema, field.type, val));
-      }
+    wontCastEasy(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("wont_cast_easy", bakedInputRuntime(schema, field.type, val));
     },
-    rowId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("row_id", bakedInputRuntime(schema, field.type, val));
-      }
+    rowId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("row_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateLeftArmPayload: {
@@ -38067,52 +37390,40 @@ export const plans = {
     }
   },
   CreateLeftArmInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    leftArm: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    leftArm(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   LeftArmInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    lengthInMetres: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      }
+    lengthInMetres(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
     },
-    mood: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      }
+    mood(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("mood", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateIssue756Payload: {
@@ -38153,36 +37464,28 @@ export const plans = {
     }
   },
   CreateIssue756Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    issue756: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    issue756(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   Issue756Input: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    ts: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+    ts(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ts", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePostPayload: {
@@ -38228,16 +37531,12 @@ export const plans = {
     }
   },
   CreatePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    post: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    post(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -38279,108 +37578,82 @@ export const plans = {
     }
   },
   CreatePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    person: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    person(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
     },
-    aliases: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      }
+    aliases(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
     },
-    about: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      }
+    about(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("about", bakedInputRuntime(schema, field.type, val));
     },
-    email: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      }
+    email(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("email", bakedInputRuntime(schema, field.type, val));
     },
-    site: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      }
+    site(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("site", bakedInputRuntime(schema, field.type, val));
     },
-    config: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      }
+    config(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("config", bakedInputRuntime(schema, field.type, val));
     },
-    lastLoginFromIp: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      }
+    lastLoginFromIp(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
     },
-    lastLoginFromSubnet: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      }
+    lastLoginFromSubnet(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
     },
-    userMac: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+    userMac(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
     },
-    createdAt: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      }
+    createdAt(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("created_at", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateListPayload: {
@@ -38421,124 +37694,94 @@ export const plans = {
     }
   },
   CreateListInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    list: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    list(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ListInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    intArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      }
+    intArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int_array", bakedInputRuntime(schema, field.type, val));
     },
-    intArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    intArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    enumArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
     },
-    enumArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    dateArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      }
+    dateArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date_array", bakedInputRuntime(schema, field.type, val));
     },
-    dateArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    dateArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptzArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptzArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptzArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptzArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    compoundTypeArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundTypeArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
     },
-    compoundTypeArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundTypeArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateTypePayload: {
@@ -38589,412 +37832,310 @@ export const plans = {
     }
   },
   CreateTypeInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    type: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    type(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   TypeInput: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    smallint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      }
+    smallint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("smallint", bakedInputRuntime(schema, field.type, val));
     },
-    bigint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      }
+    bigint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bigint", bakedInputRuntime(schema, field.type, val));
     },
-    numeric: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      }
+    numeric(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("numeric", bakedInputRuntime(schema, field.type, val));
     },
-    decimal: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      }
+    decimal(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("decimal", bakedInputRuntime(schema, field.type, val));
     },
-    boolean: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      }
+    boolean(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("boolean", bakedInputRuntime(schema, field.type, val));
     },
-    varchar: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+    varchar(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("varchar", bakedInputRuntime(schema, field.type, val));
     },
-    enum: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      }
+    enum(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum", bakedInputRuntime(schema, field.type, val));
     },
-    enumArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
     },
-    domain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      }
+    domain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("domain", bakedInputRuntime(schema, field.type, val));
     },
-    domain2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      }
+    domain2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("domain2", bakedInputRuntime(schema, field.type, val));
     },
-    textArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      }
+    textArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text_array", bakedInputRuntime(schema, field.type, val));
     },
-    json: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      }
+    json(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("json", bakedInputRuntime(schema, field.type, val));
     },
-    jsonb: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      }
+    jsonb(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
     },
-    nullableRange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableRange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
     },
-    numrange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      }
+    numrange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("numrange", bakedInputRuntime(schema, field.type, val));
     },
-    daterange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      }
+    daterange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("daterange", bakedInputRuntime(schema, field.type, val));
     },
-    anIntRange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      }
+    anIntRange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
     },
-    timestamp: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamp(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptz: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptz(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
     },
-    date: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      }
+    date(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date", bakedInputRuntime(schema, field.type, val));
     },
-    time: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      }
+    time(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("time", bakedInputRuntime(schema, field.type, val));
     },
-    timetz: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      }
+    timetz(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timetz", bakedInputRuntime(schema, field.type, val));
     },
-    interval: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      }
+    interval(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("interval", bakedInputRuntime(schema, field.type, val));
     },
-    intervalArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      }
+    intervalArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
     },
-    money: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      }
+    money(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("money", bakedInputRuntime(schema, field.type, val));
     },
-    compoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nestedCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nestedCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nullableCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nullableNestedCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableNestedCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      }
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    nullablePoint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      }
+    nullablePoint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
     },
-    inet: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      }
+    inet(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("inet", bakedInputRuntime(schema, field.type, val));
     },
-    cidr: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      }
+    cidr(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cidr", bakedInputRuntime(schema, field.type, val));
     },
-    macaddr: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      }
+    macaddr(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
     },
-    regproc: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      }
+    regproc(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regproc", bakedInputRuntime(schema, field.type, val));
     },
-    regprocedure: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      }
+    regprocedure(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
     },
-    regoper: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      }
+    regoper(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regoper", bakedInputRuntime(schema, field.type, val));
     },
-    regoperator: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      }
+    regoperator(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
     },
-    regclass: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      }
+    regclass(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regclass", bakedInputRuntime(schema, field.type, val));
     },
-    regtype: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      }
+    regtype(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regtype", bakedInputRuntime(schema, field.type, val));
     },
-    regconfig: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      }
+    regconfig(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
     },
-    regdictionary: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      }
+    regdictionary(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
     },
-    textArrayDomain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      }
+    textArrayDomain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
     },
-    int8ArrayDomain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      }
+    int8ArrayDomain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
     },
-    bytea: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      }
+    bytea(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
     },
-    ltree: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      }
+    ltree(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ltree", bakedInputRuntime(schema, field.type, val));
     },
-    ltreeArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      }
+    ltreeArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateInputPayload: {
@@ -39035,43 +38176,31 @@ export const plans = {
     }
   },
   UpdateInputInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    inputPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    inputPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   InputPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateInputByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    inputPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    inputPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39113,43 +38242,31 @@ export const plans = {
     }
   },
   UpdatePatchInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    patchPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    patchPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PatchPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePatchByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    patchPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    patchPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39191,43 +38308,31 @@ export const plans = {
     }
   },
   UpdateReservedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    reservedPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateReservedByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    reservedPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39269,43 +38374,31 @@ export const plans = {
     }
   },
   UpdateReservedPatchRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    reservedPatchRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedPatchRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedPatchRecordPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateReservedPatchRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    reservedPatchRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedPatchRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39347,43 +38440,31 @@ export const plans = {
     }
   },
   UpdateReservedInputRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    reservedInputRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedInputRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReservedInputRecordPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateReservedInputRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    reservedInputRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    reservedInputRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39425,51 +38506,37 @@ export const plans = {
     }
   },
   UpdateDefaultValueInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    defaultValuePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    defaultValuePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   DefaultValuePatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    nullValue: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      }
+    nullValue(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("null_value", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateDefaultValueByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    defaultValuePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    defaultValuePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39487,37 +38554,28 @@ export const plans = {
     }
   },
   UpdateNoPrimaryKeyByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    noPrimaryKeyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    noPrimaryKeyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   NoPrimaryKeyPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    str: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+    str(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("str", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateMyTablePayload: {
@@ -39558,51 +38616,37 @@ export const plans = {
     }
   },
   UpdateMyTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    myTablePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    myTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   MyTablePatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    jsonData: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+    jsonData(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("json_data", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateMyTableByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    myTablePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    myTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39649,51 +38693,37 @@ export const plans = {
     }
   },
   UpdatePersonSecretInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    personSecretPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personSecretPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonSecretPatch: {
     "__baked": createObjectAndApplyChildren,
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    secret: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+    secret(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePersonSecretByPersonIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    personId: undefined,
-    personSecretPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personSecretPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39735,59 +38765,43 @@ export const plans = {
     }
   },
   UpdateViewTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    viewTablePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    viewTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ViewTablePatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      }
+    col1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col1", bakedInputRuntime(schema, field.type, val));
     },
-    col2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      }
+    col2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col2", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateViewTableByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    viewTablePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    viewTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39839,60 +38853,43 @@ export const plans = {
     }
   },
   UpdateCompoundKeyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    compoundKeyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    compoundKeyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   CompoundKeyPatch: {
     "__baked": createObjectAndApplyChildren,
-    personId2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+    personId2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
     },
-    personId1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      }
+    personId1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
     },
-    extra: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      }
+    extra(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("extra", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateCompoundKeyByPersonId1AndPersonId2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    personId1: undefined,
-    personId2: undefined,
-    compoundKeyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    compoundKeyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -39934,67 +38931,49 @@ export const plans = {
     }
   },
   UpdateSimilarTable1Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    similarTable1Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable1Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SimilarTable1Patch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col1: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      }
+    col1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col1", bakedInputRuntime(schema, field.type, val));
     },
-    col2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      }
+    col2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col2", bakedInputRuntime(schema, field.type, val));
     },
-    col3: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      }
+    col3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col3", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateSimilarTable1ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    similarTable1Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable1Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40036,67 +39015,49 @@ export const plans = {
     }
   },
   UpdateSimilarTable2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    similarTable2Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable2Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SimilarTable2Patch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    col3: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      }
+    col3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col3", bakedInputRuntime(schema, field.type, val));
     },
-    col4: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      }
+    col4(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col4", bakedInputRuntime(schema, field.type, val));
     },
-    col5: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      }
+    col5(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("col5", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateSimilarTable2ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    similarTable2Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    similarTable2Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40138,67 +39099,49 @@ export const plans = {
     }
   },
   UpdateNullTestRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    nullTestRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    nullTestRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   NullTestRecordPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    nullableText: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableText(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
     },
-    nullableInt: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableInt(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
     },
-    nonNullText: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      }
+    nonNullText(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateNullTestRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    nullTestRecordPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    nullTestRecordPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40245,82 +39188,59 @@ export const plans = {
     }
   },
   UpdateLeftArmInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    leftArmPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    leftArmPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   LeftArmPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    lengthInMetres: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      }
+    lengthInMetres(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
     },
-    mood: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      }
+    mood(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("mood", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateLeftArmByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    leftArmPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    leftArmPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateLeftArmByPersonIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    personId: undefined,
-    leftArmPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    leftArmPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40362,51 +39282,37 @@ export const plans = {
     }
   },
   UpdateIssue756Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    issue756Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    issue756Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   Issue756Patch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    ts: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+    ts(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ts", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateIssue756ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    issue756Patch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    issue756Patch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40453,83 +39359,61 @@ export const plans = {
     }
   },
   UpdatePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    postPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    postPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PostPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    headline: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      }
+    headline(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("headline", bakedInputRuntime(schema, field.type, val));
     },
-    body: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      }
+    body(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("body", bakedInputRuntime(schema, field.type, val));
     },
-    authorId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      }
+    authorId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("author_id", bakedInputRuntime(schema, field.type, val));
     },
-    enums: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      }
+    enums(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enums", bakedInputRuntime(schema, field.type, val));
     },
-    comptypes: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      }
+    comptypes(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePostByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    postPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    postPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40571,138 +39455,101 @@ export const plans = {
     }
   },
   UpdatePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    personPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
     },
-    aliases: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      }
+    aliases(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
     },
-    about: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      }
+    about(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("about", bakedInputRuntime(schema, field.type, val));
     },
-    email: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      }
+    email(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("email", bakedInputRuntime(schema, field.type, val));
     },
-    site: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      }
+    site(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("site", bakedInputRuntime(schema, field.type, val));
     },
-    config: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      }
+    config(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("config", bakedInputRuntime(schema, field.type, val));
     },
-    lastLoginFromIp: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      }
+    lastLoginFromIp(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
     },
-    lastLoginFromSubnet: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      }
+    lastLoginFromSubnet(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
     },
-    userMac: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+    userMac(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
     },
-    createdAt: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      }
+    createdAt(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("created_at", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePersonByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    personPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdatePersonByEmailInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    email: undefined,
-    personPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40744,139 +39591,103 @@ export const plans = {
     }
   },
   UpdateListInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    listPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    listPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ListPatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    intArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      }
+    intArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int_array", bakedInputRuntime(schema, field.type, val));
     },
-    intArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    intArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    enumArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
     },
-    enumArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    dateArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      }
+    dateArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date_array", bakedInputRuntime(schema, field.type, val));
     },
-    dateArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    dateArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptzArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptzArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptzArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptzArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    compoundTypeArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundTypeArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
     },
-    compoundTypeArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundTypeArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArrayNn: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArrayNn(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateListByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    listPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    listPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -40928,427 +39739,319 @@ export const plans = {
     }
   },
   UpdateTypeInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    typePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    typePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   TypePatch: {
     "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    smallint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      }
+    smallint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("smallint", bakedInputRuntime(schema, field.type, val));
     },
-    bigint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      }
+    bigint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bigint", bakedInputRuntime(schema, field.type, val));
     },
-    numeric: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      }
+    numeric(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("numeric", bakedInputRuntime(schema, field.type, val));
     },
-    decimal: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      }
+    decimal(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("decimal", bakedInputRuntime(schema, field.type, val));
     },
-    boolean: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      }
+    boolean(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("boolean", bakedInputRuntime(schema, field.type, val));
     },
-    varchar: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+    varchar(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("varchar", bakedInputRuntime(schema, field.type, val));
     },
-    enum: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      }
+    enum(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum", bakedInputRuntime(schema, field.type, val));
     },
-    enumArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      }
+    enumArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
     },
-    domain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      }
+    domain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("domain", bakedInputRuntime(schema, field.type, val));
     },
-    domain2: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      }
+    domain2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("domain2", bakedInputRuntime(schema, field.type, val));
     },
-    textArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      }
+    textArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text_array", bakedInputRuntime(schema, field.type, val));
     },
-    json: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      }
+    json(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("json", bakedInputRuntime(schema, field.type, val));
     },
-    jsonb: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      }
+    jsonb(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
     },
-    nullableRange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableRange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
     },
-    numrange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      }
+    numrange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("numrange", bakedInputRuntime(schema, field.type, val));
     },
-    daterange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      }
+    daterange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("daterange", bakedInputRuntime(schema, field.type, val));
     },
-    anIntRange: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      }
+    anIntRange(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
     },
-    timestamp: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamp(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
     },
-    timestamptz: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      }
+    timestamptz(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
     },
-    date: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      }
+    date(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("date", bakedInputRuntime(schema, field.type, val));
     },
-    time: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      }
+    time(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("time", bakedInputRuntime(schema, field.type, val));
     },
-    timetz: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      }
+    timetz(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("timetz", bakedInputRuntime(schema, field.type, val));
     },
-    interval: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      }
+    interval(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("interval", bakedInputRuntime(schema, field.type, val));
     },
-    intervalArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      }
+    intervalArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
     },
-    money: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      }
+    money(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("money", bakedInputRuntime(schema, field.type, val));
     },
-    compoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    compoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nestedCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nestedCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nullableCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    nullableNestedCompoundType: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      }
+    nullableNestedCompoundType(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      }
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    nullablePoint: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      }
+    nullablePoint(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
     },
-    inet: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      }
+    inet(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("inet", bakedInputRuntime(schema, field.type, val));
     },
-    cidr: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      }
+    cidr(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cidr", bakedInputRuntime(schema, field.type, val));
     },
-    macaddr: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      }
+    macaddr(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
     },
-    regproc: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      }
+    regproc(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regproc", bakedInputRuntime(schema, field.type, val));
     },
-    regprocedure: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      }
+    regprocedure(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
     },
-    regoper: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      }
+    regoper(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regoper", bakedInputRuntime(schema, field.type, val));
     },
-    regoperator: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      }
+    regoperator(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
     },
-    regclass: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      }
+    regclass(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regclass", bakedInputRuntime(schema, field.type, val));
     },
-    regtype: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      }
+    regtype(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regtype", bakedInputRuntime(schema, field.type, val));
     },
-    regconfig: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      }
+    regconfig(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
     },
-    regdictionary: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      }
+    regdictionary(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
     },
-    textArrayDomain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      }
+    textArrayDomain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
     },
-    int8ArrayDomain: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      }
+    int8ArrayDomain(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
     },
-    bytea: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      }
+    bytea(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea", bakedInputRuntime(schema, field.type, val));
     },
-    byteaArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      }
+    byteaArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
     },
-    ltree: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      }
+    ltree(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ltree", bakedInputRuntime(schema, field.type, val));
     },
-    ltreeArray: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      }
+    ltreeArray(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateTypeByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    typePatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    typePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -41395,20 +40098,14 @@ export const plans = {
     }
   },
   DeleteInputInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteInputByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePatchPayload: {
     __assertStep: ObjectStep,
@@ -41453,20 +40150,14 @@ export const plans = {
     }
   },
   DeletePatchInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePatchByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedPayload: {
     __assertStep: ObjectStep,
@@ -41511,20 +40202,14 @@ export const plans = {
     }
   },
   DeleteReservedInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedPatchRecordPayload: {
     __assertStep: ObjectStep,
@@ -41569,20 +40254,14 @@ export const plans = {
     }
   },
   DeleteReservedPatchRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedPatchRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedInputRecordPayload: {
     __assertStep: ObjectStep,
@@ -41627,20 +40306,14 @@ export const plans = {
     }
   },
   DeleteReservedInputRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReservedInputRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteDefaultValuePayload: {
     __assertStep: ObjectStep,
@@ -41685,20 +40358,14 @@ export const plans = {
     }
   },
   DeleteDefaultValueInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteDefaultValueByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteNoPrimaryKeyPayload: {
     __assertStep: ObjectStep,
@@ -41714,12 +40381,9 @@ export const plans = {
     }
   },
   DeleteNoPrimaryKeyByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteMyTablePayload: {
     __assertStep: ObjectStep,
@@ -41764,20 +40428,14 @@ export const plans = {
     }
   },
   DeleteMyTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteMyTableByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonSecretPayload: {
     __assertStep: ObjectStep,
@@ -41827,20 +40485,14 @@ export const plans = {
     }
   },
   DeletePersonSecretInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonSecretByPersonIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    personId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteViewTablePayload: {
     __assertStep: ObjectStep,
@@ -41885,20 +40537,14 @@ export const plans = {
     }
   },
   DeleteViewTableInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteViewTableByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteCompoundKeyPayload: {
     __assertStep: ObjectStep,
@@ -41953,21 +40599,14 @@ export const plans = {
     }
   },
   DeleteCompoundKeyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteCompoundKeyByPersonId1AndPersonId2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    personId1: undefined,
-    personId2: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSimilarTable1Payload: {
     __assertStep: ObjectStep,
@@ -42012,20 +40651,14 @@ export const plans = {
     }
   },
   DeleteSimilarTable1Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSimilarTable1ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSimilarTable2Payload: {
     __assertStep: ObjectStep,
@@ -42070,20 +40703,14 @@ export const plans = {
     }
   },
   DeleteSimilarTable2Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSimilarTable2ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteNullTestRecordPayload: {
     __assertStep: ObjectStep,
@@ -42128,20 +40755,14 @@ export const plans = {
     }
   },
   DeleteNullTestRecordInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteNullTestRecordByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLeftArmPayload: {
     __assertStep: ObjectStep,
@@ -42191,28 +40812,19 @@ export const plans = {
     }
   },
   DeleteLeftArmInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLeftArmByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLeftArmByPersonIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    personId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteIssue756Payload: {
     __assertStep: ObjectStep,
@@ -42257,20 +40869,14 @@ export const plans = {
     }
   },
   DeleteIssue756Input: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteIssue756ByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePostPayload: {
     __assertStep: ObjectStep,
@@ -42320,20 +40926,14 @@ export const plans = {
     }
   },
   DeletePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePostByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonPayload: {
     __assertStep: ObjectStep,
@@ -42378,28 +40978,19 @@ export const plans = {
     }
   },
   DeletePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonByEmailInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    email: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteListPayload: {
     __assertStep: ObjectStep,
@@ -42444,20 +41035,14 @@ export const plans = {
     }
   },
   DeleteListInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteListByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteTypePayload: {
     __assertStep: ObjectStep,
@@ -42512,20 +41097,14 @@ export const plans = {
     }
   },
   DeleteTypeInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteTypeByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({
