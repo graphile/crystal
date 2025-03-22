@@ -264,7 +264,22 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
   // convert `plan: function plan() {...}` to `plan() { ... }`
   // convert `fn(...["a", "b"])` to `fn("a", "b")`
+  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
+    IfStatement(path) {
+      const t = path.node.test;
+      if (
+        (t.type === "Identifier" && t.name === "undefined") ||
+        t.type === "NullLiteral" ||
+        (t.type === "BooleanLiteral" && t.value === false)
+      ) {
+        if (path.node.alternate) {
+          path.replaceWith(path.node.alternate);
+        } else {
+          path.remove();
+        }
+      }
+    },
     ObjectProperty(path) {
       if (!t.isIdentifier(path.node.key)) {
         return;
