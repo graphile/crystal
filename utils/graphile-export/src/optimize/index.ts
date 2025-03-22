@@ -43,6 +43,16 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   // Reset the full AST
   ast = parse(generate(ast).code, { sourceType: "module" });
   traverse(ast, {
+    SpreadElement: {
+      enter(path) {
+        if (
+          path.node.argument.type === "NullLiteral" &&
+          path.parentPath.isObjectExpression()
+        ) {
+          path.remove();
+        }
+      },
+    },
     VariableDeclaration: {
       enter(path) {
         const node = path.node;
