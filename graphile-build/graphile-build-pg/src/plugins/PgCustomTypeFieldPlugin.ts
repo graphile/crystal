@@ -58,6 +58,12 @@ import { EXPORTABLE } from "graphile-build";
 import { exportNameHint, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
+const EMPTY_ARRAY = Object.freeze([]);
+const makeEmptyArray = EXPORTABLE(
+  (EMPTY_ARRAY) => () => EMPTY_ARRAY,
+  [EMPTY_ARRAY],
+);
+
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
 const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
@@ -94,13 +100,16 @@ declare global {
             description?: string;
           };
         };
-        makeArgs(args: FieldArgs, path?: string[]): PgSelectArgumentSpec[];
+        makeArgs(
+          args: FieldArgs,
+          path?: string[],
+        ): readonly PgSelectArgumentSpec[];
         makeArgsRuntime(
           schema: GraphQLSchema,
           /** Suitable for input object fields, or arguments */
           fieldsOrArgs: Record<string, { type: GraphQLInputType }>,
           input: Record<string, any>,
-        ): PgSelectArgumentRuntimeValue[];
+        ): readonly PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
@@ -548,46 +557,55 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 },
               );
 
-            const argDetailsSimple = argDetails.map(
-              ({
-                graphqlArgName,
-                pgCodec,
-                required,
-                postgresArgName,
-                fetcher,
-              }) => ({
-                graphqlArgName,
-                postgresArgName,
-                pgCodec,
-                required,
-                fetcher,
-              }),
-            );
+            const argDetailsSimple =
+              argDetails.length === 0
+                ? EMPTY_ARRAY
+                : argDetails.map(
+                    ({
+                      graphqlArgName,
+                      pgCodec,
+                      required,
+                      postgresArgName,
+                      fetcher,
+                    }) => ({
+                      graphqlArgName,
+                      postgresArgName,
+                      pgCodec,
+                      required,
+                      fetcher,
+                    }),
+                  );
             exportNameHint(
               argDetailsSimple,
               `argDetailsSimple_${resource.name}`,
             );
 
-            const makeArgs = EXPORTABLE(
-              (argDetailsSimple, makeArg) =>
-                (args: FieldArgs, path: string[] = []) =>
-                  argDetailsSimple.map((details) =>
-                    makeArg(path, args, details),
-                  ),
-              [argDetailsSimple, makeArg],
-            );
-            const makeArgsRuntime = EXPORTABLE(
-              (argDetailsSimple, makeArgRuntime) =>
-                (
-                  schema: GraphQLSchema,
-                  fields: Record<string, { type: GraphQLInputType }>,
-                  input: Record<string, any>,
-                ) =>
-                  argDetailsSimple.map((details) =>
-                    makeArgRuntime(schema, fields, input, details),
-                  ),
-              [argDetailsSimple, makeArgRuntime],
-            );
+            const makeArgs =
+              argDetailsSimple.length === 0
+                ? makeEmptyArray
+                : EXPORTABLE(
+                    (argDetailsSimple, makeArg) =>
+                      (args: FieldArgs, path: string[] = []) =>
+                        argDetailsSimple.map((details) =>
+                          makeArg(path, args, details),
+                        ) as ReadonlyArray<ReturnType<typeof makeArg>>,
+                    [argDetailsSimple, makeArg],
+                  );
+            const makeArgsRuntime =
+              argDetailsSimple.length === 0
+                ? makeEmptyArray
+                : EXPORTABLE(
+                    (argDetailsSimple, makeArgRuntime) =>
+                      (
+                        schema: GraphQLSchema,
+                        fields: Record<string, { type: GraphQLInputType }>,
+                        input: Record<string, any>,
+                      ) =>
+                        argDetailsSimple.map((details) =>
+                          makeArgRuntime(schema, fields, input, details),
+                        ) as ReadonlyArray<ReturnType<typeof makeArgRuntime>>,
+                    [argDetailsSimple, makeArgRuntime],
+                  );
 
             exportNameHint(makeArgs, `makeArgs_${resource.name}`);
 
@@ -896,22 +914,22 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
   ) => {
     function pgFunctionArgumentsFromArgs(
       $in: Step,
-      extraSelectArgs: PgSelectArgumentSpec[],
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
     ): {
       $row: PgSelectSingleStep;
-      selectArgs: PgSelectArgumentSpec[];
+      selectArgs: readonly PgSelectArgumentSpec[];
     };
     function pgFunctionArgumentsFromArgs(
       $in: Step,
-      extraSelectArgs: PgSelectArgumentSpec[],
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
       inlining: true,
     ): {
       $row: PgSelectSingleStep;
-      selectArgs: (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
+      selectArgs: readonly (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
     };
     function pgFunctionArgumentsFromArgs(
       $in: Step,
-      extraSelectArgs: PgSelectArgumentSpec[],
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
       inlining = false,
     ) {
       if (!hasRecord($in)) {
@@ -952,9 +970,17 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
             }
           },
         );
-        return { $row, selectArgs: newSelectArgs };
+        return {
+          $row,
+          selectArgs: newSelectArgs as ReadonlyArray<
+            (typeof newSelectArgs)[number]
+          >,
+        };
       } else {
-        return { $row, selectArgs };
+        return {
+          $row,
+          selectArgs: selectArgs as ReadonlyArray<(typeof selectArgs)[number]>,
+        };
       }
     }
     return pgFunctionArgumentsFromArgs;
