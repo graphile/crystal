@@ -24897,1233 +24897,701 @@ export const plans = {
     }
   },
   TypesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            typesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            typesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    SMALLINT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "smallint",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    SMALLINT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "smallint",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BIGINT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "bigint",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BIGINT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "bigint",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NUMERIC_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "numeric",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NUMERIC_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "numeric",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DECIMAL_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "decimal",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DECIMAL_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "decimal",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BOOLEAN_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "boolean",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BOOLEAN_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "boolean",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    VARCHAR_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "varchar",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    VARCHAR_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "varchar",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    ENUM_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "enum",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    ENUM_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "enum",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DOMAIN_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "domain",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DOMAIN_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "domain",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DOMAIN2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "domain2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DOMAIN2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "domain2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    JSON_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "json",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    JSON_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "json",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    JSONB_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "jsonb",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    JSONB_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "jsonb",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMESTAMP_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timestamp",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMESTAMP_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timestamp",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMESTAMPTZ_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timestamptz",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMESTAMPTZ_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timestamptz",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DATE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "date",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    DATE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "date",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "time",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "time",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMETZ_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timetz",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TIMETZ_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "timetz",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    INTERVAL_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "interval",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    INTERVAL_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "interval",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MONEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "money",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MONEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "money",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COMPOUND_TYPE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_type",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COMPOUND_TYPE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_type",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NESTED_COMPOUND_TYPE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nested_compound_type",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NESTED_COMPOUND_TYPE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nested_compound_type",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_COMPOUND_TYPE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_compound_type",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_COMPOUND_TYPE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_compound_type",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_NESTED_COMPOUND_TYPE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_nested_compound_type",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_NESTED_COMPOUND_TYPE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_nested_compound_type",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    POINT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "point",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    POINT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "point",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_POINT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullablePoint",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULLABLE_POINT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullablePoint",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    INET_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "inet",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    INET_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "inet",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CIDR_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "cidr",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CIDR_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "cidr",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MACADDR_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "macaddr",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MACADDR_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "macaddr",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGPROC_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regproc",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGPROC_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regproc",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGPROCEDURE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regprocedure",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGPROCEDURE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regprocedure",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGOPER_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regoper",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGOPER_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regoper",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGOPERATOR_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regoperator",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGOPERATOR_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regoperator",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGCLASS_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regclass",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGCLASS_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regclass",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGTYPE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regtype",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGTYPE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regtype",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGCONFIG_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regconfig",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGCONFIG_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regconfig",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGDICTIONARY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regdictionary",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    REGDICTIONARY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "regdictionary",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LTREE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "ltree",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LTREE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "ltree",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      typesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      typesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
+      }
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
+      }
+    },
+    SMALLINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "smallint",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    SMALLINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "smallint",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    BIGINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "bigint",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    BIGINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "bigint",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NUMERIC_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "numeric",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NUMERIC_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "numeric",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DECIMAL_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "decimal",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DECIMAL_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "decimal",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    BOOLEAN_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "boolean",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    BOOLEAN_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "boolean",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    VARCHAR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "varchar",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    VARCHAR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "varchar",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    ENUM_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    ENUM_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DOMAIN_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "domain",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DOMAIN_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "domain",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DOMAIN2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "domain2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DOMAIN2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "domain2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    JSON_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    JSON_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    JSONB_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "jsonb",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    JSONB_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "jsonb",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMESTAMP_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timestamp",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMESTAMP_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timestamp",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMESTAMPTZ_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timestamptz",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMESTAMPTZ_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timestamptz",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DATE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "date",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    DATE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "date",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "time",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "time",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMETZ_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timetz",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    TIMETZ_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "timetz",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    INTERVAL_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "interval",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    INTERVAL_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "interval",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    MONEY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "money",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    MONEY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "money",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    COMPOUND_TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_type",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    COMPOUND_TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_type",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nested_compound_type",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nested_compound_type",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_COMPOUND_TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_compound_type",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_COMPOUND_TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_compound_type",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_nested_compound_type",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_nested_compound_type",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    POINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    POINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_POINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullablePoint",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NULLABLE_POINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullablePoint",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    INET_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "inet",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    INET_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "inet",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    CIDR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cidr",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    CIDR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cidr",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    MACADDR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "macaddr",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    MACADDR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "macaddr",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGPROC_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regproc",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGPROC_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regproc",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGPROCEDURE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regprocedure",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGPROCEDURE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regprocedure",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGOPER_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regoper",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGOPER_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regoper",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGOPERATOR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regoperator",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGOPERATOR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regoperator",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGCLASS_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regclass",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGCLASS_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regclass",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGTYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regtype",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGTYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regtype",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGCONFIG_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regconfig",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGCONFIG_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regconfig",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGDICTIONARY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regdictionary",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    REGDICTIONARY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "regdictionary",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    LTREE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ltree",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    LTREE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ltree",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   PeopleConnection: {
@@ -26136,455 +25604,273 @@ export const plans = {
     __assertStep: assertEdgeCapableStep
   },
   PeopleOrderBy: {
-    COMPUTED_OUT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_person_computed_outPgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_person_computed_outPgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_person_computed_outPgResource.codec,
-              fragment: expression,
-              direction: "asc".toUpperCase()
-            });
-          }
-        }
+    COMPUTED_OUT_ASC(queryBuilder) {
+      if (typeof resource_person_computed_outPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_person_computed_outPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_person_computed_outPgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
+      });
+    },
+    COMPUTED_OUT_DESC(queryBuilder) {
+      if (typeof resource_person_computed_outPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_person_computed_outPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_person_computed_outPgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
+      });
+    },
+    FIRST_NAME_ASC(queryBuilder) {
+      if (typeof resource_person_first_namePgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_person_first_namePgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_person_first_namePgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
+      });
+    },
+    FIRST_NAME_DESC(queryBuilder) {
+      if (typeof resource_person_first_namePgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_person_first_namePgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_person_first_namePgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
+      });
+    },
+    PRIMARY_KEY_ASC(queryBuilder) {
+      personUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      personUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    COMPUTED_OUT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_person_computed_outPgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_person_computed_outPgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_person_computed_outPgResource.codec,
-              fragment: expression,
-              direction: "desc".toUpperCase()
-            });
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    FIRST_NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_person_first_namePgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_person_first_namePgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_person_first_namePgResource.codec,
-              fragment: expression,
-              direction: "asc".toUpperCase()
-            });
-          }
-        }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_full_name",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_full_name",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    ABOUT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "about",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    ABOUT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "about",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    EMAIL_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "email",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    FIRST_NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_person_first_namePgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_person_first_namePgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_person_first_namePgResource.codec,
-              fragment: expression,
-              direction: "desc".toUpperCase()
-            });
-          }
-        }
+    EMAIL_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "email",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            personUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    SITE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "site",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            personUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    SITE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "site",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CONFIG_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "config",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CONFIG_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "config",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_full_name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_login_from_ip",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_full_name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_login_from_ip",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ABOUT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "about",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_login_from_subnet",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ABOUT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "about",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_login_from_subnet",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    EMAIL_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "email",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    USER_MAC_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "user_mac",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    EMAIL_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "email",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    USER_MAC_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "user_mac",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    SITE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "site",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    SITE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "site",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CONFIG_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "config",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CONFIG_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "config",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LAST_LOGIN_FROM_IP_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "last_login_from_ip",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LAST_LOGIN_FROM_IP_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "last_login_from_ip",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LAST_LOGIN_FROM_SUBNET_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "last_login_from_subnet",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    LAST_LOGIN_FROM_SUBNET_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "last_login_from_subnet",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    USER_MAC_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "user_mac",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    USER_MAC_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "user_mac",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "created_at",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "created_at",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   WrappedUrl: {
@@ -26725,217 +26011,133 @@ export const plans = {
     }
   },
   PostsOrderBy: {
-    COMPUTED_WITH_OPTIONAL_ARG_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_post_computed_with_optional_argPgResource.codec,
-              fragment: expression,
-              direction: "asc".toUpperCase()
-            });
-          }
-        }
+    COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
+      if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_post_computed_with_optional_argPgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
+      });
+    },
+    COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
+      if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_post_computed_with_optional_argPgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
+      });
+    },
+    PRIMARY_KEY_ASC(queryBuilder) {
+      postUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      postUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    COMPUTED_WITH_OPTIONAL_ARG_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-              throw new Error("Invalid computed attribute 'from'");
-            }
-            const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-              placeholder: queryBuilder.alias
-            })}`;
-            queryBuilder.orderBy({
-              codec: resource_post_computed_with_optional_argPgResource.codec,
-              fragment: expression,
-              direction: "desc".toUpperCase()
-            });
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            postUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    HEADLINE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "headline",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            postUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    HEADLINE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "headline",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BODY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "body",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BODY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "body",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    HEADLINE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "headline",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    HEADLINE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "headline",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BODY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "body",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    BODY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "body",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "author_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "author_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   ForeignKeysConnection: {
@@ -27000,101 +26202,59 @@ export const plans = {
     }
   },
   ForeignKeysOrderBy: {
-    PERSON_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PERSON_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COMPOUND_KEY_1_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_key_1",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COMPOUND_KEY_1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_key_1",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COMPOUND_KEY_1_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_key_1",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COMPOUND_KEY_1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_key_1",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COMPOUND_KEY_2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_key_2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COMPOUND_KEY_2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_key_2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COMPOUND_KEY_2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "compound_key_2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COMPOUND_KEY_2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "compound_key_2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   PersonSecret: {
@@ -27172,145 +26332,89 @@ export const plans = {
     }
   },
   CompoundKeysOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            compound_keyUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      compound_keyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      compound_keyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    PERSON_ID_2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+    },
+    PERSON_ID_1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_1",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            compound_keyUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PERSON_ID_1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_1",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PERSON_ID_2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id_2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    EXTRA_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "extra",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PERSON_ID_2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id_2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    PERSON_ID_1_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id_1",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    PERSON_ID_1_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id_1",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    EXTRA_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "extra",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    EXTRA_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "extra",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    EXTRA_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "extra",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   MyTable: {
@@ -27747,37 +26851,23 @@ export const plans = {
     }
   },
   NonUpdatableViewsOrderBy: {
-    COLUMN_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "?column?",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COLUMN_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "?column?",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COLUMN_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "?column?",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COLUMN_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "?column?",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   InputsConnection: {
@@ -27801,80 +26891,52 @@ export const plans = {
     }
   },
   InputsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            inputsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      inputsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      inputsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            inputsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -27899,80 +26961,52 @@ export const plans = {
     }
   },
   PatchesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            patchsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      patchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      patchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            patchsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -27997,80 +27031,52 @@ export const plans = {
     }
   },
   ReservedsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reservedUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      reservedUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      reservedUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reservedUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -28095,80 +27101,52 @@ export const plans = {
     }
   },
   ReservedPatchRecordsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reservedPatchsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      reservedPatchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      reservedPatchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reservedPatchsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -28193,80 +27171,52 @@ export const plans = {
     }
   },
   ReservedInputRecordsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reserved_inputUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      reserved_inputUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      reserved_inputUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            reserved_inputUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -28300,113 +27250,71 @@ export const plans = {
     }
   },
   DefaultValuesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            default_valueUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      default_valueUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      default_valueUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            default_valueUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NULL_VALUE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "null_value",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    NULL_VALUE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "null_value",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NULL_VALUE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "null_value",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NULL_VALUE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "null_value",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   NoPrimaryKeysConnection: {
@@ -28439,75 +27347,47 @@ export const plans = {
     }
   },
   NoPrimaryKeysOrderBy: {
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    STR_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "str",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    STR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "str",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    STR_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "str",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    STR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "str",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   TestviewsConnection: {
@@ -28552,101 +27432,59 @@ export const plans = {
     }
   },
   TestviewsOrderBy: {
-    TESTVIEWID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "testviewid",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    TESTVIEWID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "testviewid",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    TESTVIEWID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "testviewid",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    TESTVIEWID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "testviewid",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   MyTablesConnection: {
@@ -28679,113 +27517,71 @@ export const plans = {
     }
   },
   MyTablesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            my_tableUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      my_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      my_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            my_tableUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    JSON_DATA_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json_data",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    JSON_DATA_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "json_data",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    JSON_DATA_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "json_data",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    JSON_DATA_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json_data",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   PersonSecretsConnection: {
@@ -28818,113 +27614,71 @@ export const plans = {
     }
   },
   PersonSecretsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            person_secretUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            person_secretUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PERSON_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    SECRET_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "sekrit",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PERSON_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    SECRET_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "sekrit",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    SECRET_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "sekrit",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    SECRET_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "sekrit",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   ViewTablesConnection: {
@@ -28966,145 +27720,89 @@ export const plans = {
     }
   },
   ViewTablesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            view_tableUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      view_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      view_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            view_tableUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   SimilarTable1SConnection: {
@@ -29155,177 +27853,107 @@ export const plans = {
     }
   },
   SimilarTable1SOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            similar_table_1Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      similar_table_1Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      similar_table_1Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            similar_table_1Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col1",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL1_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col1",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col2",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL2_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL3_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col3",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL2_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col2",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL3_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col3",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL3_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col3",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL3_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col3",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   SimilarTable2SConnection: {
@@ -29376,177 +28004,107 @@ export const plans = {
     }
   },
   SimilarTable2SOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            similar_table_2Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      similar_table_2Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      similar_table_2Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            similar_table_2Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL3_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col3",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    COL3_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col3",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL3_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col3",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL4_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col4",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL3_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col3",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL4_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col4",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL4_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col4",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL5_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col5",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    COL4_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col4",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL5_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col5",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    COL5_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "col5",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    COL5_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "col5",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   UpdatableViewsConnection: {
@@ -29600,139 +28158,83 @@ export const plans = {
     }
   },
   UpdatableViewsOrderBy: {
-    X_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "x",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    X_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "x",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    X_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "x",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    X_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "x",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    DESCRIPTION_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "description",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    DESCRIPTION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    DESCRIPTION_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "description",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    DESCRIPTION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    CONSTANT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "constant",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    CONSTANT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "constant",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    CONSTANT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "constant",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    CONSTANT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "constant",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   NullTestRecordsConnection: {
@@ -29783,177 +28285,107 @@ export const plans = {
     }
   },
   NullTestRecordsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            null_test_recordUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      null_test_recordUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      null_test_recordUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            null_test_recordUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NULLABLE_TEXT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_text",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NULLABLE_TEXT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_text",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NULLABLE_TEXT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_text",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NULLABLE_INT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_int",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NULLABLE_TEXT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_text",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NULLABLE_INT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_int",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NULLABLE_INT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_int",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NON_NULL_TEXT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "non_null_text",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NULLABLE_INT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "nullable_int",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NON_NULL_TEXT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "non_null_text",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    NON_NULL_TEXT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "non_null_text",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NON_NULL_TEXT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "non_null_text",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   EdgeCasesConnection: {
@@ -30015,101 +28447,59 @@ export const plans = {
     }
   },
   EdgeCasesOrderBy: {
-    NOT_NULL_HAS_DEFAULT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "not_null_has_default",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "not_null_has_default",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    NOT_NULL_HAS_DEFAULT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "not_null_has_default",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "not_null_has_default",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    WONT_CAST_EASY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "wont_cast_easy",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    WONT_CAST_EASY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "wont_cast_easy",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    WONT_CAST_EASY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "wont_cast_easy",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    WONT_CAST_EASY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "wont_cast_easy",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ROW_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "row_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    ROW_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "row_id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ROW_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "row_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    ROW_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "row_id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   LeftArmsConnection: {
@@ -30160,183 +28550,113 @@ export const plans = {
     }
   },
   LeftArmsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            left_armUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            left_armUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PERSON_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LENGTH_IN_METRES_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "length_in_metres",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    PERSON_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "person_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LENGTH_IN_METRES_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "length_in_metres",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    LENGTH_IN_METRES_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "length_in_metres",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    MOOD_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "mood",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    LENGTH_IN_METRES_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "length_in_metres",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MOOD_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "mood",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    MOOD_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "mood",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    MOOD_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "mood",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   Issue756SConnection: {
@@ -30369,113 +28689,71 @@ export const plans = {
     }
   },
   Issue756SOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            issue756Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      issue756Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      issue756Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            issue756Uniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    TS_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ts",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    TS_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "ts",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
-    },
-    TS_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "ts",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-          }
-        }
-      }
+    TS_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ts",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
     }
   },
   ListsConnection: {
@@ -30589,80 +28867,52 @@ export const plans = {
     }
   },
   ListsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            listsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      listsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      listsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            listsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
-    },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
-    },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC",
+        ...(undefined != null ? {
+          nulls: undefined ? "LAST" : "FIRST"
+        } : null)
+      });
+      if (true) {
+        queryBuilder.setOrderIsUnique();
       }
     }
   },
