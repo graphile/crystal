@@ -1344,7 +1344,6 @@ function modFields(
                                 info,
                               ) as PgSelectStep;
                               return connection($select, {
-                                // nodePlan: ($item) => $item,
                                 cursorPlan: ($item: any) =>
                                   $item.getParentStep
                                     ? $item.getParentStep().cursor()
