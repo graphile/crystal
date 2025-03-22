@@ -1731,7 +1731,7 @@ function exportSchemaTypeDefs({
       if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            t.stringLiteral("__baked"),
+            t.identifier("__baked"),
             convertToIdentifierViaAST(
               file,
               type.extensions?.grafast.baked,
