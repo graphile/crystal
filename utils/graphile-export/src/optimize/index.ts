@@ -378,10 +378,27 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
       return true;
     case "BooleanLiteral":
       return !test.value;
+    case "BinaryExpression": {
+      switch (test.operator) {
+        case "!=": {
+          if (
+            expressionIsNullOrUndefined(test.left) &&
+            expressionIsNullOrUndefined(test.right)
+          ) {
+            return true;
+          }
+          return false;
+        }
+        default: {
+          return false;
+        }
+      }
+    }
     default:
       return false;
   }
 }
+
 function expressionIsAlwaysTruthy(test: t.Expression) {
   switch (test.type) {
     case "BooleanLiteral":
@@ -389,4 +406,10 @@ function expressionIsAlwaysTruthy(test: t.Expression) {
     default:
       return false;
   }
+}
+function expressionIsNullOrUndefined(expr: t.Expression | t.PrivateName) {
+  return (
+    expr.type === "NullLiteral" ||
+    (expr.type === "Identifier" && expr.name === "undefined")
+  );
 }
