@@ -178,6 +178,10 @@ function processAttribute(
       // See if there's a resource to pull record types from (e.g. for relations/etc)
       if (!baseCodec.attributes) {
         // Simply get the value
+        if (attributeName === attributeFieldName) {
+          // Use default getter
+          return undefined;
+        }
         return EXPORTABLE(
           (attributeName) => ($record: PgSelectSingleStep) => {
             return $record.get(attributeName);
@@ -623,24 +627,17 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                                 $condition: PgCondition<PgSelectQueryBuilder>,
                                 val: unknown,
                               ) {
-                                if (val === null) {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} is null`,
-                                  });
-                                } else {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} = ${sqlValueWithCodec(
-                                        val,
-                                        attributeCodec,
-                                      )}`,
-                                  });
-                                }
+                                $condition.where({
+                                  type: "attribute",
+                                  attribute: attributeName,
+                                  callback: (expression) =>
+                                    val === null
+                                      ? sql`${expression} is null`
+                                      : sql`${expression} = ${sqlValueWithCodec(
+                                          val,
+                                          attributeCodec,
+                                        )}`,
+                                });
                               },
                             [
                               attributeCodec,

@@ -1,16 +1,16 @@
 import { expect } from "chai";
 import { resolvePreset } from "graphile-config";
-import { ExecutionResult, parse } from "graphql";
+import { parse } from "graphql";
 import { it } from "mocha";
 
 import {
   access,
   constant,
-  type ExecutableStep,
   execute,
   type FieldArgs,
   grafastSync,
   makeGrafastSchema,
+  type Step,
 } from "../dist/index.js";
 
 const schema = makeGrafastSchema({
@@ -33,19 +33,19 @@ const schema = makeGrafastSchema({
       },
     },
     Obj: {
-      o($o: ExecutableStep) {
+      o($o: Step) {
         return $o;
       },
-      a($o: ExecutableStep) {
+      a($o: Step) {
         return access($o, "a");
       },
-      b($o: ExecutableStep) {
+      b($o: Step) {
         return access($o, "b");
       },
-      echoNumber(_, { $nr }: FieldArgs) {
+      echoNumber(_: Step, { $nr }: FieldArgs) {
         return $nr;
       },
-      echoString(_, { $str }: FieldArgs) {
+      echoString(_: Step, { $str }: FieldArgs) {
         return $str;
       },
     },

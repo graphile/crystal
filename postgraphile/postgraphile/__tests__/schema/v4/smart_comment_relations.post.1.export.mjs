@@ -1423,113 +1423,85 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Post);
-const fetcher2 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Offer);
-const fetcher3 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Street);
-const fetcher4 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Property);
-const fetcher5 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.StreetProperty);
-const fetcher6 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.House);
-const fetcher7 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Building);
+const nodeFetcher_Post = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Post));
+  return nodeIdHandlerByTypeName.Post.get(nodeIdHandlerByTypeName.Post.getSpec($decoded));
+};
+const nodeFetcher_Offer = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Offer));
+  return nodeIdHandlerByTypeName.Offer.get(nodeIdHandlerByTypeName.Offer.getSpec($decoded));
+};
+const nodeFetcher_Street = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Street));
+  return nodeIdHandlerByTypeName.Street.get(nodeIdHandlerByTypeName.Street.getSpec($decoded));
+};
+const nodeFetcher_Property = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Property));
+  return nodeIdHandlerByTypeName.Property.get(nodeIdHandlerByTypeName.Property.getSpec($decoded));
+};
+const nodeFetcher_StreetProperty = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.StreetProperty));
+  return nodeIdHandlerByTypeName.StreetProperty.get(nodeIdHandlerByTypeName.StreetProperty.getSpec($decoded));
+};
+const nodeFetcher_House = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.House));
+  return nodeIdHandlerByTypeName.House.get(nodeIdHandlerByTypeName.House.getSpec($decoded));
+};
+const nodeFetcher_Building = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Building));
+  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec($decoded));
+};
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
 function CursorSerialize(value) {
   return "" + value;
 }
-const specFromArgs = args => {
+const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-const specFromArgs2 = args => {
+const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
 };
-const specFromArgs3 = args => {
+const specFromArgs_Street = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
 };
-const specFromArgs4 = args => {
+const specFromArgs_Property = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
 };
-const specFromArgs5 = args => {
+const specFromArgs_StreetProperty = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
 };
-const specFromArgs6 = args => {
+const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
-const specFromArgs7 = args => {
+const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-const specFromArgs8 = args => {
+const specFromArgs_Offer2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
 };
-const specFromArgs9 = args => {
+const specFromArgs_Street2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
 };
-const specFromArgs10 = args => {
+const specFromArgs_Property2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
 };
-const specFromArgs11 = args => {
+const specFromArgs_StreetProperty2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
 };
-const specFromArgs12 = args => {
+const specFromArgs_Building2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
@@ -3847,138 +3819,121 @@ export const plans = {
     node(_$root, args) {
       return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
-    postById(_$root, args) {
+    postById(_$root, {
+      $id
+    }) {
       return pgResource_postsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    offerById(_$root, args) {
+    offerById(_$root, {
+      $id
+    }) {
       return pgResource_offersPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    streetById(_$root, args) {
+    streetById(_$root, {
+      $id
+    }) {
       return pgResource_streetsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    streetByName(_$root, args) {
+    streetByName(_$root, {
+      $name
+    }) {
       return pgResource_streetsPgResource.get({
-        name: args.getRaw("name")
+        name: $name
       });
     },
-    propertyById(_$root, args) {
+    propertyById(_$root, {
+      $id
+    }) {
       return pgResource_propertiesPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    streetPropertyByStrIdAndPropId(_$root, args) {
+    streetPropertyByStrIdAndPropId(_$root, {
+      $strId,
+      $propId
+    }) {
       return pgResource_street_propertyPgResource.get({
-        str_id: args.getRaw("strId"),
-        prop_id: args.getRaw("propId")
+        str_id: $strId,
+        prop_id: $propId
       });
     },
-    houseByStreetIdAndPropertyId(_$root, args) {
+    houseByStreetIdAndPropertyId(_$root, {
+      $streetId,
+      $propertyId
+    }) {
       return pgResource_housesPgResource.get({
-        street_id: args.getRaw("streetId"),
-        property_id: args.getRaw("propertyId")
+        street_id: $streetId,
+        property_id: $propertyId
       });
     },
-    buildingById(_$root, args) {
+    buildingById(_$root, {
+      $id
+    }) {
       return pgResource_buildingsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
     post(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher($nodeId);
+      return nodeFetcher_Post($nodeId);
     },
     offer(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher2($nodeId);
+      return nodeFetcher_Offer($nodeId);
     },
     street(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher3($nodeId);
+      return nodeFetcher_Street($nodeId);
     },
     property(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher4($nodeId);
+      return nodeFetcher_Property($nodeId);
     },
     streetProperty(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher5($nodeId);
+      return nodeFetcher_StreetProperty($nodeId);
     },
     house(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher6($nodeId);
+      return nodeFetcher_House($nodeId);
     },
     building(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher7($nodeId);
+      return nodeFetcher_Building($nodeId);
     },
     allPosts: {
       plan() {
         return connection(pgResource_postsPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -3987,63 +3942,28 @@ export const plans = {
         return connection(pgResource_offersPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4052,63 +3972,28 @@ export const plans = {
         return connection(pgResource_streetsPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4117,63 +4002,28 @@ export const plans = {
         return connection(pgResource_propertiesPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4182,63 +4032,28 @@ export const plans = {
         return connection(pgResource_street_propertyPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4247,63 +4062,28 @@ export const plans = {
         return connection(pgResource_housesPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4312,63 +4092,28 @@ export const plans = {
         return connection(pgResource_buildingsPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
@@ -4378,9 +4123,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Post.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Post.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   Offer: {
@@ -4388,9 +4130,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Offer.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Offer.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     },
     postId($record) {
       return $record.get("post_id");
@@ -4402,12 +4141,6 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.Street.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Street.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
-    },
     propertiesByStreetId: {
       plan($record) {
         const $records = pgResource_propertiesPgResource.find({
@@ -4416,63 +4149,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4484,63 +4182,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4552,63 +4215,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4620,79 +4248,34 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   PropertiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -4702,9 +4285,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Property.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Property.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     },
     streetId($record) {
       return $record.get("street_id");
@@ -4725,63 +4305,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4793,63 +4338,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -4861,79 +4371,34 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   StreetPropertiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -4994,9 +4459,6 @@ export const plans = {
     propertyId($record) {
       return $record.get("property_id");
     },
-    floors($record) {
-      return $record.get("floors");
-    },
     streetByStreetId($record) {
       return pgResource_streetsPgResource.get({
         id: $record.get("street_id")
@@ -5025,17 +4487,8 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
     propertyId($record) {
       return $record.get("property_id");
-    },
-    name($record) {
-      return $record.get("name");
-    },
-    floors($record) {
-      return $record.get("floors");
     },
     isPrimary($record) {
       return $record.get("is_primary");
@@ -5058,79 +4511,34 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   HousesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -5170,458 +4578,174 @@ export const plans = {
     }
   },
   HouseCondition: {
-    buildingName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    buildingName($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "building_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     },
-    propertyNameOrNumber: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_name_or_number",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_name_or_number",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    propertyNameOrNumber($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "property_name_or_number",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     },
-    streetName: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    streetName($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "street_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     },
-    streetId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    streetId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "street_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    buildingId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "building_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    buildingId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "building_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    propertyId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    propertyId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "property_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    floors: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    floors($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "floors",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     }
   },
   HousesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            housesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      housesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            housesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      housesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    BUILDING_NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "building_name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BUILDING_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "building_name",
+        direction: "ASC"
+      });
     },
-    BUILDING_NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "building_name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BUILDING_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "building_name",
+        direction: "DESC"
+      });
     },
-    PROPERTY_NAME_OR_NUMBER_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_name_or_number",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_NAME_OR_NUMBER_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_name_or_number",
+        direction: "ASC"
+      });
     },
-    PROPERTY_NAME_OR_NUMBER_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_name_or_number",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_NAME_OR_NUMBER_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_name_or_number",
+        direction: "DESC"
+      });
     },
-    STREET_NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_name",
+        direction: "ASC"
+      });
     },
-    STREET_NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_name",
+        direction: "DESC"
+      });
     },
-    STREET_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    STREET_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    BUILDING_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "building_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BUILDING_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "building_id",
+        direction: "ASC"
+      });
     },
-    BUILDING_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "building_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BUILDING_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "building_id",
+        direction: "DESC"
+      });
     },
-    PROPERTY_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_id",
+        direction: "ASC"
+      });
     },
-    PROPERTY_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_id",
+        direction: "DESC"
+      });
     },
-    FLOORS_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "floors",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    FLOORS_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "floors",
+        direction: "ASC"
+      });
     },
-    FLOORS_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "floors",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    FLOORS_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "floors",
+        direction: "DESC"
+      });
     }
   },
   StreetPropertiesEdge: {
@@ -5634,236 +4758,94 @@ export const plans = {
     }
   },
   StreetPropertyCondition: {
-    strId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "str_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "str_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    strId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "str_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    propId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "prop_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "prop_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    propId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "prop_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    currentOwner: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "current_owner",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "current_owner",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    currentOwner($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "current_owner",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   StreetPropertiesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            street_propertyUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      street_propertyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            street_propertyUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      street_propertyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    STR_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "str_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "str_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    STR_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "str_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "str_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PROP_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "prop_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROP_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "prop_id",
+        direction: "ASC"
+      });
     },
-    PROP_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "prop_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROP_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "prop_id",
+        direction: "DESC"
+      });
     },
-    CURRENT_OWNER_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "current_owner",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CURRENT_OWNER_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "current_owner",
+        direction: "ASC"
+      });
     },
-    CURRENT_OWNER_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "current_owner",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CURRENT_OWNER_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "current_owner",
+        direction: "DESC"
+      });
     }
   },
   BuildingsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -5878,340 +4860,132 @@ export const plans = {
     }
   },
   BuildingCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    propertyId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "property_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    propertyId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "property_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     },
-    floors: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "floors",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    floors($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "floors",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    isPrimary: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_primary",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_primary",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-            }
-          });
+    isPrimary($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_primary",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-      }
+      });
     }
   },
   BuildingsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            buildingsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      buildingsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            buildingsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      buildingsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PROPERTY_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_id",
+        direction: "ASC"
+      });
     },
-    PROPERTY_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "property_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    PROPERTY_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "property_id",
+        direction: "DESC"
+      });
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
     },
-    FLOORS_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "floors",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    FLOORS_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "floors",
+        direction: "ASC"
+      });
     },
-    FLOORS_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "floors",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    FLOORS_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "floors",
+        direction: "DESC"
+      });
     },
-    IS_PRIMARY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "is_primary",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    IS_PRIMARY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_primary",
+        direction: "ASC"
+      });
     },
-    IS_PRIMARY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "is_primary",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    IS_PRIMARY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_primary",
+        direction: "DESC"
+      });
     }
   },
   PropertiesEdge: {
@@ -6224,236 +4998,94 @@ export const plans = {
     }
   },
   PropertyCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    streetId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "street_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    streetId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "street_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    nameOrNumber: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name_or_number",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name_or_number",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    nameOrNumber($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name_or_number",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   PropertiesOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            propertiesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      propertiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            propertiesUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      propertiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    STREET_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_id",
+        direction: "ASC"
+      });
     },
-    STREET_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "street_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    STREET_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "street_id",
+        direction: "DESC"
+      });
     },
-    NAME_OR_NUMBER_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name_or_number",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_OR_NUMBER_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name_or_number",
+        direction: "ASC"
+      });
     },
-    NAME_OR_NUMBER_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name_or_number",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_OR_NUMBER_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name_or_number",
+        direction: "DESC"
+      });
     }
   },
   PostsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -6468,118 +5100,52 @@ export const plans = {
     }
   },
   PostCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   PostsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            postsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            postsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     }
   },
   OffersConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -6594,177 +5160,73 @@ export const plans = {
     }
   },
   OfferCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    postId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "post_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "post_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    postId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "post_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   OffersOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            offersUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      offersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            offersUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      offersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    POST_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "post_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POST_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "post_id",
+        direction: "ASC"
+      });
     },
-    POST_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "post_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POST_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "post_id",
+        direction: "DESC"
+      });
     }
   },
   StreetsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -6779,163 +5241,71 @@ export const plans = {
     }
   },
   StreetCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   StreetsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            streetsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      streetsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            streetsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      streetsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     }
   },
   Mutation: {
@@ -6950,13 +5320,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -6970,13 +5335,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -6990,13 +5350,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7010,13 +5365,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7030,13 +5380,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7050,32 +5395,22 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updatePost: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_postsPgResource, specFromArgs(args));
+        const $update = pgUpdateSingle(pgResource_postsPgResource, specFromArgs_Post(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7090,32 +5425,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateOffer: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_offersPgResource, specFromArgs2(args));
+        const $update = pgUpdateSingle(pgResource_offersPgResource, specFromArgs_Offer(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7130,32 +5455,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateStreet: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_streetsPgResource, specFromArgs3(args));
+        const $update = pgUpdateSingle(pgResource_streetsPgResource, specFromArgs_Street(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7170,13 +5485,8 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7191,32 +5501,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateProperty: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_propertiesPgResource, specFromArgs4(args));
+        const $update = pgUpdateSingle(pgResource_propertiesPgResource, specFromArgs_Property(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7231,32 +5531,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateStreetProperty: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_street_propertyPgResource, specFromArgs5(args));
+        const $update = pgUpdateSingle(pgResource_street_propertyPgResource, specFromArgs_StreetProperty(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7272,32 +5562,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateBuilding: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_buildingsPgResource, specFromArgs6(args));
+        const $update = pgUpdateSingle(pgResource_buildingsPgResource, specFromArgs_Building(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7312,32 +5592,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deletePost: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_postsPgResource, specFromArgs7(args));
+        const $delete = pgDeleteSingle(pgResource_postsPgResource, specFromArgs_Post2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7352,32 +5622,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteOffer: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_offersPgResource, specFromArgs8(args));
+        const $delete = pgDeleteSingle(pgResource_offersPgResource, specFromArgs_Offer2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7392,32 +5652,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteStreet: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_streetsPgResource, specFromArgs9(args));
+        const $delete = pgDeleteSingle(pgResource_streetsPgResource, specFromArgs_Street2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7432,13 +5682,8 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7453,32 +5698,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteProperty: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_propertiesPgResource, specFromArgs10(args));
+        const $delete = pgDeleteSingle(pgResource_propertiesPgResource, specFromArgs_Property2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7493,32 +5728,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteStreetProperty: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_street_propertyPgResource, specFromArgs11(args));
+        const $delete = pgDeleteSingle(pgResource_street_propertyPgResource, specFromArgs_StreetProperty2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7534,32 +5759,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteBuilding: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_buildingsPgResource, specFromArgs12(args));
+        const $delete = pgDeleteSingle(pgResource_buildingsPgResource, specFromArgs_Building2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -7574,13 +5789,8 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -7623,28 +5833,22 @@ export const plans = {
     }
   },
   CreatePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    post: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    post(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PostInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateOfferPayload: {
@@ -7685,36 +5889,28 @@ export const plans = {
     }
   },
   CreateOfferInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    offer: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    offer(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   OfferInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    postId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("post_id", bakedInputRuntime(schema, field.type, val));
-      }
+    postId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("post_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateStreetPayload: {
@@ -7755,36 +5951,28 @@ export const plans = {
     }
   },
   CreateStreetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    street: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    street(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   StreetInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePropertyPayload: {
@@ -7830,44 +6018,34 @@ export const plans = {
     }
   },
   CreatePropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    property: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    property(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PropertyInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    streetId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("street_id", bakedInputRuntime(schema, field.type, val));
-      }
+    streetId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("street_id", bakedInputRuntime(schema, field.type, val));
     },
-    nameOrNumber: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name_or_number", bakedInputRuntime(schema, field.type, val));
-      }
+    nameOrNumber(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name_or_number", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateStreetPropertyPayload: {
@@ -7918,44 +6096,34 @@ export const plans = {
     }
   },
   CreateStreetPropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    streetProperty: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetProperty(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   StreetPropertyInput: {
-    "__baked": createObjectAndApplyChildren,
-    strId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str_id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    strId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("str_id", bakedInputRuntime(schema, field.type, val));
     },
-    propId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("prop_id", bakedInputRuntime(schema, field.type, val));
-      }
+    propId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("prop_id", bakedInputRuntime(schema, field.type, val));
     },
-    currentOwner: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("current_owner", bakedInputRuntime(schema, field.type, val));
-      }
+    currentOwner(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("current_owner", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateBuildingPayload: {
@@ -8006,60 +6174,46 @@ export const plans = {
     }
   },
   CreateBuildingInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    building: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    building(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   BuildingInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    propertyId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("property_id", bakedInputRuntime(schema, field.type, val));
-      }
+    propertyId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("property_id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    floors: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("floors", bakedInputRuntime(schema, field.type, val));
-      }
+    floors(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("floors", bakedInputRuntime(schema, field.type, val));
     },
-    isPrimary: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("is_primary", bakedInputRuntime(schema, field.type, val));
-      }
+    isPrimary(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("is_primary", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePostPayload: {
@@ -8100,43 +6254,31 @@ export const plans = {
     }
   },
   UpdatePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    postPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    postPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PostPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePostByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    postPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    postPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8178,51 +6320,37 @@ export const plans = {
     }
   },
   UpdateOfferInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    offerPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    offerPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   OfferPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    postId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("post_id", bakedInputRuntime(schema, field.type, val));
-      }
+    postId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("post_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateOfferByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    offerPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    offerPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8264,66 +6392,47 @@ export const plans = {
     }
   },
   UpdateStreetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    streetPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   StreetPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateStreetByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    streetPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateStreetByNameInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    name: undefined,
-    streetPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8370,59 +6479,43 @@ export const plans = {
     }
   },
   UpdatePropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    propertyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    propertyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PropertyPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    streetId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("street_id", bakedInputRuntime(schema, field.type, val));
-      }
+    streetId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("street_id", bakedInputRuntime(schema, field.type, val));
     },
-    nameOrNumber: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name_or_number", bakedInputRuntime(schema, field.type, val));
-      }
+    nameOrNumber(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name_or_number", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePropertyByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    propertyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    propertyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8474,60 +6567,43 @@ export const plans = {
     }
   },
   UpdateStreetPropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    streetPropertyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetPropertyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   StreetPropertyPatch: {
-    "__baked": createObjectAndApplyChildren,
-    strId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str_id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    strId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("str_id", bakedInputRuntime(schema, field.type, val));
     },
-    propId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("prop_id", bakedInputRuntime(schema, field.type, val));
-      }
+    propId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("prop_id", bakedInputRuntime(schema, field.type, val));
     },
-    currentOwner: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("current_owner", bakedInputRuntime(schema, field.type, val));
-      }
+    currentOwner(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("current_owner", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateStreetPropertyByStrIdAndPropIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    strId: undefined,
-    propId: undefined,
-    streetPropertyPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    streetPropertyPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8579,75 +6655,55 @@ export const plans = {
     }
   },
   UpdateBuildingInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    buildingPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    buildingPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   BuildingPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    propertyId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("property_id", bakedInputRuntime(schema, field.type, val));
-      }
+    propertyId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("property_id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    floors: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("floors", bakedInputRuntime(schema, field.type, val));
-      }
+    floors(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("floors", bakedInputRuntime(schema, field.type, val));
     },
-    isPrimary: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("is_primary", bakedInputRuntime(schema, field.type, val));
-      }
+    isPrimary(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("is_primary", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateBuildingByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    buildingPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    buildingPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -8694,20 +6750,14 @@ export const plans = {
     }
   },
   DeletePostInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePostByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteOfferPayload: {
     __assertStep: ObjectStep,
@@ -8752,20 +6802,14 @@ export const plans = {
     }
   },
   DeleteOfferInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteOfferByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteStreetPayload: {
     __assertStep: ObjectStep,
@@ -8810,28 +6854,19 @@ export const plans = {
     }
   },
   DeleteStreetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteStreetByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteStreetByNameInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    name: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePropertyPayload: {
     __assertStep: ObjectStep,
@@ -8881,20 +6916,14 @@ export const plans = {
     }
   },
   DeletePropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePropertyByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteStreetPropertyPayload: {
     __assertStep: ObjectStep,
@@ -8949,21 +6978,14 @@ export const plans = {
     }
   },
   DeleteStreetPropertyInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteStreetPropertyByStrIdAndPropIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    strId: undefined,
-    propId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteBuildingPayload: {
     __assertStep: ObjectStep,
@@ -9018,20 +7040,14 @@ export const plans = {
     }
   },
   DeleteBuildingInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteBuildingByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

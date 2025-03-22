@@ -4,6 +4,7 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
+import type { ObjectPlans } from "../dist/index.js";
 import { grafastSync, lambda, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -28,7 +29,7 @@ const makeSchema = () => {
             ([a, b]) => a + b,
           );
         },
-      },
+      } as ObjectPlans,
       Query: {
         addTwoNumbers(parentStep, fieldArgs) {
           return lambda(
@@ -36,7 +37,7 @@ const makeSchema = () => {
             ([a, b]) => a + b,
           );
         },
-      },
+      } as ObjectPlans,
     },
     enableDeferStream: false,
   });

@@ -450,6 +450,7 @@ export const resolveResourceRefPath = (
 };
 
 export function exportNameHint(obj: any, nameHint: string): void {
+  if (Object.isFrozen(obj) || Object.isSealed(obj)) return;
   if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
     if (!("$exporter$name" in obj)) {
       Object.defineProperty(obj, "$exporter$name", {

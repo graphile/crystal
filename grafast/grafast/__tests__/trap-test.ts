@@ -4,6 +4,7 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
+import type { ObjectPlans } from "../dist/index.js";
 import {
   assertNotNull,
   grafast,
@@ -81,7 +82,7 @@ const makeSchema = () => {
           });
           return $errorValue;
         },
-      },
+      } as ObjectPlans,
     },
     enableDeferStream: false,
   });

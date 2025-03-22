@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const handler = {
@@ -390,63 +390,84 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Person);
-const fetcher2 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Pet);
+const nodeFetcher_Person = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
+  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
+};
+const nodeFetcher_Pet = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Pet));
+  return nodeIdHandlerByTypeName.Pet.get(nodeIdHandlerByTypeName.Pet.getSpec($decoded));
+};
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
+const EMPTY_ARRAY = [];
+const makeArgs_people_odd_pets = () => EMPTY_ARRAY;
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
-const argDetailsSimple_people_odd_pets = [];
-function makeArg(path, args, details) {
-  const {
-    graphqlArgName,
-    postgresArgName,
-    pgCodec,
-    fetcher
-  } = details;
-  const fullPath = [...path, graphqlArgName];
-  const $raw = args.getRaw(fullPath);
-  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
-  return {
-    step,
-    pgCodec,
-    name: postgresArgName ?? undefined
-  };
-}
-const makeArgs_people_odd_pets = (args, path = []) => argDetailsSimple_people_odd_pets.map(details => makeArg(path, args, details));
+const pgFunctionArgumentsFromArgs = (() => {
+  function pgFunctionArgumentsFromArgs($in, extraSelectArgs, inlining = false) {
+    if (!hasRecord($in)) {
+      throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+    }
+    /**
+     * An optimisation - if all our dependencies are
+     * compatible with the expression's class plan then we
+     * can inline ourselves into that, otherwise we must
+     * issue the query separately.
+     */
+    const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+    const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+    const selectArgs = [{
+      step: $row.record()
+    }, ...extraSelectArgs];
+    if (inlining) {
+      // This is a scalar computed attribute, let's inline the expression
+      const newSelectArgs = selectArgs.map((arg, i) => {
+        if (i === 0) {
+          const {
+            step,
+            ...rest
+          } = arg;
+          return {
+            ...rest,
+            placeholder: $row.getClassStep().alias
+          };
+        } else {
+          return arg;
+        }
+      });
+      return {
+        $row,
+        selectArgs: newSelectArgs
+      };
+    } else {
+      return {
+        $row,
+        selectArgs: selectArgs
+      };
+    }
+  }
+  return pgFunctionArgumentsFromArgs;
+})();
 const resource_people_odd_petsPgResource = registry.pgResources["people_odd_pets"];
 function CursorSerialize(value) {
   return "" + value;
 }
-const specFromArgs = args => {
+const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-const specFromArgs2 = args => {
+const specFromArgs_Pet = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Pet, $nodeId);
 };
-const specFromArgs3 = args => {
+const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-const specFromArgs4 = args => {
+const specFromArgs_Pet2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Pet, $nodeId);
 };
@@ -1079,86 +1100,55 @@ export const plans = {
     node(_$root, args) {
       return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
-    personById(_$root, args) {
+    personById(_$root, {
+      $id
+    }) {
       return pgResource_peoplePgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    petById(_$root, args) {
+    petById(_$root, {
+      $id
+    }) {
       return pgResource_petsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
     person(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher($nodeId);
+      return nodeFetcher_Person($nodeId);
     },
     pet(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher2($nodeId);
+      return nodeFetcher_Pet($nodeId);
     },
     allPeople: {
       plan() {
         return connection(pgResource_peoplePgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -1167,37 +1157,17 @@ export const plans = {
         return pgResource_petsPgResource.find();
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $select, arg) {
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $select, arg) {
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $select, value) {
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $select, value) {
+          value.apply($select);
         }
       }
     }
@@ -1210,67 +1180,19 @@ export const plans = {
     },
     oddPetsList: {
       plan($in, args, _info) {
-        if (!hasRecord($in)) {
-          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-        }
-        const extraSelectArgs = makeArgs_people_odd_pets(args);
-        /**
-         * An optimisation - if all our dependencies are
-         * compatible with the expression's class plan then we
-         * can inline ourselves into that, otherwise we must
-         * issue the query separately.
-         */
-        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-        const selectArgs = [{
-          step: $row.record()
-        }, ...extraSelectArgs];
-        if (resource_people_odd_petsPgResource.isUnique && !resource_people_odd_petsPgResource.codec.attributes && typeof resource_people_odd_petsPgResource.from === "function") {
-          // This is a scalar computed attribute, let's inline the expression
-          const newSelectArgs = selectArgs.map((arg, i) => {
-            if (i === 0) {
-              const {
-                step,
-                ...rest
-              } = arg;
-              return {
-                ...rest,
-                placeholder: $row.getClassStep().alias
-              };
-            } else {
-              return arg;
-            }
-          });
-          const from = pgFromExpression($row, resource_people_odd_petsPgResource.from, resource_people_odd_petsPgResource.parameters, newSelectArgs);
-          return pgClassExpression($row, resource_people_odd_petsPgResource.codec, undefined)`${from}`;
-        }
-        // PERF: or here, if scalar add select to `$row`?
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_people_odd_pets(args));
         return resource_people_odd_petsPgResource.execute(selectArgs);
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         }
       }
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
     },
     petsByOwnerIdList: {
       plan($record) {
@@ -1279,37 +1201,17 @@ export const plans = {
         });
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $select, arg) {
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $select, arg) {
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $select, value) {
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $select, value) {
+          value.apply($select);
         }
       }
     }
@@ -1320,14 +1222,8 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.Pet.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Pet.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
     ownerId($record) {
       return $record.get("owner_id");
-    },
-    name($record) {
-      return $record.get("name");
     },
     personByOwnerId($record) {
       return pgResource_peoplePgResource.get({
@@ -1336,236 +1232,94 @@ export const plans = {
     }
   },
   PetCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    ownerId: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "owner_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "owner_id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    ownerId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "owner_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   PetsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            petsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      petsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            petsUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      petsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    OWNER_ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "owner_id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    OWNER_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "owner_id",
+        direction: "ASC"
+      });
     },
-    OWNER_ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "owner_id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    OWNER_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "owner_id",
+        direction: "DESC"
+      });
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
     }
   },
   PeopleConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -1605,163 +1359,69 @@ export const plans = {
     }
   },
   PersonCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    name: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-            }
-          });
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      }
+      });
     }
   },
   PeopleOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            peopleUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            peopleUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    NAME_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
     },
-    NAME_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "name",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
     }
   },
   Mutation: {
@@ -1776,13 +1436,8 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1796,32 +1451,22 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updatePerson: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_peoplePgResource, specFromArgs(args));
+        const $update = pgUpdateSingle(pgResource_peoplePgResource, specFromArgs_Person(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1836,32 +1481,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updatePet: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_petsPgResource, specFromArgs2(args));
+        const $update = pgUpdateSingle(pgResource_petsPgResource, specFromArgs_Pet(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1876,32 +1511,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deletePerson: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_peoplePgResource, specFromArgs3(args));
+        const $delete = pgDeleteSingle(pgResource_peoplePgResource, specFromArgs_Person2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1916,32 +1541,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deletePet: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_petsPgResource, specFromArgs4(args));
+        const $delete = pgDeleteSingle(pgResource_petsPgResource, specFromArgs_Pet2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1956,13 +1571,8 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -2005,36 +1615,28 @@ export const plans = {
     }
   },
   CreatePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    person: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    person(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePetPayload: {
@@ -2056,44 +1658,34 @@ export const plans = {
     }
   },
   CreatePetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    pet: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    pet(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PetInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    ownerId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
-      }
+    ownerId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePersonPayload: {
@@ -2134,51 +1726,37 @@ export const plans = {
     }
   },
   UpdatePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    personPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePersonByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    personPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -2201,59 +1779,43 @@ export const plans = {
     }
   },
   UpdatePetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    petPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    petPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PetPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    ownerId: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
-      }
+    ownerId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePetByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    petPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    petPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -2300,20 +1862,14 @@ export const plans = {
     }
   },
   DeletePersonInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePetPayload: {
     __assertStep: ObjectStep,
@@ -2339,20 +1895,14 @@ export const plans = {
     }
   },
   DeletePetInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePetByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

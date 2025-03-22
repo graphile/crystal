@@ -3,7 +3,7 @@ import "graphile-config";
 import type { ExecutableStep, FieldArgs, Maybe, NodeIdHandler } from "grafast";
 import { lambda } from "grafast";
 
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -86,19 +86,35 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (!specForHandler) return null;
               const handler = finalBuild.getNodeIdHandler?.(typeName);
               if (!handler) return null;
-              const fetcher = EXPORTABLE(
-                (handler, lambda, specForHandler) => {
-                  const fn: GraphileBuild.NodeFetcher = (
-                    $nodeId: ExecutableStep<Maybe<string>>,
-                  ) => {
-                    const $decoded = lambda($nodeId, specForHandler(handler));
-                    return handler.get(handler.getSpec($decoded));
-                  };
-                  fn.deprecationReason = handler.deprecationReason;
-                  return fn;
-                },
-                [handler, lambda, specForHandler],
-              );
+              const fetcher = handler.deprecationReason
+                ? EXPORTABLE(
+                    (handler, lambda, specForHandler) => {
+                      const fn: GraphileBuild.NodeFetcher = (
+                        $nodeId: ExecutableStep<Maybe<string>>,
+                      ) => {
+                        const $decoded = lambda(
+                          $nodeId,
+                          specForHandler(handler),
+                        );
+                        return handler.get(handler.getSpec($decoded));
+                      };
+                      fn.deprecationReason = handler.deprecationReason;
+                      return fn;
+                    },
+                    [handler, lambda, specForHandler],
+                  )
+                : EXPORTABLE(
+                    (handler, lambda, specForHandler) =>
+                      ($nodeId: ExecutableStep<Maybe<string>>) => {
+                        const $decoded = lambda(
+                          $nodeId,
+                          specForHandler(handler),
+                        );
+                        return handler.get(handler.getSpec($decoded));
+                      },
+                    [handler, lambda, specForHandler],
+                  );
+              exportNameHint(fetcher, `nodeFetcher_${typeName}`);
               nodeFetcherByTypeNameCache.set(typeName, fetcher);
               return fetcher;
             },

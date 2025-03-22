@@ -793,6 +793,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                           );
                         },
                         [uniqueAttributes],
+                        `specFromArgs_${tableTypeName}`,
                       )
                     : EXPORTABLE(
                         (handler, nodeIdFieldName, specFromNodeId) =>
@@ -804,6 +805,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             return specFromNodeId(handler!, $nodeId);
                           },
                         [handler, nodeIdFieldName, specFromNodeId],
+                        `specFromArgs_${handler!.typeName}`,
                       );
 
                 return build.extend(

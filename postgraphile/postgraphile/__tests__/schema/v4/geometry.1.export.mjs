@@ -284,25 +284,21 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Geom);
+const nodeFetcher_Geom = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Geom));
+  return nodeIdHandlerByTypeName.Geom.get(nodeIdHandlerByTypeName.Geom.getSpec($decoded));
+};
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
 function CursorSerialize(value) {
   return "" + value;
 }
-const specFromArgs = args => {
+const specFromArgs_Geom = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
 };
-const specFromArgs2 = args => {
+const specFromArgs_Geom2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
 };
@@ -800,77 +796,44 @@ export const plans = {
     node(_$root, args) {
       return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
-    geomById(_$root, args) {
+    geomById(_$root, {
+      $id
+    }) {
       return pgResource_geomPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
     geom(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher($nodeId);
+      return nodeFetcher_Geom($nodeId);
     },
     allGeoms: {
       plan() {
         return connection(pgResource_geomPgResource.find());
       },
       args: {
-        first: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, arg) {
-              $connection.setFirst(arg.getRaw());
-            }
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setLast(val.getRaw());
-            }
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setOffset(val.getRaw());
-            }
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setBefore(val.getRaw());
-            }
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $connection, val) {
-              $connection.setAfter(val.getRaw());
-            }
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        condition: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_condition, $connection, arg) {
-              const $select = $connection.getSubplan();
-              arg.apply($select, qbWhereBuilder);
-            }
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        orderBy: {
-          __proto__: null,
-          grafast: {
-            applyPlan(parent, $connection, value) {
-              const $select = $connection.getSubplan();
-              value.apply($select);
-            }
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
@@ -881,53 +844,15 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.Geom.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Geom.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
-    point($record) {
-      return $record.get("point");
-    },
-    line($record) {
-      return $record.get("line");
-    },
-    lseg($record) {
-      return $record.get("lseg");
-    },
-    box($record) {
-      return $record.get("box");
-    },
     openPath($record) {
       return $record.get("open_path");
     },
     closedPath($record) {
       return $record.get("closed_path");
-    },
-    polygon($record) {
-      return $record.get("polygon");
-    },
-    circle($record) {
-      return $record.get("circle");
     }
   },
-  Point: {},
-  Line: {},
-  LineSegment: {},
-  Box: {},
-  Path: {},
-  Polygon: {},
-  Circle: {},
   GeomsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -967,603 +892,216 @@ export const plans = {
     }
   },
   GeomCondition: {
-    id: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      }
+      });
     },
-    point: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-            }
-          });
+    point($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "point",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
         }
-      }
+      });
     },
-    line: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
-            }
-          });
+    line($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "line",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
         }
-      }
+      });
     },
-    lseg: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
-            }
-          });
+    lseg($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "lseg",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
         }
-      }
+      });
     },
-    box: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
-            }
-          });
+    box($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "box",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
         }
-      }
+      });
     },
-    openPath: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-            }
-          });
+    openPath($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "open_path",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
         }
-      }
+      });
     },
-    closedPath: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-            }
-          });
+    closedPath($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "closed_path",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
         }
-      }
+      });
     },
-    polygon: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
-            }
-          });
+    polygon($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "polygon",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
         }
-      }
+      });
     },
-    circle: {
-      apply($condition, val) {
-        if (val === null) {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
-            }
-          });
+    circle($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "circle",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
         }
-      }
+      });
     }
   },
-  PointInput: {
-    x: undefined,
-    y: undefined
-  },
-  LineInput: {
-    a: undefined,
-    b: undefined
-  },
-  LineSegmentInput: {
-    a: undefined,
-    b: undefined
-  },
-  BoxInput: {
-    a: undefined,
-    b: undefined
-  },
-  PathInput: {
-    points: undefined,
-    isOpen: undefined
-  },
-  PolygonInput: {
-    points: undefined
-  },
-  CircleInput: {
-    center: undefined,
-    radius: undefined
-  },
   GeomsOrderBy: {
-    PRIMARY_KEY_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            geomUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "ASC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_ASC(queryBuilder) {
+      geomUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            geomUniques[0].attributes.forEach(attributeName => {
-              queryBuilder.orderBy({
-                attribute: attributeName,
-                direction: "DESC",
-                ...(undefined != null ? {
-                  nulls: undefined ? "LAST" : "FIRST"
-                } : null)
-              });
-            });
-            queryBuilder.setOrderIsUnique();
-          }
-        }
-      }
+    PRIMARY_KEY_DESC(queryBuilder) {
+      geomUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "id",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (true) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    POINT_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "point",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "ASC"
+      });
     },
-    POINT_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "point",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "DESC"
+      });
     },
-    LINE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "line",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LINE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "line",
+        direction: "ASC"
+      });
     },
-    LINE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "line",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LINE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "line",
+        direction: "DESC"
+      });
     },
-    LSEG_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "lseg",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LSEG_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "lseg",
+        direction: "ASC"
+      });
     },
-    LSEG_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "lseg",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    LSEG_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "lseg",
+        direction: "DESC"
+      });
     },
-    BOX_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "box",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BOX_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "box",
+        direction: "ASC"
+      });
     },
-    BOX_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "box",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    BOX_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "box",
+        direction: "DESC"
+      });
     },
-    OPEN_PATH_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "open_path",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    OPEN_PATH_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "open_path",
+        direction: "ASC"
+      });
     },
-    OPEN_PATH_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "open_path",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    OPEN_PATH_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "open_path",
+        direction: "DESC"
+      });
     },
-    CLOSED_PATH_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "closed_path",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CLOSED_PATH_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "closed_path",
+        direction: "ASC"
+      });
     },
-    CLOSED_PATH_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "closed_path",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CLOSED_PATH_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "closed_path",
+        direction: "DESC"
+      });
     },
-    POLYGON_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "polygon",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POLYGON_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "polygon",
+        direction: "ASC"
+      });
     },
-    POLYGON_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "polygon",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    POLYGON_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "polygon",
+        direction: "DESC"
+      });
     },
-    CIRCLE_ASC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "circle",
-              direction: "ASC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CIRCLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "circle",
+        direction: "ASC"
+      });
     },
-    CIRCLE_DESC: {
-      extensions: {
-        __proto__: null,
-        grafast: {
-          apply(queryBuilder) {
-            queryBuilder.orderBy({
-              attribute: "circle",
-              direction: "DESC",
-              ...(undefined != null ? {
-                nulls: undefined ? "LAST" : "FIRST"
-              } : null)
-            });
-            if (false) {
-              queryBuilder.setOrderIsUnique();
-            }
-          }
-        }
-      }
+    CIRCLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "circle",
+        direction: "DESC"
+      });
     }
   },
   Mutation: {
@@ -1578,32 +1116,22 @@ export const plans = {
         return plan;
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateGeom: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_geomPgResource, specFromArgs(args));
+        const $update = pgUpdateSingle(pgResource_geomPgResource, specFromArgs_Geom(args));
         args.apply($update);
         return object({
           result: $update
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1618,32 +1146,22 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteGeom: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_geomPgResource, specFromArgs2(args));
+        const $delete = pgDeleteSingle(pgResource_geomPgResource, specFromArgs_Geom2(args));
         args.apply($delete);
         return object({
           result: $delete
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
@@ -1658,13 +1176,8 @@ export const plans = {
         });
       },
       args: {
-        input: {
-          __proto__: null,
-          grafast: {
-            applyPlan(_, $object) {
-              return $object;
-            }
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -1707,92 +1220,70 @@ export const plans = {
     }
   },
   CreateGeomInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    geom: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    geom(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   GeomInput: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      }
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    line: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("line", bakedInputRuntime(schema, field.type, val));
-      }
+    line(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("line", bakedInputRuntime(schema, field.type, val));
     },
-    lseg: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lseg", bakedInputRuntime(schema, field.type, val));
-      }
+    lseg(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("lseg", bakedInputRuntime(schema, field.type, val));
     },
-    box: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("box", bakedInputRuntime(schema, field.type, val));
-      }
+    box(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("box", bakedInputRuntime(schema, field.type, val));
     },
-    openPath: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_path", bakedInputRuntime(schema, field.type, val));
-      }
+    openPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("open_path", bakedInputRuntime(schema, field.type, val));
     },
-    closedPath: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
-      }
+    closedPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
     },
-    polygon: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygon", bakedInputRuntime(schema, field.type, val));
-      }
+    polygon(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("polygon", bakedInputRuntime(schema, field.type, val));
     },
-    circle: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circle", bakedInputRuntime(schema, field.type, val));
-      }
+    circle(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("circle", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateGeomPayload: {
@@ -1833,107 +1324,79 @@ export const plans = {
     }
   },
   UpdateGeomInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    geomPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    geomPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   GeomPatch: {
-    "__baked": createObjectAndApplyChildren,
-    id: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      }
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    line: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("line", bakedInputRuntime(schema, field.type, val));
-      }
+    line(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("line", bakedInputRuntime(schema, field.type, val));
     },
-    lseg: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lseg", bakedInputRuntime(schema, field.type, val));
-      }
+    lseg(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("lseg", bakedInputRuntime(schema, field.type, val));
     },
-    box: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("box", bakedInputRuntime(schema, field.type, val));
-      }
+    box(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("box", bakedInputRuntime(schema, field.type, val));
     },
-    openPath: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_path", bakedInputRuntime(schema, field.type, val));
-      }
+    openPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("open_path", bakedInputRuntime(schema, field.type, val));
     },
-    closedPath: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
-      }
+    closedPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
     },
-    polygon: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygon", bakedInputRuntime(schema, field.type, val));
-      }
+    polygon(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("polygon", bakedInputRuntime(schema, field.type, val));
     },
-    circle: {
-      apply(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circle", bakedInputRuntime(schema, field.type, val));
-      }
+    circle(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("circle", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateGeomByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    geomPatch: {
-      apply(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
+    geomPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
@@ -1980,20 +1443,14 @@ export const plans = {
     }
   },
   DeleteGeomInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteGeomByIdInput: {
-    clientMutationId: {
-      apply(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({
