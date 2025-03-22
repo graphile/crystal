@@ -163,12 +163,17 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                       EXPORTABLE(
                         te.run`\
 return function (resource) {
-  return (_$root, args) => resource.get({ ${te.join(
+  return (_$root, { ${te.join(
+    attributeNames.map((attributeName) =>
+      te.identifier("$" + detailsByAttributeName[attributeName].graphqlName),
+    ),
+    ", ",
+  )} }) => resource.get({ ${te.join(
     attributeNames.map(
       (attributeName) =>
-        te`${te.safeKeyOrThrow(attributeName)}: args.getRaw(${te.lit(
-          detailsByAttributeName[attributeName].graphqlName,
-        )})`,
+        te`${te.safeKeyOrThrow(attributeName)}: ${te.identifier(
+          "$" + detailsByAttributeName[attributeName].graphqlName,
+        )}`,
     ),
     ", ",
   )} });
