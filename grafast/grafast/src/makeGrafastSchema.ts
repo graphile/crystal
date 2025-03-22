@@ -9,6 +9,7 @@ import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
 import type {
+  ArgumentApplyPlanResolver,
   EnumValueApplyResolver,
   FieldPlanResolver,
   InputObjectTypeBakedResolver,
@@ -42,7 +43,13 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: graphql.GraphQLArgumentExtensions;
+        [argName: string]:
+          | ArgumentApplyPlanResolver
+          | {
+              applyPlan?: ArgumentApplyPlanResolver;
+              applySubscribePlan?: ArgumentApplyPlanResolver;
+              extensions?: graphql.GraphQLArgumentExtensions;
+            };
       };
     };
 
@@ -311,16 +318,39 @@ export function makeGrafastSchema(details: {
                   )) {
                     const argSpec = fieldSpec.args?.[argName];
                     if (typeof argSpec === "function") {
-                      // Invalid
-                      throw new Error(
-                        `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an extensions object`,
-                      );
-                    } else if (argSpec) {
+                      const applyPlan = argSpec;
                       exportNameHint(
-                        argSpec.grafast?.applyPlan,
+                        applyPlan,
                         `${typeName}_${fieldName}_${argName}_applyPlan`,
                       );
-                      Object.assign(arg.extensions!, argSpec);
+                      Object.assign(arg.extensions!, {
+                        grafast: { applyPlan },
+                      });
+                    } else if (
+                      typeof argSpec === "object" &&
+                      argSpec !== null
+                    ) {
+                      const { extensions, applyPlan, applySubscribePlan } =
+                        argSpec;
+                      if (extensions) {
+                        Object.assign(arg.extensions!, extensions);
+                      }
+                      if (applyPlan || applySubscribePlan) {
+                        exportNameHint(
+                          applyPlan,
+                          `${typeName}_${fieldName}_${argName}_applyPlan`,
+                        );
+                        exportNameHint(
+                          applySubscribePlan,
+                          `${typeName}_${fieldName}_${argName}_applySubscribePlan`,
+                        );
+                        Object.assign(arg.extensions!, {
+                          grafast: {
+                            applyPlan,
+                            applySubscribePlan,
+                          },
+                        });
+                      }
                     }
                   }
                 }

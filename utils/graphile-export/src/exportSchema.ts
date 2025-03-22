@@ -1628,18 +1628,59 @@ function exportSchemaTypeDefs({
 
         const args = field.args
           ? Object.entries(field.args)
-              .map(([argName, arg]) => {
-                const extensionsAST = extensions(
-                  file,
-                  arg.extensions,
-                  `${type.name}.${fieldName}.${argName}`,
-                  `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
-                );
-                if (!extensionsAST) return null;
-                return t.objectProperty(
-                  identifierOrLiteral(argName),
-                  extensionsAST,
-                );
+              .map(([argName, arg]): t.ObjectProperty | null => {
+                if (arg.extensions) {
+                  const { grafast, ...rest } = arg.extensions;
+                  const extensionsAST = extensions(
+                    file,
+                    rest,
+                    `${type.name}.${fieldName}.${argName}`,
+                    `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
+                  );
+                  if (!extensionsAST) {
+                    if (!grafast) return null;
+                    const keys = Object.keys(grafast);
+                    if (keys.length === 1 && keys[0] === "applyPlan") {
+                      // Shorthand
+                      return t.objectProperty(
+                        identifierOrLiteral(argName),
+                        convertToIdentifierViaAST(
+                          file,
+                          grafast.applyPlan!,
+                          `${type.name}.${fieldName}${argName}ApplyPlan`,
+                          `${type.name}.fields[${fieldName}].args[${argName}].applyPlan`,
+                        ),
+                      );
+                    }
+                  }
+                  return t.objectProperty(
+                    identifierOrLiteral(argName),
+                    t.objectExpression([
+                      ...objectToObjectProperties({
+                        extensions: extensionsAST,
+                      }),
+
+                      ...(grafast
+                        ? Object.entries(grafast)
+                            .map(([k, v]) => {
+                              if (v == null) return null;
+                              return t.objectProperty(
+                                t.identifier(k),
+                                convertToIdentifierViaAST(
+                                  file,
+                                  grafast.applyPlan!,
+                                  `${type.name}.${fieldName}${argName}${k}`,
+                                  `${type.name}.fields[${fieldName}].args[${argName}][${k}]`,
+                                ),
+                              );
+                            })
+                            .filter(isNotNullish)
+                        : []),
+                    ]),
+                  );
+                } else {
+                  return null;
+                }
               })
               .filter(isNotNullish)
           : null;
