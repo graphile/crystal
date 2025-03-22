@@ -12,6 +12,7 @@ import type {
   ArgumentApplyPlanResolver,
   EnumValueApplyResolver,
   FieldPlanResolver,
+  InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
@@ -70,7 +71,12 @@ export type ObjectPlans = {
 export type InputObjectPlans = {
   __baked?: InputObjectTypeBakedResolver;
 } & {
-  [fieldName: string]: Grafast.InputFieldExtensions;
+  [fieldName: string]:
+    | InputObjectFieldApplyResolver<any>
+    | {
+        apply?: InputObjectFieldApplyResolver<any>;
+        extensions?: graphql.GraphQLInputFieldExtensions;
+      };
 };
 
 /**
@@ -418,13 +424,26 @@ export function makeGrafastSchema(details: {
             };
             fields[fieldName] = fieldConfig;
             if (fieldSpec) {
-              exportNameHint(fieldSpec.apply, `${typeName}_${fieldName}_apply`);
+              const grafastExtensions: Grafast.InputFieldExtensions =
+                Object.create(null);
+              (fieldConfig.extensions as any).grafast = grafastExtensions;
+              if (typeof fieldSpec === "function") {
+                exportNameHint(fieldSpec, `${typeName}_${fieldName}_apply`);
+                grafastExtensions.apply = fieldSpec;
+              } else {
+                const { apply, extensions } = fieldSpec;
+                if (extensions) {
+                  Object.assign(fieldConfig.extensions!, extensions);
+                }
+                if (apply) {
+                  exportNameHint(
+                    fieldSpec.apply,
+                    `${typeName}_${fieldName}_apply`,
+                  );
+                  Object.assign(grafastExtensions, { apply });
+                }
+              }
             }
-            // it's a spec
-            const grafastExtensions: Grafast.InputFieldExtensions =
-              Object.create(null);
-            (fieldConfig.extensions as any).grafast = grafastExtensions;
-            Object.assign(grafastExtensions, fieldSpec);
           }
           return fields;
         };

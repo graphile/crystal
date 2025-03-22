@@ -1670,7 +1670,7 @@ function exportSchemaTypeDefs({
                                   file,
                                   grafast.applyPlan!,
                                   `${type.name}.${fieldName}${argName}${k}`,
-                                  `${type.name}.fields[${fieldName}].args[${argName}][${k}]`,
+                                  `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast[${k}]`,
                                 ),
                               );
                             })
@@ -1729,7 +1729,7 @@ function exportSchemaTypeDefs({
       if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            identifierOrLiteral("__baked"),
+            t.stringLiteral("__baked"),
             convertToIdentifierViaAST(
               file,
               type.extensions?.grafast.baked,
@@ -1741,15 +1741,58 @@ function exportSchemaTypeDefs({
       }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
+        if (!field.extensions) continue;
+        const { grafast, ...rest } = field.extensions;
+        const extensionsAST = extensions(
+          file,
+          rest,
+          `${type.name}_${fieldName}Extensions`,
+          `${type.name}.fields[${fieldName}].extensions`,
+        );
+        if (!extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            typeProperties.push(
+              t.objectProperty(
+                identifierOrLiteral(fieldName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${fieldName}Apply`,
+                  `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+
         typeProperties.push(
           t.objectProperty(
             identifierOrLiteral(fieldName),
-            convertToIdentifierViaAST(
-              file,
-              field.extensions?.grafast,
-              `${type.name}.${fieldName}`,
-              `${type.name}.fields[${fieldName}].extensions.grafast`,
-            ),
+            t.objectExpression([
+              ...objectToObjectProperties({
+                extensions: extensionsAST,
+              }),
+
+              ...(grafast
+                ? Object.entries(grafast)
+                    .map(([k, v]) => {
+                      if (v == null) return null;
+                      return t.objectProperty(
+                        t.identifier(k),
+                        convertToIdentifierViaAST(
+                          file,
+                          v,
+                          `${type.name}.${fieldName}${k}`,
+                          `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
+                        ),
+                      );
+                    })
+                    .filter(isNotNullish)
+                : []),
+            ]),
           ),
         );
       }
