@@ -7,6 +7,7 @@ import type {
   ExecutableStep,
   LoadedRecordStep,
   LoadOneCallback,
+  ObjectPlans,
 } from "../dist/index.js";
 import { context, grafast, loadOne, makeGrafastSchema } from "../dist/index.js";
 
@@ -227,7 +228,7 @@ const makeSchema = (useStreamableStep = false) => {
             loadThingByOrgIdRegNoObjs,
           );
         },
-      },
+      } as ObjectPlans,
       Thing: {
         org($thing: LoadedRecordStep<Thing>) {
           return loadOne($thing.get("orgId"), "id", loadOrgByIds);
@@ -250,7 +251,7 @@ const makeSchema = (useStreamableStep = false) => {
             loadThingByOrgIdRegNoObjs,
           );
         },
-      },
+      } as ObjectPlans,
     },
     enableDeferStream: true,
   });
