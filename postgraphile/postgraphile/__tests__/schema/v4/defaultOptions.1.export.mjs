@@ -24897,10 +24897,7 @@ export const plans = {
       typesUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -24909,10 +24906,7 @@ export const plans = {
       typesUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -24920,669 +24914,447 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     SMALLINT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "smallint",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     SMALLINT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "smallint",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     BIGINT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "bigint",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     BIGINT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "bigint",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NUMERIC_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "numeric",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NUMERIC_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "numeric",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     DECIMAL_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "decimal",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     DECIMAL_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "decimal",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     BOOLEAN_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "boolean",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     BOOLEAN_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "boolean",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     VARCHAR_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "varchar",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     VARCHAR_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "varchar",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     ENUM_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "enum",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     ENUM_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "enum",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     DOMAIN_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "domain",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     DOMAIN_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "domain",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     DOMAIN2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "domain2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     DOMAIN2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "domain2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     JSON_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "json",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     JSON_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "json",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     JSONB_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "jsonb",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     JSONB_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "jsonb",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     TIMESTAMP_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timestamp",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TIMESTAMP_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timestamp",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     TIMESTAMPTZ_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timestamptz",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TIMESTAMPTZ_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timestamptz",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     DATE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "date",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     DATE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "date",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     TIME_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "time",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TIME_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "time",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     TIMETZ_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timetz",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TIMETZ_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "timetz",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     INTERVAL_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "interval",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     INTERVAL_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "interval",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     MONEY_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "money",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     MONEY_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "money",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COMPOUND_TYPE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_type",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COMPOUND_TYPE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_type",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nested_compound_type",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nested_compound_type",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NULLABLE_COMPOUND_TYPE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_compound_type",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULLABLE_COMPOUND_TYPE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_compound_type",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NULLABLE_NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_nested_compound_type",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULLABLE_NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_nested_compound_type",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     POINT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "point",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     POINT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "point",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NULLABLE_POINT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullablePoint",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULLABLE_POINT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullablePoint",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     INET_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "inet",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     INET_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "inet",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     CIDR_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "cidr",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     CIDR_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "cidr",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     MACADDR_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "macaddr",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     MACADDR_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "macaddr",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGPROC_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regproc",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGPROC_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regproc",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGPROCEDURE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regprocedure",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGPROCEDURE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regprocedure",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGOPER_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regoper",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGOPER_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regoper",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGOPERATOR_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regoperator",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGOPERATOR_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regoperator",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGCLASS_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regclass",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGCLASS_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regclass",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGTYPE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regtype",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGTYPE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regtype",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGCONFIG_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regconfig",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGCONFIG_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regconfig",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     REGDICTIONARY_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regdictionary",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     REGDICTIONARY_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "regdictionary",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     LTREE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "ltree",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     LTREE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "ltree",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -25652,10 +25424,7 @@ export const plans = {
       personUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -25664,10 +25433,7 @@ export const plans = {
       personUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -25675,185 +25441,125 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     NAME_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_full_name",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NAME_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_full_name",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     ABOUT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "about",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     ABOUT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "about",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     EMAIL_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "email",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     EMAIL_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "email",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     SITE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "site",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     SITE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "site",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     CONFIG_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "config",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     CONFIG_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "config",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "last_login_from_ip",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "last_login_from_ip",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "last_login_from_subnet",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "last_login_from_subnet",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     USER_MAC_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "user_mac",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     USER_MAC_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "user_mac",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     CREATED_AT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "created_at",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     CREATED_AT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "created_at",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -26025,10 +25731,7 @@ export const plans = {
       postUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26037,10 +25740,7 @@ export const plans = {
       postUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26048,75 +25748,51 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     HEADLINE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "headline",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     HEADLINE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "headline",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     BODY_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "body",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     BODY_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "body",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     AUTHOR_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "author_id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     AUTHOR_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "author_id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -26185,55 +25861,37 @@ export const plans = {
     PERSON_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     PERSON_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COMPOUND_KEY_1_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_key_1",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COMPOUND_KEY_1_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_key_1",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COMPOUND_KEY_2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_key_2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COMPOUND_KEY_2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "compound_key_2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -26316,10 +25974,7 @@ export const plans = {
       compound_keyUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26328,10 +25983,7 @@ export const plans = {
       compound_keyUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26339,57 +25991,39 @@ export const plans = {
     PERSON_ID_2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id_2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     PERSON_ID_2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id_2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     PERSON_ID_1_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id_1",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_1_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id_1",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     EXTRA_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "extra",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     EXTRA_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "extra",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -26830,19 +26464,13 @@ export const plans = {
     COLUMN_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "?column?",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COLUMN_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "?column?",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -26871,10 +26499,7 @@ export const plans = {
       inputsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26883,10 +26508,7 @@ export const plans = {
       inputsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26894,20 +26516,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
@@ -26937,10 +26553,7 @@ export const plans = {
       patchsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26949,10 +26562,7 @@ export const plans = {
       patchsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -26960,20 +26570,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
@@ -27003,10 +26607,7 @@ export const plans = {
       reservedUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27015,10 +26616,7 @@ export const plans = {
       reservedUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27026,20 +26624,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
@@ -27069,10 +26661,7 @@ export const plans = {
       reservedPatchsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27081,10 +26670,7 @@ export const plans = {
       reservedPatchsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27092,20 +26678,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
@@ -27135,10 +26715,7 @@ export const plans = {
       reserved_inputUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27147,10 +26724,7 @@ export const plans = {
       reserved_inputUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27158,20 +26732,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
@@ -27210,10 +26778,7 @@ export const plans = {
       default_valueUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27222,10 +26787,7 @@ export const plans = {
       default_valueUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27233,39 +26795,27 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     NULL_VALUE_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "null_value",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULL_VALUE_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "null_value",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27302,39 +26852,27 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     STR_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "str",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     STR_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "str",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27383,55 +26921,37 @@ export const plans = {
     TESTVIEWID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "testviewid",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TESTVIEWID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "testviewid",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL1_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL1_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27469,10 +26989,7 @@ export const plans = {
       my_tableUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27481,10 +26998,7 @@ export const plans = {
       my_tableUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27492,39 +27006,27 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     JSON_DATA_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "json_data",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     JSON_DATA_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "json_data",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27562,10 +27064,7 @@ export const plans = {
       person_secretUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27574,10 +27073,7 @@ export const plans = {
       person_secretUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27585,39 +27081,27 @@ export const plans = {
     PERSON_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     SECRET_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "sekrit",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     SECRET_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "sekrit",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27664,10 +27148,7 @@ export const plans = {
       view_tableUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27676,10 +27157,7 @@ export const plans = {
       view_tableUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27687,57 +27165,39 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     COL1_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL1_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27793,10 +27253,7 @@ export const plans = {
       similar_table_1Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27805,10 +27262,7 @@ export const plans = {
       similar_table_1Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27816,75 +27270,51 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     COL1_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL1_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col1",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL2_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL2_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col2",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL3_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col3",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL3_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col3",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -27940,10 +27370,7 @@ export const plans = {
       similar_table_2Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27952,10 +27379,7 @@ export const plans = {
       similar_table_2Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -27963,75 +27387,51 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     COL3_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col3",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL3_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col3",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL4_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col4",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL4_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col4",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     COL5_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col5",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     COL5_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "col5",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28089,75 +27489,51 @@ export const plans = {
     X_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "x",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     X_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "x",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     NAME_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "name",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NAME_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "name",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     DESCRIPTION_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "description",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     DESCRIPTION_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "description",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     CONSTANT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "constant",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     CONSTANT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "constant",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28213,10 +27589,7 @@ export const plans = {
       null_test_recordUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28225,10 +27598,7 @@ export const plans = {
       null_test_recordUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28236,75 +27606,51 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     NULLABLE_TEXT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_text",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULLABLE_TEXT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_text",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NULLABLE_INT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_int",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NULLABLE_INT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "nullable_int",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     NON_NULL_TEXT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "non_null_text",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NON_NULL_TEXT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "non_null_text",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28370,55 +27716,37 @@ export const plans = {
     NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "not_null_has_default",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "not_null_has_default",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     WONT_CAST_EASY_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "wont_cast_easy",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     WONT_CAST_EASY_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "wont_cast_easy",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     ROW_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "row_id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     ROW_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "row_id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28474,10 +27802,7 @@ export const plans = {
       left_armUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28486,10 +27811,7 @@ export const plans = {
       left_armUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28497,77 +27819,53 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "person_id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     LENGTH_IN_METRES_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "length_in_metres",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     LENGTH_IN_METRES_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "length_in_metres",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     },
     MOOD_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "mood",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     MOOD_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "mood",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28605,10 +27903,7 @@ export const plans = {
       issue756Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28617,10 +27912,7 @@ export const plans = {
       issue756Uniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28628,39 +27920,27 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     },
     TS_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "ts",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
     },
     TS_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "ts",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
     }
   },
@@ -28779,10 +28059,7 @@ export const plans = {
       listsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "ASC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28791,10 +28068,7 @@ export const plans = {
       listsUniques[0].attributes.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+          direction: "DESC"
         });
       });
       queryBuilder.setOrderIsUnique();
@@ -28802,20 +28076,14 @@ export const plans = {
     ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "ASC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "ASC"
       });
       queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
-        direction: "DESC",
-        ...(undefined != null ? {
-          nulls: undefined ? "LAST" : "FIRST"
-        } : null)
+        direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();
     }
