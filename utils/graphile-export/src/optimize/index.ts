@@ -294,6 +294,14 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         path.replaceWith(path.node.consequent);
       }
     },
+    ConditionalExpression(path) {
+      const test = path.node.test;
+      if (expressionIsAlwaysFalsy(test)) {
+        path.replaceWith(path.node.alternate);
+      } else if (expressionIsAlwaysTruthy(test)) {
+        path.replaceWith(path.node.consequent);
+      }
+    },
     ObjectProperty(path) {
       if (!t.isIdentifier(path.node.key)) {
         return;
