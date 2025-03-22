@@ -24012,7 +24012,13 @@ export const plans = {
     }
   },
   PostComputedIntervalSetEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   Cursor: {
     serialize: UUIDSerialize,
@@ -24444,7 +24450,13 @@ export const plans = {
     }
   },
   TypesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   TypeCondition: {
     id($condition, val) {
@@ -25365,7 +25377,13 @@ export const plans = {
     }
   },
   PeopleEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   PeopleOrderBy: {
     COMPUTED_OUT_ASC(queryBuilder) {
@@ -25617,7 +25635,13 @@ export const plans = {
     }
   },
   PostsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   PostCondition: {
     id($condition, val) {
@@ -25826,7 +25850,13 @@ export const plans = {
     }
   },
   ForeignKeysEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ForeignKeyCondition: {
     personId($condition, val) {
@@ -25938,7 +25968,13 @@ export const plans = {
     }
   },
   CompoundKeysEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   CompoundKeyCondition: {
     personId2($condition, val) {
@@ -26147,7 +26183,13 @@ export const plans = {
     }
   },
   FuncOutSetofEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   QueryIntervalSetConnection: {
     __assertStep: ConnectionStep,
@@ -26156,7 +26198,13 @@ export const plans = {
     }
   },
   QueryIntervalSetEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   StaticBigIntegerConnection: {
     __assertStep: ConnectionStep,
@@ -26165,7 +26213,13 @@ export const plans = {
     }
   },
   StaticBigIntegerEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncReturnsTableOneColConnection: {
     __assertStep: ConnectionStep,
@@ -26174,7 +26228,13 @@ export const plans = {
     }
   },
   FuncReturnsTableOneColEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncOutOutRecord: {
     __assertStep: assertPgClassSingleStep,
@@ -26195,7 +26255,13 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   FuncOutOutSetofEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncOutOutUnnamedRecord: {
     __assertStep: assertPgClassSingleStep,
@@ -26228,7 +26294,13 @@ export const plans = {
     }
   },
   IntSetQueryEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncReturnsTableMultiColConnection: {
     __assertStep: ConnectionStep,
@@ -26240,7 +26312,13 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   FuncReturnsTableMultiColEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncOutOutCompoundTypeRecord: {
     __assertStep: assertPgClassSingleStep,
@@ -26273,7 +26351,13 @@ export const plans = {
     }
   },
   CompoundTypesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   FuncOutComplexRecord: {
     __assertStep: assertPgClassSingleStep,
@@ -26312,7 +26396,13 @@ export const plans = {
     }
   },
   FuncOutComplexSetofEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   PersonCondition: {
     id($condition, val) {
@@ -26447,7 +26537,13 @@ export const plans = {
     }
   },
   NonUpdatableViewsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   NonUpdatableViewCondition: {
     column($condition, val) {
@@ -26481,7 +26577,13 @@ export const plans = {
     }
   },
   InputsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   InputCondition: {
     id($condition, val) {
@@ -26535,7 +26637,13 @@ export const plans = {
     }
   },
   PatchesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   PatchCondition: {
     id($condition, val) {
@@ -26589,7 +26697,13 @@ export const plans = {
     }
   },
   ReservedsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ReservedCondition: {
     id($condition, val) {
@@ -26643,7 +26757,13 @@ export const plans = {
     }
   },
   ReservedPatchRecordsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ReservedPatchRecordCondition: {
     id($condition, val) {
@@ -26697,7 +26817,13 @@ export const plans = {
     }
   },
   ReservedInputRecordsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ReservedInputRecordCondition: {
     id($condition, val) {
@@ -26751,7 +26877,13 @@ export const plans = {
     }
   },
   DefaultValuesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   DefaultValueCondition: {
     id($condition, val) {
@@ -26826,7 +26958,13 @@ export const plans = {
     }
   },
   NoPrimaryKeysEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   NoPrimaryKeyCondition: {
     id($condition, val) {
@@ -26886,7 +27024,13 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   TestviewsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   TestviewCondition: {
     testviewid($condition, val) {
@@ -26962,7 +27106,13 @@ export const plans = {
     }
   },
   MyTablesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   MyTableCondition: {
     id($condition, val) {
@@ -27037,7 +27187,13 @@ export const plans = {
     }
   },
   PersonSecretsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   PersonSecretCondition: {
     personId($condition, val) {
@@ -27112,7 +27268,13 @@ export const plans = {
     }
   },
   ViewTablesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ViewTableCondition: {
     id($condition, val) {
@@ -27208,7 +27370,13 @@ export const plans = {
     }
   },
   SimilarTable1SEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   SimilarTable1Condition: {
     id($condition, val) {
@@ -27325,7 +27493,13 @@ export const plans = {
     }
   },
   SimilarTable2SEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   SimilarTable2Condition: {
     id($condition, val) {
@@ -27445,7 +27619,13 @@ export const plans = {
     __assertStep: assertPgClassSingleStep
   },
   UpdatableViewsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   UpdatableViewCondition: {
     x($condition, val) {
@@ -27544,7 +27724,13 @@ export const plans = {
     }
   },
   NullTestRecordsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   NullTestRecordCondition: {
     id($condition, val) {
@@ -27681,7 +27867,13 @@ export const plans = {
     }
   },
   EdgeCasesEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   EdgeCaseCondition: {
     notNullHasDefault($condition, val) {
@@ -27757,7 +27949,13 @@ export const plans = {
     }
   },
   LeftArmsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   LeftArmCondition: {
     id($condition, val) {
@@ -27876,7 +28074,13 @@ export const plans = {
     }
   },
   Issue756SEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   Issue756Condition: {
     id($condition, val) {
@@ -27951,7 +28155,13 @@ export const plans = {
     }
   },
   ListsEdge: {
-    __assertStep: assertEdgeCapableStep
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
   },
   ListCondition: {
     id($condition, val) {
