@@ -258,6 +258,22 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         }
       },
     },
+    BlockStatement(path) {
+      const body = path.node.body;
+
+      // Only strip if it's a statement within another block statement or the
+      // program. We don't want to trim block wrappers around for/if/while/etc
+      if (!path.parentPath.isBlockStatement() && !path.parentPath.isProgram()) {
+        return;
+      }
+
+      // Don't strip a block if there's any variable declarations in it.
+      if (body.some((stmt) => stmt.type === "VariableDeclaration")) {
+        return;
+      }
+
+      path.replaceWithMultiple(body);
+    },
   });
 
   ast = parse(generate(ast).code, { sourceType: "module" });
