@@ -3842,6 +3842,7 @@ const resourceConfig_compound_type = {
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
 const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
 const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
+const list_of_compound_types_mutationFunctionIdentifer = sql.identifier("c", "list_of_compound_types_mutation");
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
 const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
 const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
@@ -7428,6 +7429,32 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_set_mutation"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
+    list_of_compound_types_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+      name: "list_of_compound_types_mutation",
+      identifier: "main.c.list_of_compound_types_mutation(c._compound_type)",
+      from(...args) {
+        return sql`${list_of_compound_types_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "records",
+        required: true,
+        notNull: true,
+        codec: compoundTypeArrayCodec
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "list_of_compound_types_mutation"
         },
         tags: {}
       },
@@ -11204,6 +11231,15 @@ const argDetailsSimple_compound_type_set_mutation = [{
 }];
 const makeArgs_compound_type_set_mutation = (args, path = []) => argDetailsSimple_compound_type_set_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
+const argDetailsSimple_list_of_compound_types_mutation = [{
+  graphqlArgName: "records",
+  postgresArgName: "records",
+  pgCodec: compoundTypeArrayCodec,
+  required: true,
+  fetcher: null
+}];
+const makeArgs_list_of_compound_types_mutation = (args, path = []) => argDetailsSimple_list_of_compound_types_mutation.map(details => makeArg(path, args, details));
+const resource_list_of_compound_types_mutationPgResource = registry.pgResources["list_of_compound_types_mutation"];
 const argDetailsSimple_table_mutation = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -15986,6 +16022,12 @@ type Mutation {
     """
     input: CompoundTypeSetMutationInput!
   ): CompoundTypeSetMutationPayload
+  listOfCompoundTypesMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ListOfCompoundTypesMutationInput!
+  ): ListOfCompoundTypesMutationPayload
   tableMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -18088,6 +18130,31 @@ input CompoundTypeSetMutationInput {
   """
   clientMutationId: String
   object: CompoundTypeInput!
+}
+
+"""The output of our \`listOfCompoundTypesMutation\` mutation."""
+type ListOfCompoundTypesMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`listOfCompoundTypesMutation\` mutation."""
+input ListOfCompoundTypesMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  records: [CompoundTypeInput]!
 }
 
 """The output of our \`tableMutation\` mutation."""
@@ -37433,6 +37500,35 @@ export const plans = {
         }
       }
     },
+    listOfCompoundTypesMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs_list_of_compound_types_mutation(args, ["input"]);
+        const $result = resource_list_of_compound_types_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          __proto__: null,
+          grafast: {
+            applyPlan(_, $object, arg) {
+              // We might have any number of step types here; we need
+              // to get back to the underlying pgSelect.
+              const $result = $object.getStepForKey("result");
+              const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+              const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+              if ($pgSelect instanceof PgSelectStep) {
+                // Mostly so `clientMutationId` works!
+                arg.apply($pgSelect);
+              } else {
+                throw new Error(`Could not determine PgSelectStep for ${$result}`);
+              }
+            }
+          }
+        }
+      }
+    },
     tableMutation: {
       plan($root, args, _info) {
         const selectArgs = makeArgs_table_mutation(args, ["input"]);
@@ -41050,6 +41146,27 @@ export const plans = {
       }
     },
     object: undefined
+  },
+  ListOfCompoundTypesMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+    compoundTypes($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
+  },
+  ListOfCompoundTypesMutationInput: {
+    clientMutationId: {
+      apply(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    },
+    records: undefined
   },
   TableMutationPayload: {
     __assertStep: ObjectStep,

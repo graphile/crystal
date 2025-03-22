@@ -4124,6 +4124,7 @@ const resourceConfig_compound_type = {
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
 const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
 const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
+const list_of_compound_types_mutationFunctionIdentifer = sql.identifier("c", "list_of_compound_types_mutation");
 const mutation_compound_type_arrayFunctionIdentifer = sql.identifier("a", "mutation_compound_type_array");
 const query_compound_type_arrayFunctionIdentifer = sql.identifier("a", "query_compound_type_array");
 const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
@@ -7999,6 +8000,33 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_set_mutation"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    }),
+    list_of_compound_types_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+      name: "list_of_compound_types_mutation",
+      identifier: "main.c.list_of_compound_types_mutation(c._compound_type)",
+      from(...args) {
+        return sql`${list_of_compound_types_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "records",
+        required: true,
+        notNull: false,
+        codec: compoundTypeArrayCodec
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "list_of_compound_types_mutation"
         },
         tags: {},
         canExecute: false

@@ -1,0 +1,20 @@
+{
+  listOfCompoundTypesMutation: {
+    compoundTypes: [
+      {
+        a: 1,
+        b: "B",
+        c: "RED",
+        d: "00000000-0000-0000-0000-000000000000",
+        e: "BAZ_QUX",
+        f: "_EMPTY_",
+        g: {
+          seconds: 21,
+          minutes: 0,
+          hours: 0,
+        },
+        fooBar: 42,
+      },
+    ],
+  },
+}
