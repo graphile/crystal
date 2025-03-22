@@ -24090,7 +24090,6 @@ export const plans = {
       obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
     }
   },
-  IntervalInput: {},
   AnEnum: {
     AWAITING: {
       value: "awaiting"
@@ -24288,10 +24287,6 @@ export const plans = {
       }
     }
   },
-  BigFloatRange: {},
-  BigFloatRangeBound: {},
-  DateRange: {},
-  DateRangeBound: {},
   Date: {
     serialize: UUIDSerialize,
     parseValue: UUIDSerialize,
@@ -24302,8 +24297,6 @@ export const plans = {
       return ast.value;
     }
   },
-  AnIntRange: {},
-  AnIntRangeBound: {},
   Time: {
     serialize: UUIDSerialize,
     parseValue: UUIDSerialize,
@@ -24332,7 +24325,6 @@ export const plans = {
       return $record.get("baz_buz");
     }
   },
-  Point: {},
   InternetAddress: {
     serialize: UUIDSerialize,
     parseValue: UUIDSerialize,
@@ -25353,12 +25345,6 @@ export const plans = {
       }
     }
   },
-  BigFloatRangeInput: {},
-  BigFloatRangeBoundInput: {},
-  DateRangeInput: {},
-  DateRangeBoundInput: {},
-  AnIntRangeInput: {},
-  AnIntRangeBoundInput: {},
   NestedCompoundTypeInput: {
     "__baked": createObjectAndApplyChildren,
     a(obj, val, {
@@ -25380,7 +25366,6 @@ export const plans = {
       obj.set("baz_buz", bakedInputRuntime(schema, field.type, val));
     }
   },
-  PointInput: {},
   TypesOrderBy: {
     PRIMARY_KEY_ASC: {
       extensions: {
@@ -28137,8 +28122,6 @@ export const plans = {
   FuncReturnsTableMultiColEdge: {
     __assertStep: assertEdgeCapableStep
   },
-  FloatRangeInput: {},
-  FloatRangeBoundInput: {},
   FuncOutOutCompoundTypeRecord: {
     __assertStep: assertPgClassSingleStep,
     o2($record) {

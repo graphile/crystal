@@ -1717,12 +1717,14 @@ function exportSchemaTypeDefs({
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
@@ -1797,12 +1799,14 @@ function exportSchemaTypeDefs({
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (
       type instanceof GraphQLInterfaceType ||
       type instanceof GraphQLUnionType
