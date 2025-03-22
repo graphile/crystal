@@ -4,7 +4,7 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {ObjectPlans } from "../dist/index.js";
+import type { ObjectPlans } from "../dist/index.js";
 import { grafast, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});

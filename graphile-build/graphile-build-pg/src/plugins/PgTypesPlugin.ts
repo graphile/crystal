@@ -2,8 +2,7 @@ import "./PgBasicsPlugin.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import type { ExecutableStep } from "grafast";
-import { access, assertExecutableStep } from "grafast";
+import { assertExecutableStep } from "grafast";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 

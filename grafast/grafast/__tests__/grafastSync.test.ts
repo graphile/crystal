@@ -4,12 +4,8 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import {
-  ObjectPlans,
-  grafastSync,
-  lambda,
-  makeGrafastSchema,
-} from "../dist/index.js";
+import type { ObjectPlans } from "../dist/index.js";
+import { grafastSync, lambda, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};

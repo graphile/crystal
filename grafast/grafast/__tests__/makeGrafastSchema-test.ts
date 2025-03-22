@@ -2,12 +2,8 @@
 import { expect } from "chai";
 import { it } from "mocha";
 
-import {
-  ObjectPlans,
-  grafast,
-  lambda,
-  makeGrafastSchema,
-} from "../dist/index.js";
+import type { ObjectPlans } from "../dist/index.js";
+import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
 
 it("can create a schema with an input", async () => {
   const schema = makeGrafastSchema({
