@@ -403,11 +403,6 @@ export function makeGrafastSchema(details: {
               );
               continue;
             }
-            if (typeof fieldSpec === "function") {
-              throw new Error(
-                `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
-              );
-            }
           }
         }
 
