@@ -11110,155 +11110,155 @@ const argDetailsSimple_type_function_mutation = [{
 const makeArgs_type_function_mutation = (args, path = []) => argDetailsSimple_type_function_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
-const specFromArgs = args => {
+const specFromArgs_Input = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Input, $nodeId);
 };
-const specFromArgs2 = args => {
+const specFromArgs_Patch = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Patch, $nodeId);
 };
-const specFromArgs3 = args => {
+const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
-const specFromArgs4 = args => {
+const specFromArgs_ReservedPatchRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReservedPatchRecord, $nodeId);
 };
-const specFromArgs5 = args => {
+const specFromArgs_ReservedInputRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReservedInputRecord, $nodeId);
 };
-const specFromArgs6 = args => {
+const specFromArgs_DefaultValue = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.DefaultValue, $nodeId);
 };
-const specFromArgs7 = args => {
+const specFromArgs_MyTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.MyTable, $nodeId);
 };
-const specFromArgs8 = args => {
+const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.PersonSecret, $nodeId);
 };
-const specFromArgs9 = args => {
+const specFromArgs_ViewTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ViewTable, $nodeId);
 };
-const specFromArgs10 = args => {
+const specFromArgs_CompoundKey = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.CompoundKey, $nodeId);
 };
-const specFromArgs11 = args => {
+const specFromArgs_SimilarTable1 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.SimilarTable1, $nodeId);
 };
-const specFromArgs12 = args => {
+const specFromArgs_SimilarTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.SimilarTable2, $nodeId);
 };
-const specFromArgs13 = args => {
+const specFromArgs_NullTestRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.NullTestRecord, $nodeId);
 };
-const specFromArgs14 = args => {
+const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
 };
-const specFromArgs15 = args => {
+const specFromArgs_Issue756 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
 };
-const specFromArgs16 = args => {
+const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-const specFromArgs17 = args => {
+const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-const specFromArgs18 = args => {
+const specFromArgs_List = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.List, $nodeId);
 };
-const specFromArgs19 = args => {
+const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
-const specFromArgs20 = args => {
+const specFromArgs_Input2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Input, $nodeId);
 };
-const specFromArgs21 = args => {
+const specFromArgs_Patch2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Patch, $nodeId);
 };
-const specFromArgs22 = args => {
+const specFromArgs_Reserved2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
-const specFromArgs23 = args => {
+const specFromArgs_ReservedPatchRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReservedPatchRecord, $nodeId);
 };
-const specFromArgs24 = args => {
+const specFromArgs_ReservedInputRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReservedInputRecord, $nodeId);
 };
-const specFromArgs25 = args => {
+const specFromArgs_DefaultValue2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.DefaultValue, $nodeId);
 };
-const specFromArgs26 = args => {
+const specFromArgs_MyTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.MyTable, $nodeId);
 };
-const specFromArgs27 = args => {
+const specFromArgs_PersonSecret2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.PersonSecret, $nodeId);
 };
-const specFromArgs28 = args => {
+const specFromArgs_ViewTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ViewTable, $nodeId);
 };
-const specFromArgs29 = args => {
+const specFromArgs_CompoundKey2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.CompoundKey, $nodeId);
 };
-const specFromArgs30 = args => {
+const specFromArgs_SimilarTable12 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.SimilarTable1, $nodeId);
 };
-const specFromArgs31 = args => {
+const specFromArgs_SimilarTable22 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.SimilarTable2, $nodeId);
 };
-const specFromArgs32 = args => {
+const specFromArgs_NullTestRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.NullTestRecord, $nodeId);
 };
-const specFromArgs33 = args => {
+const specFromArgs_LeftArm2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
 };
-const specFromArgs34 = args => {
+const specFromArgs_Issue7562 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
 };
-const specFromArgs35 = args => {
+const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-const specFromArgs36 = args => {
+const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-const specFromArgs37 = args => {
+const specFromArgs_List2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.List, $nodeId);
 };
-const specFromArgs38 = args => {
+const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
@@ -34860,7 +34860,7 @@ export const plans = {
     },
     updateInput: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_inputsPgResource, specFromArgs(args));
+        const $update = pgUpdateSingle(pgResource_inputsPgResource, specFromArgs_Input(args));
         args.apply($update);
         return object({
           result: $update
@@ -34890,7 +34890,7 @@ export const plans = {
     },
     updatePatch: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_patchsPgResource, specFromArgs2(args));
+        const $update = pgUpdateSingle(pgResource_patchsPgResource, specFromArgs_Patch(args));
         args.apply($update);
         return object({
           result: $update
@@ -34920,7 +34920,7 @@ export const plans = {
     },
     updateReserved: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_reservedPgResource, specFromArgs3(args));
+        const $update = pgUpdateSingle(pgResource_reservedPgResource, specFromArgs_Reserved(args));
         args.apply($update);
         return object({
           result: $update
@@ -34950,7 +34950,7 @@ export const plans = {
     },
     updateReservedPatchRecord: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_reservedPatchsPgResource, specFromArgs4(args));
+        const $update = pgUpdateSingle(pgResource_reservedPatchsPgResource, specFromArgs_ReservedPatchRecord(args));
         args.apply($update);
         return object({
           result: $update
@@ -34980,7 +34980,7 @@ export const plans = {
     },
     updateReservedInputRecord: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_reserved_inputPgResource, specFromArgs5(args));
+        const $update = pgUpdateSingle(pgResource_reserved_inputPgResource, specFromArgs_ReservedInputRecord(args));
         args.apply($update);
         return object({
           result: $update
@@ -35010,7 +35010,7 @@ export const plans = {
     },
     updateDefaultValue: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_default_valuePgResource, specFromArgs6(args));
+        const $update = pgUpdateSingle(pgResource_default_valuePgResource, specFromArgs_DefaultValue(args));
         args.apply($update);
         return object({
           result: $update
@@ -35056,7 +35056,7 @@ export const plans = {
     },
     updateMyTable: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_my_tablePgResource, specFromArgs7(args));
+        const $update = pgUpdateSingle(pgResource_my_tablePgResource, specFromArgs_MyTable(args));
         args.apply($update);
         return object({
           result: $update
@@ -35086,7 +35086,7 @@ export const plans = {
     },
     updatePersonSecret: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_person_secretPgResource, specFromArgs8(args));
+        const $update = pgUpdateSingle(pgResource_person_secretPgResource, specFromArgs_PersonSecret(args));
         args.apply($update);
         return object({
           result: $update
@@ -35116,7 +35116,7 @@ export const plans = {
     },
     updateViewTable: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_view_tablePgResource, specFromArgs9(args));
+        const $update = pgUpdateSingle(pgResource_view_tablePgResource, specFromArgs_ViewTable(args));
         args.apply($update);
         return object({
           result: $update
@@ -35146,7 +35146,7 @@ export const plans = {
     },
     updateCompoundKey: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_compound_keyPgResource, specFromArgs10(args));
+        const $update = pgUpdateSingle(pgResource_compound_keyPgResource, specFromArgs_CompoundKey(args));
         args.apply($update);
         return object({
           result: $update
@@ -35177,7 +35177,7 @@ export const plans = {
     },
     updateSimilarTable1: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_similar_table_1PgResource, specFromArgs11(args));
+        const $update = pgUpdateSingle(pgResource_similar_table_1PgResource, specFromArgs_SimilarTable1(args));
         args.apply($update);
         return object({
           result: $update
@@ -35207,7 +35207,7 @@ export const plans = {
     },
     updateSimilarTable2: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_similar_table_2PgResource, specFromArgs12(args));
+        const $update = pgUpdateSingle(pgResource_similar_table_2PgResource, specFromArgs_SimilarTable2(args));
         args.apply($update);
         return object({
           result: $update
@@ -35237,7 +35237,7 @@ export const plans = {
     },
     updateNullTestRecord: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_null_test_recordPgResource, specFromArgs13(args));
+        const $update = pgUpdateSingle(pgResource_null_test_recordPgResource, specFromArgs_NullTestRecord(args));
         args.apply($update);
         return object({
           result: $update
@@ -35267,7 +35267,7 @@ export const plans = {
     },
     updateLeftArm: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_left_armPgResource, specFromArgs14(args));
+        const $update = pgUpdateSingle(pgResource_left_armPgResource, specFromArgs_LeftArm(args));
         args.apply($update);
         return object({
           result: $update
@@ -35313,7 +35313,7 @@ export const plans = {
     },
     updateIssue756: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_issue756PgResource, specFromArgs15(args));
+        const $update = pgUpdateSingle(pgResource_issue756PgResource, specFromArgs_Issue756(args));
         args.apply($update);
         return object({
           result: $update
@@ -35343,7 +35343,7 @@ export const plans = {
     },
     updatePost: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_postPgResource, specFromArgs16(args));
+        const $update = pgUpdateSingle(pgResource_postPgResource, specFromArgs_Post(args));
         args.apply($update);
         return object({
           result: $update
@@ -35373,7 +35373,7 @@ export const plans = {
     },
     updatePerson: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_personPgResource, specFromArgs17(args));
+        const $update = pgUpdateSingle(pgResource_personPgResource, specFromArgs_Person(args));
         args.apply($update);
         return object({
           result: $update
@@ -35419,7 +35419,7 @@ export const plans = {
     },
     updateList: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_listsPgResource, specFromArgs18(args));
+        const $update = pgUpdateSingle(pgResource_listsPgResource, specFromArgs_List(args));
         args.apply($update);
         return object({
           result: $update
@@ -35449,7 +35449,7 @@ export const plans = {
     },
     updateType: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_typesPgResource, specFromArgs19(args));
+        const $update = pgUpdateSingle(pgResource_typesPgResource, specFromArgs_Type(args));
         args.apply($update);
         return object({
           result: $update
@@ -35479,7 +35479,7 @@ export const plans = {
     },
     deleteInput: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_inputsPgResource, specFromArgs20(args));
+        const $delete = pgDeleteSingle(pgResource_inputsPgResource, specFromArgs_Input2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35509,7 +35509,7 @@ export const plans = {
     },
     deletePatch: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_patchsPgResource, specFromArgs21(args));
+        const $delete = pgDeleteSingle(pgResource_patchsPgResource, specFromArgs_Patch2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35539,7 +35539,7 @@ export const plans = {
     },
     deleteReserved: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_reservedPgResource, specFromArgs22(args));
+        const $delete = pgDeleteSingle(pgResource_reservedPgResource, specFromArgs_Reserved2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35569,7 +35569,7 @@ export const plans = {
     },
     deleteReservedPatchRecord: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_reservedPatchsPgResource, specFromArgs23(args));
+        const $delete = pgDeleteSingle(pgResource_reservedPatchsPgResource, specFromArgs_ReservedPatchRecord2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35599,7 +35599,7 @@ export const plans = {
     },
     deleteReservedInputRecord: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_reserved_inputPgResource, specFromArgs24(args));
+        const $delete = pgDeleteSingle(pgResource_reserved_inputPgResource, specFromArgs_ReservedInputRecord2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35629,7 +35629,7 @@ export const plans = {
     },
     deleteDefaultValue: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_default_valuePgResource, specFromArgs25(args));
+        const $delete = pgDeleteSingle(pgResource_default_valuePgResource, specFromArgs_DefaultValue2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35675,7 +35675,7 @@ export const plans = {
     },
     deleteMyTable: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_my_tablePgResource, specFromArgs26(args));
+        const $delete = pgDeleteSingle(pgResource_my_tablePgResource, specFromArgs_MyTable2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35705,7 +35705,7 @@ export const plans = {
     },
     deletePersonSecret: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_person_secretPgResource, specFromArgs27(args));
+        const $delete = pgDeleteSingle(pgResource_person_secretPgResource, specFromArgs_PersonSecret2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35735,7 +35735,7 @@ export const plans = {
     },
     deleteViewTable: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_view_tablePgResource, specFromArgs28(args));
+        const $delete = pgDeleteSingle(pgResource_view_tablePgResource, specFromArgs_ViewTable2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35765,7 +35765,7 @@ export const plans = {
     },
     deleteCompoundKey: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_compound_keyPgResource, specFromArgs29(args));
+        const $delete = pgDeleteSingle(pgResource_compound_keyPgResource, specFromArgs_CompoundKey2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35796,7 +35796,7 @@ export const plans = {
     },
     deleteSimilarTable1: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_similar_table_1PgResource, specFromArgs30(args));
+        const $delete = pgDeleteSingle(pgResource_similar_table_1PgResource, specFromArgs_SimilarTable12(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35826,7 +35826,7 @@ export const plans = {
     },
     deleteSimilarTable2: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_similar_table_2PgResource, specFromArgs31(args));
+        const $delete = pgDeleteSingle(pgResource_similar_table_2PgResource, specFromArgs_SimilarTable22(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35856,7 +35856,7 @@ export const plans = {
     },
     deleteNullTestRecord: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_null_test_recordPgResource, specFromArgs32(args));
+        const $delete = pgDeleteSingle(pgResource_null_test_recordPgResource, specFromArgs_NullTestRecord2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35886,7 +35886,7 @@ export const plans = {
     },
     deleteLeftArm: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_left_armPgResource, specFromArgs33(args));
+        const $delete = pgDeleteSingle(pgResource_left_armPgResource, specFromArgs_LeftArm2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35932,7 +35932,7 @@ export const plans = {
     },
     deleteIssue756: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_issue756PgResource, specFromArgs34(args));
+        const $delete = pgDeleteSingle(pgResource_issue756PgResource, specFromArgs_Issue7562(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35962,7 +35962,7 @@ export const plans = {
     },
     deletePost: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_postPgResource, specFromArgs35(args));
+        const $delete = pgDeleteSingle(pgResource_postPgResource, specFromArgs_Post2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -35992,7 +35992,7 @@ export const plans = {
     },
     deletePerson: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_personPgResource, specFromArgs36(args));
+        const $delete = pgDeleteSingle(pgResource_personPgResource, specFromArgs_Person2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -36038,7 +36038,7 @@ export const plans = {
     },
     deleteList: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_listsPgResource, specFromArgs37(args));
+        const $delete = pgDeleteSingle(pgResource_listsPgResource, specFromArgs_List2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -36068,7 +36068,7 @@ export const plans = {
     },
     deleteType: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_typesPgResource, specFromArgs38(args));
+        const $delete = pgDeleteSingle(pgResource_typesPgResource, specFromArgs_Type2(args));
         args.apply($delete);
         return object({
           result: $delete
