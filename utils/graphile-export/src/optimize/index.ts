@@ -371,13 +371,22 @@ function isNotNullish<T>(o: T | null | undefined): o is T {
 }
 
 function expressionIsAlwaysFalsy(test: t.Expression) {
-  return (
-    (test.type === "Identifier" && test.name === "undefined") ||
-    test.type === "NullLiteral" ||
-    (test.type === "BooleanLiteral" && test.value === false)
-  );
+  switch (test.type) {
+    case "Identifier":
+      return test.name === "undefined";
+    case "NullLiteral":
+      return true;
+    case "BooleanLiteral":
+      return !test.value;
+    default:
+      return false;
+  }
 }
-
 function expressionIsAlwaysTruthy(test: t.Expression) {
-  return test.type === "BooleanLiteral" && test.value === true;
+  switch (test.type) {
+    case "BooleanLiteral":
+      return test.value;
+    default:
+      return false;
+  }
 }
