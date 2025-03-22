@@ -31,13 +31,13 @@ import {
 import type {
   __InputObjectStep,
   __TrackedValueStep,
-  ExecutableStep,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
   GrafastFieldConfig,
   GrafastInputFieldConfigMap,
   Maybe,
+  Step,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -256,7 +256,7 @@ function defaultProcSourceBehavior(
 }
 
 function hasRecord(
-  $row: ExecutableStep,
+  $row: Step,
 ): $row is
   | PgSelectSingleStep
   | PgInsertSingleStep
@@ -490,7 +490,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 getSpec && codecResource
                   ? EXPORTABLE(
                       (codecResource, getSpec) =>
-                        ($nodeId: ExecutableStep<Maybe<string>>) =>
+                        ($nodeId: Step<Maybe<string>>) =>
                           codecResource.get(getSpec($nodeId)),
                       [codecResource, getSpec],
                     )
@@ -969,7 +969,7 @@ function modFields(
 
         const getSelectPlanFromParentAndArgs: FieldPlanResolver<
           any,
-          ExecutableStep,
+          Step,
           any
         > = isRootQuery
           ? // Not computed
@@ -993,89 +993,55 @@ function modFields(
               [makeArgs, object, resource],
             )
           : // Otherwise computed:
-            EXPORTABLE(
+
+          // if it's a scalar computed expression, inline it:
+          resource.isUnique &&
+            !resource.codec.attributes &&
+            typeof resource.from === "function"
+          ? EXPORTABLE(
               (
-                PgSelectSingleStep,
-                hasRecord,
                 makeArgs,
                 pgClassExpression,
                 pgFromExpression,
-                pgSelectSingleFromRecord,
+                pgFunctionArgumentsFromArgs,
                 resource,
-                stepAMayDependOnStepB,
               ) =>
                 ($in, args, _info) => {
-                  if (!hasRecord($in)) {
-                    throw new Error(
-                      `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
-                    );
-                  }
-                  const extraSelectArgs = makeArgs(args);
-                  /**
-                   * An optimisation - if all our dependencies are
-                   * compatible with the expression's class plan then we
-                   * can inline ourselves into that, otherwise we must
-                   * issue the query separately.
-                   */
-                  const canUseExpressionDirectly =
-                    $in instanceof PgSelectSingleStep &&
-                    extraSelectArgs.every((a) =>
-                      stepAMayDependOnStepB($in.getClassStep(), a.step),
-                    );
-                  const $row = canUseExpressionDirectly
-                    ? $in
-                    : pgSelectSingleFromRecord($in.resource, $in.record());
-                  const selectArgs: PgSelectArgumentSpec[] = [
-                    { step: $row.record() },
-                    ...extraSelectArgs,
-                  ];
-                  if (
-                    resource.isUnique &&
-                    !resource.codec.attributes &&
-                    typeof resource.from === "function"
-                  ) {
-                    // This is a scalar computed attribute, let's inline the expression
-                    const newSelectArgs = selectArgs.map(
-                      (
-                        arg,
-                        i,
-                      ): PgSelectArgumentSpec | PgSelectArgumentDigest => {
-                        if (i === 0) {
-                          const { step, ...rest } = arg;
-                          return {
-                            ...rest,
-                            placeholder: $row.getClassStep().alias,
-                          } as PgSelectArgumentDigest;
-                        } else {
-                          return arg;
-                        }
-                      },
-                    );
-                    const from = pgFromExpression(
-                      $row,
-                      resource.from,
-                      resource.parameters,
-                      newSelectArgs,
-                    );
-                    return pgClassExpression(
-                      $row,
-                      resource.codec,
-                      undefined,
-                    )`${from}`;
-                  }
-                  // PERF: or here, if scalar add select to `$row`?
-                  return resource.execute(selectArgs);
+                  const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
+                    $in,
+                    makeArgs(args),
+                    true,
+                  );
+                  const from = pgFromExpression(
+                    $row,
+                    resource.from,
+                    resource.parameters,
+                    selectArgs,
+                  );
+                  return pgClassExpression(
+                    $row,
+                    resource.codec,
+                    undefined,
+                  )`${from}`;
                 },
               [
-                PgSelectSingleStep,
-                hasRecord,
                 makeArgs,
                 pgClassExpression,
                 pgFromExpression,
-                pgSelectSingleFromRecord,
+                pgFunctionArgumentsFromArgs,
                 resource,
-                stepAMayDependOnStepB,
               ],
+            )
+          : EXPORTABLE(
+              (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
+                ($in, args, _info) => {
+                  const { selectArgs } = pgFunctionArgumentsFromArgs(
+                    $in,
+                    makeArgs(args),
+                  );
+                  return resource.execute(selectArgs);
+                },
+              [makeArgs, pgFunctionArgumentsFromArgs, resource],
             );
 
         if (isRootMutation) {
@@ -1262,7 +1228,7 @@ function modFields(
                         plan: EXPORTABLE(
                           (connection, getSelectPlanFromParentAndArgs) =>
                             function plan(
-                              $parent: ExecutableStep,
+                              $parent: Step,
                               args: FieldArgs,
                               info: FieldInfo,
                             ) {
@@ -1465,7 +1431,7 @@ const makeArg = EXPORTABLE(
         fetcher:
           | null
           | ((
-              $nodeId: ExecutableStep<Maybe<string>>,
+              $nodeId: Step<Maybe<string>>,
             ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentSpec {
@@ -1473,9 +1439,7 @@ const makeArg = EXPORTABLE(
       const fullPath = [...path, graphqlArgName];
       const $raw = args.getRaw(fullPath) as __TrackedValueStep;
       const step = fetcher
-        ? (
-            fetcher($raw as ExecutableStep<Maybe<string>>) as PgSelectSingleStep
-          ).record()
+        ? (fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep).record()
         : bakedInput(args.typeAt(fullPath), $raw);
 
       return {
@@ -1500,7 +1464,7 @@ const makeArgRuntime = EXPORTABLE(
         fetcher:
           | null
           | ((
-              $nodeId: ExecutableStep<Maybe<string>>,
+              $nodeId: Step<Maybe<string>>,
             ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentRuntimeValue {
@@ -1521,3 +1485,67 @@ const makeArgRuntime = EXPORTABLE(
     },
   [bakedInputRuntime],
 );
+
+function pgFunctionArgumentsFromArgs(
+  $in: Step,
+  extraSelectArgs: PgSelectArgumentSpec[],
+): {
+  $row: PgSelectSingleStep;
+  selectArgs: PgSelectArgumentSpec[];
+};
+function pgFunctionArgumentsFromArgs(
+  $in: Step,
+  extraSelectArgs: PgSelectArgumentSpec[],
+  inlining: true,
+): {
+  $row: PgSelectSingleStep;
+  selectArgs: (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
+};
+function pgFunctionArgumentsFromArgs(
+  $in: Step,
+  extraSelectArgs: PgSelectArgumentSpec[],
+  inlining = false,
+) {
+  if (!hasRecord($in)) {
+    throw new Error(
+      `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
+    );
+  }
+  /**
+   * An optimisation - if all our dependencies are
+   * compatible with the expression's class plan then we
+   * can inline ourselves into that, otherwise we must
+   * issue the query separately.
+   */
+  const canUseExpressionDirectly =
+    $in instanceof PgSelectSingleStep &&
+    extraSelectArgs.every((a) =>
+      stepAMayDependOnStepB($in.getClassStep(), a.step),
+    );
+  const $row = canUseExpressionDirectly
+    ? $in
+    : pgSelectSingleFromRecord($in.resource, $in.record());
+  const selectArgs: PgSelectArgumentSpec[] = [
+    { step: $row.record() },
+    ...extraSelectArgs,
+  ];
+  if (inlining) {
+    // This is a scalar computed attribute, let's inline the expression
+    const newSelectArgs = selectArgs.map(
+      (arg, i): PgSelectArgumentSpec | PgSelectArgumentDigest => {
+        if (i === 0) {
+          const { step, ...rest } = arg;
+          return {
+            ...rest,
+            placeholder: $row.getClassStep().alias,
+          } as PgSelectArgumentDigest;
+        } else {
+          return arg;
+        }
+      },
+    );
+    return { $row, selectArgs: newSelectArgs };
+  } else {
+    return { $row, selectArgs };
+  }
+}
