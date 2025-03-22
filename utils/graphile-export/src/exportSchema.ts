@@ -1899,23 +1899,59 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
+        const { grafast, ...rest } = enumValueConfig.extensions ?? {};
         const extensionsAST = extensions(
           file,
-          enumValueConfig.extensions,
+          rest,
           `${type.name}_${enumValueName}Extensions`,
           `${type.name}.values[${enumValueName}].extensions`,
         );
+        if (!valueAST && !extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            enumValues.push(
+              t.objectProperty(
+                identifierOrLiteral(enumValueName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${enumValueName}Apply`,
+                  `${type.name}.values[${enumValueName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+        const grafastProperties = grafast
+          ? Object.entries(grafast)
+              .map(([k, v]) => {
+                if (v == null) return null;
+                return t.objectProperty(
+                  t.identifier(k),
+                  convertToIdentifierViaAST(
+                    file,
+                    v,
+                    `${type.name}.${enumValueName}${k}`,
+                    `${type.name}.values[${enumValueName}].extensions.grafast[${k}]`,
+                  ),
+                );
+              })
+              .filter(isNotNullish)
+          : [];
 
-        if (valueAST || extensionsAST) {
+        if (valueAST || extensionsAST || grafastProperties.length) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
-              t.objectExpression(
-                objectToObjectProperties({
+              t.objectExpression([
+                ...objectToObjectProperties({
                   value: valueAST,
                   extensions: extensionsAST,
                 }),
-              ),
+                ...grafastProperties,
+              ]),
             ),
           );
         }
