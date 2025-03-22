@@ -278,6 +278,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         } else {
           path.remove();
         }
+      } else if (t.type === "BooleanLiteral" && t.value === true) {
+        path.replaceWith(path.node.consequent);
       }
     },
     ObjectProperty(path) {
