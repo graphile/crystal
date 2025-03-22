@@ -24192,18 +24192,14 @@ export const plans = {
     compoundType($record) {
       const $plan = $record.get("compound_type");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      if (true) {
-        $select.coalesceToEmptyObject();
-      }
+      $select.coalesceToEmptyObject();
       $select.getClassStep().setTrusted();
       return $select;
     },
     nestedCompoundType($record) {
       const $plan = $record.get("nested_compound_type");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_nestedCompoundTypePgResource, $plan);
-      if (true) {
-        $select.coalesceToEmptyObject();
-      }
+      $select.coalesceToEmptyObject();
       $select.getClassStep().setTrusted();
       return $select;
     },
@@ -24929,9 +24925,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -24941,9 +24935,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     SMALLINT_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -25688,9 +25680,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -25700,9 +25690,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     NAME_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -25748,9 +25736,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     EMAIL_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -25760,9 +25746,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     SITE_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26069,9 +26053,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26081,9 +26063,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     HEADLINE_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26382,9 +26362,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_1_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26394,9 +26372,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     EXTRA_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26923,9 +26899,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -26935,9 +26909,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   PatchesConnection: {
@@ -26993,9 +26965,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27005,9 +26975,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   ReservedsConnection: {
@@ -27063,9 +27031,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27075,9 +27041,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   ReservedPatchRecordsConnection: {
@@ -27133,9 +27097,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27145,9 +27107,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   ReservedInputRecordsConnection: {
@@ -27203,9 +27163,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27215,9 +27173,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   DefaultValuesConnection: {
@@ -27282,9 +27238,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27294,9 +27248,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     NULL_VALUE_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27355,9 +27307,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27367,9 +27317,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     STR_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27549,9 +27497,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27561,9 +27507,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     JSON_DATA_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27646,9 +27590,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27658,9 +27600,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     SECRET_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27752,9 +27692,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27764,9 +27702,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     COL1_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27885,9 +27821,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -27897,9 +27831,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     COL1_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28036,9 +27968,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28048,9 +27978,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     COL3_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28166,9 +28094,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     X_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28178,9 +28104,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     NAME_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28317,9 +28241,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28329,9 +28251,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     NULLABLE_TEXT_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28582,9 +28502,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28594,9 +28512,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28606,9 +28522,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     PERSON_ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28618,9 +28532,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     LENGTH_IN_METRES_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28721,9 +28633,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28733,9 +28643,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     TS_ASC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28899,9 +28807,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     },
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
@@ -28911,9 +28817,7 @@ export const plans = {
           nulls: undefined ? "LAST" : "FIRST"
         } : null)
       });
-      if (true) {
-        queryBuilder.setOrderIsUnique();
-      }
+      queryBuilder.setOrderIsUnique();
     }
   },
   Mutation: {
