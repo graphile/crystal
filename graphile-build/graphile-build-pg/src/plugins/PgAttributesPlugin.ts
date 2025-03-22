@@ -178,6 +178,10 @@ function processAttribute(
       // See if there's a resource to pull record types from (e.g. for relations/etc)
       if (!baseCodec.attributes) {
         // Simply get the value
+        if (attributeName === attributeFieldName) {
+          // Use default getter
+          return undefined;
+        }
         return EXPORTABLE(
           (attributeName) => ($record: PgSelectSingleStep) => {
             return $record.get(attributeName);

@@ -23296,9 +23296,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Input.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Input.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   Patch: {
@@ -23306,9 +23303,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Patch.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Patch.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   Reserved: {
@@ -23316,9 +23310,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Reserved.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   ReservedPatchRecord: {
@@ -23326,9 +23317,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.ReservedPatchRecord.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ReservedPatchRecord.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   ReservedInputRecord: {
@@ -23336,9 +23324,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.ReservedInputRecord.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ReservedInputRecord.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     }
   },
   DefaultValue: {
@@ -23347,21 +23332,12 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.DefaultValue.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.DefaultValue.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
     nullValue($record) {
       return $record.get("null_value");
     }
   },
   NoPrimaryKey: {
-    __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
-    str($record) {
-      return $record.get("str");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   UniqueForeignKey: {
     __assertStep: assertPgClassSingleStep,
@@ -23389,9 +23365,6 @@ export const plans = {
     },
     personId1($record) {
       return $record.get("person_id_1");
-    },
-    extra($record) {
-      return $record.get("extra");
     },
     personByPersonId1($record) {
       return pgResource_personPgResource.get({
@@ -23628,29 +23601,14 @@ export const plans = {
       } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_type_function_listPgResource.execute(selectArgs);
     },
-    id($record) {
-      return $record.get("id");
-    },
     name($record) {
       return $record.get("person_full_name");
-    },
-    aliases($record) {
-      return $record.get("aliases");
-    },
-    about($record) {
-      return $record.get("about");
-    },
-    email($record) {
-      return $record.get("email");
     },
     site($record) {
       const $plan = $record.get("site");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
       $select.getClassStep().setTrusted();
       return $select;
-    },
-    config($record) {
-      return $record.get("config");
     },
     lastLoginFromIp($record) {
       return $record.get("last_login_from_ip");
@@ -23808,22 +23766,10 @@ export const plans = {
     }
   },
   PersonComputedOutOutRecord: {
-    __assertStep: assertPgClassSingleStep,
-    o1($record) {
-      return $record.get("o1");
-    },
-    o2($record) {
-      return $record.get("o2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   PersonComputedInoutOutRecord: {
-    __assertStep: assertPgClassSingleStep,
-    ino($record) {
-      return $record.get("ino");
-    },
-    o($record) {
-      return $record.get("o");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   Email: {
     serialize: GraphQLString.serialize,
@@ -23837,16 +23783,10 @@ export const plans = {
       const $select = pgSelectSingleFromRecord(pgResource_personPgResource, $plan);
       $select.getClassStep().setTrusted();
       return $select;
-    },
-    o($record) {
-      return $record.get("o");
     }
   },
   PersonComputedComplexRecord: {
     __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
     y($record) {
       const $plan = $record.get("y");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -23869,27 +23809,6 @@ export const plans = {
       } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_compound_type_computed_fieldPgResource.from, resource_compound_type_computed_fieldPgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec, undefined)`${from}`;
-    },
-    a($record) {
-      return $record.get("a");
-    },
-    b($record) {
-      return $record.get("b");
-    },
-    c($record) {
-      return $record.get("c");
-    },
-    d($record) {
-      return $record.get("d");
-    },
-    e($record) {
-      return $record.get("e");
-    },
-    f($record) {
-      return $record.get("f");
-    },
-    g($record) {
-      return $record.get("g");
     },
     fooBar($record) {
       return $record.get("foo_bar");
@@ -24051,20 +23970,8 @@ export const plans = {
       } = pgFunctionArgumentsFromArgs($in, makeArgs_post_computed_compound_type_array(args));
       return resource_post_computed_compound_type_arrayPgResource.execute(selectArgs);
     },
-    id($record) {
-      return $record.get("id");
-    },
-    headline($record) {
-      return $record.get("headline");
-    },
-    body($record) {
-      return $record.get("body");
-    },
     authorId($record) {
       return $record.get("author_id");
-    },
-    enums($record) {
-      return $record.get("enums");
     },
     comptypes($record) {
       const $val = $record.get("comptypes");
@@ -24299,9 +24206,6 @@ export const plans = {
   },
   Comptype: {
     __assertStep: assertPgClassSingleStep,
-    schedule($record) {
-      return $record.get("schedule");
-    },
     isOptimised($record) {
       return $record.get("is_optimised");
     }
@@ -24338,83 +24242,20 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.Type.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Type.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
-    smallint($record) {
-      return $record.get("smallint");
-    },
-    bigint($record) {
-      return $record.get("bigint");
-    },
-    numeric($record) {
-      return $record.get("numeric");
-    },
-    decimal($record) {
-      return $record.get("decimal");
-    },
-    boolean($record) {
-      return $record.get("boolean");
-    },
-    varchar($record) {
-      return $record.get("varchar");
-    },
-    enum($record) {
-      return $record.get("enum");
-    },
     enumArray($record) {
       return $record.get("enum_array");
-    },
-    domain($record) {
-      return $record.get("domain");
-    },
-    domain2($record) {
-      return $record.get("domain2");
     },
     textArray($record) {
       return $record.get("text_array");
     },
-    json($record) {
-      return $record.get("json");
-    },
-    jsonb($record) {
-      return $record.get("jsonb");
-    },
     nullableRange($record) {
       return $record.get("nullable_range");
-    },
-    numrange($record) {
-      return $record.get("numrange");
-    },
-    daterange($record) {
-      return $record.get("daterange");
     },
     anIntRange($record) {
       return $record.get("an_int_range");
     },
-    timestamp($record) {
-      return $record.get("timestamp");
-    },
-    timestamptz($record) {
-      return $record.get("timestamptz");
-    },
-    date($record) {
-      return $record.get("date");
-    },
-    time($record) {
-      return $record.get("time");
-    },
-    timetz($record) {
-      return $record.get("timetz");
-    },
-    interval($record) {
-      return $record.get("interval");
-    },
     intervalArray($record) {
       return $record.get("interval_array");
-    },
-    money($record) {
-      return $record.get("money");
     },
     compoundType($record) {
       const $plan = $record.get("compound_type");
@@ -24446,59 +24287,14 @@ export const plans = {
       $select.getClassStep().setTrusted();
       return $select;
     },
-    point($record) {
-      return $record.get("point");
-    },
-    nullablePoint($record) {
-      return $record.get("nullablePoint");
-    },
-    inet($record) {
-      return $record.get("inet");
-    },
-    cidr($record) {
-      return $record.get("cidr");
-    },
-    macaddr($record) {
-      return $record.get("macaddr");
-    },
-    regproc($record) {
-      return $record.get("regproc");
-    },
-    regprocedure($record) {
-      return $record.get("regprocedure");
-    },
-    regoper($record) {
-      return $record.get("regoper");
-    },
-    regoperator($record) {
-      return $record.get("regoperator");
-    },
-    regclass($record) {
-      return $record.get("regclass");
-    },
-    regtype($record) {
-      return $record.get("regtype");
-    },
-    regconfig($record) {
-      return $record.get("regconfig");
-    },
-    regdictionary($record) {
-      return $record.get("regdictionary");
-    },
     textArrayDomain($record) {
       return $record.get("text_array_domain");
     },
     int8ArrayDomain($record) {
       return $record.get("int8_array_domain");
     },
-    bytea($record) {
-      return $record.get("bytea");
-    },
     byteaArray($record) {
       return $record.get("bytea_array");
-    },
-    ltree($record) {
-      return $record.get("ltree");
     },
     ltreeArray($record) {
       return $record.get("ltree_array");
@@ -27487,10 +27283,7 @@ export const plans = {
     }
   },
   WrappedUrl: {
-    __assertStep: assertPgClassSingleStep,
-    url($record) {
-      return $record.get("url");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   NotNullUrl: {
     serialize: GraphQLString.serialize,
@@ -28173,17 +27966,11 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.LeftArm.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LeftArm.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
     personId($record) {
       return $record.get("person_id");
     },
     lengthInMetres($record) {
       return $record.get("length_in_metres");
-    },
-    mood($record) {
-      return $record.get("mood");
     },
     personByPersonId($record) {
       return pgResource_personPgResource.get({
@@ -28429,9 +28216,6 @@ export const plans = {
       const specifier = nodeIdHandlerByTypeName.MyTable.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.MyTable.codec.name].encode);
     },
-    id($record) {
-      return $record.get("id");
-    },
     jsonData($record) {
       return $record.get("json_data");
     }
@@ -28441,15 +28225,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.ViewTable.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ViewTable.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    col1($record) {
-      return $record.get("col1");
-    },
-    col2($record) {
-      return $record.get("col2");
     }
   },
   SimilarTable1: {
@@ -28457,18 +28232,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.SimilarTable1.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SimilarTable1.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    col1($record) {
-      return $record.get("col1");
-    },
-    col2($record) {
-      return $record.get("col2");
-    },
-    col3($record) {
-      return $record.get("col3");
     }
   },
   SimilarTable2: {
@@ -28476,18 +28239,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.SimilarTable2.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SimilarTable2.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    col3($record) {
-      return $record.get("col3");
-    },
-    col4($record) {
-      return $record.get("col4");
-    },
-    col5($record) {
-      return $record.get("col5");
     }
   },
   NullTestRecord: {
@@ -28495,9 +28246,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.NullTestRecord.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.NullTestRecord.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     },
     nullableText($record) {
       return $record.get("nullable_text");
@@ -28514,12 +28262,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Issue756.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Issue756.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    ts($record) {
-      return $record.get("ts");
     }
   },
   NotNullTimestamp: {
@@ -28537,9 +28279,6 @@ export const plans = {
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.List.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.List.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
     },
     intArray($record) {
       return $record.get("int_array");
@@ -28710,13 +28449,7 @@ export const plans = {
     }
   },
   FuncOutOutSetofRecord: {
-    __assertStep: assertPgClassSingleStep,
-    o1($record) {
-      return $record.get("o1");
-    },
-    o2($record) {
-      return $record.get("o2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   FuncOutOutSetofEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -28738,9 +28471,6 @@ export const plans = {
   },
   SearchTestSummariesRecord: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
     totalDuration($record) {
       return $record.get("total_duration");
     }
@@ -28749,9 +28479,6 @@ export const plans = {
     __assertStep: assertPgClassSingleStep,
     arg1($record) {
       return $record.get("column1");
-    },
-    o2($record) {
-      return $record.get("o2");
     },
     arg3($record) {
       return $record.get("column3");
@@ -28799,13 +28526,7 @@ export const plans = {
     }
   },
   FuncReturnsTableMultiColRecord: {
-    __assertStep: assertPgClassSingleStep,
-    col1($record) {
-      return $record.get("col1");
-    },
-    col2($record) {
-      return $record.get("col2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   FuncReturnsTableMultiColEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -28826,9 +28547,6 @@ export const plans = {
   },
   FuncOutOutCompoundTypeRecord: {
     __assertStep: assertPgClassSingleStep,
-    o1($record) {
-      return $record.get("o1");
-    },
     o2($record) {
       const $plan = $record.get("o2");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -28838,9 +28556,6 @@ export const plans = {
   },
   QueryOutputTwoRowsRecord: {
     __assertStep: assertPgClassSingleStep,
-    txt($record) {
-      return $record.get("txt");
-    },
     leftArm($record) {
       const $plan = $record.get("left_arm");
       const $select = pgSelectSingleFromRecord(pgResource_left_armPgResource, $plan);
@@ -28881,9 +28596,6 @@ export const plans = {
   },
   FuncOutComplexRecord: {
     __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
     y($record) {
       const $plan = $record.get("y");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -28915,9 +28627,6 @@ export const plans = {
   },
   FuncOutComplexSetofRecord: {
     __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
     y($record) {
       const $plan = $record.get("y");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -30255,16 +29964,7 @@ export const plans = {
     }
   },
   Testview: {
-    __assertStep: assertPgClassSingleStep,
-    testviewid($record) {
-      return $record.get("testviewid");
-    },
-    col1($record) {
-      return $record.get("col1");
-    },
-    col2($record) {
-      return $record.get("col2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   TestviewsEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -31615,19 +31315,7 @@ export const plans = {
     }
   },
   UpdatableView: {
-    __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
-    name($record) {
-      return $record.get("name");
-    },
-    description($record) {
-      return $record.get("description");
-    },
-    constant($record) {
-      return $record.get("constant");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   UpdatableViewsEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -36634,13 +36322,7 @@ export const plans = {
     }
   },
   MutationOutOutSetofRecord: {
-    __assertStep: assertPgClassSingleStep,
-    o1($record) {
-      return $record.get("o1");
-    },
-    o2($record) {
-      return $record.get("o2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   MutationOutOutSetofInput: {
     clientMutationId: {
@@ -36719,9 +36401,6 @@ export const plans = {
     arg1($record) {
       return $record.get("column1");
     },
-    o2($record) {
-      return $record.get("o2");
-    },
     arg3($record) {
       return $record.get("column3");
     }
@@ -36747,13 +36426,7 @@ export const plans = {
     }
   },
   MutationReturnsTableMultiColRecord: {
-    __assertStep: assertPgClassSingleStep,
-    col1($record) {
-      return $record.get("col1");
-    },
-    col2($record) {
-      return $record.get("col2");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   MutationReturnsTableMultiColInput: {
     clientMutationId: {
@@ -36866,22 +36539,7 @@ export const plans = {
     }
   },
   JwtToken: {
-    __assertStep: assertPgClassSingleStep,
-    role($record) {
-      return $record.get("role");
-    },
-    exp($record) {
-      return $record.get("exp");
-    },
-    a($record) {
-      return $record.get("a");
-    },
-    b($record) {
-      return $record.get("b");
-    },
-    c($record) {
-      return $record.get("c");
-    }
+    __assertStep: assertPgClassSingleStep
   },
   AuthenticateFailInput: {
     clientMutationId: {
@@ -37111,12 +36769,6 @@ export const plans = {
       $select.getClassStep().setTrusted();
       return $select;
     },
-    id($record) {
-      return $record.get("id");
-    },
-    admin($record) {
-      return $record.get("admin");
-    },
     personById($record) {
       return pgResource_personPgResource.get({
         id: $record.get("id")
@@ -37174,9 +36826,6 @@ export const plans = {
   },
   MutationOutOutCompoundTypeRecord: {
     __assertStep: assertPgClassSingleStep,
-    o1($record) {
-      return $record.get("o1");
-    },
     o2($record) {
       const $plan = $record.get("o2");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -37485,9 +37134,6 @@ export const plans = {
   },
   MutationOutComplexRecord: {
     __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
     y($record) {
       const $plan = $record.get("y");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -37525,9 +37171,6 @@ export const plans = {
   },
   MutationOutComplexSetofRecord: {
     __assertStep: assertPgClassSingleStep,
-    x($record) {
-      return $record.get("x");
-    },
     y($record) {
       const $plan = $record.get("y");
       const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
