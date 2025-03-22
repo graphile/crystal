@@ -283,18 +283,14 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
     IfStatement(path) {
-      const t = path.node.test;
-      if (
-        (t.type === "Identifier" && t.name === "undefined") ||
-        t.type === "NullLiteral" ||
-        (t.type === "BooleanLiteral" && t.value === false)
-      ) {
+      const test = path.node.test;
+      if (expressionIsAlwaysFalsy(test)) {
         if (path.node.alternate) {
           path.replaceWith(path.node.alternate);
         } else {
           path.remove();
         }
-      } else if (t.type === "BooleanLiteral" && t.value === true) {
+      } else if (expressionIsAlwaysTruthy(test)) {
         path.replaceWith(path.node.consequent);
       }
     },
@@ -364,4 +360,16 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
 function isNotNullish<T>(o: T | null | undefined): o is T {
   return o != null;
+}
+
+function expressionIsAlwaysFalsy(test: t.Expression) {
+  return (
+    (test.type === "Identifier" && test.name === "undefined") ||
+    test.type === "NullLiteral" ||
+    (test.type === "BooleanLiteral" && test.value === false)
+  );
+}
+
+function expressionIsAlwaysTruthy(test: t.Expression) {
+  return test.type === "BooleanLiteral" && test.value === true;
 }
