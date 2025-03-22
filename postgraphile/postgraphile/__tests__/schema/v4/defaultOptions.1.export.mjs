@@ -9608,7 +9608,34 @@ const nodeIdHandlerByTypeName = {
 };
 const resource_no_primary_keyPgResource = registry.pgResources["no_primary_key"];
 const resource_unique_foreign_keyPgResource = registry.pgResources["unique_foreign_key"];
-const argDetailsSimple_current_user_id = [];
+const EMPTY_ARRAY = [];
+const makeArgs_person_computed_out = () => EMPTY_ARRAY;
+const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
+const resource_func_outPgResource = registry.pgResources["func_out"];
+const resource_func_out_setofPgResource = registry.pgResources["func_out_setof"];
+const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_person_computed_out(args);
+  return resource_func_out_setofPgResource.execute(selectArgs);
+};
+const resource_func_out_unnamedPgResource = registry.pgResources["func_out_unnamed"];
+const resource_no_args_queryPgResource = registry.pgResources["no_args_query"];
+const resource_query_interval_setPgResource = registry.pgResources["query_interval_set"];
+const getSelectPlanFromParentAndArgs2 = ($root, args, _info) => {
+  const selectArgs = makeArgs_person_computed_out(args);
+  return resource_query_interval_setPgResource.execute(selectArgs);
+};
+const resource_static_big_integerPgResource = registry.pgResources["static_big_integer"];
+const getSelectPlanFromParentAndArgs3 = ($root, args, _info) => {
+  const selectArgs = makeArgs_person_computed_out(args);
+  return resource_static_big_integerPgResource.execute(selectArgs);
+};
+const argDetailsSimple_func_in_out = [{
+  graphqlArgName: "i",
+  postgresArgName: "i",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 function makeArg(path, args, details) {
   const {
     graphqlArgName,
@@ -9625,45 +9652,6 @@ function makeArg(path, args, details) {
     name: postgresArgName ?? undefined
   };
 }
-const makeArgs_current_user_id = (args, path = []) => argDetailsSimple_current_user_id.map(details => makeArg(path, args, details));
-const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
-const argDetailsSimple_func_out = [];
-const makeArgs_func_out = (args, path = []) => argDetailsSimple_func_out.map(details => makeArg(path, args, details));
-const resource_func_outPgResource = registry.pgResources["func_out"];
-const argDetailsSimple_func_out_setof = [];
-const makeArgs_func_out_setof = (args, path = []) => argDetailsSimple_func_out_setof.map(details => makeArg(path, args, details));
-const resource_func_out_setofPgResource = registry.pgResources["func_out_setof"];
-const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_func_out_setof(args);
-  return resource_func_out_setofPgResource.execute(selectArgs);
-};
-const argDetailsSimple_func_out_unnamed = [];
-const makeArgs_func_out_unnamed = (args, path = []) => argDetailsSimple_func_out_unnamed.map(details => makeArg(path, args, details));
-const resource_func_out_unnamedPgResource = registry.pgResources["func_out_unnamed"];
-const argDetailsSimple_no_args_query = [];
-const makeArgs_no_args_query = (args, path = []) => argDetailsSimple_no_args_query.map(details => makeArg(path, args, details));
-const resource_no_args_queryPgResource = registry.pgResources["no_args_query"];
-const argDetailsSimple_query_interval_set = [];
-const makeArgs_query_interval_set = (args, path = []) => argDetailsSimple_query_interval_set.map(details => makeArg(path, args, details));
-const resource_query_interval_setPgResource = registry.pgResources["query_interval_set"];
-const getSelectPlanFromParentAndArgs2 = ($root, args, _info) => {
-  const selectArgs = makeArgs_query_interval_set(args);
-  return resource_query_interval_setPgResource.execute(selectArgs);
-};
-const argDetailsSimple_static_big_integer = [];
-const makeArgs_static_big_integer = (args, path = []) => argDetailsSimple_static_big_integer.map(details => makeArg(path, args, details));
-const resource_static_big_integerPgResource = registry.pgResources["static_big_integer"];
-const getSelectPlanFromParentAndArgs3 = ($root, args, _info) => {
-  const selectArgs = makeArgs_static_big_integer(args);
-  return resource_static_big_integerPgResource.execute(selectArgs);
-};
-const argDetailsSimple_func_in_out = [{
-  graphqlArgName: "i",
-  postgresArgName: "i",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
 const makeArgs_func_in_out = (args, path = []) => argDetailsSimple_func_in_out.map(details => makeArg(path, args, details));
 const resource_func_in_outPgResource = registry.pgResources["func_in_out"];
 const argDetailsSimple_func_returns_table_one_col = [{
@@ -9772,21 +9760,13 @@ const argDetailsSimple_func_in_inout = [{
 }];
 const makeArgs_func_in_inout = (args, path = []) => argDetailsSimple_func_in_inout.map(details => makeArg(path, args, details));
 const resource_func_in_inoutPgResource = registry.pgResources["func_in_inout"];
-const argDetailsSimple_func_out_out = [];
-const makeArgs_func_out_out = (args, path = []) => argDetailsSimple_func_out_out.map(details => makeArg(path, args, details));
 const resource_func_out_outPgResource = registry.pgResources["func_out_out"];
-const argDetailsSimple_func_out_out_setof = [];
-const makeArgs_func_out_out_setof = (args, path = []) => argDetailsSimple_func_out_out_setof.map(details => makeArg(path, args, details));
 const resource_func_out_out_setofPgResource = registry.pgResources["func_out_out_setof"];
 const getSelectPlanFromParentAndArgs5 = ($root, args, _info) => {
-  const selectArgs = makeArgs_func_out_out_setof(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_func_out_out_setofPgResource.execute(selectArgs);
 };
-const argDetailsSimple_func_out_out_unnamed = [];
-const makeArgs_func_out_out_unnamed = (args, path = []) => argDetailsSimple_func_out_out_unnamed.map(details => makeArg(path, args, details));
 const resource_func_out_out_unnamedPgResource = registry.pgResources["func_out_out_unnamed"];
-const argDetailsSimple_search_test_summaries = [];
-const makeArgs_search_test_summaries = (args, path = []) => argDetailsSimple_search_test_summaries.map(details => makeArg(path, args, details));
 const resource_search_test_summariesPgResource = registry.pgResources["search_test_summaries"];
 const argDetailsSimple_optional_missing_middle_1 = [{
   graphqlArgName: "arg0",
@@ -9893,8 +9873,6 @@ const argDetailsSimple_optional_missing_middle_5 = [{
 }];
 const makeArgs_optional_missing_middle_5 = (args, path = []) => argDetailsSimple_optional_missing_middle_5.map(details => makeArg(path, args, details));
 const resource_optional_missing_middle_5PgResource = registry.pgResources["optional_missing_middle_5"];
-const argDetailsSimple_func_out_unnamed_out_out_unnamed = [];
-const makeArgs_func_out_unnamed_out_out_unnamed = (args, path = []) => argDetailsSimple_func_out_unnamed_out_out_unnamed.map(details => makeArg(path, args, details));
 const resource_func_out_unnamed_out_out_unnamedPgResource = registry.pgResources["func_out_unnamed_out_out_unnamed"];
 const argDetailsSimple_int_set_query = [{
   graphqlArgName: "x",
@@ -9946,14 +9924,8 @@ const getSelectPlanFromParentAndArgs7 = ($root, args, _info) => {
   const selectArgs = makeArgs_func_returns_table_multi_col(args);
   return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
 };
-const argDetailsSimple_query_interval_array = [];
-const makeArgs_query_interval_array = (args, path = []) => argDetailsSimple_query_interval_array.map(details => makeArg(path, args, details));
 const resource_query_interval_arrayPgResource = registry.pgResources["query_interval_array"];
-const argDetailsSimple_query_text_array = [];
-const makeArgs_query_text_array = (args, path = []) => argDetailsSimple_query_text_array.map(details => makeArg(path, args, details));
 const resource_query_text_arrayPgResource = registry.pgResources["query_text_array"];
-const argDetailsSimple_return_table_without_grants = [];
-const makeArgs_return_table_without_grants = (args, path = []) => argDetailsSimple_return_table_without_grants.map(details => makeArg(path, args, details));
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
 const argDetailsSimple_types_query = [{
   graphqlArgName: "a",
@@ -10024,11 +9996,9 @@ const argDetailsSimple_query_output_two_rows = [{
 }];
 const makeArgs_query_output_two_rows = (args, path = []) => argDetailsSimple_query_output_two_rows.map(details => makeArg(path, args, details));
 const resource_query_output_two_rowsPgResource = registry.pgResources["query_output_two_rows"];
-const argDetailsSimple_compound_type_set_query = [];
-const makeArgs_compound_type_set_query = (args, path = []) => argDetailsSimple_compound_type_set_query.map(details => makeArg(path, args, details));
 const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
 const getSelectPlanFromParentAndArgs8 = ($root, args, _info) => {
-  const selectArgs = makeArgs_compound_type_set_query(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_compound_type_set_queryPgResource.execute(selectArgs);
 };
 const argDetailsSimple_compound_type_query = [{
@@ -10101,45 +10071,33 @@ const getSelectPlanFromParentAndArgs9 = ($root, args, _info) => {
   const selectArgs = makeArgs_func_out_complex_setof(args);
   return resource_func_out_complex_setofPgResource.execute(selectArgs);
 };
-const argDetailsSimple_badly_behaved_function = [];
-const makeArgs_badly_behaved_function = (args, path = []) => argDetailsSimple_badly_behaved_function.map(details => makeArg(path, args, details));
 const resource_badly_behaved_functionPgResource = registry.pgResources["badly_behaved_function"];
 const getSelectPlanFromParentAndArgs10 = ($root, args, _info) => {
-  const selectArgs = makeArgs_badly_behaved_function(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_badly_behaved_functionPgResource.execute(selectArgs);
 };
-const argDetailsSimple_func_out_table = [];
-const makeArgs_func_out_table = (args, path = []) => argDetailsSimple_func_out_table.map(details => makeArg(path, args, details));
 const resource_func_out_tablePgResource = registry.pgResources["func_out_table"];
-const argDetailsSimple_func_out_table_setof = [];
-const makeArgs_func_out_table_setof = (args, path = []) => argDetailsSimple_func_out_table_setof.map(details => makeArg(path, args, details));
 const resource_func_out_table_setofPgResource = registry.pgResources["func_out_table_setof"];
 const getSelectPlanFromParentAndArgs11 = ($root, args, _info) => {
-  const selectArgs = makeArgs_func_out_table_setof(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_func_out_table_setofPgResource.execute(selectArgs);
 };
-const argDetailsSimple_table_set_query = [];
-const makeArgs_table_set_query = (args, path = []) => argDetailsSimple_table_set_query.map(details => makeArg(path, args, details));
 const resource_table_set_queryPgResource = registry.pgResources["table_set_query"];
 const getSelectPlanFromParentAndArgs12 = ($root, args, _info) => {
-  const selectArgs = makeArgs_table_set_query(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_table_set_queryPgResource.execute(selectArgs);
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
-const argDetailsSimple_table_set_query_plpgsql = [];
-const makeArgs_table_set_query_plpgsql = (args, path = []) => argDetailsSimple_table_set_query_plpgsql.map(details => makeArg(path, args, details));
 const resource_table_set_query_plpgsqlPgResource = registry.pgResources["table_set_query_plpgsql"];
 const getSelectPlanFromParentAndArgs13 = ($root, args, _info) => {
-  const selectArgs = makeArgs_table_set_query_plpgsql(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
 };
-const argDetailsSimple_type_function_connection = [];
-const makeArgs_type_function_connection = (args, path = []) => argDetailsSimple_type_function_connection.map(details => makeArg(path, args, details));
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
 const getSelectPlanFromParentAndArgs14 = ($root, args, _info) => {
-  const selectArgs = makeArgs_type_function_connection(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
 const argDetailsSimple_type_function = [{
@@ -10151,8 +10109,6 @@ const argDetailsSimple_type_function = [{
 }];
 const makeArgs_type_function = (args, path = []) => argDetailsSimple_type_function.map(details => makeArg(path, args, details));
 const resource_type_functionPgResource = registry.pgResources["type_function"];
-const argDetailsSimple_type_function_list = [];
-const makeArgs_type_function_list = (args, path = []) => argDetailsSimple_type_function_list.map(details => makeArg(path, args, details));
 const resource_type_function_listPgResource = registry.pgResources["type_function_list"];
 function specForHandler(handler) {
   function spec(nodeId) {
@@ -10330,8 +10286,6 @@ const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];
 const resource_testviewPgResource = registry.pgResources["testview"];
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
 const resource_edge_casePgResource = registry.pgResources["edge_case"];
-const argDetailsSimple_person_computed_out = [];
-const makeArgs_person_computed_out = (args, path = []) => argDetailsSimple_person_computed_out.map(details => makeArg(path, args, details));
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -10374,18 +10328,14 @@ const pgFunctionArgumentsFromArgs = (() => {
     } else {
       return {
         $row,
-        selectArgs
+        selectArgs: selectArgs
       };
     }
   }
   return pgFunctionArgumentsFromArgs;
 })();
 const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
-const argDetailsSimple_person_first_name = [];
-const makeArgs_person_first_name = (args, path = []) => argDetailsSimple_person_first_name.map(details => makeArg(path, args, details));
 const resource_person_first_namePgResource = registry.pgResources["person_first_name"];
-const argDetailsSimple_person_computed_out_out = [];
-const makeArgs_person_computed_out_out = (args, path = []) => argDetailsSimple_person_computed_out_out.map(details => makeArg(path, args, details));
 const resource_person_computed_out_outPgResource = registry.pgResources["person_computed_out_out"];
 const argDetailsSimple_person_computed_inout = [{
   graphqlArgName: "ino",
@@ -10414,8 +10364,6 @@ const argDetailsSimple_person_exists = [{
 }];
 const makeArgs_person_exists = (args, path = []) => argDetailsSimple_person_exists.map(details => makeArg(path, args, details));
 const resource_person_existsPgResource = registry.pgResources["person_exists"];
-const argDetailsSimple_person_computed_first_arg_inout_out = [];
-const makeArgs_person_computed_first_arg_inout_out = (args, path = []) => argDetailsSimple_person_computed_first_arg_inout_out.map(details => makeArg(path, args, details));
 const resource_person_computed_first_arg_inout_outPgResource = registry.pgResources["person_computed_first_arg_inout_out"];
 const argDetailsSimple_person_optional_missing_middle_1 = [{
   graphqlArgName: "arg0",
@@ -10537,28 +10485,20 @@ const argDetailsSimple_person_computed_complex = [{
 }];
 const makeArgs_person_computed_complex = (args, path = []) => argDetailsSimple_person_computed_complex.map(details => makeArg(path, args, details));
 const resource_person_computed_complexPgResource = registry.pgResources["person_computed_complex"];
-const argDetailsSimple_person_first_post = [];
-const makeArgs_person_first_post = (args, path = []) => argDetailsSimple_person_first_post.map(details => makeArg(path, args, details));
 const resource_person_first_postPgResource = registry.pgResources["person_first_post"];
-const argDetailsSimple_person_computed_first_arg_inout = [];
-const makeArgs_person_computed_first_arg_inout = (args, path = []) => argDetailsSimple_person_computed_first_arg_inout.map(details => makeArg(path, args, details));
 const resource_person_computed_first_arg_inoutPgResource = registry.pgResources["person_computed_first_arg_inout"];
-const argDetailsSimple_person_friends = [];
-const makeArgs_person_friends = (args, path = []) => argDetailsSimple_person_friends.map(details => makeArg(path, args, details));
 const resource_person_friendsPgResource = registry.pgResources["person_friends"];
 const getSelectPlanFromParentAndArgs15 = ($in, args, _info) => {
   const {
     selectArgs
-  } = pgFunctionArgumentsFromArgs($in, makeArgs_person_friends(args));
+  } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_person_friendsPgResource.execute(selectArgs);
 };
-const argDetailsSimple_person_type_function_connection = [];
-const makeArgs_person_type_function_connection = (args, path = []) => argDetailsSimple_person_type_function_connection.map(details => makeArg(path, args, details));
 const resource_person_type_function_connectionPgResource = registry.pgResources["person_type_function_connection"];
 const getSelectPlanFromParentAndArgs16 = ($in, args, _info) => {
   const {
     selectArgs
-  } = pgFunctionArgumentsFromArgs($in, makeArgs_person_type_function_connection(args));
+  } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_person_type_function_connectionPgResource.execute(selectArgs);
 };
 const argDetailsSimple_person_type_function = [{
@@ -10570,13 +10510,9 @@ const argDetailsSimple_person_type_function = [{
 }];
 const makeArgs_person_type_function = (args, path = []) => argDetailsSimple_person_type_function.map(details => makeArg(path, args, details));
 const resource_person_type_functionPgResource = registry.pgResources["person_type_function"];
-const argDetailsSimple_person_type_function_list = [];
-const makeArgs_person_type_function_list = (args, path = []) => argDetailsSimple_person_type_function_list.map(details => makeArg(path, args, details));
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
-const argDetailsSimple_compound_type_computed_field = [];
-const makeArgs_compound_type_computed_field = (args, path = []) => argDetailsSimple_compound_type_computed_field.map(details => makeArg(path, args, details));
 const resource_compound_type_computed_fieldPgResource = registry.pgResources["compound_type_computed_field"];
 function UUIDSerialize(value) {
   return "" + value;
@@ -10587,20 +10523,14 @@ const coerce = string => {
   }
   return string;
 };
-const argDetailsSimple_post_computed_interval_set = [];
-const makeArgs_post_computed_interval_set = (args, path = []) => argDetailsSimple_post_computed_interval_set.map(details => makeArg(path, args, details));
 const resource_post_computed_interval_setPgResource = registry.pgResources["post_computed_interval_set"];
 const getSelectPlanFromParentAndArgs17 = ($in, args, _info) => {
   const {
     selectArgs
-  } = pgFunctionArgumentsFromArgs($in, makeArgs_post_computed_interval_set(args));
+  } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_post_computed_interval_setPgResource.execute(selectArgs);
 };
-const argDetailsSimple_post_computed_interval_array = [];
-const makeArgs_post_computed_interval_array = (args, path = []) => argDetailsSimple_post_computed_interval_array.map(details => makeArg(path, args, details));
 const resource_post_computed_interval_arrayPgResource = registry.pgResources["post_computed_interval_array"];
-const argDetailsSimple_post_computed_text_array = [];
-const makeArgs_post_computed_text_array = (args, path = []) => argDetailsSimple_post_computed_text_array.map(details => makeArg(path, args, details));
 const resource_post_computed_text_arrayPgResource = registry.pgResources["post_computed_text_array"];
 const argDetailsSimple_post_computed_with_optional_arg = [{
   graphqlArgName: "i",
@@ -10730,26 +10660,12 @@ const parseValueLiteral = (ast, variables) => {
       return undefined;
   }
 };
-const argDetailsSimple_edge_case_computed = [];
-const makeArgs_edge_case_computed = (args, path = []) => argDetailsSimple_edge_case_computed.map(details => makeArg(path, args, details));
 const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
-const argDetailsSimple_mutation_out = [];
-const makeArgs_mutation_out = (args, path = []) => argDetailsSimple_mutation_out.map(details => makeArg(path, args, details));
 const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
-const argDetailsSimple_mutation_out_setof = [];
-const makeArgs_mutation_out_setof = (args, path = []) => argDetailsSimple_mutation_out_setof.map(details => makeArg(path, args, details));
 const resource_mutation_out_setofPgResource = registry.pgResources["mutation_out_setof"];
-const argDetailsSimple_mutation_out_unnamed = [];
-const makeArgs_mutation_out_unnamed = (args, path = []) => argDetailsSimple_mutation_out_unnamed.map(details => makeArg(path, args, details));
 const resource_mutation_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed"];
-const argDetailsSimple_no_args_mutation = [];
-const makeArgs_no_args_mutation = (args, path = []) => argDetailsSimple_no_args_mutation.map(details => makeArg(path, args, details));
 const resource_no_args_mutationPgResource = registry.pgResources["no_args_mutation"];
-const argDetailsSimple_return_void_mutation = [];
-const makeArgs_return_void_mutation = (args, path = []) => argDetailsSimple_return_void_mutation.map(details => makeArg(path, args, details));
 const resource_return_void_mutationPgResource = registry.pgResources["return_void_mutation"];
-const argDetailsSimple_mutation_interval_set = [];
-const makeArgs_mutation_interval_set = (args, path = []) => argDetailsSimple_mutation_interval_set.map(details => makeArg(path, args, details));
 const resource_mutation_interval_setPgResource = registry.pgResources["mutation_interval_set"];
 const argDetailsSimple_mutation_in_out = [{
   graphqlArgName: "i",
@@ -10955,14 +10871,8 @@ const argDetailsSimple_mutation_in_inout = [{
 }];
 const makeArgs_mutation_in_inout = (args, path = []) => argDetailsSimple_mutation_in_inout.map(details => makeArg(path, args, details));
 const resource_mutation_in_inoutPgResource = registry.pgResources["mutation_in_inout"];
-const argDetailsSimple_mutation_out_out = [];
-const makeArgs_mutation_out_out = (args, path = []) => argDetailsSimple_mutation_out_out.map(details => makeArg(path, args, details));
 const resource_mutation_out_outPgResource = registry.pgResources["mutation_out_out"];
-const argDetailsSimple_mutation_out_out_setof = [];
-const makeArgs_mutation_out_out_setof = (args, path = []) => argDetailsSimple_mutation_out_out_setof.map(details => makeArg(path, args, details));
 const resource_mutation_out_out_setofPgResource = registry.pgResources["mutation_out_out_setof"];
-const argDetailsSimple_mutation_out_out_unnamed = [];
-const makeArgs_mutation_out_out_unnamed = (args, path = []) => argDetailsSimple_mutation_out_out_unnamed.map(details => makeArg(path, args, details));
 const resource_mutation_out_out_unnamedPgResource = registry.pgResources["mutation_out_out_unnamed"];
 const argDetailsSimple_int_set_mutation = [{
   graphqlArgName: "x",
@@ -10985,8 +10895,6 @@ const argDetailsSimple_int_set_mutation = [{
 }];
 const makeArgs_int_set_mutation = (args, path = []) => argDetailsSimple_int_set_mutation.map(details => makeArg(path, args, details));
 const resource_int_set_mutationPgResource = registry.pgResources["int_set_mutation"];
-const argDetailsSimple_mutation_out_unnamed_out_out_unnamed = [];
-const makeArgs_mutation_out_unnamed_out_out_unnamed = (args, path = []) => argDetailsSimple_mutation_out_unnamed_out_out_unnamed.map(details => makeArg(path, args, details));
 const resource_mutation_out_unnamed_out_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed_out_out_unnamed"];
 const argDetailsSimple_mutation_returns_table_multi_col = [{
   graphqlArgName: "i",
@@ -11006,11 +10914,7 @@ const argDetailsSimple_guid_fn = [{
 }];
 const makeArgs_guid_fn = (args, path = []) => argDetailsSimple_guid_fn.map(details => makeArg(path, args, details));
 const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
-const argDetailsSimple_mutation_interval_array = [];
-const makeArgs_mutation_interval_array = (args, path = []) => argDetailsSimple_mutation_interval_array.map(details => makeArg(path, args, details));
 const resource_mutation_interval_arrayPgResource = registry.pgResources["mutation_interval_array"];
-const argDetailsSimple_mutation_text_array = [];
-const makeArgs_mutation_text_array = (args, path = []) => argDetailsSimple_mutation_text_array.map(details => makeArg(path, args, details));
 const resource_mutation_text_arrayPgResource = registry.pgResources["mutation_text_array"];
 const argDetailsSimple_list_bde_mutation = [{
   graphqlArgName: "b",
@@ -11033,8 +10937,6 @@ const argDetailsSimple_list_bde_mutation = [{
 }];
 const makeArgs_list_bde_mutation = (args, path = []) => argDetailsSimple_list_bde_mutation.map(details => makeArg(path, args, details));
 const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
-const argDetailsSimple_authenticate_fail = [];
-const makeArgs_authenticate_fail = (args, path = []) => argDetailsSimple_authenticate_fail.map(details => makeArg(path, args, details));
 const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
 const argDetailsSimple_authenticate = [{
   graphqlArgName: "a",
@@ -11066,11 +10968,7 @@ const argDetailsSimple_left_arm_identity = [{
 }];
 const makeArgs_left_arm_identity = (args, path = []) => argDetailsSimple_left_arm_identity.map(details => makeArg(path, args, details));
 const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
-const argDetailsSimple_issue756_mutation = [];
-const makeArgs_issue756_mutation = (args, path = []) => argDetailsSimple_issue756_mutation.map(details => makeArg(path, args, details));
 const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
-const argDetailsSimple_issue756_set_mutation = [];
-const makeArgs_issue756_set_mutation = (args, path = []) => argDetailsSimple_issue756_set_mutation.map(details => makeArg(path, args, details));
 const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
 const argDetailsSimple_authenticate_many = [{
   graphqlArgName: "a",
@@ -11270,17 +11168,9 @@ const argDetailsSimple_mutation_out_complex_setof = [{
 }];
 const makeArgs_mutation_out_complex_setof = (args, path = []) => argDetailsSimple_mutation_out_complex_setof.map(details => makeArg(path, args, details));
 const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
-const argDetailsSimple_mutation_out_table = [];
-const makeArgs_mutation_out_table = (args, path = []) => argDetailsSimple_mutation_out_table.map(details => makeArg(path, args, details));
 const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
-const argDetailsSimple_mutation_out_table_setof = [];
-const makeArgs_mutation_out_table_setof = (args, path = []) => argDetailsSimple_mutation_out_table_setof.map(details => makeArg(path, args, details));
 const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
-const argDetailsSimple_table_set_mutation = [];
-const makeArgs_table_set_mutation = (args, path = []) => argDetailsSimple_table_set_mutation.map(details => makeArg(path, args, details));
 const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
-const argDetailsSimple_type_function_connection_mutation = [];
-const makeArgs_type_function_connection_mutation = (args, path = []) => argDetailsSimple_type_function_connection_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
 const argDetailsSimple_type_function_mutation = [{
   graphqlArgName: "id",
@@ -11291,8 +11181,6 @@ const argDetailsSimple_type_function_mutation = [{
 }];
 const makeArgs_type_function_mutation = (args, path = []) => argDetailsSimple_type_function_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
-const argDetailsSimple_type_function_list_mutation = [];
-const makeArgs_type_function_list_mutation = (args, path = []) => argDetailsSimple_type_function_list_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -22065,11 +21953,11 @@ export const plans = {
       });
     },
     currentUserId($root, args, _info) {
-      const selectArgs = makeArgs_current_user_id(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_current_user_idPgResource.execute(selectArgs);
     },
     funcOut($root, args, _info) {
-      const selectArgs = makeArgs_func_out(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_outPgResource.execute(selectArgs);
     },
     funcOutSetof: {
@@ -22101,11 +21989,11 @@ export const plans = {
       }
     },
     funcOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_func_out_unnamed(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_out_unnamedPgResource.execute(selectArgs);
     },
     noArgsQuery($root, args, _info) {
-      const selectArgs = makeArgs_no_args_query(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_no_args_queryPgResource.execute(selectArgs);
     },
     queryIntervalSet: {
@@ -22225,7 +22113,7 @@ export const plans = {
       return resource_func_in_inoutPgResource.execute(selectArgs);
     },
     funcOutOut($root, args, _info) {
-      const selectArgs = makeArgs_func_out_out(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_out_outPgResource.execute(selectArgs);
     },
     funcOutOutSetof: {
@@ -22257,12 +22145,12 @@ export const plans = {
       }
     },
     funcOutOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_func_out_out_unnamed(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_out_out_unnamedPgResource.execute(selectArgs);
     },
     searchTestSummariesList: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_search_test_summaries(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_search_test_summariesPgResource.execute(selectArgs);
       },
       args: {
@@ -22295,7 +22183,7 @@ export const plans = {
       return resource_optional_missing_middle_5PgResource.execute(selectArgs);
     },
     funcOutUnnamedOutOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_func_out_unnamed_out_out_unnamed(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_out_unnamed_out_out_unnamedPgResource.execute(selectArgs);
     },
     intSetQuery: {
@@ -22355,15 +22243,15 @@ export const plans = {
       }
     },
     queryIntervalArray($root, args, _info) {
-      const selectArgs = makeArgs_query_interval_array(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_query_interval_arrayPgResource.execute(selectArgs);
     },
     queryTextArray($root, args, _info) {
-      const selectArgs = makeArgs_query_text_array(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_query_text_arrayPgResource.execute(selectArgs);
     },
     returnTableWithoutGrants($root, args, _info) {
-      const selectArgs = makeArgs_return_table_without_grants(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_return_table_without_grantsPgResource.execute(selectArgs);
     },
     typesQuery($root, args, _info) {
@@ -22483,7 +22371,7 @@ export const plans = {
       }
     },
     funcOutTable($root, args, _info) {
-      const selectArgs = makeArgs_func_out_table(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_func_out_tablePgResource.execute(selectArgs);
     },
     funcOutTableSetof: {
@@ -22611,7 +22499,7 @@ export const plans = {
       return resource_type_functionPgResource.execute(selectArgs);
     },
     typeFunctionList($root, args, _info) {
-      const selectArgs = makeArgs_type_function_list(args);
+      const selectArgs = makeArgs_person_computed_out(args);
       return resource_type_function_listPgResource.execute(selectArgs);
     },
     input(_$parent, args) {
@@ -23612,14 +23500,14 @@ export const plans = {
       const {
         $row,
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_first_name(args), true);
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_person_first_namePgResource.from, resource_person_first_namePgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_person_first_namePgResource.codec, undefined)`${from}`;
     },
     computedOutOut($in, args, _info) {
       const {
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out_out(args));
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_computed_out_outPgResource.execute(selectArgs);
     },
     computedInout($in, args, _info) {
@@ -23647,7 +23535,7 @@ export const plans = {
     computedFirstArgInoutOut($in, args, _info) {
       const {
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_first_arg_inout_out(args));
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
     },
     optionalMissingMiddle1($in, args, _info) {
@@ -23699,13 +23587,13 @@ export const plans = {
     firstPost($in, args, _info) {
       const {
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_first_post(args));
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_first_postPgResource.execute(selectArgs);
     },
     computedFirstArgInout($in, args, _info) {
       const {
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_first_arg_inout(args));
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
     },
     friends: {
@@ -23777,7 +23665,7 @@ export const plans = {
     typeFunctionList($in, args, _info) {
       const {
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_type_function_list(args));
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
       return resource_person_type_function_listPgResource.execute(selectArgs);
     },
     id($record) {
@@ -24018,7 +23906,7 @@ export const plans = {
       const {
         $row,
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_compound_type_computed_field(args), true);
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_compound_type_computed_fieldPgResource.from, resource_compound_type_computed_fieldPgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec, undefined)`${from}`;
     },
@@ -24146,7 +24034,7 @@ export const plans = {
       const {
         $row,
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_post_computed_interval_array(args), true);
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_post_computed_interval_arrayPgResource.from, resource_post_computed_interval_arrayPgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_post_computed_interval_arrayPgResource.codec, undefined)`${from}`;
     },
@@ -24154,7 +24042,7 @@ export const plans = {
       const {
         $row,
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_post_computed_text_array(args), true);
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_post_computed_text_arrayPgResource.from, resource_post_computed_text_arrayPgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_post_computed_text_arrayPgResource.codec, undefined)`${from}`;
     },
@@ -32320,7 +32208,7 @@ export const plans = {
       const {
         $row,
         selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_edge_case_computed(args), true);
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
       const from = pgFromExpression($row, resource_edge_case_computedPgResource.from, resource_edge_case_computedPgResource.parameters, selectArgs);
       return pgClassExpression($row, resource_edge_case_computedPgResource.codec, undefined)`${from}`;
     },
@@ -33316,7 +33204,7 @@ export const plans = {
     __assertStep: __ValueStep,
     mutationOut: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_outPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33340,7 +33228,7 @@ export const plans = {
     },
     mutationOutSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_setof(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33364,7 +33252,7 @@ export const plans = {
     },
     mutationOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_unnamed(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33388,7 +33276,7 @@ export const plans = {
     },
     noArgsMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_no_args_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_no_args_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33412,7 +33300,7 @@ export const plans = {
     },
     returnVoidMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_return_void_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_return_void_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33436,7 +33324,7 @@ export const plans = {
     },
     mutationIntervalSet: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_interval_set(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_interval_setPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33844,7 +33732,7 @@ export const plans = {
     },
     mutationOutOut: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_out(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_outPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33868,7 +33756,7 @@ export const plans = {
     },
     mutationOutOutSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_out_setof(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_out_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33892,7 +33780,7 @@ export const plans = {
     },
     mutationOutOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_out_unnamed(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -33940,7 +33828,7 @@ export const plans = {
     },
     mutationOutUnnamedOutOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_unnamed_out_out_unnamed(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_unnamed_out_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34012,7 +33900,7 @@ export const plans = {
     },
     mutationIntervalArray: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_interval_array(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_interval_arrayPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34036,7 +33924,7 @@ export const plans = {
     },
     mutationTextArray: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_text_array(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_text_arrayPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34084,7 +33972,7 @@ export const plans = {
     },
     authenticateFail: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_authenticate_fail(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_authenticate_failPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34156,7 +34044,7 @@ export const plans = {
     },
     issue756Mutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_issue756_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34180,7 +34068,7 @@ export const plans = {
     },
     issue756SetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_issue756_set_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34540,7 +34428,7 @@ export const plans = {
     },
     mutationOutTable: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_table(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34564,7 +34452,7 @@ export const plans = {
     },
     mutationOutTableSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_table_setof(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34588,7 +34476,7 @@ export const plans = {
     },
     tableSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_table_set_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34612,7 +34500,7 @@ export const plans = {
     },
     typeFunctionConnectionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_type_function_connection_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -34660,7 +34548,7 @@ export const plans = {
     },
     typeFunctionListMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs_type_function_list_mutation(args, ["input"]);
+        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
         const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
