@@ -21763,121 +21763,169 @@ export const plans = {
     node(_$root, args) {
       return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
     },
-    inputById(_$root, args) {
+    inputById(_$root, {
+      $id
+    }) {
       return pgResource_inputsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    patchById(_$root, args) {
+    patchById(_$root, {
+      $id
+    }) {
       return pgResource_patchsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    reservedById(_$root, args) {
+    reservedById(_$root, {
+      $id
+    }) {
       return pgResource_reservedPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    reservedPatchRecordById(_$root, args) {
+    reservedPatchRecordById(_$root, {
+      $id
+    }) {
       return pgResource_reservedPatchsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    reservedInputRecordById(_$root, args) {
+    reservedInputRecordById(_$root, {
+      $id
+    }) {
       return pgResource_reserved_inputPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    defaultValueById(_$root, args) {
+    defaultValueById(_$root, {
+      $id
+    }) {
       return pgResource_default_valuePgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    noPrimaryKeyById(_$root, args) {
+    noPrimaryKeyById(_$root, {
+      $id
+    }) {
       return resource_no_primary_keyPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    uniqueForeignKeyByCompoundKey1AndCompoundKey2(_$root, args) {
+    uniqueForeignKeyByCompoundKey1AndCompoundKey2(_$root, {
+      $compoundKey1,
+      $compoundKey2
+    }) {
       return resource_unique_foreign_keyPgResource.get({
-        compound_key_1: args.getRaw("compoundKey1"),
-        compound_key_2: args.getRaw("compoundKey2")
+        compound_key_1: $compoundKey1,
+        compound_key_2: $compoundKey2
       });
     },
-    myTableById(_$root, args) {
+    myTableById(_$root, {
+      $id
+    }) {
       return pgResource_my_tablePgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    personSecretByPersonId(_$root, args) {
+    personSecretByPersonId(_$root, {
+      $personId
+    }) {
       return pgResource_person_secretPgResource.get({
-        person_id: args.getRaw("personId")
+        person_id: $personId
       });
     },
-    viewTableById(_$root, args) {
+    viewTableById(_$root, {
+      $id
+    }) {
       return pgResource_view_tablePgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    compoundKeyByPersonId1AndPersonId2(_$root, args) {
+    compoundKeyByPersonId1AndPersonId2(_$root, {
+      $personId1,
+      $personId2
+    }) {
       return pgResource_compound_keyPgResource.get({
-        person_id_1: args.getRaw("personId1"),
-        person_id_2: args.getRaw("personId2")
+        person_id_1: $personId1,
+        person_id_2: $personId2
       });
     },
-    similarTable1ById(_$root, args) {
+    similarTable1ById(_$root, {
+      $id
+    }) {
       return pgResource_similar_table_1PgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    similarTable2ById(_$root, args) {
+    similarTable2ById(_$root, {
+      $id
+    }) {
       return pgResource_similar_table_2PgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    nullTestRecordById(_$root, args) {
+    nullTestRecordById(_$root, {
+      $id
+    }) {
       return pgResource_null_test_recordPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    leftArmById(_$root, args) {
+    leftArmById(_$root, {
+      $id
+    }) {
       return pgResource_left_armPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    leftArmByPersonId(_$root, args) {
+    leftArmByPersonId(_$root, {
+      $personId
+    }) {
       return pgResource_left_armPgResource.get({
-        person_id: args.getRaw("personId")
+        person_id: $personId
       });
     },
-    issue756ById(_$root, args) {
+    issue756ById(_$root, {
+      $id
+    }) {
       return pgResource_issue756PgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    postById(_$root, args) {
+    postById(_$root, {
+      $id
+    }) {
       return pgResource_postPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    personById(_$root, args) {
+    personById(_$root, {
+      $id
+    }) {
       return pgResource_personPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    personByEmail(_$root, args) {
+    personByEmail(_$root, {
+      $email
+    }) {
       return pgResource_personPgResource.get({
-        email: args.getRaw("email")
+        email: $email
       });
     },
-    listById(_$root, args) {
+    listById(_$root, {
+      $id
+    }) {
       return pgResource_listsPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
-    typeById(_$root, args) {
+    typeById(_$root, {
+      $id
+    }) {
       return pgResource_typesPgResource.get({
-        id: args.getRaw("id")
+        id: $id
       });
     },
     currentUserId($root, args, _info) {
