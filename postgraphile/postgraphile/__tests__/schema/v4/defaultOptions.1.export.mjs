@@ -10129,63 +10129,35 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Input);
-const fetcher2 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Patch);
-const fetcher3 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Reserved);
-const fetcher4 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.ReservedPatchRecord);
-const fetcher5 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.ReservedInputRecord);
-const fetcher6 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.DefaultValue);
-const fetcher7 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.MyTable);
-const fetcher8 = (handler => {
+const nodeFetcher_Input = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Input));
+  return nodeIdHandlerByTypeName.Input.get(nodeIdHandlerByTypeName.Input.getSpec($decoded));
+};
+const nodeFetcher_Patch = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Patch));
+  return nodeIdHandlerByTypeName.Patch.get(nodeIdHandlerByTypeName.Patch.getSpec($decoded));
+};
+const nodeFetcher_Reserved = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Reserved));
+  return nodeIdHandlerByTypeName.Reserved.get(nodeIdHandlerByTypeName.Reserved.getSpec($decoded));
+};
+const nodeFetcher_ReservedPatchRecord = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.ReservedPatchRecord));
+  return nodeIdHandlerByTypeName.ReservedPatchRecord.get(nodeIdHandlerByTypeName.ReservedPatchRecord.getSpec($decoded));
+};
+const nodeFetcher_ReservedInputRecord = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.ReservedInputRecord));
+  return nodeIdHandlerByTypeName.ReservedInputRecord.get(nodeIdHandlerByTypeName.ReservedInputRecord.getSpec($decoded));
+};
+const nodeFetcher_DefaultValue = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.DefaultValue));
+  return nodeIdHandlerByTypeName.DefaultValue.get(nodeIdHandlerByTypeName.DefaultValue.getSpec($decoded));
+};
+const nodeFetcher_MyTable = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.MyTable));
+  return nodeIdHandlerByTypeName.MyTable.get(nodeIdHandlerByTypeName.MyTable.getSpec($decoded));
+};
+const nodeFetcher_PersonSecret = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
     return handler.get(handler.getSpec($decoded));
@@ -10193,94 +10165,50 @@ const fetcher8 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.PersonSecret);
-const fetcher9 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.ViewTable);
-const fetcher10 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.CompoundKey);
-const fetcher11 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.SimilarTable1);
-const fetcher12 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.SimilarTable2);
-const fetcher13 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.NullTestRecord);
-const fetcher14 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.LeftArm);
-const fetcher15 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Issue756);
-const fetcher16 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Post);
-const fetcher17 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Person);
-const fetcher18 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.List);
-const fetcher19 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Type);
+const nodeFetcher_ViewTable = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.ViewTable));
+  return nodeIdHandlerByTypeName.ViewTable.get(nodeIdHandlerByTypeName.ViewTable.getSpec($decoded));
+};
+const nodeFetcher_CompoundKey = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.CompoundKey));
+  return nodeIdHandlerByTypeName.CompoundKey.get(nodeIdHandlerByTypeName.CompoundKey.getSpec($decoded));
+};
+const nodeFetcher_SimilarTable1 = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SimilarTable1));
+  return nodeIdHandlerByTypeName.SimilarTable1.get(nodeIdHandlerByTypeName.SimilarTable1.getSpec($decoded));
+};
+const nodeFetcher_SimilarTable2 = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SimilarTable2));
+  return nodeIdHandlerByTypeName.SimilarTable2.get(nodeIdHandlerByTypeName.SimilarTable2.getSpec($decoded));
+};
+const nodeFetcher_NullTestRecord = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.NullTestRecord));
+  return nodeIdHandlerByTypeName.NullTestRecord.get(nodeIdHandlerByTypeName.NullTestRecord.getSpec($decoded));
+};
+const nodeFetcher_LeftArm = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.LeftArm));
+  return nodeIdHandlerByTypeName.LeftArm.get(nodeIdHandlerByTypeName.LeftArm.getSpec($decoded));
+};
+const nodeFetcher_Issue756 = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Issue756));
+  return nodeIdHandlerByTypeName.Issue756.get(nodeIdHandlerByTypeName.Issue756.getSpec($decoded));
+};
+const nodeFetcher_Post = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Post));
+  return nodeIdHandlerByTypeName.Post.get(nodeIdHandlerByTypeName.Post.getSpec($decoded));
+};
+const nodeFetcher_Person = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
+  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
+};
+const nodeFetcher_List = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.List));
+  return nodeIdHandlerByTypeName.List.get(nodeIdHandlerByTypeName.List.getSpec($decoded));
+};
+const nodeFetcher_Type = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Type));
+  return nodeIdHandlerByTypeName.Type.get(nodeIdHandlerByTypeName.Type.getSpec($decoded));
+};
 const resource_non_updatable_viewPgResource = registry.pgResources["non_updatable_view"];
 const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];
 const resource_testviewPgResource = registry.pgResources["testview"];
@@ -22504,79 +22432,79 @@ export const plans = {
     },
     input(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher($nodeId);
+      return nodeFetcher_Input($nodeId);
     },
     patch(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher2($nodeId);
+      return nodeFetcher_Patch($nodeId);
     },
     reserved(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher3($nodeId);
+      return nodeFetcher_Reserved($nodeId);
     },
     reservedPatchRecord(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher4($nodeId);
+      return nodeFetcher_ReservedPatchRecord($nodeId);
     },
     reservedInputRecord(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher5($nodeId);
+      return nodeFetcher_ReservedInputRecord($nodeId);
     },
     defaultValue(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher6($nodeId);
+      return nodeFetcher_DefaultValue($nodeId);
     },
     myTable(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher7($nodeId);
+      return nodeFetcher_MyTable($nodeId);
     },
     personSecret(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher8($nodeId);
+      return nodeFetcher_PersonSecret($nodeId);
     },
     viewTable(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher9($nodeId);
+      return nodeFetcher_ViewTable($nodeId);
     },
     compoundKey(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher10($nodeId);
+      return nodeFetcher_CompoundKey($nodeId);
     },
     similarTable1(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher11($nodeId);
+      return nodeFetcher_SimilarTable1($nodeId);
     },
     similarTable2(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher12($nodeId);
+      return nodeFetcher_SimilarTable2($nodeId);
     },
     nullTestRecord(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher13($nodeId);
+      return nodeFetcher_NullTestRecord($nodeId);
     },
     leftArm(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher14($nodeId);
+      return nodeFetcher_LeftArm($nodeId);
     },
     issue756(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher15($nodeId);
+      return nodeFetcher_Issue756($nodeId);
     },
     post(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher16($nodeId);
+      return nodeFetcher_Post($nodeId);
     },
     person(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher17($nodeId);
+      return nodeFetcher_Person($nodeId);
     },
     list(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher18($nodeId);
+      return nodeFetcher_List($nodeId);
     },
     type(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
-      return fetcher19($nodeId);
+      return nodeFetcher_Type($nodeId);
     },
     allNonUpdatableViews: {
       plan() {
