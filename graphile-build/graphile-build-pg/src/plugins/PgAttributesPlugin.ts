@@ -627,24 +627,17 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                                 $condition: PgCondition<PgSelectQueryBuilder>,
                                 val: unknown,
                               ) {
-                                if (val === null) {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} is null`,
-                                  });
-                                } else {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} = ${sqlValueWithCodec(
-                                        val,
-                                        attributeCodec,
-                                      )}`,
-                                  });
-                                }
+                                $condition.where({
+                                  type: "attribute",
+                                  attribute: attributeName,
+                                  callback: (expression) =>
+                                    val === null
+                                      ? sql`${expression} is null`
+                                      : sql`${expression} = ${sqlValueWithCodec(
+                                          val,
+                                          attributeCodec,
+                                        )}`,
+                                });
                               },
                             [
                               attributeCodec,
