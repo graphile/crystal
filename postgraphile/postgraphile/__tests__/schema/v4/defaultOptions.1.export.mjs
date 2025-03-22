@@ -23855,25 +23855,7 @@ export const plans = {
     }
   },
   Interval: {
-    __assertStep: assertExecutableStep,
-    seconds($r) {
-      return access($r, ["seconds"]);
-    },
-    minutes($r) {
-      return access($r, ["minutes"]);
-    },
-    hours($r) {
-      return access($r, ["hours"]);
-    },
-    days($r) {
-      return access($r, ["days"]);
-    },
-    months($r) {
-      return access($r, ["months"]);
-    },
-    years($r) {
-      return access($r, ["years"]);
-    }
+    __assertStep: assertExecutableStep
   },
   Post: {
     __assertStep: assertPgClassSingleStep,
