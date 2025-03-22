@@ -24452,897 +24452,427 @@ export const plans = {
   },
   TypeCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     smallint($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "smallint",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "smallint",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "smallint",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
+        }
+      });
     },
     bigint($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "bigint",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "bigint",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "bigint",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        }
+      });
     },
     numeric($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "numeric",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "numeric",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "numeric",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
+        }
+      });
     },
     decimal($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "decimal",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "decimal",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "decimal",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
+        }
+      });
     },
     boolean($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "boolean",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "boolean",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "boolean",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        }
+      });
     },
     varchar($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "varchar",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "varchar",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "varchar",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+        }
+      });
     },
     enum($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "enum",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
+        }
+      });
     },
     enumArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+        }
+      });
     },
     domain($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "domain",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
+        }
+      });
     },
     domain2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "domain2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
+        }
+      });
     },
     textArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "text_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+        }
+      });
     },
     json($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "json",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "json",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "json",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
+        }
+      });
     },
     jsonb($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonb",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonb",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "jsonb",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+        }
+      });
     },
     nullableRange($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_range",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_range",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullable_range",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
+        }
+      });
     },
     numrange($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "numrange",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "numrange",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "numrange",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
+        }
+      });
     },
     daterange($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "daterange",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "daterange",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "daterange",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
+        }
+      });
     },
     anIntRange($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "an_int_range",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "an_int_range",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "an_int_range",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
+        }
+      });
     },
     timestamp($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamp",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamp",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "timestamp",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+        }
+      });
     },
     timestamptz($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "timestamptz",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        }
+      });
     },
     date($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "date",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "date",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
+        }
+      });
     },
     time($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "time",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "time",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "time",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
+        }
+      });
     },
     timetz($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timetz",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "timetz",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "timetz",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
+        }
+      });
     },
     interval($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "interval",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
+        }
+      });
     },
     intervalArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "interval_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
+        }
+      });
     },
     money($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "money",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "money",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "money",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
+        }
+      });
     },
     compoundType($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "compound_type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
+        }
+      });
     },
     nestedCompoundType($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nested_compound_type",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nested_compound_type",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nested_compound_type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
+        }
+      });
     },
     nullableCompoundType($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_compound_type",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_compound_type",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullable_compound_type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
+        }
+      });
     },
     nullableNestedCompoundType($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_nested_compound_type",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_nested_compound_type",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullable_nested_compound_type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
+        }
+      });
     },
     point($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "point",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "point",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "point",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
+        }
+      });
     },
     nullablePoint($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullablePoint",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullablePoint",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullablePoint",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
+        }
+      });
     },
     inet($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "inet",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "inet",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "inet",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+        }
+      });
     },
     cidr($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "cidr",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "cidr",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "cidr",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+        }
+      });
     },
     macaddr($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "macaddr",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "macaddr",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "macaddr",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+        }
+      });
     },
     regproc($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regproc",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regproc",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regproc",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
+        }
+      });
     },
     regprocedure($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regprocedure",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regprocedure",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regprocedure",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
+        }
+      });
     },
     regoper($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoper",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoper",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regoper",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
+        }
+      });
     },
     regoperator($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoperator",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoperator",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regoperator",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
+        }
+      });
     },
     regclass($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regclass",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regclass",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regclass",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
+        }
+      });
     },
     regtype($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regtype",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regtype",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regtype",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
+        }
+      });
     },
     regconfig($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regconfig",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regconfig",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regconfig",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
+        }
+      });
     },
     regdictionary($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regdictionary",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "regdictionary",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "regdictionary",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
+        }
+      });
     },
     textArrayDomain($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array_domain",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array_domain",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "text_array_domain",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
+        }
+      });
     },
     int8ArrayDomain($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int8_array_domain",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "int8_array_domain",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "int8_array_domain",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
+        }
+      });
     },
     ltree($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "ltree",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
+        }
+      });
     },
     ltreeArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "ltree_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
+        }
+      });
     }
   },
   NestedCompoundTypeInput: {
@@ -27115,118 +26645,58 @@ export const plans = {
   },
   PostCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     headline($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "headline",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "headline",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "headline",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
     body($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "body",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "body",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "body",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
     authorId($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     enums($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enums",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "enums",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, anEnumArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "enums",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anEnumArrayCodec)}`;
+        }
+      });
     },
     comptypes($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "comptypes",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "comptypes",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, comptypeArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "comptypes",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, comptypeArrayCodec)}`;
+        }
+      });
     },
     computedWithOptionalArg($condition, val) {
       if (val === undefined) return;
@@ -27236,11 +26706,7 @@ export const plans = {
       const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
         placeholder: $condition.alias
       })}`;
-      if (val === null) {
-        $condition.where(sql`${expression} is null`);
-      } else {
-        $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_post_computed_with_optional_argPgResource.codec)}`);
-      }
+      $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, resource_post_computed_with_optional_argPgResource.codec)}`);
     }
   },
   ComptypeInput: {
@@ -27506,61 +26972,31 @@ export const plans = {
   },
   ForeignKeyCondition: {
     personId($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     compoundKey1($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_key_1",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_key_1",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "compound_key_1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     compoundKey2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_key_2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_key_2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "compound_key_2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   ForeignKeysOrderBy: {
@@ -27708,61 +27144,31 @@ export const plans = {
   },
   CompoundKeyCondition: {
     personId2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id_2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id_2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id_2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     personId1($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id_1",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id_1",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id_1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     extra($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "extra",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "extra",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "extra",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        }
+      });
     }
   },
   CompoundKeysOrderBy: {
@@ -28196,213 +27602,103 @@ export const plans = {
   },
   PersonCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     name($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_full_name",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_full_name",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_full_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+        }
+      });
     },
     aliases($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "aliases",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "aliases",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "aliases",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+        }
+      });
     },
     about($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "about",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "about",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "about",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
     email($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "email",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "email",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "email",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
+        }
+      });
     },
     site($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "site",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "site",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "site",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
+        }
+      });
     },
     config($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "config",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "config",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "config",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
+        }
+      });
     },
     lastLoginFromIp($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_ip",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_ip",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "last_login_from_ip",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+        }
+      });
     },
     lastLoginFromSubnet($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_subnet",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_subnet",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "last_login_from_subnet",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+        }
+      });
     },
     userMac($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "user_mac",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "user_mac",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "user_mac",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+        }
+      });
     },
     createdAt($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+        }
+      });
     },
     computedOut($condition, val) {
       if (val === undefined) return;
@@ -28412,11 +27708,7 @@ export const plans = {
       const expression = sql`${resource_person_computed_outPgResource.from({
         placeholder: $condition.alias
       })}`;
-      if (val === null) {
-        $condition.where(sql`${expression} is null`);
-      } else {
-        $condition.where(sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
-      }
+      $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
     }
   },
   WrappedUrlInput: {
@@ -28445,23 +27737,13 @@ export const plans = {
   },
   NonUpdatableViewCondition: {
     column($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "?column?",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "?column?",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "?column?",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   NonUpdatableViewsOrderBy: {
@@ -28509,23 +27791,13 @@ export const plans = {
   },
   InputCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   InputsOrderBy: {
@@ -28617,23 +27889,13 @@ export const plans = {
   },
   PatchCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   PatchesOrderBy: {
@@ -28725,23 +27987,13 @@ export const plans = {
   },
   ReservedCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   ReservedsOrderBy: {
@@ -28833,23 +28085,13 @@ export const plans = {
   },
   ReservedPatchRecordCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   ReservedPatchRecordsOrderBy: {
@@ -28941,23 +28183,13 @@ export const plans = {
   },
   ReservedInputRecordCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   ReservedInputRecordsOrderBy: {
@@ -29049,42 +28281,22 @@ export const plans = {
   },
   DefaultValueCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     nullValue($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "null_value",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "null_value",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "null_value",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     }
   },
   DefaultValuesOrderBy: {
@@ -29208,42 +28420,22 @@ export const plans = {
   },
   NoPrimaryKeyCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     str($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "str",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "str",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "str",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     }
   },
   NoPrimaryKeysOrderBy: {
@@ -29332,61 +28524,31 @@ export const plans = {
   },
   TestviewCondition: {
     testviewid($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "testviewid",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "testviewid",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "testviewid",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col1($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   TestviewsOrderBy: {
@@ -29498,42 +28660,22 @@ export const plans = {
   },
   MyTableCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     jsonData($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "json_data",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "json_data",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "json_data",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+        }
+      });
     }
   },
   MyTablesOrderBy: {
@@ -29657,42 +28799,22 @@ export const plans = {
   },
   PersonSecretCondition: {
     personId($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     secret($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "sekrit",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "sekrit",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "sekrit",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     }
   },
   PersonSecretsOrderBy: {
@@ -29816,61 +28938,31 @@ export const plans = {
   },
   ViewTableCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col1($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   ViewTablesOrderBy: {
@@ -30026,80 +29118,40 @@ export const plans = {
   },
   SimilarTable1Condition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col1($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col2($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col2",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col3($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col3",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col3",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col3",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   SimilarTable1SOrderBy: {
@@ -30287,80 +29339,40 @@ export const plans = {
   },
   SimilarTable2Condition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col3($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col3",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col3",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col3",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col4($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col4",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col4",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col4",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     col5($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col5",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "col5",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "col5",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   SimilarTable2SOrderBy: {
@@ -30551,80 +29563,40 @@ export const plans = {
   },
   UpdatableViewCondition: {
     x($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "x",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "x",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "x",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     name($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+        }
+      });
     },
     description($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "description",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "description",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "description",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
     constant($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constant",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "constant",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "constant",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   UpdatableViewsOrderBy: {
@@ -30774,80 +29746,40 @@ export const plans = {
   },
   NullTestRecordCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     nullableText($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_text",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_text",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullable_text",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
     nullableInt($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_int",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_int",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "nullable_int",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     nonNullText($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "non_null_text",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "non_null_text",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "non_null_text",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     }
   },
   NullTestRecordsOrderBy: {
@@ -31055,61 +29987,31 @@ export const plans = {
   },
   EdgeCaseCondition: {
     notNullHasDefault($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "not_null_has_default",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "not_null_has_default",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "not_null_has_default",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        }
+      });
     },
     wontCastEasy($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "wont_cast_easy",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "wont_cast_easy",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "wont_cast_easy",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
+        }
+      });
     },
     rowId($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "row_id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "row_id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "row_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     }
   },
   EdgeCasesOrderBy: {
@@ -31221,80 +30123,40 @@ export const plans = {
   },
   LeftArmCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     personId($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     lengthInMetres($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "length_in_metres",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "length_in_metres",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "length_in_metres",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+        }
+      });
     },
     mood($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "mood",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "mood",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "mood",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     }
   },
   LeftArmsOrderBy: {
@@ -31488,42 +30350,22 @@ export const plans = {
   },
   Issue756Condition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     ts($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "ts",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "ts",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "ts",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
+        }
+      });
     }
   },
   Issue756SOrderBy: {
@@ -31647,213 +30489,103 @@ export const plans = {
   },
   ListCondition: {
     id($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
     intArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "int_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
+        }
+      });
     },
     intArrayNn($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array_nn",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array_nn",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "int_array_nn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
+        }
+      });
     },
     enumArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+        }
+      });
     },
     enumArrayNn($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array_nn",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array_nn",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_array_nn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
+        }
+      });
     },
     dateArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "date_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
+        }
+      });
     },
     dateArrayNn($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array_nn",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array_nn",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "date_array_nn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
+        }
+      });
     },
     timestamptzArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "timestamptz_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
+        }
+      });
     },
     timestamptzArrayNn($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array_nn",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array_nn",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "timestamptz_array_nn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
+        }
+      });
     },
     compoundTypeArray($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "compound_type_array",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
+        }
+      });
     },
     compoundTypeArrayNn($condition, val) {
-      if (val === null) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array_nn",
-          callback(expression) {
-            return sql`${expression} is null`;
-          }
-        });
-      } else {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array_nn",
-          callback(expression) {
-            return sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-          }
-        });
-      }
+      $condition.where({
+        type: "attribute",
+        attribute: "compound_type_array_nn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
+        }
+      });
     }
   },
   ListsOrderBy: {
