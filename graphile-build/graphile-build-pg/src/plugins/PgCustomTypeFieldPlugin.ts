@@ -887,6 +887,86 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 };
 
+const pgFunctionArgumentsFromArgs = EXPORTABLE(
+  (
+    PgSelectSingleStep,
+    hasRecord,
+    pgSelectSingleFromRecord,
+    stepAMayDependOnStepB,
+  ) => {
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: PgSelectArgumentSpec[],
+    ): {
+      $row: PgSelectSingleStep;
+      selectArgs: PgSelectArgumentSpec[];
+    };
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: PgSelectArgumentSpec[],
+      inlining: true,
+    ): {
+      $row: PgSelectSingleStep;
+      selectArgs: (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
+    };
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: PgSelectArgumentSpec[],
+      inlining = false,
+    ) {
+      if (!hasRecord($in)) {
+        throw new Error(
+          `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
+        );
+      }
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly =
+        $in instanceof PgSelectSingleStep &&
+        extraSelectArgs.every((a) =>
+          stepAMayDependOnStepB($in.getClassStep(), a.step),
+        );
+      const $row = canUseExpressionDirectly
+        ? $in
+        : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs: PgSelectArgumentSpec[] = [
+        { step: $row.record() },
+        ...extraSelectArgs,
+      ];
+      if (inlining) {
+        // This is a scalar computed attribute, let's inline the expression
+        const newSelectArgs = selectArgs.map(
+          (arg, i): PgSelectArgumentSpec | PgSelectArgumentDigest => {
+            if (i === 0) {
+              const { step, ...rest } = arg;
+              return {
+                ...rest,
+                placeholder: $row.getClassStep().alias,
+              } as PgSelectArgumentDigest;
+            } else {
+              return arg;
+            }
+          },
+        );
+        return { $row, selectArgs: newSelectArgs };
+      } else {
+        return { $row, selectArgs };
+      }
+    }
+    return pgFunctionArgumentsFromArgs;
+  },
+  [
+    PgSelectSingleStep,
+    hasRecord,
+    pgSelectSingleFromRecord,
+    stepAMayDependOnStepB,
+  ],
+);
+
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
@@ -1485,67 +1565,3 @@ const makeArgRuntime = EXPORTABLE(
     },
   [bakedInputRuntime],
 );
-
-function pgFunctionArgumentsFromArgs(
-  $in: Step,
-  extraSelectArgs: PgSelectArgumentSpec[],
-): {
-  $row: PgSelectSingleStep;
-  selectArgs: PgSelectArgumentSpec[];
-};
-function pgFunctionArgumentsFromArgs(
-  $in: Step,
-  extraSelectArgs: PgSelectArgumentSpec[],
-  inlining: true,
-): {
-  $row: PgSelectSingleStep;
-  selectArgs: (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
-};
-function pgFunctionArgumentsFromArgs(
-  $in: Step,
-  extraSelectArgs: PgSelectArgumentSpec[],
-  inlining = false,
-) {
-  if (!hasRecord($in)) {
-    throw new Error(
-      `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
-    );
-  }
-  /**
-   * An optimisation - if all our dependencies are
-   * compatible with the expression's class plan then we
-   * can inline ourselves into that, otherwise we must
-   * issue the query separately.
-   */
-  const canUseExpressionDirectly =
-    $in instanceof PgSelectSingleStep &&
-    extraSelectArgs.every((a) =>
-      stepAMayDependOnStepB($in.getClassStep(), a.step),
-    );
-  const $row = canUseExpressionDirectly
-    ? $in
-    : pgSelectSingleFromRecord($in.resource, $in.record());
-  const selectArgs: PgSelectArgumentSpec[] = [
-    { step: $row.record() },
-    ...extraSelectArgs,
-  ];
-  if (inlining) {
-    // This is a scalar computed attribute, let's inline the expression
-    const newSelectArgs = selectArgs.map(
-      (arg, i): PgSelectArgumentSpec | PgSelectArgumentDigest => {
-        if (i === 0) {
-          const { step, ...rest } = arg;
-          return {
-            ...rest,
-            placeholder: $row.getClassStep().alias,
-          } as PgSelectArgumentDigest;
-        } else {
-          return arg;
-        }
-      },
-    );
-    return { $row, selectArgs: newSelectArgs };
-  } else {
-    return { $row, selectArgs };
-  }
-}
