@@ -262,9 +262,10 @@ export function makeGrafastSchema(details: {
             if (fieldName.startsWith("__")) {
               continue;
             }
-            const fieldSpec = (objectPlans as ObjectPlans | undefined)?.[
-              fieldName
-            ];
+            const fieldSpec =
+              objectPlans && Object.hasOwn(objectPlans, fieldName)
+                ? objectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
               ...rawFieldSpec,
               type: mapType(rawFieldSpec.type),
@@ -412,7 +413,10 @@ export function makeGrafastSchema(details: {
             Object.create(null);
 
           for (const [fieldName, rawFieldConfig] of Object.entries(rawFields)) {
-            const fieldSpec = inputObjectPlans?.[fieldName];
+            const fieldSpec =
+              inputObjectPlans && Object.hasOwn(inputObjectPlans, fieldName)
+                ? inputObjectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLInputFieldConfig = {
               ...rawFieldConfig,
               type: mapType(rawFieldConfig.type),
