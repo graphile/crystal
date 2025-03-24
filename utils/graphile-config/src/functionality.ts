@@ -36,10 +36,10 @@ export function orderedApply<
     >
       ? U
       : TFunctionality[TFunctionalityName] extends ReadonlyArray<
-          CallbackDescriptor<infer U>
-        >
-      ? U
-      : never,
+            CallbackDescriptor<infer U>
+          >
+        ? U
+        : never,
     plugin: GraphileConfig.Plugin,
   ) => void,
 ): void {

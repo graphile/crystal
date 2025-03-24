@@ -52,7 +52,7 @@ export function hookArgs(
   const middleware =
     rawMiddleware === undefined && resolvedPreset != null
       ? getGrafastMiddleware(resolvedPreset)
-      : rawMiddleware ?? null;
+      : (rawMiddleware ?? null);
   if (rawMiddleware === undefined) {
     rawArgs.middleware = middleware;
   }

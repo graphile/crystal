@@ -42,13 +42,13 @@ Add to your eslintrc:
   //...
   "plugins": [
     //...
-    "graphile-export"
+    "graphile-export",
     //...
   ],
   "extends": [
     // ...
-    "plugin:graphile-export/recommended"
-  ]
+    "plugin:graphile-export/recommended",
+  ],
   // ...
 }
 ```

@@ -421,7 +421,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               : null;
           }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
-          return typeName ? build.getTypeByName(typeName) ?? null : null;
+          return typeName ? (build.getTypeByName(typeName) ?? null) : null;
         };
 
         const hasGraphQLTypeForPgCodec: GraphileBuild.HasGraphQLTypeForPgCodec =

@@ -1078,24 +1078,26 @@ export type SpecForType<TType extends GraphQLNamedType | GraphQLSchema> =
   TType extends GraphQLSchema
     ? Partial<GraphQLSchemaConfig>
     : TType extends GraphQLObjectType
-    ? Partial<GraphileBuild.GrafastObjectTypeConfig<any>> & {
-        name: string;
-      }
-    : TType extends GraphQLInterfaceType
-    ? Partial<GraphileBuild.GrafastInterfaceTypeConfig<any>> & {
-        name: string;
-      }
-    : TType extends GraphQLUnionType
-    ? Partial<GraphileBuild.GrafastUnionTypeConfig<any>> & {
-        name: string;
-      }
-    : TType extends GraphQLScalarType
-    ? Partial<GraphQLScalarTypeConfig<any, any>> & { name: string }
-    : TType extends GraphQLEnumType
-    ? Partial<GraphQLEnumTypeConfig> & { name: string }
-    : TType extends GraphQLInputObjectType
-    ? Partial<GraphileBuild.GrafastInputObjectTypeConfig> & { name: string }
-    : never;
+      ? Partial<GraphileBuild.GrafastObjectTypeConfig<any>> & {
+          name: string;
+        }
+      : TType extends GraphQLInterfaceType
+        ? Partial<GraphileBuild.GrafastInterfaceTypeConfig<any>> & {
+            name: string;
+          }
+        : TType extends GraphQLUnionType
+          ? Partial<GraphileBuild.GrafastUnionTypeConfig<any>> & {
+              name: string;
+            }
+          : TType extends GraphQLScalarType
+            ? Partial<GraphQLScalarTypeConfig<any, any>> & { name: string }
+            : TType extends GraphQLEnumType
+              ? Partial<GraphQLEnumTypeConfig> & { name: string }
+              : TType extends GraphQLInputObjectType
+                ? Partial<GraphileBuild.GrafastInputObjectTypeConfig> & {
+                    name: string;
+                  }
+                : never;
 
 // TYPES: this returning `never` for non-GraphQLSchema seems wrong... why is it
 // not causing issues?

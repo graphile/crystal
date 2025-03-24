@@ -204,8 +204,8 @@ export class NodeGrafservBase extends GrafservBase {
               ? typeof (res as any).flush === "function"
                 ? (res as any).flush.bind(res)
                 : typeof (res as any).flushHeaders === "function"
-                ? (res as any).flushHeaders.bind(res)
-                : null
+                  ? (res as any).flushHeaders.bind(res)
+                  : null
               : null;
 
             try {

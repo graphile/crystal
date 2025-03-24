@@ -480,16 +480,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                     ? inflection.updateNodeInputType(details)
                     : inflection.updateByKeysInputType(details)
                   : uniqueMode === "node"
-                  ? inflection.deleteNodeInputType(details)
-                  : inflection.deleteByKeysInputType(details);
+                    ? inflection.deleteNodeInputType(details)
+                    : inflection.deleteByKeysInputType(details);
               const fieldName =
                 mode === "resource:update"
                   ? uniqueMode === "node"
                     ? inflection.updateNodeField(details)
                     : inflection.updateByKeysField(details)
                   : uniqueMode === "node"
-                  ? inflection.deleteNodeField(details)
-                  : inflection.deleteByKeysField(details);
+                    ? inflection.deleteNodeField(details)
+                    : inflection.deleteByKeysField(details);
               const nodeIdFieldName =
                 uniqueMode === "node" ? inflection.nodeIdFieldName() : null;
 
@@ -695,16 +695,16 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                       ? inflection.updateNodeField(details)
                       : inflection.updateByKeysField(details)
                     : uniqueMode === "node"
-                    ? inflection.deleteNodeField(details)
-                    : inflection.deleteByKeysField(details);
+                      ? inflection.deleteNodeField(details)
+                      : inflection.deleteByKeysField(details);
                 const inputTypeName =
                   mode === "resource:update"
                     ? uniqueMode === "node"
                       ? inflection.updateNodeInputType(details)
                       : inflection.updateByKeysInputType(details)
                     : uniqueMode === "node"
-                    ? inflection.deleteNodeInputType(details)
-                    : inflection.deleteByKeysInputType(details);
+                      ? inflection.deleteNodeInputType(details)
+                      : inflection.deleteByKeysInputType(details);
 
                 const fieldBehaviorScope =
                   uniqueMode === "node"
@@ -889,9 +889,9 @@ return (_$root, args) => {
                                   ],
                                 ) as any)
                             : specFromArgsString
-                            ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                              EXPORTABLE(
-                                te.run`\
+                              ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                                EXPORTABLE(
+                                  te.run`\
 return function (object, pgDeleteSingle, resource) {
 return (_$root, args) => {
   const $delete = pgDeleteSingle(resource, ${specFromArgsString});
@@ -899,35 +899,35 @@ return (_$root, args) => {
   return object({ result: $delete });
 }
 }` as any,
-                                [object, pgDeleteSingle, resource],
-                              )
-                            : (EXPORTABLE(
-                                (
-                                  object,
-                                  pgDeleteSingle,
-                                  resource,
-                                  specFromArgs,
-                                ) =>
-                                  function plan(
-                                    _$root: ExecutableStep,
-                                    args: FieldArgs,
-                                  ) {
-                                    const $delete = pgDeleteSingle(
-                                      resource,
-                                      specFromArgs(args),
-                                    );
-                                    args.apply($delete);
-                                    return object({
-                                      result: $delete,
-                                    });
-                                  },
-                                [
-                                  object,
-                                  pgDeleteSingle,
-                                  resource,
-                                  specFromArgs,
-                                ],
-                              ) as any),
+                                  [object, pgDeleteSingle, resource],
+                                )
+                              : (EXPORTABLE(
+                                  (
+                                    object,
+                                    pgDeleteSingle,
+                                    resource,
+                                    specFromArgs,
+                                  ) =>
+                                    function plan(
+                                      _$root: ExecutableStep,
+                                      args: FieldArgs,
+                                    ) {
+                                      const $delete = pgDeleteSingle(
+                                        resource,
+                                        specFromArgs(args),
+                                      );
+                                      args.apply($delete);
+                                      return object({
+                                        result: $delete,
+                                      });
+                                    },
+                                  [
+                                    object,
+                                    pgDeleteSingle,
+                                    resource,
+                                    specFromArgs,
+                                  ],
+                                ) as any),
                       },
                     ),
                   },

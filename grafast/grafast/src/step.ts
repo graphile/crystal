@@ -399,8 +399,8 @@ export /* abstract */ class Step<TData = any> {
     return depId == null
       ? null
       : throwOnFlagged
-      ? this.getDep<TStep>(depId, true)
-      : this.getDep<TStep>(depId);
+        ? this.getDep<TStep>(depId, true)
+        : this.getDep<TStep>(depId);
   }
 
   protected getDepOrConstant<TData = any>(

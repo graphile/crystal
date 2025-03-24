@@ -17,11 +17,12 @@ export type UnwrapCallback<
   T extends
     | CallbackOrDescriptor<AnyCallback>
     | ReadonlyArray<CallbackDescriptor<AnyCallback>>,
-> = T extends CallbackOrDescriptor<infer U>
-  ? U
-  : T extends ReadonlyArray<CallbackDescriptor<infer U>>
-  ? U
-  : never;
+> =
+  T extends CallbackOrDescriptor<infer U>
+    ? U
+    : T extends ReadonlyArray<CallbackDescriptor<infer U>>
+      ? U
+      : never;
 
 export type FunctionalityObject<T> = Record<
   keyof T,

@@ -1050,10 +1050,10 @@ function modFields(
   const procSources = isRootQuery
     ? build[$$rootQuery]
     : isRootMutation
-    ? build[$$rootMutation]
-    : pgCodec
-    ? build[$$computed].get(pgCodec) ?? []
-    : [];
+      ? build[$$rootMutation]
+      : pgCodec
+        ? (build[$$computed].get(pgCodec) ?? [])
+        : [];
   if (procSources.length === 0) {
     return fields;
   }
@@ -1087,68 +1087,68 @@ function modFields(
               [makeArgs, resource],
             )
           : isRootMutation
-          ? // Mutation uses 'args.input' rather than 'args'
-            EXPORTABLE(
-              (makeArgs, object, resource) => ($root, args, _info) => {
-                const selectArgs = makeArgs(args, ["input"]);
-                const $result = resource.execute(selectArgs, "mutation");
-                return object({
-                  result: $result,
-                });
-              },
-              [makeArgs, object, resource],
-            )
-          : // Otherwise computed:
+            ? // Mutation uses 'args.input' rather than 'args'
+              EXPORTABLE(
+                (makeArgs, object, resource) => ($root, args, _info) => {
+                  const selectArgs = makeArgs(args, ["input"]);
+                  const $result = resource.execute(selectArgs, "mutation");
+                  return object({
+                    result: $result,
+                  });
+                },
+                [makeArgs, object, resource],
+              )
+            : // Otherwise computed:
 
-          // if it's a scalar computed expression, inline it:
-          resource.isUnique &&
-            !resource.codec.attributes &&
-            typeof resource.from === "function"
-          ? EXPORTABLE(
-              (
-                makeArgs,
-                pgClassExpression,
-                pgFromExpression,
-                pgFunctionArgumentsFromArgs,
-                resource,
-              ) =>
-                ($in, args, _info) => {
-                  const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
-                    $in,
-                    makeArgs(args),
-                    true,
-                  );
-                  const from = pgFromExpression(
-                    $row,
-                    resource.from,
-                    resource.parameters,
-                    selectArgs,
-                  );
-                  return pgClassExpression(
-                    $row,
-                    resource.codec,
-                    undefined,
-                  )`${from}`;
-                },
-              [
-                makeArgs,
-                pgClassExpression,
-                pgFromExpression,
-                pgFunctionArgumentsFromArgs,
-                resource,
-              ],
-            )
-          : EXPORTABLE(
-              (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
-                ($in, args, _info) => {
-                  const { selectArgs } = pgFunctionArgumentsFromArgs(
-                    $in,
-                    makeArgs(args),
-                  );
-                  return resource.execute(selectArgs);
-                },
-              [makeArgs, pgFunctionArgumentsFromArgs, resource],
-            );
+              // if it's a scalar computed expression, inline it:
+              resource.isUnique &&
+                !resource.codec.attributes &&
+                typeof resource.from === "function"
+              ? EXPORTABLE(
+                  (
+                    makeArgs,
+                    pgClassExpression,
+                    pgFromExpression,
+                    pgFunctionArgumentsFromArgs,
+                    resource,
+                  ) =>
+                    ($in, args, _info) => {
+                      const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
+                        $in,
+                        makeArgs(args),
+                        true,
+                      );
+                      const from = pgFromExpression(
+                        $row,
+                        resource.from,
+                        resource.parameters,
+                        selectArgs,
+                      );
+                      return pgClassExpression(
+                        $row,
+                        resource.codec,
+                        undefined,
+                      )`${from}`;
+                    },
+                  [
+                    makeArgs,
+                    pgClassExpression,
+                    pgFromExpression,
+                    pgFunctionArgumentsFromArgs,
+                    resource,
+                  ],
+                )
+              : EXPORTABLE(
+                  (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
+                    ($in, args, _info) => {
+                      const { selectArgs } = pgFunctionArgumentsFromArgs(
+                        $in,
+                        makeArgs(args),
+                      );
+                      return resource.execute(selectArgs);
+                    },
+                  [makeArgs, pgFunctionArgumentsFromArgs, resource],
+                );
 
         if (isRootMutation) {
           // mutation type
@@ -1296,10 +1296,10 @@ function modFields(
                     resource,
                   })
               : resource.codec.attributes
-              ? inflection.tableConnectionType(resource.codec)
-              : namedType
-              ? inflection.connectionType(namedType.name)
-              : null;
+                ? inflection.tableConnectionType(resource.codec)
+                : namedType
+                  ? inflection.connectionType(namedType.name)
+                  : null;
 
             const ConnectionType = connectionTypeName
               ? build.getOutputTypeByName(connectionTypeName)
@@ -1369,10 +1369,10 @@ function modFields(
                 ? inflection.customQueryField({ resource })
                 : inflection.customQueryListField({ resource })
               : resource.isList
-              ? inflection.computedAttributeField({ resource })
-              : inflection.computedAttributeListField({
-                  resource,
-                });
+                ? inflection.computedAttributeField({ resource })
+                : inflection.computedAttributeListField({
+                    resource,
+                  });
             memo = build.recoverable(memo, () =>
               build.extend(
                 memo,

@@ -551,10 +551,10 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               const fieldBehaviorScope = isPgBaseInput
                 ? `attribute:base`
                 : isPgPatch
-                ? `attribute:update`
-                : isPgCondition
-                ? `condition:attribute:filterBy`
-                : `attribute:insert`;
+                  ? `attribute:update`
+                  : isPgCondition
+                    ? `condition:attribute:filterBy`
+                    : `attribute:insert`;
 
               if (
                 !build.behavior.pgCodecAttributeMatches(

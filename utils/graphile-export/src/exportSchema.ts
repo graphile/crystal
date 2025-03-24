@@ -145,7 +145,7 @@ function getNameForThing(
     const name =
       thingConstructorName && thingName
         ? `${thingName}${thingConstructorName}`
-        : thingName ?? thingConstructorName ?? null;
+        : (thingName ?? thingConstructorName ?? null);
     return baseNameHint || name
       ? (baseNameHint ?? "") + (baseNameHint && name ? "-" : "") + (name ?? "")
       : "value";
@@ -916,20 +916,20 @@ type ConfigForGraphQLEntity<TKey extends GraphQLEntityName> =
   TKey extends "GraphQLSchema"
     ? GraphQLSchemaConfig
     : TKey extends "GraphQLDirective"
-    ? GraphQLDirectiveConfig
-    : TKey extends "GraphQLObjectType"
-    ? GraphQLObjectTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInterfaceType"
-    ? GraphQLInterfaceTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLUnionType"
-    ? GraphQLUnionTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInputObjectType"
-    ? GraphQLInputObjectTypeConfig
-    : TKey extends "GraphQLScalarType"
-    ? GraphQLScalarTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLEnumType"
-    ? GraphQLEnumTypeConfig
-    : never;
+      ? GraphQLDirectiveConfig
+      : TKey extends "GraphQLObjectType"
+        ? GraphQLObjectTypeConfig<unknown, unknown>
+        : TKey extends "GraphQLInterfaceType"
+          ? GraphQLInterfaceTypeConfig<unknown, unknown>
+          : TKey extends "GraphQLUnionType"
+            ? GraphQLUnionTypeConfig<unknown, unknown>
+            : TKey extends "GraphQLInputObjectType"
+              ? GraphQLInputObjectTypeConfig
+              : TKey extends "GraphQLScalarType"
+                ? GraphQLScalarTypeConfig<unknown, unknown>
+                : TKey extends "GraphQLEnumType"
+                  ? GraphQLEnumTypeConfig
+                  : never;
 
 function declareGraphQLEntity<TKey extends GraphQLEntityName>(
   file: CodegenFile,

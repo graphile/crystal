@@ -513,7 +513,7 @@ style for these configuration options (e.g. change \`interfaces: \
       } catch (e) {
         const placeholders = [name, ...args];
         const msg = message.replace(/\$([0-9]+)/g, (_, n) =>
-          n == "0" ? JSON.stringify(name) : placeholders[n] ?? _,
+          n == "0" ? JSON.stringify(name) : (placeholders[n] ?? _),
         );
         throw new TypeError(msg + " " + e.message);
       }

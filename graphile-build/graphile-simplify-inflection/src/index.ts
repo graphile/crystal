@@ -239,12 +239,12 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       connectionField(_prev, options, baseName) {
-        return globalPgOmitListSuffix ?? options.schema?.pgOmitListSuffix
+        return (globalPgOmitListSuffix ?? options.schema?.pgOmitListSuffix)
           ? baseName + "Connection"
           : baseName;
       },
       listField(_prev, options, baseName) {
-        return globalPgOmitListSuffix ?? options.schema?.pgOmitListSuffix
+        return (globalPgOmitListSuffix ?? options.schema?.pgOmitListSuffix)
           ? baseName
           : baseName + "List";
       },

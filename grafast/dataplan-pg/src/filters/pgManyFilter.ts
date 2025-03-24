@@ -59,8 +59,8 @@ export class PgManyFilter<
         conditions.length === 0
           ? sql.blank
           : conditions.length === 1
-          ? sql`\nwhere ${sqlConditions}`
-          : sql`\nwhere\n${sql.indent(sqlConditions)}`;
+            ? sql`\nwhere ${sqlConditions}`
+            : sql`\nwhere\n${sql.indent(sqlConditions)}`;
       this.parent.where(
         sql`exists(${sql.indent(sql`select 1${from}${where}`)})`,
       );

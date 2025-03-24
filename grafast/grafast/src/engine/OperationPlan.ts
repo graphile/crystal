@@ -1071,8 +1071,8 @@ export class OperationPlan {
           resolvedResolver && !usesDefaultResolver
             ? resolvedResolver
             : resolverEmulation && isPolymorphic
-            ? defaultFieldResolver
-            : null;
+              ? defaultFieldResolver
+              : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1254,7 +1254,7 @@ export class OperationPlan {
             parentStep,
             objectField,
             trackedArguments,
-            isList ? streamDetails ?? false : null,
+            isList ? (streamDetails ?? false) : null,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a

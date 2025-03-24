@@ -38,8 +38,8 @@ export class ListStep<
       this.cacheSize <= 0
         ? undefined
         : cacheConfig?.identifier
-        ? `list|${list.length}|${cacheConfig.identifier}`
-        : this.id;
+          ? `list|${list.length}|${cacheConfig.identifier}`
+          : this.id;
     for (let i = 0, l = list.length; i < l; i++) {
       this.addDependency({ step: list[i], skipDeduplication: true });
     }

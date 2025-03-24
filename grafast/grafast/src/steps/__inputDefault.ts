@@ -22,7 +22,7 @@ export class __InputDefaultStep extends UnbatchedStep {
   }
 
   /** @internal */
-  eval(): any[] | null {
+  eval(): any {
     const $variable = this.getDep(0) as __TrackedValueStep;
     const variableValue = $variable.eval();
     return variableValue === undefined ? this.defaultValue : variableValue;

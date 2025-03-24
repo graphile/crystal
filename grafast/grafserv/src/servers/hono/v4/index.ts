@@ -176,6 +176,7 @@ export class HonoGrafserv extends GrafservBase {
         const { statusCode, headers, json } = result;
         this.setResponseHeaders(ctx, headers);
         ctx.status(statusCode as StatusCode);
+        // @ts-expect-error Some issue with types causing "excessively deep and possibly infinite"
         return ctx.json(json);
       }
       case "noContent": {

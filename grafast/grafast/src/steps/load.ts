@@ -665,8 +665,8 @@ type IOEquivalence<TMultistep extends Multistep> =
             | null;
         }
       : UnwrapMultistep<TMultistep> extends Record<string, any>
-      ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
-      : never);
+        ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
+        : never);
 
 export function loadOne<
   const TMultistep extends Multistep,

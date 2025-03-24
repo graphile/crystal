@@ -63,14 +63,14 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const schema = isSchema(mod.default)
     ? mod.default
     : isSchema(mod.schema)
-    ? mod.schema
-    : isSchema(mod)
-    ? mod
-    : isSchema(mod.default.default)
-    ? mod.default.default
-    : isSchema(mod.default.schema)
-    ? mod.default.schema
-    : null;
+      ? mod.schema
+      : isSchema(mod)
+        ? mod
+        : isSchema(mod.default.default)
+          ? mod.default.default
+          : isSchema(mod.default.schema)
+            ? mod.default.schema
+            : null;
   if (!schema) {
     throw new Error(
       `Could not find a schema exported from that file - please export the schema as 'schema' or 'default'. Exports: ${Object.keys(

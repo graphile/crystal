@@ -1438,13 +1438,13 @@ function evaluateStream(
   const shouldStream =
     stream.ifStepId == null
       ? true
-      : bucket.store.get(stream.ifStepId)?.unaryValue() ?? true;
+      : (bucket.store.get(stream.ifStepId)?.unaryValue() ?? true);
   if (!shouldStream) return null;
 
   const initialCount =
     stream.initialCountStepId == null
       ? 0
-      : bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0;
+      : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
 
   return { initialCount };
 }
