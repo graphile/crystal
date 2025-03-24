@@ -814,17 +814,16 @@ get the alias) you can do `$pgSelectSingle.getClassStep()`.
 
 Should you have code that uses `queryBuilder.parentQueryBuilder` there's no
 direct parallel. Instead, you should use the parent step and get what you need
-from there, and then embed that value into your query using a placeholder:
+from there, and then embed that value into your query:
 
 ```ts
 // V4
 const parentAlias = queryBuilder.parentQueryBuilder.getTableAlias();
-queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not true`);
+queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not null`);
 
 // V5
 const $archivedAt = $parent.get("archived_at");
-const archivedAtFrag = $pgSelect.placeholder($archivedAt);
-$pgSelect.where(sql`${archivedAtFrag} is not true`);
+$pgSelect.where(sql`${$archivedAt} is not null`);
 ```
 
 :::info
