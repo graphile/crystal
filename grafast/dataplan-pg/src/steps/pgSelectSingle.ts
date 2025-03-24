@@ -38,6 +38,8 @@ export interface PgSelectSinglePlanOptions {
   fromRelation?: [PgSelectSingleStep<PgResource>, string];
 }
 
+const EMPTY_TUPLE = Object.freeze([]) as never[];
+
 // Types that only take a few bytes so adding them to the selection would be
 // cheap to do.
 const CHEAP_ATTRIBUTE_TYPES = new Set([
@@ -65,7 +67,8 @@ export class PgSelectSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
   extends UnbatchedStep<
-    unknown[] /* What we return will be a tuple based on the values selected */
+    | unknown[]
+    | null /* What we return will be a tuple based on the values selected */
   >
   implements
     PgTypedStep<
@@ -596,14 +599,14 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
-    result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
-  ): unknown[] {
+    result: string[] | null,
+  ): unknown[] | null {
     if (result == null) {
-      return this._coalesceToEmptyObject ? Object.create(null) : null;
+      return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
     } else if (this.nullCheckAttributeIndex != null) {
       const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
       if (nullIfAttributeNull == null) {
-        return this._coalesceToEmptyObject ? Object.create(null) : null;
+        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
       }
     } else if (this.nullCheckId != null) {
       const nullIfExpressionNotTrue = result[this.nullCheckId];
@@ -611,7 +614,7 @@ export class PgSelectSingleStep<
         nullIfExpressionNotTrue == null ||
         TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
       ) {
-        return this._coalesceToEmptyObject ? Object.create(null) : null;
+        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
       }
     }
     return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
