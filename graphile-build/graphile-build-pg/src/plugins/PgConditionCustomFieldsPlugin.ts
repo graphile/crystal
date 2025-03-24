@@ -145,16 +145,14 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                           const expression = sql`${pgFieldSource.from({
                             placeholder: $condition.alias,
                           })}`;
-                          if (val === null) {
-                            $condition.where(sql`${expression} is null`);
-                          } else {
-                            $condition.where(
-                              sql`${expression} = ${sqlValueWithCodec(
-                                val,
-                                pgFieldSource.codec,
-                              )}`,
-                            );
-                          }
+                          $condition.where(
+                            val === null
+                              ? sql`${expression} is null`
+                              : sql`${expression} = ${sqlValueWithCodec(
+                                  val,
+                                  pgFieldSource.codec,
+                                )}`,
+                          );
                         },
                       [pgFieldSource, sql, sqlValueWithCodec],
                     ),

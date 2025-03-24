@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy()
+#> variableValues: {"input": {"records": [{"a":1,"b":"B","c":"RED","d":"00000000-0000-0000-0000-000000000000","e":"BAZ_QUX","f":"_EMPTY_","g":{"seconds":21},"fooBar":42}]}}
+mutation M($input: ListOfCompoundTypesMutationInput!) {
+  listOfCompoundTypesMutation(input: $input) {
+    compoundTypes {
+      a
+      b
+      c
+      d
+      e
+      f
+      g {
+        seconds
+        minutes
+        hours
+      }
+      fooBar
+    }
+  }
+}

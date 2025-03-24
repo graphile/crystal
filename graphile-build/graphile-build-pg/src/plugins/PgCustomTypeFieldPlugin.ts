@@ -31,13 +31,13 @@ import {
 import type {
   __InputObjectStep,
   __TrackedValueStep,
-  ExecutableStep,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
   GrafastFieldConfig,
   GrafastInputFieldConfigMap,
   Maybe,
+  Step,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -57,6 +57,12 @@ import { EXPORTABLE } from "graphile-build";
 
 import { exportNameHint, tagToString } from "../utils.js";
 import { version } from "../version.js";
+
+const EMPTY_ARRAY = Object.freeze([]);
+const makeEmptyArray = EXPORTABLE(
+  (EMPTY_ARRAY) => () => EMPTY_ARRAY,
+  [EMPTY_ARRAY],
+);
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
@@ -94,13 +100,16 @@ declare global {
             description?: string;
           };
         };
-        makeArgs(args: FieldArgs, path?: string[]): PgSelectArgumentSpec[];
+        makeArgs(
+          args: FieldArgs,
+          path?: string[],
+        ): readonly PgSelectArgumentSpec[];
         makeArgsRuntime(
           schema: GraphQLSchema,
           /** Suitable for input object fields, or arguments */
           fieldsOrArgs: Record<string, { type: GraphQLInputType }>,
           input: Record<string, any>,
-        ): PgSelectArgumentRuntimeValue[];
+        ): readonly PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
@@ -256,7 +265,7 @@ function defaultProcSourceBehavior(
 }
 
 function hasRecord(
-  $row: ExecutableStep,
+  $row: Step,
 ): $row is
   | PgSelectSingleStep
   | PgInsertSingleStep
@@ -490,7 +499,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 getSpec && codecResource
                   ? EXPORTABLE(
                       (codecResource, getSpec) =>
-                        ($nodeId: ExecutableStep<Maybe<string>>) =>
+                        ($nodeId: Step<Maybe<string>>) =>
                           codecResource.get(getSpec($nodeId)),
                       [codecResource, getSpec],
                     )
@@ -548,46 +557,55 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 },
               );
 
-            const argDetailsSimple = argDetails.map(
-              ({
-                graphqlArgName,
-                pgCodec,
-                required,
-                postgresArgName,
-                fetcher,
-              }) => ({
-                graphqlArgName,
-                postgresArgName,
-                pgCodec,
-                required,
-                fetcher,
-              }),
-            );
+            const argDetailsSimple =
+              argDetails.length === 0
+                ? EMPTY_ARRAY
+                : argDetails.map(
+                    ({
+                      graphqlArgName,
+                      pgCodec,
+                      required,
+                      postgresArgName,
+                      fetcher,
+                    }) => ({
+                      graphqlArgName,
+                      postgresArgName,
+                      pgCodec,
+                      required,
+                      fetcher,
+                    }),
+                  );
             exportNameHint(
               argDetailsSimple,
               `argDetailsSimple_${resource.name}`,
             );
 
-            const makeArgs = EXPORTABLE(
-              (argDetailsSimple, makeArg) =>
-                (args: FieldArgs, path: string[] = []) =>
-                  argDetailsSimple.map((details) =>
-                    makeArg(path, args, details),
-                  ),
-              [argDetailsSimple, makeArg],
-            );
-            const makeArgsRuntime = EXPORTABLE(
-              (argDetailsSimple, makeArgRuntime) =>
-                (
-                  schema: GraphQLSchema,
-                  fields: Record<string, { type: GraphQLInputType }>,
-                  input: Record<string, any>,
-                ) =>
-                  argDetailsSimple.map((details) =>
-                    makeArgRuntime(schema, fields, input, details),
-                  ),
-              [argDetailsSimple, makeArgRuntime],
-            );
+            const makeArgs =
+              argDetailsSimple.length === 0
+                ? makeEmptyArray
+                : EXPORTABLE(
+                    (argDetailsSimple, makeArg) =>
+                      (args: FieldArgs, path: string[] = []) =>
+                        argDetailsSimple.map((details) =>
+                          makeArg(path, args, details),
+                        ) as ReadonlyArray<ReturnType<typeof makeArg>>,
+                    [argDetailsSimple, makeArg],
+                  );
+            const makeArgsRuntime =
+              argDetailsSimple.length === 0
+                ? makeEmptyArray
+                : EXPORTABLE(
+                    (argDetailsSimple, makeArgRuntime) =>
+                      (
+                        schema: GraphQLSchema,
+                        fields: Record<string, { type: GraphQLInputType }>,
+                        input: Record<string, any>,
+                      ) =>
+                        argDetailsSimple.map((details) =>
+                          makeArgRuntime(schema, fields, input, details),
+                        ) as ReadonlyArray<ReturnType<typeof makeArgRuntime>>,
+                    [argDetailsSimple, makeArgRuntime],
+                  );
 
             exportNameHint(makeArgs, `makeArgs_${resource.name}`);
 
@@ -887,6 +905,94 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 };
 
+const pgFunctionArgumentsFromArgs = EXPORTABLE(
+  (
+    PgSelectSingleStep,
+    hasRecord,
+    pgSelectSingleFromRecord,
+    stepAMayDependOnStepB,
+  ) => {
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
+    ): {
+      $row: PgSelectSingleStep;
+      selectArgs: readonly PgSelectArgumentSpec[];
+    };
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
+      inlining: true,
+    ): {
+      $row: PgSelectSingleStep;
+      selectArgs: readonly (PgSelectArgumentSpec | PgSelectArgumentDigest)[];
+    };
+    function pgFunctionArgumentsFromArgs(
+      $in: Step,
+      extraSelectArgs: readonly PgSelectArgumentSpec[],
+      inlining = false,
+    ) {
+      if (!hasRecord($in)) {
+        throw new Error(
+          `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
+        );
+      }
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly =
+        $in instanceof PgSelectSingleStep &&
+        extraSelectArgs.every((a) =>
+          stepAMayDependOnStepB($in.getClassStep(), a.step),
+        );
+      const $row = canUseExpressionDirectly
+        ? $in
+        : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs: PgSelectArgumentSpec[] = [
+        { step: $row.record() },
+        ...extraSelectArgs,
+      ];
+      if (inlining) {
+        // This is a scalar computed attribute, let's inline the expression
+        const newSelectArgs = selectArgs.map(
+          (arg, i): PgSelectArgumentSpec | PgSelectArgumentDigest => {
+            if (i === 0) {
+              const { step, ...rest } = arg;
+              return {
+                ...rest,
+                placeholder: $row.getClassStep().alias,
+              } as PgSelectArgumentDigest;
+            } else {
+              return arg;
+            }
+          },
+        );
+        return {
+          $row,
+          selectArgs: newSelectArgs as ReadonlyArray<
+            (typeof newSelectArgs)[number]
+          >,
+        };
+      } else {
+        return {
+          $row,
+          selectArgs: selectArgs as ReadonlyArray<(typeof selectArgs)[number]>,
+        };
+      }
+    }
+    return pgFunctionArgumentsFromArgs;
+  },
+  [
+    PgSelectSingleStep,
+    hasRecord,
+    pgSelectSingleFromRecord,
+    stepAMayDependOnStepB,
+  ],
+);
+
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
@@ -969,7 +1075,7 @@ function modFields(
 
         const getSelectPlanFromParentAndArgs: FieldPlanResolver<
           any,
-          ExecutableStep,
+          Step,
           any
         > = isRootQuery
           ? // Not computed
@@ -993,89 +1099,55 @@ function modFields(
               [makeArgs, object, resource],
             )
           : // Otherwise computed:
-            EXPORTABLE(
+
+          // if it's a scalar computed expression, inline it:
+          resource.isUnique &&
+            !resource.codec.attributes &&
+            typeof resource.from === "function"
+          ? EXPORTABLE(
               (
-                PgSelectSingleStep,
-                hasRecord,
                 makeArgs,
                 pgClassExpression,
                 pgFromExpression,
-                pgSelectSingleFromRecord,
+                pgFunctionArgumentsFromArgs,
                 resource,
-                stepAMayDependOnStepB,
               ) =>
                 ($in, args, _info) => {
-                  if (!hasRecord($in)) {
-                    throw new Error(
-                      `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
-                    );
-                  }
-                  const extraSelectArgs = makeArgs(args);
-                  /**
-                   * An optimisation - if all our dependencies are
-                   * compatible with the expression's class plan then we
-                   * can inline ourselves into that, otherwise we must
-                   * issue the query separately.
-                   */
-                  const canUseExpressionDirectly =
-                    $in instanceof PgSelectSingleStep &&
-                    extraSelectArgs.every((a) =>
-                      stepAMayDependOnStepB($in.getClassStep(), a.step),
-                    );
-                  const $row = canUseExpressionDirectly
-                    ? $in
-                    : pgSelectSingleFromRecord($in.resource, $in.record());
-                  const selectArgs: PgSelectArgumentSpec[] = [
-                    { step: $row.record() },
-                    ...extraSelectArgs,
-                  ];
-                  if (
-                    resource.isUnique &&
-                    !resource.codec.attributes &&
-                    typeof resource.from === "function"
-                  ) {
-                    // This is a scalar computed attribute, let's inline the expression
-                    const newSelectArgs = selectArgs.map(
-                      (
-                        arg,
-                        i,
-                      ): PgSelectArgumentSpec | PgSelectArgumentDigest => {
-                        if (i === 0) {
-                          const { step, ...rest } = arg;
-                          return {
-                            ...rest,
-                            placeholder: $row.getClassStep().alias,
-                          } as PgSelectArgumentDigest;
-                        } else {
-                          return arg;
-                        }
-                      },
-                    );
-                    const from = pgFromExpression(
-                      $row,
-                      resource.from,
-                      resource.parameters,
-                      newSelectArgs,
-                    );
-                    return pgClassExpression(
-                      $row,
-                      resource.codec,
-                      undefined,
-                    )`${from}`;
-                  }
-                  // PERF: or here, if scalar add select to `$row`?
-                  return resource.execute(selectArgs);
+                  const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
+                    $in,
+                    makeArgs(args),
+                    true,
+                  );
+                  const from = pgFromExpression(
+                    $row,
+                    resource.from,
+                    resource.parameters,
+                    selectArgs,
+                  );
+                  return pgClassExpression(
+                    $row,
+                    resource.codec,
+                    undefined,
+                  )`${from}`;
                 },
               [
-                PgSelectSingleStep,
-                hasRecord,
                 makeArgs,
                 pgClassExpression,
                 pgFromExpression,
-                pgSelectSingleFromRecord,
+                pgFunctionArgumentsFromArgs,
                 resource,
-                stepAMayDependOnStepB,
               ],
+            )
+          : EXPORTABLE(
+              (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
+                ($in, args, _info) => {
+                  const { selectArgs } = pgFunctionArgumentsFromArgs(
+                    $in,
+                    makeArgs(args),
+                  );
+                  return resource.execute(selectArgs);
+                },
+              [makeArgs, pgFunctionArgumentsFromArgs, resource],
             );
 
         if (isRootMutation) {
@@ -1262,7 +1334,7 @@ function modFields(
                         plan: EXPORTABLE(
                           (connection, getSelectPlanFromParentAndArgs) =>
                             function plan(
-                              $parent: ExecutableStep,
+                              $parent: Step,
                               args: FieldArgs,
                               info: FieldInfo,
                             ) {
@@ -1272,7 +1344,6 @@ function modFields(
                                 info,
                               ) as PgSelectStep;
                               return connection($select, {
-                                // nodePlan: ($item) => $item,
                                 cursorPlan: ($item: any) =>
                                   $item.getParentStep
                                     ? $item.getParentStep().cursor()
@@ -1465,7 +1536,7 @@ const makeArg = EXPORTABLE(
         fetcher:
           | null
           | ((
-              $nodeId: ExecutableStep<Maybe<string>>,
+              $nodeId: Step<Maybe<string>>,
             ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentSpec {
@@ -1473,9 +1544,7 @@ const makeArg = EXPORTABLE(
       const fullPath = [...path, graphqlArgName];
       const $raw = args.getRaw(fullPath) as __TrackedValueStep;
       const step = fetcher
-        ? (
-            fetcher($raw as ExecutableStep<Maybe<string>>) as PgSelectSingleStep
-          ).record()
+        ? (fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep).record()
         : bakedInput(args.typeAt(fullPath), $raw);
 
       return {
@@ -1500,7 +1569,7 @@ const makeArgRuntime = EXPORTABLE(
         fetcher:
           | null
           | ((
-              $nodeId: ExecutableStep<Maybe<string>>,
+              $nodeId: Step<Maybe<string>>,
             ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentRuntimeValue {

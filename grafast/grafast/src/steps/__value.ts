@@ -16,8 +16,9 @@ export class __ValueStep<TData> extends Step<TData> {
   isSyncAndSafe = true;
   [$$noExec] = true;
 
-  constructor() {
+  constructor(isImmutable: boolean) {
     super();
+    this._isImmutable = isImmutable;
   }
 
   toStringMeta(): string | null {

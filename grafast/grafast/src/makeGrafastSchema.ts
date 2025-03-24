@@ -9,8 +9,10 @@ import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
 import type {
+  ArgumentApplyPlanResolver,
   EnumValueApplyResolver,
   FieldPlanResolver,
+  InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
@@ -42,7 +44,13 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: graphql.GraphQLArgumentExtensions;
+        [argName: string]:
+          | ArgumentApplyPlanResolver
+          | {
+              applyPlan?: ArgumentApplyPlanResolver;
+              applySubscribePlan?: ArgumentApplyPlanResolver;
+              extensions?: graphql.GraphQLArgumentExtensions;
+            };
       };
     };
 
@@ -63,7 +71,12 @@ export type ObjectPlans = {
 export type InputObjectPlans = {
   __baked?: InputObjectTypeBakedResolver;
 } & {
-  [fieldName: string]: Grafast.InputFieldExtensions;
+  [fieldName: string]:
+    | InputObjectFieldApplyResolver<any>
+    | {
+        apply?: InputObjectFieldApplyResolver<any>;
+        extensions?: graphql.GraphQLInputFieldExtensions;
+      };
 };
 
 /**
@@ -249,9 +262,10 @@ export function makeGrafastSchema(details: {
             if (fieldName.startsWith("__")) {
               continue;
             }
-            const fieldSpec = (objectPlans as ObjectPlans | undefined)?.[
-              fieldName
-            ];
+            const fieldSpec =
+              objectPlans && Object.hasOwn(objectPlans, fieldName)
+                ? objectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
               ...rawFieldSpec,
               type: mapType(rawFieldSpec.type),
@@ -311,16 +325,39 @@ export function makeGrafastSchema(details: {
                   )) {
                     const argSpec = fieldSpec.args?.[argName];
                     if (typeof argSpec === "function") {
-                      // Invalid
-                      throw new Error(
-                        `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an extensions object`,
-                      );
-                    } else if (argSpec) {
+                      const applyPlan = argSpec;
                       exportNameHint(
-                        argSpec.grafast?.applyPlan,
+                        applyPlan,
                         `${typeName}_${fieldName}_${argName}_applyPlan`,
                       );
-                      Object.assign(arg.extensions!, argSpec);
+                      Object.assign(arg.extensions!, {
+                        grafast: { applyPlan },
+                      });
+                    } else if (
+                      typeof argSpec === "object" &&
+                      argSpec !== null
+                    ) {
+                      const { extensions, applyPlan, applySubscribePlan } =
+                        argSpec;
+                      if (extensions) {
+                        Object.assign(arg.extensions!, extensions);
+                      }
+                      if (applyPlan || applySubscribePlan) {
+                        exportNameHint(
+                          applyPlan,
+                          `${typeName}_${fieldName}_${argName}_applyPlan`,
+                        );
+                        exportNameHint(
+                          applySubscribePlan,
+                          `${typeName}_${fieldName}_${argName}_applySubscribePlan`,
+                        );
+                        Object.assign(arg.extensions!, {
+                          grafast: {
+                            applyPlan,
+                            applySubscribePlan,
+                          },
+                        });
+                      }
                     }
                   }
                 }
@@ -367,11 +404,6 @@ export function makeGrafastSchema(details: {
               );
               continue;
             }
-            if (typeof fieldSpec === "function") {
-              throw new Error(
-                `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
-              );
-            }
           }
         }
 
@@ -381,20 +413,36 @@ export function makeGrafastSchema(details: {
             Object.create(null);
 
           for (const [fieldName, rawFieldConfig] of Object.entries(rawFields)) {
-            const fieldSpec = inputObjectPlans?.[fieldName];
+            const fieldSpec =
+              inputObjectPlans && Object.hasOwn(inputObjectPlans, fieldName)
+                ? inputObjectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLInputFieldConfig = {
               ...rawFieldConfig,
               type: mapType(rawFieldConfig.type),
             };
             fields[fieldName] = fieldConfig;
             if (fieldSpec) {
-              exportNameHint(fieldSpec.apply, `${typeName}_${fieldName}_apply`);
+              const grafastExtensions: Grafast.InputFieldExtensions =
+                Object.create(null);
+              (fieldConfig.extensions as any).grafast = grafastExtensions;
+              if (typeof fieldSpec === "function") {
+                exportNameHint(fieldSpec, `${typeName}_${fieldName}_apply`);
+                grafastExtensions.apply = fieldSpec;
+              } else {
+                const { apply, extensions } = fieldSpec;
+                if (extensions) {
+                  Object.assign(fieldConfig.extensions!, extensions);
+                }
+                if (apply) {
+                  exportNameHint(
+                    fieldSpec.apply,
+                    `${typeName}_${fieldName}_apply`,
+                  );
+                  Object.assign(grafastExtensions, { apply });
+                }
+              }
             }
-            // it's a spec
-            const grafastExtensions: Grafast.InputFieldExtensions =
-              Object.create(null);
-            (fieldConfig.extensions as any).grafast = grafastExtensions;
-            Object.assign(grafastExtensions, fieldSpec);
           }
           return fields;
         };

@@ -2,6 +2,7 @@
 import { expect } from "chai";
 import { it } from "mocha";
 
+import type { ObjectPlans } from "../dist/index.js";
 import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
 
 it("can create a schema with an input", async () => {
@@ -11,7 +12,7 @@ it("can create a schema with an input", async () => {
         a(_, { $a }) {
           return lambda($a, (a) => JSON.stringify(a));
         },
-      },
+      } as ObjectPlans,
     },
     typeDefs: /* GraphQL */ `
       type Query {
