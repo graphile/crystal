@@ -1,5 +1,171 @@
 # graphile-export
 
+## 0.0.2-beta.26
+
+### Patch Changes
+
+- [#2356](https://github.com/graphile/crystal/pull/2356)
+  [`eb34f24cbbddd3553e2bd00176193ca998f35fb4`](https://github.com/graphile/crystal/commit/eb34f24cbbddd3553e2bd00176193ca998f35fb4)
+  Thanks [@benjie](https://github.com/benjie)! - No longer outputs 'undefined'
+  properties for arguments that have no extensions/etc.
+
+- [#2356](https://github.com/graphile/crystal/pull/2356)
+  [`4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b`](https://github.com/graphile/crystal/commit/4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 makeGrafastSchema and schema
+  export now export extensions directly rather than extensions.grafast - applies
+  to fields and arguments. All previous exports cannot be (safely) executed with
+  latest makeGrafastSchema - please regenerate exports.
+
+- [#2424](https://github.com/graphile/crystal/pull/2424)
+  [`bff9ad1af9a4ef33ab3f7684bf384a069343d5ff`](https://github.com/graphile/crystal/commit/bff9ad1af9a4ef33ab3f7684bf384a069343d5ff)
+  Thanks [@benjie](https://github.com/benjie)! - Implement a large number of
+  optimizations against the exported code and update to the latest
+  makeGrafastSchema format.
+
+- [#2377](https://github.com/graphile/crystal/pull/2377)
+  [`7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7`](https://github.com/graphile/crystal/commit/7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7)
+  Thanks [@benjie](https://github.com/benjie)! - Since `ModifierStep` and
+  `BaseStep` are no more; `ExecutableStep` can be renamed to simply `Step`. The
+  old name (`ExecutableStep`) is now deprecated.
+
+- [#2376](https://github.com/graphile/crystal/pull/2376)
+  [`da6f3c04efe3d8634c0bc3fcf93ac2518de85322`](https://github.com/graphile/crystal/commit/da6f3c04efe3d8634c0bc3fcf93ac2518de85322)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul Grafast to remove more
+  input planning - inputs should be evaluated at runtime - and remove more
+  plan-time step evaluation.
+
+  `FieldArgs.get` is no more; use `FieldArgs.getRaw` or use `bakedInput()`
+  (TODO: document) to get the "baked" version of a raw input value.
+
+  Input object fields no longer have `applyPlan`/`inputPlan`, instead having the
+  runtime equivalents `apply()` and `baked()`. `FieldArgs` is no longer
+  available on input object fields, since these fields are no longer called at
+  plantime; instead, the actual value is passed.
+
+  `FieldArgs` gains `.typeAt(path)` method that details the GraphQL input type
+  at the given path.
+
+  Field arguments are no longer passed `FieldArgs`, instead they're passed a
+  (similar) `FieldArg` object representing the argument value itself.
+
+  `autoApplyAfterParentPlan` is no more - instead if an argument has `applyPlan`
+  it will be called automatically unless it was called during the field plan
+  resolver itself.
+
+  `autoApplyAfterParentSubscribePlan` is no more - instead if an argument has
+  `applySubscribePlan` it will be called automatically unless it was called
+  during the field plan resolver itself.
+
+  Field arguments no longer support `inputPlan` - use `bakedInput()` if you need
+  that.
+
+  Input fields no longer support `inputPlan`, `applyPlan`,
+  `autoApplyAfterParentInputPlan` nor `autoApplyAfterParentApplyPlan`. Instead,
+  `apply()` (which is called by `applyStep()` at runtime) has been added.
+
+  `sqlValueWithCodec(value, codec)` can be used at runtime in places where
+  `$step.placeholder($value, codec)` would have been used previously.
+  `placeholder` has been removed from all places that are now runtime - namely
+  the list of modifiers below...
+
+  The following `ModifierStep` classes have all dropped their `Step` suffix,
+  these `Modifier` classes now all run at runtime, and are thus no longer steps;
+  they're invoked as part of the new `applyInput()` (TODO: document) step:
+
+  - `ModifierStep` &rArr; `Modifier`
+  - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
+  - `PgClassFilterStep` &rArr; `PgClassFilter`
+  - `PgConditionCapableParentStep` &rArr; `PgConditionCapableParent`
+  - `PgConditionLikeStep` &rArr; `PgConditionLike`
+  - `PgConditionStepMode` &rArr; `PgConditionMode`
+  - `PgConditionStep` &rArr; `PgCondition`
+  - `PgManyFilterStep` &rArr; `PgManyFilter`
+  - `PgOrFilterStep` &rArr; `PgOrFilter`
+  - `PgTempTableStep` &rArr; `PgTempTable`
+  - `SetterCapableStep` &rArr; `SetterCapable`
+  - `SetterStep` &rArr; `Setter`
+
+  (Interestingly, other than the removal of `placeholder` and the fact they deal
+  with runtime values rather than steps now, they're very similar to what they
+  were before.)
+
+  The deprecated forms of the above have been removed.
+
+  Methods that rely on these modifier plans have been removed:
+
+  - `PgUnionAllStep.wherePlan` - use
+    `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
+  - `PgUnionAllStep.havingPlan` - use
+    `fieldArg.apply($unionAll, qb => qb.havingBuilder())` instead
+  - Same for PgSelectStep
+
+  The following gain query builders:
+
+  - `PgInsertSingle`
+  - `PgUpdateSingle`
+  - `PgDeleteSingle`
+
+  Query builders gain `meta`, an object that can be augmented with metadata
+  about the operation (typically this relates to cursors and similar
+  functionality). This is now used to implement `clientMutationId`.
+
+  Extends query builders with additional functionality.
+
+  Many of the types have had their generics changed, TypeScript should guide you
+  if you have issues here.
+
+  `NodeIdHandler` now requires a `getIdentifiers` method that runs at runtime
+  and returns the identifiers from a decoded NodeId string.
+
+  Types around GraphQL Global Object Identification (i.e. `Node` / `id`) have
+  changed.
+
+- Updated dependencies
+  [[`d34014a9a3c469154cc796086ba13719954731e5`](https://github.com/graphile/crystal/commit/d34014a9a3c469154cc796086ba13719954731e5),
+  [`98516379ac355a0833a64e002f3717cc3a1d6473`](https://github.com/graphile/crystal/commit/98516379ac355a0833a64e002f3717cc3a1d6473),
+  [`f8602d05eed3247c90b87c55d7af580d1698effc`](https://github.com/graphile/crystal/commit/f8602d05eed3247c90b87c55d7af580d1698effc),
+  [`65df25534fa3f787ba2ab7fd9547d295ff2b1288`](https://github.com/graphile/crystal/commit/65df25534fa3f787ba2ab7fd9547d295ff2b1288),
+  [`1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a`](https://github.com/graphile/crystal/commit/1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a),
+  [`e10c372dafbe0d6014b1e946349b22f40aa87ef9`](https://github.com/graphile/crystal/commit/e10c372dafbe0d6014b1e946349b22f40aa87ef9),
+  [`3c0a925f26f10cae627a23c49c75ccd8d76b60c8`](https://github.com/graphile/crystal/commit/3c0a925f26f10cae627a23c49c75ccd8d76b60c8),
+  [`fcaeb48844156e258a037f420ea1505edb50c52a`](https://github.com/graphile/crystal/commit/fcaeb48844156e258a037f420ea1505edb50c52a),
+  [`68926abc31c32ce527327ffbb1ede4b0b7be446b`](https://github.com/graphile/crystal/commit/68926abc31c32ce527327ffbb1ede4b0b7be446b),
+  [`4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b`](https://github.com/graphile/crystal/commit/4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b),
+  [`d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48`](https://github.com/graphile/crystal/commit/d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48),
+  [`c8f1971ea4198633ec97f72f82abf65089f71a88`](https://github.com/graphile/crystal/commit/c8f1971ea4198633ec97f72f82abf65089f71a88),
+  [`dd3d22eab73a8554715bf1111e30586251f69a88`](https://github.com/graphile/crystal/commit/dd3d22eab73a8554715bf1111e30586251f69a88),
+  [`a120a8e43b24dfc174950cdbb69e481272a0b45e`](https://github.com/graphile/crystal/commit/a120a8e43b24dfc174950cdbb69e481272a0b45e),
+  [`3b0f5082b2272997ce33ce8823a4752513d19e28`](https://github.com/graphile/crystal/commit/3b0f5082b2272997ce33ce8823a4752513d19e28),
+  [`84f06eafa051e907a3050237ac6ee5aefb184652`](https://github.com/graphile/crystal/commit/84f06eafa051e907a3050237ac6ee5aefb184652),
+  [`4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf`](https://github.com/graphile/crystal/commit/4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf),
+  [`3789326b2e2fdb86519acc75e606c752ddefe590`](https://github.com/graphile/crystal/commit/3789326b2e2fdb86519acc75e606c752ddefe590),
+  [`0fc2db95d90df918cf5c59ef85f22ac78d8000d3`](https://github.com/graphile/crystal/commit/0fc2db95d90df918cf5c59ef85f22ac78d8000d3),
+  [`90e81a5deeae554a8be2dd55dcd01489860e96e6`](https://github.com/graphile/crystal/commit/90e81a5deeae554a8be2dd55dcd01489860e96e6),
+  [`c59132eb7a93bc82493d2f1ca050db8aaea9f4d1`](https://github.com/graphile/crystal/commit/c59132eb7a93bc82493d2f1ca050db8aaea9f4d1),
+  [`7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7`](https://github.com/graphile/crystal/commit/7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7),
+  [`728888b28fcd2a6fc481e0ccdfe20d41181a091f`](https://github.com/graphile/crystal/commit/728888b28fcd2a6fc481e0ccdfe20d41181a091f),
+  [`f4f39092d7a51517668384945895d3b450237cce`](https://github.com/graphile/crystal/commit/f4f39092d7a51517668384945895d3b450237cce),
+  [`5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e`](https://github.com/graphile/crystal/commit/5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e),
+  [`83d3b533e702cc875b46ba2ca02bf3642b421be8`](https://github.com/graphile/crystal/commit/83d3b533e702cc875b46ba2ca02bf3642b421be8),
+  [`7001138c38e09822ad13db1018c62d2cac37941e`](https://github.com/graphile/crystal/commit/7001138c38e09822ad13db1018c62d2cac37941e),
+  [`e9e7e33665e22ec397e9ead054d2e4aad3eadc8c`](https://github.com/graphile/crystal/commit/e9e7e33665e22ec397e9ead054d2e4aad3eadc8c),
+  [`bb6ec8d834e3e630e28316196246f514114a2296`](https://github.com/graphile/crystal/commit/bb6ec8d834e3e630e28316196246f514114a2296),
+  [`2b1918d053f590cdc534c8cb81f7e74e96c1bbe6`](https://github.com/graphile/crystal/commit/2b1918d053f590cdc534c8cb81f7e74e96c1bbe6),
+  [`d1ecb39693a341f85762b27012ec4ea013857b0c`](https://github.com/graphile/crystal/commit/d1ecb39693a341f85762b27012ec4ea013857b0c),
+  [`042ebafe11fcf7e2ecac9b131265a55dddd42a6d`](https://github.com/graphile/crystal/commit/042ebafe11fcf7e2ecac9b131265a55dddd42a6d),
+  [`fa005eb0783c58a2476add984fbdd462e0e91dbe`](https://github.com/graphile/crystal/commit/fa005eb0783c58a2476add984fbdd462e0e91dbe),
+  [`df0e5a0f968cf6f9ae97b68745a9a2f391324bf5`](https://github.com/graphile/crystal/commit/df0e5a0f968cf6f9ae97b68745a9a2f391324bf5),
+  [`ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f`](https://github.com/graphile/crystal/commit/ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f),
+  [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6),
+  [`629b45aab49151810f6efc18ac18f7d735626433`](https://github.com/graphile/crystal/commit/629b45aab49151810f6efc18ac18f7d735626433),
+  [`6d19724330d50d076aab9442660fa8abddd095cb`](https://github.com/graphile/crystal/commit/6d19724330d50d076aab9442660fa8abddd095cb),
+  [`ca5bc1a834df7b894088fb8602a12f9fcff55b38`](https://github.com/graphile/crystal/commit/ca5bc1a834df7b894088fb8602a12f9fcff55b38),
+  [`da6f3c04efe3d8634c0bc3fcf93ac2518de85322`](https://github.com/graphile/crystal/commit/da6f3c04efe3d8634c0bc3fcf93ac2518de85322),
+  [`412b92a0b1e03ad962521f630b57a996d8620cf6`](https://github.com/graphile/crystal/commit/412b92a0b1e03ad962521f630b57a996d8620cf6),
+  [`f0bc64b71914dfdd3612f4b65370401fd85b97bc`](https://github.com/graphile/crystal/commit/f0bc64b71914dfdd3612f4b65370401fd85b97bc)]:
+  - grafast@0.1.1-beta.21
+  - pg-sql2@5.0.0-beta.8
+
 ## 0.0.2-beta.25
 
 ### Patch Changes
