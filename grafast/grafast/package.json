@@ -107,7 +107,7 @@
     "sqlite3": "^5.1.7",
     "ts-node": "^10.9.1",
     "tsafe": "^1.7.2",
-    "typescript": "^5.2.2",
+    "typescript": "^5.8.2",
     "zx": "^7.2.3"
   },
   "publishConfig": {

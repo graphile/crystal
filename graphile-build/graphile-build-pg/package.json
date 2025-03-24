@@ -96,7 +96,7 @@
     "pg": "^8.13.3",
     "ruru": "workspace:^",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.8.2",
     "ws": "^8.17.1"
   }
 }

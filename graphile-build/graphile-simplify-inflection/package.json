@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/node": "^20.5.7",
     "postgraphile": "workspace:^",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.2"
   },
   "publishConfig": {
     "access": "public"

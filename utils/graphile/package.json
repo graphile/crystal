@@ -36,7 +36,7 @@
     "chalk": "^4.1.2",
     "graphile-config": "workspace:^",
     "tslib": "^2.6.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "graphile-build": "workspace:^",

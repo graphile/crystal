@@ -40,7 +40,7 @@
     "glob": "^10.3.4",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.2"
   },
   "files": [
     "dist",
