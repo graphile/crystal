@@ -26,7 +26,7 @@ declare global {
   namespace Grafast {
     interface Context {
       currentUserId?: number;
-    };
+    }
   }
 }
 ```
