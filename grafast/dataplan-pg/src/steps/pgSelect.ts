@@ -238,7 +238,7 @@ export interface PgSelectOptions<
    * If your `from` (or resource.from if omitted) is a function, the arguments
    * to pass to the function.
    */
-  args?: Array<PgSelectArgumentSpec>;
+  args?: ReadonlyArray<PgSelectArgumentSpec>;
 
   /**
    * If you want to build the data in a custom way (e.g. calling a function,

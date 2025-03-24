@@ -725,7 +725,7 @@ export class PgResource<
   }
 
   execute(
-    args: Array<PgSelectArgumentSpec> = [],
+    args: ReadonlyArray<PgSelectArgumentSpec> = [],
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
     const $select = pgSelect({

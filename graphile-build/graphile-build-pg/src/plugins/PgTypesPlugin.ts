@@ -2,8 +2,7 @@ import "./PgBasicsPlugin.js";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import type { ExecutableStep } from "grafast";
-import { access, assertExecutableStep } from "grafast";
+import { assertExecutableStep } from "grafast";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -392,13 +391,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLFloat,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["seconds"]);
-                    },
-                  [access],
-                ),
               },
               minutes: {
                 description: build.wrapDescription(
@@ -406,13 +398,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["minutes"]);
-                    },
-                  [access],
-                ),
               },
               hours: {
                 description: build.wrapDescription(
@@ -420,13 +405,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["hours"]);
-                    },
-                  [access],
-                ),
               },
               days: {
                 description: build.wrapDescription(
@@ -434,13 +412,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["days"]);
-                    },
-                  [access],
-                ),
               },
               months: {
                 description: build.wrapDescription(
@@ -448,13 +419,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["months"]);
-                    },
-                  [access],
-                ),
               },
               years: {
                 description: build.wrapDescription(
@@ -462,13 +426,6 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   "field",
                 ),
                 type: GraphQLInt,
-                plan: EXPORTABLE(
-                  (access) =>
-                    function plan($r: ExecutableStep) {
-                      return access($r, ["years"]);
-                    },
-                  [access],
-                ),
               },
             };
           };

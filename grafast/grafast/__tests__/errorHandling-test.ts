@@ -7,6 +7,7 @@ import { it } from "mocha";
 import type {
   ExecutionDetails,
   ExecutionResults,
+  FieldArgs,
   PromiseOrDirect,
 } from "../dist/index.js";
 import {
@@ -84,7 +85,7 @@ const schema = makeGrafastSchema({
       list() {
         return constant([1, 2]);
       },
-      sideEffectListCheck(_, fieldArgs) {
+      sideEffectListCheck(_: Step, fieldArgs: FieldArgs) {
         const $mol = context().get("mol");
         sideEffect($mol, () => {});
         const $count = lambda(fieldArgs.getRaw("arr"), (arr) => {
