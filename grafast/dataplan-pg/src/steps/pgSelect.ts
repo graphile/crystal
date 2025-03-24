@@ -1768,9 +1768,8 @@ export class PgSelectStep<
         const $details = $pgSelect.getMeta(
           identifier,
         ) as Step<PgSelectInlineViaJoinDetails>;
-        $pgSelectSingle.coalesceToEmptyObject();
         return lambda(
-          [$details, $pgSelectSingle as Step<readonly unknown[]>],
+          [$details, $pgSelectSingle],
           pgInlineViaJoinTransform,
           true,
         );
@@ -3866,7 +3865,7 @@ function createSelectResult(
 
 function pgInlineViaJoinTransform([details, item]: readonly [
   PgSelectInlineViaJoinDetails,
-  readonly any[],
+  any[],
 ]) {
   const { meta, selectIndexes, cursorDetails, groupDetails } = details;
   const newItem = [];
