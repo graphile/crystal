@@ -48,7 +48,6 @@ module.exports = {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/consistent-type-imports": "error",
     "no-confusing-arrow": 0,
     "no-else-return": 0,
     "no-underscore-dangle": 0,
@@ -179,7 +178,9 @@ module.exports = {
       parserOptions: {
         project: true,
       },
-      rules: {},
+      rules: {
+        "@typescript-eslint/consistent-type-imports": "error",
+      },
     },
 
     // Rules for tests only
