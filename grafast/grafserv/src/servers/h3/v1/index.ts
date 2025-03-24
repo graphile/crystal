@@ -1,6 +1,5 @@
 import { PassThrough } from "node:stream";
 
-//@ts-expect-error type imports.
 import type { Hooks, Peer } from "crossws";
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
