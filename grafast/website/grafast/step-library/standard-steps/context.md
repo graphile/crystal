@@ -15,18 +15,22 @@ The returned step has the following methods:
 - `.at(index)` - gets the value at index `index` assuming the parsed JSON value
   was an array
 
-## Typescript
+## TypeScript
 
-Typescript declaration merging should be used to extend the default grafast context and make the usage of this step type safe in the plan resolvers. Here's an example:
+TypeScript declaration merging should be used to detail the properties you are
+making available on GraphQL context such that usage of this step is type safe in
+plan resolvers. For example:
 
 ```ts
 declare global {
   namespace Grafast {
     interface Context {
-      postgresClient: PostgresClient;
+      currentUserId?: number;
     };
   }
 }
 ```
 
-The code above would make accessing `context().get("postgresClient")` and its return value type-safe in the plan resolvers.
+The code above would mean that `context().get("currentUserId")` returns
+`Step<number | undefined>`, thereby making its usage in plan resolvers type
+safe.
