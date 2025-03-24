@@ -14,7 +14,7 @@ const app = new Hono();
 const serv = grafserv({ schema, preset });
 
 // Mount the request handler into a new HTTP server
-serv.addTo(server).catch((e) => {
+serv.addTo(app).catch((e) => {
   console.error(e);
   process.exit(1);
 });
