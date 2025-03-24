@@ -62,7 +62,7 @@ export interface PgClientResult<TData> {
    * For `INSERT/UPDATE/DELETE` without `RETURNING`, this will be the number of
    * rows created/updated/deleted.
    */
-  rowCount: number;
+  rowCount: number | null;
 }
 
 /**

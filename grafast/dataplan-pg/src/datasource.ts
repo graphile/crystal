@@ -819,12 +819,13 @@ export class PgResource<
     } else {
       // Every column in a primary key is non-nullable; so just see if one is null
       const pk = this.uniques.find((u) => u.isPrimary);
-      const nonNullableAttribute = this.codec.attributes
-        ? Object.entries(this.codec.attributes).find(
-            ([_attributeName, spec]) =>
-              !spec.via && !spec.expression && spec.notNull,
-          )?.[0]
-        : null ?? pk?.attributes[0];
+      const nonNullableAttribute =
+        (this.codec.attributes
+          ? Object.entries(this.codec.attributes).find(
+              ([_attributeName, spec]) =>
+                !spec.via && !spec.expression && spec.notNull,
+            )?.[0]
+          : null) ?? pk?.attributes[0];
       if (nonNullableAttribute) {
         const firstAttribute = sql`${alias}.${sql.identifier(
           nonNullableAttribute,
