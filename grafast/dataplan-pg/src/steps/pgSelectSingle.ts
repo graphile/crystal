@@ -4,10 +4,7 @@ import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type {
-  ObjectFromPgCodecAttributes,
-  PgCodecAttribute,
-} from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {

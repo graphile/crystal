@@ -455,7 +455,7 @@ export class PgResource<
     const selectAuth =
       overrideSelectAuth === null
         ? null
-        : overrideSelectAuth ?? originalSelectAuth;
+        : (overrideSelectAuth ?? originalSelectAuth);
     if (!returnsArray) {
       // This is the easy case
       return {
@@ -1520,8 +1520,9 @@ exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
 
 function printResourceFrom(resource: PgResourceOptions): string {
   if (typeof resource.from === "function") {
-    return `a function accepting ${resource.parameters
-      ?.length} parameters and returning SQL type '${
+    return `a function accepting ${
+      resource.parameters?.length
+    } parameters and returning SQL type '${
       sql.compile(resource.codec.sqlType).text
     }'`;
   } else {

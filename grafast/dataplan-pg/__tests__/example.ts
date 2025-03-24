@@ -25,7 +25,7 @@ import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import { planToMermaid } from "grafast/mermaid";
 import { resolve } from "path";
 import { Pool } from "pg";
-import prettier from "prettier";
+import * as prettier from "prettier";
 
 import {
   makePgAdaptorWithPgClient,

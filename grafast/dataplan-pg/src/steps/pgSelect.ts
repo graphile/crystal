@@ -2556,8 +2556,8 @@ function calculateOrderBySQL(params: {
             o.nulls === "LAST"
               ? "FIRST"
               : o.nulls === "FIRST"
-              ? "LAST"
-              : o.nulls,
+                ? "LAST"
+                : o.nulls,
         }),
       )
     : rawOrders;
@@ -2569,8 +2569,8 @@ function calculateOrderBySQL(params: {
             o.nulls === "LAST"
               ? sql` nulls last`
               : o.nulls === "FIRST"
-              ? sql` nulls first`
-              : sql.blank
+                ? sql` nulls first`
+                : sql.blank
           }`;
         }),
         ", ",
@@ -3474,10 +3474,10 @@ function applyConditionFromCursor<
       nulls === "FIRST"
         ? true
         : nulls === "LAST"
-        ? false
-        : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-          // ASC = NULLS LAST
-          direction === "DESC";
+          ? false
+          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+            // ASC = NULLS LAST
+            direction === "DESC";
 
     // Simple less than or greater than
     let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
@@ -3741,8 +3741,8 @@ function buildWhereOrHaving(
   return allConditions.length === 0
     ? sql.blank
     : allConditions.length === 1
-    ? sql`\n${whereOrHaving} ${sqlConditions}`
-    : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`;
+      ? sql`\n${whereOrHaving} ${sqlConditions}`
+      : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`;
 }
 
 function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
@@ -3751,13 +3751,13 @@ function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
       j.type === "cross"
         ? sql.blank
         : j.conditions.length === 0
-        ? sql.true
-        : j.conditions.length === 1
-        ? j.conditions[0]
-        : sql.join(
-            j.conditions.map((c) => sql.parens(sql.indent(c))),
-            " and ",
-          );
+          ? sql.true
+          : j.conditions.length === 1
+            ? j.conditions[0]
+            : sql.join(
+                j.conditions.map((c) => sql.parens(sql.indent(c))),
+                " and ",
+              );
     const joinCondition =
       j.type !== "cross"
         ? sql`\non ${sql.parens(
@@ -3768,14 +3768,14 @@ function buildJoin(inJoins: readonly PgSelectPlanJoin[]) {
       j.type === "inner"
         ? sql`inner join`
         : j.type === "left"
-        ? sql`left outer join`
-        : j.type === "right"
-        ? sql`right outer join`
-        : j.type === "full"
-        ? sql`full outer join`
-        : j.type === "cross"
-        ? sql`cross join`
-        : (sql.blank as never);
+          ? sql`left outer join`
+          : j.type === "right"
+            ? sql`right outer join`
+            : j.type === "full"
+              ? sql`full outer join`
+              : j.type === "cross"
+                ? sql`cross join`
+                : (sql.blank as never);
 
     return sql`${join}${j.lateral ? sql` lateral` : sql.blank} ${j.from} as ${
       j.alias
