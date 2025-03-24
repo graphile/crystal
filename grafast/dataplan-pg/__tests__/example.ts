@@ -25,7 +25,7 @@ import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import { planToMermaid } from "grafast/mermaid";
 import { resolve } from "path";
 import { Pool } from "pg";
-import * as prettier from "prettier";
+import { format } from "prettier";
 
 import {
   makePgAdaptorWithPgClient,
@@ -101,7 +101,7 @@ async function main() {
       ...(nicerErrors !== undefined ? { errors: nicerErrors } : null),
     };
     console.log(
-      prettier.format(JSON.stringify(formattedResult), {
+      format(JSON.stringify(formattedResult), {
         parser: "json5",
         printWidth: 200,
       }),
@@ -123,7 +123,7 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    console.log(prettier.format(source, { parser: "graphql" }));
+    console.log(format(source, { parser: "graphql" }));
     console.log();
     console.log();
     console.log();
