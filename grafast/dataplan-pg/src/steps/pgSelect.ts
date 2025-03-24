@@ -3869,7 +3869,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
 ]) {
   const { meta, selectIndexes, cursorDetails, groupDetails } = details;
   const items: unknown[][] = [];
-  if (item) {
+  if (item != null) {
     const newItem = [];
     for (let i = 0, l = selectIndexes.length; i < l; i++) {
       newItem[i] = item[selectIndexes[i]];
