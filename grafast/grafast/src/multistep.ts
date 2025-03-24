@@ -19,22 +19,24 @@ export type UnwrapMultistep<TMultistepSpec extends Multistep> =
   TMultistepSpec extends null
     ? null
     : TMultistepSpec extends undefined
-    ? undefined
-    : TMultistepSpec extends Step<infer U>
-    ? U
-    : TMultistepSpec extends readonly [...(readonly any[])]
-    ? {
-        [index in keyof TMultistepSpec]: TMultistepSpec[index] extends Step<
-          infer V
-        >
-          ? V
-          : never;
-      }
-    : {
-        [key in keyof TMultistepSpec]: TMultistepSpec[key] extends Step<infer V>
-          ? V
-          : never;
-      };
+      ? undefined
+      : TMultistepSpec extends Step<infer U>
+        ? U
+        : TMultistepSpec extends readonly [...(readonly any[])]
+          ? {
+              [index in keyof TMultistepSpec]: TMultistepSpec[index] extends Step<
+                infer V
+              >
+                ? V
+                : never;
+            }
+          : {
+              [key in keyof TMultistepSpec]: TMultistepSpec[key] extends Step<
+                infer V
+              >
+                ? V
+                : never;
+            };
 
 interface MultistepCacheConfig {
   identifier: string;
@@ -54,8 +56,8 @@ export function multistep<const TMultistepSpec extends Multistep>(
       stable === true
         ? { identifier: `multistep` }
         : typeof stable === "string"
-        ? { identifier: stable }
-        : stable;
+          ? { identifier: stable }
+          : stable;
     const $step = list(spec, config);
     return $step as any;
   } else {
@@ -63,8 +65,8 @@ export function multistep<const TMultistepSpec extends Multistep>(
       stable === true
         ? { identifier: `multistep` }
         : typeof stable === "string"
-        ? { identifier: stable }
-        : stable;
+          ? { identifier: stable }
+          : stable;
     const $step = object(spec, config);
     return $step as any;
   }

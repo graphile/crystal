@@ -252,8 +252,8 @@ export function access<TData>(
   const path = Array.isArray(rawPath)
     ? rawPath
     : rawPath != null
-    ? [rawPath]
-    : [];
+      ? [rawPath]
+      : [];
   if (
     typeof fallback === "undefined" &&
     !path.some((k) => typeof k === "symbol")

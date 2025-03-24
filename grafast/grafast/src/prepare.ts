@@ -399,7 +399,7 @@ function executePreemptive(
       return finalize(
         result,
         ctx,
-        index === 0 ? rootValue[$$extensions] ?? undefined : undefined,
+        index === 0 ? (rootValue[$$extensions] ?? undefined) : undefined,
         outputDataAsString,
       );
     }

@@ -272,8 +272,8 @@ export class __TrackedValueStep<
     TInputType extends GraphQLList<infer U>
       ? U & GraphQLInputType
       : TInputType extends GraphQLNonNull<GraphQLList<infer U>>
-      ? U & GraphQLInputType
-      : undefined
+        ? U & GraphQLInputType
+        : undefined
   > {
     const { value, path, constraints } = this;
     const newValue = value?.[index];

@@ -169,8 +169,8 @@ export function grafast(
     rawMiddleware !== undefined
       ? rawMiddleware
       : resolvedPreset != null
-      ? getGrafastMiddleware(resolvedPreset)
-      : null;
+        ? getGrafastMiddleware(resolvedPreset)
+        : null;
 
   // Validate Schema
   const schemaValidationErrors =

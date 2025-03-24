@@ -149,8 +149,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
           pgResource
             ? !build.behavior.pgResourceMatches(pgResource, desiredBehavior)
             : codec
-            ? !build.behavior.pgCodecMatches(codec, desiredBehavior)
-            : true
+              ? !build.behavior.pgCodecMatches(codec, desiredBehavior)
+              : true
         ) {
           return args;
         }

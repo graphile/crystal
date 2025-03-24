@@ -39,11 +39,11 @@ export class __InputListStep<
       inputValues === undefined
         ? undefined
         : inputValues.kind === Kind.LIST
-        ? inputValues.values
-        : inputValues.kind === Kind.NULL
-        ? undefined // Really it's `null` but we don't care here
-        : // Coerce to list
-          [inputValues];
+          ? inputValues.values
+          : inputValues.kind === Kind.NULL
+            ? undefined // Really it's `null` but we don't care here
+            : // Coerce to list
+              [inputValues];
     if (values !== undefined) {
       for (
         let inputValueIndex = 0, inputValuesLength = values.length;

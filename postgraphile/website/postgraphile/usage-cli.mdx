@@ -56,30 +56,34 @@ you can run PostGraphile with no (or minimal) CLI flags.
   output usage information
 - `--preset <string>` (alias: `-P`)
   <equivalent>{`{ extends: [...] }`}</equivalent>
-  can be used to specify a comma-separated list of presets to add to the configuration
+  can be used to specify a comma-separated list of presets to add to the
+  configuration
 - `--allow-explain` (alias: `-e`)
   <equivalent>{`{ grafast: { explain: true } }`}</equivalent>
-  enables "explain" mode, you won't want this in production but it's very helpful
-  in development to know what's going on
+  enables "explain" mode, you won't want this in production but it's very
+  helpful in development to know what's going on
 - `--connection <string>` (alias: `-c`)
   <equivalent>{`{ pgServices: [makePgService({ connectionString: '...' })] }`}</equivalent>
-  the PostgreSQL connection string. If omitted, inferred from <a href="https://www.postgresql.org/docs/current/static/libpq-envars.html">
+  the PostgreSQL connection string. If omitted, inferred from
+  <a href="https://www.postgresql.org/docs/current/static/libpq-envars.html">
     environmental variables
   </a>
   .<br />
-  Examples: <code>db</code>, <code>postgres:///db</code>, <code>postgres://user:password@domain:port/db?ssl=true</code>
+  Examples: <code>db</code>, <code>postgres:///db</code>,
+  <code>postgres://user:password@domain:port/db?ssl=true</code>
 - `--superuser-connection <string>` (alias: `-S`)
   <equivalent>{`{ pgServices: [makePgService({ superuserConnectionString:'...' })] }`}</equivalent>
-  the PostgreSQL superuser connection string to use for installing watch fixtures
-  (if <code>--watch</code> is enabled). If omitted, the regular connection string
-  will be used.
+  the PostgreSQL superuser connection string to use for installing watch
+  fixtures (if <code>--watch</code> is enabled). If omitted, the regular
+  connection string will be used.
 - `--schema <string>` (alias: `-s`)
   <equivalent>{`{ pgServices: [makePgService({ schemas: ['...'] })] }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
   <equivalent>{`{ grafserv: { watch: true } }`}</equivalent>
-  automatically updates your GraphQL schema when your database schema changes (NOTE:
-  requires DB superuser to install <code>postgraphile_watch</code> schema)
+  automatically updates your GraphQL schema when your database schema changes
+  (NOTE: requires DB superuser to install <code>postgraphile_watch</code>
+  schema)
 - `--host <string>` (alias: `-n`)
   <equivalent>{`{ grafserv: { host: 'localhost' } }`}</equivalent>
   the hostname to be used. Defaults to <code>localhost</code>

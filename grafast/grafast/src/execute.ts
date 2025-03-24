@@ -132,7 +132,7 @@ export function execute(
   const middleware =
     args.middleware === undefined && resolvedPreset != null
       ? getGrafastMiddleware(resolvedPreset)
-      : args.middleware ?? null;
+      : (args.middleware ?? null);
   if (args.middleware === undefined) {
     args.middleware = middleware;
   }

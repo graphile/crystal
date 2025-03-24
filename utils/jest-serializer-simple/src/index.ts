@@ -20,11 +20,11 @@ function printFormattedObject(val: FormattedObject): string {
   return typeof val.__ === "string"
     ? String(val.__)
     : typeof val.__ === "undefined"
-    ? "undefined"
-    : JSON5.stringify(val.__, {
-        space: 2,
-        quote: '"',
-      }).trim();
+      ? "undefined"
+      : JSON5.stringify(val.__, {
+          space: 2,
+          quote: '"',
+        }).trim();
   // prettier
   //     .format(JSON5.stringify(val.__), {
   //       printWidth: 120,

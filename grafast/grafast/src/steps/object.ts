@@ -84,8 +84,8 @@ export class ObjectStep<
       this.cacheSize <= 0
         ? undefined
         : this.cacheConfig?.identifier
-        ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
-        : this.id;
+          ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
+          : this.id;
   }
 
   /**

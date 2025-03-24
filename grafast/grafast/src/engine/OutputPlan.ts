@@ -588,8 +588,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
               spec.type === "__typename"
                 ? "__typename"
                 : spec.isNonNull
-                ? "outputPlan!"
-                : "outputPlan?",
+                  ? "outputPlan!"
+                  : "outputPlan?",
             sameBucket:
               spec.type === "__typename" ||
               spec.outputPlan.layerPlan.id === this.layerPlan.id,

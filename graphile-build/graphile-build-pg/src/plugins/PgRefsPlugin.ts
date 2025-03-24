@@ -117,8 +117,8 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         const rawRefs = Array.isArray(tags.ref)
           ? tags.ref
           : tags.ref
-          ? [tags.ref]
-          : null;
+            ? [tags.ref]
+            : null;
 
         if (!rawRefs) {
           return;
@@ -205,8 +205,8 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
         const rawRefVias = Array.isArray(tags.refVia)
           ? tags.refVia
           : tags.refVia
-          ? [tags.refVia]
-          : null;
+            ? [tags.refVia]
+            : null;
 
         const refDefinitions = (resourceOptions.codec as PgCodec).extensions
           ?.refDefinitions;

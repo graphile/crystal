@@ -196,17 +196,17 @@ export function planToMermaid(
         plan.stepClass === "__ItemStep"
           ? ["[/", "\\]"]
           : plan.isSyncAndSafe
-          ? isUnbatched
-            ? ["{{", "}}"]
-            : ["[", "]"]
-          : ["[[", "]]"];
+            ? isUnbatched
+              ? ["{{", "}}"]
+              : ["[", "]"]
+            : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
         : plan.stepClass === "__ItemStep"
-        ? "itemplan"
-        : isUnbatched && !plan.isSyncAndSafe
-        ? "unbatchedplan"
-        : "plan";
+          ? "itemplan"
+          : isUnbatched && !plan.isSyncAndSafe
+            ? "unbatchedplan"
+            : "plan";
       graph.push(
         `    ${planNode}${lBrace}${mermaidEscape(
           planString,

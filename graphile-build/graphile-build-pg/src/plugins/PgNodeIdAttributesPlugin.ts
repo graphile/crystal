@@ -154,10 +154,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               const action = isPgBaseInput
                 ? "base"
                 : isPgPatch
-                ? "update"
-                : isPgCondition
-                ? "filterBy"
-                : "insert";
+                  ? "update"
+                  : isPgCondition
+                    ? "filterBy"
+                    : "insert";
 
               const fieldBehaviorScope = `nodeId:${action}` as const;
               if (

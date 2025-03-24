@@ -179,12 +179,12 @@ export const wrapDescription = (
     position === "root"
       ? 0
       : position === "type"
-      ? 0
-      : position === "field"
-      ? 2
-      : position === "arg"
-      ? 4
-      : 0;
+        ? 0
+        : position === "field"
+          ? 2
+          : position === "arg"
+            ? 4
+            : 0;
   // This follows the implementation from GraphQL v14 to make our GraphQL v15
   // schema more similar. Ref:
   // https://github.com/graphql/graphql-js/pull/2223/files

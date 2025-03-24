@@ -233,8 +233,8 @@ function processAfter(
       applyAfterMode === "plan"
         ? arg.extensions.grafast?.applyPlan
         : applyAfterMode === "subscribePlan"
-        ? arg.extensions.grafast?.applySubscribePlan
-        : null;
+          ? arg.extensions.grafast?.applySubscribePlan
+          : null;
     if (autoApply) {
       // TODO: should this have dollars on it for accessing subkeys?
       const input: FieldArg = {

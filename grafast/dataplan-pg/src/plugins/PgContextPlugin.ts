@@ -58,7 +58,7 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
               contextValue[pgSettingsKey] =
                 typeof pgSettings === "function"
                   ? pgSettings(ctx ?? EMPTY_OBJECT)
-                  : pgSettings ?? undefined;
+                  : (pgSettings ?? undefined);
             }
             if (pgSubscriberKey != null) {
               if (pgSubscriberKey in contextValue) {
