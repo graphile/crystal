@@ -3865,12 +3865,16 @@ function createSelectResult(
 
 function pgInlineViaJoinTransform([details, item]: readonly [
   PgSelectInlineViaJoinDetails,
-  any[],
+  any[] | null,
 ]) {
   const { meta, selectIndexes, cursorDetails, groupDetails } = details;
-  const newItem = [];
-  for (let i = 0, l = selectIndexes.length; i < l; i++) {
-    newItem[i] = item[selectIndexes[i]];
+  const items: unknown[][] = [];
+  if (item) {
+    const newItem = [];
+    for (let i = 0, l = selectIndexes.length; i < l; i++) {
+      newItem[i] = item[selectIndexes[i]];
+    }
+    items.push(newItem);
   }
   return {
     hasMore: false,
@@ -3878,7 +3882,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination
     // because it only contains one entry.
-    items: [newItem],
+    items,
     cursorDetails,
     groupDetails,
     m: meta,
