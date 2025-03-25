@@ -3656,44 +3656,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-explorer@npm:^1.0.3-canary-64994e0e.0":
-  version: 1.0.4
-  resolution: "@graphiql/plugin-explorer@npm:1.0.4"
+"@graphiql/plugin-explorer@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "@graphiql/plugin-explorer@npm:3.2.5"
   dependencies:
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
-    "@graphiql/react": ^0.20.4
-    graphql: ^15.5.0 || ^16.0.0
+    "@graphiql/react": ^0.28.0
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^16.8.0 || ^17 || ^18
     react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 463e03b5bb33ba3749744de7772b668a5689c6817e0a54a591dc700c52c0858545a34aa00c1e4b5206e147b448f2ec799c79315cb4d32a420f7b6953f73a443c
-  languageName: node
-  linkType: hard
-
-"@graphiql/react@npm:^0.20.3-canary-64994e0e.0":
-  version: 0.20.4
-  resolution: "@graphiql/react@npm:0.20.4"
-  dependencies:
-    "@graphiql/toolkit": "npm:^0.9.1"
-    "@headlessui/react": "npm:^1.7.15"
-    "@radix-ui/react-dialog": "npm:^1.0.4"
-    "@radix-ui/react-dropdown-menu": "npm:^2.0.5"
-    "@radix-ui/react-tooltip": "npm:^1.0.6"
-    "@radix-ui/react-visually-hidden": "npm:^1.0.3"
-    "@types/codemirror": "npm:^5.60.8"
-    clsx: "npm:^1.2.1"
-    codemirror: "npm:^5.65.3"
-    codemirror-graphql: "npm:^2.0.11"
-    copy-to-clipboard: "npm:^3.2.0"
-    framer-motion: "npm:^6.5.1"
-    graphql-language-service: "npm:^5.2.0"
-    markdown-it: "npm:^12.2.0"
-    set-value: "npm:^4.1.0"
-  peerDependencies:
-    graphql: ^15.5.0 || ^16.0.0
-    react: ^16.8.0 || ^17 || ^18
-    react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 5c12abd57cd662c687b31101693ab663b91adbc8deccd913deb93c5b965cb70413a57f66ed4e68aaf2ba583563cfb03decfee492cf6f1c5e0e6e29373baf5657
+  checksum: 4c0eccaf96b2615ca2e4cf52ec9a6351d45483a7f17c2b8bf734997635f94108208eadd7a8657189d00cb25794bcfb0579cf522d1970aa01378eeabc9fce1580
   languageName: node
   linkType: hard
 
@@ -3726,7 +3699,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphiql/toolkit@npm:^0.11.0":
+"@graphiql/toolkit@npm:^0.11.0, @graphiql/toolkit@npm:^0.11.1":
   version: 0.11.1
   resolution: "@graphiql/toolkit@npm:0.11.1"
   dependencies:
@@ -3739,22 +3712,6 @@ __metadata:
     graphql-ws:
       optional: true
   checksum: 73d6c105a31a3cec851598f27dbd17927e944d79a62de7a19d6acff5ffcb106bd9efbfc4708c71a50e67d0871e80fdada5070034d7cb322d55b764edef0d4713
-  languageName: node
-  linkType: hard
-
-"@graphiql/toolkit@npm:^0.9.1":
-  version: 0.9.2
-  resolution: "@graphiql/toolkit@npm:0.9.2"
-  dependencies:
-    "@n1ru4l/push-pull-async-iterable-iterator": "npm:^3.1.0"
-    meros: "npm:^1.1.4"
-  peerDependencies:
-    graphql: ^15.5.0 || ^16.0.0
-    graphql-ws: ">= 4.5.0"
-  peerDependenciesMeta:
-    graphql-ws:
-      optional: true
-  checksum: ec3f5c50bd71a617045381d7d0d32697dbfe92d7b594ec6fe08849bbf035eecc8b2d4dd52548cde9a99000bab26b66eb652823e421e5383bc1ac23faa6ba3eb0
   languageName: node
   linkType: hard
 
@@ -4566,8 +4523,8 @@ __metadata:
     "@mdx-js/react": "npm:^1.6.22"
     "@uiw/react-codemirror": "npm:^4.21.12"
     clsx: "npm:^2.0.0"
-    codemirror: "npm:^5.65.16"
-    codemirror-graphql: "npm:^2.0.10"
+    codemirror: "npm:^5.65.19"
+    codemirror-graphql: "npm:^2.2.0"
     dataloader: "npm:^2.2.2"
     grafast: "workspace:^"
     mermaid: "npm:^9.4.3"
@@ -9082,7 +9039,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror-graphql@npm:^2.0.10, codemirror-graphql@npm:^2.0.11, codemirror-graphql@npm:^2.2.0":
+"codemirror-graphql@npm:^2.2.0":
   version: 2.2.0
   resolution: "codemirror-graphql@npm:2.2.0"
   dependencies:
@@ -9096,7 +9053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror@npm:^5.65.16, codemirror@npm:^5.65.3":
+"codemirror@npm:^5.65.19, codemirror@npm:^5.65.3":
   version: 5.65.19
   resolution: "codemirror@npm:5.65.19"
   checksum: aef199b640cf93fff7ac57b157dca911698e378195b71e248c61f3e422401223faf821bf056c3da296e54d4da550427db5766b1d1702343f4e7cc58fea9197ec
@@ -11082,13 +11039,6 @@ __metadata:
   version: 4.5.0
   resolution: "entities@npm:4.5.0"
   checksum: 3c45485495e0a5481893b0b618aec46fbe960130bf0437b052ec08c25a8c781b978a06fca889ad7af79634d9111df159c2a37b56d2b2a847c0c4625cd40ab1be
-  languageName: node
-  linkType: hard
-
-"entities@npm:~2.1.0":
-  version: 2.1.0
-  resolution: "entities@npm:2.1.0"
-  checksum: 87e14da51029c0f52f439d82e39188af6433afa86e72f34446979fa37580f3250ed581cdd51073842117ac76d0501995a20b27bd8eafa64f62edada0d5f35d0e
   languageName: node
   linkType: hard
 
@@ -13263,7 +13213,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^3.1.1-canary-64994e0e.0":
+"graphiql@npm:^3.8.3":
   version: 3.8.3
   resolution: "graphiql@npm:3.8.3"
   dependencies:
@@ -13315,7 +13265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-language-service@npm:5.3.0, graphql-language-service@npm:^5.2.0, graphql-language-service@npm:^5.3.0":
+"graphql-language-service@npm:5.3.0, graphql-language-service@npm:^5.3.0":
   version: 5.3.0
   resolution: "graphql-language-service@npm:5.3.0"
   dependencies:
@@ -15786,15 +15736,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-it@npm:^3.0.1":
-  version: 3.0.3
-  resolution: "linkify-it@npm:3.0.3"
-  dependencies:
-    uc.micro: "npm:^1.0.1"
-  checksum: 314f9d994b7192991a209b0518b4cd2d82662b1d688f281b222d269c6b4921557daddd2fd12a3fdac31ca69f44b50f96a7218661657a37f7ece174bc6ebd847a
-  languageName: node
-  linkType: hard
-
 "linkify-it@npm:^5.0.0":
   version: 5.0.0
   resolution: "linkify-it@npm:5.0.0"
@@ -16246,21 +16187,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markdown-it@npm:^12.2.0":
-  version: 12.3.2
-  resolution: "markdown-it@npm:12.3.2"
-  dependencies:
-    argparse: "npm:^2.0.1"
-    entities: "npm:~2.1.0"
-    linkify-it: "npm:^3.0.1"
-    mdurl: "npm:^1.0.1"
-    uc.micro: "npm:^1.0.5"
-  bin:
-    markdown-it: bin/markdown-it.js
-  checksum: 5d937f600be0135f2881fa7c98abbdcf026731dfb190d700b3f14f556af0fe2fb087cddfc5397216b802634240b871106ae32ad5332ec2e4746797b6525d261a
-  languageName: node
-  linkType: hard
-
 "markdown-it@npm:^14.1.0":
   version: 14.1.0
   resolution: "markdown-it@npm:14.1.0"
@@ -16350,7 +16276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdurl@npm:^1.0.0, mdurl@npm:^1.0.1":
+"mdurl@npm:^1.0.0":
   version: 1.0.1
   resolution: "mdurl@npm:1.0.1"
   checksum: de89d573bab7a689c8f24680ec7612d60c2858ec9527738312737845c0890d6b36832cd1a95cfe5c590c694cd96a7ca3e4dc9bf8d7f7048906ba8f8049929a02
@@ -20058,9 +19984,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
-    "@graphiql/plugin-explorer": "npm:^1.0.3-canary-64994e0e.0"
-    "@graphiql/react": "npm:^0.20.3-canary-64994e0e.0"
-    "@graphiql/toolkit": "npm:^0.9.1"
+    "@graphiql/plugin-explorer": "npm:^3.2.5"
+    "@graphiql/react": "npm:^0.28.2"
+    "@graphiql/toolkit": "npm:^0.11.1"
     "@types/codemirror": "npm:^5.60.9"
     "@types/debug": "npm:^4.1.8"
     "@types/jest": "npm:^29.5.4"
@@ -20069,7 +19995,7 @@ __metadata:
     "@types/react": "npm:^18.2.21"
     "@types/react-dom": "npm:^18.2.7"
     grafast: "workspace:^"
-    graphiql: "npm:^3.1.1-canary-64994e0e.0"
+    graphiql: "npm:^3.8.3"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
     jest: "npm:^29.6.4"
@@ -22127,13 +22053,6 @@ __metadata:
   bin:
     ua-parser-js: script/cli.js
   checksum: 6efddf38c926b127f754fb6b89261537700a92b1772ef130829421be5673a1b2435a0f8a9eef56c3a5cecc881e53d57d4cf1143a8405c8245278cd0e77e85c48
-  languageName: node
-  linkType: hard
-
-"uc.micro@npm:^1.0.1, uc.micro@npm:^1.0.5":
-  version: 1.0.6
-  resolution: "uc.micro@npm:1.0.6"
-  checksum: 1091718106ef95d70ccb6e81fb3b60a1fedb583e0651dfe9ac125f394e783a7d1f524213a56a70c2822610b65f24a2c03a4414a8322446f52ae1acbae68c392d
   languageName: node
   linkType: hard
 
