@@ -1,5 +1,14 @@
 # ruru
 
+## 2.0.0-beta.22
+
+### Patch Changes
+
+- [#2426](https://github.com/graphile/crystal/pull/2426)
+  [`658d46c9a5b246e3beb4ba2a004334278f7bb24d`](https://github.com/graphile/crystal/commit/658d46c9a5b246e3beb4ba2a004334278f7bb24d)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade GraphiQL and fix
+  duplicate module issue
+
 ## 2.0.0-beta.21
 
 ### Patch Changes
