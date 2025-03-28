@@ -656,6 +656,11 @@ export function listOfCodec<
         .flat(100)
         .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
     toPg: (value) => {
+      if (!Array.isArray(value)) {
+        throw new Error(
+          `Do not know how to encode ${inspect(value)} to an array`,
+        );
+      }
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
         if (i > 0) {
