@@ -116,8 +116,8 @@ graph TD
     First113 --> PgSelectSingle115
     PgClassExpression242{{"PgClassExpression[242∈8]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle115 --> PgClassExpression242
-    PgClassExpression141{{"PgClassExpression[141∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle47 --> PgClassExpression141
+    PgClassExpression241{{"PgClassExpression[241∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle47 --> PgClassExpression241
 
     %% define steps
 
@@ -145,7 +145,7 @@ graph TD
     class Bucket6,PgSelect109,First113,PgSelectRows114,PgSelectSingle115 bucket6
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 47<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[47]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression141 bucket7
+    class Bucket7,PgClassExpression241 bucket7
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 115<br /><br />ROOT PgSelectSingle{6}ᐸpeopleᐳ[115]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression242 bucket8
