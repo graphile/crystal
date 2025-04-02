@@ -111,6 +111,8 @@ const atpe =
   typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
 const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
+/* How many selection sets deep do we allow? Should be handled by validation. */
+const MAX_DEPTH = 1000;
 
 /**
  * Returns true for steps that the system populates automatically without executing.
@@ -185,6 +187,19 @@ const NO_ARGS: TrackedArguments = {
     throw new Error(`This field doesn't have any arguments`);
   },
 };
+
+interface PendingSelectionSet {
+  loc: string[] | null;
+  outputPlan: OutputPlan;
+  path: readonly string[];
+  polymorphicPath: string | null;
+  polymorphicPaths: ReadonlySet<string> | null;
+  parentStep: Step;
+  objectType: GraphQLObjectType;
+  selections: readonly SelectionNode[];
+  resolverEmulation: boolean;
+  isMutation: boolean;
+}
 
 export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
@@ -1330,6 +1345,7 @@ export class OperationPlan {
             0,
             streamDetails,
           );
+          //this.planPendingSelectionSets()
         }
       } finally {
         outputPlan.layerPlan.latestSideEffectStep = $sideEffect;
@@ -1367,6 +1383,7 @@ export class OperationPlan {
             isMutation,
             deferred,
           );
+          //this.planPendingSelectionSets()
         } finally {
           deferredOutputPlan.layerPlan.latestSideEffectStep = $sideEffect;
         }
@@ -1374,18 +1391,7 @@ export class OperationPlan {
     }
   }
 
-  private selectionSetsToPlan: Array<{
-    loc: string[] | null;
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    polymorphicPath: string | null;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    objectType: GraphQLObjectType;
-    selections: readonly SelectionNode[];
-    resolverEmulation: boolean;
-    isMutation: boolean;
-  }> = [];
+  private selectionSetsToPlan: Array<PendingSelectionSet> = [];
 
   /**
    *
@@ -1421,9 +1427,7 @@ export class OperationPlan {
     });
   }
 
-  private actuallyPlanSelectionSet(
-    t: (typeof this.selectionSetsToPlan)[number],
-  ) {
+  private actuallyPlanSelectionSet(t: PendingSelectionSet) {
     const {
       loc,
       outputPlan,
@@ -1479,12 +1483,45 @@ export class OperationPlan {
   }
 
   private planPendingSelectionSets() {
-    let l: number;
-    while ((l = this.selectionSetsToPlan.length) > 0) {
+    for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
-      const todo = this.selectionSetsToPlan.splice(0, l);
-      for (const t of todo) {
-        this.actuallyPlanSelectionSet(t);
+      const l = this.selectionSetsToPlan.length;
+      if (l === 0) break;
+      if (depth === MAX_DEPTH) {
+        throw new Error(
+          `Grafast refuses to traverse selection sets at depth ${MAX_DEPTH}`,
+        );
+      }
+
+      const batch = this.selectionSetsToPlan.splice(0, l);
+
+      const grouped = Object.create(null) as Record<
+        string,
+        PendingSelectionSet[]
+      >;
+      for (const t of batch) {
+        const p = t.path.join(">");
+        if (grouped[p]) {
+          grouped[p].push(t);
+        } else {
+          grouped[p] = [t];
+        }
+      }
+      console.log(
+        `Running batch with paths:\n- ` +
+          Object.entries(grouped)
+            .map(([k, v]) => `${k} (${v.length})`)
+            .join("\n- "),
+      );
+      for (const selectionSetsAtSamePath of Object.values(grouped)) {
+        for (const t of selectionSetsAtSamePath) {
+          assert.strictEqual(
+            t.path.length,
+            depth,
+            "GrafastInternalError<17d4080a-f2fb-4cab-92f3-1d64b0152127>: all pending selection sets should have the same depth",
+          );
+          this.actuallyPlanSelectionSet(t);
+        }
       }
     }
   }
