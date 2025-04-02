@@ -1710,10 +1710,11 @@ export class OperationPlan {
        * other types.
        *
        * First, we figure out the list of `possibleTypes` based on the
-       * union/interface and any other constraints that we know. NOTE: we can't
+       * union/interface and any other constraints that we know. Note: we can't
        * discount a type just because it doesn't have any fragments that apply
        * to it - instead we must still plan an empty selection set (or one just
-       * using `{__typename}`), and we need to know it exists for that. See
+       * using `{__typename}`), and we need to know it exists (is not null) for
+       * that. See
        * https://github.com/graphql/graphql-spec/issues/951#issuecomment-1140957685
        */
       const allPossibleObjectTypes = isUnion
