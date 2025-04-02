@@ -37,7 +37,12 @@ import type { Step, UnbatchedStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
-import { arrayOfLength, isPromiseLike, sudo } from "../utils.js";
+import {
+  arrayOfLength,
+  isPhaseTransitionLayerPlan,
+  isPromiseLike,
+  sudo,
+} from "../utils.js";
 import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
@@ -1072,6 +1077,7 @@ function completeBucketAndExecuteSamePhaseChildren(
       `${bucket} has already completed, it cannot complete again!`,
     );
   }
+  bucket.sharedState._doneBucketIds.add(bucket.layerPlan.id);
 
   const { layerPlan, sharedState } = bucket;
   const { children: childLayerPlans } = layerPlan;
@@ -1176,7 +1182,6 @@ function completeBucketAndExecuteSamePhaseChildren(
     }
   }
 
-  bucket.sharedState._doneBucketIds.add(bucket.layerPlan.id);
   bucket.sharedState.release(bucket);
 
   return childPromises;
@@ -1217,7 +1222,10 @@ export function newBucket(
 ): Bucket {
   const parentMetaByMetaKey = parent?.metaByMetaKey;
   const sharedState: SharedBucketState =
-    parent?.sharedState ?? makeSharedState();
+    // Do not copy state across phase transitions
+    isPhaseTransitionLayerPlan(spec.layerPlan)
+      ? makeSharedState()
+      : (parent?.sharedState ?? makeSharedState());
   if (isDev) {
     // Some validations
     if (!(spec.size > 0)) {

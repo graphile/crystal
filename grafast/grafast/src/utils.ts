@@ -1022,6 +1022,35 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   );
 }
 
+export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
+  const t = layerPlan.reason.type;
+  switch (t) {
+    case "subscription":
+    case "defer": {
+      return true;
+    }
+    case "listItem": {
+      if (layerPlan.reason.stream) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    case "polymorphic":
+    case "root":
+    case "nullableBoundary":
+    case "subroutine":
+    case "combined": // TODO: CHECK ME!
+    case "mutationField": {
+      return false;
+    }
+    default: {
+      const never: never = t;
+      throw new Error(`Unhandled layer plan type '${never}'`);
+    }
+  }
+}
+
 // ENHANCE: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
 
