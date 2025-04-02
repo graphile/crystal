@@ -78,6 +78,7 @@ import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
 import type { Sudo } from "../utils.js";
 import {
+  arraysMatch,
   assertNotAsync,
   assertNotPromise,
   defaultValueToValueNode,
@@ -189,16 +190,21 @@ const NO_ARGS: TrackedArguments = {
 };
 
 interface PendingSelectionSet {
+  // These must be in common for all grouped selection sets
   loc: string[] | null;
-  outputPlan: OutputPlan;
   path: readonly string[];
+  objectType: GraphQLObjectType;
+  isMutation: boolean;
+
+  // This may be replaced via the export/import mechanic
+  parentStep: Step;
+
+  // These differ on a per-selection-set basis
+  outputPlan: OutputPlan;
   polymorphicPath: string | null;
   polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  objectType: GraphQLObjectType;
   selections: readonly SelectionNode[];
   resolverEmulation: boolean;
-  isMutation: boolean;
 }
 
 export class OperationPlan {
@@ -1427,21 +1433,17 @@ export class OperationPlan {
     });
   }
 
-  private actuallyPlanSelectionSet(t: PendingSelectionSet) {
-    const {
-      loc,
-      outputPlan,
-      path,
-      polymorphicPath,
-      polymorphicPaths,
-      parentStep,
-      objectType,
-      selections,
-      resolverEmulation,
-      isMutation,
-    } = t;
-    const oldLoc = this.loc;
-    this.loc = loc;
+  private actuallyPlanSelectionSet(
+    outputPlan: OutputPlan,
+    path: readonly string[],
+    polymorphicPath: string | null,
+    polymorphicPaths: ReadonlySet<string> | null,
+    parentStep: Step,
+    objectType: GraphQLObjectType,
+    selections: readonly SelectionNode[],
+    resolverEmulation: boolean,
+    isMutation = false,
+  ) {
     if (this.loc !== null) {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
@@ -1479,7 +1481,6 @@ export class OperationPlan {
     );
 
     if (this.loc !== null) this.loc.pop();
-    this.loc = oldLoc;
   }
 
   private planPendingSelectionSets() {
@@ -1507,21 +1508,141 @@ export class OperationPlan {
           grouped[p] = [t];
         }
       }
-      console.log(
-        `Running batch with paths:\n- ` +
-          Object.entries(grouped)
-            .map(([k, v]) => `${k} (${v.length})`)
-            .join("\n- "),
-      );
+      //console.log(
+      //  `Running batch with paths:\n- ` +
+      //    Object.entries(grouped)
+      //      .map(([k, v]) => `${k} (${v.length})`)
+      //      .join("\n- "),
+      //);
       for (const selectionSetsAtSamePathForSameType of Object.values(grouped)) {
-        for (const t of selectionSetsAtSamePathForSameType) {
-          assert.strictEqual(
-            t.path.length,
-            depth,
-            "GrafastInternalError<17d4080a-f2fb-4cab-92f3-1d64b0152127>: all pending selection sets should have the same depth",
+        const first = selectionSetsAtSamePathForSameType[0];
+        // All of these properties should be in common
+        const { loc, path, objectType, isMutation } = first;
+        const oldLoc = this.loc;
+        this.loc = loc;
+
+        if (isDev) {
+          assert.ok(
+            isObjectType(objectType),
+            "GrafastInternalError<e7a5a50f-278c-47ce-8e63-62816bab25f9>: all pending selection sets should have the same object type",
           );
-          this.actuallyPlanSelectionSet(t);
+          for (const t of selectionSetsAtSamePathForSameType) {
+            assert.strictEqual(
+              t.path.length,
+              depth,
+              "GrafastInternalError<17d4080a-f2fb-4cab-92f3-1d64b0152127>: all pending selection sets should have the same depth",
+            );
+            assert.ok(
+              loc === t.loc ||
+                (Array.isArray(loc) &&
+                  Array.isArray(t.loc) &&
+                  arraysMatch(loc, t.loc)),
+              "GrafastInternalError<da9a4b55-051c-4539-8f4a-76756bfd8ee1>: all pending selection sets should have the same loc",
+            );
+            assert.ok(
+              arraysMatch(path, t.path),
+              "GrafastInternalError<9f06cb00-7aca-49c8-8a44-56da2f862a1a>: all pending selection sets should have the same path",
+            );
+            assert.strictEqual(
+              objectType,
+              t.objectType,
+              "GrafastInternalError<f6b13887-c963-4a2a-ab40-66208b51a42b>: all pending selection sets should have the same object type",
+            );
+            assert.strictEqual(
+              isMutation,
+              t.isMutation,
+              "GrafastInternalError<b154bf65-e52d-4de7-9486-03da151c3ef0>: all pending selection sets should have the same isMutation",
+            );
+            assert.strictEqual(
+              first.polymorphicPaths === null,
+              t.polymorphicPaths === null,
+              "GrafastInternalError<57f96165-40d1-4710-934b-be575db5a44d>: all pending selection sets should agree on whether there are polymorphic paths or not",
+            );
+          }
         }
+
+        let commonParentStep: Step | undefined;
+        if (
+          selectionSetsAtSamePathForSameType.length > 1 &&
+          typeof objectType.extensions?.grafast?.pack === "function" &&
+          typeof objectType.extensions?.grafast?.unpack === "function"
+        ) {
+          const listOf$Data: Step[] = [];
+          const parentLayerPlans = new Set<LayerPlan>();
+          for (const { parentStep } of selectionSetsAtSamePathForSameType) {
+            parentLayerPlans.add(parentStep.layerPlan);
+          }
+          const combinedLayerPlan = new LayerPlan(
+            this,
+            first.parentStep.layerPlan,
+            {
+              type: "combined",
+              parentLayerPlans,
+            },
+          );
+          const combinedPolymorphicPaths = first.polymorphicPaths
+            ? new Set<string>(/* TODO */)
+            : null;
+          for (const {
+            parentStep,
+            outputPlan,
+            polymorphicPaths,
+          } of selectionSetsAtSamePathForSameType) {
+            if (polymorphicPaths) {
+              for (const path of polymorphicPaths) {
+                combinedPolymorphicPaths!.add(path);
+              }
+            }
+            const $data = withGlobalLayerPlan(
+              outputPlan.layerPlan,
+              polymorphicPaths,
+              objectType.extensions.grafast.pack,
+              objectType.extensions.grafast,
+              parentStep,
+            );
+            listOf$Data.push($data);
+          }
+          // Create a __ValueStep in the new combined layer plan that
+          // represents all of these values
+          const $combined = withGlobalLayerPlan(
+            combinedLayerPlan,
+            combinedPolymorphicPaths,
+            newValueStepCallback,
+            null,
+            false,
+          );
+          combinedLayerPlan.setRootStep($combined);
+          commonParentStep = withGlobalLayerPlan(
+            combinedLayerPlan,
+            combinedPolymorphicPaths,
+            objectType.extensions.grafast.unpack,
+            objectType.extensions.grafast,
+            $combined,
+          );
+        }
+
+        for (const t of selectionSetsAtSamePathForSameType) {
+          const {
+            outputPlan,
+            polymorphicPath,
+            polymorphicPaths,
+            selections,
+            resolverEmulation,
+          } = t;
+          const parentStep = commonParentStep ?? t.parentStep;
+          this.actuallyPlanSelectionSet(
+            outputPlan,
+            path,
+            polymorphicPath,
+            polymorphicPaths,
+            parentStep,
+            objectType,
+            selections,
+            resolverEmulation,
+            isMutation,
+          );
+        }
+        this.loc = oldLoc;
       }
     }
   }
@@ -2744,6 +2865,10 @@ export class OperationPlan {
           break;
         }
       }
+      case "combined": {
+        // Cannot hoist out of a combination
+        return;
+      }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
@@ -2872,6 +2997,9 @@ export class OperationPlan {
       case "listItem": {
         // Fine to push lower
         break;
+      }
+      case "combined": {
+        return step;
       }
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
@@ -3869,6 +3997,13 @@ export class OperationPlan {
         case "subroutine": {
           const { type, parentStep } = reason;
           return { type, parentStepId: parentStep.id };
+        }
+        case "combined": {
+          const { type, parentLayerPlans } = reason;
+          return {
+            type,
+            parentLayerPlanIds: [...parentLayerPlans].map((l) => l.id),
+          };
         }
         default: {
           const never: never = reason;

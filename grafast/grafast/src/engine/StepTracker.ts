@@ -170,6 +170,10 @@ export class StepTracker {
           layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
         break;
       }
+      case "combined": {
+        // TODO: tell the parent layer plans to expect me ;)
+        break;
+      }
       default: {
         const never: never = layerPlan.reason;
         throw new Error(`Unexpected layerPlan reason ${(never as any).type}`);

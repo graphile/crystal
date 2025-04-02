@@ -714,6 +714,31 @@ declare global {
         | ((step: Step) => asserts step is Step)
         | { new (...args: any[]): Step }
         | null;
+
+      /**
+       * Takes an arbitrary step representing this object type, and turns it
+       * into an "intermediate representation" that represents this data such
+       * that `unpack` may reproduce it. This may be by taking an optimized
+       * step and turning it into the full data that represents the record, or
+       * by representing identifiers that `unpack` can look up.
+       *
+       * `pack` and `unpack` work together to take a number of steps
+       * representing the same object type at the same position in the GraphQL
+       * request and converting them into a single step representing all values
+       * across these steps. This is typically useful inside of polymorphic
+       * selection sets to reduce branching.
+       *
+       * This approach can also be used to coerce an unexpected step class to
+       * match the step class that this type would like to make available to
+       * its plan resolvers.
+       */
+      pack?: (step: Step) => Step;
+      /**
+       * Takes a `Step` (typically a `__ValueStep`) representing the data from
+       * `pack` and returns the representation that this object type would like
+       * to make available to its plan resolvers.
+       */
+      unpack?: (step: Step) => Step;
     }
 
     interface EnumTypeExtensions {}

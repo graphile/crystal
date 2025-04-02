@@ -103,6 +103,11 @@ export interface LayerPlanReasonSubroutine {
   type: "subroutine";
   parentStep: Step;
 }
+/** Anti-branching, non-deferred */
+export interface LayerPlanReasonCombined {
+  type: "combined";
+  parentLayerPlans: Set<LayerPlan>;
+}
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
   return layerPlan.reason.type === "polymorphic";
@@ -129,7 +134,8 @@ export type LayerPlanReason =
   | LayerPlanReasonMutationField
   | LayerPlanReasonDefer
   | LayerPlanReasonPolymorphic
-  | LayerPlanReasonSubroutine;
+  | LayerPlanReasonSubroutine
+  | LayerPlanReasonCombined;
 
 // The `A extends any ? ... : never` tells TypeScript to make this
 // distributive. TypeScript can be a bit arcane.
@@ -717,6 +723,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
 
         break;
+      }
+      case "combined": {
+        // TODO
+        throw new Error("TODO");
       }
       case "subscription":
       case "defer": {

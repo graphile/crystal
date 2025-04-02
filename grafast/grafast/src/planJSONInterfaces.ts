@@ -35,7 +35,8 @@ export type GrafastPlanBucketReasonJSONv1 =
   | GrafastPlanBucketReasonMutationFieldJSONv1
   | GrafastPlanBucketReasonDeferJSONv1
   | GrafastPlanBucketReasonPolymorphicJSONv1
-  | GrafastPlanBucketReasonSubroutineJSONv1;
+  | GrafastPlanBucketReasonSubroutineJSONv1
+  | GrafastPlanBucketReasonCombinedJSONv1;
 
 export interface GrafastPlanBucketReasonRootJSONv1 {
   type: "root";
@@ -82,6 +83,11 @@ export interface GrafastPlanBucketReasonPolymorphicJSONv1 {
 export interface GrafastPlanBucketReasonSubroutineJSONv1 {
   type: "subroutine";
   parentStepId: string | number;
+}
+/** Anti-branching, non-deferred */
+export interface GrafastPlanBucketReasonCombinedJSONv1 {
+  type: "combined";
+  parentLayerPlanIds: ReadonlyArray<string | number>;
 }
 
 export interface GrafastPlanBucketJSONv1 {
