@@ -1064,6 +1064,16 @@ export function executeBucket(
 
     loop: for (const childLayerPlan of childLayerPlans) {
       switch (childLayerPlan.reason.type) {
+        case "combined": {
+          // First, see if _all_ parent layer plans are ready
+          const allParentLayerPlansAreReady = false; // TODO!
+          if (!allParentLayerPlansAreReady) {
+            // The last parent layer plan to complete will handle it
+            continue loop;
+          }
+
+          // falls through
+        }
         case "nullableBoundary":
         case "listItem":
         case "polymorphic": {

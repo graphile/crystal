@@ -1007,6 +1007,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "root":
       case "nullableBoundary":
       case "subroutine":
+      case "combined": // TODO: CHECK ME!
       case "mutationField": {
         continue;
       }
