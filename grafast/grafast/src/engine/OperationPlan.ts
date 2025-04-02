@@ -1500,7 +1500,7 @@ export class OperationPlan {
         PendingSelectionSet[]
       >;
       for (const t of batch) {
-        const p = t.path.join(">");
+        const p = t.path.join(">") + "|" + t.objectType.name;
         if (grouped[p]) {
           grouped[p].push(t);
         } else {
@@ -1513,8 +1513,8 @@ export class OperationPlan {
             .map(([k, v]) => `${k} (${v.length})`)
             .join("\n- "),
       );
-      for (const selectionSetsAtSamePath of Object.values(grouped)) {
-        for (const t of selectionSetsAtSamePath) {
+      for (const selectionSetsAtSamePathForSameType of Object.values(grouped)) {
+        for (const t of selectionSetsAtSamePathForSameType) {
           assert.strictEqual(
             t.path.length,
             depth,
