@@ -15,6 +15,7 @@ import {
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type { Step, UnbatchedStep } from "../step";
+import type { __ValueStep } from "../steps/index.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -106,7 +107,7 @@ export interface LayerPlanReasonSubroutine {
 /** Anti-branching, non-deferred */
 export interface LayerPlanReasonCombined {
   type: "combined";
-  parentLayerPlans: Set<LayerPlan>;
+  parentLayerPlans: ReadonlyArray<LayerPlan>;
 }
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
@@ -348,7 +349,19 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         reason.type != "root",
         "Non-root LayerPlan must have a parentStep",
       );
-      parentLayerPlan.children.push(this);
+      if (reason.type === "combined") {
+        assert.ok(
+          reason.parentLayerPlans.includes(parentLayerPlan),
+          "GrafastInternalError<f68525c6-d82d-41ff-9648-8227134690f3>: combined layer plan parent inconsistency",
+        );
+
+        // Deliberately shadow!
+        for (const parentLayerPlan of reason.parentLayerPlans) {
+          parentLayerPlan.children.push(this);
+        }
+      } else {
+        parentLayerPlan.children.push(this);
+      }
     }
   }
 
@@ -415,6 +428,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
+    if (this.reason.type === "combined") {
+      return this.newCombinedBucket(parentBucket);
+    }
     const { copyStepIds } = this;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] =
@@ -724,10 +740,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
         break;
       }
-      case "combined": {
-        // TODO
-        throw new Error("TODO");
-      }
+      // case "combined": See newCombinedBucket below
       case "subscription":
       case "defer": {
         // TODO
@@ -775,6 +788,162 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       return null;
     }
   }
+
+  private newCombinedBucket(finalParentBucket: Bucket): Bucket | null {
+    if (this.reason.type !== "combined") {
+      throw new Error(
+        `GrafastInternalError<59c54cd0-ee32-478a-9e0e-4123eec2f8f5>: newCombinedBucket must only be called on combined layer plans`,
+      );
+    }
+    const { sharedState } = finalParentBucket;
+    const { copyStepIds } = this;
+    const store: Bucket["store"] = new Map();
+    const polymorphicPathList: (string | null)[] = [];
+    const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
+    const mapByParentLayerPlanId: Record<
+      number,
+      Map<number, number>
+    > = Object.create(null);
+    let flagUnion = NO_FLAGS;
+    for (const plp of this.reason.parentLayerPlans) {
+      mapByParentLayerPlanId[plp.id] = new Map();
+      const parentBucket = sharedState._retainedBuckets.get(plp.id);
+      if (!parentBucket) continue;
+      flagUnion |= parentBucket.flagUnion;
+
+      // PERF: we shouldn't need a nested loop for this
+      for (const stepId of copyStepIds) {
+        const ev = parentBucket.store.get(stepId);
+        if (ev == null) {
+          continue;
+        } else if (ev.isBatch) {
+          throw new Error(`Don't know how to handle batch steps in ${this}`);
+        } else {
+          store.set(stepId, ev);
+        }
+      }
+    }
+
+    const $parentSideEffect = this.parentSideEffectStep;
+    if ($parentSideEffect) {
+      throw new Error(`Do not support side effects here`);
+    }
+
+    let size = 0;
+
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    // Code that would be in the switch statement if we were normal...
+    //
+
+    for (const { targetStepId, sources } of this.combinations) {
+      const values: any[] = [];
+      const ev = batchExecutionValue(values);
+      store.set(targetStepId, ev);
+      for (
+        let sourceIndex = 0, sourceCount = sources.length;
+        sourceIndex < sourceCount;
+        sourceIndex++
+      ) {
+        const { stepId, layerPlanId } = sources[sourceIndex];
+        // PERF: isDev
+        if (layerPlanId !== this.reason.parentLayerPlans[sourceIndex]?.id) {
+          throw new Error(
+            `GrafastInternalError<>: layer plans out of order in ${this}?!`,
+          );
+        }
+        const map = mapByParentLayerPlanId[layerPlanId]!;
+        const parentBucket = sharedState._retainedBuckets.get(layerPlanId);
+        if (parentBucket != null) {
+          const sourceStore = parentBucket.store.get(stepId);
+          if (!sourceStore) {
+            throw new Error(
+              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for step ${stepId} in ${this}`,
+            );
+          }
+          for (
+            let originalIndex = 0;
+            originalIndex < parentBucket.size;
+            originalIndex++
+          ) {
+            const value = sourceStore.at(originalIndex);
+            const newIndex = values.push(value) - 1;
+            ev._flags[newIndex] = value == null ? FLAG_NULL : NO_FLAGS;
+            map.set(originalIndex, newIndex);
+            polymorphicPathList[newIndex] =
+              parentBucket.polymorphicPathList[originalIndex];
+            iterators[newIndex] = parentBucket.iterators[originalIndex];
+          }
+        }
+      }
+      if (size === 0) {
+        size = values.length;
+        if (size === 0) {
+          // No data; skip
+          break;
+        }
+      } else if (size !== values.length) {
+        throw new Error(
+          `GrafastInternalError<9d205bd8-2d00-4d9a-8471-4e24d4720806>: inconsistency! Different lengths in store sizes found`,
+        );
+      }
+    }
+
+    //
+    // End: code that would be in the switch statement if we were normal.
+    //
+    ////////////////////////////////////////////////////////////////////////////
+
+    if (size > 0) {
+      // Reference
+      const childBucket = newBucket(
+        { metaByMetaKey: undefined /* use defaults */, sharedState },
+        {
+          layerPlan: this,
+          size,
+          store,
+          // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
+          flagUnion,
+          polymorphicPathList,
+          iterators,
+        },
+      );
+      for (const plp of this.reason.parentLayerPlans) {
+        const parentBucket = sharedState._retainedBuckets.get(plp.id);
+        if (parentBucket != null) {
+          const map = mapByParentLayerPlanId[plp.id]!;
+          parentBucket.children[this.id] = {
+            bucket: childBucket,
+            map,
+          };
+        }
+      }
+
+      return childBucket;
+    } else {
+      return null;
+    }
+  }
+
+  private combinations: Array<{
+    sources: readonly {
+      layerPlanId: LayerPlan["id"];
+      stepId: Step["id"];
+    }[];
+    targetStepId: number;
+  }> = [];
+  public addCombo(sourceSteps: Step[], $target: __ValueStep<any>): void {
+    if (this.reason.type !== "combined") {
+      throw new Error(`Combinations may only be added to combined layer plans`);
+    }
+    this.combinations.push({
+      sources: sourceSteps.map((s) => ({
+        layerPlanId: s.layerPlan.id,
+        stepId: s.id,
+      })),
+      targetStepId: $target.id,
+    });
+  }
 }
 
 type Factory = (copyStepIds: number[]) => typeof LayerPlan.prototype.newBucket;
@@ -818,7 +987,7 @@ ${inner}
 
   if (size > 0) {
     // Reference
-    const childBucket = ${ref_newBucket}({
+    const childBucket = ${ref_newBucket}(parentBucket, {
       layerPlan: this,
       size,
       store,
@@ -826,7 +995,7 @@ ${inner}
       flagUnion: parentBucket.flagUnion,
       polymorphicPathList,
       iterators,
-    }, parentBucket.metaByMetaKey);
+    });
     // PERF: set ourselves in more places so that we never have to call 'getChildBucketAndIndex'.
     parentBucket.children[this.id] = { bucket: childBucket, map };
 

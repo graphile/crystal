@@ -40,6 +40,15 @@ export interface RequestTools {
   insideGraphQL: false;
 }
 
+/** @internal */
+export interface SharedBucketState {
+  _retainedBuckets: Map<LayerPlan["id"], Bucket>;
+  _doneBucketIds: Set<LayerPlan["id"]>;
+
+  retain(bucket: Bucket): void;
+  release(bucket: Bucket): void;
+}
+
 /**
  * A "bucket" is where the results from plans are stored so that other plans
  * can retrieve them, it may take on different forms depending on the mode of
@@ -52,6 +61,22 @@ export interface RequestTools {
  * @internal
  */
 export interface Bucket {
+  /**
+   * A small (low memory footprint) object that keeps track of when various
+   * buckets are complete or not. Needed for `combined` LayerPlans so that
+   * the bucket can be created once all buckets it depends on are done.
+   *
+   * @internal
+   */
+  sharedState: SharedBucketState;
+
+  /**
+   * How many things need this bucket to be retained?
+   *
+   * @internal
+   */
+  retainCount: number;
+
   /** @internal */
   toString?(): string;
 
@@ -109,7 +134,7 @@ export interface Bucket {
   ): void;
 
   /**
-   * Set this true when the bucket is fully executed.
+   * Set this true when the bucket is fully executed, including child buckets.
    *
    * Initialize it to false.
    */
