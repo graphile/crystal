@@ -1138,6 +1138,9 @@ export function executeBucket(
 
 /** @internal */
 export function newBucket(
+  parent: {
+    metaByMetaKey: MetaByMetaKey;
+  } | null,
   spec: Pick<
     Bucket,
     | "layerPlan"
@@ -1147,8 +1150,8 @@ export function newBucket(
     | "polymorphicPathList"
     | "iterators"
   >,
-  parentMetaByMetaKey: MetaByMetaKey | null,
 ): Bucket {
+  const parentMetaByMetaKey = parent?.metaByMetaKey;
   if (isDev) {
     // Some validations
     if (!(spec.size > 0)) {
@@ -1190,7 +1193,7 @@ export function newBucket(
   }
   const type = spec.layerPlan.reason.type;
   const metaByMetaKey =
-    parentMetaByMetaKey === null ||
+    parentMetaByMetaKey == null ||
     type === "root" ||
     type === "mutationField" ||
     type === "subscription"

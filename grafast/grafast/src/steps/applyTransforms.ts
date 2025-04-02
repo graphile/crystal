@@ -168,17 +168,14 @@ export class ApplyTransformsStep extends Step {
     });
 
     if (size > 0) {
-      const childBucket = newBucket(
-        {
-          layerPlan: childLayerPlan,
-          size,
-          store,
-          flagUnion: bucket.flagUnion,
-          polymorphicPathList,
-          iterators,
-        },
-        bucket.metaByMetaKey,
-      );
+      const childBucket = newBucket(bucket, {
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        flagUnion: bucket.flagUnion,
+        polymorphicPathList,
+        iterators,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 

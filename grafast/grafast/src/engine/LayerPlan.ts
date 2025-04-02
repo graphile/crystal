@@ -756,18 +756,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     if (size > 0) {
       // Reference
-      const childBucket = newBucket(
-        {
-          layerPlan: this,
-          size,
-          store,
-          // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-          flagUnion: parentBucket.flagUnion,
-          polymorphicPathList,
-          iterators,
-        },
-        parentBucket.metaByMetaKey,
-      );
+      const childBucket = newBucket(parentBucket, {
+        layerPlan: this,
+        size,
+        store,
+        // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
+        flagUnion: parentBucket.flagUnion,
+        polymorphicPathList,
+        iterators,
+      });
       parentBucket.children[this.id] = {
         bucket: childBucket,
         map,
