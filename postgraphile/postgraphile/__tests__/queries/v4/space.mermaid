@@ -42,8 +42,8 @@ graph TD
     PgSelectSingle17 --> PgClassExpression26
     Access27{{"Access[27∈4]<br />ᐸ26.startᐳ"}}:::plan
     PgClassExpression26 --> Access27
-    Access30{{"Access[30∈4]<br />ᐸ26.endᐳ"}}:::plan
-    PgClassExpression26 --> Access30
+    Access28{{"Access[28∈4]<br />ᐸ26.endᐳ"}}:::plan
+    PgClassExpression26 --> Access28
 
     %% define steps
 
@@ -62,11 +62,11 @@ graph TD
     class Bucket3,PgClassExpression18,PgClassExpression19,PgClassExpression26 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgClassExpression{3}ᐸ(1/0) /* E...ferred! */ᐳ[26]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,Access27,Access30 bucket4
+    class Bucket4,Access27,Access28 bucket4
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27, 26<br /><br />ROOT Access{4}ᐸ26.startᐳ[27]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 30, 26<br /><br />ROOT Access{4}ᐸ26.endᐳ[30]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 28, 26<br /><br />ROOT Access{4}ᐸ26.endᐳ[28]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
     Bucket0 --> Bucket1

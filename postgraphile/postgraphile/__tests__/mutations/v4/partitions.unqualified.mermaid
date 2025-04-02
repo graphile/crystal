@@ -15,9 +15,9 @@ graph TD
     Constant61{{"Constant[61∈0] ➊<br />ᐸ12.7ᐳ"}}:::plan
     Constant62{{"Constant[62∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant59 & Constant60 & Constant61 & Constant62 --> __InputObject8
-    __InputObject33{{"__InputObject[33∈0] ➊"}}:::plan
-    __InputObject37{{"__InputObject[37∈0] ➊"}}:::plan
-    Constant59 & Constant60 & __InputObject37 --> __InputObject33
+    __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
+    __InputObject23{{"__InputObject[23∈0] ➊"}}:::plan
+    Constant59 & Constant60 & __InputObject23 --> __InputObject19
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
     __InputObject8 --> __InputObject6
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -25,109 +25,109 @@ graph TD
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access14 & Access15 --> Object16
     Constant63{{"Constant[63∈0] ➊<br />ᐸ13ᐳ"}}:::plan
-    Constant63 --> __InputObject37
+    Constant63 --> __InputObject23
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput17
-    ApplyInput43{{"ApplyInput[43∈0] ➊"}}:::plan
-    __InputObject33 --> ApplyInput43
+    ApplyInput29{{"ApplyInput[29∈0] ➊"}}:::plan
+    __InputObject19 --> ApplyInput29
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸmeasurements()ᐳ"]]:::sideeffectplan
     Object16 & ApplyInput17 --> PgInsertSingle13
     Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle13 --> Object18
-    PgSelect24[["PgSelect[24∈3] ➊<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
-    Object16 & PgClassExpression23 --> PgSelect24
-    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
-    Access20{{"Access[20∈3] ➊<br />ᐸ13.tᐳ"}}:::plan
-    Access20 --> PgClassExpression19
-    PgInsertSingle13 --> Access20
-    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
-    Access20 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
-    Access20 --> PgClassExpression22
-    Access20 --> PgClassExpression23
-    First28{{"First[28∈3] ➊"}}:::plan
-    PgSelectRows29[["PgSelectRows[29∈3] ➊"]]:::plan
-    PgSelectRows29 --> First28
-    PgSelect24 --> PgSelectRows29
-    PgSelectSingle30{{"PgSelectSingle[30∈3] ➊<br />ᐸusersᐳ"}}:::plan
-    First28 --> PgSelectSingle30
-    PgClassExpression31{{"PgClassExpression[31∈4] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈4] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression32
-    PgUpdateSingle39[["PgUpdateSingle[39∈5] ➊<br />ᐸmeasurements(timestamp,key;)ᐳ"]]:::sideeffectplan
-    Object42{{"Object[42∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object42 & Constant59 & Constant60 & ApplyInput43 --> PgUpdateSingle39
-    Access40{{"Access[40∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access41{{"Access[41∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access40 & Access41 --> Object42
-    __Value2 --> Access40
-    __Value2 --> Access41
-    Object44{{"Object[44∈5] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle39 --> Object44
-    PgSelect50[["PgSelect[50∈7] ➊<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression49{{"PgClassExpression[49∈7] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
-    Object42 & PgClassExpression49 --> PgSelect50
-    PgClassExpression45{{"PgClassExpression[45∈7] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
-    Access46{{"Access[46∈7] ➊<br />ᐸ39.tᐳ"}}:::plan
-    Access46 --> PgClassExpression45
-    PgUpdateSingle39 --> Access46
-    PgClassExpression47{{"PgClassExpression[47∈7] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
-    Access46 --> PgClassExpression47
-    PgClassExpression48{{"PgClassExpression[48∈7] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
-    Access46 --> PgClassExpression48
-    Access46 --> PgClassExpression49
-    First54{{"First[54∈7] ➊"}}:::plan
-    PgSelectRows55[["PgSelectRows[55∈7] ➊"]]:::plan
-    PgSelectRows55 --> First54
-    PgSelect50 --> PgSelectRows55
-    PgSelectSingle56{{"PgSelectSingle[56∈7] ➊<br />ᐸusersᐳ"}}:::plan
-    First54 --> PgSelectSingle56
+    PgSelect36[["PgSelect[36∈5] ➊<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression35{{"PgClassExpression[35∈5] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
+    Object16 & PgClassExpression35 --> PgSelect36
+    PgClassExpression31{{"PgClassExpression[31∈5] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
+    Access32{{"Access[32∈5] ➊<br />ᐸ13.tᐳ"}}:::plan
+    Access32 --> PgClassExpression31
+    PgInsertSingle13 --> Access32
+    PgClassExpression33{{"PgClassExpression[33∈5] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
+    Access32 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈5] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
+    Access32 --> PgClassExpression34
+    Access32 --> PgClassExpression35
+    First40{{"First[40∈5] ➊"}}:::plan
+    PgSelectRows41[["PgSelectRows[41∈5] ➊"]]:::plan
+    PgSelectRows41 --> First40
+    PgSelect36 --> PgSelectRows41
+    PgSelectSingle42{{"PgSelectSingle[42∈5] ➊<br />ᐸusersᐳ"}}:::plan
+    First40 --> PgSelectSingle42
+    PgClassExpression55{{"PgClassExpression[55∈7] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
+    PgSelectSingle42 --> PgClassExpression55
+    PgClassExpression56{{"PgClassExpression[56∈7] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
+    PgSelectSingle42 --> PgClassExpression56
+    PgUpdateSingle25[["PgUpdateSingle[25∈3] ➊<br />ᐸmeasurements(timestamp,key;)ᐳ"]]:::sideeffectplan
+    Object28{{"Object[28∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object28 & Constant59 & Constant60 & ApplyInput29 --> PgUpdateSingle25
+    Access26{{"Access[26∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access27{{"Access[27∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access26 & Access27 --> Object28
+    __Value2 --> Access26
+    __Value2 --> Access27
+    Object30{{"Object[30∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle25 --> Object30
+    PgSelect48[["PgSelect[48∈6] ➊<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression47{{"PgClassExpression[47∈6] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
+    Object28 & PgClassExpression47 --> PgSelect48
+    PgClassExpression43{{"PgClassExpression[43∈6] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
+    Access44{{"Access[44∈6] ➊<br />ᐸ25.tᐳ"}}:::plan
+    Access44 --> PgClassExpression43
+    PgUpdateSingle25 --> Access44
+    PgClassExpression45{{"PgClassExpression[45∈6] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
+    Access44 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈6] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
+    Access44 --> PgClassExpression46
+    Access44 --> PgClassExpression47
+    First52{{"First[52∈6] ➊"}}:::plan
+    PgSelectRows53[["PgSelectRows[53∈6] ➊"]]:::plan
+    PgSelectRows53 --> First52
+    PgSelect48 --> PgSelectRows53
+    PgSelectSingle54{{"PgSelectSingle[54∈6] ➊<br />ᐸusersᐳ"}}:::plan
+    First52 --> PgSelectSingle54
     PgClassExpression57{{"PgClassExpression[57∈8] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression57
+    PgSelectSingle54 --> PgClassExpression57
     PgClassExpression58{{"PgClassExpression[58∈8] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression58
+    PgSelectSingle54 --> PgClassExpression58
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/partitions.unqualified"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17,__InputObject33,__InputObject37,ApplyInput43,Constant59,Constant60,Constant61,Constant62,Constant63 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17,__InputObject19,__InputObject23,ApplyInput29,Constant59,Constant60,Constant61,Constant62,Constant63 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 16, 17<br /><br />1: PgInsertSingle[13]<br />2: <br />ᐳ: Object[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle13,Object18 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 13, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13, 16<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements()ᐳ[13]<br />1: <br />ᐳ: 20, 19, 21, 22, 23<br />2: PgSelect[24]<br />3: PgSelectRows[29]<br />ᐳ: First[28], PgSelectSingle[30]"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 59, 60, 29, 2<br /><br />1: Access[26]<br />2: Access[27]<br />3: Object[28]<br />4: PgUpdateSingle[25]<br />5: <br />ᐳ: Object[30]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression19,Access20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgSelect24,First28,PgSelectRows29,PgSelectSingle30 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[30]"):::bucket
+    class Bucket3,PgUpdateSingle25,Access26,Access27,Object28,Object30 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 25, 28<br /><br />ROOT Object{3}ᐸ{result}ᐳ[30]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression31,PgClassExpression32 bucket4
-    Bucket5("Bucket 5 (mutationField)<br />Deps: 59, 60, 43, 2<br /><br />1: Access[40]<br />2: Access[41]<br />3: Object[42]<br />4: PgUpdateSingle[39]<br />5: <br />ᐳ: Object[44]"):::bucket
+    class Bucket4 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 13, 16<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements()ᐳ[13]<br />1: <br />ᐳ: 32, 31, 33, 34, 35<br />2: PgSelect[36]<br />3: PgSelectRows[41]<br />ᐳ: First[40], PgSelectSingle[42]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgUpdateSingle39,Access40,Access41,Object42,Object44 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 44, 39, 42<br /><br />ROOT Object{5}ᐸ{result}ᐳ[44]"):::bucket
+    class Bucket5,PgClassExpression31,Access32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgSelect36,First40,PgSelectRows41,PgSelectSingle42 bucket5
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 25, 28<br /><br />ROOT PgUpdateSingle{3}ᐸmeasurements(timestamp,key;)ᐳ[25]<br />1: <br />ᐳ: 44, 43, 45, 46, 47<br />2: PgSelect[48]<br />3: PgSelectRows[53]<br />ᐳ: First[52], PgSelectSingle[54]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 39, 42<br /><br />ROOT PgUpdateSingle{5}ᐸmeasurements(timestamp,key;)ᐳ[39]<br />1: <br />ᐳ: 46, 45, 47, 48, 49<br />2: PgSelect[50]<br />3: PgSelectRows[55]<br />ᐳ: First[54], PgSelectSingle[56]"):::bucket
+    class Bucket6,PgClassExpression43,Access44,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgSelect48,First52,PgSelectRows53,PgSelectSingle54 bucket6
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 42<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[42]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression45,Access46,PgClassExpression47,PgClassExpression48,PgClassExpression49,PgSelect50,First54,PgSelectRows55,PgSelectSingle56 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[56]"):::bucket
+    class Bucket7,PgClassExpression55,PgClassExpression56 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[54]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression57,PgClassExpression58 bucket8
-    Bucket0 --> Bucket1 & Bucket5
+    Bucket0 --> Bucket1 & Bucket3
     Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
+    Bucket2 --> Bucket5
     Bucket3 --> Bucket4
-    Bucket5 --> Bucket6
-    Bucket6 --> Bucket7
-    Bucket7 --> Bucket8
+    Bucket4 --> Bucket6
+    Bucket5 --> Bucket7
+    Bucket6 --> Bucket8
     end

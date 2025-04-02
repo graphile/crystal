@@ -41,17 +41,17 @@ graph TD
     PgSelectRows28[["PgSelectRows[28∈3]"]]:::plan
     Lambda37{{"Lambda[37∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda37 --> PgSelectRows28
-    PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression33
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression31
     List36 --> Lambda37
     __Item29[/"__Item[29∈4]<br />ᐸ28ᐳ"\]:::itemplan
     PgSelectRows28 ==> __Item29
     PgSelectSingle30{{"PgSelectSingle[30∈4]<br />ᐸlog_entriesᐳ"}}:::plan
     __Item29 --> PgSelectSingle30
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression32
+    PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression33
 
     %% define steps
 
@@ -65,12 +65,12 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 35<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 35, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 33, 36, 37<br />2: PgSelectRows[28]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 35, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 31, 36, 37<br />2: PgSelectRows[28]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgSelectRows28,PgClassExpression33,List36,Lambda37 bucket3
+    class Bucket3,PgClassExpression22,PgSelectRows28,PgClassExpression31,List36,Lambda37 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ28ᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item29,PgSelectSingle30,PgClassExpression31,PgClassExpression32 bucket4
+    class Bucket4,__Item29,PgSelectSingle30,PgClassExpression32,PgClassExpression33 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
