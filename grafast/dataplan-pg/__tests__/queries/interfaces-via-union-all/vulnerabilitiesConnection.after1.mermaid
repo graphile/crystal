@@ -41,8 +41,8 @@ graph TD
     PgSelect26[["PgSelect[26∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access25{{"Access[25∈4]^<br />ᐸ24.0ᐳ"}}:::plan
     Object13 & Access25 --> PgSelect26
-    PgSelect39[["PgSelect[39∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object13 & Access25 --> PgSelect39
+    PgSelect35[["PgSelect[35∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Object13 & Access25 --> PgSelect35
     JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
     Access23 --> JSONParse24
     JSONParse24 --> Access25
@@ -52,28 +52,28 @@ graph TD
     PgSelect26 --> PgSelectRows31
     PgSelectSingle32{{"PgSelectSingle[32∈4]^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
     First30 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈4]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression33
-    PgClassExpression34{{"PgClassExpression[34∈4]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈4]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈4]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression36
-    First41{{"First[41∈4]^"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈4]^"]]:::plan
-    PgSelectRows42 --> First41
-    PgSelect39 --> PgSelectRows42
-    PgSelectSingle43{{"PgSelectSingle[43∈4]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First41 --> PgSelectSingle43
+    First37{{"First[37∈4]^"}}:::plan
+    PgSelectRows38[["PgSelectRows[38∈4]^"]]:::plan
+    PgSelectRows38 --> First37
+    PgSelect35 --> PgSelectRows38
+    PgSelectSingle39{{"PgSelectSingle[39∈4]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First37 --> PgSelectSingle39
+    PgClassExpression40{{"PgClassExpression[40∈4]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression40
+    PgClassExpression41{{"PgClassExpression[41∈4]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression41
+    PgClassExpression42{{"PgClassExpression[42∈4]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression42
+    PgClassExpression43{{"PgClassExpression[43∈4]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression43
     PgClassExpression44{{"PgClassExpression[44∈4]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression44
+    PgSelectSingle39 --> PgClassExpression44
     PgClassExpression45{{"PgClassExpression[45∈4]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression45
+    PgSelectSingle39 --> PgClassExpression45
     PgClassExpression46{{"PgClassExpression[46∈4]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression46
+    PgSelectSingle39 --> PgClassExpression46
     PgClassExpression47{{"PgClassExpression[47∈4]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression47
+    PgSelectSingle39 --> PgClassExpression47
 
     %% define steps
 
@@ -90,9 +90,9 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 13<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor22,Access23 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 23, 13, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[24]<br />ᐳ: Access[25]<br />2: PgSelect[26], PgSelect[39]<br />3: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 23, 13, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[24]<br />ᐳ: Access[25]<br />2: PgSelect[26], PgSelect[35]<br />3: PgSelectRows[31], PgSelectRows[38]<br />ᐳ: 30, 32, 37, 39, 40, 41, 42, 43, 44, 45, 46, 47"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
+    class Bucket4,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgSelect35,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,PgClassExpression41,PgClassExpression42,PgClassExpression43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

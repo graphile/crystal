@@ -43,26 +43,26 @@ graph TD
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
     Object11 & PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 & Constant45 --> PgSelect31
-    PgSelect38[["PgSelect[38∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object11 & PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 --> PgSelect38
-    Object36{{"Object[36∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Access35{{"Access[35∈3]<br />ᐸ31.hasMoreᐳ"}}:::plan
-    Constant45 & Access35 --> Object36
+    PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    Object11 & PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 --> PgSelect33
+    Object41{{"Object[41∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Access40{{"Access[40∈3]<br />ᐸ31.hasMoreᐳ"}}:::plan
+    Constant45 & Access40 --> Object41
     PgSelectSingle16 --> PgClassExpression20
     PgSelectSingle16 --> PgClassExpression27
     PgPageInfo32{{"PgPageInfo[32∈3] ➊"}}:::plan
     Connection25 --> PgPageInfo32
-    PgSelect31 --> Access35
-    Lambda37{{"Lambda[37∈3]<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object36 --> Lambda37
-    First39{{"First[39∈3]"}}:::plan
-    PgSelectRows40[["PgSelectRows[40∈3]"]]:::plan
-    PgSelectRows40 --> First39
-    PgSelect38 --> PgSelectRows40
-    PgSelectSingle41{{"PgSelectSingle[41∈3]<br />ᐸmessagesᐳ"}}:::plan
-    First39 --> PgSelectSingle41
-    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression42
+    First34{{"First[34∈3]"}}:::plan
+    PgSelectRows35[["PgSelectRows[35∈3]"]]:::plan
+    PgSelectRows35 --> First34
+    PgSelect33 --> PgSelectRows35
+    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸmessagesᐳ"}}:::plan
+    First34 --> PgSelectSingle36
+    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression37
+    PgSelect31 --> Access40
+    Lambda42{{"Lambda[42∈3]<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object41 --> Lambda42
 
     %% define steps
 
@@ -76,9 +76,9 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 26, 30, 25, 45, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 26, 30, 25, 45, 6<br /><br />ROOT Connectionᐸ21ᐳ[25]<br />1: <br />ᐳ: 20, 27, 32<br />2: PgSelect[31], PgSelect[38]<br />ᐳ: Access[35], Object[36], Lambda[37]<br />3: PgSelectRows[40]<br />ᐳ: 39, 41, 42"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 26, 30, 25, 45, 6<br /><br />ROOT Connectionᐸ21ᐳ[25]<br />1: <br />ᐳ: 20, 27, 32<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: Access[40], Object[41], Lambda[42]<br />3: PgSelectRows[35]<br />ᐳ: 34, 36, 37"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression20,PgClassExpression27,PgSelect31,PgPageInfo32,Access35,Object36,Lambda37,PgSelect38,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42 bucket3
+    class Bucket3,PgClassExpression20,PgClassExpression27,PgSelect31,PgPageInfo32,PgSelect33,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression37,Access40,Object41,Lambda42 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

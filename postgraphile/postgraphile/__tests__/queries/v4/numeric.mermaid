@@ -30,8 +30,8 @@ graph TD
     PgSelectSingle13 --> PgClassExpression14
     Access15{{"Access[15∈2] ➊<br />ᐸ14.startᐳ"}}:::plan
     PgClassExpression14 --> Access15
-    Access18{{"Access[18∈2] ➊<br />ᐸ14.endᐳ"}}:::plan
-    PgClassExpression14 --> Access18
+    Access16{{"Access[16∈2] ➊<br />ᐸ14.endᐳ"}}:::plan
+    PgClassExpression14 --> Access16
 
     %% define steps
 
@@ -44,11 +44,11 @@ graph TD
     class Bucket1,PgClassExpression14 bucket1
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgClassExpression{1}ᐸ__range_test__.”num”ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access15,Access18 bucket2
+    class Bucket2,Access15,Access16 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 14<br /><br />ROOT Access{2}ᐸ14.startᐳ[15]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 14<br /><br />ROOT Access{2}ᐸ14.endᐳ[18]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 16, 14<br /><br />ROOT Access{2}ᐸ14.endᐳ[16]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     Bucket0 --> Bucket1
