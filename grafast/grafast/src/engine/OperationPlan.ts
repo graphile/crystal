@@ -667,7 +667,7 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.planSelectionSet(
+    this.queuePlanSelectionSet(
       outputPlan,
       [],
       POLYMORPHIC_ROOT_PATH,
@@ -677,6 +677,7 @@ export class OperationPlan {
       this.operation.selectionSet.selections,
       true,
     );
+    this.planPendingSelectionSets();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -708,7 +709,7 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.planSelectionSet(
+    this.queuePlanSelectionSet(
       outputPlan,
       [],
       POLYMORPHIC_ROOT_PATH,
@@ -719,6 +720,7 @@ export class OperationPlan {
       true,
       true,
     );
+    this.planPendingSelectionSets();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -844,7 +846,7 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.planSelectionSet(
+      this.queuePlanSelectionSet(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
@@ -854,6 +856,7 @@ export class OperationPlan {
         selectionSet.selections,
         false,
       );
+      this.planPendingSelectionSets();
     } else {
       const subscribeStep = withGlobalLayerPlan(
         this.rootLayerPlan,
@@ -932,7 +935,7 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.planSelectionSet(
+      this.queuePlanSelectionSet(
         outputPlan,
         [],
         POLYMORPHIC_ROOT_PATH,
@@ -942,6 +945,7 @@ export class OperationPlan {
         selectionSet.selections,
         true,
       );
+      this.planPendingSelectionSets();
     }
     if (this.loc !== null) this.loc.pop();
   }
@@ -1370,6 +1374,19 @@ export class OperationPlan {
     }
   }
 
+  private selectionSetsToPlan: Array<{
+    loc: string[] | null;
+    outputPlan: OutputPlan;
+    path: readonly string[];
+    polymorphicPath: string | null;
+    polymorphicPaths: ReadonlySet<string> | null;
+    parentStep: Step;
+    objectType: GraphQLObjectType;
+    selections: readonly SelectionNode[];
+    resolverEmulation: boolean;
+    isMutation: boolean;
+  }> = [];
+
   /**
    *
    * @param outputPlan - The output plan that this selection set is being added to
@@ -1379,7 +1396,7 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private planSelectionSet(
+  private queuePlanSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
     polymorphicPath: string | null,
@@ -1389,7 +1406,38 @@ export class OperationPlan {
     selections: readonly SelectionNode[],
     resolverEmulation: boolean,
     isMutation = false,
+  ): void {
+    this.selectionSetsToPlan.push({
+      loc: this.loc,
+      outputPlan,
+      path,
+      polymorphicPath,
+      polymorphicPaths,
+      parentStep,
+      objectType,
+      selections,
+      resolverEmulation,
+      isMutation,
+    });
+  }
+
+  private actuallyPlanSelectionSet(
+    t: (typeof this.selectionSetsToPlan)[number],
   ) {
+    const {
+      loc,
+      outputPlan,
+      path,
+      polymorphicPath,
+      polymorphicPaths,
+      parentStep,
+      objectType,
+      selections,
+      resolverEmulation,
+      isMutation,
+    } = t;
+    const oldLoc = this.loc;
+    this.loc = loc;
     if (this.loc !== null) {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
@@ -1427,6 +1475,18 @@ export class OperationPlan {
     );
 
     if (this.loc !== null) this.loc.pop();
+    this.loc = oldLoc;
+  }
+
+  private planPendingSelectionSets() {
+    let l: number;
+    while ((l = this.selectionSetsToPlan.length) > 0) {
+      // Process the next batch
+      const todo = this.selectionSetsToPlan.splice(0, l);
+      for (const t of todo) {
+        this.actuallyPlanSelectionSet(t);
+      }
+    }
   }
 
   private internalDependency<TStep extends Step>($step: TStep): TStep {
@@ -1452,7 +1512,7 @@ export class OperationPlan {
     resolverEmulation: boolean,
     listDepth: number,
     streamDetails: StreamDetails | null,
-  ) {
+  ): void {
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
 
@@ -1678,7 +1738,7 @@ export class OperationPlan {
           isNonNull,
           locationDetails,
         });
-        this.planSelectionSet(
+        this.queuePlanSelectionSet(
           objectOutputPlan,
           path,
           polymorphicPath,
@@ -1837,7 +1897,7 @@ export class OperationPlan {
             );
             // find all selections compatible with `type`
             const fieldNodes = fieldSelectionsForType(this, type, selections);
-            this.planSelectionSet(
+            this.queuePlanSelectionSet(
               objectOutputPlan,
               path,
               newPolymorphicPath,
