@@ -42,3 +42,14 @@
   background: inherit;
   color: var(--ifm-color-primary);
 }
+
+.intro {
+  color: var(--ifm-color-primary-darkest);
+  font-style: italic;
+  font-size: 1.25rem;
+}
+
+.intro li,
+code {
+  font-style: normal;
+}
