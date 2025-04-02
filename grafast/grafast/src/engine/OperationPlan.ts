@@ -1483,6 +1483,19 @@ export class OperationPlan {
     if (this.loc !== null) this.loc.pop();
   }
 
+  private getCombinedLayerPlanForLayerPlans(
+    setOfParentLayerPlans: Set<LayerPlan>,
+  ) {
+    const parentLayerPlans = [...setOfParentLayerPlans];
+    // TODO: find out if there's already a combined layer plan for this
+    // combination of PLPs. MUST BE IN SAME ORDER!
+    const firstLayerPlan = parentLayerPlans[0];
+    return new LayerPlan(this, firstLayerPlan, {
+      type: "combined",
+      parentLayerPlans,
+    });
+  }
+
   private planPendingSelectionSets() {
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
@@ -1572,14 +1585,12 @@ export class OperationPlan {
           for (const { parentStep } of selectionSetsAtSamePathForSameType) {
             parentLayerPlans.add(parentStep.layerPlan);
           }
-          const combinedLayerPlan = new LayerPlan(
-            this,
-            first.parentStep.layerPlan,
-            {
-              type: "combined",
-              parentLayerPlans,
-            },
-          );
+
+          // TODO: does this need constraints on the polymorphic paths or
+          // similar? I don't think so...
+          const combinedLayerPlan =
+            this.getCombinedLayerPlanForLayerPlans(parentLayerPlans);
+
           const combinedPolymorphicPaths = first.polymorphicPaths
             ? new Set<string>(/* TODO */)
             : null;
@@ -1611,7 +1622,9 @@ export class OperationPlan {
             null,
             false,
           );
-          combinedLayerPlan.setRootStep($combined);
+          // Tell it to populate the __ValuePlan $combined with the combination
+          // of all the values from listOf$Data.
+          combinedLayerPlan.addCombo(listOf$Data, $combined);
           commonParentStep = withGlobalLayerPlan(
             combinedLayerPlan,
             combinedPolymorphicPaths,
