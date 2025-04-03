@@ -10,7 +10,6 @@ authors:
     url: https://github.com/Benjie
     image_url: https://github.com/Benjie.png
 tags: [0.1]
-hide_table_of_contents: true
 ---
 
 import styles from "@site/src/css/common.module.css";
@@ -21,9 +20,9 @@ In the first Gra<em>fast</em> Working Group, we outlined 4 <em>major</em> issues
 that needed to be addressed before we could think about general release. With
 this release, 3 of these are now complete!
 
-- ✅⤵️ Global dependencies - solved via "unary" steps
-- ✅⤵️ Early exit - solved via "flags"
-- ✅🎉 **Eradicating eval - this release!**
+- ✅⤵️ Global dependencies — solved via “unary” steps
+- ✅⤵️ Early exit — solved via “flags”
+- ✅🎉 **Eradicating eval — this release!**
 - 🤔🔜 Polymorphism
 
 We’re proud to announce that the third of these, eradicating eval, is now
@@ -53,8 +52,10 @@ add plan resolvers to fields and arguments, you can no longer attach
 used a lot in PostGraphile and its various plugins, but very few people
 (no-one?) used externally so it was ripe for removal.
 
-That problematic query that took 4 minutes to plan before? It now takes 1.1ms to
-plan, yielding a 200,000x speedup!
+<strong>
+  That problematic query that took 4 minutes to plan before? It now takes 1.1ms
+  to plan, yielding a 200,000x speedup!
+</strong>
 
 <!-- truncate-->
 
@@ -75,8 +76,8 @@ the pull requests where the changes occurred.
 
 Because we’ve removed `inputPlan`, the `fieldArgs.get(key)` method is no more;
 instead use `fieldArgs.getRaw(key)` which is equivalent unless the inputs had
-plans (which they cannot any more). You'd know if you had plans on your inputs,
-it's very unlikely you did if you were writing your own Gra*fast* schema.
+plans (which they cannot any more). You’d know if you had plans on your inputs,
+it’s very unlikely you did if you were writing your own Gra*fast* schema.
 
 #### Converting `applyPlan` and `inputPlan`
 
@@ -89,7 +90,7 @@ in our plan diagram.
 We’ve managed to make this new runtime system very similar in shape to the old
 plan-time system (largely enabled by how closely we managed to get the
 Gra*fast* plan syntax to the syntax of code you would normally write at
-runtime), so if you do need to transform any it shouldn't take much effort. The
+runtime), so if you do need to transform any it shouldn’t take much effort. The
 first change is to rename `applyPlan` to `apply`, and `inputPlan` to `baked`.
 From there, your code might just work straight away, or it might need some more
 small tweaks (e.g. `fieldArgs` is no longer present, it’s been replaced with
@@ -120,3 +121,83 @@ renamed it to simply `Step`.
 
 _We have kept an <code>ExecutableStep</code> export for backwards
 compatibility._
+
+## makeGrafastSchema
+
+- 🚨 The structure of `makeGrafastSchema` as it relates to arguments and input
+  object fields has changed a little; use TypeScript to guide you. I’m hoping
+  this is the last change of its kind before release.
+- New shortcuts added for argument `applyPlan()` and input field `apply()`
+  methods.
+- Trimmed a load of unnecessary exported code, such as empty objects and field
+  resolvers that do the same as the default field resolver.
+- Fix bug in `makeGrafastSchema` that fails to build schema sometimes if a field
+  uses a function shortcut rather than object definition.
+- Fix bug in `makeGrafastSchema` that sometimes doesn’t allow defining input
+  objects
+
+🚨 If you use `graphile-export` to export your schema as executable code, be
+sure to regenerate your schemas as the old generated code could be
+misinterpreted by the new `makeGrafastSchema`.
+
+## Improved plan diagrams
+
+- Plan diagrams now reveal (via `@s` text) if a step is meant to be streamed.
+- Constant steps improved.
+- `Object: null prototype` simplified to `§` in output.
+- Hoist steps during `optimize` phase.
+- We no longer render dependencies on the `undefined` constant, because it’s
+  messy and doesn’t add value
+- We group when there are multiple dependencies to the same step from the same
+  step, and label the line with the count instead.
+
+## Step classes
+
+When writing your own step classes:
+
+- `ExecutionValue` has gained a new `.unaryValue()` method that returns the
+  unary value for unary execution values, and throws an error for non-unary
+  execution values. This is much safer than the previous `.at(0)` trick which
+  did not assert that you were actually dealing with a unary execution value.
+- If you were using `@stream` (incremental delivery) and had written your own
+  `Step` class with stream support, first of all: amazing! Please let me know
+  you did that (_via email or [Discord](https://discord.gg/graphile)_)!
+  Secondly, you’ll need to either rename your `stream` function to `execute` or
+  merge its code into your existing `execute` method if you have one. It turns
+  out there wasn’t much point in separating them, and you can confer a lot of
+  benefit from merging them.
+
+## Other improvements
+
+- Compatible mutation operations can now complete synchronously via
+  `grafastSync()`
+- Fixes bug in input objects where keys that weren’t set would still be present
+  with value `undefined`
+- Fix bug in step caching relating to polymorphism
+- New `items()` conventional method for extracting the items from a collection
+  (makes for easier compatibility with connections)
+- Error handling improved
+- Lists improved — especially error handling and deduplication logic; as well as
+  allowing returning connection-capable steps in list positions
+- Optimization to Gra*fast*’s internal execution values, which are used heavily
+  in hot paths.
+
+## Thank you Sponsors
+
+Gra*fast* is crowd-funded open-source software, they rely on
+crowd-sourced funding from individuals and companies to keep advancing.
+
+If your company benefits from Gra*fast*, PostGraphile or the wider Graphile
+suite, you should consider asking them to fund our work. By significantly
+reducing the amount of work needed to achieve business goals and reducing
+running costs, Graphile’s software results in huge time and money savings for
+users. We encourage companies to contribute a portion of these savings back,
+enabling the projects to advance more rapidly, and result in even greater
+savings for your company.
+[Find out more about sponsorship on graphile.org](https://graphile.org/sponsor/).
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>
