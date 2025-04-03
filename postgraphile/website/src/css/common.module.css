@@ -159,7 +159,6 @@ tt {
   color: var(--ifm-color-primary-darker);
   font-style: italic;
   font-size: 1.25rem;
-  padding-bottom: 1rem;
 }
 
 [data-theme="dark"] .intro {
