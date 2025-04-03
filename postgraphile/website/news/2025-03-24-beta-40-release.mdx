@@ -31,6 +31,13 @@ fully adopted and tested via incorporation into `postgraphile@5.0.0-beta.40`.
 
 </p>
 
+## What does this mean for PostGraphile?
+
+Gra*fast* is the underlying execution engine of PostGraphile, written to maximize the
+declarative nature of GraphQL to give you a smooth and efficient query planning experience.
+While PostGraphile users need not to intricately know of the internals of Gra*fast*, this
+focus of eradicating eval from Gra*fast* has given PostGraphile users some new benefits.
+
 ### SQL generation moved to runtime
 
 PostGraphile's various SQL-running steps like PgSelectStep now build their
@@ -49,6 +56,8 @@ for every request, rather than once per plan. We're happy with this tradeoff;
 one of the core goals of PostGraphile V5 (and the motivation for Gra*fast* in the
 first place) was to shift load from the PostgreSQL layer (which is non-trivial
 to scale) to the Node.js layer (which is easy to scale horizontally).
+
+<!-- truncate-->
 
 ### Postgres Arrays now parse 5x faster
 
@@ -87,7 +96,7 @@ If you use Discord, join our server at [https://discord.gg/graphile](https://dis
 
 ## Thank you Sponsors
 
-PostGraphile is crowd-funded open-source software, they rely on
+PostGraphile is crowd-funded open-source software, it relies on
 crowd-sourced funding from individuals and companies to keep advancing.
 
 If your company benefits from PostGraphile or the wider Graphile
