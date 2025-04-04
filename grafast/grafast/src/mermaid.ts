@@ -109,6 +109,10 @@ export function planToMermaid(
   } = Object.create(null);
   const sortedSteps: GrafastPlanStepJSONv1[] = [];
   const extractSteps = (bucket: GrafastPlanBucketJSONv1): void => {
+    if (layerPlanById[bucket.id]) {
+      // Already processed. Likely either a combo or descendant of a combo
+      return;
+    }
     layerPlanById[bucket.id] = bucket;
     // Shallowest bucket first, then most dependencies
     const sorted = [...bucket.steps].sort(
