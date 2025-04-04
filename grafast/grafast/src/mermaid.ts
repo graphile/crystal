@@ -251,19 +251,21 @@ export function planToMermaid(
         );
       const polyPathsIfDifferent = polyPathsAreSame ? "" : `\n${polyPaths}`;
 
-      const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}${
+      const [lBrace, rBrace, shape = "", planNameText = planName] =
+        plan.stepClass === "__ItemStep"
+          ? ["[/", "\\]"]
+          : plan.stepClass === "__ValueStep" && plan.extra?.combined
+            ? [null, null, "docs", "__Combined"]
+            : plan.isSyncAndSafe
+              ? isUnbatched
+                ? ["{{", "}}"]
+                : ["[", "]"]
+              : ["[[", "]]"];
+      const planString = `${planNameText}[${plan.id}${`∈${plan.bucketId}`}${
         plan.stream ? "@s" : ""
       }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame && polyPaths !== "" ? "^" : ""}${
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
-      const [lBrace, rBrace] =
-        plan.stepClass === "__ItemStep"
-          ? ["[/", "\\]"]
-          : plan.isSyncAndSafe
-            ? isUnbatched
-              ? ["{{", "}}"]
-              : ["[", "]"]
-            : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
         : plan.stepClass === "__ItemStep"
@@ -271,11 +273,17 @@ export function planToMermaid(
           : isUnbatched && !plan.isSyncAndSafe
             ? "unbatchedplan"
             : "plan";
-      graph.push(
-        `    ${planNode}${lBrace}${mermaidEscape(
-          planString,
-        )}${rBrace}:::${planClass}`,
-      );
+      if (lBrace === null) {
+        graph.push(
+          `    ${planNode}:::${planClass}@{shape: ${shape}, label: ${mermaidEscape(planString)}}`,
+        );
+      } else {
+        graph.push(
+          `    ${planNode}${lBrace}${mermaidEscape(
+            planString,
+          )}${rBrace}:::${planClass}`,
+        );
+      }
     }
     return planIdMap[plan.id];
   };
@@ -438,14 +446,9 @@ export function planToMermaid(
     if (layerPlan.reason.type === "combined") {
       for (const { targetStepId, sources } of layerPlan.reason.combinations) {
         const targetStep = stepById[targetStepId];
-        const nodule = `Nodule_${targetStepId}`;
-        graph.push(
-          `    ${nodule}:::plan@{shape: dbl-circ} -.-> ${planId(targetStep)}`,
-        );
-        graph.push(`    class ${nodule} bucket${layerPlan.id}`);
         for (const { stepId } of sources) {
           const step = stepById[stepId];
-          graph.push(`    ${planId(step)} -.-> ${nodule}`);
+          graph.push(`    ${planId(step)} -.-x ${planId(targetStep)}`);
         }
       }
     }
