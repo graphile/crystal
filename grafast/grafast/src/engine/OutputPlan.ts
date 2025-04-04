@@ -728,62 +728,64 @@ export function getChildBucketAndIndex(
   if (paths.length === 0) {
     return null;
   }
-  const path = paths[0];
 
-  let currentBucket = bucket;
-  let currentIndex = bucketIndex;
+  toNextPath: for (const path of paths) {
+    let currentBucket = bucket;
+    let currentIndex = bucketIndex;
 
-  for (let i = 0, l = path.length; i < l; i++) {
-    const layerPlan = path[i];
-    const child = currentBucket.children[layerPlan.id];
-    if (!child) {
-      return null;
-    }
-
-    const out = child.map.get(currentIndex);
-    if (out == null) {
-      return null;
-    }
-
-    /*
-     * TEST: I think this  '|| i !== l - 1' check is saying that an array can
-     * only occur at the furthest ancestor and everything since then must be
-     * non-array. Presumably in the case of nested arrays there would be an
-     * intermediary bucket, hence why this check is allowed, but that should be
-     * tested. Also, are there any confounding factors when it comes to steps
-     * themselves using arrays for object values - for example pgSelectSingle is
-     * represented by an array (tuple), but that doesn't make it a list so it should
-     * be fine. Use tests to validate this is all fine.
-     */
-    if (arrayIndex == null || i !== 0) {
-      if (Array.isArray(out)) {
-        throw new Error(
-          "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
-        );
+    for (let i = 0, l = path.length; i < l; i++) {
+      const layerPlan = path[i];
+      const child = currentBucket.children[layerPlan.id];
+      if (!child) {
+        continue toNextPath;
       }
-      currentBucket = child.bucket;
-      currentIndex = out;
-    } else {
-      if (!Array.isArray(out)) {
-        throw new Error(
-          `GrafastInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
-            out,
-          )}`,
-        );
+
+      const out = child.map.get(currentIndex);
+      if (out == null) {
+        continue toNextPath;
       }
-      if (!(out.length > arrayIndex)) {
-        throw new Error(
-          `GrafastInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
-        );
+
+      /*
+       * TEST: I think this  '|| i !== l - 1' check is saying that an array can
+       * only occur at the furthest ancestor and everything since then must be
+       * non-array. Presumably in the case of nested arrays there would be an
+       * intermediary bucket, hence why this check is allowed, but that should be
+       * tested. Also, are there any confounding factors when it comes to steps
+       * themselves using arrays for object values - for example pgSelectSingle is
+       * represented by an array (tuple), but that doesn't make it a list so it should
+       * be fine. Use tests to validate this is all fine.
+       */
+      if (arrayIndex == null || i !== 0) {
+        if (Array.isArray(out)) {
+          throw new Error(
+            "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+          );
+        }
+        currentBucket = child.bucket;
+        currentIndex = out;
+      } else {
+        if (!Array.isArray(out)) {
+          throw new Error(
+            `GrafastInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+              out,
+            )}`,
+          );
+        }
+        if (!(out.length > arrayIndex)) {
+          throw new Error(
+            `GrafastInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+          );
+        }
+        currentBucket = child.bucket;
+        currentIndex = out[arrayIndex];
       }
-      currentBucket = child.bucket;
-      currentIndex = out[arrayIndex];
     }
+    if (currentIndex == null) {
+      continue toNextPath;
+    }
+    return [currentBucket, currentIndex];
   }
-  if (currentIndex == null) {
-    return null;
-  }
-  return [currentBucket, currentIndex];
+  return null;
 }
 
 interface Execute {
