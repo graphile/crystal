@@ -1072,15 +1072,33 @@ function completeBucketAndExecuteSamePhaseChildren(
   bucket: Bucket,
   requestContext: RequestTools,
 ) {
-  if (bucket.sharedState._doneBucketIds.has(bucket.layerPlan.id)) {
+  const { layerPlan, sharedState } = bucket;
+
+  const childPromises = markLayerPlanAsDone(
+    requestContext,
+    sharedState,
+    layerPlan,
+    bucket,
+  );
+
+  bucket.sharedState.release(bucket);
+
+  return childPromises;
+}
+
+function markLayerPlanAsDone(
+  requestContext: RequestTools,
+  sharedState: SharedBucketState,
+  layerPlan: LayerPlan,
+  bucket: Bucket | null,
+) {
+  if (sharedState._doneBucketIds.has(layerPlan.id)) {
     throw new Error(
       `${bucket} has already completed, it cannot complete again!`,
     );
   }
-  bucket.sharedState._doneBucketIds.add(bucket.layerPlan.id);
+  sharedState._doneBucketIds.add(layerPlan.id);
 
-  const { layerPlan, sharedState } = bucket;
-  const { children: childLayerPlans } = layerPlan;
   const childPromises: PromiseLike<any>[] = [];
 
   // This promise should never reject
@@ -1098,6 +1116,7 @@ function completeBucketAndExecuteSamePhaseChildren(
     }
     return result;
   };
+  const { children: childLayerPlans } = layerPlan;
 
   // PERF: create a JIT factory for this at planning time
   loop: for (const childLayerPlan of childLayerPlans) {
@@ -1105,26 +1124,39 @@ function completeBucketAndExecuteSamePhaseChildren(
       case "nullableBoundary":
       case "listItem":
       case "polymorphic": {
-        const childBucket = childLayerPlan.newBucket(bucket);
-        if (childBucket !== null) {
-          // Execute
-          const result = executeBucket(childBucket, requestContext);
-          if (isPromiseLike(result)) {
-            childPromises.push(result);
-          }
+        const childBucket =
+          bucket == null ? null : childLayerPlan.newBucket(bucket);
+        // Execute
+        const result =
+          childBucket !== null
+            ? executeBucket(childBucket, requestContext)
+            : markLayerPlanAsDone(
+                requestContext,
+                sharedState,
+                childLayerPlan,
+                null,
+              );
+        if (isPromiseLike(result)) {
+          childPromises.push(result);
         }
         break;
       }
       case "mutationField": {
-        const childBucket = childLayerPlan.newBucket(bucket);
-        if (childBucket !== null) {
-          // Enqueue for execution (mutations must run in order)
-          const promise = enqueue(() =>
-            executeBucket(childBucket, requestContext),
-          );
-          if (isPromiseLike(promise)) {
-            childPromises.push(promise);
-          }
+        const childBucket =
+          bucket == null ? null : childLayerPlan.newBucket(bucket);
+        // Enqueue for execution (mutations must run in order)
+        const promise = enqueue(() =>
+          childBucket !== null
+            ? executeBucket(childBucket, requestContext)
+            : markLayerPlanAsDone(
+                requestContext,
+                sharedState,
+                childLayerPlan,
+                null,
+              ),
+        );
+        if (isPromiseLike(promise)) {
+          childPromises.push(promise);
         }
 
         break;
@@ -1143,13 +1175,15 @@ function completeBucketAndExecuteSamePhaseChildren(
           // The last parent layer plan to complete will handle it.
           // Make sure we're retained so it can use our data!
           // Will be released inside the "combined" branch in childLayerPlan.newBucket
-          bucket.sharedState.retain(bucket);
+          if (bucket != null) {
+            bucket.sharedState.retain(bucket);
+          }
 
           // TODO: MAKE SURE CANCELLED BUCKETS ARE HANDLED!
 
           continue loop;
         }
-        const childBucket = childLayerPlan.newBucket(bucket);
+        const childBucket = childLayerPlan.newCombinedBucket({ sharedState });
         if (childBucket !== null) {
           // Execute
           const result = executeBucket(childBucket, requestContext);
@@ -1181,9 +1215,6 @@ function completeBucketAndExecuteSamePhaseChildren(
       }
     }
   }
-
-  bucket.sharedState.release(bucket);
-
   return childPromises;
 }
 
