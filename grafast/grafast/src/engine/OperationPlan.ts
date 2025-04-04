@@ -3117,14 +3117,16 @@ export class OperationPlan {
 
     for (const dependentLayerPlan of dependentLayerPlans) {
       const lp = dependentLayerPlan;
-      const path = pathFromLayerPlanToStep(lp, step);
-      if (!path) {
+      const childPaths = pathsFromLayerPlanToStep(lp, step);
+      if (childPaths.length === 0) {
         throw new Error(
           `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy; step ${step} cannot be found from ${dependentLayerPlan}`,
         );
       }
-      paths.push(path);
-      minPathLength = Math.min(path.length, minPathLength);
+      for (const path of childPaths) {
+        paths.push(path);
+        minPathLength = Math.min(path.length, minPathLength);
+      }
     }
 
     const dependentLayerPlanCount = dependentLayerPlans.size;
@@ -4379,36 +4381,27 @@ type StreamDetails = {
   label: Step<Maybe<string>>;
 };
 
-function pathFromLayerPlanToStep(
+function pathsFromLayerPlanToStep(
   lp: LayerPlan,
   step: Step,
-): readonly LayerPlan[] | null {
-  const path: LayerPlan[] = [lp];
-  while (lp.parentLayerPlan != step.layerPlan) {
-    let parent: Maybe<LayerPlan>;
-    if (lp.reason.type === "combined") {
-      // need to check each of the parents
-      for (const plp of lp.reason.parentLayerPlans) {
-        if (step.layerPlan === plp) {
-          // This is an alternative to the `while` condition
-          return path;
-        } else {
-          if (layerPlanHeirarchyContains(plp, step.layerPlan)) {
-            parent = plp;
-            break;
-          }
-        }
-      }
-    } else {
-      parent = lp.parentLayerPlan;
-    }
-    if (parent == null) return null;
-    lp = parent;
-    path.push(lp);
+): readonly LayerPlan[][] {
+  if (lp === step.layerPlan) return [[]];
+  if (lp.reason.type === "combined") {
+    const paths = lp.reason.parentLayerPlans.flatMap((plp) =>
+      pathsFromLayerPlanToStep(plp, step),
+    );
+    return paths.map((p) => [lp, ...p]);
+  } else if (lp.parentLayerPlan) {
+    return pathsFromLayerPlanToStep(lp.parentLayerPlan, step).map((p) => [
+      lp,
+      ...p,
+    ]);
+  } else {
+    // No paths found
+    return [];
   }
-  return path;
 }
-function layerPlanHeirarchyContains(
+export function layerPlanHeirarchyContains(
   lp: LayerPlan,
   targetLp: LayerPlan,
 ): boolean {
