@@ -19,6 +19,7 @@ import type {
   ExecutionEntryFlags,
   JSONValue,
   LocationDetails,
+  Maybe,
 } from "../interfaces.js";
 import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
@@ -26,6 +27,10 @@ import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
+import {
+  layerPlanHeirarchyContains,
+  pathsFromAncestorToTargetLayerPlan,
+} from "./OperationPlan.js";
 
 const {
   executeSync,
@@ -712,26 +717,24 @@ export function getChildBucketAndIndex(
       "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
+  /* Handled above?!
   if (outputPlan != null && layerPlan === bucket.layerPlan) {
     // Same layer; straightforward
     return [bucket, bucketIndex];
   }
+  */
 
-  const reversePath = [layerPlan];
-  let current: LayerPlan | null = layerPlan;
-  while (!bucket.children[current.id]) {
-    current = current.parentLayerPlan;
-    if (!current) {
-      return null;
-    }
-    reversePath.push(current);
+  const paths = pathsFromAncestorToTargetLayerPlan(bucket.layerPlan, layerPlan);
+  if (paths.length === 0) {
+    return null;
   }
+  const path = paths[0];
 
   let currentBucket = bucket;
   let currentIndex = bucketIndex;
 
-  for (let l = reversePath.length, i = l - 1; i >= 0; i--) {
-    const layerPlan = reversePath[i];
+  for (let i = 0, l = path.length; i < l; i++) {
+    const layerPlan = path[i];
     const child = currentBucket.children[layerPlan.id];
     if (!child) {
       return null;
@@ -752,7 +755,7 @@ export function getChildBucketAndIndex(
      * represented by an array (tuple), but that doesn't make it a list so it should
      * be fine. Use tests to validate this is all fine.
      */
-    if (arrayIndex == null || i !== l - 1) {
+    if (arrayIndex == null || i !== 0) {
       if (Array.isArray(out)) {
         throw new Error(
           "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
