@@ -1488,8 +1488,17 @@ export class OperationPlan {
     setOfParentLayerPlans: Set<LayerPlan>,
   ) {
     const parentLayerPlans = [...setOfParentLayerPlans];
-    // TODO: find out if there's already a combined layer plan for this
-    // combination of PLPs. MUST BE IN SAME ORDER!
+
+    // See if one already exists with the same layer plans in the same order
+    for (const lp of this.stepTracker.layerPlans) {
+      if (
+        lp?.reason.type === "combined" &&
+        arraysMatch(parentLayerPlans, lp.reason.parentLayerPlans)
+      ) {
+        return lp;
+      }
+    }
+
     const firstLayerPlan = parentLayerPlans[0];
     return new LayerPlan(this, firstLayerPlan, {
       type: "combined",
