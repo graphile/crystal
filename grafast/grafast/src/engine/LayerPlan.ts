@@ -5,17 +5,23 @@ import te from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { inspect } from "../inspect.js";
-import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
+import type {
+  BatchExecutionValue,
+  ExecutionValue,
+  UnaryExecutionValue,
+} from "../interfaces.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
+  FLAG_STOPPED,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
+import { arrayOfLength } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -805,24 +811,49 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       Map<number, number>
     > = Object.create(null);
     let flagUnion = NO_FLAGS;
+    let totalSize = 0;
     for (const plp of this.reason.parentLayerPlans) {
       mapByParentLayerPlanId[plp.id] = new Map();
       const parentBucket = sharedState._retainedBuckets.get(plp.id);
       if (!parentBucket) continue;
       flagUnion |= parentBucket.flagUnion;
-
-      // PERF: we shouldn't need a nested loop for this
-      for (const stepId of copyStepIds) {
+      totalSize += parentBucket.size;
+    }
+    for (const stepId of copyStepIds) {
+      let newEv: ExecutionValue | undefined;
+      let offset = 0;
+      for (const plp of this.reason.parentLayerPlans) {
+        const parentBucket = sharedState._retainedBuckets.get(plp.id);
+        if (!parentBucket) continue;
         const ev = parentBucket.store.get(stepId);
         if (ev == null) {
-          continue;
+          // No action
         } else if (ev.isBatch) {
-          throw new Error(
-            `GrafastInternalError<e9ebc6b4-708c-4983-8a8f-a6bd41ae3513>: Don't know how to handle batch steps in ${this}`,
-          );
+          // Create a batch execution value if one doesn't already exist
+          if (!newEv) {
+            const values = arrayOfLength(totalSize, null);
+            newEv = batchExecutionValue(values);
+            // By default, these values aren't used
+            for (let i = 0; i < totalSize; i++) {
+              newEv._flags[i] = FLAG_NULL & FLAG_STOPPED;
+            }
+          }
+          // Populate it with the values we care about
+          for (let i = 0, l = parentBucket.size; i < l; i++) {
+            newEv._copyResult(i + offset, ev, i);
+          }
         } else {
-          store.set(stepId, ev);
+          newEv = ev;
         }
+
+        offset += parentBucket.size;
+      }
+      if (newEv != null) {
+        store.set(stepId, newEv);
+      } else {
+        // TODO: do we need a placeholder for not found evs? I don't think so -
+        // it implies that the dependency bucket doesn't exist and thus nothing
+        // will use it?
       }
     }
 
