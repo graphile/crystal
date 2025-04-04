@@ -3117,7 +3117,7 @@ export class OperationPlan {
 
     for (const dependentLayerPlan of dependentLayerPlans) {
       const lp = dependentLayerPlan;
-      const childPaths = pathsFromLayerPlanToAncestor(lp, step.layerPlan);
+      const childPaths = pathsFromAncestorToTargetLayerPlan(step.layerPlan, lp);
       if (childPaths.length === 0) {
         throw new Error(
           `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy; step ${step} cannot be found from ${dependentLayerPlan}`,
@@ -3132,7 +3132,7 @@ export class OperationPlan {
     const dependentLayerPlanCount = dependentLayerPlans.size;
 
     let deepest = step.layerPlan;
-    outerloop: for (let i = 0; i < minPathLength; i++) {
+    outerloop: for (let i = minPathLength - 1; i >= 0; i--) {
       const expected = paths[0][i];
       if (expected.reason.type === "polymorphic") {
         // PERF: reconsider
@@ -4381,9 +4381,9 @@ type StreamDetails = {
   label: Step<Maybe<string>>;
 };
 
-function pathsFromLayerPlanToAncestor(
-  lp: LayerPlan,
+function pathsFromAncestorToTargetLayerPlan(
   ancestor: LayerPlan,
+  lp: LayerPlan,
 ): readonly LayerPlan[][] {
   if (lp === ancestor) {
     // One path, and it's the null path - stay where you are.
@@ -4392,12 +4392,12 @@ function pathsFromLayerPlanToAncestor(
 
   if (lp.reason.type === "combined") {
     const paths = lp.reason.parentLayerPlans.flatMap((plp) =>
-      pathsFromLayerPlanToAncestor(plp, ancestor),
+      pathsFromAncestorToTargetLayerPlan(plp, ancestor),
     );
-    return paths.map((p) => [lp, ...p]);
+    return paths.map((p) => (p.push(lp), p));
   } else if (lp.parentLayerPlan) {
-    return pathsFromLayerPlanToAncestor(lp.parentLayerPlan, ancestor).map(
-      (p) => [lp, ...p],
+    return pathsFromAncestorToTargetLayerPlan(lp.parentLayerPlan, ancestor).map(
+      (p) => (p.push(lp), p),
     );
   } else {
     // No paths found - lp doesn't inherit from ancestor.
