@@ -435,7 +435,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   public newBucket(parentBucket: Bucket): Bucket | null {
     if (this.reason.type === "combined") {
-      return this.newCombinedBucket(parentBucket);
+      throw new Error(`Use newCombinedBucket instead.`);
     }
     const { copyStepIds } = this;
     const store: Bucket["store"] = new Map();
@@ -795,7 +795,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
   }
 
-  private newCombinedBucket(finalParentBucket: Bucket): Bucket | null {
+  public newCombinedBucket(
+    finalParentBucket: Pick<Bucket, "sharedState">,
+  ): Bucket | null {
     if (this.reason.type !== "combined") {
       throw new Error(
         `GrafastInternalError<59c54cd0-ee32-478a-9e0e-4123eec2f8f5>: newCombinedBucket must only be called on combined layer plans`,
