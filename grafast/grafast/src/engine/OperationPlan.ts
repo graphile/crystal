@@ -1595,11 +1595,15 @@ export class OperationPlan {
           const combinedPolymorphicPaths = first.polymorphicPaths
             ? new Set<string>(/* TODO */)
             : null;
+          let isUnary = true;
           for (const {
             parentStep,
             outputPlan,
             polymorphicPaths,
           } of selectionSetsAtSamePathForSameType) {
+            if (!parentStep._isUnary) {
+              isUnary = false;
+            }
             if (polymorphicPaths) {
               for (const path of polymorphicPaths) {
                 combinedPolymorphicPaths!.add(path);
@@ -1623,6 +1627,9 @@ export class OperationPlan {
             null,
             false,
           );
+          if (!isUnary) {
+            $combined._isUnary = false;
+          }
           // Tell it to populate the __ValuePlan $combined with the combination
           // of all the values from listOf$Data.
           combinedLayerPlan.addCombo(listOf$Data, $combined);
