@@ -28,7 +28,10 @@ const randomString = (length = 10) => {
 export function defaultMaskError(
   error: graphql.GraphQLError,
 ): graphql.GraphQLError {
-  if (error.originalError instanceof GraphQLError) {
+  if (!error.originalError && error instanceof GraphQLError) {
+    // Things like 'Cannot return null for non-nullable field'
+    return error;
+  } else if (error.originalError instanceof GraphQLError) {
     return error;
   } else if (error.originalError != null && isSafeError(error.originalError)) {
     return new GraphQLError(
