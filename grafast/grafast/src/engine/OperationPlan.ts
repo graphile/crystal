@@ -4391,14 +4391,22 @@ function pathsFromAncestorToTargetLayerPlan(
   }
 
   if (lp.reason.type === "combined") {
-    const paths = lp.reason.parentLayerPlans.flatMap((plp) =>
+    const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
       pathsFromAncestorToTargetLayerPlan(plp, ancestor),
     );
-    return paths.map((p) => (p.push(lp), p));
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
   } else if (lp.parentLayerPlan) {
-    return pathsFromAncestorToTargetLayerPlan(lp.parentLayerPlan, ancestor).map(
-      (p) => (p.push(lp), p),
+    const childPaths = pathsFromAncestorToTargetLayerPlan(
+      lp.parentLayerPlan,
+      ancestor,
     );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
   } else {
     // No paths found - lp doesn't inherit from ancestor.
     return [];
