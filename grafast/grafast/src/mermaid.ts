@@ -167,6 +167,62 @@ export function planToMermaid(
     return str;
   };
 
+  const stepToString = (step: GrafastPlanStepJSONv1): string => {
+    return `${step.stepClass.replace(/Step$/, "")}${
+      step.bucketId === 0 ? "" : `{${step.bucketId}}`
+    }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
+  };
+
+  const layerPlans = Object.values(layerPlanById);
+
+  if (!skipBuckets) {
+    if (!concise) graph.push("    subgraph Buckets");
+    for (let i = 0, l = layerPlans.length; i < l; i++) {
+      const layerPlan = layerPlans[i];
+      const raisonDEtre =
+        ` (${layerPlan.reason.type})` +
+        (layerPlan.reason.type === "polymorphic"
+          ? `\n${layerPlan.reason.typeNames}`
+          : ``);
+      graph.push(
+        `    Bucket${layerPlan.id}(${mermaidEscape(
+          `Bucket ${layerPlan.id}${raisonDEtre}${
+            layerPlan.parentSideEffectStepId != null
+              ? `\nParent side effect step: ${
+                  stepById[layerPlan.parentSideEffectStepId].id
+                }`
+              : ""
+          }${
+            layerPlan.copyStepIds.length > 0
+              ? `\nDeps: ${layerPlan.copyStepIds
+                  .map((pId) => stepById[pId]!.id)
+                  .join(", ")}`
+              : ""
+          }${
+            layerPlan.reason.type === "polymorphic"
+              ? "\n" + pp(layerPlan.reason.polymorphicPaths)
+              : ""
+          }\n${
+            layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
+              ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
+              : ""
+          }${startSteps(layerPlan)}`,
+        )}):::bucket`,
+      );
+    }
+    if (!concise) graph.push("    end");
+  }
+
+  if (!skipBuckets) {
+    for (let i = 0, l = layerPlans.length; i < l; i++) {
+      const layerPlan = layerPlans[i];
+      const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
+      if (childNodes.length > 0) {
+        graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
+      }
+    }
+  }
+
   const planIdMap = Object.create(null);
   const planId = (plan: GrafastPlanStepJSONv1): string => {
     if (!planIdMap[plan.id]) {
@@ -347,11 +403,19 @@ export function planToMermaid(
     }
   });
 
-  const stepToString = (step: GrafastPlanStepJSONv1): string => {
-    return `${step.stepClass.replace(/Step$/, "")}${
-      step.bucketId === 0 ? "" : `{${step.bucketId}}`
-    }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
-  };
+  for (let i = 0, l = layerPlans.length; i < l; i++) {
+    const layerPlan = layerPlans[i];
+    const steps = layerPlan.steps;
+    graph.push(
+      `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
+    );
+    graph.push(
+      `    class ${[
+        `Bucket${layerPlan.id}`,
+        ...steps.filter((s) => !shouldHideStep(s)).map(planId),
+      ].join(",")} bucket${layerPlan.id}`,
+    );
+  }
 
   let firstSideEffect = true;
   sortedSteps.forEach((step) => {
@@ -367,63 +431,25 @@ export function planToMermaid(
   });
 
   graph.push("");
-  if (!concise && !skipBuckets) graph.push("    subgraph Buckets");
-  const layerPlans = Object.values(layerPlanById);
+
+  // Handle concat for any "combination" layer plans
   for (let i = 0, l = layerPlans.length; i < l; i++) {
     const layerPlan = layerPlans[i];
-    const steps = layerPlan.steps;
-    const raisonDEtre =
-      ` (${layerPlan.reason.type})` +
-      (layerPlan.reason.type === "polymorphic"
-        ? `\n${layerPlan.reason.typeNames}`
-        : ``);
-    if (!skipBuckets) {
-      graph.push(
-        `    Bucket${layerPlan.id}(${mermaidEscape(
-          `Bucket ${layerPlan.id}${raisonDEtre}${
-            layerPlan.parentSideEffectStepId != null
-              ? `\nParent side effect step: ${
-                  stepById[layerPlan.parentSideEffectStepId].id
-                }`
-              : ""
-          }${
-            layerPlan.copyStepIds.length > 0
-              ? `\nDeps: ${layerPlan.copyStepIds
-                  .map((pId) => stepById[pId]!.id)
-                  .join(", ")}`
-              : ""
-          }${
-            layerPlan.reason.type === "polymorphic"
-              ? "\n" + pp(layerPlan.reason.polymorphicPaths)
-              : ""
-          }\n${
-            layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
-              ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
-              : ""
-          }${startSteps(layerPlan)}`,
-        )}):::bucket`,
-      );
-    }
-    graph.push(
-      `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
-    );
-    graph.push(
-      `    class ${[
-        `Bucket${layerPlan.id}`,
-        ...steps.filter((s) => !shouldHideStep(s)).map(planId),
-      ].join(",")} bucket${layerPlan.id}`,
-    );
-  }
-  if (!skipBuckets) {
-    for (let i = 0, l = layerPlans.length; i < l; i++) {
-      const layerPlan = layerPlans[i];
-      const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
-      if (childNodes.length > 0) {
-        graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
+    if (layerPlan.reason.type === "combined") {
+      for (const { targetStepId, sources } of layerPlan.reason.combinations) {
+        const targetStep = stepById[targetStepId];
+        const nodule = `Nodule_${targetStepId}`;
+        graph.push(
+          `    ${nodule}:::plan@{shape: dbl-circ} -.-> ${planId(targetStep)}`,
+        );
+        graph.push(`    class ${nodule} bucket${layerPlan.id}`);
+        for (const { stepId } of sources) {
+          const step = stepById[stepId];
+          graph.push(`    ${planId(step)} -.-> ${nodule}`);
+        }
       }
     }
   }
-  if (!concise && !skipBuckets) graph.push("    end");
 
   const graphString = graph.join("\n");
   return graphString;

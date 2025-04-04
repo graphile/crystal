@@ -4018,8 +4018,9 @@ export class OperationPlan {
       };
     }
     function printBucketReason(
-      reason: LayerPlanReason,
+      layerPlan: LayerPlan,
     ): GrafastPlanBucketReasonJSONv1 {
+      const { reason } = layerPlan;
       switch (reason.type) {
         case "root": {
           const { type } = reason;
@@ -4063,6 +4064,13 @@ export class OperationPlan {
           return {
             type,
             parentLayerPlanIds: [...parentLayerPlans].map((l) => l.id),
+            combinations: layerPlan.combinations.map((c) => ({
+              sources: c.sources.map((f) => ({
+                layerPlanId: f.layerPlanId,
+                stepId: f.stepId,
+              })),
+              targetStepId: c.targetStepId,
+            })),
           };
         }
         default: {
@@ -4077,7 +4085,7 @@ export class OperationPlan {
       lp.reason;
       return {
         id: lp.id,
-        reason: printBucketReason(lp.reason),
+        reason: printBucketReason(lp),
         parentSideEffectStepId: lp.parentSideEffectStep?.id ?? null,
         copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
