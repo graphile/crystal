@@ -170,7 +170,7 @@ function makeFieldsHook(isInterface: boolean) {
     const {
       getTypeByName,
       graphql: { GraphQLList, GraphQLNonNull },
-      grafast: { lambda },
+      grafast: { lambda, ConstantStep },
       inflection,
     } = build;
     const {
@@ -207,7 +207,7 @@ function makeFieldsHook(isInterface: boolean) {
               : {
                   applyPlan: isPgFieldConnection
                     ? EXPORTABLE(
-                        (lambda, limitToTypes) =>
+                        (ConstantStep, lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $connection: ConnectionStep<
@@ -220,21 +220,35 @@ function makeFieldsHook(isInterface: boolean) {
                           ) => {
                             const $union = $connection.getSubplan();
                             const $ltt = fieldArgs.getRaw();
-                            $union.apply(lambda($ltt, limitToTypes));
+                            if (
+                              $ltt instanceof ConstantStep &&
+                              $ltt.data == null
+                            ) {
+                              // No action
+                            } else {
+                              $union.apply(lambda($ltt, limitToTypes));
+                            }
                           },
-                        [lambda, limitToTypes],
+                        [ConstantStep, lambda, limitToTypes],
                       )
                     : EXPORTABLE(
-                        (lambda, limitToTypes) =>
+                        (ConstantStep, lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $union: PgUnionAllStep,
                             fieldArgs: FieldArgs,
                           ) => {
                             const $ltt = fieldArgs.getRaw();
-                            $union.apply(lambda($ltt, limitToTypes));
+                            if (
+                              $ltt instanceof ConstantStep &&
+                              $ltt.data == null
+                            ) {
+                              // No action
+                            } else {
+                              $union.apply(lambda($ltt, limitToTypes));
+                            }
                           },
-                        [lambda, limitToTypes],
+                        [ConstantStep, lambda, limitToTypes],
                       ),
                 }),
           },
