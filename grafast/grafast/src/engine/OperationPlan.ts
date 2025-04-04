@@ -1633,6 +1633,11 @@ export class OperationPlan {
             objectType.extensions.grafast,
             $combined,
           );
+
+          // Update the outputPlans to link to this new combined layer plan
+          for (const { outputPlan } of selectionSetsAtSamePathForSameType) {
+            outputPlan.layerPlan = combinedLayerPlan;
+          }
         }
 
         for (const t of selectionSetsAtSamePathForSameType) {
