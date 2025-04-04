@@ -530,7 +530,25 @@ let currentTypeDetails: TypeDetails | null = null;
 function generateSpecFromDetails(details: TypeDetails) {
   currentTypeDetails = details;
   try {
-    return details.specGenerator();
+    const spec = details.specGenerator();
+    if (details.klass === GraphQLObjectType) {
+      // Merge in the Grafast stuff
+      const s = spec as GraphileBuild.GrafastObjectTypeConfig;
+      const { assertStep, pack, unpack } = s;
+      if (assertStep || pack || unpack) {
+        if (!s.extensions) {
+          s.extensions = Object.create(null);
+        }
+        if (!s.extensions!.grafast) {
+          (s.extensions as any).grafast = Object.create(null);
+        }
+        const o = s.extensions!.grafast!;
+        if (assertStep) o.assertStep = assertStep;
+        if (pack) o.pack = pack;
+        if (unpack) o.unpack = unpack;
+      }
+    }
+    return spec;
   } finally {
     currentTypeDetails = null;
   }

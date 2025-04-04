@@ -663,7 +663,9 @@ export function pgSelectSingleFromRecord<
   TResource extends PgResource<any, any, any, any>,
 >(
   resource: TResource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+  $record:
+    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | Step,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(

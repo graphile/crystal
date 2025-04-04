@@ -8,6 +8,7 @@ import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
+  LayerPlanReasonCombined,
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
 } from "./LayerPlan.js";
@@ -55,6 +56,11 @@ export class StepTracker {
   public layerPlansByParentStep = new Map<
     Step,
     Set<LayerPlan<LayerPlanReasonsWithParentStep>>
+  >();
+  /** @internal */
+  public layerPlansByDependentStep = new Map<
+    Step,
+    Set<LayerPlan<LayerPlanReasonCombined>>
   >();
 
   /** @internal */
@@ -246,6 +252,16 @@ export class StepTracker {
         this.layerPlansByParentStep
           .get($parent)!
           .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+      }
+    }
+    if (layerPlan.reason.type === "combined") {
+      for (const combo of layerPlan.combinations) {
+        for (const source of combo.sources) {
+          const step = this.getStepById(source.stepId);
+          this.layerPlansByDependentStep
+            .get(step)!
+            .delete(layerPlan as LayerPlan<LayerPlanReasonCombined>);
+        }
       }
     }
     // Remove all plans in this layer
@@ -534,6 +550,33 @@ export class StepTracker {
       }
     }
 
+    // Update combos
+    {
+      const layerPlans = this.layerPlansByDependentStep.get($original);
+      if (layerPlans?.size) {
+        let layerPlansByReplacementDependentStep =
+          this.layerPlansByDependentStep.get($replacement);
+        if (!layerPlansByReplacementDependentStep) {
+          layerPlansByReplacementDependentStep = new Set();
+          this.layerPlansByDependentStep.set(
+            $replacement,
+            layerPlansByReplacementDependentStep,
+          );
+        }
+        for (const layerPlan of layerPlans) {
+          for (const combo of layerPlan.combinations) {
+            for (const source of combo.sources) {
+              if (source.stepId === $original.id) {
+                source.stepId = $replacement.id;
+              }
+            }
+          }
+          layerPlansByReplacementDependentStep.add(layerPlan);
+        }
+        layerPlans.clear();
+      }
+    }
+
     // NOTE: had to add the code ensuring all the layer plan parentStepId's
     // existed to fix polymorphism, but it feels wrong. Should we be doing
     // something different?
@@ -592,6 +635,8 @@ export class StepTracker {
     if (s2 && s2.size !== 0) return false;
     const s3 = this.layerPlansByParentStep.get($step);
     if (s3 && s3.size !== 0) return false;
+    const s4 = this.layerPlansByDependentStep.get($step);
+    if (s4 && s4.size !== 0) return false;
     return true;
   }
 

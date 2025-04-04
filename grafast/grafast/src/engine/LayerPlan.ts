@@ -817,7 +817,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         if (ev == null) {
           continue;
         } else if (ev.isBatch) {
-          throw new Error(`Don't know how to handle batch steps in ${this}`);
+          throw new Error(
+            `GrafastInternalError<e9ebc6b4-708c-4983-8a8f-a6bd41ae3513>: Don't know how to handle batch steps in ${this}`,
+          );
         } else {
           store.set(stepId, ev);
         }
@@ -857,8 +859,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         if (parentBucket != null) {
           const sourceStore = parentBucket.store.get(stepId);
           if (!sourceStore) {
+            const step = this.operationPlan.stepTracker.getStepById(stepId);
             throw new Error(
-              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for step ${stepId} in ${this}`,
+              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} in ${this}`,
             );
           }
           for (
@@ -925,7 +928,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
   }
 
-  private combinations: Array<{
+  /** @internal */
+  public combinations: Array<{
     sources: readonly {
       layerPlanId: LayerPlan["id"];
       stepId: Step["id"];
@@ -942,6 +946,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         stepId: s.id,
       })),
       targetStepId: $target.id,
+    });
+    const { layerPlansByDependentStep } = this.operationPlan.stepTracker;
+    sourceSteps.forEach(($step) => {
+      let set = layerPlansByDependentStep.get($step);
+      if (!set) {
+        set = new Set();
+        layerPlansByDependentStep.set($step, set);
+      }
+      set.add(this as LayerPlan<LayerPlanReasonCombined>);
     });
   }
 }
