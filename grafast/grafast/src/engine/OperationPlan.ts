@@ -3070,21 +3070,25 @@ export class OperationPlan {
       }
     }
 
-    const layerPlansByRoot = this.stepTracker.layerPlansByRootStep.get(step);
-    if (layerPlansByRoot !== undefined) {
-      for (const layerPlan of layerPlansByRoot) {
-        if (layerPlan === step.layerPlan) {
-          return step;
-        } else {
-          dependentLayerPlans.add(layerPlan);
-        }
-      }
-    }
-
     const layerPlansByDependent =
       this.stepTracker.layerPlansByDependentStep.get(step);
     if (layerPlansByDependent !== undefined) {
       for (const layerPlan of layerPlansByDependent) {
+        for (const parentLayerPlan of layerPlan.reason.parentLayerPlans) {
+          if (parentLayerPlan === step.layerPlan) {
+            return step;
+          } else if (
+            layerPlanHeirarchyContains(parentLayerPlan, step.layerPlan)
+          ) {
+            dependentLayerPlans.add(parentLayerPlan);
+          }
+        }
+      }
+    }
+
+    const layerPlansByRoot = this.stepTracker.layerPlansByRootStep.get(step);
+    if (layerPlansByRoot !== undefined) {
+      for (const layerPlan of layerPlansByRoot) {
         if (layerPlan === step.layerPlan) {
           return step;
         } else {
