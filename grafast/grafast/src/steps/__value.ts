@@ -1,4 +1,4 @@
-import type { GrafastResultsList } from "../index.js";
+import type { GrafastResultsList, JSONValue } from "../interfaces.js";
 import { $$noExec, Step } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
@@ -19,6 +19,12 @@ export class __ValueStep<TData> extends Step<TData> {
   constructor(isImmutable: boolean) {
     super();
     this._isImmutable = isImmutable;
+  }
+
+  public planJSONExtra(): undefined | Record<string, JSONValue> {
+    if (this.layerPlan.reason.type === "combined") {
+      return { combined: true };
+    }
   }
 
   toStringMeta(): string | null {
