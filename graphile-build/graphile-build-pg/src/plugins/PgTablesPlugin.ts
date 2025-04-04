@@ -4,8 +4,14 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
+import {
+  assertPgClassSingleStep,
+  makePgResourceOptions,
+  pgSelectSingleFromRecord,
+} from "@dataplan/pg";
+import type { Step } from "grafast";
 import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
@@ -679,6 +685,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
+              const resource = Object.values(
+                build.input.pgRegistry.pgResources,
+              ).find((r) => !r.parameters && r.codec === codec);
               build.registerObjectType(
                 tableTypeName,
                 {
@@ -688,6 +697,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
+                  pack(step: Step | PgSelectSingleStep) {
+                    if ("record" in step && typeof step.record === "function") {
+                      return step.record();
+                    } else {
+                      return step;
+                    }
+                  },
+                  unpack: resource
+                    ? function (step) {
+                        return pgSelectSingleFromRecord(
+                          resource,
+                          step,
+                        ) as PgSelectSingleStep<any>;
+                      }
+                    : undefined,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

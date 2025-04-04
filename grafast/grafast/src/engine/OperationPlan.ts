@@ -93,6 +93,7 @@ import {
 import type {
   LayerPlanPhase,
   LayerPlanReason,
+  LayerPlanReasonCombined,
   LayerPlanReasonListItemStream,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
@@ -3080,6 +3081,18 @@ export class OperationPlan {
       }
     }
 
+    const layerPlansByDependent =
+      this.stepTracker.layerPlansByDependentStep.get(step);
+    if (layerPlansByDependent !== undefined) {
+      for (const layerPlan of layerPlansByDependent) {
+        if (layerPlan === step.layerPlan) {
+          return step;
+        } else {
+          dependentLayerPlans.add(layerPlan);
+        }
+      }
+    }
+
     if (dependentLayerPlans.size === 0) {
       throw new Error(`Nothing depends on ${step}?!`);
     }
@@ -3090,21 +3103,16 @@ export class OperationPlan {
       );
     }
 
-    const paths: LayerPlan[][] = [];
+    const paths: Array<readonly LayerPlan[]> = [];
     let minPathLength = Infinity;
 
     for (const dependentLayerPlan of dependentLayerPlans) {
-      let lp = dependentLayerPlan;
-      const path: LayerPlan[] = [lp];
-      while (lp.parentLayerPlan != step.layerPlan) {
-        const parent = lp.parentLayerPlan;
-        if (!parent) {
-          throw new Error(
-            `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy`,
-          );
-        }
-        lp = parent;
-        path.push(lp);
+      const lp = dependentLayerPlan;
+      const path = pathFromLayerPlanToStep(lp, step);
+      if (!path) {
+        throw new Error(
+          `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy; step ${step} cannot be found from ${dependentLayerPlan}`,
+        );
       }
       paths.push(path);
       minPathLength = Math.min(path.length, minPathLength);
@@ -3581,7 +3589,19 @@ export class OperationPlan {
           targetStep._isUnaryLocked = true;
         }
         currentLayerPlan.copyStepIds.push(dep.id);
-        currentLayerPlan = currentLayerPlan.parentLayerPlan;
+        if (currentLayerPlan.reason.type === "combined") {
+          const prev = currentLayerPlan as LayerPlan<LayerPlanReasonCombined>;
+          currentLayerPlan = null;
+          // Figure out which of our parent layer plans contains the step
+          for (const parentLayerPlan of prev.reason.parentLayerPlans) {
+            if (layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)) {
+              currentLayerPlan = parentLayerPlan;
+              break;
+            }
+          }
+        } else {
+          currentLayerPlan = currentLayerPlan.parentLayerPlan;
+        }
         if (!currentLayerPlan) {
           throw new Error(
             `GrafastInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan}`,
@@ -4349,3 +4369,49 @@ type StreamDetails = {
   initialCount: Step<number>;
   label: Step<Maybe<string>>;
 };
+
+function pathFromLayerPlanToStep(
+  lp: LayerPlan,
+  step: Step,
+): readonly LayerPlan[] | null {
+  const path: LayerPlan[] = [lp];
+  while (lp.parentLayerPlan != step.layerPlan) {
+    let parent: Maybe<LayerPlan>;
+    if (lp.reason.type === "combined") {
+      // need to check each of the parents
+      for (const plp of lp.reason.parentLayerPlans) {
+        if (step.layerPlan === plp) {
+          // This is an alternative to the `while` condition
+          return path;
+        } else {
+          if (layerPlanHeirarchyContains(plp, step.layerPlan)) {
+            parent = plp;
+            break;
+          }
+        }
+      }
+    } else {
+      parent = lp.parentLayerPlan;
+    }
+    if (parent == null) return null;
+    lp = parent;
+    path.push(lp);
+  }
+  return path;
+}
+function layerPlanHeirarchyContains(
+  lp: LayerPlan,
+  targetLp: LayerPlan,
+): boolean {
+  if (lp === targetLp) return true;
+  if (lp.reason.type === "combined") {
+    return lp.reason.parentLayerPlans.some((plp) =>
+      layerPlanHeirarchyContains(plp, targetLp),
+    );
+  } else if (lp.parentLayerPlan) {
+    // PERF: loop would be faster than recursion
+    return layerPlanHeirarchyContains(lp.parentLayerPlan, targetLp);
+  } else {
+    return false;
+  }
+}

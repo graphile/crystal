@@ -217,8 +217,10 @@ declare global {
     };
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
-    interface GrafastObjectTypeConfig<TParentStep extends Step = Step>
-      extends Omit<
+    interface GrafastObjectTypeConfig<
+      TParentStep extends Step = Step,
+      TPacked = any,
+    > extends Omit<
         GraphQLObjectTypeConfig<unknown, Grafast.Context>,
         "fields" | "interfaces"
       > {
@@ -235,6 +237,8 @@ declare global {
             | ((step: Step) => asserts step is TParentStep)
             | { new (...args: any[]): TParentStep }
         : null;
+      pack?: (step: TParentStep | Step) => Step<TPacked>;
+      unpack?: (step: Step<TPacked>) => TParentStep;
     }
 
     /** Our take on GraphQLInputObjectTypeConfig that allows for plans */
