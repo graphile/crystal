@@ -1183,6 +1183,9 @@ export class PgSelectStep<
         let done = false;
         const l = initialFetchResult[idx].length;
         const mergedGenerator: AsyncGenerator<PromiseOrDirect<unknown[]>> = {
+          async [Symbol.asyncDispose]() {
+            await this.return(undefined);
+          },
           next() {
             if (done) {
               return Promise.resolve({ value: undefined, done });
