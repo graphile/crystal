@@ -88,6 +88,13 @@ export interface GrafastPlanBucketReasonSubroutineJSONv1 {
 export interface GrafastPlanBucketReasonCombinedJSONv1 {
   type: "combined";
   parentLayerPlanIds: ReadonlyArray<string | number>;
+  combinations: ReadonlyArray<{
+    sources: readonly {
+      layerPlanId: string | number;
+      stepId: string | number;
+    }[];
+    targetStepId: number;
+  }>;
 }
 
 export interface GrafastPlanBucketJSONv1 {
