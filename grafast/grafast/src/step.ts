@@ -487,7 +487,7 @@ export /* abstract */ class Step<TData = any> {
         : stepOrOptions;
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
@@ -506,7 +506,7 @@ export /* abstract */ class Step<TData = any> {
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add a unary dependency on ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);

@@ -1224,7 +1224,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
         );
         if (!c) {
           throw new Error(
-            "GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket",
+            `GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket. childOutputPlan=${childOutputPlan}, couldOutputPlan.layerPlan=${childOutputPlan.layerPlan}, bucket=${bucket}`,
           );
         }
         const [childBucket, childBucketIndex] = c;
