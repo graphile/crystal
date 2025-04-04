@@ -3117,7 +3117,7 @@ export class OperationPlan {
 
     for (const dependentLayerPlan of dependentLayerPlans) {
       const lp = dependentLayerPlan;
-      const childPaths = pathsFromLayerPlanToStep(lp, step);
+      const childPaths = pathsFromLayerPlanToAncestor(lp, step.layerPlan);
       if (childPaths.length === 0) {
         throw new Error(
           `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy; step ${step} cannot be found from ${dependentLayerPlan}`,
@@ -4381,23 +4381,26 @@ type StreamDetails = {
   label: Step<Maybe<string>>;
 };
 
-function pathsFromLayerPlanToStep(
+function pathsFromLayerPlanToAncestor(
   lp: LayerPlan,
-  step: Step,
+  ancestor: LayerPlan,
 ): readonly LayerPlan[][] {
-  if (lp === step.layerPlan) return [[]];
+  if (lp === ancestor) {
+    // One path, and it's the null path - stay where you are.
+    return [[]];
+  }
+
   if (lp.reason.type === "combined") {
     const paths = lp.reason.parentLayerPlans.flatMap((plp) =>
-      pathsFromLayerPlanToStep(plp, step),
+      pathsFromLayerPlanToAncestor(plp, ancestor),
     );
     return paths.map((p) => [lp, ...p]);
   } else if (lp.parentLayerPlan) {
-    return pathsFromLayerPlanToStep(lp.parentLayerPlan, step).map((p) => [
-      lp,
-      ...p,
-    ]);
+    return pathsFromLayerPlanToAncestor(lp.parentLayerPlan, ancestor).map(
+      (p) => [lp, ...p],
+    );
   } else {
-    // No paths found
+    // No paths found - lp doesn't inherit from ancestor.
     return [];
   }
 }
