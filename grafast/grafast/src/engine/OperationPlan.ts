@@ -4381,7 +4381,7 @@ type StreamDetails = {
   label: Step<Maybe<string>>;
 };
 
-function pathsFromAncestorToTargetLayerPlan(
+export function pathsFromAncestorToTargetLayerPlan(
   ancestor: LayerPlan,
   lp: LayerPlan,
 ): readonly LayerPlan[][] {
@@ -4392,7 +4392,7 @@ function pathsFromAncestorToTargetLayerPlan(
 
   if (lp.reason.type === "combined") {
     const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
-      pathsFromAncestorToTargetLayerPlan(plp, ancestor),
+      pathsFromAncestorToTargetLayerPlan(ancestor, plp),
     );
     for (const path of childPaths) {
       path.push(lp);
@@ -4400,8 +4400,8 @@ function pathsFromAncestorToTargetLayerPlan(
     return childPaths;
   } else if (lp.parentLayerPlan) {
     const childPaths = pathsFromAncestorToTargetLayerPlan(
-      lp.parentLayerPlan,
       ancestor,
+      lp.parentLayerPlan,
     );
     for (const path of childPaths) {
       path.push(lp);
