@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -24,6 +23,7 @@ graph TD
     PgSelectInlineApply77["PgSelectInlineApply[77∈0] ➊"]:::plan
     PgSelectInlineApply77 --> PgSelectInlineApply81
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant31{{"Constant[31∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     Constant53{{"Constant[53∈0] ➊<br />ᐸ'person_secrets'ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
@@ -126,10 +126,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/one-to-one-backward"
-    Bucket0("Bucket 0 (root)<br /><br />1: 69, 77<br />ᐳ: 6, 9, 10, 31, 53, 11, 12<br />2: 73, 81"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 69, 77<br />ᐳ: 9, 10, 12, 31, 53, 11<br />2: 73, 81"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant31,Constant53,PgSelectInlineApply69,PgSelectInlineApply73,PgSelectInlineApply77,PgSelectInlineApply81 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 73, 81, 31, 53<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[18], Access[74], Access[82]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 73, 81, 31, 53<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[18], Access[74], Access[82]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access18,Access74,Access82 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 74, 82, 31, 53<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket

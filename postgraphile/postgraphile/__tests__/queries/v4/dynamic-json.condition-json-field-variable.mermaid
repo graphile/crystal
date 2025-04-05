@@ -9,9 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection16{{"Connection[16∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Connection30{{"Connection[30∈0] ➊<br />ᐸ28ᐳ"}}:::plan
-    Connection45{{"Connection[45∈0] ➊<br />ᐸ43ᐳ"}}:::plan
     __InputObject7{{"__InputObject[7∈0] ➊"}}:::plan
     __InputDynamicScalar8{{"__InputDynamicScalar[8∈0] ➊"}}:::plan
     __InputDynamicScalar8 --> __InputObject7
@@ -40,6 +37,9 @@ graph TD
     ApplyInput46{{"ApplyInput[46∈0] ➊"}}:::plan
     __InputObject39 --> ApplyInput46
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection16{{"Connection[16∈0] ➊<br />ᐸ12ᐳ"}}:::plan
+    Connection30{{"Connection[30∈0] ➊<br />ᐸ28ᐳ"}}:::plan
+    Connection45{{"Connection[45∈0] ➊<br />ᐸ43ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmy_tableᐳ"]]:::plan
     Object15 & ApplyInput17 & Connection16 --> PgSelect19
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
@@ -83,7 +83,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value2,__Value4,__InputObject7,__InputDynamicScalar8,Access9,Access13,Access14,Object15,Connection16,ApplyInput17,__InputObject25,__InputDynamicScalar26,Connection30,ApplyInput31,__InputObject39,Access40,Connection45,ApplyInput46 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15, 17, 16, 6<br /><br />ROOT Connectionᐸ12ᐳ[16]<br />1: PgSelect[19]<br />2: PgSelectRows[20]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15, 17, 16<br /><br />ROOT Connectionᐸ12ᐳ[16]<br />1: PgSelect[19]<br />2: PgSelectRows[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,PgSelectRows20 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
@@ -92,7 +92,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸmy_tableᐳ[22]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression24 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 15, 31, 30, 6<br /><br />ROOT Connectionᐸ28ᐳ[30]<br />1: PgSelect[33]<br />2: PgSelectRows[34]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 15, 31, 30<br /><br />ROOT Connectionᐸ28ᐳ[30]<br />1: PgSelect[33]<br />2: PgSelectRows[34]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect33,PgSelectRows34 bucket4
     Bucket5("Bucket 5 (listItem)<br /><br />ROOT __Item{5}ᐸ34ᐳ[35]"):::bucket
@@ -101,7 +101,7 @@ graph TD
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{5}ᐸmy_tableᐳ[36]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression37,PgClassExpression38 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 15, 46, 45, 6<br /><br />ROOT Connectionᐸ43ᐳ[45]<br />1: PgSelect[48]<br />2: PgSelectRows[49]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 15, 46, 45<br /><br />ROOT Connectionᐸ43ᐳ[45]<br />1: PgSelect[48]<br />2: PgSelectRows[49]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgSelect48,PgSelectRows49 bucket7
     Bucket8("Bucket 8 (listItem)<br /><br />ROOT __Item{8}ᐸ49ᐳ[50]"):::bucket

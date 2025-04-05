@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection13{{"Connection[13∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -19,6 +18,7 @@ graph TD
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant12{{"Constant[12∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgUnionAll14[["PgUnionAll[14∈1] ➊"]]:::plan
     Object11 & Constant12 & Connection13 --> PgUnionAll14
     Access18{{"Access[18∈1] ➊<br />ᐸ14.cursorDetailsᐳ"}}:::plan
@@ -76,7 +76,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant12,Connection13 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 13, 6<br /><br />ROOT Connectionᐸ8ᐳ[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 13<br /><br />ROOT Connectionᐸ8ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll14,Access18,Access45 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 11<br /><br />ROOT __Item{2}ᐸ45ᐳ[16]"):::bucket

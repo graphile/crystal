@@ -15,9 +15,6 @@ graph TD
     ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
     PgSelectInlineApply42["PgSelectInlineApply[42∈0] ➊"]:::plan
     Object16 & Lambda18 & ApplyInput19 & PgSelectInlineApply42 --> PgSelect13
-    ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
-    Lambda36{{"Lambda[36∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    ApplyInput32 & Lambda36 --> PgSelectInlineApply42
     __InputObject10{{"__InputObject[10∈0] ➊"}}:::plan
     __InputObject11{{"__InputObject[11∈0] ➊"}}:::plan
     __InputObject11 --> __InputObject10
@@ -30,6 +27,9 @@ graph TD
     __InputObject25{{"__InputObject[25∈0] ➊"}}:::plan
     __InputObject25 --> __InputObject24
     Constant48 --> __InputObject25
+    ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
+    Lambda36{{"Lambda[36∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    ApplyInput32 & Lambda36 --> PgSelectInlineApply42
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
     __InputObject9 --> __InputObject8
