@@ -1,7 +1,6 @@
 import "./interfaces.js";
 import "graphile-config";
 
-import * as dataplanJson from "@dataplan/json";
 import * as grafast from "grafast";
 import * as graphql from "grafast/graphql";
 
@@ -38,7 +37,6 @@ import { version } from "./version.js";
 declare global {
   namespace GraphileConfig {
     interface Lib {
-      dataplanJson: typeof dataplanJson;
       graphql: typeof graphql;
       grafast: typeof grafast;
       graphileBuild: {
@@ -53,12 +51,10 @@ declare global {
 export const GraphileBuildLibPreset: GraphileConfig.Preset = {
   lib: {
     versions: {
-      "@dataplan/json": dataplanJson.version,
       grafast: grafast.version,
       graphql: graphql.version,
       "graphile-build": version,
     },
-    dataplanJson,
     graphql,
     grafast,
     graphileBuild: {

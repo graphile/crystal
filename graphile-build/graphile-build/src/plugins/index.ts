@@ -7,7 +7,6 @@ import { CommonBehaviorsPlugin } from "./CommonBehaviorsPlugin.js";
 import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
 import { ConnectionPlugin } from "./ConnectionPlugin.js";
 import { CursorTypePlugin } from "./CursorTypePlugin.js";
-import { DataplanJsonPlugin } from "./DataplanJsonPlugin.js";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.js";
 import { MutationPlugin } from "./MutationPlugin.js";
 import { NodeAccessorPlugin } from "./NodeAccessorPlugin.js";
@@ -33,7 +32,6 @@ export {
   CommonTypesPlugin,
   ConnectionPlugin,
   CursorTypePlugin,
-  DataplanJsonPlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
   NodeAccessorPlugin,
