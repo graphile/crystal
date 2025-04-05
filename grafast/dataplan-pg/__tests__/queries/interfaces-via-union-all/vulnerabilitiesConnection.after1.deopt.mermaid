@@ -9,14 +9,14 @@ graph TD
 
 
     %% plan dependencies
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant49 & Lambda16 --> Connection15
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ10ᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Constant49 & Lambda16 --> Connection15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
@@ -81,7 +81,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Constant14,Connection15,Lambda16,Constant49,Constant50 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 16, 49, 6<br /><br />ROOT Connectionᐸ10ᐳ[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 16, 49<br /><br />ROOT Connectionᐸ10ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll17,Access21,Access48 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 21, 13<br /><br />ROOT __Item{2}ᐸ48ᐳ[19]"):::bucket

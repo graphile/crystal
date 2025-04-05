@@ -9,46 +9,40 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect48[["PgSelect[48∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    ApplyInput50{{"ApplyInput[50∈0] ➊"}}:::plan
-    Object10 & ApplyInput50 --> PgSelect48
     PgSelect59[["PgSelect[59∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant117{{"Constant[117∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     ApplyInput61{{"ApplyInput[61∈0] ➊"}}:::plan
     Object10 & Constant117 & ApplyInput61 --> PgSelect59
-    PgSelect98[["PgSelect[98∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    ApplyInput100{{"ApplyInput[100∈0] ➊"}}:::plan
-    Object10 & ApplyInput100 --> PgSelect98
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 --> PgSelect7
-    PgSelect18[["PgSelect[18∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 & Constant117 --> PgSelect18
-    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 --> PgSelect27
-    PgSelect37[["PgSelect[37∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 --> PgSelect37
     PgSelect69[["PgSelect[69∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Constant118{{"Constant[118∈0] ➊<br />ᐸ3ᐳ"}}:::plan
     Constant119{{"Constant[119∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Object10 & Constant118 & Constant119 --> PgSelect69
-    PgSelect78[["PgSelect[78∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Constant120{{"Constant[120∈0] ➊<br />ᐸ0ᐳ"}}:::plan
-    Object10 & Constant120 --> PgSelect78
-    PgSelect87[["PgSelect[87∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 --> PgSelect87
-    PgSelect109[["PgSelect[109∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object10 & Constant118 --> PgSelect109
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    PgSelect18[["PgSelect[18∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10 & Constant117 --> PgSelect18
     __InputObject46{{"__InputObject[46∈0] ➊"}}:::plan
     Constant117 --> __InputObject46
+    PgSelect48[["PgSelect[48∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    ApplyInput50{{"ApplyInput[50∈0] ➊"}}:::plan
+    Object10 & ApplyInput50 --> PgSelect48
     __InputObject57{{"__InputObject[57∈0] ➊"}}:::plan
     Constant117 --> __InputObject57
+    PgSelect78[["PgSelect[78∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Constant120{{"Constant[120∈0] ➊<br />ᐸ0ᐳ"}}:::plan
+    Object10 & Constant120 --> PgSelect78
     __InputObject96{{"__InputObject[96∈0] ➊"}}:::plan
     Constant97{{"Constant[97∈0] ➊<br />ᐸnullᐳ"}}:::plan
     Constant97 --> __InputObject96
+    PgSelect98[["PgSelect[98∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    ApplyInput100{{"ApplyInput[100∈0] ➊"}}:::plan
+    Object10 & ApplyInput100 --> PgSelect98
+    PgSelect109[["PgSelect[109∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Object10 & Constant118 --> PgSelect109
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10 --> PgSelect7
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -56,8 +50,12 @@ graph TD
     PgSelect7 --> PgSelectRows11
     PgSelectRows20[["PgSelectRows[20∈0] ➊"]]:::plan
     PgSelect18 --> PgSelectRows20
+    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10 --> PgSelect27
     PgSelectRows30[["PgSelectRows[30∈0] ➊"]]:::plan
     PgSelect27 --> PgSelectRows30
+    PgSelect37[["PgSelect[37∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10 --> PgSelect37
     PgSelectRows40[["PgSelectRows[40∈0] ➊"]]:::plan
     PgSelect37 --> PgSelectRows40
     __InputObject46 --> ApplyInput50
@@ -70,6 +68,8 @@ graph TD
     PgSelect69 --> PgSelectRows71
     PgSelectRows80[["PgSelectRows[80∈0] ➊"]]:::plan
     PgSelect78 --> PgSelectRows80
+    PgSelect87[["PgSelect[87∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10 --> PgSelect87
     PgSelectRows90[["PgSelectRows[90∈0] ➊"]]:::plan
     PgSelect87 --> PgSelectRows90
     __InputObject96 --> ApplyInput100

@@ -70,13 +70,13 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/conditions/complex-filter-via-partial-variables"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 10, 13, 14, 24, 26, 43, 44, 9, 15, 17, 23, 33, 37, 8, 18<br />2: PgSelect[12]<br />3: PgSelectRows[19]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 13, 14, 24, 26, 43, 44, 9, 15, 17, 23, 33, 37, 8, 18<br />2: PgSelect[12]<br />3: PgSelectRows[19]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value2,__Value4,__InputObject8,__InputObject9,Access10,PgSelect12,Access13,Access14,Object15,Lambda17,ApplyInput18,PgSelectRows19,__InputObject23,Access24,Access26,ApplyInput33,Lambda37,Constant43,Constant44 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 15, 6, 33, 37<br /><br />ROOT __Item{1}ᐸ19ᐳ[20]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />Deps: 15, 33, 37<br /><br />ROOT __Item{1}ᐸ19ᐳ[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item20,PgSelectSingle21 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 15, 6, 33, 37<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]<br />1: <br />ᐳ: 22, 28, 34<br />2: PgSelect[29]<br />3: PgSelectRows[38]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 15, 33, 37<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[21]<br />1: <br />ᐳ: 22, 28, 34<br />2: PgSelect[29]<br />3: PgSelectRows[38]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression22,PgClassExpression28,PgSelect29,PgClassExpression34,PgSelectRows38 bucket2
     Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ38ᐳ[39]"):::bucket

@@ -9,10 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant284{{"Constant[284∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant284 --> Connection13
-    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ"}}:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -20,7 +16,11 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
+    Constant284{{"Constant[284∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant284 --> Connection13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ"}}:::plan
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object12 & Connection13 & Constant284 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
@@ -29,13 +29,13 @@ graph TD
     PgSelectRows16 ==> __Item17
     PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item17 --> PgSelectSingle18
-    PgUnionAll31[["PgUnionAll[31∈3]"]]:::plan
+    PgUnionAll26[["PgUnionAll[26∈3]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Object12 & PgClassExpression19 & Connection25 --> PgUnionAll26
+    PgUnionAll31[["PgUnionAll[31∈3]"]]:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll31
     PgUnionAll56[["PgUnionAll[56∈3]"]]:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll56
-    PgUnionAll26[["PgUnionAll[26∈3]"]]:::plan
-    Object12 & PgClassExpression19 & Connection25 --> PgUnionAll26
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
@@ -91,35 +91,35 @@ graph TD
     __Item58 --> PgUnionAllSingle59
     Access60{{"Access[60∈7]<br />ᐸ59.1ᐳ"}}:::plan
     PgUnionAllSingle59 --> Access60
-    PgUnionAll139[["PgUnionAll[139∈8]<br />ᐳAwsApplication"]]:::plan
-    PgClassExpression71{{"PgClassExpression[71∈8]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    Connection133{{"Connection[133∈8] ➊<br />ᐸ131ᐳ<br />ᐳAwsApplication"}}:::plan
-    Object12 & PgClassExpression71 & Connection133 --> PgUnionAll139
-    PgUnionAll244[["PgUnionAll[244∈8]<br />ᐳGcpApplication"]]:::plan
-    PgClassExpression176{{"PgClassExpression[176∈8]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    Connection238{{"Connection[238∈8] ➊<br />ᐸ236ᐳ<br />ᐳGcpApplication"}}:::plan
-    Object12 & PgClassExpression176 & Connection238 --> PgUnionAll244
-    PgUnionAll101[["PgUnionAll[101∈8]<br />ᐳAwsApplication"]]:::plan
-    Object12 & PgClassExpression71 --> PgUnionAll101
-    PgUnionAll206[["PgUnionAll[206∈8]<br />ᐳGcpApplication"]]:::plan
-    Object12 & PgClassExpression176 --> PgUnionAll206
     PgUnionAll75[["PgUnionAll[75∈8]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression73{{"PgClassExpression[73∈8]<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression74{{"PgClassExpression[74∈8]<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object12 & PgClassExpression73 & PgClassExpression74 --> PgUnionAll75
     PgUnionAll134[["PgUnionAll[134∈8]<br />ᐳAwsApplication"]]:::plan
+    PgClassExpression71{{"PgClassExpression[71∈8]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
+    Connection133{{"Connection[133∈8] ➊<br />ᐸ131ᐳ<br />ᐳAwsApplication"}}:::plan
     Object12 & PgClassExpression71 & Connection133 --> PgUnionAll134
+    PgUnionAll139[["PgUnionAll[139∈8]<br />ᐳAwsApplication"]]:::plan
+    Object12 & PgClassExpression71 & Connection133 --> PgUnionAll139
     PgUnionAll180[["PgUnionAll[180∈8]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression178{{"PgClassExpression[178∈8]<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression179{{"PgClassExpression[179∈8]<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object12 & PgClassExpression178 & PgClassExpression179 --> PgUnionAll180
     PgUnionAll239[["PgUnionAll[239∈8]<br />ᐳGcpApplication"]]:::plan
+    PgClassExpression176{{"PgClassExpression[176∈8]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    Connection238{{"Connection[238∈8] ➊<br />ᐸ236ᐳ<br />ᐳGcpApplication"}}:::plan
     Object12 & PgClassExpression176 & Connection238 --> PgUnionAll239
+    PgUnionAll244[["PgUnionAll[244∈8]<br />ᐳGcpApplication"]]:::plan
+    Object12 & PgClassExpression176 & Connection238 --> PgUnionAll244
     PgSelect63[["PgSelect[63∈8]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access62{{"Access[62∈8]<br />ᐸ61.0ᐳ"}}:::plan
     Object12 & Access62 --> PgSelect63
+    PgUnionAll101[["PgUnionAll[101∈8]<br />ᐳAwsApplication"]]:::plan
+    Object12 & PgClassExpression71 --> PgUnionAll101
     PgSelect170[["PgSelect[170∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & Access62 --> PgSelect170
+    PgUnionAll206[["PgUnionAll[206∈8]<br />ᐳGcpApplication"]]:::plan
+    Object12 & PgClassExpression176 --> PgUnionAll206
     JSONParse61[["JSONParse[61∈8]<br />ᐸ60ᐳ<br />ᐳAwsApplication<br />ᐳGcpApplication"]]:::plan
     Access60 --> JSONParse61
     JSONParse61 --> Access62
@@ -420,13 +420,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection25,Constant284 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 284, 7, 25<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 284, 25<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 25, 7<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 12, 25<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item17,PgSelectSingle18 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25, 7<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: 26, 31, 56<br />ᐳ: 273, 274, 283, 27<br />3: PgUnionAllSingle[29]<br />ᐳ: PgClassExpression[30]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: 26, 31, 56<br />ᐳ: 273, 274, 283, 27<br />3: PgUnionAllSingle[29]<br />ᐳ: PgClassExpression[30]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,First27,PgUnionAllSingle29,PgClassExpression30,PgUnionAll31,PgUnionAll56,Access273,Access274,Access283 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 31, 12<br /><br />ROOT __Item{4}ᐸ274ᐳ[33]"):::bucket
@@ -438,10 +438,10 @@ graph TD
     Bucket6("Bucket 6 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 37, 12, 34<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[38]<br />ᐳ: Access[39]<br />2: PgSelect[40], PgSelect[50]<br />3: PgSelectRows[45], PgSelectRows[53]<br />ᐳ: 44, 46, 47, 52, 54, 55"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,JSONParse38,Access39,PgSelect40,First44,PgSelectRows45,PgSelectSingle46,PgClassExpression47,PgSelect50,First52,PgSelectRows53,PgSelectSingle54,PgClassExpression55 bucket6
-    Bucket7("Bucket 7 (listItem)<br />Deps: 12, 7<br /><br />ROOT __Item{7}ᐸ283ᐳ[58]"):::bucket
+    Bucket7("Bucket 7 (listItem)<br />Deps: 12<br /><br />ROOT __Item{7}ᐸ283ᐳ[58]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,__Item58,PgUnionAllSingle59,Access60 bucket7
-    Bucket8("Bucket 8 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 60, 12, 7, 59<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[61]<br />ᐳ: 133, 238, 62<br />2: PgSelect[63], PgSelect[170]<br />3: PgSelectRows[68], PgSelectRows[173]<br />ᐳ: 67, 69, 70, 71, 72, 73, 74, 172, 174, 175, 176, 177, 178, 179<br />4: 75, 101, 134, 139, 180, 206, 239, 244<br />ᐳ: 275, 276, 277, 278, 279, 280, 281, 282, 77, 135, 182, 240<br />5: 79, 137, 184, 242<br />ᐳ: 80, 138, 185, 243"):::bucket
+    Bucket8("Bucket 8 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 60, 12, 59<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[61]<br />ᐳ: 133, 238, 62<br />2: PgSelect[63], PgSelect[170]<br />3: PgSelectRows[68], PgSelectRows[173]<br />ᐳ: 67, 69, 70, 71, 72, 73, 74, 172, 174, 175, 176, 177, 178, 179<br />4: 75, 101, 134, 139, 180, 206, 239, 244<br />ᐳ: 275, 276, 277, 278, 279, 280, 281, 282, 77, 135, 182, 240<br />5: 79, 137, 184, 242<br />ᐳ: 80, 138, 185, 243"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,JSONParse61,Access62,PgSelect63,First67,PgSelectRows68,PgSelectSingle69,PgClassExpression70,PgClassExpression71,PgClassExpression72,PgClassExpression73,PgClassExpression74,PgUnionAll75,First77,PgUnionAllSingle79,Access80,PgUnionAll101,Connection133,PgUnionAll134,First135,PgUnionAllSingle137,PgClassExpression138,PgUnionAll139,PgSelect170,First172,PgSelectRows173,PgSelectSingle174,PgClassExpression175,PgClassExpression176,PgClassExpression177,PgClassExpression178,PgClassExpression179,PgUnionAll180,First182,PgUnionAllSingle184,Access185,PgUnionAll206,Connection238,PgUnionAll239,First240,PgUnionAllSingle242,PgClassExpression243,PgUnionAll244,Access275,Access276,Access277,Access278,Access279,Access280,Access281,Access282 bucket8
     Bucket9("Bucket 9 (polymorphic)<br />Organization,Person<br />Deps: 80, 12, 79<br />ᐳAwsApplicationᐳOrganization<br />ᐳAwsApplicationᐳPerson<br /><br />1: JSONParse[81]<br />ᐳ: Access[82]<br />2: PgSelect[83], PgSelect[94]<br />3: PgSelectRows[88], PgSelectRows[97]<br />ᐳ: 87, 89, 90, 91, 96, 98, 99, 100"):::bucket

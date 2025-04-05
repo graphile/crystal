@@ -9,9 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant597{{"Constant[597∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant597 --> Connection12
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -19,6 +16,9 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
+    Constant597{{"Constant[597∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant597 --> Connection12
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant27{{"Constant[27∈0] ➊<br />ᐸ'first_party_vulnerabilities'ᐳ"}}:::plan
     Constant49{{"Constant[49∈0] ➊<br />ᐸ'aws_applications'ᐳ"}}:::plan
@@ -40,17 +40,13 @@ graph TD
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     Connection34{{"Connection[34∈3] ➊<br />ᐸ32ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     Object11 & PgClassExpression28 & Connection34 --> PgUnionAll35
+    PgUnionAll237[["PgUnionAll[237∈3]<br />ᐳFirstPartyVulnerability"]]:::plan
+    Connection236{{"Connection[236∈3] ➊<br />ᐸ234ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
+    Object11 & PgClassExpression28 & Connection236 --> PgUnionAll237
     PgUnionAll315[["PgUnionAll[315∈3]<br />ᐳThirdPartyVulnerability"]]:::plan
     PgClassExpression308{{"PgClassExpression[308∈3]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     Connection314{{"Connection[314∈3] ➊<br />ᐸ312ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Object11 & PgClassExpression308 & Connection314 --> PgUnionAll315
-    PgUnionAll134[["PgUnionAll[134∈3]<br />ᐳFirstPartyVulnerability"]]:::plan
-    Object11 & PgClassExpression28 --> PgUnionAll134
-    PgUnionAll414[["PgUnionAll[414∈3]<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object11 & PgClassExpression308 --> PgUnionAll414
-    PgUnionAll237[["PgUnionAll[237∈3]<br />ᐳFirstPartyVulnerability"]]:::plan
-    Connection236{{"Connection[236∈3] ➊<br />ᐸ234ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
-    Object11 & PgClassExpression28 & Connection236 --> PgUnionAll237
     PgUnionAll517[["PgUnionAll[517∈3]<br />ᐳThirdPartyVulnerability"]]:::plan
     Connection516{{"Connection[516∈3] ➊<br />ᐸ514ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Object11 & PgClassExpression308 & Connection516 --> PgUnionAll517
@@ -59,12 +55,16 @@ graph TD
     Object11 & Access19 --> PgSelect20
     List29{{"List[29∈3]<br />ᐸ27,28ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     Constant27 & PgClassExpression28 --> List29
+    PgUnionAll134[["PgUnionAll[134∈3]<br />ᐳFirstPartyVulnerability"]]:::plan
+    Object11 & PgClassExpression28 --> PgUnionAll134
     PgUnionAll268[["PgUnionAll[268∈3]<br />ᐳFirstPartyVulnerability"]]:::plan
     Object11 & PgClassExpression28 --> PgUnionAll268
     PgSelect302[["PgSelect[302∈3]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Object11 & Access19 --> PgSelect302
     List309{{"List[309∈3]<br />ᐸ307,308ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Constant307 & PgClassExpression308 --> List309
+    PgUnionAll414[["PgUnionAll[414∈3]<br />ᐳThirdPartyVulnerability"]]:::plan
+    Object11 & PgClassExpression308 --> PgUnionAll414
     PgUnionAll548[["PgUnionAll[548∈3]<br />ᐳThirdPartyVulnerability"]]:::plan
     Object11 & PgClassExpression308 --> PgUnionAll548
     JSONParse18[["JSONParse[18∈3]<br />ᐸ17ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
@@ -851,13 +851,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant27,Constant49,Constant71,Constant83,Constant95,Constant307,Constant597 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 597, 7, 27, 307, 49, 95, 71, 83<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 597, 27, 307, 49, 95, 71, 83<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll13,Access596 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11, 27, 7, 307, 49, 95, 71, 83<br /><br />ROOT __Item{2}ᐸ596ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11, 27, 307, 49, 95, 71, 83<br /><br />ROOT __Item{2}ᐸ596ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgUnionAllSingle16,Access17 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 17, 11, 27, 7, 307, 16, 49, 95, 71, 83<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[18]<br />ᐳ: 34, 236, 314, 516, 19<br />2: PgSelect[20], PgSelect[302]<br />3: PgSelectRows[25], PgSelectRows[305]<br />ᐳ: 24, 26, 28, 29, 30, 31, 304, 306, 308, 309, 310, 311<br />4: 35, 134, 237, 268, 315, 414, 517, 548<br />ᐳ: 582, 585, 586, 587, 590, 593, 594, 595"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 17, 11, 27, 307, 16, 49, 95, 71, 83<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[18]<br />ᐳ: 34, 236, 314, 516, 19<br />2: PgSelect[20], PgSelect[302]<br />3: PgSelectRows[25], PgSelectRows[305]<br />ᐳ: 24, 26, 28, 29, 30, 31, 304, 306, 308, 309, 310, 311<br />4: 35, 134, 237, 268, 315, 414, 517, 548<br />ᐳ: 582, 585, 586, 587, 590, 593, 594, 595"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,JSONParse18,Access19,PgSelect20,First24,PgSelectRows25,PgSelectSingle26,PgClassExpression28,List29,Lambda30,PgClassExpression31,Connection34,PgUnionAll35,PgUnionAll134,Connection236,PgUnionAll237,PgUnionAll268,PgSelect302,First304,PgSelectRows305,PgSelectSingle306,PgClassExpression308,List309,Lambda310,PgClassExpression311,Connection314,PgUnionAll315,PgUnionAll414,Connection516,PgUnionAll517,PgUnionAll548,Access582,Access585,Access586,Access587,Access590,Access593,Access594,Access595 bucket3
     Bucket4("Bucket 4 (listItem)<br />Deps: 11, 49, 95, 71, 83<br /><br />ROOT __Item{4}ᐸ582ᐳ[37]"):::bucket
