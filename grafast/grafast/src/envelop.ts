@@ -65,7 +65,7 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
       const ctx = opts.args.contextValue as any;
       const explainHeaders = (ctx?.req?.headers ||
         ctx?.request?.headers ||
-        ctx?.connectionParams)?.["x-graphql-explain"];
+        ctx?.normalizedConnectionParams)?.["x-graphql-explain"];
       const explain = processExplain(explainAllowed, explainHeaders);
       opts.setSubscribeFn(async (args) =>
         grafastSubscribe(
