@@ -73,6 +73,13 @@ declare global {
       dataplanPg: typeof import("@dataplan/pg");
 
       /**
+       * A copy of `import * from "@dataplan/json"` so that plugins don't need to
+       * import it directly.
+       */
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      dataplanJson: typeof import("@dataplan/json");
+
+      /**
        * A store of metadata for given codecs. Currently internal as this API
        * may change.
        *
@@ -383,7 +390,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       build(build) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
-          lib: { dataplanPg, sql },
+          lib: { dataplanJson, dataplanPg, sql },
         } = build;
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
@@ -513,10 +520,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               build.versions,
               {
                 "graphile-build-pg": version,
+                "@dataplan/json": dataplanJson.version,
                 "@dataplan/pg": dataplanPg.version,
               },
-              "Adding graphile-build-pg and @dataplan/pg version to build.versions",
+              "Adding graphile-build-pg, @dataplan/json and @dataplan/pg version to build.versions",
             ),
+            dataplanJson,
             dataplanPg,
             pgCodecMetaLookup,
             getGraphQLTypeNameByPgCodec,
