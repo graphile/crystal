@@ -34,7 +34,7 @@ const isDev =
     process.env.GRAPHILE_ENV === "test");
 
 const nodeInspect: CustomInspectFunction = function (
-  this: SQLNode,
+  this: SQLNode | SQLQuery,
   depth,
   options,
 ) {
@@ -50,6 +50,12 @@ const nodeInspect: CustomInspectFunction = function (
     return `sql\`${this.t}\``;
   } else if (this[$$type] === "IDENTIFIER") {
     return `sql.identifier(${JSON.stringify(this.n)})`;
+  } else if (this[$$type] === "QUERY") {
+    if (depth < 0) {
+      return `sql\`...\``;
+    } else {
+      return `sql\`${this.n.map((n) => (n[$$type] === "RAW" ? n.t : "${" + nodeInspect.call(n, depth + 1, options) + "}")).join("")}\``;
+    }
   } else {
     return `sql{${this[$$type]}}`;
   }
@@ -153,6 +159,7 @@ export type SQLNode =
   | SQLPlaceholderNode;
 
 export interface SQLQuery {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "QUERY";
   /** nodes @internal */
   readonly n: ReadonlyArray<SQLNode>;
@@ -338,6 +345,7 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
     }
   }
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "QUERY" as const,
     n: nodes,
     f: flags,
