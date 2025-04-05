@@ -134,6 +134,7 @@ export default function makeNewBuild(
 
     options: builder.options,
     versions: {
+      "@dataplan/json": lib.dataplanJson.version,
       grafast: lib.grafast.version,
       graphql: lib.graphql.version,
       "graphile-build": version,
