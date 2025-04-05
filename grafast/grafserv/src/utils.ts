@@ -202,7 +202,7 @@ function coerceHeaderValue(rawValue: unknown): string | string[] | undefined {
   return undefined;
 }
 
-function asHeaders(
+export function normalizeConnectionParams(
   connectionParams: Record<string, unknown> | undefined,
 ): IncomingHttpHeaders | undefined {
   if (
@@ -218,12 +218,21 @@ function asHeaders(
     const key = rawKey.toLowerCase();
     const value = coerceHeaderValue(rawValue);
     if (value == null) continue;
-    if (key in headers) {
-      const existing = Array.isArray(headers[key])
-        ? headers[key]
-        : [headers[key]];
-      const additional = Array.isArray(value) ? value : [value];
-      headers[key] = [...existing, ...additional];
+    if (headers[key] != null) {
+      const prev = headers[key];
+      if (Array.isArray(prev)) {
+        if (Array.isArray(value)) {
+          headers[key] = [...prev, ...value];
+        } else {
+          headers[key] = [...prev, value];
+        }
+      } else {
+        if (Array.isArray(value)) {
+          headers[key] = [prev, ...value];
+        } else {
+          headers[key] = [prev, value];
+        }
+      }
     } else {
       headers[key] = value;
     }
@@ -239,7 +248,9 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           request: (ctx.extra as Extra).request,
           socket: (ctx.extra as Extra).socket,
           connectionParams: ctx.connectionParams,
-          normalizedConnectionParams: asHeaders(ctx.connectionParams),
+          normalizedConnectionParams: normalizeConnectionParams(
+            ctx.connectionParams,
+          ),
         },
       };
       const { grafastMiddleware } = instance;
