@@ -21,6 +21,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import fastify from "fastify";
 import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import { graphql } from "grafast/graphql";
+import { normalizeConnectionParams } from "grafserv";
 import {
   buildInflection,
   buildSchema,
@@ -306,6 +307,9 @@ pool.on("error", (e) => {
             subscribe,
           } = getEnveloped({
             connectionParams: ctx.connectionParams,
+            normalizedConnectionParams: normalizeConnectionParams(
+              ctx.connectionParams,
+            ),
             socket: ctx.extra.socket,
             request: ctx.extra.request,
           });

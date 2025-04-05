@@ -13033,6 +13033,7 @@ __metadata:
     express-graphql: "npm:^0.12.0"
     fastify: "npm:^4.22.1"
     fastify-static: "npm:^4.7.0"
+    grafserv: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"

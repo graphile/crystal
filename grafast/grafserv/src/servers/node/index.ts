@@ -1,4 +1,5 @@
 import type {
+  IncomingHttpHeaders,
   IncomingMessage,
   Server as HTTPServer,
   ServerResponse,
@@ -41,6 +42,19 @@ declare global {
 
         /** The parameters passed during the connection initialisation. */
         readonly connectionParams: Record<string, unknown> | undefined;
+
+        /**
+         * As `connectionParams`, but with lower case keys to avoid case sensitivity issues. The actual transforms are:
+         *
+         * - Non-string keys are ignored
+         * - Keys are lowercased
+         * - Array values are confirmed to be string[], otherwise they're ignored
+         * - Other values are coerced to string if appropriate, otherwise ignored
+         * - Ignored values are not added to headers
+         * - If duplicate keys are found, the resulting value will be string[]
+         *   by concatenating existing and new values
+         */
+        readonly normalizedConnectionParams: IncomingHttpHeaders | undefined;
       };
     }
   }
