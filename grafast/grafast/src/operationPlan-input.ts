@@ -229,6 +229,13 @@ function processAfter(
 ) {
   const schema = $parent.operationPlan.schema;
   for (const [argName, arg] of Object.entries(args)) {
+    if (arg.defaultValue === undefined) {
+      const $argVal = rootFieldArgs.getRaw(argName);
+      if ($argVal instanceof ConstantStep && $argVal.data === undefined) {
+        // no action necessary
+        continue;
+      }
+    }
     const autoApply =
       applyAfterMode === "plan"
         ? arg.extensions.grafast?.applyPlan
