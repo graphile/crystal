@@ -229,13 +229,6 @@ function processAfter(
 ) {
   const schema = $parent.operationPlan.schema;
   for (const [argName, arg] of Object.entries(args)) {
-    if (arg.defaultValue === undefined) {
-      const $argVal = rootFieldArgs.getRaw(argName);
-      if ($argVal instanceof ConstantStep && $argVal.data === undefined) {
-        // no action necessary
-        continue;
-      }
-    }
     const autoApply =
       applyAfterMode === "plan"
         ? arg.extensions.grafast?.applyPlan
@@ -243,6 +236,13 @@ function processAfter(
           ? arg.extensions.grafast?.applySubscribePlan
           : null;
     if (autoApply) {
+      if (arg.defaultValue === undefined) {
+        const $argVal = rootFieldArgs.getRaw(argName);
+        if ($argVal instanceof ConstantStep && $argVal.data === undefined) {
+          // no action necessary
+          continue;
+        }
+      }
       // TODO: should this have dollars on it for accessing subkeys?
       const input: FieldArg = {
         typeAt(path) {
