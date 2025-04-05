@@ -56,9 +56,8 @@ graph TD
     Access33{{"Access[33∈5]<br />ᐸ32.0ᐳ"}}:::plan
     Object12 & Access33 --> PgSelect34
     PgSelect53[["PgSelect[53∈5]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Access52{{"Access[52∈5]<br />ᐸ51.0ᐳ"}}:::plan
-    Object12 & Access52 --> PgSelect53
-    JSONParse32[["JSONParse[32∈5]<br />ᐸ31ᐳ<br />ᐳAwsApplication"]]:::plan
+    Object12 & Access33 --> PgSelect53
+    JSONParse32[["JSONParse[32∈5]<br />ᐸ31ᐳ<br />ᐳAwsApplication<br />ᐳGcpApplication"]]:::plan
     Access31 --> JSONParse32
     JSONParse32 --> Access33
     First38{{"First[38∈5]"}}:::plan
@@ -75,9 +74,6 @@ graph TD
     First47 --> PgUnionAllSingle49
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸcount(*)ᐳ"}}:::plan
     PgUnionAllSingle49 --> PgClassExpression50
-    JSONParse51[["JSONParse[51∈5]<br />ᐸ31ᐳ<br />ᐳGcpApplication"]]:::plan
-    Access31 --> JSONParse51
-    JSONParse51 --> Access52
     First55{{"First[55∈5]"}}:::plan
     PgSelectRows56[["PgSelectRows[56∈5]"]]:::plan
     PgSelectRows56 --> First55
@@ -113,9 +109,9 @@ graph TD
     Bucket4("Bucket 4 (listItem)<br />Deps: 12, 7, 26<br /><br />ROOT __Item{4}ᐸ70ᐳ[29]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item29,PgUnionAllSingle30,Access31 bucket4
-    Bucket5("Bucket 5 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 31, 12, 7, 26, 30<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[32], JSONParse[51]<br />ᐳ: 44, 61, 33, 52<br />2: PgSelect[34], PgSelect[53]<br />3: PgSelectRows[39], PgSelectRows[56]<br />ᐳ: 38, 40, 41, 55, 57, 58<br />4: PgUnionAll[46], PgUnionAll[63]<br />ᐳ: 68, 69, 47, 64<br />5: 49, 66<br />ᐳ: 50, 67"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />AwsApplication,GcpApplication<br />Deps: 31, 12, 7, 26, 30<br />ᐳAwsApplication<br />ᐳGcpApplication<br /><br />1: JSONParse[32]<br />ᐳ: 44, 61, 33<br />2: PgSelect[34], PgSelect[53]<br />3: PgSelectRows[39], PgSelectRows[56]<br />ᐳ: 38, 40, 41, 55, 57, 58<br />4: PgUnionAll[46], PgUnionAll[63]<br />ᐳ: 68, 69, 47, 64<br />5: 49, 66<br />ᐳ: 50, 67"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,JSONParse32,Access33,PgSelect34,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41,Connection44,PgUnionAll46,First47,PgUnionAllSingle49,PgClassExpression50,JSONParse51,Access52,PgSelect53,First55,PgSelectRows56,PgSelectSingle57,PgClassExpression58,Connection61,PgUnionAll63,First64,PgUnionAllSingle66,PgClassExpression67,Access68,Access69 bucket5
+    class Bucket5,JSONParse32,Access33,PgSelect34,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression41,Connection44,PgUnionAll46,First47,PgUnionAllSingle49,PgClassExpression50,PgSelect53,First55,PgSelectRows56,PgSelectSingle57,PgClassExpression58,Connection61,PgUnionAll63,First64,PgUnionAllSingle66,PgClassExpression67,Access68,Access69 bucket5
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
