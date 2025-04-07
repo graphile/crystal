@@ -9,14 +9,14 @@ graph TD
 
 
     %% plan dependencies
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant49 & Lambda16 --> Connection15
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ10ᐳ"}}:::plan
+    Constant49{{"Constant[49∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Lambda16{{"Lambda[16∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Constant49 & Lambda16 --> Connection15
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
@@ -42,9 +42,8 @@ graph TD
     Access25{{"Access[25∈4]<br />ᐸ24.0ᐳ"}}:::plan
     Object13 & Access25 --> PgSelect26
     PgSelect39[["PgSelect[39∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access38{{"Access[38∈4]<br />ᐸ37.0ᐳ"}}:::plan
-    Object13 & Access38 --> PgSelect39
-    JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
+    Object13 & Access25 --> PgSelect39
+    JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
     Access23 --> JSONParse24
     JSONParse24 --> Access25
     First30{{"First[30∈4]"}}:::plan
@@ -61,9 +60,6 @@ graph TD
     PgSelectSingle32 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression36
-    JSONParse37[["JSONParse[37∈4]<br />ᐸ23ᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Access23 --> JSONParse37
-    JSONParse37 --> Access38
     First41{{"First[41∈4]"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈4]"]]:::plan
     PgSelectRows42 --> First41
@@ -85,7 +81,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Constant14,Connection15,Lambda16,Constant49,Constant50 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 16, 49, 6<br /><br />ROOT Connectionᐸ10ᐳ[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 16, 49<br /><br />ROOT Connectionᐸ10ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll17,Access21,Access48 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 21, 13<br /><br />ROOT __Item{2}ᐸ48ᐳ[19]"):::bucket
@@ -94,9 +90,9 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 13<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor22,Access23 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 23, 13, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[24], JSONParse[37]<br />ᐳ: Access[25], Access[38]<br />2: PgSelect[26], PgSelect[39]<br />3: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 23, 13, 20<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: JSONParse[24]<br />ᐳ: Access[25]<br />2: PgSelect[26], PgSelect[39]<br />3: PgSelectRows[31], PgSelectRows[42]<br />ᐳ: 30, 32, 33, 34, 35, 36, 41, 43, 44, 45, 46, 47"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,JSONParse37,Access38,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
+    class Bucket4,JSONParse24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3

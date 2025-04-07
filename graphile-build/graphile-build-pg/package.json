@@ -88,6 +88,7 @@
     "express-graphql": "^0.12.0",
     "fastify": "^4.22.1",
     "fastify-static": "^4.7.0",
+    "grafserv": "workspace:^",
     "graphile-export": "workspace:^",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "graphql-helix": "^1.13.0",
