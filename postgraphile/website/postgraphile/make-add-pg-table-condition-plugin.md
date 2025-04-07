@@ -136,7 +136,7 @@ implementation then there’s a good chance your plugin is incorrect.
 ## Example with ordering
 
 It's also possible for condition plugins to change the order of results by using
-[QueryBuilder](./make-extend-schema-plugin/#querybuilder)'s `orderBy` method.
+[QueryBuilder](./make-extend-schema-plugin#querybuilder)'s `orderBy` method.
 The following example both limits the list of quizzes returned to only those
 with a certain number of entries, _and_ orders the results such that the quizzes
 with the most entries are listed first.

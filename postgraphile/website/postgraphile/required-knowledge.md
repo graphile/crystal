@@ -247,7 +247,7 @@ create policy select_my_organizations
 A good way to tackle and make sense of PostGraphile is to go through these
 steps:
 
-[**Introduction**](./)
+[**Introduction**](.)
 
 Describes why you would want to go with this approach in the first place and
 what the benefits and features of using PostGraphile are. Do not be deterred if

@@ -6,7 +6,7 @@ Views are a great solution for abstraction. PostGraphile supports reading from
 and writing to views; however PostgreSQL lacks the powerful introspection
 capabilities on views that it has on tables, so we cannot easily automatically
 infer the relations. However, you can
-[use our "smart tags" functionality to add constraints to views](./smart-tags/#virtual-constraints)
+[use our "smart tags" functionality to add constraints to views](./smart-tags#virtual-constraints)
 which will make them a lot more table-like (giving them a primary key so you can
 get a `nodeId` and maybe CRUD mutations; adding foreign key references between views and other views or
 tables; setting columns as non-null).
