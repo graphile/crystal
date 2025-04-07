@@ -1025,8 +1025,8 @@ on (${sql.indent(
                 return val == null
                   ? null
                   : alreadyEncoded
-                  ? val
-                  : codec.toPg(val);
+                    ? val
+                    : codec.toPg(val);
               })
             : EMPTY_ARRAY,
       };
@@ -1936,10 +1936,10 @@ function applyConditionFromCursor<
         nulls === "FIRST"
           ? true
           : nulls === "LAST"
-          ? false
-          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-            // ASC = NULLS LAST
-            direction === "DESC";
+            ? false
+            : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+              // ASC = NULLS LAST
+              direction === "DESC";
 
       // Simple less than or greater than
       let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;

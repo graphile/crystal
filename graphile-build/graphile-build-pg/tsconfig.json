@@ -14,6 +14,7 @@
     { "path": "../../grafast/dataplan-pg" },
     { "path": "../graphile-build" },
     { "path": "../../grafast/grafast" },
+    { "path": "../../grafast/grafserv" },
     { "path": "../../utils/graphile-export" },
     { "path": "../../grafast/ruru/tsconfig.build.json" },
     { "path": "../../utils/graphile-config" },

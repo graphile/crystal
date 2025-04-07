@@ -58,6 +58,7 @@ export {
   httpError,
   makeGraphQLWSConfig,
   memo,
+  normalizeConnectionParams,
   normalizeRequest,
   parseGraphQLJSONBody,
   processHeaders,

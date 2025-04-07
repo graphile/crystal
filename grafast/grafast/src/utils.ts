@@ -873,16 +873,17 @@ export function isTypePlanned(
  *
  * @internal
  */
-export type Sudo<T> = T extends Step<any>
-  ? T & {
-      dependencies: ReadonlyArray<Step>;
-      implicitSideEffectStep: Step | null;
-      dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
-      dependencyOnReject: ReadonlyArray<Error | null | undefined>;
-      defaultForbiddenFlags: ExecutionEntryFlags;
-      getDepOptions: Step["getDepOptions"];
-    }
-  : T;
+export type Sudo<T> =
+  T extends Step<any>
+    ? T & {
+        dependencies: ReadonlyArray<Step>;
+        implicitSideEffectStep: Step | null;
+        dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+        dependencyOnReject: ReadonlyArray<Error | null | undefined>;
+        defaultForbiddenFlags: ExecutionEntryFlags;
+        getDepOptions: Step["getDepOptions"];
+      }
+    : T;
 
 /**
  * Make protected/private methods accessible.
@@ -1120,13 +1121,13 @@ export function directiveArgument<T>(
   return val.kind === graphql.Kind.VARIABLE
     ? operationPlan.variableValuesStep.get(val.name.value)
     : val.kind === expectedKind
-    ? constant(
-        val.kind === Kind.INT
-          ? (parseInt(val.value, 10) as T)
-          : val.kind === Kind.FLOAT
-          ? (parseFloat(val.value) as T)
-          : // boolean, string
-            (val.value as T),
-      )
-    : undefined;
+      ? constant(
+          val.kind === Kind.INT
+            ? (parseInt(val.value, 10) as T)
+            : val.kind === Kind.FLOAT
+              ? (parseFloat(val.value) as T)
+              : // boolean, string
+                (val.value as T),
+        )
+      : undefined;
 }

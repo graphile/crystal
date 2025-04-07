@@ -9,10 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Connection123{{"Connection[123∈0] ➊<br />ᐸ121ᐳ"}}:::plan
-    Connection453{{"Connection[453∈0] ➊<br />ᐸ451ᐳ"}}:::plan
-    Connection517{{"Connection[517∈0] ➊<br />ᐸ515ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -31,17 +27,21 @@ graph TD
     ApplyInput518{{"ApplyInput[518∈0] ➊"}}:::plan
     __InputObject512 --> ApplyInput518
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant18{{"Constant[18∈0] ➊<br />ᐸ'SingleTableTopic'ᐳ"}}:::plan
     Constant36{{"Constant[36∈0] ➊<br />ᐸ'SingleTablePost'ᐳ"}}:::plan
     Constant39{{"Constant[39∈0] ➊<br />ᐸ'SingleTableDivider'ᐳ"}}:::plan
     Constant42{{"Constant[42∈0] ➊<br />ᐸ'SingleTableChecklist'ᐳ"}}:::plan
     Constant45{{"Constant[45∈0] ➊<br />ᐸ'SingleTableChecklistItem'ᐳ"}}:::plan
+    Connection123{{"Connection[123∈0] ➊<br />ᐸ121ᐳ"}}:::plan
     Constant137{{"Constant[137∈0] ➊<br />ᐸ'relational_topics'ᐳ"}}:::plan
     Constant165{{"Constant[165∈0] ➊<br />ᐸ'relational_posts'ᐳ"}}:::plan
     Constant174{{"Constant[174∈0] ➊<br />ᐸ'relational_dividers'ᐳ"}}:::plan
     Constant183{{"Constant[183∈0] ➊<br />ᐸ'relational_checklists'ᐳ"}}:::plan
     Constant192{{"Constant[192∈0] ➊<br />ᐸ'relational_checklist_items'ᐳ"}}:::plan
+    Connection453{{"Connection[453∈0] ➊<br />ᐸ451ᐳ"}}:::plan
     Constant460{{"Constant[460∈0] ➊<br />ᐸ'single_table_item_relations'ᐳ"}}:::plan
+    Connection517{{"Connection[517∈0] ➊<br />ᐸ515ᐳ"}}:::plan
     Constant524{{"Constant[524∈0] ➊<br />ᐸ'relational_item_relations'ᐳ"}}:::plan
     PgSelectInlineApply640["PgSelectInlineApply[640∈0] ➊"]:::plan
     PgSelectInlineApply644["PgSelectInlineApply[644∈0] ➊"]:::plan
@@ -884,7 +884,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant18,Constant36,Constant39,Constant42,Constant45,Connection123,Constant137,Constant165,Constant174,Constant183,Constant192,__InputObject448,Connection453,ApplyInput454,Constant460,__InputObject512,Connection517,ApplyInput518,Constant524,PgSelectInlineApply640,PgSelectInlineApply644,PgSelectInlineApply648,PgSelectInlineApply652,Constant656,Constant657 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 18, 36, 39, 42, 45<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 18, 36, 39, 42, 45<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 11, 36, 39, 42, 45<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
@@ -896,7 +896,7 @@ graph TD
     Bucket4("Bucket 4 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 18, 32, 36, 39, 42, 45, 30, 35<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,List33,Lambda34,List37,Lambda38,List40,Lambda41,List43,Lambda44,List46,Lambda47 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 123, 6, 137, 165, 174, 183, 192<br /><br />ROOT Connectionᐸ121ᐳ[123]<br />1: PgSelect[125]<br />2: PgSelectRows[126]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 123, 137, 165, 174, 183, 192<br /><br />ROOT Connectionᐸ121ᐳ[123]<br />1: PgSelect[125]<br />2: PgSelectRows[126]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect125,PgSelectRows126 bucket5
     Bucket6("Bucket 6 (listItem)<br />Deps: 11, 137, 165, 174, 183, 192<br /><br />ROOT __Item{6}ᐸ126ᐳ[127]"):::bucket
@@ -920,7 +920,7 @@ graph TD
     Bucket12("Bucket 12 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 399, 137, 165, 174, 183, 192, 398, 411<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem<br /><br />1: 400, 412, 421, 430, 439<br />2: 405, 415, 424, 433, 442<br />ᐳ: 404, 406, 408, 409, 410, 414, 416, 418, 419, 420, 423, 425, 427, 428, 429, 432, 434, 436, 437, 438, 441, 443, 445, 446, 447"):::bucket
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgSelect400,First404,PgSelectRows405,PgSelectSingle406,PgClassExpression408,List409,Lambda410,PgSelect412,First414,PgSelectRows415,PgSelectSingle416,PgClassExpression418,List419,Lambda420,PgSelect421,First423,PgSelectRows424,PgSelectSingle425,PgClassExpression427,List428,Lambda429,PgSelect430,First432,PgSelectRows433,PgSelectSingle434,PgClassExpression436,List437,Lambda438,PgSelect439,First441,PgSelectRows442,PgSelectSingle443,PgClassExpression445,List446,Lambda447 bucket12
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 11, 454, 453, 6, 640, 644, 460, 18, 36, 39, 42, 45<br /><br />ROOT Connectionᐸ451ᐳ[453]<br />1: PgSelect[456]<br />ᐳ: Access[641], Access[645]<br />2: PgSelectRows[457]"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 11, 454, 453, 640, 644, 460, 18, 36, 39, 42, 45<br /><br />ROOT Connectionᐸ451ᐳ[453]<br />1: PgSelect[456]<br />ᐳ: Access[641], Access[645]<br />2: PgSelectRows[457]"):::bucket
     classDef bucket13 stroke:#3cb371
     class Bucket13,PgSelect456,PgSelectRows457,Access641,Access645 bucket13
     Bucket14("Bucket 14 (listItem)<br />Deps: 460, 641, 645, 18, 36, 39, 42, 45<br /><br />ROOT __Item{14}ᐸ457ᐳ[458]"):::bucket
@@ -935,7 +935,7 @@ graph TD
     Bucket17("Bucket 17 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 18, 496, 36, 39, 42, 45, 494, 499<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17,List497,Lambda498,List501,Lambda502,List504,Lambda505,List507,Lambda508,List510,Lambda511 bucket17
-    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 11, 518, 517, 6, 648, 652, 524, 137, 165, 174, 183, 192<br /><br />ROOT Connectionᐸ515ᐳ[517]<br />1: PgSelect[520]<br />ᐳ: Access[649], Access[653]<br />2: PgSelectRows[521]"):::bucket
+    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 11, 518, 517, 648, 652, 524, 137, 165, 174, 183, 192<br /><br />ROOT Connectionᐸ515ᐳ[517]<br />1: PgSelect[520]<br />ᐳ: Access[649], Access[653]<br />2: PgSelectRows[521]"):::bucket
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgSelect520,PgSelectRows521,Access649,Access653 bucket18
     Bucket19("Bucket 19 (listItem)<br />Deps: 524, 649, 653, 11, 137, 165, 174, 183, 192<br /><br />ROOT __Item{19}ᐸ521ᐳ[522]"):::bucket

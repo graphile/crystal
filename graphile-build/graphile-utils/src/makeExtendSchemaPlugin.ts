@@ -1105,8 +1105,8 @@ export function makeExtendSchemaPlugin(
                       : "resolve"]: spec as any,
                   }
                 : typeof spec === "object" && spec
-                ? spec
-                : null),
+                  ? spec
+                  : null),
               type: type as GraphQLOutputType,
               args,
             };

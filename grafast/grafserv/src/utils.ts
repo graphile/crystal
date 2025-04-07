@@ -190,6 +190,56 @@ type ExtendedExecutionArgs = GrafastExecutionArgs & {
   subscribe: typeof subscribe;
 };
 
+function coerceHeaderValue(rawValue: unknown): string | string[] | undefined {
+  if (rawValue == null) return undefined;
+  if (typeof rawValue === "string") return rawValue;
+  if (typeof rawValue === "number") return String(rawValue);
+  if (typeof rawValue === "boolean") return String(rawValue);
+  if (Array.isArray(rawValue) && rawValue.every((v) => typeof v === "string")) {
+    return rawValue;
+  }
+  // Strip unsupported values
+  return undefined;
+}
+
+export function normalizeConnectionParams(
+  connectionParams: Record<string, unknown> | undefined,
+): IncomingHttpHeaders | undefined {
+  if (
+    typeof connectionParams !== "object" ||
+    connectionParams === null ||
+    Array.isArray(connectionParams)
+  ) {
+    return undefined;
+  }
+  const headers = Object.create(null);
+  for (const [rawKey, rawValue] of Object.entries(connectionParams)) {
+    if (typeof rawKey !== "string") continue;
+    const key = rawKey.toLowerCase();
+    const value = coerceHeaderValue(rawValue);
+    if (value == null) continue;
+    if (headers[key] != null) {
+      const prev = headers[key];
+      if (Array.isArray(prev)) {
+        if (Array.isArray(value)) {
+          headers[key] = [...prev, ...value];
+        } else {
+          headers[key] = [...prev, value];
+        }
+      } else {
+        if (Array.isArray(value)) {
+          headers[key] = [prev, ...value];
+        } else {
+          headers[key] = [prev, value];
+        }
+      }
+    } else {
+      headers[key] = value;
+    }
+  }
+  return headers;
+}
+
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   async function onSubscribeWithEvent({ ctx, message }: OnSubscribeEvent) {
     try {
@@ -198,6 +248,9 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           request: (ctx.extra as Extra).request,
           socket: (ctx.extra as Extra).socket,
           connectionParams: ctx.connectionParams,
+          normalizedConnectionParams: normalizeConnectionParams(
+            ctx.connectionParams,
+          ),
         },
       };
       const { grafastMiddleware } = instance;

@@ -177,7 +177,8 @@ export interface MetaByMetaKey {
 const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
-const newValueStepCallback = () => new __ValueStep();
+const newValueStepCallback = (isImmutable: boolean) =>
+  new __ValueStep(isImmutable);
 
 const NO_ARGS: TrackedArguments = {
   get() {
@@ -1070,8 +1071,8 @@ export class OperationPlan {
           resolvedResolver && !usesDefaultResolver
             ? resolvedResolver
             : resolverEmulation && isPolymorphic
-            ? defaultFieldResolver
-            : null;
+              ? defaultFieldResolver
+              : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1253,7 +1254,7 @@ export class OperationPlan {
             parentStep,
             objectField,
             trackedArguments,
-            isList ? streamDetails ?? false : null,
+            isList ? (streamDetails ?? false) : null,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
@@ -2109,6 +2110,8 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       newValueStepCallback,
+      null,
+      variableDefinitions != null,
     );
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
@@ -2119,6 +2122,7 @@ export class OperationPlan {
           valueStep,
           constraints,
           [],
+          variableDefinitions != null,
           variableDefinitions,
         ),
     );

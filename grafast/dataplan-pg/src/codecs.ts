@@ -410,12 +410,12 @@ const codecInspect: CustomInspectFunction = function (this: PgCodec) {
   const type = this.domainOfCodec
     ? `DomainCodec<${this.domainOfCodec.name}>`
     : this.arrayOfCodec
-    ? `ListCodec<${this.arrayOfCodec.name}[]>`
-    : this.rangeOfCodec
-    ? `RangeCodec<${this.rangeOfCodec.name}>`
-    : this.attributes
-    ? `RecordCodec`
-    : "Codec";
+      ? `ListCodec<${this.arrayOfCodec.name}[]>`
+      : this.rangeOfCodec
+        ? `RangeCodec<${this.rangeOfCodec.name}>`
+        : this.attributes
+          ? `RecordCodec`
+          : "Codec";
   return `${type}(${this.name})`;
 };
 
@@ -588,17 +588,10 @@ type CodecWithListCodec<
 
 type PgCodecTFromJavaScript<
   TInnerCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TInnerCodec extends PgCodec<
-  any,
-  any,
-  any,
-  infer UFromJs,
-  undefined,
-  any,
-  any
->
-  ? UFromJs
-  : any;
+> =
+  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
+    ? UFromJs
+    : any;
 
 /**
  * Given a PgCodec, this returns a new PgCodec that represents a list

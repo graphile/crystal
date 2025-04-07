@@ -74,12 +74,15 @@ it("cancels future steps on error", async () => {
   assert.deepEqual(result.data, {
     test: null,
   });
-  assert.deepEqual(result.errors?.map((e) => e.toJSON()), [
-    {
-      message: "Side effect 3 failed",
-      path: ["test"],
-      locations: [{ line: 3, column: 7 }],
-    },
-  ]);
+  assert.deepEqual(
+    result.errors?.map((e) => e.toJSON()),
+    [
+      {
+        message: "Side effect 3 failed",
+        path: ["test"],
+        locations: [{ line: 3, column: 7 }],
+      },
+    ],
+  );
   assert.equal(contextValue.number, 4);
 });

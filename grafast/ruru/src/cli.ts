@@ -145,12 +145,12 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const subscriptionsEndpointUrl = subscriptionEndpoint
     ? new URL(subscriptionEndpoint)
     : subscriptions
-    ? (() => {
-        const url = new URL(endpointUrl);
-        url.protocol = endpointUrl.protocol === "https:" ? "wss:" : "ws:";
-        return url;
-      })()
-    : undefined;
+      ? (() => {
+          const url = new URL(endpointUrl);
+          url.protocol = endpointUrl.protocol === "https:" ? "wss:" : "ws:";
+          return url;
+        })()
+      : undefined;
   const endpointBase = new URL(endpointUrl);
   endpointBase.pathname = "";
   endpointBase.search = "";

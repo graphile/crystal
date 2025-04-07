@@ -161,8 +161,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           pgResource
             ? !build.behavior.pgResourceMatches(pgResource, "order")
             : codec
-            ? !build.behavior.pgCodecMatches(codec, "order")
-            : false
+              ? !build.behavior.pgCodecMatches(codec, "order")
+              : false
         ) {
           return args;
         }

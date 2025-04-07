@@ -14,7 +14,7 @@ import {
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
-import { __ListTransformStep, arrayOfLength } from "../index.js";
+import { __ListTransformStep, arrayOfLength, operationPlan } from "../index.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
@@ -83,12 +83,16 @@ export class __TrackedValueStep<
     path: Array<string | number> = [],
     graphqlType: TInputType,
   ) {
-    return new __TrackedValueStep<TData, TInputType>(
-      value,
-      valuePlan,
-      constraints,
-      path,
-      graphqlType,
+    return operationPlan().withRootLayerPlan(
+      () =>
+        new __TrackedValueStep<TData, TInputType>(
+          value,
+          valuePlan,
+          constraints,
+          path,
+          true,
+          graphqlType,
+        ),
     ) as __TrackedValueStepWithDollars<TData, TInputType>;
   }
 
@@ -96,6 +100,7 @@ export class __TrackedValueStep<
   private variableDefinitions:
     | ReadonlyArray<VariableDefinitionNode>
     | undefined;
+
   /**
    * @internal
    */
@@ -104,9 +109,11 @@ export class __TrackedValueStep<
     valuePlan: __ValueStep<TData> | AccessStep<TData>,
     constraints: Constraint[],
     path: Array<string | number> = [],
+    isImmutable: boolean,
     graphqlTypeOrVariableDefinitions?: TInputType,
   ) {
     super();
+    this._isImmutable = isImmutable;
     this.addDependency(valuePlan);
     this.value = value;
     this.constraints = constraints;
@@ -233,12 +240,24 @@ export class __TrackedValueStep<
         newPath,
         type,
       ) as any;
+    } else if (this._isImmutable) {
+      return this.operationPlan.withRootLayerPlan(
+        () =>
+          new __TrackedValueStep(
+            newValue,
+            newValuePlan,
+            constraints,
+            newPath,
+            this._isImmutable,
+          ),
+      ) as any;
     } else {
       return new __TrackedValueStep(
         newValue,
         newValuePlan,
         constraints,
         newPath,
+        this._isImmutable,
       ) as any;
     }
   }
@@ -253,8 +272,8 @@ export class __TrackedValueStep<
     TInputType extends GraphQLList<infer U>
       ? U & GraphQLInputType
       : TInputType extends GraphQLNonNull<GraphQLList<infer U>>
-      ? U & GraphQLInputType
-      : undefined
+        ? U & GraphQLInputType
+        : undefined
   > {
     const { value, path, constraints } = this;
     const newValue = value?.[index];
@@ -274,12 +293,24 @@ export class __TrackedValueStep<
           `'${this.nullableGraphQLType}' is not a list type, cannot access array index '${index}' on it`,
         );
       }
+    } else if (this._isImmutable) {
+      return this.operationPlan.withRootLayerPlan(
+        () =>
+          new __TrackedValueStep(
+            newValue,
+            newValuePlan,
+            constraints,
+            newPath,
+            this._isImmutable,
+          ),
+      ) as any;
     } else {
       return new __TrackedValueStep(
         newValue,
         newValuePlan,
         constraints,
         newPath,
+        this._isImmutable,
       ) as any;
     }
   }

@@ -117,6 +117,13 @@ export /* abstract */ class Step<TData = any> {
   public _isUnary: boolean;
   /** @internal */
   public _isUnaryLocked: boolean;
+  /**
+   * For input values, set `true` if it comes from variables/arguments since
+   * they cannot be modified (even by mutations), set `false` otherwise.
+   *
+   * @internal
+   */
+  public _isImmutable = false;
   public debug: boolean;
 
   // Explicitly we do not add $$export here because we want children to set it
@@ -392,8 +399,8 @@ export /* abstract */ class Step<TData = any> {
     return depId == null
       ? null
       : throwOnFlagged
-      ? this.getDep<TStep>(depId, true)
-      : this.getDep<TStep>(depId);
+        ? this.getDep<TStep>(depId, true)
+        : this.getDep<TStep>(depId);
   }
 
   protected getDepOrConstant<TData = any>(

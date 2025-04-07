@@ -428,7 +428,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const tags = JSON.parse(JSON.stringify(rawTags));
         const description = isReferencee
           ? tags.backwardDescription
-          : tags.forwardDescription ?? constraintDescription;
+          : (tags.forwardDescription ?? constraintDescription);
         const baseBehavior = tags.behavior;
         const specificBehavior = isReferencee
           ? tags.backwardBehavior
@@ -685,21 +685,21 @@ return function (otherSource) {
           [otherSource],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return otherSource.get(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return otherSource.get(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return otherSource.get(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return otherSource.get(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          );
 
   const listPlan =
     clean && specString
@@ -712,21 +712,21 @@ return function (otherSource) {
           [otherSource],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return otherSource.find(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return otherSource.find(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return otherSource.find(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return otherSource.find(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          );
 
   const connectionPlan =
     clean && specString
@@ -742,21 +742,21 @@ return function (otherSource, connection) {
           [otherSource, connection],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (connection, otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return connection(otherSource.find(specFromRecord($record)));
-            },
-          [connection, otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (connection, otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return connection(otherSource.find(specFromRecord($record)));
-            },
-          [connection, otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (connection, otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return connection(otherSource.find(specFromRecord($record)));
+              },
+            [connection, otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (connection, otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return connection(otherSource.find(specFromRecord($record)));
+              },
+            [connection, otherSource, specFromRecord],
+          );
   return { singleRecordPlan, listPlan, connectionPlan };
 }
 
@@ -824,32 +824,32 @@ function addRelations(
   }> = isMutationPayload
     ? []
     : codec.refs
-    ? Object.entries(codec.refs)
-        .filter(
-          ([, spec]) =>
-            !spec.definition.sourceGraphqlType ||
-            spec.definition.sourceGraphqlType === context.Self.name,
+      ? Object.entries(codec.refs)
+          .filter(
+            ([, spec]) =>
+              !spec.definition.sourceGraphqlType ||
+              spec.definition.sourceGraphqlType === context.Self.name,
+          )
+          .map(([refName, spec]) => ({
+            codec,
+            refName,
+            refDefinition: spec.definition,
+            ref: spec,
+          }))
+      : Object.entries(
+          codec.extensions?.refDefinitions ??
+            (Object.create(null) as Record<string, never>),
         )
-        .map(([refName, spec]) => ({
-          codec,
-          refName,
-          refDefinition: spec.definition,
-          ref: spec,
-        }))
-    : Object.entries(
-        codec.extensions?.refDefinitions ??
-          (Object.create(null) as Record<string, never>),
-      )
-        .filter(
-          ([, refDefinition]) =>
-            !refDefinition.sourceGraphqlType ||
-            refDefinition.sourceGraphqlType === context.Self.name,
-        )
-        .map(([refName, refDefinition]) => ({
-          codec,
-          refName,
-          refDefinition,
-        }));
+          .filter(
+            ([, refDefinition]) =>
+              !refDefinition.sourceGraphqlType ||
+              refDefinition.sourceGraphqlType === context.Self.name,
+          )
+          .map(([refName, refDefinition]) => ({
+            codec,
+            refName,
+            refDefinition,
+          }));
 
   type Digest = {
     identifier: string;

@@ -150,6 +150,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
     public readonly fallback?: any,
   ) {
     super();
+    this._isImmutable = parentPlan._isImmutable;
     this.path = path;
     this.hasSymbols = this.path.some((k) => typeof k === "symbol");
     this.peerKey =
@@ -251,19 +252,30 @@ export function access<TData>(
   const path = Array.isArray(rawPath)
     ? rawPath
     : rawPath != null
-    ? [rawPath]
-    : [];
+      ? [rawPath]
+      : [];
   if (
     typeof fallback === "undefined" &&
     !path.some((k) => typeof k === "symbol")
   ) {
     const pathKey = digestKeys(path);
-    return parentPlan.operationPlan.cacheStep(
-      parentPlan,
-      "GrafastInternal:access()",
-      pathKey,
-      () => new AccessStep<TData>(parentPlan, path),
-    );
+    if (parentPlan._isImmutable) {
+      return parentPlan.operationPlan.withRootLayerPlan(() =>
+        parentPlan.operationPlan.cacheStep(
+          parentPlan,
+          "GrafastInternal:access()",
+          pathKey,
+          () => new AccessStep<TData>(parentPlan, path),
+        ),
+      );
+    } else {
+      return parentPlan.operationPlan.cacheStep(
+        parentPlan,
+        "GrafastInternal:access()",
+        pathKey,
+        () => new AccessStep<TData>(parentPlan, path),
+      );
+    }
   }
   return new AccessStep<TData>(parentPlan, path, fallback);
 }

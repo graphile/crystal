@@ -708,11 +708,12 @@ export type GetPgRegistryCodecRelations<
 
 export type GetPgCodecAttributes<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
-  ? UAttributes extends undefined
-    ? never
-    : UAttributes
-  : PgCodecAttributes;
+> =
+  TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
+    ? UAttributes extends undefined
+      ? never
+      : UAttributes
+    : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
   TResource extends PgResource<any, any, any, any, any>,

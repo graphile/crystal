@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelect69[["PgSelect[69∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access67{{"Access[67∈0] ➊<br />ᐸ66.1ᐳ"}}:::plan
@@ -39,6 +38,7 @@ graph TD
     Access247{{"Access[247∈0] ➊<br />ᐸ69.m.joinDetailsFor80ᐳ"}}:::plan
     PgSelect69 --> Access247
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant19{{"Constant[19∈0] ➊<br />ᐸ'SingleTableTopic'ᐳ"}}:::plan
     Constant33{{"Constant[33∈0] ➊<br />ᐸ'SingleTablePost'ᐳ"}}:::plan
     Constant41{{"Constant[41∈0] ➊<br />ᐸ'SingleTableDivider'ᐳ"}}:::plan
@@ -313,10 +313,10 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/simple-single-table-items-root-topic"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[246]<br />ᐳ: 6, 9, 10, 19, 33, 41, 49, 57, 254, 11, 12, 66, 67, 91, 90<br />2: PgSelect[69]<br />ᐳ: Access[247]<br />3: PgSelectRows[72]<br />ᐳ: First[71], PgSelectSingle[73]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[246]<br />ᐳ: 9, 10, 12, 19, 33, 41, 49, 57, 254, 11, 66, 67, 91, 90<br />2: PgSelect[69]<br />ᐳ: Access[247]<br />3: PgSelectRows[72]<br />ᐳ: First[71], PgSelectSingle[73]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant19,Constant33,Constant41,Constant49,Constant57,Lambda66,Access67,PgSelect69,First71,PgSelectRows72,PgSelectSingle73,Node90,Lambda91,PgSelectInlineApply246,Access247,Constant254 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 19, 33, 41, 49, 57<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 19, 33, 41, 49, 57<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 19, 11, 33, 41, 49, 57<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket

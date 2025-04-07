@@ -1,5 +1,30 @@
 # pg-sql2
 
+## 5.0.0-beta.8
+
+### Patch Changes
+
+- [#2329](https://github.com/graphile/crystal/pull/2329)
+  [`e10c372dafbe0d6014b1e946349b22f40aa87ef9`](https://github.com/graphile/crystal/commit/e10c372dafbe0d6014b1e946349b22f40aa87ef9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug causing unhelpful throw
+  on $type optimization on null - instead pass through to more helpful throw.
+
+- [#2341](https://github.com/graphile/crystal/pull/2341)
+  [`3b0f5082b2272997ce33ce8823a4752513d19e28`](https://github.com/graphile/crystal/commit/3b0f5082b2272997ce33ce8823a4752513d19e28)
+  Thanks [@benjie](https://github.com/benjie)! - Some of the pg-sql2 inputs are
+  now marked Readonly to indicate we won't mutate them.
+
+- [#2320](https://github.com/graphile/crystal/pull/2320)
+  [`3789326b2e2fdb86519acc75e606c752ddefe590`](https://github.com/graphile/crystal/commit/3789326b2e2fdb86519acc75e606c752ddefe590)
+  Thanks [@benjie](https://github.com/benjie)! - Add new `withTransformer`
+  functionality to enable embedding of non-SQL values into PgSQL fragments, for
+  improved user ergonomics.
+
+- [#2384](https://github.com/graphile/crystal/pull/2384)
+  [`412b92a0b1e03ad962521f630b57a996d8620cf6`](https://github.com/graphile/crystal/commit/412b92a0b1e03ad962521f630b57a996d8620cf6)
+  Thanks [@benjie](https://github.com/benjie)! - Small optimization/fix to
+  `arraysMatch` function.
+
 ## 5.0.0-beta.7
 
 ### Patch Changes

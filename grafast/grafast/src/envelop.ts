@@ -27,7 +27,7 @@ function processExplain(
   const explainHeader = Array.isArray(explainHeaders)
     ? explainHeaders.join(",")
     : explainHeaders;
-  if (!explainHeader) {
+  if (typeof explainHeader !== "string") {
     return undefined;
   }
   const explainParts = explainHeader.split(",");
@@ -63,9 +63,25 @@ export const useGrafast = (options: UseGrafastOptions = {}): EnvelopPlugin => {
     },
     async onSubscribe(opts) {
       const ctx = opts.args.contextValue as any;
-      const explainHeaders = (ctx?.req?.headers ||
+
+      const headersObj =
+        ctx?.req?.headers ||
         ctx?.request?.headers ||
-        ctx?.connectionParams)?.["x-graphql-explain"];
+        ctx?.normalizedConnectionParams ||
+        ctx?.connectionParams;
+      let explainHeaders: string | string[] | undefined;
+      if (headersObj) {
+        explainHeaders = headersObj["x-graphql-explain"];
+        if (explainHeaders == null) {
+          const key = Object.keys(headersObj).find(
+            (k) => k.toLowerCase() === "x-graphql-explain",
+          );
+          if (key != null) {
+            explainHeaders = headersObj[key];
+          }
+        }
+      }
+
       const explain = processExplain(explainAllowed, explainHeaders);
       opts.setSubscribeFn(async (args) =>
         grafastSubscribe(

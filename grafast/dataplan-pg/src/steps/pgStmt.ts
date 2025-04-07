@@ -409,8 +409,8 @@ export function calculateLimitAndOffsetSQL(params: {
       first != null
         ? first + (fetchOneExtra ? 1 : 0)
         : last != null
-        ? last + (fetchOneExtra ? 1 : 0)
-        : null;
+          ? last + (fetchOneExtra ? 1 : 0)
+          : null;
     offsetValue = offset;
 
     innerLimitValue =

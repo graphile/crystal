@@ -149,15 +149,15 @@ export function augmentIntrospection(
     objsubid?: number,
   ): string | undefined =>
     objsubid == null
-      ? introspection.descriptions.find(
+      ? (introspection.descriptions.find(
           (d) => d.classoid === classoid && d.objoid === objoid,
-        )?.description ?? undefined
-      : introspection.descriptions.find(
+        )?.description ?? undefined)
+      : (introspection.descriptions.find(
           (d) =>
             d.classoid === classoid &&
             d.objoid === objoid &&
             d.objsubid === objsubid,
-        )?.description ?? undefined;
+        )?.description ?? undefined);
 
   const getTagsAndDescription = (
     classoid: string,
@@ -292,8 +292,8 @@ export function augmentIntrospection(
         "number" in by && by.number
           ? att.attnum === by.number
           : "name" in by && by.name
-          ? att.attname === by.name
-          : false,
+            ? att.attname === by.name
+            : false,
       );
     };
     entity.getInherited = memo(() =>

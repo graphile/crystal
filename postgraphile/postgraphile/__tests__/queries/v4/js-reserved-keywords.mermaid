@@ -18,8 +18,6 @@ graph TD
     Constant83{{"Constant[83∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     PgSelectInlineApply78["PgSelectInlineApply[78∈0] ➊"]:::plan
     Object10 & Constant83 & PgSelectInlineApply78 --> PgSelect26
-    Connection38{{"Connection[38∈0] ➊<br />ᐸ34ᐳ"}}:::plan
-    Connection51{{"Connection[51∈0] ➊<br />ᐸ49ᐳ"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -47,6 +45,8 @@ graph TD
     Lambda81{{"Lambda[81∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List80 --> Lambda81
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection38{{"Connection[38∈0] ➊<br />ᐸ34ᐳ"}}:::plan
+    Connection51{{"Connection[51∈0] ➊<br />ᐸ49ᐳ"}}:::plan
     List76{{"List[76∈1] ➊<br />ᐸ75,13ᐳ"}}:::plan
     Access75 & PgSelectSingle13 --> List76
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
@@ -117,7 +117,7 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/js-reserved-keywords"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[74]<br />ᐳ: 8, 9, 31, 82, 83, 10, 38, 51<br />2: PgSelect[7], PgSelectInlineApply[78]<br />ᐳ: Access[75]<br />3: PgSelectRows[12], PgSelect[26]<br />ᐳ: 11, 13, 79<br />4: PgSelectRows[29]<br />ᐳ: 28, 30, 80, 81"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 74, 78<br />ᐳ: 8, 9, 38, 51, 82, 83, 10<br />2: PgSelect[7], PgSelect[26]<br />ᐳ: Access[75], Access[79]<br />3: PgSelectRows[12], PgSelectRows[29]<br />ᐳ: 11, 13, 28, 30, 80, 81"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelect26,First28,PgSelectRows29,PgSelectSingle30,Connection38,Connection51,PgSelectInlineApply74,Access75,PgSelectInlineApply78,Access79,List80,Lambda81,Constant82,Constant83 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 75<br /><br />ROOT PgSelectSingleᐸmachineᐳ[13]<br />1: <br />ᐳ: 14, 24, 76, 77<br />2: PgSelectRows[20]<br />ᐳ: First[19], PgSelectSingle[21]"):::bucket
@@ -135,7 +135,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{4}ᐸmachineᐳ[43]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression44,PgClassExpression45,PgClassExpression46 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 10, 51, 31<br /><br />ROOT Connectionᐸ49ᐳ[51]<br />1: PgSelect[53]<br />2: PgSelectRows[54]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 10, 51<br /><br />ROOT Connectionᐸ49ᐳ[51]<br />1: PgSelect[53]<br />2: PgSelectRows[54]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect53,PgSelectRows54 bucket6
     Bucket7("Bucket 7 (listItem)<br />Deps: 10<br /><br />ROOT __Item{7}ᐸ54ᐳ[55]"):::bucket

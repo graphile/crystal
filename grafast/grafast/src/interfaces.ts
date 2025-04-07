@@ -427,14 +427,20 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
     ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
-    : TType extends GraphQLList<GraphQLNonNull<infer U>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
-    : TType extends GraphQLList<infer U>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
-    : TType extends GraphQLNonNull<infer U>
-    ? OutputPlanForNamedType<U>
-    : OutputPlanForNamedType<TType>;
+      ?
+          | ListCapableStep<any, OutputPlanForNamedType<U>>
+          | Step<ReadonlyArray<any>>
+      : TType extends GraphQLList<GraphQLNonNull<infer U>>
+        ?
+            | ListCapableStep<any, OutputPlanForNamedType<U>>
+            | Step<ReadonlyArray<any>>
+        : TType extends GraphQLList<infer U>
+          ?
+              | ListCapableStep<any, OutputPlanForNamedType<U>>
+              | Step<ReadonlyArray<any>>
+          : TType extends GraphQLNonNull<infer U>
+            ? OutputPlanForNamedType<U>
+            : OutputPlanForNamedType<TType>;
 
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
@@ -856,9 +862,8 @@ export interface DependencyOptions<TStep extends Step = Step> {
  */
 export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 
-export type DataFromStep<TStep extends Step> = TStep extends Step<infer TData>
-  ? TData
-  : never;
+export type DataFromStep<TStep extends Step> =
+  TStep extends Step<infer TData> ? TData : never;
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;

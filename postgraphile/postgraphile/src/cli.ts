@@ -129,8 +129,8 @@ async function loadPresets(
       exportName !== null
         ? mod[exportName]
         : isGraphileConfigPreset(mod)
-        ? mod
-        : mod.default;
+          ? mod
+          : mod.default;
     if (isGraphileConfigPreset(possiblePreset)) {
       presets.push(possiblePreset);
     } else {

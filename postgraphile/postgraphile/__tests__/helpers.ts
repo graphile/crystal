@@ -283,13 +283,13 @@ export async function runTestQuery(
   const schemas = Array.isArray(config.schema)
     ? config.schema
     : typeof config.schema === "string"
-    ? [config.schema]
-    : ["a", "b", "c"];
+      ? [config.schema]
+      : ["a", "b", "c"];
   const extendsRaw = Array.isArray(config.extends)
     ? config.extends
     : config.extends
-    ? [config.extends]
-    : [];
+      ? [config.extends]
+      : [];
   const presets = await Promise.all(
     extendsRaw.map(async (extendRaw) => {
       const [modulePath, name = "default"] = extendRaw.split(":");
@@ -328,10 +328,10 @@ export async function runTestQuery(
                 search_path,
               })
             : search_path
-            ? {
-                search_path,
-              }
-            : undefined,
+              ? {
+                  search_path,
+                }
+              : undefined,
         schemas: schemas,
         adaptorSettings: {
           connectionString,
@@ -424,11 +424,11 @@ export async function runTestQuery(
           }
 
           const execute =
-            options.prepare ?? true
+            (options.prepare ?? true)
               ? grafastExecute
               : (args: ExecutionArgs) => graphqlExecute(args);
           const subscribe =
-            options.prepare ?? true
+            (options.prepare ?? true)
               ? grafastSubscribe
               : (args: SubscriptionArgs) => graphqlSubscribe(args);
 

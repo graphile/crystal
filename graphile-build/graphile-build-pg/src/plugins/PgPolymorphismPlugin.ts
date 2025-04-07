@@ -311,8 +311,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 if (!pgConstraint) {
                   throw new Error(
-                    `Could not build polymorphic reference from '${pgClass.getNamespace()
-                      ?.nspname}.${
+                    `Could not build polymorphic reference from '${
+                      pgClass.getNamespace()?.nspname
+                    }.${
                       pgClass.relname
                     }' to '${referencedClass.getNamespace()?.nspname}.${
                       referencedClass.relname

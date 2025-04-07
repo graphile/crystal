@@ -484,8 +484,8 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
           isLegacy || !result.errors
             ? 200
             : result.data === undefined
-            ? 400
-            : 200,
+              ? 400
+              : 200,
         contentType: chosenContentType,
         payload: maskPayload(result),
         outputDataAsString,
