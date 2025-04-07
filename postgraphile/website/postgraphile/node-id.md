@@ -67,7 +67,7 @@ export const client = new ApolloClient({
 ### Using the Global Object Identifier in Function Arguments
 
 The global object identifier can be accepted as a function argument using
-[`@argNvariant nodeId`](./smart-tags/#arg0variant-arg1variant-).
+[`@argNvariant nodeId`](./smart-tags#arg0variant-arg1variant-).
 
 ```sql
 create table entity_a(

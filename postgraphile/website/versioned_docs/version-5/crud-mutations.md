@@ -60,14 +60,14 @@ PostGraphile settings you use (and the permissions you've granted), you might
 get the following mutations:
 
 - createUser - Creates a single `User`.
-  [See example](./examples/#Mutations__Create).
+  [See example](./examples#Mutations__Create).
 - updateUser - Updates a single `User` using its globally unique id and a patch.
 - updateUserById - Updates a single `User` using a unique key and a patch.
-  [See example](./examples/#Mutations__Update).
+  [See example](./examples#Mutations__Update).
 - updateUserByUsername - Updates a single `User` using a unique key and a patch.
 - deleteUser - Deletes a single `User` using its globally unique id.
 - deleteUserById - Deletes a single `User` using a unique key.
-  [See example](./examples/#Mutations__Delete).
+  [See example](./examples#Mutations__Delete).
 - deleteUserByUsername - Deletes a single `User` using a unique key.
 
 **The `update` and `delete` mutations are created only if the table contains a

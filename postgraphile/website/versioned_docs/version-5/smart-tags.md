@@ -25,9 +25,9 @@ PostGraphile) the `@` is required to denote a smart tag, and this pattern has
 stuck when referring to smart tags.
 
 You will also often see the [smart comment
-syntax](./smart-comments/#smart-comment-spec) used to refer to smart tags in
+syntax](./smart-comments#smart-comment-spec) used to refer to smart tags in
 general, it's because the syntax is a little easier to write quickly. Read the
-[Smart Comments Spec](./smart-comments/#smart-comment-spec) and you'll soon
+[Smart Comments Spec](./smart-comments#smart-comment-spec) and you'll soon
 learn to translate `@omit update,delete` to `omit: "update,delete"` (and
 vice-versa) in your head.
 
