@@ -43,12 +43,10 @@ afterAll(async () => {
 
 /**
  * WARNING: Side effects should NOT be used outside of mutation fields.
- * According to the GraphQL spec:
  *
- * > the resolution of fields other than top-level mutation fields must
- * > always be side effect-free and idempotent
- * >
- * > — https://spec.graphql.org/draft/#sel-GANRNDABiEBuHxyV
+ * According to the GraphQL spec: "the resolution of fields other than
+ * top-level mutation fields must always be side effect-free and idempotent"
+ * (https://spec.graphql.org/draft/#sel-GANRNDABiEBuHxyV)
  *
  * This plugin is just a minimal effort way to check that the most common
  * side effects in polymorphic positions don't cause the query to break. It
