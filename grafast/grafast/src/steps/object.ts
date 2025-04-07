@@ -9,11 +9,10 @@ import type {
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
-import type { SetterCapableStep } from "./setter.js";
 
 const DEFAULT_CACHE_SIZE = 100;
 
@@ -22,21 +21,17 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
 // const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-export type DataFromObjectSteps<
-  TSteps extends { [key: string]: ExecutableStep },
-> = {
+export type DataFromObjectSteps<TSteps extends { [key: string]: Step }> = {
   [key in keyof TSteps]: DataFromStep<TSteps[key]>;
 };
-type Results<TSteps extends { [key: string]: ExecutableStep }> = Array<
+type Results<TSteps extends { [key: string]: Step }> = Array<
   [
     Array<DataFromObjectSteps<TSteps>[keyof TSteps]>,
     DataFromObjectSteps<TSteps>,
   ]
 >;
 
-export interface ObjectPlanMeta<
-  TSteps extends { [key: string]: ExecutableStep },
-> {
+export interface ObjectPlanMeta<TSteps extends { [key: string]: Step }> {
   results: Results<TSteps>;
 }
 
@@ -50,13 +45,10 @@ interface ObjectStepCacheConfig {
  * the results of the associated plans.
  */
 export class ObjectStep<
-    TPlans extends { [key: string]: ExecutableStep } = {
-      [key: string]: ExecutableStep;
-    },
-  >
-  extends UnbatchedExecutableStep<DataFromObjectSteps<TPlans>>
-  implements SetterCapableStep<TPlans>
-{
+  TPlans extends { [key: string]: Step } = {
+    [key: string]: Step;
+  },
+> extends UnbatchedStep<DataFromObjectSteps<TPlans>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ObjectStep",
@@ -92,8 +84,8 @@ export class ObjectStep<
       this.cacheSize <= 0
         ? undefined
         : this.cacheConfig?.identifier
-        ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
-        : this.id;
+          ? `object|${this.peerKey}|${this.cacheConfig.identifier}`
+          : this.id;
   }
 
   /**
@@ -105,10 +97,15 @@ export class ObjectStep<
     this.addDependency({ step: plan, skipDeduplication: true });
   }
 
+  getStepForKey<TKey extends keyof TPlans>(key: TKey): TPlans[TKey];
+  getStepForKey<TKey extends keyof TPlans>(
+    key: TKey,
+    allowMissing: true,
+  ): TPlans[TKey] | null;
   getStepForKey<TKey extends keyof TPlans>(
     key: TKey,
     allowMissing = false,
-  ): TKey extends keyof TPlans ? TPlans[TKey] : null {
+  ): TPlans[TKey] | null {
     const idx = this.keys.indexOf(key as string);
     if (idx < 0) {
       if (!allowMissing) {
@@ -118,9 +115,9 @@ export class ObjectStep<
           )}' - we have no such key`,
         );
       }
-      return null as any;
+      return null;
     }
-    return this.getDep(idx) as any;
+    return this.getDepOptions<TPlans[TKey]>(idx).step;
   }
 
   toStringMeta(): string {
@@ -324,7 +321,7 @@ ${inner}
         )}'; supported keys: '${this.keys.join("', '")}'`,
       );
     }
-    return this.getDep<TPlans[TKey]>(index);
+    return this.getDepOptions<TPlans[TKey]>(index).step;
   }
 }
 
@@ -332,7 +329,7 @@ ${inner}
  * A plan that represents an object using the keys given and the values being
  * the results of the associated plans.
  */
-export function object<TPlans extends { [key: string]: ExecutableStep }>(
+export function object<TPlans extends { [key: string]: Step }>(
   obj: TPlans,
   cacheConfig?: ObjectStepCacheConfig,
 ): ObjectStep<TPlans> {

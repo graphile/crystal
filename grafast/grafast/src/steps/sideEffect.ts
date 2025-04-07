@@ -4,13 +4,13 @@ import type {
 } from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { multistep } from "../multistep.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 
 /**
  * Calls the given callback function for each tuple
  */
-export class SideEffectStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
+export class SideEffectStep<TIn, TOut> extends UnbatchedStep<TOut> {
   static $$export = {
     moduleName: "grafast",
     exportName: "SideEffectStep",
@@ -20,7 +20,7 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
 
   private planDep: number | null;
   constructor(
-    $plan: ExecutableStep<TIn> | null | undefined,
+    $plan: Step<TIn> | null | undefined,
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();

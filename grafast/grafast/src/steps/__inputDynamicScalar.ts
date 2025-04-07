@@ -8,7 +8,7 @@ import * as graphql from "graphql";
 
 import { SafeError } from "../error.js";
 import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import type { __TrackedValueStep } from "./__trackedValue.js";
 
 const { Kind } = graphql;
@@ -18,7 +18,7 @@ const { Kind } = graphql;
  */
 export class __InputDynamicScalarStep<
   TLeaf = any,
-> extends UnbatchedExecutableStep<TLeaf> {
+> extends UnbatchedStep<TLeaf> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__InputDynamicScalarStep",
@@ -129,13 +129,15 @@ export class __InputDynamicScalarStep<
     return converted;
   };
 
+  /** @internal */
   eval(): TLeaf {
     const variableValues = this.variableNames.map((variableName, i) =>
-      this.getDep<__TrackedValueStep>(i).eval(),
+      this.getDep<__TrackedValueStep>(i, true).eval(),
     );
     return this.valueFromValues(variableValues);
   }
 
+  /** @internal */
   evalIs(expectedValue: undefined | null | 0): boolean {
     if (
       expectedValue === undefined ||

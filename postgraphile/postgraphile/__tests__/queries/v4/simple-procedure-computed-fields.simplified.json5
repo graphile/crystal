@@ -1,0 +1,74 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        name: "John Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You hit me with a cricket bat.",
+              headlineTrimmed: "You hit m…",
+            },
+            {
+              headline: "Large bet on myself in round one.",
+              headlineTrimmed: "Large bet…",
+            },
+          ],
+        },
+      },
+      {
+        name: "Sara Smith",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "It’s a fez. I wear a fez now. Fezes are cool.",
+              headlineTrimmed: "It’s a fe…",
+            },
+            {
+              headline: "What’s with you kids? Every other day it’s food, food, food.",
+              headlineTrimmed: "What’s wi…",
+            },
+          ],
+        },
+      },
+      {
+        name: "Budd Deey",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "You know how I sometimes have really brilliant ideas?",
+              headlineTrimmed: "You know …",
+            },
+            {
+              headline: "They’re not aliens, they’re Earth…liens!",
+              headlineTrimmed: "They’re n…",
+            },
+          ],
+        },
+      },
+      {
+        name: "Kathryn Ramirez",
+        postsByAuthorId: {
+          nodes: [],
+        },
+      },
+      {
+        name: "Joe Tucker",
+        postsByAuthorId: {
+          nodes: [
+            {
+              headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              headlineTrimmed: "Please, D…",
+            },
+          ],
+        },
+      },
+      {
+        name: "Twenty Seventwo",
+        postsByAuthorId: {
+          nodes: [],
+        },
+      },
+    ],
+  },
+}

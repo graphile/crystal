@@ -32,16 +32,18 @@ from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
+  __person__."person_full_name" as "1",
+  array(
+    select array[
+      __post__."id"::text
+    ]::text[]
+    from "a"."post" as __post__
+    where (
+      __post__."author_id" = __person__."id"
+    )
+    order by __post__."id" asc
+  )::text as "2"
 from (select ($1::"c"."person").*) as __person__;
-
-select
-  __post__."id"::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-)
-order by __post__."id" asc;
 
 select
   __mutation_out_complex_setof__."x"::text as "0",
@@ -62,16 +64,18 @@ from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
 select
   __person__."id"::text as "0",
-  __person__."person_full_name" as "1"
+  __person__."person_full_name" as "1",
+  array(
+    select array[
+      __post__."id"::text
+    ]::text[]
+    from "a"."post" as __post__
+    where (
+      __post__."author_id" = __person__."id"
+    )
+    order by __post__."id" asc
+  )::text as "2"
 from (select ($1::"c"."person").*) as __person__;
-
-select
-  __post__."id"::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-)
-order by __post__."id" asc;
 
 select
   __mutation_out_out__."first_out"::text as "0",

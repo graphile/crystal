@@ -41,8 +41,8 @@ export function makeGraphiQLHandler(
         dynamicOptions.explain === true
           ? ["explain", "plan"]
           : dynamicOptions.explain === false
-          ? []
-          : (dynamicOptions.explain as any[]),
+            ? []
+            : (dynamicOptions.explain as any[]),
     };
     return {
       statusCode: 200,

@@ -32,10 +32,9 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
-  InputStep,
   OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutableStep, ModifierStep } from "./step.js";
+import type { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
 
 const {
@@ -334,28 +333,18 @@ export function arraysMatch<T>(
   return true;
 }
 
-export type ObjectTypeFields<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-> = {
-  [key: string]: GrafastFieldConfig<
-    GraphQLOutputType,
-    TContext,
-    TParentStep,
-    any,
-    any
-  >;
+export type ObjectTypeFields<TParentStep extends Step> = {
+  [key: string]: GrafastFieldConfig<GraphQLOutputType, TParentStep, any, any>;
 };
 
 export type ObjectTypeSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
+> = Omit<GraphQLObjectTypeConfig<any, Grafast.Context>, "fields"> & {
   fields: TFields | (() => TFields);
-  assertStep?: TParentStep extends ExecutableStep
+  assertStep?: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
 };
@@ -364,14 +353,13 @@ export type ObjectTypeSpec<
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
 >(
-  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-): GraphQLObjectTypeConfig<any, TContext> {
+  spec: ObjectTypeSpec<TParentStep, TFields>,
+): GraphQLObjectTypeConfig<any, Grafast.Context> {
   const { assertStep, ...rest } = spec;
-  const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
+  const modifiedSpec: GraphQLObjectTypeConfig<any, Grafast.Context> = {
     ...rest,
     ...(assertStep
       ? {
@@ -389,13 +377,13 @@ export function objectSpec<
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce(
         (o, key) => {
-          o[key] = objectFieldSpec<TContext, TParentStep>(
+          o[key] = objectFieldSpec<TParentStep>(
             fields[key],
             `${spec.name}.${key}`,
           );
           return o;
         },
-        {} as GraphQLFieldConfigMap<any, TContext>,
+        {} as GraphQLFieldConfigMap<any, Grafast.Context>,
       );
       return modifiedFields;
     },
@@ -404,53 +392,42 @@ export function objectSpec<
 }
 
 export type GrafastObjectType<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = graphql.GraphQLObjectType<
-  TParentStep extends ExecutableStep<infer U> ? U : never,
-  TContext
-> & { TParentStep: TParentStep; TFields: TFields };
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
+> = graphql.GraphQLObjectType<TParentStep extends Step<infer U> ? U : never> & {
+  TParentStep: TParentStep;
+  TFields: TFields;
+};
 
 /**
  * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
  */
-export function newObjectTypeBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
->(
-  assertStep: TParentStep extends ExecutableStep
+export function newObjectTypeBuilder<TParentStep extends Step>(
+  assertStep: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : never,
-): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
-  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-) => GrafastObjectType<TContext, TParentStep, TFields> {
+): <TFields extends ObjectTypeFields<TParentStep>>(
+  spec: ObjectTypeSpec<TParentStep, TFields>,
+) => GrafastObjectType<TParentStep, TFields> {
   return (spec) =>
     new GraphQLObjectType(
       objectSpec({ assertStep, ...spec }),
-    ) as GrafastObjectType<TContext, TParentStep, any>;
+    ) as GrafastObjectType<TParentStep, any>;
 }
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectFieldSpec<
-  TContext extends Grafast.Context,
-  TSource extends ExecutableStep,
-  TResult extends ExecutableStep = ExecutableStep,
+  TSource extends Step,
+  TResult extends Step = Step,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
-  grafastSpec: GrafastFieldConfig<
-    GraphQLOutputType,
-    TContext,
-    TSource,
-    TResult,
-    TArgs
-  >,
+  grafastSpec: GrafastFieldConfig<GraphQLOutputType, TSource, TResult, TArgs>,
   path: string,
-): GraphQLFieldConfig<any, TContext, TArgs> {
+): GraphQLFieldConfig<any, TArgs> {
   const { plan, subscribePlan, args, ...spec } = grafastSpec;
 
   assertNotAsync(plan, `${path ?? "?"}.plan`);
@@ -458,29 +435,34 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const {
-          inputPlan,
-          applyPlan,
-          autoApplyAfterParentPlan,
-          autoApplyAfterParentSubscribePlan,
-          ...argSpec
-        } = args[argName];
-        assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
+        const grafastArgSpec = args[argName];
+        // TODO: remove this code
+        if (
+          grafastArgSpec.inputPlan ||
+          grafastArgSpec.autoApplyAfterParentPlan ||
+          grafastArgSpec.autoApplyAfterParentSubscribePlan
+        ) {
+          throw new Error(
+            `Argument at ${path} has inputPlan or autoApplyAfterParentPlan or autoApplyAfterParentSubscribePlan set; these properties no longer do anything and should be removed.`,
+          );
+        }
+
+        const { applyPlan, applySubscribePlan, ...argSpec } = grafastArgSpec;
         assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
+        assertNotAsync(
+          applySubscribePlan,
+          `${path ?? "?"}(${argName}:).applySubscribePlan`,
+        );
         memo[argName] = {
           ...argSpec,
-          ...(inputPlan || applyPlan
+          ...(applyPlan || applySubscribePlan
             ? {
                 extensions: {
+                  ...argSpec.extensions,
                   grafast: {
-                    ...(inputPlan ? { inputPlan } : null),
-                    ...(autoApplyAfterParentPlan
-                      ? { autoApplyAfterParentPlan }
-                      : null),
+                    ...argSpec.extensions?.grafast,
                     ...(applyPlan ? { applyPlan } : null),
-                    ...(autoApplyAfterParentSubscribePlan
-                      ? { autoApplyAfterParentSubscribePlan }
-                      : null),
+                    ...(applySubscribePlan ? { applySubscribePlan } : null),
                   },
                 },
               }
@@ -513,46 +495,31 @@ export function objectFieldSpec<
  *
  * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
  */
-export function newGrafastFieldConfigBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
->(): <
+export function newGrafastFieldConfigBuilder<TParentStep extends Step>(): <
   TType extends GraphQLOutputType,
   TFieldStep extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 >(
-  config: GrafastFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>,
+  config: GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>,
 ) => typeof config {
   return (config) => config;
 }
 
-export type GrafastInputFieldConfigMap<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-> = {
-  [key: string]: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParentStep,
-    any,
-    any
-  >;
+export type GrafastInputFieldConfigMap<TParent> = {
+  [key: string]: GrafastInputFieldConfig<TParent, GraphQLInputType>;
 };
 
-export type InputObjectTypeSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-  fields: TFields | (() => TFields);
+export type InputObjectTypeSpec<TParent> = Omit<
+  GraphQLInputObjectTypeConfig,
+  "fields"
+> & {
+  fields:
+    | GrafastInputFieldConfigMap<TParent>
+    | (() => GrafastInputFieldConfigMap<TParent>);
 };
 
-function inputObjectSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
->(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
+function inputObjectSpec<TParent>(
+  spec: InputObjectTypeSpec<TParent>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -560,10 +527,7 @@ function inputObjectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec<TContext, TParentStep>(
-          fields[key],
-          `${spec.name}.${key}`,
-        );
+        o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
         return o;
       }, {} as GraphQLInputFieldConfigMap);
       return modifiedFields;
@@ -572,71 +536,49 @@ function inputObjectSpec<
   return modifiedSpec;
 }
 
-export type GrafastInputObjectType<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = graphql.GraphQLInputObjectType & {
-  TContext: TContext;
-  TParentStep: TParentStep;
-  TFields: TFields;
+export type GrafastInputObjectType<TParent> = graphql.GraphQLInputObjectType & {
+  TParent: TParent;
 };
 
-export function newInputObjectTypeBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
->(): <TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>>(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
-) => GrafastInputObjectType<TContext, TParentStep, TFields> {
+export function newInputObjectTypeBuilder<TParent = any>(): (
+  spec: InputObjectTypeSpec<TParent>,
+) => GrafastInputObjectType<TParent> {
   return (spec) =>
-    new GraphQLInputObjectType(inputObjectSpec(spec)) as GrafastInputObjectType<
-      TContext,
-      TParentStep,
-      any
-    >;
+    new GraphQLInputObjectType(
+      inputObjectSpec(spec),
+    ) as GrafastInputObjectType<TParent>;
 }
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
-export function inputObjectFieldSpec<
-  TContext extends Grafast.Context,
-  TParent extends ModifierStep<any>,
-  TResult extends ModifierStep<TParent> = ModifierStep<TParent>,
-  TInput extends InputStep = InputStep,
->(
-  grafastSpec: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParent,
-    TResult,
-    TInput
-  >,
+export function inputObjectFieldSpec<TParent>(
+  grafastSpec: GrafastInputFieldConfig<TParent, GraphQLInputType>,
   path: string,
 ): GraphQLInputFieldConfig {
-  const {
-    inputPlan,
-    applyPlan,
-    autoApplyAfterParentInputPlan,
-    autoApplyAfterParentApplyPlan,
-    ...spec
-  } = grafastSpec;
-  assertNotAsync(inputPlan, `${path ?? "?"}.inputPlan`);
-  assertNotAsync(applyPlan, `${path ?? "?"}.applyPlan`);
-  return inputPlan || applyPlan
+  // TODO: remove this code
+  if (
+    grafastSpec.applyPlan ||
+    grafastSpec.inputPlan ||
+    grafastSpec.autoApplyAfterParentApplyPlan ||
+    grafastSpec.autoApplyAfterParentInputPlan
+  ) {
+    throw new Error(
+      `Input field at ${path} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
+    );
+  }
+
+  const { apply, ...spec } = grafastSpec;
+  assertNotAsync(apply, `${path ?? "?"}.apply`);
+  return apply
     ? {
         ...spec,
         extensions: {
+          ...spec.extensions,
           grafast: {
-            ...(inputPlan ? { inputPlan } : null),
-            ...(applyPlan ? { applyPlan } : null),
-            ...(autoApplyAfterParentInputPlan
-              ? { autoApplyAfterParentInputPlan }
-              : null),
-            ...(autoApplyAfterParentApplyPlan
-              ? { autoApplyAfterParentApplyPlan }
-              : null),
-          },
+            ...spec.extensions?.grafast,
+            apply,
+          } as Grafast.InputFieldExtensions,
         },
       }
     : spec;
@@ -649,6 +591,22 @@ declare module "graphql" {
 }
 
 const $$valueConfigByValue = Symbol("valueConfigByValue");
+export function getEnumValueConfigs(enumType: graphql.GraphQLEnumType): {
+  [outputValue: string]: GraphQLEnumValueConfig | undefined;
+} {
+  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
+  if (enumType[$$valueConfigByValue] === undefined) {
+    const config = enumType.toConfig();
+    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
+      (memo, value) => {
+        memo[value.value] = value;
+        return memo;
+      },
+      Object.create(null),
+    );
+  }
+  return enumType[$$valueConfigByValue]!;
+}
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
  * that's not a public API so we have to do a bit of heavy lifting here. Since
@@ -659,18 +617,7 @@ export function getEnumValueConfig(
   enumType: graphql.GraphQLEnumType,
   outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
-  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
-  if (!enumType[$$valueConfigByValue]) {
-    const config = enumType.toConfig();
-    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
-      (memo, value) => {
-        memo[value.value] = value;
-        return memo;
-      },
-      Object.create(null),
-    );
-  }
-  return enumType[$$valueConfigByValue]![outputValue];
+  return getEnumValueConfigs(enumType)[outputValue];
 }
 
 /**
@@ -738,7 +685,9 @@ export function arrayOfLengthCb(length: number, fill: () => any) {
   return arr;
 }
 
-function findVariableNamesUsedInValueNode(
+export const valueNodeToStaticValue = graphql.valueFromAST;
+
+export function findVariableNamesUsedInValueNode(
   valueNode: ValueNode,
   variableNames: Set<string>,
 ): void {
@@ -924,16 +873,17 @@ export function isTypePlanned(
  *
  * @internal
  */
-export type Sudo<T> = T extends ExecutableStep<any>
-  ? T & {
-      dependencies: ReadonlyArray<ExecutableStep>;
-      implicitSideEffectStep: ExecutableStep | null;
-      dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
-      dependencyOnReject: ReadonlyArray<Error | null | undefined>;
-      defaultForbiddenFlags: ExecutionEntryFlags;
-      getDepOptions: ExecutableStep["getDepOptions"];
-    }
-  : T;
+export type Sudo<T> =
+  T extends Step<any>
+    ? T & {
+        dependencies: ReadonlyArray<Step>;
+        implicitSideEffectStep: Step | null;
+        dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+        dependencyOnReject: ReadonlyArray<Error | null | undefined>;
+        defaultForbiddenFlags: ExecutionEntryFlags;
+        getDepOptions: Step["getDepOptions"];
+      }
+    : T;
 
 /**
  * Make protected/private methods accessible.
@@ -959,10 +909,7 @@ export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
  * Returns `true` if the first argument depends on the second argument either
  * directly or indirectly (via a chain of dependencies).
  */
-export function stepADependsOnStepB(
-  stepA: ExecutableStep,
-  stepB: ExecutableStep,
-): boolean {
+export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
@@ -989,10 +936,7 @@ export function stepADependsOnStepB(
  * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
  * mostly relates to heirarchy.)
  */
-export function stepAMayDependOnStepB(
-  $a: ExecutableStep,
-  $b: ExecutableStep,
-): boolean {
+export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
   if ($a.isFinalized) {
     return false;
   }
@@ -1032,10 +976,7 @@ export function stepAMayDependOnStepB(
  * approach. Once you have, you can use this function to help you, should you
  * need it.
  */
-export function stepsAreInSamePhase(
-  ancestor: ExecutableStep,
-  descendent: ExecutableStep,
-) {
+export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
   do {
     if (currentLayerPlan === ancestor.layerPlan) {
@@ -1107,11 +1048,11 @@ export function assertNotPromise<TVal>(
 }
 
 export function hasItemPlan(
-  step: ExecutableStep & {
-    itemPlan?: ($item: ExecutableStep) => ExecutableStep;
+  step: Step & {
+    itemPlan?: ($item: Step) => Step;
   },
-): step is ExecutableStep & {
-  itemPlan: ($item: ExecutableStep) => ExecutableStep;
+): step is Step & {
+  itemPlan: ($item: Step) => Step;
 } {
   return "itemPlan" in step && typeof step.itemPlan === "function";
 }
@@ -1173,20 +1114,20 @@ export function directiveArgument<T>(
     | graphql.Kind.FLOAT
     | graphql.Kind.BOOLEAN
     | graphql.Kind.STRING,
-): ExecutableStep<T> | undefined {
+): Step<T> | undefined {
   const arg = directive.arguments?.find((n) => n.name.value === argName);
   if (!arg) return undefined;
   const val = arg.value;
   return val.kind === graphql.Kind.VARIABLE
     ? operationPlan.variableValuesStep.get(val.name.value)
     : val.kind === expectedKind
-    ? constant(
-        val.kind === Kind.INT
-          ? (parseInt(val.value, 10) as T)
-          : val.kind === Kind.FLOAT
-          ? (parseFloat(val.value) as T)
-          : // boolean, string
-            (val.value as T),
-      )
-    : undefined;
+      ? constant(
+          val.kind === Kind.INT
+            ? (parseInt(val.value, 10) as T)
+            : val.kind === Kind.FLOAT
+              ? (parseFloat(val.value) as T)
+              : // boolean, string
+                (val.value as T),
+        )
+      : undefined;
 }

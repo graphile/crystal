@@ -797,9 +797,7 @@ As we read earlier, there's no look-ahead system in PostGraphile V5; instead we
 use Gra*fast*'s planning system.
 
 Where you used to use `addArgDataGenerator` you should now give your argument
-an `applyPlan` and set `autoApplyAfterParentPlan: true` so that the plan is
-automatically applied (without the parent field having to call
-`fieldArgs.apply($target, 'argName')`).
+an `applyPlan`.
 
 Typically where you'd use a `QueryBuilder` (`queryBuilder`) in V4, you'll be
 dealing with a `PgSelectStep` (`$pgSelect`) in V5. Note that these are
@@ -816,17 +814,16 @@ get the alias) you can do `$pgSelectSingle.getClassStep()`.
 
 Should you have code that uses `queryBuilder.parentQueryBuilder` there's no
 direct parallel. Instead, you should use the parent step and get what you need
-from there, and then embed that value into your query using a placeholder:
+from there, and then embed that value into your query:
 
 ```ts
 // V4
 const parentAlias = queryBuilder.parentQueryBuilder.getTableAlias();
-queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not true`);
+queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not null`);
 
 // V5
 const $archivedAt = $parent.get("archived_at");
-const archivedAtFrag = $pgSelect.placeholder($archivedAt);
-$pgSelect.where(sql`${archivedAtFrag} is not true`);
+$pgSelect.where(sql`${$archivedAt} is not null`);
 ```
 
 :::info

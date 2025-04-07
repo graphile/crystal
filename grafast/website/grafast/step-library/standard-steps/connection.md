@@ -25,11 +25,11 @@ methods, specifically:
     >,
   ): PageInfoCapableStep;
 
-  setFirst($step: ExecutableStep<Maybe<number>> | number): void;
-  setLast($step: ExecutableStep<Maybe<number>> | number): void;
-  setOffset($step: ExecutableStep<Maybe<number>> | number): void;
+  setFirst($step: Step<Maybe<number>> | number): void;
+  setLast($step: Step<Maybe<number>> | number): void;
+  setOffset($step: Step<Maybe<number>> | number): void;
 
-  parseCursor($step: ExecutableStep<Maybe<string>>): TCursorStep | null | undefined;
+  parseCursor($step: Step<Maybe<string>>): TCursorStep;
   setBefore($step: TCursorStep): void;
   setAfter($step: TCursorStep): void;
 ```
@@ -38,13 +38,13 @@ TODO: the documentation for this is terrible. Sorry.
 
 ```ts
 export function connection<
-  TItemStep extends ExecutableStep,
-  TCursorStep extends ExecutableStep,
+  TItemStep extends Step,
+  TCursorStep extends Step,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TNodeStep extends ExecutableStep = ExecutableStep,
+  TNodeStep extends Step = Step,
 >(
   $collection: TStep,
   itemPlan?: ($item: TItemStep) => TNodeStep,
-  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
+  cursorPlan?: ($item: TItemStep) => Step<string | null>,
 ): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>;
 ```

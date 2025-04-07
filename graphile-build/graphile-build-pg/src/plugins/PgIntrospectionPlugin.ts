@@ -291,8 +291,8 @@ function makeGetEntity<
       "_id" in entity
         ? entity._id === id
         : "indexrelid" in entity
-        ? entity.indexrelid
-        : false,
+          ? entity.indexrelid
+          : false,
     );
   };
 }

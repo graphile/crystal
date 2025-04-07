@@ -256,10 +256,10 @@ export function parseDatabaseIdentifier<TExpectedLength extends number>(
 ): TExpectedLength extends 1
   ? [string]
   : TExpectedLength extends 2
-  ? [string, string]
-  : TExpectedLength extends 3
-  ? [string, string, string]
-  : string[] {
+    ? [string, string]
+    : TExpectedLength extends 3
+      ? [string, string, string]
+      : string[] {
   const identifiers = parseDatabaseIdentifiers(
     identifier,
     expectedLength,
@@ -290,10 +290,10 @@ export function parseDatabaseIdentifiers<TExpectedLength extends number>(
   TExpectedLength extends 1
     ? [string]
     : TExpectedLength extends 2
-    ? [string, string]
-    : TExpectedLength extends 3
-    ? [string, string, string]
-    : string[]
+      ? [string, string]
+      : TExpectedLength extends 3
+        ? [string, string, string]
+        : string[]
 > {
   const identifiers: string[][] = [];
   let currentParts: string[] = [];
@@ -450,6 +450,7 @@ export const resolveResourceRefPath = (
 };
 
 export function exportNameHint(obj: any, nameHint: string): void {
+  if (Object.isFrozen(obj) || Object.isSealed(obj)) return;
   if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
     if (!("$exporter$name" in obj)) {
       Object.defineProperty(obj, "$exporter$name", {

@@ -1,9 +1,9 @@
 import "graphile-config";
 
-import type { ExecutableStep, FieldArgs, NodeIdHandler } from "grafast";
+import type { ExecutableStep, FieldArgs, Maybe, NodeIdHandler } from "grafast";
 import { lambda } from "grafast";
 
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -15,11 +15,11 @@ declare global {
 
   namespace GraphileBuild {
     type NodeFetcher = {
-      ($nodeId: ExecutableStep<string>): ExecutableStep<any>;
+      ($nodeId: ExecutableStep<Maybe<string>>): ExecutableStep<any>;
       deprecationReason?: string;
     };
     interface Build {
-      specForHandler?(handler: NodeIdHandler): (nodeId: string) => any;
+      specForHandler?(handler: NodeIdHandler): (nodeId: Maybe<string>) => any;
       nodeFetcherByTypeName?(typeName: string): NodeFetcher | null;
     }
     interface Inflection {
@@ -50,7 +50,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
       build(build) {
         const nodeFetcherByTypeNameCache = new Map<
           string,
-          ($id: ExecutableStep<string>) => ExecutableStep<any>
+          ($id: ExecutableStep<Maybe<string>>) => ExecutableStep<any>
         >();
         return build.extend(
           build,
@@ -58,9 +58,10 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
             specForHandler: EXPORTABLE(
               () =>
                 function (handler) {
-                  function spec(nodeId: string) {
+                  function spec(nodeId: Maybe<string>) {
                     // We only want to return the specifier if it matches
                     // this handler; otherwise return null.
+                    if (nodeId == null) return null;
                     try {
                       const specifier = handler.codec.decode(nodeId);
                       if (handler.match(specifier)) {
@@ -85,19 +86,35 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (!specForHandler) return null;
               const handler = finalBuild.getNodeIdHandler?.(typeName);
               if (!handler) return null;
-              const fetcher = EXPORTABLE(
-                (handler, lambda, specForHandler) => {
-                  const fn: GraphileBuild.NodeFetcher = (
-                    $nodeId: ExecutableStep<string>,
-                  ) => {
-                    const $decoded = lambda($nodeId, specForHandler(handler));
-                    return handler.get(handler.getSpec($decoded));
-                  };
-                  fn.deprecationReason = handler.deprecationReason;
-                  return fn;
-                },
-                [handler, lambda, specForHandler],
-              );
+              const fetcher = handler.deprecationReason
+                ? EXPORTABLE(
+                    (handler, lambda, specForHandler) => {
+                      const fn: GraphileBuild.NodeFetcher = (
+                        $nodeId: ExecutableStep<Maybe<string>>,
+                      ) => {
+                        const $decoded = lambda(
+                          $nodeId,
+                          specForHandler(handler),
+                        );
+                        return handler.get(handler.getSpec($decoded));
+                      };
+                      fn.deprecationReason = handler.deprecationReason;
+                      return fn;
+                    },
+                    [handler, lambda, specForHandler],
+                  )
+                : EXPORTABLE(
+                    (handler, lambda, specForHandler) =>
+                      ($nodeId: ExecutableStep<Maybe<string>>) => {
+                        const $decoded = lambda(
+                          $nodeId,
+                          specForHandler(handler),
+                        );
+                        return handler.get(handler.getSpec($decoded));
+                      },
+                    [handler, lambda, specForHandler],
+                  );
+              exportNameHint(fetcher, `nodeFetcher_${typeName}`);
               nodeFetcherByTypeNameCache.set(typeName, fetcher);
               return fetcher;
             },
@@ -150,7 +167,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   (fetcher, nodeIdFieldName) =>
                     function plan(_$parent: ExecutableStep, args: FieldArgs) {
-                      const $nodeId = args.get(nodeIdFieldName);
+                      const $nodeId = args.getRaw(
+                        nodeIdFieldName,
+                      ) as ExecutableStep<string>;
                       return fetcher($nodeId);
                     },
                   [fetcher, nodeIdFieldName],

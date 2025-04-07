@@ -1,17 +1,12 @@
 import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
-import {
-  access,
-  applyTransforms,
-  ExecutableStep,
-  lambda,
-  SafeError,
-} from "grafast";
+import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type {
   PgCodec,
   PgGroupSpec,
-  PgTypedExecutableStep,
+  PgQueryRootStep,
+  PgTypedStep,
 } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
@@ -48,7 +43,10 @@ export type PgStmtDeferredSQL = {
 const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
-export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
+export abstract class PgStmtBaseStep<T>
+  extends Step<T>
+  implements PgQueryRootStep
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgStmtBaseStep",
@@ -80,21 +78,21 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
    * request-global dependencies such as variableValues, context, and input
    * arguments.
    */
-  public deferredSQL($step: ExecutableStep<SQL>): SQL {
+  public deferredSQL($step: Step<SQL>): SQL {
     const symbol = Symbol(`deferred-${$step.id}`);
     const dependencyIndex = this.addUnaryDependency($step);
     this.deferreds.push({ symbol, dependencyIndex });
     return sql.placeholder(symbol, UNHANDLED_DEFERRED);
   }
 
-  public placeholder($step: PgTypedExecutableStep<PgCodec>): SQL;
+  public placeholder($step: PgTypedStep<PgCodec>): SQL;
   public placeholder(
-    $step: ExecutableStep,
+    $step: Step,
     codec: PgCodec,
     alreadyEncoded?: boolean,
   ): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<PgCodec>,
+    $step: Step | PgTypedStep<PgCodec>,
     overrideCodec?: PgCodec,
     alreadyEncoded = false,
   ): SQL {
@@ -198,14 +196,14 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   }
   protected abstract assertCursorPaginationAllowed(): void;
 
-  public setFirst($first: ExecutableStep<Maybe<number>>): this {
+  public setFirst($first: Step<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("first");
     this.firstStepId = this.addUnaryDependency($first);
     this.locker.lockParameter("first");
     return this;
   }
 
-  public setLast($last: ExecutableStep<Maybe<number>>): this {
+  public setLast($last: Step<Maybe<number>>): this {
     this.assertCursorPaginationAllowed();
     this.locker.assertParameterUnlocked("orderBy");
     this.locker.assertParameterUnlocked("last");
@@ -214,7 +212,7 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
     return this;
   }
 
-  public setOffset($offset: ExecutableStep<Maybe<number>>): this {
+  public setOffset($offset: Step<Maybe<number>>): this {
     this.locker.assertParameterUnlocked("offset");
     this.offsetStepId = this.addUnaryDependency($offset);
     this.locker.lockParameter("offset");
@@ -230,15 +228,9 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
   }
 
   parseCursor(
-    $cursorPlan: __InputStaticLeafStep<string>,
-  ): PgSelectParsedCursorStep | null {
+    $cursorPlan: __InputStaticLeafStep<Maybe<string>>,
+  ): PgSelectParsedCursorStep {
     this.assertCursorPaginationAllowed();
-    if ($cursorPlan.evalIs(null)) {
-      return null;
-    } else if ($cursorPlan.evalIs(undefined)) {
-      return null;
-    }
-
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
   }
@@ -247,19 +239,19 @@ export abstract class PgStmtBaseStep<T> extends ExecutableStep<T> {
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
    */
-  public hasMore(): ExecutableStep<boolean> {
+  public hasMore(): Step<boolean> {
     this.fetchOneExtra = true;
     return access(this, "hasMore", false);
   }
+
+  public getPgRoot() {
+    return this;
+  }
 }
 
-function parseCursor(cursor: string | null) {
+function parseCursor(cursor: Maybe<string>) {
   if (cursor == null) {
-    // This throw should never happen, so we can still be isSyncAndSafe.
-    // If it does throw, the entire lambda will throw, which is allowed.
-    throw new Error(
-      "GrafastInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-    );
+    return null;
   }
   try {
     if (typeof cursor !== "string") {
@@ -417,8 +409,8 @@ export function calculateLimitAndOffsetSQL(params: {
       first != null
         ? first + (fetchOneExtra ? 1 : 0)
         : last != null
-        ? last + (fetchOneExtra ? 1 : 0)
-        : null;
+          ? last + (fetchOneExtra ? 1 : 0)
+          : null;
     offsetValue = offset;
 
     innerLimitValue =
@@ -444,12 +436,13 @@ export function calculateLimitAndOffsetSQL(params: {
 }
 
 export interface PgStmtCommonQueryInfo {
+  readonly symbol: symbol | string;
   readonly alias: SQL;
   readonly hasSideEffects: boolean;
 
   readonly executionDetails: ExecutionDetails;
-  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
-  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
+  readonly placeholderSymbols: ReadonlyArray<symbol>;
+  readonly deferredSymbols: ReadonlyArray<symbol>;
   readonly fetchOneExtra: boolean;
   readonly forceIdentity: boolean;
   readonly needsCursor: boolean;
@@ -462,6 +455,12 @@ export interface PgStmtCommonQueryInfo {
 
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;
+  readonly applyDepIds: ReadonlyArray<number>;
+}
+
+export interface PgStmtCompileQueryInfo extends PgStmtCommonQueryInfo {
+  readonly placeholders: ReadonlyArray<PgStmtDeferredPlaceholder>;
+  readonly deferreds: ReadonlyArray<PgStmtDeferredSQL>;
 }
 
 export interface MutablePgStmtCommonQueryInfo {
@@ -475,7 +474,26 @@ export interface MutablePgStmtCommonQueryInfo {
   offset: Maybe<number>;
 
   cursorDigest: string | null;
-  readonly cursorIndicies: Array<{ index: number; codec: PgCodec }> | null;
+  readonly cursorIndicies: Array<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
+}
+
+export interface ResolvedPgStmtCommonQueryInfo {
+  readonly cursorLower: Maybe<number>;
+  readonly cursorUpper: Maybe<number>;
+
+  readonly first: Maybe<number>;
+  readonly last: Maybe<number>;
+  readonly shouldReverseOrder: boolean;
+  readonly offset: Maybe<number>;
+
+  readonly cursorDigest: string | null;
+  readonly cursorIndicies: ReadonlyArray<{
+    readonly index: number;
+    readonly codec: PgCodec;
+  }> | null;
 }
 
 export function calculateLimitAndOffsetSQLFromInfo(
@@ -527,7 +545,10 @@ export function applyCommonPaginationStuff(
     first == null && last != null && cursorLower == null && cursorUpper == null;
 }
 
-export function makeValues(info: PgStmtCommonQueryInfo, name: string) {
+export function makeValues(
+  info: PgStmtCommonQueryInfo & PgStmtCompileQueryInfo,
+  name: string,
+) {
   const { executionDetails, placeholders, deferreds } = info;
   const { values, count } = executionDetails;
   const identifiersSymbol = Symbol(name + "_identifiers");

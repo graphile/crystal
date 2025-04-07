@@ -9,6 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    Constant22{{"Constant[22∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
+    Constant22 & Constant23 & Constant24 --> __InputObject6
+    PgFromExpression15{{"PgFromExpression[15∈0] ➊"}}:::plan
+    Constant22 & Constant23 & Constant24 --> PgFromExpression15
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -16,35 +23,34 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
+    ApplyInput20{{"ApplyInput[20∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput20
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    Object14 & Constant20 & Constant21 & Constant22 --> PgSelect11
-    First15{{"First[15∈1] ➊"}}:::plan
-    PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
-    PgSelectRows16 --> First15
-    PgSelect11 --> PgSelectRows16
-    PgSelectSingle17{{"PgSelectSingle[17∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
-    First15 --> PgSelectSingle17
-    Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle17 --> Object18
-    PgClassExpression19{{"PgClassExpression[19∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
-    PgSelectSingle17 --> PgClassExpression19
+    Object14 & PgFromExpression15 & ApplyInput20 --> PgSelect11
+    First16{{"First[16∈1] ➊"}}:::plan
+    PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
+    PgSelectRows17 --> First16
+    PgSelect11 --> PgSelectRows17
+    PgSelectSingle18{{"PgSelectSingle[18∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
+    First16 --> PgSelectSingle18
+    Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle18 --> Object19
+    PgClassExpression21{{"PgClassExpression[21∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression21
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-bigNumbers"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant20,Constant21,Constant22 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 20, 21, 22<br /><br />1: PgSelect[11]<br />2: PgSelectRows[16]<br />ᐳ: 15, 17, 18"):::bucket
+    class Bucket0,__Value2,__Value4,__InputObject6,Access12,Access13,Object14,PgFromExpression15,ApplyInput20,Constant22,Constant23,Constant24 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect11,First15,PgSelectRows16,PgSelectSingle17,Object18 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
+    class Bucket1,PgSelect11,First16,PgSelectRows17,PgSelectSingle18,Object19 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression19 bucket2
+    class Bucket2,PgClassExpression21 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     end

@@ -152,20 +152,20 @@ const processFragment = (
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   const defer = selection.directives?.find((d) => d.name.value === "defer");
   const deferIf = defer
-    ? evalDirectiveArgDirect<boolean | null>(
+    ? (evalDirectiveArgDirect<boolean | null>(
         defer,
         "if",
         trackedVariableValuesStep,
         true,
-      ) ?? true
+      ) ?? true)
     : undefined;
   const label = defer
-    ? evalDirectiveArgDirect<string | null>(
+    ? (evalDirectiveArgDirect<string | null>(
         defer,
         "label",
         trackedVariableValuesStep,
         null,
-      ) ?? undefined
+      ) ?? undefined)
     : undefined;
   const deferredDigest: SelectionSetDigest | null =
     deferIf === true

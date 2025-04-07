@@ -3,7 +3,7 @@ select
   __entity_search__."post_id"::text as "1",
   __entity_search__."comment_id"::text as "2",
   (not (__entity_search__ is null))::text as "3"
-from interfaces_and_unions.search("query" := $1::"text") as __entity_search__
+from interfaces_and_unions.search($1::"text") as __entity_search__
 where (
   true /* authorization checks */
 );
@@ -14,9 +14,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -26,9 +26,9 @@ select
 from interfaces_and_unions.posts as __posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __posts__."post_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -39,9 +39,9 @@ select
 from interfaces_and_unions.comments as __comments__
 where
   (
-    true /* authorization checks */
-  ) and (
     __comments__."comment_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -49,9 +49,9 @@ select
 from interfaces_and_unions.people as __people__
 where
   (
-    true /* authorization checks */
-  ) and (
     __people__."person_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );
 
 select
@@ -60,7 +60,7 @@ select
 from interfaces_and_unions.posts as __posts__
 where
   (
-    true /* authorization checks */
-  ) and (
     __posts__."post_id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
   );

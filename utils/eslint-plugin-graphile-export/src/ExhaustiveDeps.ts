@@ -393,8 +393,8 @@ export const ExhaustiveDeps: Rule.RuleModule = {
                 node.range != null && node.body.range != null
                   ? [node.range[0], node.body.range[0]]
                   : node.start != null && node.body.start != null
-                  ? [node.start, node.body.start]
-                  : null;
+                    ? [node.start, node.body.start]
+                    : null;
               if (range != null) {
                 const preferredArgs = `(${suggestedDeps.join(", ")})`;
                 if (node.type === "ArrowFunctionExpression") {

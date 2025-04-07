@@ -11,7 +11,13 @@ tags: [0.1]
 hide_table_of_contents: true
 ---
 
-Gra*fast* is finally here &mdash; a new holistic execution engine for GraphQL. It enables greater efficiency across the entire backend stack by leveraging the declarative nature of GraphQL to give your business logic a better understanding of everything it needs to do. It&lsquo;s backwards compatible, so you can adopt it incrementally within your existing schema and it&lsquo;s finally ready to try with [the `grafast` module on npm](https://www.npmjs.com/package/grafast); or check out [the source code on GitHub](https://github.com/graphile/crystal/tree/main/grafast/grafast)!
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
+Gra*fast* is finally here &mdash; a new holistic execution engine for GraphQL. It enables greater efficiency across the entire backend stack by leveraging the declarative nature of GraphQL to give your business logic a better understanding of everything it needs to do. It’s backwards compatible, so you can adopt it incrementally within your existing schema and it’s finally ready to try with [the `grafast` module on npm](https://www.npmjs.com/package/grafast); or check out [the source code on GitHub](https://github.com/graphile/crystal/tree/main/grafast/grafast)!
+
+</p>
 
 <figure>
   <iframe
@@ -33,11 +39,13 @@ Gra*fast* is finally here &mdash; a new holistic execution engine for GraphQL. I
 
 ## Gra*fast* Working Group
 
-There&lsquo;s still decisions to be made and edges to be smoothed before Gra*fast* can become a specification that can be implemented in any language. If the potential of this technology is interesting to you, please [join the Gra*fast* working group](https://github.com/grafast/wg) and get involved. We all deserve our future of easy GraphQL execution efficiency!
+There’s still decisions to be made and edges to be smoothed before Gra*fast* can become a specification that can be implemented in any language. If the potential of this technology is interesting to you, please [join the Gra*fast* working group](https://github.com/grafast/wg) and get involved. We all deserve our future of easy GraphQL execution efficiency!
 
-If you don&lsquo;t have time to watch the video above, here&lsquo;s a little about Gra*fast*:
+<!-- truncate-->
 
-## &ldquo;GraphQL&lsquo;s execution model is wrong for most servers&rdquo;
+If you don’t have time to watch the video above, here’s a little about Gra*fast*:
+
+## &ldquo;GraphQL’s execution model is wrong for most servers&rdquo;
 
 GraphQL is a declarative language; the requests specify everything that the client is asking for up&ndash;front.
 
@@ -45,9 +53,9 @@ But the resolver&ndash;based execution model **_obfuscates_** this knowledge &md
 
 DataLoader is one of the suggested approaches to solve the &ldquo;N+1 Problem&rdquo; but this is only the most egregious performance issue a GraphQL schema may face &mdash; there are plenty of related issues that can build up as your schemas and operations get more complex.
 
-I set out not only to solve the well&ndash;known N+1 problem and the more subtle under&ndash; and over&ndash;fetching problems, but to help you achieve the most efficient execution for your GraphQL schema no matter what data sources you&lsquo;re working with! The solution? Leverage the declarative nature of GraphQL via a new general purpose query planner.
+I set out not only to solve the well&ndash;known N+1 problem and the more subtle under&ndash; and over&ndash;fetching problems, but to help you achieve the most efficient execution for your GraphQL schema no matter what data sources you’re working with! The solution? Leverage the declarative nature of GraphQL via a new general purpose query planner.
 
-## &ldquo;Step aside resolvers! There&lsquo;s a new way to execute GraphQL&rdquo;
+## &ldquo;Step aside resolvers! There’s a new way to execute GraphQL&rdquo;
 
 <figure>
 
@@ -62,7 +70,7 @@ Grafast calls &ldquo;plan resolvers&rdquo; to determine the requirements for eac
 
 Gra*fast* has been designed from the ground up to give schema designers the tools they need to ensure their schemas are executing as efficiently as possible, whilst ensuring that writing their logic is still a pleasant experience. To achieve this, Gra*fast* favours a planning strategy which takes a holistic approach to understanding the incoming operation and unlocks the potential for significant optimizations: optimizations that are not achievable with a resolver&ndash;based execution model unless one puts in herculean effort (and a little sorcery 😉).
 
-Gra*fast*, like GraphQL, is not specific to any particular technology stack, business logic shape or data storage layer. It doesn&lsquo;t care if you&lsquo;re using relational databases, document stores, ORMs, HTTP APIs, file systems or _[carrier pigeons](https://datatracker.ietf.org/doc/html/rfc1149)_. Any valid GraphQL schema can be implemented with Gra*fast*, and a Gra*fast* schema can query any data source, business logic or service.
+Gra*fast*, like GraphQL, is not specific to any particular technology stack, business logic shape or data storage layer. It doesn’t care if you’re using relational databases, document stores, ORMs, HTTP APIs, file systems or _[carrier pigeons](https://datatracker.ietf.org/doc/html/rfc1149)_. Any valid GraphQL schema can be implemented with Gra*fast*, and a Gra*fast* schema can query any data source, business logic or service.
 
 Though it supports traditional resolvers, Gra*fast* encourages developers to use &ldquo;plan resolvers&rdquo;: small functions similar to resolvers but which describe the required data, rather than actually fetching it.
 
@@ -88,23 +96,24 @@ This greater understanding of the needs of the GraphQL requests unlocks entire n
 <blockquote class="twitter-tweet" data-conversation="none" data-theme="light">
   <p lang="en" dir="ltr">
     <strong>
-    Probably worth looking into the work{" "}
-    <a href="https://twitter.com/Benjie?ref_src=twsrc%5Etfw">@Benjie</a> is
-    doing with Grafast as well. Feels like the missing substrate in the GraphQL
-    world.
+      Probably worth looking into the work{" "}
+      <a href="https://twitter.com/Benjie?ref_src=twsrc%5Etfw">@Benjie</a> is
+      doing with Grafast as well. Feels like the missing substrate in the
+      GraphQL world.
     </strong>
   </p>
   &mdash; Sean Grove (@sgrove){" "}
   <a href="https://twitter.com/sgrove/status/1696572548803162477?ref_src=twsrc%5Etfw">
     August 29, 2023
   </a>
-</blockquote> <script
+</blockquote>
+<script
   async
   src="https://platform.twitter.com/widgets.js"
   charset="utf-8"
 ></script>
 
-Gra*fast* already works and some of my [sponsors](https://graphile.org/sponsors) are already running it in production. You can try it out today by following the guide at [grafast.org](https://grafast.org). All that&lsquo;s left for me to say now is, if the potential of this new technology is interesting, then please:
+Gra*fast* already works and some of my [sponsors](https://graphile.org/sponsors) are already running it in production. You can try it out today by following the guide at [grafast.org](https://grafast.org). All that’s left for me to say now is, if the potential of this new technology is interesting, then please:
 
 ## Help shape the future on 24th October and join the [Gra*fast* working group](https://github.com/grafast/wg)!
 
@@ -113,5 +122,3 @@ Gra*fast* already works and some of my [sponsors](https://graphile.org/sponsors)
 [![A cartoon graphic of superheroes looking over their city at sunset. The text reads "Get involved" and there is a link to the Grafast working group hosted on GitHub](../static/img/news/2023-10-13-get-involved.png)](https://github.com/grafast/wg)
 
 </figure>
-
-<!--truncate-->

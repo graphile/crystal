@@ -633,8 +633,8 @@ function substring(text: string, stringType: "'" | '"' | "`"): TE {
     stringType === '"'
       ? inner // "" strings already escapes
       : stringType === "'"
-      ? inner.replace(/'/g, "\\'") // '' strings need `'` escaped too (`\` has already been escaped)
-      : inner.replace(/[`$]/g, "\\$&"); // `` strings need both '`' and `$` to be escaped (`\` has already been escaped)
+        ? inner.replace(/'/g, "\\'") // '' strings need `'` escaped too (`\` has already been escaped)
+        : inner.replace(/[`$]/g, "\\$&"); // `` strings need both '`' and `$` to be escaped (`\` has already been escaped)
   // Finally return a raw node
   return makeRawNode(escaped);
 }
@@ -762,9 +762,10 @@ function get(key: string | symbol | number): TE {
     ? // ._mySimpleProperty
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
-    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${stringifyJSON(key)}]`)
-    : te`[${te.lit(key)}]`;
+      typeof key === "string" ||
+        (typeof key === "number" && Number.isFinite(key))
+      ? makeRawNode(`[${stringifyJSON(key)}]`)
+      : te`[${te.lit(key)}]`;
 }
 
 /**
@@ -779,9 +780,10 @@ function optionalGet(key: string | symbol | number): TE {
     ? // ?._mySimpleProperty
       makeRawNode(`?.${key}`)
     : // ?.["@@meaning"]
-    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`?.[${stringifyJSON(key)}]`)
-    : te`?.[${te.lit(key)}]`;
+      typeof key === "string" ||
+        (typeof key === "number" && Number.isFinite(key))
+      ? makeRawNode(`?.[${stringifyJSON(key)}]`)
+      : te`?.[${te.lit(key)}]`;
 }
 
 /**
@@ -810,9 +812,10 @@ function set(key: string | symbol | number, hasNullPrototype = false): TE {
     ? // ._mySimpleProperty
       makeRawNode(`.${key}`)
     : // ["@@meaning"]
-    typeof key === "string" || (typeof key === "number" && Number.isFinite(key))
-    ? makeRawNode(`[${stringifyJSON(key)}]`)
-    : te`[${te.lit(key)}]`;
+      typeof key === "string" ||
+        (typeof key === "number" && Number.isFinite(key))
+      ? makeRawNode(`[${stringifyJSON(key)}]`)
+      : te`[${te.lit(key)}]`;
 }
 
 /**
@@ -1071,8 +1074,8 @@ function indent(
     "raw" in fragmentOrStrings
       ? te(fragmentOrStrings, ...values)
       : fragmentOrStrings[$$type] !== undefined
-      ? fragmentOrStrings
-      : enforceValidNode(fragmentOrStrings);
+        ? fragmentOrStrings
+        : enforceValidNode(fragmentOrStrings);
   if (!isDev) {
     return fragment;
   }

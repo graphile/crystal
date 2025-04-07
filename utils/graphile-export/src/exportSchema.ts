@@ -145,7 +145,7 @@ function getNameForThing(
     const name =
       thingConstructorName && thingName
         ? `${thingName}${thingConstructorName}`
-        : thingName ?? thingConstructorName ?? null;
+        : (thingName ?? thingConstructorName ?? null);
     return baseNameHint || name
       ? (baseNameHint ?? "") + (baseNameHint && name ? "-" : "") + (name ?? "")
       : "value";
@@ -916,20 +916,20 @@ type ConfigForGraphQLEntity<TKey extends GraphQLEntityName> =
   TKey extends "GraphQLSchema"
     ? GraphQLSchemaConfig
     : TKey extends "GraphQLDirective"
-    ? GraphQLDirectiveConfig
-    : TKey extends "GraphQLObjectType"
-    ? GraphQLObjectTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInterfaceType"
-    ? GraphQLInterfaceTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLUnionType"
-    ? GraphQLUnionTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInputObjectType"
-    ? GraphQLInputObjectTypeConfig
-    : TKey extends "GraphQLScalarType"
-    ? GraphQLScalarTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLEnumType"
-    ? GraphQLEnumTypeConfig
-    : never;
+      ? GraphQLDirectiveConfig
+      : TKey extends "GraphQLObjectType"
+        ? GraphQLObjectTypeConfig<unknown, unknown>
+        : TKey extends "GraphQLInterfaceType"
+          ? GraphQLInterfaceTypeConfig<unknown, unknown>
+          : TKey extends "GraphQLUnionType"
+            ? GraphQLUnionTypeConfig<unknown, unknown>
+            : TKey extends "GraphQLInputObjectType"
+              ? GraphQLInputObjectTypeConfig
+              : TKey extends "GraphQLScalarType"
+                ? GraphQLScalarTypeConfig<unknown, unknown>
+                : TKey extends "GraphQLEnumType"
+                  ? GraphQLEnumTypeConfig
+                  : never;
 
 function declareGraphQLEntity<TKey extends GraphQLEntityName>(
   file: CodegenFile,
@@ -1628,18 +1628,59 @@ function exportSchemaTypeDefs({
 
         const args = field.args
           ? Object.entries(field.args)
-              .map(([argName, arg]) => {
-                const extensionsAST = extensions(
-                  file,
-                  arg.extensions,
-                  `${type.name}.${fieldName}.${argName}`,
-                  `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
-                );
-                if (!extensionsAST) return null;
-                return t.objectProperty(
-                  identifierOrLiteral(argName),
-                  extensionsAST,
-                );
+              .map(([argName, arg]): t.ObjectProperty | null => {
+                if (arg.extensions) {
+                  const { grafast, ...rest } = arg.extensions;
+                  const extensionsAST = extensions(
+                    file,
+                    rest,
+                    `${type.name}.${fieldName}.${argName}`,
+                    `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
+                  );
+                  if (!extensionsAST) {
+                    if (!grafast) return null;
+                    const keys = Object.keys(grafast);
+                    if (keys.length === 1 && keys[0] === "applyPlan") {
+                      // Shorthand
+                      return t.objectProperty(
+                        identifierOrLiteral(argName),
+                        convertToIdentifierViaAST(
+                          file,
+                          grafast.applyPlan!,
+                          `${type.name}.${fieldName}${argName}ApplyPlan`,
+                          `${type.name}.fields[${fieldName}].args[${argName}].applyPlan`,
+                        ),
+                      );
+                    }
+                  }
+                  return t.objectProperty(
+                    identifierOrLiteral(argName),
+                    t.objectExpression([
+                      ...objectToObjectProperties({
+                        extensions: extensionsAST,
+                      }),
+
+                      ...(grafast
+                        ? Object.entries(grafast)
+                            .map(([k, v]) => {
+                              if (v == null) return null;
+                              return t.objectProperty(
+                                t.identifier(k),
+                                convertToIdentifierViaAST(
+                                  file,
+                                  grafast.applyPlan!,
+                                  `${type.name}.${fieldName}${argName}${k}`,
+                                  `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast[${k}]`,
+                                ),
+                              );
+                            })
+                            .filter(isNotNullish)
+                        : []),
+                    ]),
+                  );
+                } else {
+                  return null;
+                }
               })
               .filter(isNotNullish)
           : null;
@@ -1676,49 +1717,96 @@ function exportSchemaTypeDefs({
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions?.grafast?.inputPlan) {
+      if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            identifierOrLiteral("__inputPlan"),
+            t.identifier("__baked"),
             convertToIdentifierViaAST(
               file,
-              type.extensions?.grafast.inputPlan,
+              type.extensions?.grafast.baked,
               `${type.name}.inputPlan`,
-              `${type.name}.extensions.grafast.inputPlan`,
+              `${type.name}.extensions.grafast.baked`,
             ),
           ),
         );
       }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
+        if (!field.extensions) continue;
+        const { grafast, ...rest } = field.extensions;
+        const extensionsAST = extensions(
+          file,
+          rest,
+          `${type.name}_${fieldName}Extensions`,
+          `${type.name}.fields[${fieldName}].extensions`,
+        );
+        if (!extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            typeProperties.push(
+              t.objectProperty(
+                identifierOrLiteral(fieldName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${fieldName}Apply`,
+                  `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+
         typeProperties.push(
           t.objectProperty(
             identifierOrLiteral(fieldName),
-            convertToIdentifierViaAST(
-              file,
-              field.extensions?.grafast,
-              `${type.name}.${fieldName}`,
-              `${type.name}.fields[${fieldName}].extensions.grafast`,
-            ),
+            t.objectExpression([
+              ...objectToObjectProperties({
+                extensions: extensionsAST,
+              }),
+
+              ...(grafast
+                ? Object.entries(grafast)
+                    .map(([k, v]) => {
+                      if (v == null) return null;
+                      return t.objectProperty(
+                        t.identifier(k),
+                        convertToIdentifierViaAST(
+                          file,
+                          v,
+                          `${type.name}.${fieldName}${k}`,
+                          `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
+                        ),
+                      );
+                    })
+                    .filter(isNotNullish)
+                : []),
+            ]),
           ),
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (
       type instanceof GraphQLInterfaceType ||
       type instanceof GraphQLUnionType
@@ -1811,23 +1899,59 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
+        const { grafast, ...rest } = enumValueConfig.extensions ?? {};
         const extensionsAST = extensions(
           file,
-          enumValueConfig.extensions,
+          rest,
           `${type.name}_${enumValueName}Extensions`,
           `${type.name}.values[${enumValueName}].extensions`,
         );
+        if (!valueAST && !extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            enumValues.push(
+              t.objectProperty(
+                identifierOrLiteral(enumValueName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${enumValueName}Apply`,
+                  `${type.name}.values[${enumValueName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+        const grafastProperties = grafast
+          ? Object.entries(grafast)
+              .map(([k, v]) => {
+                if (v == null) return null;
+                return t.objectProperty(
+                  t.identifier(k),
+                  convertToIdentifierViaAST(
+                    file,
+                    v,
+                    `${type.name}.${enumValueName}${k}`,
+                    `${type.name}.values[${enumValueName}].extensions.grafast[${k}]`,
+                  ),
+                );
+              })
+              .filter(isNotNullish)
+          : [];
 
-        if (valueAST || extensionsAST) {
+        if (valueAST || extensionsAST || grafastProperties.length) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
-              t.objectExpression(
-                objectToObjectProperties({
+              t.objectExpression([
+                ...objectToObjectProperties({
                   value: valueAST,
                   extensions: extensionsAST,
                 }),
-              ),
+                ...grafastProperties,
+              ]),
             ),
           );
         }

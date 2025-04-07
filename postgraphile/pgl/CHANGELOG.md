@@ -1,5 +1,97 @@
 # pgl
 
+## 5.0.0-beta.40
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafserv@0.1.1-beta.24
+  - graphile-build-pg@5.0.0-beta.38
+  - @dataplan/pg@0.0.1-beta.32
+  - postgraphile@5.0.0-beta.40
+
+## 5.0.0-beta.39
+
+### Patch Changes
+
+- Updated dependencies
+  [[`d34014a9a3c469154cc796086ba13719954731e5`](https://github.com/graphile/crystal/commit/d34014a9a3c469154cc796086ba13719954731e5),
+  [`d3ae3415c230784fdfefc9d192ad93aca462bceb`](https://github.com/graphile/crystal/commit/d3ae3415c230784fdfefc9d192ad93aca462bceb),
+  [`98516379ac355a0833a64e002f3717cc3a1d6473`](https://github.com/graphile/crystal/commit/98516379ac355a0833a64e002f3717cc3a1d6473),
+  [`f8602d05eed3247c90b87c55d7af580d1698effc`](https://github.com/graphile/crystal/commit/f8602d05eed3247c90b87c55d7af580d1698effc),
+  [`65df25534fa3f787ba2ab7fd9547d295ff2b1288`](https://github.com/graphile/crystal/commit/65df25534fa3f787ba2ab7fd9547d295ff2b1288),
+  [`1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a`](https://github.com/graphile/crystal/commit/1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a),
+  [`f6e22692b628703b8ea48e580dc0b6f0bcbc9c5a`](https://github.com/graphile/crystal/commit/f6e22692b628703b8ea48e580dc0b6f0bcbc9c5a),
+  [`e10c372dafbe0d6014b1e946349b22f40aa87ef9`](https://github.com/graphile/crystal/commit/e10c372dafbe0d6014b1e946349b22f40aa87ef9),
+  [`c3538050abbb485cf1d43f7c870b89f1ad7c2218`](https://github.com/graphile/crystal/commit/c3538050abbb485cf1d43f7c870b89f1ad7c2218),
+  [`3c0a925f26f10cae627a23c49c75ccd8d76b60c8`](https://github.com/graphile/crystal/commit/3c0a925f26f10cae627a23c49c75ccd8d76b60c8),
+  [`fcaeb48844156e258a037f420ea1505edb50c52a`](https://github.com/graphile/crystal/commit/fcaeb48844156e258a037f420ea1505edb50c52a),
+  [`68926abc31c32ce527327ffbb1ede4b0b7be446b`](https://github.com/graphile/crystal/commit/68926abc31c32ce527327ffbb1ede4b0b7be446b),
+  [`98c5009e21e423b0da22c2cb70cdb62909578f50`](https://github.com/graphile/crystal/commit/98c5009e21e423b0da22c2cb70cdb62909578f50),
+  [`4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b`](https://github.com/graphile/crystal/commit/4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b),
+  [`d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48`](https://github.com/graphile/crystal/commit/d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48),
+  [`c8f1971ea4198633ec97f72f82abf65089f71a88`](https://github.com/graphile/crystal/commit/c8f1971ea4198633ec97f72f82abf65089f71a88),
+  [`182ed0564104f59b012e0f9ffd452556b0927750`](https://github.com/graphile/crystal/commit/182ed0564104f59b012e0f9ffd452556b0927750),
+  [`dd3d22eab73a8554715bf1111e30586251f69a88`](https://github.com/graphile/crystal/commit/dd3d22eab73a8554715bf1111e30586251f69a88),
+  [`a120a8e43b24dfc174950cdbb69e481272a0b45e`](https://github.com/graphile/crystal/commit/a120a8e43b24dfc174950cdbb69e481272a0b45e),
+  [`be1e558d6a1a8cae3bf4b5724c340469d8837504`](https://github.com/graphile/crystal/commit/be1e558d6a1a8cae3bf4b5724c340469d8837504),
+  [`3b0f5082b2272997ce33ce8823a4752513d19e28`](https://github.com/graphile/crystal/commit/3b0f5082b2272997ce33ce8823a4752513d19e28),
+  [`84f06eafa051e907a3050237ac6ee5aefb184652`](https://github.com/graphile/crystal/commit/84f06eafa051e907a3050237ac6ee5aefb184652),
+  [`4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf`](https://github.com/graphile/crystal/commit/4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf),
+  [`3789326b2e2fdb86519acc75e606c752ddefe590`](https://github.com/graphile/crystal/commit/3789326b2e2fdb86519acc75e606c752ddefe590),
+  [`12d3a7174949794a1679132635e196f5dadce8a2`](https://github.com/graphile/crystal/commit/12d3a7174949794a1679132635e196f5dadce8a2),
+  [`ab7658ac44e1a5a0a98c6bb688a26d94b1175cc1`](https://github.com/graphile/crystal/commit/ab7658ac44e1a5a0a98c6bb688a26d94b1175cc1),
+  [`bc2a00d35f0a1954dba22e857adc3f4e2f5118e5`](https://github.com/graphile/crystal/commit/bc2a00d35f0a1954dba22e857adc3f4e2f5118e5),
+  [`ceeb9a6b63e566b09298e0440a385943302ad0f9`](https://github.com/graphile/crystal/commit/ceeb9a6b63e566b09298e0440a385943302ad0f9),
+  [`3e8c64bef928295494119e15e1e55cbdadb696fa`](https://github.com/graphile/crystal/commit/3e8c64bef928295494119e15e1e55cbdadb696fa),
+  [`0fc2db95d90df918cf5c59ef85f22ac78d8000d3`](https://github.com/graphile/crystal/commit/0fc2db95d90df918cf5c59ef85f22ac78d8000d3),
+  [`90e81a5deeae554a8be2dd55dcd01489860e96e6`](https://github.com/graphile/crystal/commit/90e81a5deeae554a8be2dd55dcd01489860e96e6),
+  [`836c8327a5ca1bd3c69f72055e71d00694de363e`](https://github.com/graphile/crystal/commit/836c8327a5ca1bd3c69f72055e71d00694de363e),
+  [`2f31836cb89a7ab27a8919803fe12b53a46d77e4`](https://github.com/graphile/crystal/commit/2f31836cb89a7ab27a8919803fe12b53a46d77e4),
+  [`c59132eb7a93bc82493d2f1ca050db8aaea9f4d1`](https://github.com/graphile/crystal/commit/c59132eb7a93bc82493d2f1ca050db8aaea9f4d1),
+  [`7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7`](https://github.com/graphile/crystal/commit/7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7),
+  [`728888b28fcd2a6fc481e0ccdfe20d41181a091f`](https://github.com/graphile/crystal/commit/728888b28fcd2a6fc481e0ccdfe20d41181a091f),
+  [`f4f39092d7a51517668384945895d3b450237cce`](https://github.com/graphile/crystal/commit/f4f39092d7a51517668384945895d3b450237cce),
+  [`5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e`](https://github.com/graphile/crystal/commit/5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e),
+  [`925689578ee9def403382df70f0e003bb299c166`](https://github.com/graphile/crystal/commit/925689578ee9def403382df70f0e003bb299c166),
+  [`83d3b533e702cc875b46ba2ca02bf3642b421be8`](https://github.com/graphile/crystal/commit/83d3b533e702cc875b46ba2ca02bf3642b421be8),
+  [`7001138c38e09822ad13db1018c62d2cac37941e`](https://github.com/graphile/crystal/commit/7001138c38e09822ad13db1018c62d2cac37941e),
+  [`e9e7e33665e22ec397e9ead054d2e4aad3eadc8c`](https://github.com/graphile/crystal/commit/e9e7e33665e22ec397e9ead054d2e4aad3eadc8c),
+  [`bb6ec8d834e3e630e28316196246f514114a2296`](https://github.com/graphile/crystal/commit/bb6ec8d834e3e630e28316196246f514114a2296),
+  [`3e188c2e981193d228ba3b7433f5e326336f629b`](https://github.com/graphile/crystal/commit/3e188c2e981193d228ba3b7433f5e326336f629b),
+  [`07a5469e5d3d050a7bcab928bb751c9e150d2e49`](https://github.com/graphile/crystal/commit/07a5469e5d3d050a7bcab928bb751c9e150d2e49),
+  [`e6da5d956ab696932410e7172cedfacba71dbf5e`](https://github.com/graphile/crystal/commit/e6da5d956ab696932410e7172cedfacba71dbf5e),
+  [`2b1918d053f590cdc534c8cb81f7e74e96c1bbe6`](https://github.com/graphile/crystal/commit/2b1918d053f590cdc534c8cb81f7e74e96c1bbe6),
+  [`037a1bcdc8ed8493d4748e08c18f258e4382a815`](https://github.com/graphile/crystal/commit/037a1bcdc8ed8493d4748e08c18f258e4382a815),
+  [`72b300b436a7acedaa7d0e3a7a5458d15a0e5396`](https://github.com/graphile/crystal/commit/72b300b436a7acedaa7d0e3a7a5458d15a0e5396),
+  [`770363214ee630746cddc9080dec22bbf38a3bb5`](https://github.com/graphile/crystal/commit/770363214ee630746cddc9080dec22bbf38a3bb5),
+  [`d1ecb39693a341f85762b27012ec4ea013857b0c`](https://github.com/graphile/crystal/commit/d1ecb39693a341f85762b27012ec4ea013857b0c),
+  [`042ebafe11fcf7e2ecac9b131265a55dddd42a6d`](https://github.com/graphile/crystal/commit/042ebafe11fcf7e2ecac9b131265a55dddd42a6d),
+  [`fa005eb0783c58a2476add984fbdd462e0e91dbe`](https://github.com/graphile/crystal/commit/fa005eb0783c58a2476add984fbdd462e0e91dbe),
+  [`df0e5a0f968cf6f9ae97b68745a9a2f391324bf5`](https://github.com/graphile/crystal/commit/df0e5a0f968cf6f9ae97b68745a9a2f391324bf5),
+  [`ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f`](https://github.com/graphile/crystal/commit/ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f),
+  [`ba2bfa15deaaddd92757a56c2b761624afe940bd`](https://github.com/graphile/crystal/commit/ba2bfa15deaaddd92757a56c2b761624afe940bd),
+  [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6),
+  [`629b45aab49151810f6efc18ac18f7d735626433`](https://github.com/graphile/crystal/commit/629b45aab49151810f6efc18ac18f7d735626433),
+  [`6d19724330d50d076aab9442660fa8abddd095cb`](https://github.com/graphile/crystal/commit/6d19724330d50d076aab9442660fa8abddd095cb),
+  [`ca5bc1a834df7b894088fb8602a12f9fcff55b38`](https://github.com/graphile/crystal/commit/ca5bc1a834df7b894088fb8602a12f9fcff55b38),
+  [`da6f3c04efe3d8634c0bc3fcf93ac2518de85322`](https://github.com/graphile/crystal/commit/da6f3c04efe3d8634c0bc3fcf93ac2518de85322),
+  [`8026b982a81776fb3d1d808392970c2d678c4023`](https://github.com/graphile/crystal/commit/8026b982a81776fb3d1d808392970c2d678c4023),
+  [`d257a1a1e59a7d4da0bf67345c07b04c04a2f7da`](https://github.com/graphile/crystal/commit/d257a1a1e59a7d4da0bf67345c07b04c04a2f7da),
+  [`00d79e6f5608affc3f36bb0ce4ca2547230174e7`](https://github.com/graphile/crystal/commit/00d79e6f5608affc3f36bb0ce4ca2547230174e7),
+  [`412b92a0b1e03ad962521f630b57a996d8620cf6`](https://github.com/graphile/crystal/commit/412b92a0b1e03ad962521f630b57a996d8620cf6),
+  [`15854c5109114919b3d38fa675c539cda1f634a1`](https://github.com/graphile/crystal/commit/15854c5109114919b3d38fa675c539cda1f634a1),
+  [`f0bc64b71914dfdd3612f4b65370401fd85b97bc`](https://github.com/graphile/crystal/commit/f0bc64b71914dfdd3612f4b65370401fd85b97bc)]:
+  - grafast@0.1.1-beta.21
+  - @dataplan/pg@0.0.1-beta.32
+  - pg-sql2@5.0.0-beta.8
+  - graphile-build-pg@5.0.0-beta.38
+  - postgraphile@5.0.0-beta.39
+  - graphile-build@5.0.0-beta.33
+  - @dataplan/json@0.0.1-beta.30
+  - graphile-config@0.0.1-beta.15
+  - grafserv@0.1.1-beta.23
+
 ## 5.0.0-beta.38
 
 ### Patch Changes

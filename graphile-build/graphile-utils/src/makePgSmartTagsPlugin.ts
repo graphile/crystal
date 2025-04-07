@@ -217,8 +217,8 @@ function rulesFrom(
   const rawRules = Array.isArray(ruleOrRules)
     ? ruleOrRules
     : ruleOrRules
-    ? [ruleOrRules]
-    : [];
+      ? [ruleOrRules]
+      : [];
   return [rawRules.map(compileRule), rawRules];
 }
 

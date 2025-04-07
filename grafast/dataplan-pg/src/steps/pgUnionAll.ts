@@ -16,7 +16,6 @@ import {
   access,
   arrayOfLength,
   constant,
-  ExecutableStep,
   exportAs,
   first,
   isDev,
@@ -24,6 +23,7 @@ import {
   polymorphicWrap,
   reverseArray,
   SafeError,
+  Step,
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -38,8 +38,11 @@ import type {
   PgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
+  PgQueryBuilder,
   PgSQLCallbackOrDirect,
-  PgTypedExecutableStep,
+  PgTypedStep,
+  PgUnionAllQueryBuilderCallback,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
@@ -49,7 +52,7 @@ import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
 } from "./pgCondition.js";
-import { PgConditionStep } from "./pgCondition.js";
+import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
@@ -60,6 +63,7 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
+  PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   QueryValue,
@@ -90,6 +94,7 @@ const digestSpecificExpressionFromAttributeName = (
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
+  m: Object.create(null),
   hasMore: false,
   items: [],
 } as PgUnionAllStepResult);
@@ -139,11 +144,11 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
   match?: {
     [resourceAttributeName: string]:
       | {
-          step: PgTypedExecutableStep<any>;
+          step: PgTypedStep<any>;
           codec?: never;
         }
       | {
-          step: ExecutableStep;
+          step: Step;
           codec: PgCodec;
         };
   };
@@ -185,7 +190,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 }
 
 export class PgUnionAllSingleStep
-  extends ExecutableStep
+  extends Step
   implements PolymorphicStep, EdgeCapableStep<any>
 {
   static $$export = {
@@ -196,7 +201,7 @@ export class PgUnionAllSingleStep
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
-  constructor($parent: PgUnionAllStep<any, any>, $item: ExecutableStep) {
+  constructor($parent: PgUnionAllStep<any, any>, $item: Step) {
     super();
     this.addDependency($item);
     this.spec = $parent.spec;
@@ -209,7 +214,7 @@ export class PgUnionAllSingleStep
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): ExecutableStep {
+  planForType(objectType: GraphQLObjectType<any, any>): Step {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
@@ -258,21 +263,25 @@ export class PgUnionAllSingleStep
     return $pgUnionAll;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   public node() {
     return this;
   }
 
   public scopedSQL = makeScopedSQL(this);
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public placeholder($step: PgTypedStep<any>): SQL;
+  public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    $step: Step | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
-      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+      : this.getClassStep().placeholder($step as PgTypedStep<any>);
   }
 
   /**
@@ -364,6 +373,8 @@ export type PgUnionAllMode = "normal" | "aggregate";
  * the relevant queryValues. This saves repeating this work at execution time.
  */
 interface QueryBuildResult {
+  meta: Record<string, unknown>;
+
   // The SQL query text
   text: string;
 
@@ -397,6 +408,7 @@ interface QueryBuildResult {
 }
 
 interface PgUnionAllStepResult {
+  m: Record<string, unknown>;
   hasMore?: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
@@ -481,6 +493,8 @@ export class PgUnionAllStep<
   private memberDigests: Readonly<MutableMemberDigest<TTypeNames>>[] = [];
   private _limitToTypes: string[] | undefined;
 
+  private applyDepIds: number[] = [];
+
   /**
    * Set this true if your query includes any `VOLATILE` function (including
    * seemingly innocuous things such as `random()`) otherwise we might only
@@ -521,6 +535,7 @@ export class PgUnionAllStep<
       }
     });
 
+    $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.contextId = cloneFrom.contextId;
     $clone.memberDigests = cloneFrom.memberDigests.map(cloneMemberDigest);
     if (cloneFrom._limitToTypes) {
@@ -755,6 +770,10 @@ on (${sql.indent(
     return index;
   }
 
+  public getMeta(key: string) {
+    return access(this, ["m", key]);
+  }
+
   /**
    * If this plan may only return one record, you can use `.singleAsRecord()`
    * to return a plan that resolves to that record (rather than a list of
@@ -772,8 +791,14 @@ on (${sql.indent(
     return this.singleAsRecord();
   }
 
-  row($row: ExecutableStep) {
+  row($row: Step) {
     return new PgUnionAllSingleStep(this, $row);
+  }
+
+  apply(
+    $step: Step<ReadonlyArrayOrDirect<Maybe<PgUnionAllQueryBuilderCallback>>>,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
   }
 
   public items() {
@@ -785,7 +810,7 @@ on (${sql.indent(
     );
   }
 
-  listItem(itemPlan: ExecutableStep) {
+  listItem(itemPlan: Step) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
   }
@@ -822,33 +847,12 @@ on (${sql.indent(
     }
   }
 
-  wherePlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
-      );
-    }
-    return new PgConditionStep(this);
-  }
-
   groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
     }
     this.groups.push(this.scopedSQL(group));
-  }
-
-  havingPlan(): PgConditionStep<this> {
-    if (this.locker.locked) {
-      throw new Error(
-        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
-      );
-    }
-    if (this.mode !== "aggregate") {
-      throw new SafeError(`Cannot add having to a non-aggregate query`);
-    }
-    return new PgConditionStep(this, true);
   }
 
   having(
@@ -907,16 +911,6 @@ on (${sql.indent(
   }
 
   optimize() {
-    if (this._limitToTypes) {
-      this.memberDigests = this.memberDigests.filter((d) =>
-        this._limitToTypes!.includes(d.member.typeName),
-      );
-    }
-    if (this.memberDigests.length === 0) {
-      // We have no implementations, we'll never return anything
-      return constant(NO_ROWS, false);
-    }
-
     // TODO: validate the parsed cursor and throw error in connection if it
     // fails. I'm not sure, but perhaps we can add this step itself (or a
     // derivative thereof) as a dependency of the connection - that way, if
@@ -943,7 +937,7 @@ on (${sql.indent(
     return this;
   }
 
-  public getCursorDetails(): ExecutableStep<PgCursorDetails> {
+  public getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
   }
@@ -971,6 +965,7 @@ on (${sql.indent(
     } = executionDetails;
     const { fetchOneExtra } = this;
     const {
+      meta,
       text,
       rawSqlValues,
       identifierIndex,
@@ -983,7 +978,9 @@ on (${sql.indent(
     } = buildTheQuery<TAttributes, TTypeNames>({
       executionDetails,
       placeholders: this.placeholders,
+      placeholderSymbols: this.placeholders.map((p) => p.symbol),
       deferreds: this.deferreds,
+      deferredSymbols: this.deferreds.map((d) => d.symbol),
       firstStepId: this.firstStepId,
       lastStepId: this.lastStepId,
       offsetStepId: this.offsetStepId,
@@ -993,6 +990,7 @@ on (${sql.indent(
       havingConditions: this.havingConditions,
       mode: this.mode,
       alias: this.alias,
+      symbol: this.symbol,
       hasSideEffects: this.hasSideEffects,
       groups: this.groups,
       orderSpecs: this.orderSpecs,
@@ -1000,8 +998,10 @@ on (${sql.indent(
       typeIdx: this.typeIdx,
       attributes: this.spec.attributes,
       memberDigests: this.memberDigests,
+      limitToTypes: this._limitToTypes,
       fetchOneExtra,
       needsCursor: this.needsCursor,
+      applyDepIds: this.applyDepIds,
     });
 
     if (first === 0 || last === 0) {
@@ -1025,8 +1025,8 @@ on (${sql.indent(
                 return val == null
                   ? null
                   : alreadyEncoded
-                  ? val
-                  : codec.toPg(val);
+                    ? val
+                    : codec.toPg(val);
               })
             : EMPTY_ARRAY,
       };
@@ -1068,6 +1068,7 @@ on (${sql.indent(
         ? reverseArray(slicedRows)
         : slicedRows;
       return {
+        m: meta,
         hasMore,
         items: orderedRows,
         cursorDetails,
@@ -1087,7 +1088,7 @@ on (${sql.indent(
 export class PgUnionAllRowsStep<
   TAttributes extends string = string,
   TTypeNames extends string = string,
-> extends ExecutableStep {
+> extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllRowsStep",
@@ -1098,14 +1099,14 @@ export class PgUnionAllRowsStep<
     this.addDependency($pgUnionAll);
   }
   public getClassStep(): PgUnionAllStep<TAttributes, TTypeNames> {
-    return this.getDep<PgUnionAllStep<TAttributes, TTypeNames>>(0);
+    return this.getDepOptions<PgUnionAllStep<TAttributes, TTypeNames>>(0).step;
   }
 
-  listItem(itemPlan: ExecutableStep) {
+  listItem(itemPlan: Step) {
     return this.getClassStep().listItem(itemPlan);
   }
 
-  public deduplicate(_peers: readonly ExecutableStep[]) {
+  public deduplicate(_peers: readonly Step[]) {
     // We don't have any properties, and dependencies is already checked, so we're the same as our kin.
     return _peers;
   }
@@ -1133,10 +1134,12 @@ exportAs("@dataplan/pg", pgUnionAll, "pgUnionAll");
 interface PgUnionAllQueryInfo<
   TAttributes extends string = string,
   TTypeNames extends string = string,
-> extends PgStmtCommonQueryInfo {
+> extends PgStmtCommonQueryInfo,
+    PgStmtCompileQueryInfo {
   readonly mode: PgUnionAllMode;
   readonly typeIdx: number | null;
   readonly memberDigests: ReadonlyArray<MemberDigest<TTypeNames>>;
+  readonly limitToTypes: ReadonlyArray<string> | undefined;
   readonly attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
 
   readonly selects: ReadonlyArray<PgUnionAllStepSelect<TAttributes>>;
@@ -1147,14 +1150,18 @@ interface MutablePgUnionAllQueryInfo<
   TTypeNames extends string = string,
 > extends PgUnionAllQueryInfo<TAttributes, TTypeNames>,
     MutablePgStmtCommonQueryInfo {
-  readonly memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  memberDigests: ReadonlyArray<MutableMemberDigest<TTypeNames>>;
+  limitToTypes: Array<string> | undefined;
   readonly selects: Array<PgUnionAllStepSelect<TAttributes>>;
 
+  readonly orderSpecs: Array<PgUnionAllStepOrder<TAttributes>>;
   readonly orders: Array<PgOrderFragmentSpec>;
   cursorLower: Maybe<number>;
   cursorUpper: Maybe<number>;
   ordersForCursor: ReadonlyArray<PgOrderFragmentSpec>;
   typeIdx: number | null;
+  isOrderUnique: boolean;
+  readonly havingConditions: Array<SQL>;
 }
 
 function buildTheQuery<
@@ -1166,10 +1173,13 @@ function buildTheQuery<
 
     // Copy and make mutable
     selects: [...rawInfo.selects],
+    orderSpecs: [...rawInfo.orderSpecs],
     orders: [],
+    isOrderUnique: false,
     groups: [...rawInfo.groups],
     havingConditions: [...rawInfo.havingConditions],
     memberDigests: rawInfo.memberDigests.map(cloneMemberDigest),
+    limitToTypes: rawInfo.limitToTypes?.slice(),
 
     // Will be populated below
     ordersForCursor: undefined as never,
@@ -1186,6 +1196,7 @@ function buildTheQuery<
     offset: null,
     shouldReverseOrder: false,
   };
+
   const { values, count } = info.executionDetails;
 
   function selectAndReturnIndex(expression: SQL): number {
@@ -1224,7 +1235,104 @@ function buildTheQuery<
     return info.selects.push({ type: "pk" }) - 1;
   }
 
-  // TODO: evaluate runtime orders, conditions, etc here
+  const meta = Object.create(null);
+  const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
+    alias: info.alias,
+    [$$toSQL]() {
+      return info.alias;
+    },
+    setMeta(key, value) {
+      meta[key] = value;
+    },
+    getMetaRaw(key) {
+      return meta[key];
+    },
+    orderBy(spec) {
+      if (info.mode !== "aggregate") {
+        info.orderSpecs.push(spec);
+      }
+    },
+    setOrderIsUnique() {
+      info.isOrderUnique = true;
+    },
+    where(whereSpec) {
+      for (const digest of info.memberDigests) {
+        const { alias: tableAlias, symbol } = digest;
+        if (sql.isSQL(whereSpec)) {
+          // Merge the global where into this sub-where.
+          digest.conditions.push(
+            // TODO: do we require that info.symbol is a symbol?
+            typeof info.symbol === "symbol"
+              ? sql.replaceSymbol(whereSpec, info.symbol, symbol)
+              : whereSpec,
+          );
+        } else {
+          const ident = sql`${tableAlias}.${digestSpecificExpressionFromAttributeName(
+            digest,
+            whereSpec.attribute,
+          )}`;
+          digest.conditions.push(whereSpec.callback(ident));
+        }
+      }
+    },
+    having(condition) {
+      if (info.mode !== "aggregate") {
+        throw new SafeError(`Cannot add having to a non-aggregate query`);
+      }
+      if (sql.isSQL(condition)) {
+        info.havingConditions.push(condition);
+      } else {
+        const never: never = condition;
+        console.error("Unsupported condition: ", never);
+        throw new Error(`Unsupported condition`);
+      }
+    },
+    whereBuilder() {
+      return new PgCondition(this);
+    },
+    havingBuilder() {
+      return new PgCondition(this, true);
+    },
+    limitToTypes(types) {
+      if (!info.limitToTypes) {
+        info.limitToTypes = [...types];
+      } else {
+        info.limitToTypes = info.limitToTypes.filter((t) => types.includes(t));
+      }
+    },
+  };
+
+  for (const applyDepId of info.applyDepIds) {
+    const val = values[applyDepId].unaryValue();
+    if (Array.isArray(val)) {
+      val.forEach((v) => v?.(queryBuilder));
+    } else {
+      val?.(queryBuilder);
+    }
+  }
+
+  // Apply type limits
+  if (info.limitToTypes) {
+    info.memberDigests = info.memberDigests.filter((d) =>
+      info.limitToTypes!.includes(d.member.typeName),
+    );
+  }
+
+  // Now turn order specs into orders
+  if (info.memberDigests.length === 0) {
+    // We have no implementations, we'll never return anything
+    return {
+      meta,
+      text: `select null;`,
+      rawSqlValues: [],
+      identifierIndex: null,
+      first: 0,
+      last: 0,
+      queryValues: [],
+      cursorDetails: undefined,
+      shouldReverseOrder: false,
+    };
+  }
 
   for (const orderSpec of info.orderSpecs) {
     if (!info.attributes) {
@@ -1684,6 +1792,7 @@ ${lateralText};`;
       : undefined;
 
   return {
+    meta,
     text,
     rawSqlValues,
     identifierIndex,
@@ -1827,10 +1936,10 @@ function applyConditionFromCursor<
         nulls === "FIRST"
           ? true
           : nulls === "LAST"
-          ? false
-          : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
-            // ASC = NULLS LAST
-            direction === "DESC";
+            ? false
+            : // NOTE: PostgreSQL states that by default DESC = NULLS FIRST,
+              // ASC = NULLS LAST
+              direction === "DESC";
 
       // Simple less than or greater than
       let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
@@ -1925,4 +2034,20 @@ function cloneMemberDigest<TTypeNames extends string = string>(
     orders: [...memberDigest.orders],
     conditions: [...memberDigest.conditions],
   };
+}
+
+export interface PgUnionAllQueryBuilder<
+  TAttributes extends string = string,
+  _TTypeNames extends string = string,
+> extends PgQueryBuilder {
+  /** Instruct to add another order */
+  orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
+  /** Inform that the resulting order is now unique */
+  setOrderIsUnique(): void;
+  where(whereSpec: PgWhereConditionSpec<TAttributes>): void;
+  whereBuilder(): PgCondition<this>;
+  having(rawCondition: PgHavingConditionSpec<string>): void;
+  havingBuilder(): PgCondition<this>;
+  /** Only return values of the given types */
+  limitToTypes(types: readonly string[]): void;
 }

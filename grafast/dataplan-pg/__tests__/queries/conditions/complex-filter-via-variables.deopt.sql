@@ -5,6 +5,8 @@ select
 from app_public.forums as __forums__
 where
   (
+    true /* authorization checks */
+  ) and (
     __forums__.archived_at is null
   ) and (
     exists(
@@ -17,8 +19,6 @@ where
           __messages_filter__.featured = $1::"bool"
         )
     )
-  ) and (
-    true /* authorization checks */
   )
 order by __forums__."id" asc;
 
@@ -28,10 +28,10 @@ select
 from app_public.messages as __messages__
 where
   (
-    __messages__.featured <> $1::"bool"
+    __messages__."forum_id" = $1::"uuid"
   ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
+    __messages__.featured <> $2::"bool"
   ) and (
-    __messages__."forum_id" = $3::"uuid"
+    (__messages__.archived_at is null) = ($3::"timestamptz" is null)
   )
 order by __messages__."id" asc;

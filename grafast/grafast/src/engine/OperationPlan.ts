@@ -24,23 +24,24 @@ import {
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON, ModifierStep } from "../index.js";
+import type { GrafastPlanJSON } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
   __TrackedValueStep,
   __ValueStep,
   error,
-  ExecutableStep,
   isDev,
   object,
   SafeError,
+  Step,
   stripAnsi,
 } from "../index.js";
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
+  AnyInputStep,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -68,7 +69,7 @@ import {
   assertFinalized,
   isListCapableStep,
   isPolymorphicStep,
-  isUnbatchedExecutableStep,
+  isUnbatchedStep,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
@@ -114,7 +115,7 @@ const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
 /**
  * Returns true for steps that the system populates automatically without executing.
  */
-function isPrepopulatedStep(step: ExecutableStep) {
+function isPrepopulatedStep(step: Step) {
   return step instanceof __ItemStep || step instanceof __ValueStep;
 }
 
@@ -176,7 +177,8 @@ export interface MetaByMetaKey {
 const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
-const newValueStepCallback = () => new __ValueStep();
+const newValueStepCallback = (isImmutable: boolean) =>
+  new __ValueStep(isImmutable);
 
 const NO_ARGS: TrackedArguments = {
   get() {
@@ -228,15 +230,8 @@ export class OperationPlan {
    */
   public rootOutputPlan!: OutputPlan;
 
-  private modifierStepCount = 0;
-  private modifierDepthCount = 0;
-  private modifierSteps: ModifierStep[] = [];
-
   /** @internal */
   public readonly stepTracker = new StepTracker(this);
-
-  private maxDeduplicatedStepId = -1;
-  private maxValidatedStepId = -1;
 
   /** Constraints based on evaluating variables. @internal */
   public readonly variableValuesConstraints: Constraint[];
@@ -290,6 +285,12 @@ export class OperationPlan {
   >();
 
   private scalarPlanInfo: { schema: GraphQLSchema };
+
+  /** @internal */
+  public valueNodeToStaticValueCache = new Map<
+    graphql.ValueNode,
+    AnyInputStep
+  >();
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -552,7 +553,7 @@ export class OperationPlan {
    *
    * @internal
    */
-  public _addStep(plan: ExecutableStep): number {
+  public _addStep(plan: Step): number {
     if (!["plan", "validate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
@@ -561,29 +562,8 @@ export class OperationPlan {
     return this.stepTracker.addStep(plan);
   }
 
-  /**
-   * Adds a plan to the known steps and returns the number to use as the plan
-   * id. ONLY to be used from Step, user code should never call this directly.
-   *
-   * @internal
-   */
-  public _addModifierStep(step: ModifierStep<any>): string {
-    if (!["plan", "validate", "optimize"].includes(this.phase)) {
-      throw new Error(
-        `Creating a step during the '${this.phase}' phase is forbidden.`,
-      );
-    }
-    const modifierStepId = `${this.modifierDepthCount}-${this
-      .modifierStepCount++}`;
-    this.modifierSteps.push(step);
-    return modifierStepId;
-  }
-
   /** @internal Use plan.getStep(id) instead. */
-  public getStep: (
-    id: number,
-    requestingStep: ExecutableStep,
-  ) => ExecutableStep = isDev
+  public getStep: (id: number, requestingStep: Step) => Step = isDev
     ? (id, requestingStep) => {
         if (!["plan", "validate", "optimize"].includes(this.phase)) {
           throw new Error(
@@ -621,7 +601,7 @@ export class OperationPlan {
    *
    * @internal
    */
-  public dangerouslyGetStep(id: number): ExecutableStep {
+  public dangerouslyGetStep(id: number): Step {
     return this.stepTracker.getStepById(id);
   }
 
@@ -812,13 +792,13 @@ export class OperationPlan {
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
       const { haltTree, step: subscribeStep } = this.planField(
+        rootType.name,
         fieldName,
         this.rootLayerPlan,
         path,
         POLYMORPHIC_ROOT_PATHS,
-        fields,
         subscriptionPlanResolver,
-        "autoApplyAfterParentSubscribePlan",
+        "subscribePlan",
         this.trackedRootValueStep,
         fieldSpec,
         trackedArguments,
@@ -972,7 +952,7 @@ export class OperationPlan {
    */
   private itemStepForListStep<TData>(
     parentLayerPlan: LayerPlan,
-    listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
+    listStep: Step<TData> | Step<TData[]>,
     depth: number,
     stream: LayerPlanReasonListItemStream | undefined,
   ): __ItemStep<TData> {
@@ -1002,7 +982,7 @@ export class OperationPlan {
     path: readonly string[],
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: ExecutableStep,
+    parentStep: Step,
     objectType: GraphQLObjectType,
     objectTypeFields: GraphQLFieldMap<any, any>,
     isMutation: boolean,
@@ -1091,8 +1071,8 @@ export class OperationPlan {
           resolvedResolver && !usesDefaultResolver
             ? resolvedResolver
             : resolverEmulation && isPolymorphic
-            ? defaultFieldResolver
-            : null;
+              ? defaultFieldResolver
+              : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1178,7 +1158,7 @@ export class OperationPlan {
           );
         }
 
-        let step: ExecutableStep | PolymorphicStep;
+        let step: Step | PolymorphicStep;
         let haltTree = false;
         const fieldLayerPlan = isMutation
           ? new LayerPlan(this, outputPlan.layerPlan, {
@@ -1264,17 +1244,17 @@ export class OperationPlan {
         }
         if (typeof planResolver === "function") {
           ({ step, haltTree } = this.planField(
+            objectType.name,
             fieldName,
             fieldLayerPlan,
             fieldPath,
             polymorphicPaths,
-            fieldNodes,
             planResolver,
-            "autoApplyAfterParentPlan",
+            "plan",
             parentStep,
             objectField,
             trackedArguments,
-            isList ? streamDetails ?? false : null,
+            isList ? (streamDetails ?? false) : null,
           ));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
@@ -1404,7 +1384,7 @@ export class OperationPlan {
     path: readonly string[],
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: ExecutableStep,
+    parentStep: Step,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
     resolverEmulation: boolean,
@@ -1449,9 +1429,7 @@ export class OperationPlan {
     if (this.loc !== null) this.loc.pop();
   }
 
-  private internalDependency<TStep extends ExecutableStep>(
-    $step: TStep,
-  ): TStep {
+  private internalDependency<TStep extends Step>($step: TStep): TStep {
     this.stepTracker.internalDependencies.add($step);
     return $step;
   }
@@ -1469,7 +1447,7 @@ export class OperationPlan {
     parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
     fieldType: GraphQLOutputType,
-    $step: ExecutableStep,
+    $step: Step,
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
     listDepth: number,
@@ -1511,7 +1489,7 @@ export class OperationPlan {
             labelStepId: streamDetails.label.id,
           }
         : undefined;
-      const $__item = this.itemStepForListStep(
+      let $__item = this.itemStepForListStep(
         parentLayerPlan,
         $list,
         listDepth,
@@ -1519,15 +1497,24 @@ export class OperationPlan {
       );
       const $sideEffect = $__item.layerPlan.latestSideEffectStep;
       try {
-        const $item = isListCapableStep($list)
-          ? withGlobalLayerPlan(
-              $__item.layerPlan,
-              $__item.polymorphicPaths,
-              $list.listItem,
-              $list,
-              $__item,
-            )
-          : $__item;
+        let $item: Step;
+        if (isListCapableStep($list)) {
+          $item = withGlobalLayerPlan(
+            $__item.layerPlan,
+            $__item.polymorphicPaths,
+            $list.listItem,
+            $list,
+            $__item,
+          );
+
+          this.deduplicateSteps();
+          // Refetch steps following deduplicate
+          $__item = this.stepTracker.getStepById<typeof $__item>($__item.id);
+          $item = this.stepTracker.getStepById<typeof $item>($item.id);
+        } else {
+          $item = $__item;
+        }
+
         this.planIntoOutputPlan(
           listOutputPlan,
           $item.layerPlan,
@@ -1615,20 +1602,20 @@ export class OperationPlan {
         if (stepAssertion != null) {
           try {
             if (
-              stepAssertion === ExecutableStep ||
-              stepAssertion.prototype instanceof ExecutableStep
+              stepAssertion === Step ||
+              stepAssertion.prototype instanceof Step
             ) {
               if (!($step instanceof stepAssertion)) {
                 throw new Error(
                   `Step mis-match: expected ${
                     stepAssertion.name
                   }, but instead found ${
-                    ($step as ExecutableStep).constructor.name
+                    ($step as Step).constructor.name
                   } (${$step})`,
                 );
               }
             } else {
-              (stepAssertion as ($step: ExecutableStep) => void)($step);
+              (stepAssertion as ($step: Step) => void)($step);
             }
           } catch (e) {
             throw new Error(
@@ -1883,7 +1870,7 @@ export class OperationPlan {
   private getPolymorphicLayerPlan(
     parentLayerPlan: LayerPlan,
     path: readonly string[],
-    $step: ExecutableStep,
+    $step: Step,
     allPossibleObjectTypes: readonly GraphQLObjectType[],
   ): LayerPlan<LayerPlanReasonPolymorphic> {
     // OPTIMIZE: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
@@ -1939,14 +1926,14 @@ export class OperationPlan {
   }
 
   private planField(
+    typeName: string,
     fieldName: string,
     layerPlan: LayerPlan,
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
-    fieldNodes: FieldNode[],
-    planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
+    planResolver: FieldPlanResolver<any, Step, Step>,
     applyAfterMode: ApplyAfterModeArg,
-    rawParentStep: ExecutableStep,
+    rawParentStep: Step,
     field: GraphQLField<any, any>,
     trackedArguments: TrackedArguments,
     // If 'true' this is a subscription rather than a stream
@@ -1955,7 +1942,9 @@ export class OperationPlan {
     // Otherwise, it's a list field that has the `@stream` directive applied
     streamDetails: StreamDetails | true | false | null,
     deduplicate = true,
-  ): { haltTree: boolean; step: ExecutableStep } {
+  ): { haltTree: boolean; step: Step } {
+    const coordinate = `${typeName}.${fieldName}`;
+
     // The step may have been de-duped whilst sibling steps were planned
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
@@ -1971,10 +1960,11 @@ export class OperationPlan {
         withFieldArgsForArguments,
         null,
         this,
-        parentStep,
         trackedArguments,
         field,
+        parentStep,
         applyAfterMode,
+        coordinate,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
             fieldName,
@@ -2058,7 +2048,6 @@ export class OperationPlan {
         e,
       );
       const haltTree = true;
-      this.modifierSteps = [];
       // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
@@ -2109,41 +2098,6 @@ export class OperationPlan {
     };
   }
 
-  public withModifiers<T>(cb: () => T): T {
-    // Stash previous modifiers
-    const previousModifierDepthCount = this.modifierDepthCount++;
-    const previousCount = this.modifierStepCount;
-    const previousStack = this.modifierSteps.splice(
-      0,
-      this.modifierSteps.length,
-    );
-    this.modifierStepCount = 0;
-    let result;
-    let plansToApply;
-    try {
-      result = cb();
-    } finally {
-      // Remove the modifier plans from operationPlan and sort them ready for application.
-      plansToApply = this.modifierSteps
-        .splice(0, this.modifierSteps.length)
-        .reverse();
-      // Restore previous modifiers
-      this.modifierStepCount = previousCount;
-      for (const mod of previousStack) {
-        this.modifierSteps.push(mod);
-      }
-      // Restore previous depth
-      this.modifierDepthCount = previousModifierDepthCount;
-    }
-
-    // Apply the plans.
-    for (let i = 0, l = plansToApply.length; i < l; i++) {
-      plansToApply[i].apply();
-    }
-
-    return result;
-  }
-
   /**
    * Sets up tracking for the given value (variableValues, context, rootValue).
    */
@@ -2156,6 +2110,8 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       newValueStepCallback,
+      null,
+      variableDefinitions != null,
     );
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
@@ -2166,6 +2122,7 @@ export class OperationPlan {
           valueStep,
           constraints,
           [],
+          variableDefinitions != null,
           variableDefinitions,
         ),
     );
@@ -2183,8 +2140,8 @@ export class OperationPlan {
       for (const key in step) {
         const val = step[key as keyof typeof step];
         if (
-          key !== ("implicitSideEffectStep" satisfies keyof ExecutableStep) &&
-          val instanceof ExecutableStep
+          key !== ("implicitSideEffectStep" satisfies keyof Step) &&
+          val instanceof Step
         ) {
           errors.push(
             new Error(
@@ -2200,10 +2157,7 @@ export class OperationPlan {
     }
   }
 
-  private replaceStep(
-    $original: ExecutableStep,
-    $replacement: ExecutableStep,
-  ): void {
+  private replaceStep($original: Step, $replacement: Step): void {
     this.stepTracker.replaceStep($original, $replacement);
   }
 
@@ -2211,9 +2165,9 @@ export class OperationPlan {
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
-    callback: (plan: ExecutableStep) => ExecutableStep,
-    processed: Set<ExecutableStep>,
-    step: ExecutableStep,
+    callback: (plan: Step) => Step,
+    processed: Set<Step>,
+    step: Step,
   ) {
     // MUST come before anything else, otherwise infinite loops may occur
     processed.add(step);
@@ -2279,7 +2233,7 @@ export class OperationPlan {
       return step;
     }
 
-    let replacementStep: ExecutableStep = step;
+    let replacementStep: Step = step;
     try {
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
@@ -2326,12 +2280,12 @@ export class OperationPlan {
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
-    callback: (plan: ExecutableStep) => ExecutableStep,
+    callback: (plan: Step) => Step,
   ): void {
     if (isDev) this.stepTracker.lockNewSteps();
     const previousStepCount = this.stepTracker.stepCount;
 
-    const processed = new Set<ExecutableStep>();
+    const processed = new Set<Step>();
 
     for (let i = 0; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
@@ -2391,7 +2345,7 @@ export class OperationPlan {
    * compatible layers and have the same dependencies. Peers must not have side
    * effects. A step is not its own peer.
    */
-  private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
+  private getPeers(step: Step): ReadonlyArray<Step> {
     if (step.hasSideEffects) {
       // Plans with side effects have no peers.
       return EMPTY_ARRAY;
@@ -2439,7 +2393,7 @@ export class OperationPlan {
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
       const stepsWithNoDependencies =
         this.stepTracker.stepsWithNoDependenciesByConstructor.get(
           step.constructor,
@@ -2475,7 +2429,7 @@ export class OperationPlan {
       }
 
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
 
       for (const {
         dependencyIndex: peerDependencyIndex,
@@ -2525,7 +2479,7 @@ export class OperationPlan {
        * Compatible layer plans are no less deep than minDepth.
        */
       let minDepth = deferBoundaryDepth;
-      const possiblePeers: ExecutableStep[] = [];
+      const possiblePeers: Step[] = [];
       // Loop backwards since last dependency is most likely to be most unique
       for (
         let dependencyIndex = dependencyCount - 1;
@@ -2583,7 +2537,7 @@ export class OperationPlan {
       if (possiblePeers.length === 0) {
         return EMPTY_ARRAY;
       }
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
       outerloop: for (const possiblyPeer of possiblePeers) {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
         // We know the final dependency matches and the dependency count
@@ -2603,7 +2557,7 @@ export class OperationPlan {
     }
   }
 
-  private isImmoveable(step: ExecutableStep): boolean {
+  private isImmoveable(step: Step): boolean {
     if (step.hasSideEffects) {
       return true;
     }
@@ -2622,7 +2576,7 @@ export class OperationPlan {
    * Attempts to hoist the step into a higher layerPlan to maximize
    * deduplication.
    */
-  private hoistStep(step: ExecutableStep) {
+  private hoistStep(step: Step) {
     if (this.isImmoveable(step)) {
       return;
     }
@@ -2799,7 +2753,7 @@ export class OperationPlan {
    * Attempts to push the step into the lowest layerPlan to minimize the need
    * for copying between layer plans.
    */
-  private pushDown<T extends ExecutableStep>(step: T): T {
+  private pushDown<T extends Step>(step: T): T {
     if (this.isImmoveable(step)) {
       return step;
     }
@@ -2966,7 +2920,7 @@ export class OperationPlan {
     return step;
   }
 
-  private _deduplicateInnerLogic(step: ExecutableStep) {
+  private _deduplicateInnerLogic(step: Step) {
     if (step instanceof __ItemStep) {
       // __ItemStep cannot be deduplicated
       return null;
@@ -3000,7 +2954,7 @@ export class OperationPlan {
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = step.layerPlan.depth;
-    let stepsAtMinDepth: ExecutableStep[] = [step];
+    let stepsAtMinDepth: Step[] = [step];
     for (const step of equivalentSteps) {
       const depth = step.layerPlan.depth;
       if (depth < minDepth) {
@@ -3014,8 +2968,17 @@ export class OperationPlan {
     return { stepsAtMinDepth, equivalentSteps };
   }
 
-  private deduplicateStep(step: ExecutableStep): ExecutableStep {
+  private deduplicateStep(step: Step): Step {
+    // Conditions applied to this step are now finalized, though we may still
+    // tell the step to do more stuff (like fetch extra data), it can no longer
+    // change its order, conditions, etc.
     step.isArgumentsFinalized = true;
+
+    // If a step is unary at this point, it must always remain unary.
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+    }
+
     if (step.deduplicate == null) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
@@ -3094,9 +3057,9 @@ export class OperationPlan {
    */
 
   private deduplicateStepsProcess(
-    processed: Set<ExecutableStep>,
+    processed: Set<Step>,
     start: number,
-    step: ExecutableStep,
+    step: Step,
   ) {
     processed.add(step);
     for (const dep of sudo(step).dependencies) {
@@ -3107,7 +3070,7 @@ export class OperationPlan {
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
-      this.deduplicateStep,
+      this.phase === "plan" ? this.deduplicateStep : this.hoistAndDeduplicate,
       this,
       step,
     );
@@ -3131,7 +3094,7 @@ export class OperationPlan {
       return;
     }
 
-    const processed = new Set<ExecutableStep>();
+    const processed = new Set<Step>();
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
       if (!step || step.id !== i || processed.has(step)) continue;
@@ -3143,7 +3106,7 @@ export class OperationPlan {
       // More steps were created during deduplicate; let's deduplicate those!
       const MAX_DEPTH = 5;
       if (depth > MAX_DEPTH) {
-        const newSteps: (ExecutableStep | null)[] = [];
+        const newSteps: (Step | null)[] = [];
         for (let i = end, l = this.stepTracker.stepCount; i < l; i++) {
           newSteps.push(this.stepTracker.stepById[i]);
         }
@@ -3157,7 +3120,7 @@ export class OperationPlan {
     }
   }
 
-  private hoistAndDeduplicate(step: ExecutableStep) {
+  private hoistAndDeduplicate(step: Step) {
     this.hoistStep(step);
     // Even if step wasn't hoisted, its deps may have been so we should still
     // re-deduplicate it.
@@ -3182,7 +3145,7 @@ export class OperationPlan {
    * communicate with its (deep) dependencies, and even to replace itself with
    * a different plan.
    */
-  private optimizeStep(inStep: ExecutableStep): ExecutableStep {
+  private optimizeStep(inStep: Step): Step {
     const step =
       inStep.allowMultipleOptimizations && inStep.deduplicate
         ? this.deduplicateStep(inStep)
@@ -3207,7 +3170,11 @@ export class OperationPlan {
     }
     const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
-      // ...stepOptions,
+      stream: step._stepOptions.stream
+        ? {
+            // We could add more details here, but for now we don't really need them?
+          }
+        : null,
       meta,
     });
     if (wasLocked) lock(step);
@@ -3225,7 +3192,7 @@ export class OperationPlan {
    * know all our dependent's needs before we optimise ourself.
    */
   private optimizeSteps() {
-    const thirdAndFutureLoopReplacedPlans: ExecutableStep[] = [];
+    const thirdAndFutureLoopReplacedPlans: Step[] = [];
     for (let loops = 0; loops < MAX_OPTIMIZATION_LOOPS; loops++) {
       let replacedPlan = false;
       this.processSteps(
@@ -3291,10 +3258,10 @@ export class OperationPlan {
 
         // We're only going to inline one if we can inline all.
         const toInline: Array<{
-          $dependent: Sudo<ExecutableStep>;
+          $dependent: Sudo<Step>;
           dependencyIndex: number;
           inlineDetails: AddDependencyOptions;
-          dependent: ExecutableStep["dependents"][number];
+          dependent: Step["dependents"][number];
         }> = [];
         for (const dependent of $flag.dependents) {
           const { step, dependencyIndex } = dependent;
@@ -3333,11 +3300,6 @@ export class OperationPlan {
   /** Finalizes each step */
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
-    assert.strictEqual(
-      this.modifierSteps.length,
-      0,
-      "No modifier steps expected when performing finalizeSteps",
-    );
     for (const step of this.stepTracker.activeSteps) {
       const wasLocked = isDev && unlock(step);
       step.finalize();
@@ -3357,7 +3319,7 @@ export class OperationPlan {
      * ancestor layers until we hit the layerPlan that `dep` is from.
      */
     const ensurePlanAvailableInLayer = (
-      dep: ExecutableStep,
+      dep: Step,
       layerPlan: LayerPlan,
     ): void => {
       let currentLayerPlan: LayerPlan | null = layerPlan;
@@ -3405,11 +3367,11 @@ export class OperationPlan {
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
       );
-      const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
-      const processed = new Set<ExecutableStep>();
+      const pending = new Set<Step>(layerPlan.pendingSteps);
+      const processed = new Set<Step>();
 
-      let latestSideEffectStep: ExecutableStep | null = null;
-      const processSideEffectPlan = (step: ExecutableStep) => {
+      let latestSideEffectStep: Step | null = null;
+      const processSideEffectPlan = (step: Step) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
         }
@@ -3417,8 +3379,8 @@ export class OperationPlan {
         processed.add(step);
         pending.delete(step);
 
-        const sideEffectDeps: ExecutableStep[] = [];
-        const rest: ExecutableStep[] = [];
+        const sideEffectDeps: Step[] = [];
+        const rest: Step[] = [];
         for (const dep of sstep.dependencies) {
           if (dep.layerPlan !== layerPlan) {
             continue;
@@ -3466,7 +3428,7 @@ export class OperationPlan {
         processSideEffectPlan(sideEffectStep);
       }
 
-      const readyToExecute = (step: ExecutableStep): boolean => {
+      const readyToExecute = (step: Step): boolean => {
         for (const dep of sudo(step).dependencies) {
           if (dep.layerPlan === layerPlan && pending.has(dep)) {
             return false;
@@ -3476,7 +3438,7 @@ export class OperationPlan {
       };
 
       while (pending.size > 0) {
-        const nextSteps: ExecutableStep[] = [];
+        const nextSteps: Step[] = [];
         for (const step of pending) {
           if (readyToExecute(step)) {
             nextSteps.push(step);
@@ -3502,7 +3464,7 @@ export class OperationPlan {
           ) {
             sstep.implicitSideEffectStep = latestSideEffectStep;
           }
-          if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+          if (step.isSyncAndSafe && isUnbatchedStep(step)) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
                 step,
@@ -3530,7 +3492,7 @@ export class OperationPlan {
         do {
           foundOne = false;
           for (const step of pending) {
-            if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+            if (step.isSyncAndSafe && isUnbatchedStep(step)) {
               if (readyToExecute(step)) {
                 processed.add(step);
                 pending.delete(step);
@@ -3696,7 +3658,7 @@ export class OperationPlan {
   }
 
   generatePlanJSON(): GrafastPlanJSON {
-    function printStep(step: ExecutableStep): GrafastPlanStepJSONv1 {
+    function printStep(step: Step): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
       const sstep = sudo(step);
       return {
@@ -3801,7 +3763,7 @@ export class OperationPlan {
   }
 
   finishSubroutine(
-    subroutineStep: ExecutableStep,
+    subroutineStep: Step,
     layerPlan: LayerPlan<LayerPlanReasonSubroutine>,
   ): void {
     // Now find anything that these plans are dependent on and make ourself
@@ -3833,8 +3795,8 @@ export class OperationPlan {
     this.stepTracker.deleteLayerPlan(layerPlan);
   }
 
-  getStepsByMetaKey(metaKey: string | number | symbol): ExecutableStep[] {
-    const matches: ExecutableStep[] = [];
+  getStepsByMetaKey(metaKey: string | number | symbol): Step[] {
+    const matches: Step[] = [];
     for (const step of this.stepTracker.activeSteps) {
       if (step.metaKey === metaKey) {
         matches.push(step);
@@ -3843,7 +3805,7 @@ export class OperationPlan {
     return matches;
   }
 
-  getStepsByStepClass<TClass extends ExecutableStep>(klass: {
+  getStepsByStepClass<TClass extends Step>(klass: {
     new (...args: any[]): TClass;
   }): TClass[] {
     const matches: TClass[] = [];
@@ -3870,8 +3832,8 @@ export class OperationPlan {
    *
    * @experimental
    */
-  cacheStep<T extends ExecutableStep>(
-    ownerStep: ExecutableStep,
+  cacheStep<T extends Step>(
+    ownerStep: Step,
     actionKey: string,
     cacheKey: symbol | string | number | boolean | null | undefined,
     cb: () => T,
@@ -3884,7 +3846,7 @@ export class OperationPlan {
 
     const cacheIt = () => {
       const stepToCache = cb();
-      if (!(stepToCache instanceof ExecutableStep)) {
+      if (!(stepToCache instanceof Step)) {
         throw new Error(
           `The callback passed to cacheStep must always return an ExecutableStep; but this call from ${ownerStep} returned instead ${inspect(
             stepToCache,
@@ -4080,11 +4042,11 @@ function newLayerPlanPhase(): LayerPlanPhase {
 function throwNoNewStepsError(
   operationPlan: OperationPlan,
   actionDescription: string,
-  step: ExecutableStep,
+  step: Step,
   previousStepCount: number,
   message: string,
 ) {
-  const newSteps: (ExecutableStep | null)[] = [];
+  const newSteps: (Step | null)[] = [];
   for (
     let i = previousStepCount, l = operationPlan.stepTracker.stepCount;
     i < l;
@@ -4100,7 +4062,7 @@ function throwNoNewStepsError(
 }
 
 type StreamDetails = {
-  if: ExecutableStep<boolean>;
-  initialCount: ExecutableStep<number>;
-  label: ExecutableStep<Maybe<string>>;
+  if: Step<boolean>;
+  initialCount: Step<number>;
+  label: Step<Maybe<string>>;
 };

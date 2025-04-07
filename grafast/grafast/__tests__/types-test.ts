@@ -5,8 +5,8 @@ import type {
   __ValueStep,
   ConstantStep,
   DataFromObjectSteps,
-  ExecutableStep,
   ListStep,
+  Step,
 } from "../dist/index.js";
 
 type Expected = {
@@ -16,5 +16,5 @@ type Test = DataFromObjectSteps<{ test: ListStep<ConstantStep<number>[]> }>;
 assert<Equals<Test, Expected>>();
 
 type TStep = __ValueStep<Grafast.Context>;
-type TCtx = TStep extends ExecutableStep<infer U> ? U : never;
+type TCtx = TStep extends Step<infer U> ? U : never;
 assert<Equals<TCtx, Grafast.Context>>();

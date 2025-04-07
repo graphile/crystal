@@ -9,11 +9,14 @@ import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
 import type {
-  EnumValueApplyPlanResolver,
+  ArgumentApplyPlanResolver,
+  EnumValueApplyResolver,
   FieldPlanResolver,
+  InputObjectFieldApplyResolver,
+  InputObjectTypeBakedResolver,
   ScalarPlanResolver,
 } from "./interfaces.js";
-import type { ExecutableStep } from "./step.js";
+import type { Step } from "./step.js";
 import { exportNameHint } from "./utils.js";
 
 const {
@@ -41,7 +44,13 @@ export type FieldPlans =
       resolve?: GraphQLFieldResolver<any, any>;
       subscribe?: GraphQLFieldResolver<any, any>;
       args?: {
-        [argName: string]: graphql.GraphQLArgumentExtensions;
+        [argName: string]:
+          | ArgumentApplyPlanResolver
+          | {
+              applyPlan?: ArgumentApplyPlanResolver;
+              applySubscribePlan?: ArgumentApplyPlanResolver;
+              extensions?: graphql.GraphQLArgumentExtensions;
+            };
       };
     };
 
@@ -50,8 +59,8 @@ export type FieldPlans =
  */
 export type ObjectPlans = {
   __assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep };
+    | ((step: Step) => asserts step is Step)
+    | { new (...args: any[]): Step };
 } & {
   [fieldName: string]: FieldPlans;
 };
@@ -60,9 +69,14 @@ export type ObjectPlans = {
  * The plans for each field of a GraphQL input object type.
  */
 export type InputObjectPlans = {
-  __inputPlan?: () => ExecutableStep;
+  __baked?: InputObjectTypeBakedResolver;
 } & {
-  [fieldName: string]: Grafast.InputFieldExtensions;
+  [fieldName: string]:
+    | InputObjectFieldApplyResolver<any>
+    | {
+        apply?: InputObjectFieldApplyResolver<any>;
+        extensions?: graphql.GraphQLInputFieldExtensions;
+      };
 };
 
 /**
@@ -88,15 +102,14 @@ export type ScalarPlans = {
 export type EnumPlans = {
   // The internal value for the enum
   [enumValueName: string]:
-    | EnumValueApplyPlanResolver
+    | EnumValueApplyResolver
     | string
     | number
     | boolean
     | {
         value?: unknown;
         extensions?: graphql.GraphQLEnumValueExtensions;
-        /** @deprecated Use extensions */
-        applyPlan?: EnumValueApplyPlanResolver;
+        apply?: EnumValueApplyResolver;
       };
 };
 
@@ -249,9 +262,10 @@ export function makeGrafastSchema(details: {
             if (fieldName.startsWith("__")) {
               continue;
             }
-            const fieldSpec = (objectPlans as ObjectPlans | undefined)?.[
-              fieldName
-            ];
+            const fieldSpec =
+              objectPlans && Object.hasOwn(objectPlans, fieldName)
+                ? objectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
               ...rawFieldSpec,
               type: mapType(rawFieldSpec.type),
@@ -311,28 +325,39 @@ export function makeGrafastSchema(details: {
                   )) {
                     const argSpec = fieldSpec.args?.[argName];
                     if (typeof argSpec === "function") {
-                      // Invalid
-                      throw new Error(
-                        `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an extensions object`,
-                      );
-                    } else if (argSpec) {
+                      const applyPlan = argSpec;
                       exportNameHint(
-                        argSpec.grafast?.applyPlan,
+                        applyPlan,
                         `${typeName}_${fieldName}_${argName}_applyPlan`,
                       );
-                      exportNameHint(
-                        argSpec.grafast?.inputPlan,
-                        `${typeName}_${fieldName}_${argName}_inputPlan`,
-                      );
-                      exportNameHint(
-                        argSpec.pgSelectApply,
-                        `${typeName}_${fieldName}_${argName}_pgSelectApply`,
-                      );
-                      exportNameHint(
-                        argSpec.pgUnionAllApply,
-                        `${typeName}_${fieldName}_${argName}_pgUnionAllApply`,
-                      );
-                      Object.assign(arg.extensions!, argSpec);
+                      Object.assign(arg.extensions!, {
+                        grafast: { applyPlan },
+                      });
+                    } else if (
+                      typeof argSpec === "object" &&
+                      argSpec !== null
+                    ) {
+                      const { extensions, applyPlan, applySubscribePlan } =
+                        argSpec;
+                      if (extensions) {
+                        Object.assign(arg.extensions!, extensions);
+                      }
+                      if (applyPlan || applySubscribePlan) {
+                        exportNameHint(
+                          applyPlan,
+                          `${typeName}_${fieldName}_${argName}_applyPlan`,
+                        );
+                        exportNameHint(
+                          applySubscribePlan,
+                          `${typeName}_${fieldName}_${argName}_applySubscribePlan`,
+                        );
+                        Object.assign(arg.extensions!, {
+                          grafast: {
+                            applyPlan,
+                            applySubscribePlan,
+                          },
+                        });
+                      }
                     }
                   }
                 }
@@ -361,10 +386,16 @@ export function makeGrafastSchema(details: {
           for (const [fieldName, fieldSpec] of Object.entries(
             inputObjectPlans,
           )) {
-            if (fieldName === "__inputPlan") {
-              config.extensions!.grafast!.inputPlan =
-                fieldSpec as () => ExecutableStep;
+            if (fieldName === "__baked") {
+              config.extensions!.grafast!.baked =
+                fieldSpec as InputObjectTypeBakedResolver;
               continue;
+            }
+            if (config.extensions?.grafast?.baked) {
+              exportNameHint(
+                config.extensions.grafast.baked,
+                `${typeName}__baked`,
+              );
             }
             const field = rawConfig.fields[fieldName];
             if (!field) {
@@ -372,11 +403,6 @@ export function makeGrafastSchema(details: {
                 `'plans' specified configuration for input object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
               );
               continue;
-            }
-            if (typeof fieldSpec === "function") {
-              throw new Error(
-                `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
-              );
             }
           }
         }
@@ -387,27 +413,36 @@ export function makeGrafastSchema(details: {
             Object.create(null);
 
           for (const [fieldName, rawFieldConfig] of Object.entries(rawFields)) {
-            const fieldSpec = inputObjectPlans?.[fieldName];
+            const fieldSpec =
+              inputObjectPlans && Object.hasOwn(inputObjectPlans, fieldName)
+                ? inputObjectPlans[fieldName]
+                : undefined;
             const fieldConfig: graphql.GraphQLInputFieldConfig = {
               ...rawFieldConfig,
               type: mapType(rawFieldConfig.type),
             };
             fields[fieldName] = fieldConfig;
             if (fieldSpec) {
-              exportNameHint(
-                fieldSpec.inputPlan,
-                `${typeName}_${fieldName}_inputPlan`,
-              );
-              exportNameHint(
-                fieldSpec.applyPlan,
-                `${typeName}_${fieldName}_applyPlan`,
-              );
+              const grafastExtensions: Grafast.InputFieldExtensions =
+                Object.create(null);
+              (fieldConfig.extensions as any).grafast = grafastExtensions;
+              if (typeof fieldSpec === "function") {
+                exportNameHint(fieldSpec, `${typeName}_${fieldName}_apply`);
+                grafastExtensions.apply = fieldSpec;
+              } else {
+                const { apply, extensions } = fieldSpec;
+                if (extensions) {
+                  Object.assign(fieldConfig.extensions!, extensions);
+                }
+                if (apply) {
+                  exportNameHint(
+                    fieldSpec.apply,
+                    `${typeName}_${fieldName}_apply`,
+                  );
+                  Object.assign(grafastExtensions, { apply });
+                }
+              }
             }
-            // it's a spec
-            const grafastExtensions: Grafast.InputFieldExtensions =
-              Object.create(null);
-            (fieldConfig.extensions as any).grafast = grafastExtensions;
-            Object.assign(grafastExtensions, fieldSpec);
           }
           return fields;
         };
@@ -519,7 +554,7 @@ export function makeGrafastSchema(details: {
             if (typeof enumValueSpec === "function") {
               exportNameHint(
                 enumValueSpec,
-                `${typeName}_${enumValueName}_applyPlan`,
+                `${typeName}_${enumValueName}_apply`,
               );
               // It's a plan
               if (!enumValue.extensions) {
@@ -528,7 +563,7 @@ export function makeGrafastSchema(details: {
                 ) as graphql.GraphQLEnumValueExtensions;
               }
               enumValue.extensions.grafast = {
-                applyPlan: enumValueSpec,
+                apply: enumValueSpec,
               } as Grafast.EnumValueExtensions;
             } else if (
               typeof enumValueSpec === "object" &&
@@ -542,13 +577,13 @@ export function makeGrafastSchema(details: {
                 );
                 Object.assign(enumValue.extensions!, enumValueSpec.extensions);
               }
-              if (enumValueSpec.applyPlan) {
+              if (enumValueSpec.apply) {
                 exportNameHint(
-                  enumValueSpec.applyPlan,
-                  `${typeName}_${enumValueName}_applyPlan`,
+                  enumValueSpec.apply,
+                  `${typeName}_${enumValueName}_apply`,
                 );
                 enumValue.extensions!.grafast = {
-                  applyPlan: enumValueSpec.applyPlan,
+                  apply: enumValueSpec.apply,
                 } as Grafast.EnumValueExtensions;
               }
               if ("value" in enumValueSpec) {

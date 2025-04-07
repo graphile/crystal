@@ -6,7 +6,7 @@ title: ESLint Plugin
 # Using our ESLint plugin
 
 Tracking all these dependencies yourself can to be a royal pain in the
-aggragate, so we've written a plugin `eslint-plugin-graphile-export` to do away
+aggregate, so we've written a plugin `eslint-plugin-graphile-export` to do away
 with a lot of the pain.
 
 To install:
@@ -37,7 +37,7 @@ module.exports = {
 };
 ```
 
-To use it, simply add `EXPORTABLE(() =>` before the value exporession to be
+To use it, simply add `EXPORTABLE(() =>` before the value expression to be
 exported, and `)` after and then run `eslint --fix` against the file. It will
 automatically convert:
 

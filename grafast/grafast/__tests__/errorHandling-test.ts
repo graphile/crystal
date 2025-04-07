@@ -7,16 +7,17 @@ import { it } from "mocha";
 import type {
   ExecutionDetails,
   ExecutionResults,
+  FieldArgs,
   PromiseOrDirect,
 } from "../dist/index.js";
 import {
   constant,
   context,
-  ExecutableStep,
   grafast,
   lambda,
   makeGrafastSchema,
   sideEffect,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -32,13 +33,10 @@ declare global {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-class SyncListCallbackStep<
-  TIn,
-  TOut extends any[],
-> extends ExecutableStep<TOut> {
+class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
   constructor(
-    $dep: ExecutableStep<TIn>,
+    $dep: Step<TIn>,
     private callback: (val: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
@@ -87,10 +85,10 @@ const schema = makeGrafastSchema({
       list() {
         return constant([1, 2]);
       },
-      sideEffectListCheck(_, fieldArgs) {
+      sideEffectListCheck(_: Step, fieldArgs: FieldArgs) {
         const $mol = context().get("mol");
         sideEffect($mol, () => {});
-        const $count = lambda(fieldArgs.get("arr"), (arr) => {
+        const $count = lambda(fieldArgs.getRaw("arr"), (arr) => {
           return arr.length;
         });
         $count.hasSideEffects = true;
@@ -98,10 +96,10 @@ const schema = makeGrafastSchema({
       },
     },
     Thing: {
-      id($i: ExecutableStep<number>) {
+      id($i: Step<number>) {
         return $i;
       },
-      anotherList($i: ExecutableStep<number>) {
+      anotherList($i: Step<number>) {
         return new SyncListCallbackStep($i, (i) => [i + 0, i + 1, i + 2]);
       },
       throw() {
@@ -109,7 +107,7 @@ const schema = makeGrafastSchema({
       },
     },
     OtherThing: {
-      id($i: ExecutableStep<number>) {
+      id($i: Step<number>) {
         return $i;
       },
     },

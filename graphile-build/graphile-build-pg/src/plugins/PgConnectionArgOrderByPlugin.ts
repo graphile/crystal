@@ -7,15 +7,9 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import type {
-  ConnectionStep,
-  GrafastFieldConfigArgumentMap,
-  InputStep,
-} from "grafast";
-import { getEnumValueConfig, SafeError } from "grafast";
-import type { GraphQLEnumType, GraphQLSchema } from "grafast/graphql";
+import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
+import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
-import { inspect } from "util";
 
 import { version } from "../version.js";
 
@@ -46,6 +40,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   description:
     "Adds the 'orderBy' argument to connections and simple collections",
   version: version,
+
+  after: ["PgConditionArgumentPlugin"],
 
   inflection: {
     add: {
@@ -109,12 +105,7 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               ),
               values: {
                 [inflection.builtin("NATURAL")]: {
-                  extensions: {
-                    grafast: {
-                      // NATURAL means to not change the sort order
-                      applyPlan: EXPORTABLE(() => () => {}, []),
-                    },
-                  },
+                  // No need for hooks, it doesn't change the order
                 },
               },
             }),
@@ -170,8 +161,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           pgResource
             ? !build.behavior.pgResourceMatches(pgResource, "order")
             : codec
-            ? !build.behavior.pgCodecMatches(codec, "order")
-            : false
+              ? !build.behavior.pgCodecMatches(codec, "order")
+              : false
         ) {
           return args;
         }
@@ -185,102 +176,45 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
           return args;
         }
 
+        // TODO: inflection
+        const argName = "orderBy";
         return extend(
           args,
           {
-            orderBy: {
+            [argName]: {
               description: build.wrapDescription(
                 `The method to use when ordering \`${tableTypeName}\`.`,
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-              autoApplyAfterParentPlan: true,
               applyPlan: isPgFieldConnection
                 ? EXPORTABLE(
-                    (applyOrderToPlan, tableOrderByTypeName) =>
-                      function plan(
-                        _: any,
+                    () =>
+                      (
+                        parent,
                         $connection: ConnectionStep<
                           PgSelectSingleStep<any>,
                           PgSelectParsedCursorStep,
                           PgSelectStep<any>
                         >,
-                        val,
-                        info: { schema: GraphQLSchema },
-                      ) {
-                        const $value = val.getRaw();
+                        value,
+                      ) => {
                         const $select = $connection.getSubplan();
-                        applyOrderToPlan(
-                          $select,
-                          $value,
-                          info.schema.getType(
-                            tableOrderByTypeName,
-                          ) as GraphQLEnumType,
-                        );
-                        return null;
+                        value.apply($select);
                       },
-                    [applyOrderToPlan, tableOrderByTypeName],
+                    [],
                   )
                 : EXPORTABLE(
-                    (applyOrderToPlan, tableOrderByTypeName) =>
-                      function plan(
-                        _: any,
-                        $select: PgSelectStep<any>,
-                        val,
-                        info: { schema: GraphQLSchema },
-                      ) {
-                        const $value = val.getRaw();
-                        applyOrderToPlan(
-                          $select,
-                          $value,
-                          info.schema.getType(
-                            tableOrderByTypeName,
-                          ) as GraphQLEnumType,
-                        );
-                        return null;
-                      },
-                    [applyOrderToPlan, tableOrderByTypeName],
+                    () => (parent, $select: PgSelectStep<any>, value) => {
+                      value.apply($select);
+                    },
+                    [],
                   ),
             },
-          } as GrafastFieldConfigArgumentMap<any, any, any, any>,
-          `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
+          } as GrafastFieldConfigArgumentMap,
+          `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,
         );
       },
     },
   },
 };
-
-export const applyOrderToPlan = EXPORTABLE(
-  (SafeError, getEnumValueConfig, inspect) =>
-    (
-      $select: PgSelectStep<any>,
-      $value: InputStep,
-      TableOrderByType: GraphQLEnumType,
-    ) => {
-      if (!("evalLength" in $value)) {
-        return;
-      }
-      const length = $value.evalLength();
-      if (length == null) {
-        return;
-      }
-      for (let i = 0; i < length; i++) {
-        const order = $value.at(i).eval();
-        if (order == null) continue;
-        const config = getEnumValueConfig(TableOrderByType, order);
-        const plan = config?.extensions?.grafast?.applyPlan;
-        if (typeof plan !== "function") {
-          console.error(
-            `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-              plan,
-            )}`,
-          );
-          throw new SafeError(
-            "Internal server error: invalid orderBy configuration",
-          );
-        }
-        plan($select);
-      }
-    },
-  [SafeError, getEnumValueConfig, inspect],
-);

@@ -163,12 +163,17 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                       EXPORTABLE(
                         te.run`\
 return function (resource) {
-  return (_$root, args) => resource.get({ ${te.join(
+  return (_$root, { ${te.join(
+    attributeNames.map((attributeName) =>
+      te.identifier("$" + detailsByAttributeName[attributeName].graphqlName),
+    ),
+    ", ",
+  )} }) => resource.get({ ${te.join(
     attributeNames.map(
       (attributeName) =>
-        te`${te.safeKeyOrThrow(attributeName)}: args.get(${te.lit(
-          detailsByAttributeName[attributeName].graphqlName,
-        )})`,
+        te`${te.safeKeyOrThrow(attributeName)}: ${te.identifier(
+          "$" + detailsByAttributeName[attributeName].graphqlName,
+        )}`,
     ),
     ", ",
   )} });
@@ -180,7 +185,7 @@ return function (resource) {
                           function plan(_$root: any, args: FieldArgs) {
                             const spec = Object.create(null);
                             for (const attributeName in detailsByAttributeName) {
-                              spec[attributeName] = args.get(
+                              spec[attributeName] = args.getRaw(
                                 detailsByAttributeName[attributeName]
                                   .graphqlName,
                               );

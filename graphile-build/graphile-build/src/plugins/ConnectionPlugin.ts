@@ -188,15 +188,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                                 nullableIf(!nonNullNode, NodeType),
                               ),
                             ),
-                            plan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $connection: ConnectionStep<any, any, any>,
-                                ) {
-                                  return $connection.nodes();
-                                },
-                              [],
-                            ) as any,
                           }),
                         ),
                         edges: fieldWithHooks(
@@ -214,15 +205,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                                 nullableIf(!nonNullNode, EdgeType),
                               ),
                             ),
-                            plan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $connection: ConnectionStep<any, any, any>,
-                                ) {
-                                  return $connection.edges();
-                                },
-                              [],
-                            ) as any,
                           }),
                         ),
                         pageInfo: fieldWithHooks(
@@ -235,16 +217,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                               "field",
                             ),
                             type: new build.graphql.GraphQLNonNull(PageInfo),
-                            plan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $connection: ConnectionStep<any, any, any>,
-                                ) {
-                                  // TYPES: why is this a TypeScript issue without the 'any'?
-                                  return $connection.pageInfo() as any;
-                                },
-                              [],
-                            ),
                           }),
                         ),
                       };

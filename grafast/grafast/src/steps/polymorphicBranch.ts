@@ -7,29 +7,25 @@ import type {
 } from "../index.js";
 import { polymorphicWrap } from "../index.js";
 import type { PolymorphicStep } from "../step.js";
-import { ExecutableStep } from "../step.js";
+import { Step } from "../step.js";
 import { constant } from "./constant.js";
 
-type StepData<TStep extends ExecutableStep> = TStep extends ExecutableStep<
-  infer U
->
-  ? U
-  : any;
+type StepData<TStep extends Step> = TStep extends Step<infer U> ? U : any;
 
-interface ConcretePolymorphicBranchMatcher<TStep extends ExecutableStep> {
+interface ConcretePolymorphicBranchMatcher<TStep extends Step> {
   match: (obj: StepData<TStep>) => boolean;
-  plan: ($obj: TStep) => ExecutableStep;
+  plan: ($obj: TStep) => Step;
 }
-export interface PolymorphicBranchMatchers<TStep extends ExecutableStep> {
+export interface PolymorphicBranchMatchers<TStep extends Step> {
   [typeName: string]: PolymorphicBranchMatcher<TStep>;
 }
-export interface PolymorphicBranchMatcher<TStep extends ExecutableStep> {
+export interface PolymorphicBranchMatcher<TStep extends Step> {
   match?: (obj: StepData<TStep>) => boolean;
-  plan?: ($obj: TStep) => ExecutableStep;
+  plan?: ($obj: TStep) => Step;
 }
 
-export class PolymorphicBranchStep<TStep extends ExecutableStep>
-  extends ExecutableStep
+export class PolymorphicBranchStep<TStep extends Step>
+  extends Step
   implements PolymorphicStep
 {
   static $$export = {
@@ -56,9 +52,9 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
     );
   }
 
-  planForType(objectType: GraphQLObjectType): ExecutableStep {
+  planForType(objectType: GraphQLObjectType): Step {
     const matcher = this.matchers[objectType.name];
-    const $step = this.getDep<TStep>(0);
+    const $step = this.getDep<TStep>(0, true);
     if (matcher) {
       if (typeof matcher.plan === "function") {
         return matcher.plan($step);
@@ -91,7 +87,7 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
   }
 }
 
-export function polymorphicBranch<TStep extends ExecutableStep>(
+export function polymorphicBranch<TStep extends Step>(
   $step: TStep,
   matchers: PolymorphicBranchMatchers<TStep>,
 ) {

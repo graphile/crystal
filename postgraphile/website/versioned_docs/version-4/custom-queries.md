@@ -46,6 +46,15 @@ could be queried in GraphQL like this:
 }
 ```
 
+:::tip Nullability Note
+
+By default all attributes on postgres types are nullable, and so a function that
+returns a type instead of a table will have all its fields treated as such by the
+generated GraphQL schema. This can be over-ridden on an attribute-by-attribute basis
+with the `@notNull` [smart tag](./smart-tags).
+
+:::
+
 ### Example
 
 Here we write a search query for our [forum example][] using the PostgreSQL
@@ -80,6 +89,25 @@ create function search_posts(search text)
       body ilike ('%' || search || '%')
   -- End the function declaring the language we used as SQL and add the
   -- `STABLE` marker so PostGraphile knows its a query and not a mutation.
+  $$ language sql stable;
+```
+
+Or using a type to return the exact shape of data you need:
+
+```sql {5}
+create type post_search_result as (
+  headline         text,
+  body             text
+);
+comment on column post_search_result.headline is E'@notNull';
+
+create function search_posts(search text)
+  returns setof post_search_result as $$
+    select headline, body
+    from post
+    where
+      headline ilike ('%' || search || '%') or
+      body ilike ('%' || search || '%')
   $$ language sql stable;
 ```
 

@@ -70,10 +70,9 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
   }),
   (value, helpers) => {
     expect(helpers.build.graphql).toBeTruthy();
-    const { sqlTableAlias, sql, $condition } = helpers;
-    const val = value.get();
-    return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${$condition.placeholder(
-      val,
+    const { sqlTableAlias, sql } = helpers;
+    return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${helpers.sqlValueWithCodec(
+      value,
       TYPES.int,
     )}`;
   },

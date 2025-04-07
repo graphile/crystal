@@ -202,7 +202,7 @@ function newNodePostgresPgClient(
           }
         }
 
-        return pgClient.query(queryObj);
+        return pgClient.query<any>(queryObj);
       }
     },
   };
