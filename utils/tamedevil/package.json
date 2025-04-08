@@ -41,11 +41,11 @@
     "jest": "^29.6.4",
     "markdown-doctest": "^1.1.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@graphile/lru": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "^2.8.1"
   },
   "files": [
     "dist"
