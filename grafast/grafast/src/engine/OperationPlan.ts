@@ -1595,8 +1595,21 @@ export class OperationPlan {
 
         // Mess with batch[*][5] (i.e. the steps) to see if we can dedupe ignoring data-only deps
         steps.clear();
+        const seen = new Set<string | null>();
         for (const entry of batch) {
-          steps.add(entry[1][5]);
+          const polyPath = entry[1][3];
+          if (polyPath == null) continue;
+          const step = entry[1][5];
+          if (step.polymorphicPaths == null) continue;
+          if (seen.has(polyPath)) {
+            throw new Error(
+              `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
+            );
+          }
+          seen.add(polyPath);
+          if (step.polymorphicPaths.has(polyPath)) {
+            steps.add(step);
+          }
         }
         if (steps.size > 1) {
           // TODO: try primary dedupe
