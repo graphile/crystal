@@ -1399,6 +1399,7 @@ export class OperationPlan {
             polymorphicPath,
             polymorphicPaths,
             step,
+            fieldType,
             fieldLayerPlan,
             // If one field has a selection set, they all have a selection set (guaranteed by validation).
             field.selectionSet != null
@@ -1406,7 +1407,6 @@ export class OperationPlan {
               : undefined,
             objectType,
             responseKey,
-            fieldType,
             locationDetails,
             resolverEmulation,
             0,
@@ -1550,7 +1550,7 @@ export class OperationPlan {
   private planningQueueByPlanningPath = new Map<string, Array<QueueTuple>>();
 
   private queueNextLayer<
-    TMethod extends (...params: CommonPlanningParametersTuple) => void,
+    TMethod extends (...params: CommonPlanningParametersTuple<any>) => void,
   >(method: TMethod, ...params: Parameters<TMethod>): void {
     const [, , planningPath] = params;
     if (this.frozenPlanningPaths.has(planningPath)) {
@@ -1792,12 +1792,12 @@ export class OperationPlan {
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     $step: Step,
+    fieldType: GraphQLOutputType,
     // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
     parentLayerPlan: LayerPlan,
     selections: readonly SelectionNode[] | undefined,
     parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
-    fieldType: GraphQLOutputType,
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
     listDepth: number,
@@ -1874,11 +1874,11 @@ export class OperationPlan {
           polymorphicPath,
           polymorphicPaths,
           $item,
+          nullableFieldType.ofType,
           $item.layerPlan,
           selections,
           null,
           null,
-          nullableFieldType.ofType,
           locationDetails,
           resolverEmulation,
           listDepth + 1,
@@ -4565,16 +4565,18 @@ export function layerPlanHeirarchyContains(
   }
 }
 
-type CommonPlanningParametersTuple = readonly [
+type CommonPlanningParametersTuple<
+  TType extends GraphQLOutputType = GraphQLOutputType,
+> = readonly [
   outputPlan: OutputPlan,
   path: readonly string[],
   planningPath: string,
   polymorphicPath: string | null,
   polymorphicPaths: ReadonlySet<string> | null,
   parentStep: Step,
+  positionType: TType,
   ...any[],
 ];
-type QueueTuple = [
-  (...params: CommonPlanningParametersTuple) => void,
-  CommonPlanningParametersTuple,
-];
+type QueueTuple<
+  T extends CommonPlanningParametersTuple = CommonPlanningParametersTuple,
+> = [(...params: T) => void, T];
