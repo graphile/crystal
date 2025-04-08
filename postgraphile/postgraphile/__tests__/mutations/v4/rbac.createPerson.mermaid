@@ -7,6 +7,18 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/rbac.createPerson"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 19<br /><br />1: PgInsertSingle[15]<br />2: <br />ᐳ: Object[20]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 15, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 18<br /><br />ROOT PgInsertSingle{1}ᐸperson()ᐳ[15]<br />1: <br />ᐳ: 22, 21, 23, 24, 25, 26, 27, 32<br />2: PgSelect[28]<br />3: PgSelectRows[34]<br />ᐳ: First[33], PgSelectSingle[35]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ24ᐳ[36]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrlᐳ[35]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4 & Bucket5
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
@@ -34,9 +46,9 @@ graph TD
     Object18 & ApplyInput19 --> PgInsertSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle15 --> Object20
-    PgSelect29[["PgSelect[29∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
-    PgFromExpression33{{"PgFromExpression[33∈3] ➊"}}:::plan
-    Object18 & PgFromExpression33 --> PgSelect29
+    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
+    PgFromExpression32{{"PgFromExpression[32∈3] ➊"}}:::plan
+    Object18 & PgFromExpression32 --> PgSelect28
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Access22{{"Access[22∈3] ➊<br />ᐸ15.tᐳ"}}:::plan
     Access22 --> PgClassExpression21
@@ -45,47 +57,35 @@ graph TD
     Access22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
     Access22 --> PgClassExpression24
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    Access22 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
     Access22 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
     Access22 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
-    Access22 --> PgClassExpression28
-    PgClassExpression28 --> PgFromExpression33
-    First34{{"First[34∈3] ➊"}}:::plan
-    PgSelectRows35[["PgSelectRows[35∈3] ➊"]]:::plan
-    PgSelectRows35 --> First34
-    PgSelect29 --> PgSelectRows35
-    PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
-    First34 --> PgSelectSingle36
-    __Item25[/"__Item[25∈4]<br />ᐸ24ᐳ"\]:::itemplan
-    PgClassExpression24 ==> __Item25
+    PgClassExpression27 --> PgFromExpression32
+    First33{{"First[33∈3] ➊"}}:::plan
+    PgSelectRows34[["PgSelectRows[34∈3] ➊"]]:::plan
+    PgSelectRows34 --> First33
+    PgSelect28 --> PgSelectRows34
+    PgSelectSingle35{{"PgSelectSingle[35∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
+    First33 --> PgSelectSingle35
+    __Item36[/"__Item[36∈4]<br />ᐸ24ᐳ"\]:::itemplan
+    PgClassExpression24 ==> __Item36
     PgClassExpression37{{"PgClassExpression[37∈5] ➊<br />ᐸ__frmcdc_w...rl__.”url”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression37
+    PgSelectSingle35 --> PgClassExpression37
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/rbac.createPerson"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Constant10,__InputObject13,Access16,Access17,Object18,ApplyInput19,Constant38,Constant39,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 19<br /><br />1: PgInsertSingle[15]<br />2: <br />ᐳ: Object[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle15,Object20 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 15, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 18<br /><br />ROOT PgInsertSingle{1}ᐸperson()ᐳ[15]<br />1: <br />ᐳ: 22, 21, 23, 24, 26, 27, 28, 33<br />2: PgSelect[29]<br />3: PgSelectRows[35]<br />ᐳ: First[34], PgSelectSingle[36]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,Access22,PgClassExpression23,PgClassExpression24,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgSelect29,PgFromExpression33,First34,PgSelectRows35,PgSelectSingle36 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ24ᐳ[25]"):::bucket
+    class Bucket3,PgClassExpression21,Access22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelect28,PgFromExpression32,First33,PgSelectRows34,PgSelectSingle35 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item25 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgSelectSingle{3}ᐸfrmcdc_wrappedUrlᐳ[36]"):::bucket
+    class Bucket4,__Item36 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression37 bucket5
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket3 --> Bucket4 & Bucket5
-    end
+

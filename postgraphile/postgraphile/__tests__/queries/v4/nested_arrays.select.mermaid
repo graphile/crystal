@@ -7,6 +7,19 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/v4/nested_arrays.select"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 27<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11, 27<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 11, 27<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[17]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 11, 27<br /><br />ROOT __Item{5}ᐸ19ᐳ[22]<br />1: PgSelect[23]<br />2: PgSelectRows[28]"):::bucket
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ28ᐳ[29]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket5
+    Bucket5 --> Bucket6
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -51,29 +64,16 @@ graph TD
     PgSelectSingle30 --> PgClassExpression34
 
     %% define steps
-
-    subgraph "Buckets for queries/v4/nested_arrays.select"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,PgFromExpression27 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 27<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11, 27<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 11, 27<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[17]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,PgClassExpression19 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 11, 27<br /><br />ROOT __Item{5}ᐸ19ᐳ[22]<br />1: PgSelect[23]<br />2: PgSelectRows[28]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item22,PgSelect23,PgSelectRows28 bucket5
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ28ᐳ[29]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item29,PgSelectSingle30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34 bucket6
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket3 --> Bucket5
-    Bucket5 --> Bucket6
-    end
+

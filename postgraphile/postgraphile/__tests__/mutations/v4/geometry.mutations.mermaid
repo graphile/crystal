@@ -7,6 +7,30 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/geometry.mutations"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 49, 50<br /><br />1: PgInsertSingle[46]<br />2: <br />ᐳ: Object[51]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 51, 46<br /><br />ROOT Object{1}ᐸ{result}ᐳ[51]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgInsertSingle{1}ᐸgeom()ᐳ[46]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[54]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”line”ᐳ[55]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”lseg”ᐳ[56]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 57<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”box”ᐳ[57]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 58<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”open_path”ᐳ[58]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”closed_path”ᐳ[59]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 60<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”polygon”ᐳ[60]"):::bucket
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”circle”ᐳ[61]"):::bucket
+    Bucket12("Bucket 12 (listItem)<br /><br />ROOT __Item{12}ᐸ71ᐳ[77]"):::bucket
+    Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ73ᐳ[78]"):::bucket
+    Bucket14("Bucket 14 (listItem)<br /><br />ROOT __Item{14}ᐸ74ᐳ[79]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11
+    Bucket8 --> Bucket12
+    Bucket9 --> Bucket13
+    Bucket10 --> Bucket14
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
@@ -100,70 +124,46 @@ graph TD
     Access53 --> PgClassExpression61
     Access71{{"Access[71∈8] ➊<br />ᐸ58.pointsᐳ"}}:::plan
     PgClassExpression58 --> Access71
-    __Item72[/"__Item[72∈12]<br />ᐸ71ᐳ"\]:::itemplan
-    Access71 ==> __Item72
-    Access74{{"Access[74∈9] ➊<br />ᐸ59.pointsᐳ"}}:::plan
-    PgClassExpression59 --> Access74
-    __Item75[/"__Item[75∈13]<br />ᐸ74ᐳ"\]:::itemplan
-    Access74 ==> __Item75
-    Access76{{"Access[76∈10] ➊<br />ᐸ60.pointsᐳ"}}:::plan
-    PgClassExpression60 --> Access76
-    __Item77[/"__Item[77∈14]<br />ᐸ76ᐳ"\]:::itemplan
-    Access76 ==> __Item77
+    __Item77[/"__Item[77∈12]<br />ᐸ71ᐳ"\]:::itemplan
+    Access71 ==> __Item77
+    Access73{{"Access[73∈9] ➊<br />ᐸ59.pointsᐳ"}}:::plan
+    PgClassExpression59 --> Access73
+    __Item78[/"__Item[78∈13]<br />ᐸ73ᐳ"\]:::itemplan
+    Access73 ==> __Item78
+    Access74{{"Access[74∈10] ➊<br />ᐸ60.pointsᐳ"}}:::plan
+    PgClassExpression60 --> Access74
+    __Item79[/"__Item[79∈14]<br />ᐸ74ᐳ"\]:::itemplan
+    Access74 ==> __Item79
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/geometry.mutations"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,__InputObject9,__InputObject12,__InputObject13,__InputObject16,__InputObject19,__InputObject20,__InputObject23,__InputObject26,__InputObject27,__InputObject30,__InputObject33,Constant34,__InputObject36,Constant37,__InputObject39,Constant40,__InputObject41,__InputObject42,Access47,Access48,Object49,ApplyInput50,Constant100,Constant101,Constant102,Constant103,Constant104,Constant105,Constant106,Constant107,Constant108,Constant109,Constant110,Constant111,Constant112,Constant113,Constant114,Constant115,Constant116,Constant117 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 49, 50<br /><br />1: PgInsertSingle[46]<br />2: <br />ᐳ: Object[51]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle46,Object51 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 51, 46<br /><br />ROOT Object{1}ᐸ{result}ᐳ[51]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgInsertSingle{1}ᐸgeom()ᐳ[46]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression52,Access53,PgClassExpression54,PgClassExpression55,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60,PgClassExpression61 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”point”ᐳ[54]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”line”ᐳ[55]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”lseg”ᐳ[56]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 57<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”box”ᐳ[57]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 58<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”open_path”ᐳ[58]"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,Access71 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”closed_path”ᐳ[59]"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,Access74 bucket9
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 60<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”polygon”ᐳ[60]"):::bucket
+    class Bucket9,Access73 bucket9
     classDef bucket10 stroke:#ffff00
-    class Bucket10,Access76 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgClassExpression{3}ᐸ__geom__.”circle”ᐳ[61]"):::bucket
+    class Bucket10,Access74 bucket10
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
-    Bucket12("Bucket 12 (listItem)<br /><br />ROOT __Item{12}ᐸ71ᐳ[72]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,__Item72 bucket12
-    Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ74ᐳ[75]"):::bucket
+    class Bucket12,__Item77 bucket12
     classDef bucket13 stroke:#3cb371
-    class Bucket13,__Item75 bucket13
-    Bucket14("Bucket 14 (listItem)<br /><br />ROOT __Item{14}ᐸ76ᐳ[77]"):::bucket
+    class Bucket13,__Item78 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,__Item77 bucket14
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket3 --> Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11
-    Bucket8 --> Bucket12
-    Bucket9 --> Bucket13
-    Bucket10 --> Bucket14
-    end
+    class Bucket14,__Item79 bucket14
+

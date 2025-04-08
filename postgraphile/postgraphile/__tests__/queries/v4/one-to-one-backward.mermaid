@@ -7,6 +7,22 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/v4/one-to-one-backward"
+    Bucket0("Bucket 0 (root)<br /><br />1: 69, 77<br />ᐳ: 9, 10, 12, 36, 49, 11<br />2: 73, 81"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 73, 81, 36, 49<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[18], Access[74], Access[82]<br />2: PgSelectRows[15]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 18, 74, 82, 36, 49<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 18, 74, 82, 36, 49<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[17]<br />1: <br />ᐳ: 19, 20, 21, 23, 75, 83, 76, 84<br />2: PgSelectRows[29], PgSelectRows[34]<br />ᐳ: 28, 30, 33, 35"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 36, 76<br /><br />ROOT PgSelectSingle{3}ᐸleft_armᐳ[30]<br />1: <br />ᐳ: 37, 40, 48, 70, 38, 39, 71, 72<br />2: PgSelectRows[46]<br />ᐳ: First[45], PgSelectSingle[47]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 49, 84<br /><br />ROOT PgSelectSingle{3}ᐸperson_secretᐳ[35]<br />1: <br />ᐳ: 50, 60, 78, 51, 52, 79, 80<br />2: PgSelectRows[58]<br />ᐳ: First[57], PgSelectSingle[59]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 47<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[47]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[59]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4 & Bucket5
+    Bucket4 --> Bucket6
+    Bucket5 --> Bucket7
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -124,36 +140,20 @@ graph TD
     PgSelectSingle59 --> PgClassExpression68
 
     %% define steps
-
-    subgraph "Buckets for queries/v4/one-to-one-backward"
-    Bucket0("Bucket 0 (root)<br /><br />1: 69, 77<br />ᐳ: 9, 10, 12, 36, 49, 11<br />2: 73, 81"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant36,Constant49,PgSelectInlineApply69,PgSelectInlineApply73,PgSelectInlineApply77,PgSelectInlineApply81 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 73, 81, 36, 49<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[18], Access[74], Access[82]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access18,Access74,Access82 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 18, 74, 82, 36, 49<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 18, 74, 82, 36, 49<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[17]<br />1: <br />ᐳ: 19, 20, 21, 23, 75, 83, 76, 84<br />2: PgSelectRows[29], PgSelectRows[34]<br />ᐳ: 28, 30, 33, 35"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor19,PgClassExpression20,PgClassExpression21,PgClassExpression23,First28,PgSelectRows29,PgSelectSingle30,First33,PgSelectRows34,PgSelectSingle35,List75,Lambda76,List83,Lambda84 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 36, 76<br /><br />ROOT PgSelectSingle{3}ᐸleft_armᐳ[30]<br />1: <br />ᐳ: 37, 40, 48, 70, 38, 39, 71, 72<br />2: PgSelectRows[46]<br />ᐳ: First[45], PgSelectSingle[47]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression37,List38,Lambda39,PgClassExpression40,First45,PgSelectRows46,PgSelectSingle47,PgClassExpression48,Access70,List71,Lambda72 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 49, 84<br /><br />ROOT PgSelectSingle{3}ᐸperson_secretᐳ[35]<br />1: <br />ᐳ: 50, 60, 78, 51, 52, 79, 80<br />2: PgSelectRows[58]<br />ᐳ: First[57], PgSelectSingle[59]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression50,List51,Lambda52,First57,PgSelectRows58,PgSelectSingle59,PgClassExpression60,Access78,List79,Lambda80 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 47<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[47]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression61,PgClassExpression62,PgClassExpression64 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 59<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[59]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression65,PgClassExpression66,PgClassExpression68 bucket7
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket3 --> Bucket4 & Bucket5
-    Bucket4 --> Bucket6
-    Bucket5 --> Bucket7
-    end
+

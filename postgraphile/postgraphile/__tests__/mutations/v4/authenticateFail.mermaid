@@ -7,6 +7,13 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/authenticateFail"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -34,17 +41,10 @@ graph TD
     PgSelectSingle14 --> PgClassExpression17
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/authenticateFail"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />ᐳ: 12, 14, 15"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17 bucket2
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    end
+

@@ -7,6 +7,14 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/interfaces-relational/commentables-simple"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 106, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />4: __ListTransform[11]"):::bucket
+    Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 10<br /><br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 94, 98, 102<br />2: 20, 27, 32<br />ᐳ: Access[95], Access[99], Access[103]<br />3: 25, 30, 35<br />ᐳ: 24, 26, 29, 31, 34, 36, 96, 97, 100, 101, 104, 105<br />4: 41, 60, 79<br />ᐳ: 40, 42, 43, 49, 55, 59, 61, 62, 68, 74, 78, 80, 81, 87, 93"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket2 --> Bucket3
 
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_commentablesᐳ"]]:::plan
@@ -121,20 +129,12 @@ graph TD
     List104 --> Lambda105
 
     %% define steps
-
-    subgraph "Buckets for queries/interfaces-relational/commentables-simple"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 106, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />4: __ListTransform[11]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,PgSelectRows12,Constant106 bucket0
-    Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgSelectSingle{1}ᐸrelational_commentablesᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 10<br /><br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgPolymorphic18,PgClassExpression19 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 94, 98, 102<br />2: 20, 27, 32<br />ᐳ: Access[95], Access[99], Access[103]<br />3: 25, 30, 35<br />ᐳ: 24, 26, 29, 31, 34, 36, 96, 97, 100, 101, 104, 105<br />4: 41, 60, 79<br />ᐳ: 40, 42, 43, 49, 55, 59, 61, 62, 68, 74, 78, 80, 81, 87, 93"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect20,First24,PgSelectRows25,PgSelectSingle26,PgSelect27,First29,PgSelectRows30,PgSelectSingle31,PgSelect32,First34,PgSelectRows35,PgSelectSingle36,First40,PgSelectRows41,PgSelectSingle42,PgClassExpression43,PgClassExpression49,PgClassExpression55,First59,PgSelectRows60,PgSelectSingle61,PgClassExpression62,PgClassExpression68,PgClassExpression74,First78,PgSelectRows79,PgSelectSingle80,PgClassExpression81,PgClassExpression87,PgClassExpression93,PgSelectInlineApply94,Access95,List96,Lambda97,PgSelectInlineApply98,Access99,List100,Lambda101,PgSelectInlineApply102,Access103,List104,Lambda105 bucket3
-    Bucket0 --> Bucket1 & Bucket2
-    Bucket2 --> Bucket3
-    end
+

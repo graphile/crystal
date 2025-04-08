@@ -7,6 +7,13 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/rbac.deletePerson"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 15, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
@@ -37,17 +44,10 @@ graph TD
     List18 --> Lambda19
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/rbac.deletePerson"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant15,Constant20 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9,Object14 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 15, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression16,Access17,List18,Lambda19 bucket2
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    end
+

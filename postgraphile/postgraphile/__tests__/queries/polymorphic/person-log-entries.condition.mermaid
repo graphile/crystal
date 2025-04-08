@@ -7,6 +7,17 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/polymorphic/person-log-entries.condition"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 14, 34<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17]<br />ᐳ: Access[35]<br />2: PgSelectRows[18]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 35<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 35, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 28, 36, 37<br />2: PgSelectRows[29]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ29ᐳ[30]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
 
     %% plan dependencies
     __InputObject7{{"__InputObject[7∈0] ➊"}}:::plan
@@ -38,41 +49,30 @@ graph TD
     Access35 & __Item19 --> List36
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression22
-    PgSelectRows28[["PgSelectRows[28∈3]"]]:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression28
+    PgSelectRows29[["PgSelectRows[29∈3]"]]:::plan
     Lambda37{{"Lambda[37∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    Lambda37 --> PgSelectRows28
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression31
+    Lambda37 --> PgSelectRows29
     List36 --> Lambda37
-    __Item29[/"__Item[29∈4]<br />ᐸ28ᐳ"\]:::itemplan
-    PgSelectRows28 ==> __Item29
-    PgSelectSingle30{{"PgSelectSingle[30∈4]<br />ᐸlog_entriesᐳ"}}:::plan
-    __Item29 --> PgSelectSingle30
+    __Item30[/"__Item[30∈4]<br />ᐸ29ᐳ"\]:::itemplan
+    PgSelectRows29 ==> __Item30
+    PgSelectSingle31{{"PgSelectSingle[31∈4]<br />ᐸlog_entriesᐳ"}}:::plan
+    __Item30 --> PgSelectSingle31
     PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression32
+    PgSelectSingle31 --> PgClassExpression32
     PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression33
+    PgSelectSingle31 --> PgClassExpression33
 
     %% define steps
-
-    subgraph "Buckets for queries/polymorphic/person-log-entries.condition"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject7,Access11,Access12,Object13,Connection14,ApplyInput15,PgSelectInlineApply34,Constant38 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 14, 34<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[17]<br />ᐳ: Access[35]<br />2: PgSelectRows[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows18,Access35 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 35<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 35, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 22, 31, 36, 37<br />2: PgSelectRows[28]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgSelectRows28,PgClassExpression31,List36,Lambda37 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ28ᐳ[29]"):::bucket
+    class Bucket3,PgClassExpression22,PgClassExpression28,PgSelectRows29,List36,Lambda37 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item29,PgSelectSingle30,PgClassExpression32,PgClassExpression33 bucket4
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    Bucket3 --> Bucket4
-    end
+    class Bucket4,__Item30,PgSelectSingle31,PgClassExpression32,PgClassExpression33 bucket4
+
