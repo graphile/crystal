@@ -194,6 +194,7 @@ interface PendingSelectionSet {
   // These must be in common for all grouped selection sets
   loc: string[] | null;
   path: readonly string[];
+  planningPath: string;
   objectType: GraphQLObjectType;
   isMutation: boolean;
 
@@ -313,6 +314,52 @@ export class OperationPlan {
     graphql.ValueNode,
     AnyInputStep
   >();
+
+  /**
+   * TEMPORARY. Maybe.
+   *
+   * @internal
+   */
+  private stepsByPlanningPath = new Map<string, Step[]>();
+  private frozenPlanningPaths = new Set<string>();
+
+  private addStepAtPlanningPath(planningPath: string, step: Step) {
+    if (this.frozenPlanningPaths.has(planningPath)) {
+      throw new Error(
+        `Attempted to add ${step} to ${planningPath} but that path is already frozen!`,
+      );
+    }
+    let list = this.stepsByPlanningPath.get(planningPath);
+    if (!list) {
+      list = [];
+      this.stepsByPlanningPath.set(planningPath, list);
+    }
+    list.push(step);
+  }
+
+  private analyzePlanningPath(planningPath: string) {
+    const PAD = 80;
+    console.log();
+    if (this.frozenPlanningPaths.has(planningPath)) {
+      console.warn(`${planningPath.padEnd(PAD, " ")} !! ALREADY FROZEN`);
+      return;
+    }
+    this.frozenPlanningPaths.add(planningPath);
+    const list = this.stepsByPlanningPath.get(planningPath);
+    if (!list) {
+      console.warn(`${planningPath.padEnd(PAD, " ")} !! NO STEPS FOUND`);
+      return;
+    }
+    if (isDev) {
+      // No more allowed!
+      Object.freeze(list);
+    }
+    console.log(
+      `${planningPath.padEnd(PAD, " ")} Found steps:\n- ${list.join("\n- ")}`,
+    );
+
+    // TODO: actually tidy this up
+  }
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -692,6 +739,7 @@ export class OperationPlan {
     this.queuePlanSelectionSet(
       outputPlan,
       [],
+      rootType.name,
       POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
@@ -734,6 +782,7 @@ export class OperationPlan {
     this.queuePlanSelectionSet(
       outputPlan,
       [],
+      rootType.name,
       POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
@@ -871,6 +920,7 @@ export class OperationPlan {
       this.queuePlanSelectionSet(
         outputPlan,
         [],
+        rootType.name,
         POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
@@ -960,6 +1010,7 @@ export class OperationPlan {
       this.queuePlanSelectionSet(
         outputPlan,
         [],
+        rootType.name,
         POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
@@ -1006,6 +1057,8 @@ export class OperationPlan {
     // Deliberately shadows
     outputPlan: OutputPlan,
     path: readonly string[],
+    planningPath: string,
+    seenFieldPlanningPaths: Set<string>,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
@@ -1205,6 +1258,8 @@ export class OperationPlan {
               )
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
+        const fieldPlanningPath = planningPath + "." + responseKey;
+        seenFieldPlanningPaths.add(fieldPlanningPath);
         let streamDetails: StreamDetails | null = null;
         const isList = isListType(getNullableType(fieldType));
         if (isList) {
@@ -1319,6 +1374,7 @@ export class OperationPlan {
 
         // May have changed due to deduplicate
         step = this.stepTracker.getStepById(step.id);
+        this.addStepAtPlanningPath(fieldPlanningPath, step);
         if (haltTree) {
           const isNonNull = isNonNullType(fieldType);
           outputPlan.addChild(objectType, responseKey, {
@@ -1337,6 +1393,7 @@ export class OperationPlan {
             outputPlan,
             fieldLayerPlan,
             fieldPath,
+            fieldPlanningPath,
             polymorphicPath,
             polymorphicPaths,
             // If one field has a selection set, they all have a selection set (guaranteed by validation).
@@ -1382,6 +1439,8 @@ export class OperationPlan {
           this.processGroupedFieldSet(
             deferredOutputPlan,
             path,
+            planningPath,
+            seenFieldPlanningPaths,
             polymorphicPath,
             polymorphicPaths,
             parentStep,
@@ -1412,6 +1471,7 @@ export class OperationPlan {
   private queuePlanSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
+    planningPath: string,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
@@ -1424,6 +1484,7 @@ export class OperationPlan {
       loc: this.loc,
       outputPlan,
       path,
+      planningPath,
       polymorphicPath,
       polymorphicPaths,
       parentStep,
@@ -1437,6 +1498,8 @@ export class OperationPlan {
   private actuallyPlanSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
+    planningPath: string,
+    seenFieldPlanningPaths: Set<string>,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
@@ -1472,6 +1535,8 @@ export class OperationPlan {
     this.processGroupedFieldSet(
       outputPlan,
       path,
+      planningPath,
+      seenFieldPlanningPaths,
       polymorphicPath,
       polymorphicPaths,
       parentStep,
@@ -1517,6 +1582,8 @@ export class OperationPlan {
         );
       }
 
+      const seenFieldPlanningPaths = new Set<string>();
+
       const batch = this.selectionSetsToPlan.splice(0, l);
 
       const grouped = Object.create(null) as Record<
@@ -1540,7 +1607,7 @@ export class OperationPlan {
       for (const selectionSetsAtSamePathForSameType of Object.values(grouped)) {
         const first = selectionSetsAtSamePathForSameType[0];
         // All of these properties should be in common
-        const { loc, path, objectType, isMutation } = first;
+        const { loc, path, planningPath, objectType, isMutation } = first;
         const oldLoc = this.loc;
         this.loc = loc;
 
@@ -1565,6 +1632,11 @@ export class OperationPlan {
             assert.ok(
               arraysMatch(path, t.path),
               "GrafastInternalError<9f06cb00-7aca-49c8-8a44-56da2f862a1a>: all pending selection sets should have the same path",
+            );
+            assert.strictEqual(
+              planningPath,
+              t.planningPath,
+              "GrafastInternalError<5d825f85-2463-403a-8120-e1c602ffc70d>: all pending selection sets should have the same planningPath",
             );
             assert.strictEqual(
               objectType,
@@ -1668,6 +1740,8 @@ export class OperationPlan {
           this.actuallyPlanSelectionSet(
             outputPlan,
             path,
+            planningPath,
+            seenFieldPlanningPaths,
             polymorphicPath,
             polymorphicPaths,
             parentStep,
@@ -1678,6 +1752,9 @@ export class OperationPlan {
           );
         }
         this.loc = oldLoc;
+      }
+      for (const fieldPlanningPath of seenFieldPlanningPaths) {
+        this.analyzePlanningPath(fieldPlanningPath);
       }
     }
   }
@@ -1694,6 +1771,7 @@ export class OperationPlan {
     parentLayerPlan: LayerPlan,
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
+    planningPath: string,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     selections: readonly SelectionNode[] | undefined,
@@ -1767,11 +1845,14 @@ export class OperationPlan {
         } else {
           $item = $__item;
         }
+        const listItemPlanningPath = planningPath + "[#]";
+        this.addStepAtPlanningPath(listItemPlanningPath, $item);
 
         this.planIntoOutputPlan(
           listOutputPlan,
           $item.layerPlan,
           path,
+          listItemPlanningPath,
           polymorphicPath,
           polymorphicPaths,
           selections,
@@ -1934,6 +2015,7 @@ export class OperationPlan {
         this.queuePlanSelectionSet(
           objectOutputPlan,
           path,
+          planningPath,
           polymorphicPath,
           polymorphicPaths,
           $step,
@@ -2035,6 +2117,7 @@ export class OperationPlan {
          */
         const polyBase = polymorphicPath ?? "";
         const $oldStep = $step;
+        const polymorphicPlanningPath = planningPath + "<*>";
         for (const type of allPossibleObjectTypes) {
           const $sideEffect = polymorphicLayerPlan.latestSideEffectStep;
           try {
@@ -2078,6 +2161,9 @@ export class OperationPlan {
               $step,
               type,
             );
+
+            this.addStepAtPlanningPath(planningPath, $step);
+
             const objectOutputPlan = new OutputPlan(
               polymorphicLayerPlan,
               $root,
@@ -2093,6 +2179,7 @@ export class OperationPlan {
             this.queuePlanSelectionSet(
               objectOutputPlan,
               path,
+              polymorphicPlanningPath,
               newPolymorphicPath,
               newPolymorphicPaths,
               $root,
@@ -2109,6 +2196,10 @@ export class OperationPlan {
           } finally {
             polymorphicLayerPlan.latestSideEffectStep = $sideEffect;
           }
+        }
+
+        if (allPossibleObjectTypes.length > 0) {
+          this.analyzePlanningPath(polymorphicPlanningPath);
         }
       }
     }
