@@ -40,13 +40,13 @@
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "@types/interpret": "^1.1.1",
-    "@types/node": "^20.5.7",
+    "@types/node": "^20.17.30",
     "@types/semver": "^7.5.1",
     "chalk": "^4.1.2",
     "debug": "^4.3.4",
     "interpret": "^3.1.1",
     "semver": "^7.5.4",
-    "tslib": "^2.6.2",
+    "tslib": "^2.8.1",
     "yargs": "^17.7.2"
   },
   "engines": {
@@ -61,6 +61,6 @@
     "chai": "^4.3.8",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   }
 }
