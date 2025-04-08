@@ -740,7 +740,7 @@ export class OperationPlan {
       this.actuallyPlanSelectionSet,
       outputPlan,
       [],
-      rootType.name,
+      rootType.name + ".",
       POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
@@ -784,7 +784,7 @@ export class OperationPlan {
       this.actuallyPlanSelectionSet,
       outputPlan,
       [],
-      rootType.name,
+      rootType.name + ".",
       POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
@@ -923,7 +923,7 @@ export class OperationPlan {
         this.actuallyPlanSelectionSet,
         outputPlan,
         [],
-        rootType.name,
+        rootType.name + ".",
         POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
@@ -1014,7 +1014,7 @@ export class OperationPlan {
         this.actuallyPlanSelectionSet,
         outputPlan,
         [],
-        rootType.name,
+        rootType.name + ".",
         POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
@@ -1261,7 +1261,7 @@ export class OperationPlan {
               )
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
-        const fieldPlanningPath = planningPath + "." + responseKey;
+        const fieldPlanningPath = planningPath + responseKey;
         let streamDetails: StreamDetails | null = null;
         const isList = isListType(getNullableType(fieldType));
         if (isList) {
@@ -1857,14 +1857,13 @@ export class OperationPlan {
         } else {
           $item = $__item;
         }
-        const listItemPlanningPath = planningPath + "[#]";
         //this.addStepAtPlanningPath(listItemPlanningPath, $item);
 
         this.queueNextLayer(
           this.planIntoOutputPlan,
           listOutputPlan,
           path,
-          listItemPlanningPath,
+          planningPath + "[#]",
           polymorphicPath,
           polymorphicPaths,
           $item,
@@ -2029,7 +2028,7 @@ export class OperationPlan {
           this.actuallyPlanSelectionSet,
           objectOutputPlan,
           path,
-          planningPath,
+          planningPath + ".",
           polymorphicPath,
           polymorphicPaths,
           $step,
@@ -2131,7 +2130,7 @@ export class OperationPlan {
          */
         const polyBase = polymorphicPath ?? "";
         const $oldStep = $step;
-        const polymorphicPlanningPath = planningPath + "<*>";
+        const polymorphicPlanningPath = planningPath + "<*>.";
         for (const type of allPossibleObjectTypes) {
           const $sideEffect = polymorphicLayerPlan.latestSideEffectStep;
           try {
