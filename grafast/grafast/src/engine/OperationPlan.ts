@@ -736,7 +736,8 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.queuePlanSelectionSet(
+    this.queueNextLayer(
+      this.actuallyPlanSelectionSet,
       outputPlan,
       [],
       rootType.name,
@@ -747,7 +748,7 @@ export class OperationPlan {
       this.operation.selectionSet.selections,
       true,
     );
-    this.planPendingSelectionSets();
+    this.planPending();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -779,7 +780,8 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.queuePlanSelectionSet(
+    this.queueNextLayer(
+      this.actuallyPlanSelectionSet,
       outputPlan,
       [],
       rootType.name,
@@ -791,7 +793,7 @@ export class OperationPlan {
       true,
       true,
     );
-    this.planPendingSelectionSets();
+    this.planPending();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -917,7 +919,8 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.queuePlanSelectionSet(
+      this.queueNextLayer(
+        this.actuallyPlanSelectionSet,
         outputPlan,
         [],
         rootType.name,
@@ -928,7 +931,7 @@ export class OperationPlan {
         selectionSet.selections,
         false,
       );
-      this.planPendingSelectionSets();
+      this.planPending();
     } else {
       const subscribeStep = withGlobalLayerPlan(
         this.rootLayerPlan,
@@ -1007,7 +1010,8 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.queuePlanSelectionSet(
+      this.queueNextLayer(
+        this.actuallyPlanSelectionSet,
         outputPlan,
         [],
         rootType.name,
@@ -1018,7 +1022,7 @@ export class OperationPlan {
         selectionSet.selections,
         true,
       );
-      this.planPendingSelectionSets();
+      this.planPending();
     }
     if (this.loc !== null) this.loc.pop();
   }
@@ -1058,7 +1062,6 @@ export class OperationPlan {
     outputPlan: OutputPlan,
     path: readonly string[],
     planningPath: string,
-    seenFieldPlanningPaths: Set<string>,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
@@ -1259,7 +1262,6 @@ export class OperationPlan {
             : NO_ARGS;
         const fieldPath = [...path, responseKey];
         const fieldPlanningPath = planningPath + "." + responseKey;
-        seenFieldPlanningPaths.add(fieldPlanningPath);
         let streamDetails: StreamDetails | null = null;
         const isList = isListType(getNullableType(fieldType));
         if (isList) {
@@ -1409,7 +1411,7 @@ export class OperationPlan {
             0,
             streamDetails,
           );
-          //this.planPendingSelectionSets()
+          //this.planPending()
         }
       } finally {
         outputPlan.layerPlan.latestSideEffectStep = $sideEffect;
@@ -1440,7 +1442,6 @@ export class OperationPlan {
             deferredOutputPlan,
             path,
             planningPath,
-            seenFieldPlanningPaths,
             polymorphicPath,
             polymorphicPaths,
             parentStep,
@@ -1449,7 +1450,7 @@ export class OperationPlan {
             isMutation,
             deferred,
           );
-          //this.planPendingSelectionSets()
+          //this.planPending()
         } finally {
           deferredOutputPlan.layerPlan.latestSideEffectStep = $sideEffect;
         }
@@ -1457,7 +1458,7 @@ export class OperationPlan {
     }
   }
 
-  private selectionSetsToPlan: Array<PendingSelectionSet> = [];
+  private queue: Array<[any, any]> = [];
 
   /**
    *
@@ -1468,38 +1469,17 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private queuePlanSelectionSet(
-    outputPlan: OutputPlan,
-    path: readonly string[],
-    planningPath: string,
-    polymorphicPath: string | null,
-    polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: Step,
-    objectType: GraphQLObjectType,
-    selections: readonly SelectionNode[],
-    resolverEmulation: boolean,
-    isMutation = false,
+  private queueNextLayer<TMethod extends (...params: any[]) => void>(
+    method: TMethod,
+    ...params: Parameters<TMethod>
   ): void {
-    this.selectionSetsToPlan.push({
-      loc: this.loc,
-      outputPlan,
-      path,
-      planningPath,
-      polymorphicPath,
-      polymorphicPaths,
-      parentStep,
-      objectType,
-      selections,
-      resolverEmulation,
-      isMutation,
-    });
+    this.queue.push([method, params]);
   }
 
   private actuallyPlanSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
     planningPath: string,
-    seenFieldPlanningPaths: Set<string>,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
@@ -1536,7 +1516,6 @@ export class OperationPlan {
       outputPlan,
       path,
       planningPath,
-      seenFieldPlanningPaths,
       polymorphicPath,
       polymorphicPaths,
       parentStep,
@@ -1571,10 +1550,10 @@ export class OperationPlan {
     });
   }
 
-  private planPendingSelectionSets() {
+  private planPending() {
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
-      const l = this.selectionSetsToPlan.length;
+      const l = this.queue.length;
       if (l === 0) break;
       if (depth === MAX_DEPTH) {
         throw new Error(
@@ -1582,10 +1561,13 @@ export class OperationPlan {
         );
       }
 
-      const seenFieldPlanningPaths = new Set<string>();
+      const batch = this.queue.splice(0, l);
+      // TODO: group (if not already done for us)
+      for (const [fn, args] of batch) {
+        fn.apply(this, args);
+      }
 
-      const batch = this.selectionSetsToPlan.splice(0, l);
-
+      /*
       const grouped = Object.create(null) as Record<
         string,
         PendingSelectionSet[]
@@ -1674,7 +1656,7 @@ export class OperationPlan {
             this.getCombinedLayerPlanForLayerPlans(parentLayerPlans);
 
           const combinedPolymorphicPaths = first.polymorphicPaths
-            ? new Set<string>(/* TODO */)
+            ? new Set<string>(/* TODO * /)
             : null;
           let isUnary = true;
           for (const {
@@ -1741,7 +1723,6 @@ export class OperationPlan {
             outputPlan,
             path,
             planningPath,
-            seenFieldPlanningPaths,
             polymorphicPath,
             polymorphicPaths,
             parentStep,
@@ -1753,9 +1734,7 @@ export class OperationPlan {
         }
         this.loc = oldLoc;
       }
-      for (const fieldPlanningPath of seenFieldPlanningPaths) {
-        this.analyzePlanningPath(fieldPlanningPath);
-      }
+    */
     }
   }
 
@@ -2012,7 +1991,8 @@ export class OperationPlan {
           isNonNull,
           locationDetails,
         });
-        this.queuePlanSelectionSet(
+        this.queueNextLayer(
+          this.actuallyPlanSelectionSet,
           objectOutputPlan,
           path,
           planningPath,
@@ -2176,7 +2156,8 @@ export class OperationPlan {
             );
             // find all selections compatible with `type`
             const fieldNodes = fieldSelectionsForType(this, type, selections);
-            this.queuePlanSelectionSet(
+            this.queueNextLayer(
+              this.actuallyPlanSelectionSet,
               objectOutputPlan,
               path,
               polymorphicPlanningPath,
