@@ -23,7 +23,7 @@ graph TD
     Bucket5 --> Bucket6
 
     %% plan dependencies
-    PgUnionAll20[["PgUnionAll[20∈0] ➊"]]:::plan
+    PgUnionAll20[["PgUnionAll[20∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant113{{"Constant[113∈0] ➊<br />ᐸ3ᐳ"}}:::plan
     Constant115{{"Constant[115∈0] ➊<br />ᐸ1ᐳ"}}:::plan
@@ -44,20 +44,20 @@ graph TD
     PgUnionAll20 --> Access108
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant16{{"Constant[16∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
-    PgUnionAll26[["PgUnionAll[26∈1] ➊"]]:::plan
+    PgUnionAll26[["PgUnionAll[26∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 & Lambda15 & Constant113 --> PgUnionAll26
-    PgUnionAll61[["PgUnionAll[61∈1] ➊"]]:::plan
+    PgUnionAll61[["PgUnionAll[61∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 & Lambda15 & Constant113 --> PgUnionAll61
-    PgUnionAll67[["PgUnionAll[67∈1] ➊"]]:::plan
+    PgUnionAll67[["PgUnionAll[67∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 & Lambda15 & Constant113 --> PgUnionAll67
-    PgUnionAll74[["PgUnionAll[74∈1] ➊"]]:::plan
+    PgUnionAll74[["PgUnionAll[74∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 & Lambda15 & Constant113 --> PgUnionAll74
-    PgUnionAll78[["PgUnionAll[78∈1] ➊"]]:::plan
+    PgUnionAll78[["PgUnionAll[78∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 & Lambda15 & Constant113 --> PgUnionAll78
     Object80{{"Object[80∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
     Access79{{"Access[79∈1] ➊<br />ᐸ78.hasMoreᐳ"}}:::plan
     Constant113 & Access79 --> Object80
-    PgUnionAll27[["PgUnionAll[27∈1] ➊"]]:::plan
+    PgUnionAll27[["PgUnionAll[27∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object13 & Constant16 & Connection14 --> PgUnionAll27
     Object76{{"Object[76∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access75{{"Access[75∈1] ➊<br />ᐸ74.hasMoreᐳ"}}:::plan
