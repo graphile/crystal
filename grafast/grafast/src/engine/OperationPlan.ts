@@ -1599,182 +1599,169 @@ export class OperationPlan {
           steps.add(entry[1][5]);
         }
         if (steps.size > 1) {
-          // TODO: process these steps
+          // TODO: try primary dedupe
+          // TODO: update `steps`
+
+          if (steps.size > 1) {
+            // Fallback: attempt to recombine using pack/unpack approach
+
+            const grouped = Object.create(null) as Record<string, QueueTuple[]>;
+            for (const t of batch) {
+              const type = t[1][6];
+              if (isObjectType(type)) {
+                if (!grouped[type.name]) {
+                  grouped[type.name] = [];
+                }
+                grouped[type.name].push(t);
+              }
+            }
+
+            for (const tuplesAtSamePathForSameType of Object.values(grouped)) {
+              if (tuplesAtSamePathForSameType.length === 1) continue;
+              const first = tuplesAtSamePathForSameType[0];
+              // All of these properties should be in common
+              const path = first[1][1];
+              const planningPath = first[1][2];
+              const polymorphicPaths = first[1][4];
+              const objectType = first[1][6] as GraphQLObjectType;
+              //const { loc, path, planningPath, objectType, isMutation } = first;
+              //const oldLoc = this.loc;
+              //this.loc = loc;
+
+              if (isDev) {
+                assert.ok(
+                  isObjectType(objectType),
+                  "GrafastInternalError<e7a5a50f-278c-47ce-8e63-62816bab25f9>: all pending selection sets should have the same object type",
+                );
+                for (const t of tuplesAtSamePathForSameType) {
+                  const tPath = t[1][1];
+                  const tPlanningPath = t[1][2];
+                  const tPolymorphicPaths = first[1][4];
+                  const tObjectType = t[1][6] as GraphQLObjectType;
+
+                  // assert.strictEqual(
+                  //   tPath.length,
+                  //   depth,
+                  //   "GrafastInternalError<17d4080a-f2fb-4cab-92f3-1d64b0152127>: all pending selection sets should have the same depth",
+                  // );
+                  //assert.ok(
+                  //  loc === t.loc ||
+                  //    (Array.isArray(loc) &&
+                  //      Array.isArray(t.loc) &&
+                  //      arraysMatch(loc, t.loc)),
+                  //  "GrafastInternalError<da9a4b55-051c-4539-8f4a-76756bfd8ee1>: all pending selection sets should have the same loc",
+                  //);
+                  assert.ok(
+                    arraysMatch(path, tPath),
+                    "GrafastInternalError<9f06cb00-7aca-49c8-8a44-56da2f862a1a>: all pending selection sets should have the same path",
+                  );
+                  assert.strictEqual(
+                    planningPath,
+                    tPlanningPath,
+                    "GrafastInternalError<5d825f85-2463-403a-8120-e1c602ffc70d>: all pending selection sets should have the same planningPath",
+                  );
+                  assert.strictEqual(
+                    objectType,
+                    tObjectType,
+                    "GrafastInternalError<f6b13887-c963-4a2a-ab40-66208b51a42b>: all pending selection sets should have the same object type",
+                  );
+                  //assert.strictEqual(
+                  //  isMutation,
+                  //  t.isMutation,
+                  //  "GrafastInternalError<b154bf65-e52d-4de7-9486-03da151c3ef0>: all pending selection sets should have the same isMutation",
+                  //);
+                  assert.strictEqual(
+                    polymorphicPaths === null,
+                    tPolymorphicPaths === null,
+                    "GrafastInternalError<57f96165-40d1-4710-934b-be575db5a44d>: all pending selection sets should agree on whether there are polymorphic paths or not",
+                  );
+                }
+              }
+
+              let commonParentStep: Step | undefined;
+              if (
+                tuplesAtSamePathForSameType.length > 1 &&
+                typeof objectType.extensions?.grafast?.pack === "function" &&
+                typeof objectType.extensions?.grafast?.unpack === "function"
+              ) {
+                const listOf$Data: Step[] = [];
+                const parentLayerPlans = new Set<LayerPlan>();
+                for (const t of tuplesAtSamePathForSameType) {
+                  const parentStep = t[1][5];
+                  parentLayerPlans.add(parentStep.layerPlan);
+                }
+
+                // TODO: does this need constraints on the polymorphic paths or
+                // similar? I don't think so...
+                const combinedLayerPlan =
+                  this.getCombinedLayerPlanForLayerPlans(parentLayerPlans);
+
+                const combinedPolymorphicPaths = polymorphicPaths
+                  ? new Set<string>(/* TODO */)
+                  : null;
+                let isUnary = true;
+                for (const t of tuplesAtSamePathForSameType) {
+                  const outputPlan = t[1][0];
+                  const parentStep = t[1][5];
+                  const polymorphicPaths = t[1][4];
+                  if (!parentStep._isUnary) {
+                    isUnary = false;
+                  }
+                  if (polymorphicPaths) {
+                    for (const path of polymorphicPaths) {
+                      combinedPolymorphicPaths!.add(path);
+                    }
+                  }
+                  const $data = withGlobalLayerPlan(
+                    outputPlan.layerPlan,
+                    polymorphicPaths,
+                    objectType.extensions.grafast.pack,
+                    objectType.extensions.grafast,
+                    parentStep,
+                  );
+                  listOf$Data.push($data);
+                }
+                // Create a __ValueStep in the new combined layer plan that
+                // represents all of these values
+                const $combined = withGlobalLayerPlan(
+                  combinedLayerPlan,
+                  combinedPolymorphicPaths,
+                  newValueStepCallback,
+                  null,
+                  false,
+                );
+                if (!isUnary) {
+                  $combined._isUnary = false;
+                }
+                // Tell it to populate the __ValuePlan $combined with the combination
+                // of all the values from listOf$Data.
+                combinedLayerPlan.addCombo(listOf$Data, $combined);
+                commonParentStep = withGlobalLayerPlan(
+                  combinedLayerPlan,
+                  combinedPolymorphicPaths,
+                  objectType.extensions.grafast.unpack,
+                  objectType.extensions.grafast,
+                  $combined,
+                );
+
+                // Update the outputPlans to link to this new combined layer
+                // plan, and use the new common step
+                for (const t of tuplesAtSamePathForSameType) {
+                  const outputPlan = t[1][0];
+                  outputPlan.layerPlan = combinedLayerPlan;
+                  t[1][5] = commonParentStep;
+                }
+              }
+
+              //this.loc = oldLoc;
+            }
+          }
         }
       }
 
       for (const [fn, args] of batch) {
         fn.apply(this, args as Parameters<typeof fn>);
       }
-
-      /*
-      const grouped = Object.create(null) as Record<
-        string,
-        PendingSelectionSet[]
-      >;
-      for (const t of batch) {
-        const p = t.path.join(">") + "|" + t.objectType.name;
-        if (grouped[p]) {
-          grouped[p].push(t);
-        } else {
-          grouped[p] = [t];
-        }
-      }
-      //console.log(
-      //  `Running batch with paths:\n- ` +
-      //    Object.entries(grouped)
-      //      .map(([k, v]) => `${k} (${v.length})`)
-      //      .join("\n- "),
-      //);
-      for (const selectionSetsAtSamePathForSameType of Object.values(grouped)) {
-        const first = selectionSetsAtSamePathForSameType[0];
-        // All of these properties should be in common
-        const { loc, path, planningPath, objectType, isMutation } = first;
-        const oldLoc = this.loc;
-        this.loc = loc;
-
-        if (isDev) {
-          assert.ok(
-            isObjectType(objectType),
-            "GrafastInternalError<e7a5a50f-278c-47ce-8e63-62816bab25f9>: all pending selection sets should have the same object type",
-          );
-          for (const t of selectionSetsAtSamePathForSameType) {
-            assert.strictEqual(
-              t.path.length,
-              depth,
-              "GrafastInternalError<17d4080a-f2fb-4cab-92f3-1d64b0152127>: all pending selection sets should have the same depth",
-            );
-            assert.ok(
-              loc === t.loc ||
-                (Array.isArray(loc) &&
-                  Array.isArray(t.loc) &&
-                  arraysMatch(loc, t.loc)),
-              "GrafastInternalError<da9a4b55-051c-4539-8f4a-76756bfd8ee1>: all pending selection sets should have the same loc",
-            );
-            assert.ok(
-              arraysMatch(path, t.path),
-              "GrafastInternalError<9f06cb00-7aca-49c8-8a44-56da2f862a1a>: all pending selection sets should have the same path",
-            );
-            assert.strictEqual(
-              planningPath,
-              t.planningPath,
-              "GrafastInternalError<5d825f85-2463-403a-8120-e1c602ffc70d>: all pending selection sets should have the same planningPath",
-            );
-            assert.strictEqual(
-              objectType,
-              t.objectType,
-              "GrafastInternalError<f6b13887-c963-4a2a-ab40-66208b51a42b>: all pending selection sets should have the same object type",
-            );
-            assert.strictEqual(
-              isMutation,
-              t.isMutation,
-              "GrafastInternalError<b154bf65-e52d-4de7-9486-03da151c3ef0>: all pending selection sets should have the same isMutation",
-            );
-            assert.strictEqual(
-              first.polymorphicPaths === null,
-              t.polymorphicPaths === null,
-              "GrafastInternalError<57f96165-40d1-4710-934b-be575db5a44d>: all pending selection sets should agree on whether there are polymorphic paths or not",
-            );
-          }
-        }
-
-        let commonParentStep: Step | undefined;
-        if (
-          selectionSetsAtSamePathForSameType.length > 1 &&
-          typeof objectType.extensions?.grafast?.pack === "function" &&
-          typeof objectType.extensions?.grafast?.unpack === "function"
-        ) {
-          const listOf$Data: Step[] = [];
-          const parentLayerPlans = new Set<LayerPlan>();
-          for (const { parentStep } of selectionSetsAtSamePathForSameType) {
-            parentLayerPlans.add(parentStep.layerPlan);
-          }
-
-          // TODO: does this need constraints on the polymorphic paths or
-          // similar? I don't think so...
-          const combinedLayerPlan =
-            this.getCombinedLayerPlanForLayerPlans(parentLayerPlans);
-
-          const combinedPolymorphicPaths = first.polymorphicPaths
-            ? new Set<string>(/* TODO * /)
-            : null;
-          let isUnary = true;
-          for (const {
-            parentStep,
-            outputPlan,
-            polymorphicPaths,
-          } of selectionSetsAtSamePathForSameType) {
-            if (!parentStep._isUnary) {
-              isUnary = false;
-            }
-            if (polymorphicPaths) {
-              for (const path of polymorphicPaths) {
-                combinedPolymorphicPaths!.add(path);
-              }
-            }
-            const $data = withGlobalLayerPlan(
-              outputPlan.layerPlan,
-              polymorphicPaths,
-              objectType.extensions.grafast.pack,
-              objectType.extensions.grafast,
-              parentStep,
-            );
-            listOf$Data.push($data);
-          }
-          // Create a __ValueStep in the new combined layer plan that
-          // represents all of these values
-          const $combined = withGlobalLayerPlan(
-            combinedLayerPlan,
-            combinedPolymorphicPaths,
-            newValueStepCallback,
-            null,
-            false,
-          );
-          if (!isUnary) {
-            $combined._isUnary = false;
-          }
-          // Tell it to populate the __ValuePlan $combined with the combination
-          // of all the values from listOf$Data.
-          combinedLayerPlan.addCombo(listOf$Data, $combined);
-          commonParentStep = withGlobalLayerPlan(
-            combinedLayerPlan,
-            combinedPolymorphicPaths,
-            objectType.extensions.grafast.unpack,
-            objectType.extensions.grafast,
-            $combined,
-          );
-
-          // Update the outputPlans to link to this new combined layer plan
-          for (const { outputPlan } of selectionSetsAtSamePathForSameType) {
-            outputPlan.layerPlan = combinedLayerPlan;
-          }
-        }
-
-        for (const t of selectionSetsAtSamePathForSameType) {
-          const {
-            outputPlan,
-            polymorphicPath,
-            polymorphicPaths,
-            selections,
-            resolverEmulation,
-          } = t;
-          const parentStep = commonParentStep ?? t.parentStep;
-          this.actuallyPlanSelectionSet(
-            outputPlan,
-            path,
-            planningPath,
-            polymorphicPath,
-            polymorphicPaths,
-            parentStep,
-            objectType,
-            selections,
-            resolverEmulation,
-            isMutation,
-          );
-        }
-        this.loc = oldLoc;
-      }
-    */
     }
   }
 
@@ -4567,14 +4554,14 @@ export function layerPlanHeirarchyContains(
 
 type CommonPlanningParametersTuple<
   TType extends GraphQLOutputType = GraphQLOutputType,
-> = readonly [
-  outputPlan: OutputPlan,
-  path: readonly string[],
-  planningPath: string,
-  polymorphicPath: string | null,
-  polymorphicPaths: ReadonlySet<string> | null,
-  parentStep: Step,
-  positionType: TType,
+> = [
+  /* 0: */ outputPlan: OutputPlan,
+  /* 1: */ path: readonly string[],
+  /* 2: */ planningPath: string,
+  /* 3: */ polymorphicPath: string | null,
+  /* 4: */ polymorphicPaths: ReadonlySet<string> | null,
+  /* 5: */ parentStep: Step,
+  /* 6: */ positionType: TType,
   ...any[],
 ];
 type QueueTuple<
