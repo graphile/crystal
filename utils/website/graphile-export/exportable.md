@@ -79,7 +79,7 @@ export const getExportTime = EXPORTABLE(
 
 Just wrapping your function in `EXPORTABLE(() => ...)` is a good first step,
 then you can use `eslint-plugin-graphile-export` to assert that all of the
-dependencies have been correctly passed (and it can even auto-fix it for you!)
+dependencies have been correctly passed (and it can even autofix it for you!)
 
 :::
 
