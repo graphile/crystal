@@ -72,7 +72,7 @@ graph TD
     Constant163{{"Constant[163∈0] ➊<br />ᐸ'gcp_applications'ᐳ"}}:::plan
     Constant178{{"Constant[178∈0] ➊<br />ᐸ'organizations'ᐳ"}}:::plan
     Constant183{{"Constant[183∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgUnionAll13[["PgUnionAll[13∈1] ➊"]]:::plan
+    PgUnionAll13[["PgUnionAll[13∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object11 & Connection12 & Constant597 --> PgUnionAll13
     Access596{{"Access[596∈1] ➊<br />ᐸ13.itemsᐳ"}}:::plan
     PgUnionAll13 --> Access596
@@ -82,18 +82,18 @@ graph TD
     __Item15 --> PgUnionAllSingle16
     Access17{{"Access[17∈2]<br />ᐸ16.1ᐳ"}}:::plan
     PgUnionAllSingle16 --> Access17
-    PgUnionAll76[["PgUnionAll[76∈3]^"]]:::plan
+    PgUnionAll76[["PgUnionAll[76∈3]^<br />ᐸAwsApplication,GcpApplicationᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     PgClassExpression35{{"PgClassExpression[35∈3]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     Connection41{{"Connection[41∈3] ➊<br />ᐸ39ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     Object11 & PgClassExpression35 & Connection41 --> PgUnionAll76
-    PgUnionAll94[["PgUnionAll[94∈3]^"]]:::plan
+    PgUnionAll94[["PgUnionAll[94∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Connection46{{"Connection[46∈3] ➊<br />ᐸ44ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     Object11 & PgClassExpression35 & Connection46 --> PgUnionAll94
-    PgUnionAll112[["PgUnionAll[112∈3]^"]]:::plan
+    PgUnionAll112[["PgUnionAll[112∈3]^<br />ᐸAwsApplication,GcpApplicationᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     PgClassExpression50{{"PgClassExpression[50∈3]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     Connection56{{"Connection[56∈3] ➊<br />ᐸ54ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Object11 & PgClassExpression50 & Connection56 --> PgUnionAll112
-    PgUnionAll130[["PgUnionAll[130∈3]^"]]:::plan
+    PgUnionAll130[["PgUnionAll[130∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Connection61{{"Connection[61∈3] ➊<br />ᐸ59ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Object11 & PgClassExpression50 & Connection61 --> PgUnionAll130
     PgSelect20[["PgSelect[20∈3]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
@@ -103,15 +103,15 @@ graph TD
     Object11 & Access19 --> PgSelect29
     List36{{"List[36∈3]^<br />ᐸ34,35ᐳ"}}:::plan
     Constant34 & PgClassExpression35 --> List36
-    PgUnionAll42[["PgUnionAll[42∈3]^"]]:::plan
+    PgUnionAll42[["PgUnionAll[42∈3]^<br />ᐸAwsApplication,GcpApplicationᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Object11 & PgClassExpression35 --> PgUnionAll42
-    PgUnionAll47[["PgUnionAll[47∈3]^"]]:::plan
+    PgUnionAll47[["PgUnionAll[47∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Object11 & PgClassExpression35 --> PgUnionAll47
     List51{{"List[51∈3]^<br />ᐸ49,50ᐳ"}}:::plan
     Constant49 & PgClassExpression50 --> List51
-    PgUnionAll57[["PgUnionAll[57∈3]^"]]:::plan
+    PgUnionAll57[["PgUnionAll[57∈3]^<br />ᐸAwsApplication,GcpApplicationᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Object11 & PgClassExpression50 --> PgUnionAll57
-    PgUnionAll62[["PgUnionAll[62∈3]^"]]:::plan
+    PgUnionAll62[["PgUnionAll[62∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Object11 & PgClassExpression50 --> PgUnionAll62
     JSONParse18[["JSONParse[18∈3]<br />ᐸ17ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
     Access17 --> JSONParse18
@@ -160,11 +160,11 @@ graph TD
     __Item65 --> PgUnionAllSingle66
     Access77{{"Access[77∈4]^<br />ᐸ66.1ᐳ"}}:::plan
     PgUnionAllSingle66 --> Access77
-    PgUnionAll158[["PgUnionAll[158∈8]^"]]:::plan
+    PgUnionAll158[["PgUnionAll[158∈8]^<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression156{{"PgClassExpression[156∈8]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression157{{"PgClassExpression[157∈8]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression156 & PgClassExpression157 --> PgUnionAll158
-    PgUnionAll170[["PgUnionAll[170∈8]^"]]:::plan
+    PgUnionAll170[["PgUnionAll[170∈8]^<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression168{{"PgClassExpression[168∈8]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression169{{"PgClassExpression[169∈8]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression168 & PgClassExpression169 --> PgUnionAll170
@@ -344,11 +344,11 @@ graph TD
     __Item71 --> PgUnionAllSingle72
     Access113{{"Access[113∈6]^<br />ᐸ72.1ᐳ"}}:::plan
     PgUnionAllSingle72 --> Access113
-    PgUnionAll198[["PgUnionAll[198∈10]^"]]:::plan
+    PgUnionAll198[["PgUnionAll[198∈10]^<br />ᐸPerson,Organizationᐳ<br />ᐳThirdPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression196{{"PgClassExpression[196∈10]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression197{{"PgClassExpression[197∈10]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression196 & PgClassExpression197 --> PgUnionAll198
-    PgUnionAll210[["PgUnionAll[210∈10]^"]]:::plan
+    PgUnionAll210[["PgUnionAll[210∈10]^<br />ᐸPerson,Organizationᐳ<br />ᐳThirdPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression208{{"PgClassExpression[208∈10]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression209{{"PgClassExpression[209∈10]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression208 & PgClassExpression209 --> PgUnionAll210
@@ -528,11 +528,11 @@ graph TD
     __Item149 --> PgUnionAllSingle150
     Access228{{"Access[228∈12]^<br />ᐸ150.1ᐳ"}}:::plan
     PgUnionAllSingle150 --> Access228
-    PgUnionAll371[["PgUnionAll[371∈16]^"]]:::plan
+    PgUnionAll371[["PgUnionAll[371∈16]^<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression369{{"PgClassExpression[369∈16]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression370{{"PgClassExpression[370∈16]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression369 & PgClassExpression370 --> PgUnionAll371
-    PgUnionAll383[["PgUnionAll[383∈16]^"]]:::plan
+    PgUnionAll383[["PgUnionAll[383∈16]^<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression381{{"PgClassExpression[381∈16]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression382{{"PgClassExpression[382∈16]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression381 & PgClassExpression382 --> PgUnionAll383
@@ -712,11 +712,11 @@ graph TD
     __Item189 --> PgUnionAllSingle190
     Access296{{"Access[296∈14]^<br />ᐸ190.1ᐳ"}}:::plan
     PgUnionAllSingle190 --> Access296
-    PgUnionAll425[["PgUnionAll[425∈20]^"]]:::plan
+    PgUnionAll425[["PgUnionAll[425∈20]^<br />ᐸPerson,Organizationᐳ<br />ᐳThirdPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression423{{"PgClassExpression[423∈20]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression424{{"PgClassExpression[424∈20]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression423 & PgClassExpression424 --> PgUnionAll425
-    PgUnionAll437[["PgUnionAll[437∈20]^"]]:::plan
+    PgUnionAll437[["PgUnionAll[437∈20]^<br />ᐸPerson,Organizationᐳ<br />ᐳThirdPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression435{{"PgClassExpression[435∈20]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression436{{"PgClassExpression[436∈20]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object11 & PgClassExpression435 & PgClassExpression436 --> PgUnionAll437

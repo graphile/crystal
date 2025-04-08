@@ -42,7 +42,7 @@ graph TD
     PgSelectRows16 ==> __Item17
     PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item17 --> PgSelectSingle18
-    PgUnionAll26[["PgUnionAll[26∈3]"]]:::plan
+    PgUnionAll26[["PgUnionAll[26∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll26
     PgSelectSingle18 --> PgClassExpression19
@@ -56,12 +56,12 @@ graph TD
     __Item28 --> PgUnionAllSingle29
     Access30{{"Access[30∈4]<br />ᐸ29.1ᐳ"}}:::plan
     PgUnionAllSingle29 --> Access30
-    PgUnionAll55[["PgUnionAll[55∈5]^"]]:::plan
+    PgUnionAll55[["PgUnionAll[55∈5]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     PgClassExpression47{{"PgClassExpression[47∈5]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Connection50{{"Connection[50∈5] ➊<br />ᐸ48ᐳ<br />ᐳAwsApplication"}}:::plan
     Object12 & PgClassExpression47 & Connection50 --> PgUnionAll55
-    PgUnionAll60[["PgUnionAll[60∈5]^"]]:::plan
-    PgClassExpression51{{"PgClassExpression[51∈5]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    PgUnionAll60[["PgUnionAll[60∈5]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
+    PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Connection54{{"Connection[54∈5] ➊<br />ᐸ52ᐳ<br />ᐳGcpApplication"}}:::plan
     Object12 & PgClassExpression51 & Connection54 --> PgUnionAll60
     PgSelect33[["PgSelect[33∈5]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan

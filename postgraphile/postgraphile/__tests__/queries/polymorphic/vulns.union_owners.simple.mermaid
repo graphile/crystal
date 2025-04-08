@@ -40,7 +40,7 @@ graph TD
     Constant42{{"Constant[42∈0] ➊<br />ᐸ'third_party_vulnerabilities'ᐳ"}}:::plan
     Constant92{{"Constant[92∈0] ➊<br />ᐸ'organizations'ᐳ"}}:::plan
     Constant97{{"Constant[97∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgUnionAll13[["PgUnionAll[13∈1] ➊"]]:::plan
+    PgUnionAll13[["PgUnionAll[13∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
     Object11 & Connection12 & Constant115 --> PgUnionAll13
     Access114{{"Access[114∈1] ➊<br />ᐸ13.itemsᐳ"}}:::plan
     PgUnionAll13 --> Access114
@@ -50,11 +50,11 @@ graph TD
     __Item15 --> PgUnionAllSingle16
     Access17{{"Access[17∈2]<br />ᐸ16.1ᐳ"}}:::plan
     PgUnionAllSingle16 --> Access17
-    PgUnionAll50[["PgUnionAll[50∈3]^"]]:::plan
+    PgUnionAll50[["PgUnionAll[50∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     PgClassExpression35{{"PgClassExpression[35∈3]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     Connection41{{"Connection[41∈3] ➊<br />ᐸ39ᐳ<br />ᐳFirstPartyVulnerability"}}:::plan
     Object11 & PgClassExpression35 & Connection41 --> PgUnionAll50
-    PgUnionAll51[["PgUnionAll[51∈3]^"]]:::plan
+    PgUnionAll51[["PgUnionAll[51∈3]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     PgClassExpression43{{"PgClassExpression[43∈3]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     Connection49{{"Connection[49∈3] ➊<br />ᐸ47ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
     Object11 & PgClassExpression43 & Connection49 --> PgUnionAll51

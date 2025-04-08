@@ -66,12 +66,12 @@ graph TD
     PgSelectRows16 ==> __Item17
     PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item17 --> PgSelectSingle18
-    PgUnionAll26[["PgUnionAll[26∈3]"]]:::plan
+    PgUnionAll26[["PgUnionAll[26∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll26
-    PgUnionAll31[["PgUnionAll[31∈3]"]]:::plan
+    PgUnionAll31[["PgUnionAll[31∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll31
-    PgUnionAll32[["PgUnionAll[32∈3]"]]:::plan
+    PgUnionAll32[["PgUnionAll[32∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
     Object12 & PgClassExpression19 & Connection25 --> PgUnionAll32
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
@@ -128,34 +128,34 @@ graph TD
     __Item37 --> PgUnionAllSingle38
     Access39{{"Access[39∈5]<br />ᐸ38.1ᐳ"}}:::plan
     PgUnionAllSingle38 --> Access39
-    PgUnionAll63[["PgUnionAll[63∈7]^"]]:::plan
+    PgUnionAll63[["PgUnionAll[63∈7]^<br />ᐸPerson,Organizationᐳ<br />ᐳAwsApplication"]]:::plan
     PgClassExpression61{{"PgClassExpression[61∈7]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression62{{"PgClassExpression[62∈7]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
     Object12 & PgClassExpression61 & PgClassExpression62 --> PgUnionAll63
-    PgUnionAll78[["PgUnionAll[78∈7]^"]]:::plan
+    PgUnionAll78[["PgUnionAll[78∈7]^<br />ᐸPerson,Organizationᐳ<br />ᐳGcpApplication"]]:::plan
     PgClassExpression76{{"PgClassExpression[76∈7]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression77{{"PgClassExpression[77∈7]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
     Object12 & PgClassExpression76 & PgClassExpression77 --> PgUnionAll78
-    PgUnionAll168[["PgUnionAll[168∈7]^"]]:::plan
+    PgUnionAll168[["PgUnionAll[168∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     PgClassExpression59{{"PgClassExpression[59∈7]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Connection72{{"Connection[72∈7] ➊<br />ᐸ70ᐳ<br />ᐳAwsApplication"}}:::plan
     Object12 & PgClassExpression59 & Connection72 --> PgUnionAll168
-    PgUnionAll173[["PgUnionAll[173∈7]^"]]:::plan
+    PgUnionAll173[["PgUnionAll[173∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     Object12 & PgClassExpression59 & Connection72 --> PgUnionAll173
-    PgUnionAll195[["PgUnionAll[195∈7]^"]]:::plan
+    PgUnionAll195[["PgUnionAll[195∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     PgClassExpression74{{"PgClassExpression[74∈7]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Connection87{{"Connection[87∈7] ➊<br />ᐸ85ᐳ<br />ᐳGcpApplication"}}:::plan
     Object12 & PgClassExpression74 & Connection87 --> PgUnionAll195
-    PgUnionAll200[["PgUnionAll[200∈7]^"]]:::plan
+    PgUnionAll200[["PgUnionAll[200∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & PgClassExpression74 & Connection87 --> PgUnionAll200
     PgSelect42[["PgSelect[42∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access41{{"Access[41∈7]^<br />ᐸ40.0ᐳ"}}:::plan
     Object12 & Access41 --> PgSelect42
     PgSelect51[["PgSelect[51∈7]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & Access41 --> PgSelect51
-    PgUnionAll68[["PgUnionAll[68∈7]^"]]:::plan
+    PgUnionAll68[["PgUnionAll[68∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     Object12 & PgClassExpression59 --> PgUnionAll68
-    PgUnionAll83[["PgUnionAll[83∈7]^"]]:::plan
+    PgUnionAll83[["PgUnionAll[83∈7]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & PgClassExpression74 --> PgUnionAll83
     JSONParse40[["JSONParse[40∈7]<br />ᐸ39ᐳ<br />ᐳAwsApplication<br />ᐳGcpApplication"]]:::plan
     Access39 --> JSONParse40

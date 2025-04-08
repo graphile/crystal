@@ -38,7 +38,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant36{{"Constant[36∈0] ➊<br />ᐸ[ 'ThirdPartyVulnerability' ]ᐳ"}}:::plan
-    PgUnionAll14[["PgUnionAll[14∈1] ➊"]]:::plan
+    PgUnionAll14[["PgUnionAll[14∈1] ➊<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
     Object11 & Lambda13 & Connection12 --> PgUnionAll14
     Access104{{"Access[104∈1] ➊<br />ᐸ14.itemsᐳ"}}:::plan
     PgUnionAll14 --> Access104
@@ -48,12 +48,12 @@ graph TD
     __Item16 --> PgUnionAllSingle17
     Access18{{"Access[18∈2]<br />ᐸ17.1ᐳ"}}:::plan
     PgUnionAllSingle17 --> Access18
-    PgUnionAll48[["PgUnionAll[48∈3]<br />ᐳAwsApplication"]]:::plan
+    PgUnionAll48[["PgUnionAll[48∈3]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     PgClassExpression37{{"PgClassExpression[37∈3]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Lambda41[["Lambda[41∈3] ➊<br />ᐸlimitToTypesᐳ<br />ᐳAwsApplication<br />ᐳGcpApplication"]]:::unbatchedplan
     Connection40{{"Connection[40∈3] ➊<br />ᐸ38ᐳ<br />ᐳAwsApplication"}}:::plan
     Object11 & PgClassExpression37 & Lambda41 & Connection40 --> PgUnionAll48
-    PgUnionAll49[["PgUnionAll[49∈3]<br />ᐳGcpApplication"]]:::plan
+    PgUnionAll49[["PgUnionAll[49∈3]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     PgClassExpression43{{"PgClassExpression[43∈3]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     Connection46{{"Connection[46∈3] ➊<br />ᐸ44ᐳ<br />ᐳGcpApplication"}}:::plan
     Object11 & PgClassExpression43 & Lambda41 & Connection46 --> PgUnionAll49
