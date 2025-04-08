@@ -1391,13 +1391,15 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
-          this.planIntoOutputPlan(
+          this.queueNextLayer(
+            this.planIntoOutputPlan,
             outputPlan,
-            fieldLayerPlan,
             fieldPath,
             fieldPlanningPath,
             polymorphicPath,
             polymorphicPaths,
+            step,
+            fieldLayerPlan,
             // If one field has a selection set, they all have a selection set (guaranteed by validation).
             field.selectionSet != null
               ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
@@ -1405,7 +1407,6 @@ export class OperationPlan {
             objectType,
             responseKey,
             fieldType,
-            step,
             locationDetails,
             resolverEmulation,
             0,
@@ -1458,8 +1459,6 @@ export class OperationPlan {
     }
   }
 
-  private queue: Array<[any, any]> = [];
-
   /**
    *
    * @param outputPlan - The output plan that this selection set is being added to
@@ -1469,13 +1468,6 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private queueNextLayer<TMethod extends (...params: any[]) => void>(
-    method: TMethod,
-    ...params: Parameters<TMethod>
-  ): void {
-    this.queue.push([method, params]);
-  }
-
   private actuallyPlanSelectionSet(
     outputPlan: OutputPlan,
     path: readonly string[],
@@ -1550,10 +1542,37 @@ export class OperationPlan {
     });
   }
 
+  private planningQueue = new Map<string, [any, any][]>();
+
+  private queueNextLayer<
+    TMethod extends (
+      ...params: [
+        outputPlan: OutputPlan,
+        path: readonly string[],
+        planningPath: string,
+        polymorphicPath: string | null,
+        polymorphicPaths: ReadonlySet<string> | null,
+        parentStep: Step,
+        ...rest: any[],
+      ]
+    ) => void,
+  >(method: TMethod, ...params: Parameters<TMethod>): void {
+    const [, , planningPath] = params;
+    let list = this.planningQueue.get(planningPath);
+    if (!list) {
+      list = [];
+      this.planningQueue.set(planningPath, list);
+    }
+    list.push([method, params]);
+  }
+
   private planPending() {
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
-      const l = this.queue.length;
+      const todo = [...this.planningQueue.entries()];
+      this.planningQueue.clear();
+
+      const l = todo.length;
       if (l === 0) break;
       if (depth === MAX_DEPTH) {
         throw new Error(
@@ -1561,10 +1580,11 @@ export class OperationPlan {
         );
       }
 
-      const batch = this.queue.splice(0, l);
-      // TODO: group (if not already done for us)
-      for (const [fn, args] of batch) {
-        fn.apply(this, args);
+      for (const [planningPath, batch] of todo) {
+        // TODO: do something with `planningPath`
+        for (const [fn, args] of batch) {
+          fn.apply(this, args);
+        }
       }
 
       /*
@@ -1746,18 +1766,18 @@ export class OperationPlan {
   // Similar to the old 'planFieldReturnType'
   private planIntoOutputPlan(
     parentOutputPlan: OutputPlan,
-    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
-    parentLayerPlan: LayerPlan,
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
     planningPath: string,
     polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
+    $step: Step,
+    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
+    parentLayerPlan: LayerPlan,
     selections: readonly SelectionNode[] | undefined,
     parentObjectType: GraphQLObjectType | null,
     responseKey: string | null,
     fieldType: GraphQLOutputType,
-    $step: Step,
     locationDetails: LocationDetails,
     resolverEmulation: boolean,
     listDepth: number,
@@ -1827,18 +1847,19 @@ export class OperationPlan {
         const listItemPlanningPath = planningPath + "[#]";
         this.addStepAtPlanningPath(listItemPlanningPath, $item);
 
-        this.planIntoOutputPlan(
+        this.queueNextLayer(
+          this.planIntoOutputPlan,
           listOutputPlan,
-          $item.layerPlan,
           path,
           listItemPlanningPath,
           polymorphicPath,
           polymorphicPaths,
+          $item,
+          $item.layerPlan,
           selections,
           null,
           null,
           nullableFieldType.ofType,
-          $item,
           locationDetails,
           resolverEmulation,
           listDepth + 1,
