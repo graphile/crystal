@@ -1376,7 +1376,7 @@ export class OperationPlan {
 
         // May have changed due to deduplicate
         step = this.stepTracker.getStepById(step.id);
-        this.addStepAtPlanningPath(fieldPlanningPath, step);
+        //this.addStepAtPlanningPath(fieldPlanningPath, step);
         if (haltTree) {
           const isNonNull = isNonNullType(fieldType);
           outputPlan.addChild(objectType, responseKey, {
@@ -1845,7 +1845,7 @@ export class OperationPlan {
           $item = $__item;
         }
         const listItemPlanningPath = planningPath + "[#]";
-        this.addStepAtPlanningPath(listItemPlanningPath, $item);
+        //this.addStepAtPlanningPath(listItemPlanningPath, $item);
 
         this.queueNextLayer(
           this.planIntoOutputPlan,
@@ -2163,7 +2163,7 @@ export class OperationPlan {
               type,
             );
 
-            this.addStepAtPlanningPath(planningPath, $step);
+            //this.addStepAtPlanningPath(planningPath, $step);
 
             const objectOutputPlan = new OutputPlan(
               polymorphicLayerPlan,
@@ -2200,9 +2200,9 @@ export class OperationPlan {
           }
         }
 
-        if (allPossibleObjectTypes.length > 0) {
-          this.analyzePlanningPath(polymorphicPlanningPath);
-        }
+        //if (allPossibleObjectTypes.length > 0) {
+        //  this.analyzePlanningPath(polymorphicPlanningPath);
+        //}
       }
     }
   }
