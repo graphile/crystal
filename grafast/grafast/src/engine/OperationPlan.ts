@@ -1542,7 +1542,15 @@ export class OperationPlan {
     });
   }
 
-  private planningQueue = new Map<string, [any, any][]>();
+  // This is the queue of things to be done _IN ORDER_
+  private planningQueue: Array<readonly [any, any]> = [];
+  // This is the queue of things to be done grouped by their planning path.
+  // The result of this is not necessarily in order, but it does save us
+  // time and effort in `planPending()`
+  private planningQueueByPlanningPath = new Map<
+    string,
+    Array<readonly [any, any]>
+  >();
 
   private queueNextLayer<
     TMethod extends (
@@ -1558,21 +1566,21 @@ export class OperationPlan {
     ) => void,
   >(method: TMethod, ...params: Parameters<TMethod>): void {
     const [, , planningPath] = params;
-    let list = this.planningQueue.get(planningPath);
+    let list = this.planningQueueByPlanningPath.get(planningPath);
     if (!list) {
       list = [];
-      this.planningQueue.set(planningPath, list);
+      this.planningQueueByPlanningPath.set(planningPath, list);
     }
-    list.push([method, params]);
+    const tuple = [method, params] as const;
+    this.planningQueue.push(tuple);
+    list.push(tuple);
   }
 
   private planPending() {
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
-      const todo = [...this.planningQueue.entries()];
-      this.planningQueue.clear();
 
-      const l = todo.length;
+      const l = this.planningQueue.length;
       if (l === 0) break;
       if (depth === MAX_DEPTH) {
         throw new Error(
@@ -1580,11 +1588,17 @@ export class OperationPlan {
         );
       }
 
+      const batch = this.planningQueue.splice(0, l);
+      const todo = [...this.planningQueueByPlanningPath.entries()];
+      this.planningQueueByPlanningPath.clear();
+
       for (const [planningPath, batch] of todo) {
-        // TODO: do something with `planningPath`
-        for (const [fn, args] of batch) {
-          fn.apply(this, args);
-        }
+        console.log(`${planningPath.padEnd(PLANNING_PAD, " ")} processing`);
+        // TODO: mess with batch[*][5] (i.e. the step)
+      }
+
+      for (const [fn, args] of batch) {
+        fn.apply(this, args);
       }
 
       /*
