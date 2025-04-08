@@ -7,6 +7,20 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/v4/orderByNullsLast"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 27<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[19]<br />2: PgSelectRows[21]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 17, 27<br /><br />ROOT Connectionᐸ15ᐳ[17]<br />1: PgSelect[20]<br />2: PgSelectRows[24]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 27<br /><br />ROOT __Item{3}ᐸ21ᐳ[22]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />Deps: 27<br /><br />ROOT __Item{4}ᐸ24ᐳ[25]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 23, 27<br /><br />ROOT PgSelectSingle{3}ᐸsimilar_table_1ᐳ[23]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 26, 27<br /><br />ROOT PgSelectSingle{4}ᐸsimilar_table_1ᐳ[26]"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket1 --> Bucket3
+    Bucket2 --> Bucket4
+    Bucket3 --> Bucket5
+    Bucket4 --> Bucket6
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -22,27 +36,27 @@ graph TD
     Constant27{{"Constant[27∈0] ➊<br />ᐸ'similar_table_1S'ᐳ"}}:::plan
     PgSelect19[["PgSelect[19∈1] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
     Object11 & Connection12 --> PgSelect19
-    PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
-    PgSelect19 --> PgSelectRows20
-    __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectRows20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸsimilar_table_1ᐳ"}}:::plan
-    __Item21 --> PgSelectSingle22
-    List29{{"List[29∈4]<br />ᐸ27,28ᐳ"}}:::plan
-    PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    PgSelectRows21[["PgSelectRows[21∈1] ➊"]]:::plan
+    PgSelect19 --> PgSelectRows21
+    __Item22[/"__Item[22∈3]<br />ᐸ21ᐳ"\]:::itemplan
+    PgSelectRows21 ==> __Item22
+    PgSelectSingle23{{"PgSelectSingle[23∈3]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    __Item22 --> PgSelectSingle23
+    List29{{"List[29∈5]<br />ᐸ27,28ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈5]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant27 & PgClassExpression28 --> List29
-    PgSelectSingle22 --> PgClassExpression28
-    Lambda30{{"Lambda[30∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    PgSelectSingle23 --> PgClassExpression28
+    Lambda30{{"Lambda[30∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List29 --> Lambda30
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression31
-    PgSelect23[["PgSelect[23∈2] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object11 & Connection17 --> PgSelect23
+    PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    PgSelectSingle23 --> PgClassExpression31
+    PgSelect20[["PgSelect[20∈2] ➊<br />ᐸsimilar_table_1ᐳ"]]:::plan
+    Object11 & Connection17 --> PgSelect20
     PgSelectRows24[["PgSelectRows[24∈2] ➊"]]:::plan
-    PgSelect23 --> PgSelectRows24
-    __Item25[/"__Item[25∈5]<br />ᐸ24ᐳ"\]:::itemplan
+    PgSelect20 --> PgSelectRows24
+    __Item25[/"__Item[25∈4]<br />ᐸ24ᐳ"\]:::itemplan
     PgSelectRows24 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸsimilar_table_1ᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
     List34{{"List[34∈6]<br />ᐸ27,33ᐳ"}}:::plan
     PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
@@ -54,32 +68,18 @@ graph TD
     PgSelectSingle26 --> PgClassExpression36
 
     %% define steps
-
-    subgraph "Buckets for queries/v4/orderByNullsLast"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection17,Constant27 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 27<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[19]<br />2: PgSelectRows[20]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect19,PgSelectRows20 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 17, 27<br /><br />ROOT Connectionᐸ15ᐳ[17]<br />1: PgSelect[23]<br />2: PgSelectRows[24]"):::bucket
+    class Bucket1,PgSelect19,PgSelectRows21 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgSelect23,PgSelectRows24 bucket2
-    Bucket3("Bucket 3 (listItem)<br />Deps: 27<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]"):::bucket
+    class Bucket2,PgSelect20,PgSelectRows24 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 22, 27<br /><br />ROOT PgSelectSingle{3}ᐸsimilar_table_1ᐳ[22]"):::bucket
+    class Bucket3,__Item22,PgSelectSingle23 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression28,List29,Lambda30,PgClassExpression31 bucket4
-    Bucket5("Bucket 5 (listItem)<br />Deps: 27<br /><br />ROOT __Item{5}ᐸ24ᐳ[25]"):::bucket
+    class Bucket4,__Item25,PgSelectSingle26 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item25,PgSelectSingle26 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 26, 27<br /><br />ROOT PgSelectSingle{5}ᐸsimilar_table_1ᐳ[26]"):::bucket
+    class Bucket5,PgClassExpression28,List29,Lambda30,PgClassExpression31 bucket5
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression33,List34,Lambda35,PgClassExpression36 bucket6
-    Bucket0 --> Bucket1 & Bucket2
-    Bucket1 --> Bucket3
-    Bucket2 --> Bucket5
-    Bucket3 --> Bucket4
-    Bucket5 --> Bucket6
-    end
+

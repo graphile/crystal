@@ -7,6 +7,11 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/connections/pagination-before-last-pagination-only.variables"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 18, 36, 6<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[19], PgSelect[21]<br />ᐳ: 20, 28, 29, 30, 33, 34<br />2: PgSelectRows[23]<br />ᐳ: 22, 24, 25"):::bucket
+    end
+    Bucket0 --> Bucket1
 
     %% plan dependencies
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -54,13 +59,8 @@ graph TD
     Object33 --> Lambda34
 
     %% define steps
-
-    subgraph "Buckets for queries/connections/pagination-before-last-pagination-only.variables"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value2,__Value4,Access9,Access12,Access13,Object14,Connection15,Lambda17,Lambda18,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 18, 36, 6<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[19], PgSelect[21]<br />ᐳ: 20, 28, 29, 30, 33, 34<br />2: PgSelectRows[23]<br />ᐳ: 22, 24, 25"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,PgPageInfo20,PgSelect21,First22,PgSelectRows23,PgSelectSingle24,PgClassExpression25,Access28,Object29,Lambda30,Object33,Lambda34 bucket1
-    Bucket0 --> Bucket1
-    end
+

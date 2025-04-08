@@ -7,15 +7,15 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/errors/root-non-nullable-violation"
+    Bucket0("Bucket 0 (root)"):::bucket
+    end
 
     %% plan dependencies
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant6{{"Constant[6∈0] ➊<br />ᐸnullᐳ"}}:::plan
 
     %% define steps
-
-    subgraph "Buckets for queries/errors/root-non-nullable-violation"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value4,Constant6 bucket0
-    end
+

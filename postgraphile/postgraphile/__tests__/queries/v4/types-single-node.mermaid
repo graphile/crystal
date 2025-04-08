@@ -7,6 +7,11 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/v4/types-single-node"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756,List<br />Deps: 2, 8, 7, 4<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList<br /><br />1: <br />ᐳ: 14, 15, 131, 132, 16<br />2: 13, 21, 27, 33, 39, 45, 53, 59, 65, 71, 77, 83, 89, 95, 101, 107, 113, 119, 125<br />3: 18, 24, 30, 36, 42, 48, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128<br />ᐳ: 17, 19, 23, 25, 29, 31, 35, 37, 41, 43, 47, 49, 55, 57, 61, 63, 67, 69, 73, 75, 79, 81, 85, 87, 91, 93, 97, 99, 103, 105, 109, 111, 115, 117, 121, 123, 127, 129, 130"):::bucket
+    end
+    Bucket0 --> Bucket1
 
     %% plan dependencies
     Node7{{"Node[7∈0] ➊"}}:::plan
@@ -202,13 +207,8 @@ graph TD
     Lambda8 --> Access132
 
     %% define steps
-
-    subgraph "Buckets for queries/v4/types-single-node"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Node7,Lambda8,Constant133 bucket0
-    Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756,List<br />Deps: 2, 8, 7, 4<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList<br /><br />1: <br />ᐳ: 14, 15, 131, 132, 16<br />2: 13, 21, 27, 33, 39, 45, 53, 59, 65, 71, 77, 83, 89, 95, 101, 107, 113, 119, 125<br />3: 18, 24, 30, 36, 42, 48, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128<br />ᐳ: 17, 19, 23, 25, 29, 31, 35, 37, 41, 43, 47, 49, 55, 57, 61, 63, 67, 69, 73, 75, 79, 81, 85, 87, 91, 93, 97, 99, 103, 105, 109, 111, 115, 117, 121, 123, 127, 129, 130"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect13,Access14,Access15,Object16,First17,PgSelectRows18,PgSelectSingle19,PgSelect21,First23,PgSelectRows24,PgSelectSingle25,PgSelect27,First29,PgSelectRows30,PgSelectSingle31,PgSelect33,First35,PgSelectRows36,PgSelectSingle37,PgSelect39,First41,PgSelectRows42,PgSelectSingle43,PgSelect45,First47,PgSelectRows48,PgSelectSingle49,PgSelect53,First55,PgSelectRows56,PgSelectSingle57,PgSelect59,First61,PgSelectRows62,PgSelectSingle63,PgSelect65,First67,PgSelectRows68,PgSelectSingle69,PgSelect71,First73,PgSelectRows74,PgSelectSingle75,PgSelect77,First79,PgSelectRows80,PgSelectSingle81,PgSelect83,First85,PgSelectRows86,PgSelectSingle87,PgSelect89,First91,PgSelectRows92,PgSelectSingle93,PgSelect95,First97,PgSelectRows98,PgSelectSingle99,PgSelect101,First103,PgSelectRows104,PgSelectSingle105,PgSelect107,First109,PgSelectRows110,PgSelectSingle111,PgSelect113,First115,PgSelectRows116,PgSelectSingle117,PgSelect119,First121,PgSelectRows122,PgSelectSingle123,PgSelect125,First127,PgSelectRows128,PgSelectSingle129,PgClassExpression130,Access131,Access132 bucket1
-    Bucket0 --> Bucket1
-    end
+

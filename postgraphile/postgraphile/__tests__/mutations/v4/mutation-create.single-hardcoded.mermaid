@@ -7,6 +7,21 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/mutation-create.single-hardcoded"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 51, 4, 53<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 20, 51, 22, 4, 53<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 26, 32, 44, 52, 25<br />2: PgSelect[27]<br />ᐳ: Access[37]<br />3: PgSelectRows[34]<br />ᐳ: 33, 35, 38, 50, 36, 48"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 36, 35, 53, 38<br /><br />ROOT Edge{2}[36]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 48, 35, 53, 50<br /><br />ROOT Edge{2}[48]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 4, 52<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 35, 53<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 35, 53<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3 & Bucket4 & Bucket5
+    Bucket3 --> Bucket6
+    Bucket4 --> Bucket7
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
@@ -81,35 +96,20 @@ graph TD
     PgSelectSingle35 --> PgClassExpression62
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/mutation-create.single-hardcoded"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,__InputDynamicScalar13,Access18,Access19,Object20,ApplyInput21,Constant51,Constant53,Constant63,Constant64,Constant65,Constant66,Constant67,Constant68,Constant69 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 51, 4, 53<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object22 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 20, 51, 22, 4, 53<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 26, 32, 44, 52, 25<br />2: PgSelect[27]<br />ᐳ: Access[37]<br />3: PgSelectRows[34]<br />ᐳ: 33, 35, 38, 50, 36, 48"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression25,Access26,PgSelect27,Connection32,First33,PgSelectRows34,PgSelectSingle35,Edge36,Access37,PgCursor38,Connection44,Edge48,PgCursor50,Lambda52 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 36, 35, 53, 38<br /><br />ROOT Edge{2}[36]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 48, 35, 53, 50<br /><br />ROOT Edge{2}[48]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 4, 52<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 35, 53<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression54,List55,Lambda56,PgClassExpression57 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 35, 53<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[35]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression59,List60,Lambda61,PgClassExpression62 bucket7
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3 & Bucket4 & Bucket5
-    Bucket3 --> Bucket6
-    Bucket4 --> Bucket7
-    end
+

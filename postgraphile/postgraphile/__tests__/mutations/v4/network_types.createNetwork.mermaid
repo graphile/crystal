@@ -7,6 +7,15 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/network_types.createNetwork"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 16, 18<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[17]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 12, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 18<br /><br />ROOT PgInsertSingle{1}ᐸnetwork()ᐳ[12]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
 
     %% plan dependencies
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
@@ -47,21 +56,12 @@ graph TD
     Access20 --> PgClassExpression26
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/network_types.createNetwork"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access13,Access14,Object15,ApplyInput16,Constant18,Constant27,Constant28,Constant29 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 16, 18<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[17]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,Object17 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 12, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 18<br /><br />ROOT PgInsertSingle{1}ᐸnetwork()ᐳ[12]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,Access20,List21,Lambda22,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    end
+
