@@ -686,6 +686,10 @@ on (${sql.indent(
     }
   }
 
+  toStringMeta() {
+    return this.memberDigests.map((d) => d.member.typeName).join(",");
+  }
+
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
