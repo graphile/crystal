@@ -1543,27 +1543,14 @@ export class OperationPlan {
   }
 
   // This is the queue of things to be done _IN ORDER_
-  private planningQueue: Array<readonly [any, any]> = [];
+  private planningQueue: Array<QueueTuple> = [];
   // This is the queue of things to be done grouped by their planning path.
   // The result of this is not necessarily in order, but it does save us
   // time and effort in `planPending()`
-  private planningQueueByPlanningPath = new Map<
-    string,
-    Array<readonly [any, any]>
-  >();
+  private planningQueueByPlanningPath = new Map<string, Array<QueueTuple>>();
 
   private queueNextLayer<
-    TMethod extends (
-      ...params: [
-        outputPlan: OutputPlan,
-        path: readonly string[],
-        planningPath: string,
-        polymorphicPath: string | null,
-        polymorphicPaths: ReadonlySet<string> | null,
-        parentStep: Step,
-        ...rest: any[],
-      ]
-    ) => void,
+    TMethod extends (...params: CommonPlanningParametersTuple) => void,
   >(method: TMethod, ...params: Parameters<TMethod>): void {
     const [, , planningPath] = params;
     if (this.frozenPlanningPaths.has(planningPath)) {
@@ -1576,7 +1563,7 @@ export class OperationPlan {
       list = [];
       this.planningQueueByPlanningPath.set(planningPath, list);
     }
-    const tuple = [method, params] as const;
+    const tuple: QueueTuple = [method, params];
     this.planningQueue.push(tuple);
     list.push(tuple);
   }
@@ -1597,6 +1584,7 @@ export class OperationPlan {
       const todo = [...this.planningQueueByPlanningPath.entries()];
       this.planningQueueByPlanningPath.clear();
 
+      const steps = new Set<Step>();
       for (const [planningPath, batch] of todo) {
         if (this.frozenPlanningPaths.has(planningPath)) {
           throw new Error(
@@ -1605,11 +1593,18 @@ export class OperationPlan {
         }
         this.frozenPlanningPaths.add(planningPath);
 
-        // TODO: mess with batch[*][5] (i.e. the step)
+        // Mess with batch[*][5] (i.e. the steps) to see if we can dedupe ignoring data-only deps
+        steps.clear();
+        for (const entry of batch) {
+          steps.add(entry[1][5]);
+        }
+        if (steps.size > 1) {
+          // TODO: process these steps
+        }
       }
 
       for (const [fn, args] of batch) {
-        fn.apply(this, args);
+        fn.apply(this, args as Parameters<typeof fn>);
       }
 
       /*
@@ -4569,3 +4564,17 @@ export function layerPlanHeirarchyContains(
     return false;
   }
 }
+
+type CommonPlanningParametersTuple = readonly [
+  outputPlan: OutputPlan,
+  path: readonly string[],
+  planningPath: string,
+  polymorphicPath: string | null,
+  polymorphicPaths: ReadonlySet<string> | null,
+  parentStep: Step,
+  ...any[],
+];
+type QueueTuple = [
+  (...params: CommonPlanningParametersTuple) => void,
+  CommonPlanningParametersTuple,
+];
