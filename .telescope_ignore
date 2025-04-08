@@ -1,0 +1,22 @@
+# Lua Patterns - Special Characters That Require `%`
+# +-----------+-------------------------------+
+# | `%`       | Escape character itself       |
+# | `.`       | Matches any character         |
+# | `^`       | Anchors the start of a string |
+# | `$`       | Anchors the end of a string   |
+# | `(` `)`   | Capturing groups              |
+# | `[` `]`   | Character sets                |
+# | `*`       | Wildcard repetition           |
+# | `+`       | One or more                   |
+# | `-`       | Non-greedy repetition         |
+# | `?`       | Matches 0 or 1                |
+# +-----------+-------------------------------+
+grafast/dataplan%-pg/__tests__/.*%.mermaid
+postgraphile/postgraphile/__tests__/.*%.mermaid
+postgraphile/postgraphile/__tests__/.*%.export%.mjs
+.*/__tests__/.*%.json5
+.*/__tests__/.*%.snap
+
+# If you only want source files
+# [a-z-]+/[a-z-]+/_*tests_*/.*
+# [a-z-]+/website/.*
