@@ -382,7 +382,8 @@ export class StepTracker {
       $dependent._isUnary = false;
     }
 
-    const forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
+    const forbiddenFlags =
+      ALL_FLAGS & ~(acceptFlags & $dependent.__trappableFlags);
 
     this.stepsWithNoDependenciesByConstructor
       .get($dependent.constructor)
