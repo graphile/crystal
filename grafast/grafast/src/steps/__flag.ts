@@ -55,6 +55,7 @@ export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Error | null;
+  dataOnly?: boolean;
   if?: Step<boolean>;
   // Trapping an error might want to result in a null or an empty list.
   valueForInhibited?: TrapValue;
@@ -108,6 +109,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     const {
       acceptFlags = DEFAULT_ACCEPT_FLAGS,
       onReject,
+      dataOnly,
       if: $cond,
       valueForInhibited = "PASS_THROUGH",
       valueForError = "PASS_THROUGH",
@@ -131,7 +133,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
         this.ifDep = this.addDependency($cond);
       }
     } else {
-      this.addDependency({ step, acceptFlags, onReject });
+      this.addDependency({ step, acceptFlags, onReject, dataOnly });
     }
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
@@ -169,6 +171,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     const step = this.dependencies[0];
     const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
+    const dataOnly = this.dependencyDataOnly[0];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     if (
       // TODO: this logic could be improved so that more flag checks were
@@ -189,7 +192,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
         options.acceptFlags === acceptFlags ||
         false
       ) {
-        return { step, acceptFlags, onReject };
+        return { step, acceptFlags, onReject, dataOnly };
       }
     }
     return null;
@@ -333,7 +336,7 @@ export function trap<TStep extends Step>(
   depId: number,
   throwOnFlagged = false,
 ) {
-  const { step, acceptFlags, onReject } = this.getDepOptions(depId);
+  const { step, acceptFlags, onReject, dataOnly } = this.getDepOptions(depId);
   if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
     return step;
   } else {
@@ -347,6 +350,6 @@ export function trap<TStep extends Step>(
       );
     }
     // Return a __FlagStep around options.step so that all the options are preserved.
-    return new __FlagStep(step, { acceptFlags, onReject });
+    return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };
