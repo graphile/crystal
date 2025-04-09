@@ -183,8 +183,6 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
-  /** @internal */
-  protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
    * Just for mermaid
@@ -326,7 +324,6 @@ export /* abstract */ class Step<TData = any> {
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
-    this.dependencyDataOnly = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
@@ -367,7 +364,7 @@ export /* abstract */ class Step<TData = any> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
-    const dataOnly = this.dependencyDataOnly[depId];
+    const dataOnly = false; // Step will already be dataOnly
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
   }
@@ -504,18 +501,26 @@ export /* abstract */ class Step<TData = any> {
         : { dataOnly: false, skipDeduplication: false, ...stepOrOptions };
     return this._addDependency(options);
   }
-  protected addDataDependency(step: Step): number {
+  protected addDataDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    const opts =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     return this._addDependency({
-      step,
       dataOnly: true,
       skipDeduplication: false,
+      ...opts,
     });
   }
-  protected addStrongDependency(step: Step): number {
+  protected addStrongDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    const opts =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     return this._addDependency({
-      step,
       dataOnly: false,
       skipDeduplication: false,
+      ...opts,
     });
   }
 

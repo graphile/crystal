@@ -1,0 +1,58 @@
+import type { ExecutionDetails } from "../index.js";
+import { $$inhibit, arrayOfLength } from "../index.js";
+import { FLAG_NULL, FLAG_POLY_SKIPPED } from "../interfaces.js";
+import { Step } from "../step.js";
+
+export class __DataOnlyStep<T> extends Step<T> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "__DataOnlyStep",
+  };
+  isSyncAndSafe = true;
+  depIndexes: number[];
+  constructor(dep: Step<T>) {
+    super();
+    this.depIndexes = [
+      this.addStrongDependency({
+        step: dep,
+        acceptFlags: FLAG_POLY_SKIPPED | FLAG_NULL,
+      }),
+    ];
+  }
+  public deduplicatedWith(replacement: __DataOnlyStep<T>): void {
+    for (const idx of this.depIndexes) {
+      const options = this.getDepOptions(idx);
+      replacement.depIndexes.push(
+        replacement.addStrongDependency({
+          ...options,
+          acceptFlags: options.acceptFlags | FLAG_POLY_SKIPPED,
+        }),
+      );
+    }
+  }
+  optimize(): Step<T> {
+    if (this.depIndexes.length === 1) {
+      return this.getDep(0);
+    }
+    return this;
+  }
+  execute(details: ExecutionDetails) {
+    return details.indexMap((i) => {
+      for (const val of details.values) {
+        if ((val._flagsAt(i) & FLAG_POLY_SKIPPED) === 0) {
+          return val.at(i);
+        }
+      }
+      // This should only happen on error, and even then... we shouldn't
+      // reach here?
+      return $$inhibit;
+    });
+  }
+}
+
+export function __dataOnly<T>(step: Step<T>) {
+  if (step instanceof __DataOnlyStep) {
+    return step;
+  }
+  return new __DataOnlyStep<T>(step);
+}
