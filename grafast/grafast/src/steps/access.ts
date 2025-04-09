@@ -157,7 +157,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
       (this.fallback === "undefined" ? "U" : "D") +
       (this.hasSymbols ? "§" : ".") +
       digestKeys(this.path);
-    this.addDependency(parentPlan);
+    this.addDataDependency(parentPlan);
   }
 
   toStringMeta(): string {

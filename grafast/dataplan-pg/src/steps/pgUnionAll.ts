@@ -601,7 +601,7 @@ export class PgUnionAllStep<
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
-          this.contextId = this.addDependency(this.executor.context());
+          this.contextId = this.addDataDependency(this.executor.context());
         }
         const { path = [] } = member;
         const conditions: SQL[] = [];
