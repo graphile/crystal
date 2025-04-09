@@ -2418,8 +2418,10 @@ export class OperationPlan {
     } else if (dependencyCount === 1) {
       // Optimized form for steps that have one dependency (extremely common!)
 
+      const dependencyIndex = 0;
+
       const { ancestry, deferBoundaryDepth } = layerPlan;
-      const dep = deps[0];
+      const dep = deps[dependencyIndex];
 
       const dl = dep.dependents.length;
       if (dl === 1) {
@@ -2436,7 +2438,7 @@ export class OperationPlan {
         step: rawPossiblyPeer,
       } of dep.dependents) {
         if (
-          peerDependencyIndex !== 0 ||
+          peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
           rawPossiblyPeer._stepOptions.stream != null ||
@@ -2456,8 +2458,8 @@ export class OperationPlan {
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
-          peerFlags[0] === flags[0] &&
-          peerOnReject[0] === onReject[0]
+          peerFlags[dependencyIndex] === flags[dependencyIndex] &&
+          peerOnReject[dependencyIndex] === onReject[dependencyIndex]
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2522,8 +2524,8 @@ export class OperationPlan {
             if (
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
-              peerFlags[0] === flags[0] &&
-              peerOnReject[0] === onReject[0]
+              peerFlags[dependencyIndex] === flags[dependencyIndex] &&
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
