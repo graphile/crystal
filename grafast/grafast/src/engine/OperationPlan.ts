@@ -1589,7 +1589,7 @@ export class OperationPlan {
       for (const [planningPath, batch] of todo) {
         if (this.frozenPlanningPaths.has(planningPath)) {
           throw new Error(
-            `GrafastInternalError<dd30288e-9375-4025-91a6-66b64e74cf74>: planning path already processed - ${planningPath.padEnd(PLANNING_PAD, " ")}`,
+            `GrafastInternalError<dd30288e-9375-4025-91a6-66b64e74cf74>: planning path already processed - ${planningPath}`,
           );
         }
         this.frozenPlanningPaths.add(planningPath);
