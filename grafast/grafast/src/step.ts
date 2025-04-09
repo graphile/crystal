@@ -183,6 +183,8 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
+  /** @internal */
+  protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
    * Just for mermaid
@@ -324,6 +326,7 @@ export /* abstract */ class Step<TData = any> {
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
+    this.dependencyDataOnly = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
@@ -364,8 +367,9 @@ export /* abstract */ class Step<TData = any> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
+    const dataOnly = this.dependencyDataOnly[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
-    return { step, acceptFlags, onReject };
+    return { step, acceptFlags, onReject, dataOnly };
   }
 
   protected getDep<TStep extends Step = Step>(

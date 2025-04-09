@@ -1594,26 +1594,55 @@ export class OperationPlan {
         this.frozenPlanningPaths.add(planningPath);
 
         // Mess with batch[*][5] (i.e. the steps) to see if we can dedupe ignoring data-only deps
-        steps.clear();
-        const seen = new Set<string | null>();
-        for (const entry of batch) {
-          const polyPath = entry[1][3];
-          if (polyPath == null) continue;
-          const step = entry[1][5];
-          if (step.polymorphicPaths == null) continue;
-          if (seen.has(polyPath)) {
-            throw new Error(
-              `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
-            );
+
+        /**
+         * Goes through the batch and extracts all the steps that have
+         * different polymorphic paths.
+         *
+         * If `withUpdate` is set, we'll also update the tuple to point to the
+         * latest version of that step (e.g. if the step has been
+         * deduplicated).
+         */
+        const populateStepsFromBatch = (withUpdate = false) => {
+          steps.clear();
+          const seen = new Set<string | null>();
+          for (const entry of batch) {
+            const polyPath = entry[1][3];
+            if (polyPath == null) continue;
+            let step = entry[1][5];
+            if (withUpdate) {
+              const actualStep = this.stepTracker.getStepById(step.id);
+              if (actualStep !== step) {
+                step = actualStep;
+                entry[1][5] = actualStep;
+              }
+            }
+            if (step.polymorphicPaths == null) continue;
+            if (step.hasSideEffects) continue;
+            if (step._stepOptions.stream != null) continue;
+            if (this.stepTracker.internalDependencies.has(step)) {
+              // PERF: we need to set up correct tracking, then internal deps can be deduped
+              continue;
+            }
+            if (seen.has(polyPath)) {
+              throw new Error(
+                `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
+              );
+            }
+            seen.add(polyPath);
+            if (step.polymorphicPaths.has(polyPath)) {
+              steps.add(step);
+            }
           }
-          seen.add(polyPath);
-          if (step.polymorphicPaths.has(polyPath)) {
-            steps.add(step);
-          }
-        }
+        };
+
+        populateStepsFromBatch();
         if (steps.size > 1) {
           // TODO: try primary dedupe
-          // TODO: update `steps`
+          this.deduplicateStepsAtPlanningPath(planningPath, steps);
+
+          // update batch and steps
+          populateStepsFromBatch(true);
 
           if (steps.size > 1) {
             // Fallback: attempt to recombine using pack/unpack approach
@@ -2717,16 +2746,6 @@ export class OperationPlan {
       return EMPTY_ARRAY;
     }
 
-    if (step._stepOptions.stream) {
-      // Streams have no peers - we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      //
-      // HOWEVER! There may be lifecycle parts that need to be called... So
-      // call the function with an empty array; ignore the result.
-      return EMPTY_ARRAY;
-    }
-
     // NOTE: Streams have no peers - we cannot reference the stream more than
     // once (and we aim to not cache the stream because we want its entries to
     // be garbage collected) - however if we're already fetching the list then
@@ -2734,6 +2753,13 @@ export class OperationPlan {
     // to return a non-stream.
 
     if (step._stepOptions.stream != null) {
+      // Streams have no peers - we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      //
+      // HOWEVER! There may be lifecycle parts that need to be called... So
+      // call the function with an empty array; ignore the result.
+
       // TODO: remove this if block when we implement the new stream/defer -
       // deduplicating a stream should be fine. (Not subscriptions though - may
       // need a check for that!)
@@ -2751,6 +2777,7 @@ export class OperationPlan {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
       dependencyOnReject: onReject,
+      dependencyDataOnly: dataOnly,
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
@@ -2819,13 +2846,15 @@ export class OperationPlan {
           layerPlan: peerLayerPlan,
           dependencyForbiddenFlags: peerFlags,
           dependencyOnReject: peerOnReject,
+          dependencyDataOnly: peerDataOnly,
         } = possiblyPeer;
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-          peerOnReject[dependencyIndex] === onReject[dependencyIndex]
+          peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+          peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2885,13 +2914,15 @@ export class OperationPlan {
               layerPlan: peerLayerPlan,
               dependencyForbiddenFlags: peerFlags,
               dependencyOnReject: peerOnReject,
+              dependencyDataOnly: peerDataOnly,
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-              peerOnReject[dependencyIndex] === onReject[dependencyIndex]
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+              peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
@@ -3508,6 +3539,91 @@ export class OperationPlan {
     }
   }
 
+  private deduplicateStepsAtPlanningPath(
+    planningPath: string,
+    stepSet: Set<Step>,
+  ) {
+    const handledSteps = new Set<Step>();
+    /** Guaranteed to not have duplicates */
+    const steps = [...stepSet];
+    const l = steps.length;
+    for (let i = 0; i < l; i++) {
+      const step = steps[i];
+      handledSteps.add(step);
+      const sstep = sudo(step);
+      const stepConstructor = sstep.constructor;
+      const stepPeerKey = sstep.peerKey;
+      const stepLayerPlan = sstep.layerPlan;
+      const depCount = sstep.dependencies.length;
+      /**
+       * Follows similar checks to `getPeers`, except when comparing
+       * dependencies, "data only" dependencies can be treated as the same.
+       *
+       * Note some checks have already been performed before reaching this
+       * point:
+       *
+       * - steps with side effects have been excluded already
+       * - steps that might stream have been excluded already
+       * - "internal" dependencies have been excluded already
+       */
+      const peers: Step[] = [];
+      nextPeer: for (let j = i + 1; j < l; j++) {
+        const rawPotentialPeer = steps[j];
+        if (handledSteps.has(rawPotentialPeer)) continue;
+        if (rawPotentialPeer.peerKey !== stepPeerKey) continue;
+        // TODO: this check is too strict, we don't strictly require it's the
+        // same layer plan.
+        if (rawPotentialPeer.layerPlan !== stepLayerPlan) continue;
+        if (rawPotentialPeer.constructor !== stepConstructor) continue;
+
+        const potentialPeer = sudo(rawPotentialPeer);
+        if (potentialPeer.dependencies.length !== depCount) continue;
+        // Now see if the dependencies match, respecting data-only dependencies
+        // and noting that the data they depend on must also either be the same
+        // step, or must only be valid in the step's current polymorphic paths
+        for (let i = 0; i < depCount; i++) {
+          const stepDep = sstep.dependencies[i];
+          const stepDepOnReject = sstep.dependencyOnReject[i];
+          const stepDepFFlags = sstep.dependencyForbiddenFlags[i];
+          const stepDepDataOnly = sstep.dependencyDataOnly[i];
+          const peerDep = potentialPeer.dependencies[i];
+          const peerDepOnReject = potentialPeer.dependencyOnReject[i];
+          const peerDepFFlags = potentialPeer.dependencyForbiddenFlags[i];
+          const peerDepDataOnly = potentialPeer.dependencyDataOnly[i];
+          if (
+            stepDep === peerDep ||
+            stepDepFFlags === peerDepFFlags ||
+            stepDepOnReject === peerDepOnReject
+          ) {
+            // Allowed!
+          } else if (stepDepDataOnly && peerDepDataOnly) {
+            // Can only merge if the data-only dependencies match the step's polymorphism exactly (otherwise we can't join them)
+            if (
+              !setsExistAndMatch(
+                sstep.polymorphicPaths,
+                stepDep.polymorphicPaths,
+              )
+            ) {
+              continue nextPeer;
+            }
+            if (
+              !setsExistAndMatch(
+                sstep.polymorphicPaths,
+                peerDep.polymorphicPaths,
+              )
+            ) {
+              continue nextPeer;
+            }
+          } else {
+            continue nextPeer;
+          }
+
+          // TODO: It very much could be a peer! Let's combine?
+        }
+      }
+    }
+  }
+
   private hoistAndDeduplicate(step: Step) {
     this.hoistStep(step);
     // Even if step wasn't hoisted, its deps may have been so we should still
@@ -3672,10 +3788,16 @@ export class OperationPlan {
           const {
             $dependent,
             dependencyIndex,
-            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
+            inlineDetails: {
+              onReject,
+              dataOnly = false,
+              acceptFlags = DEFAULT_ACCEPT_FLAGS,
+            },
           } = todo;
           writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
             onReject;
+          writeableArray($dependent.dependencyDataOnly)[dependencyIndex] =
+            dataOnly;
           writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
             ALL_FLAGS & ~acceptFlags;
         }
@@ -4108,6 +4230,7 @@ export class OperationPlan {
         dependencyOnReject: sstep.dependencyOnReject.map((or) =>
           or ? String(or) : or,
         ),
+        dependencyDataOnly: sstep.dependencyDataOnly.slice(),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
@@ -4580,3 +4703,16 @@ type CommonPlanningParametersTuple<
 type QueueTuple<
   T extends CommonPlanningParametersTuple = CommonPlanningParametersTuple,
 > = [(...params: T) => void, T];
+
+function setsExistAndMatch(
+  s1: ReadonlySet<string> | null,
+  s2: ReadonlySet<string> | null,
+) {
+  if (s1 == null) return false;
+  if (s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+  for (const p of s1) {
+    if (!s2.has(p)) return false;
+  }
+  return true;
+}

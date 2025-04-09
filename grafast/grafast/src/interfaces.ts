@@ -848,6 +848,7 @@ export interface AddDependencyOptions<TStep extends Step = Step> {
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Maybe<Error>;
+  dataOnly?: boolean;
   nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
 }
 
@@ -855,6 +856,7 @@ export interface DependencyOptions<TStep extends Step = Step> {
   step: TStep;
   acceptFlags: ExecutionEntryFlags;
   onReject: Maybe<Error>;
+  dataOnly: boolean;
 }
 
 /**

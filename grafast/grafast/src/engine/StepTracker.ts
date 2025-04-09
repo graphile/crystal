@@ -353,10 +353,14 @@ export class StepTracker {
     const dependentDependencyOnReject = writeableArray(
       $dependent.dependencyOnReject,
     );
+    const dependentDependencyDataOnly = writeableArray(
+      $dependent.dependencyDataOnly,
+    );
     const {
       skipDeduplication,
       acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
       onReject,
+      dataOnly = false,
     } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
@@ -386,6 +390,7 @@ export class StepTracker {
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
     dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
     dependentDependencyOnReject[dependencyIndex] = onReject;
+    dependentDependencyDataOnly[dependencyIndex] = dataOnly;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
