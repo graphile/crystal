@@ -36,6 +36,7 @@ import {
   $$subroutine,
   ALL_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
+  TRAPPABLE_FLAGS,
 } from "./interfaces.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
@@ -259,7 +260,16 @@ export /* abstract */ class Step<TData = any> {
    */
   public hasSideEffects: boolean;
 
+  /**
+   * This exists specifically so that __DataOnlyStep can override it.
+   * NOTHING ELSE SHOULD TOUCH IT!
+   *
+   * @internal
+   */
+  public __trappableFlags: number;
+
   constructor() {
+    this.__trappableFlags = TRAPPABLE_FLAGS;
     this.isArgumentsFinalized = false;
     this.isFinalized = false;
     this.debug = getDebug();

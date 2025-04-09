@@ -1,6 +1,10 @@
 import type { ExecutionDetails } from "../index.js";
-import { $$inhibit, arrayOfLength } from "../index.js";
-import { FLAG_NULL, FLAG_POLY_SKIPPED } from "../interfaces.js";
+import { $$inhibit } from "../index.js";
+import {
+  FLAG_NULL,
+  FLAG_POLY_SKIPPED,
+  TRAPPABLE_FLAGS,
+} from "../interfaces.js";
 import { Step } from "../step.js";
 
 export class __DataOnlyStep<T> extends Step<T> {
@@ -12,6 +16,7 @@ export class __DataOnlyStep<T> extends Step<T> {
   depIndexes: number[];
   constructor(dep: Step<T>) {
     super();
+    this.__trappableFlags = TRAPPABLE_FLAGS | FLAG_POLY_SKIPPED;
     this.depIndexes = [
       this.addStrongDependency({
         step: dep,
