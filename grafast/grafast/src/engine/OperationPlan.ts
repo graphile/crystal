@@ -3586,6 +3586,7 @@ export class OperationPlan {
           const stepDepOnReject = sstep.dependencyOnReject[i];
           const stepDepFFlags = sstep.dependencyForbiddenFlags[i];
           const stepDepDataOnly = sstep.dependencyDataOnly[i];
+          const stepPolymorphicPaths = sstep.polymorphicPaths!;
           const peerDep = potentialPeer.dependencies[i];
           const peerDepOnReject = potentialPeer.dependencyOnReject[i];
           const peerDepFFlags = potentialPeer.dependencyForbiddenFlags[i];
@@ -3598,20 +3599,13 @@ export class OperationPlan {
           ) {
             // Allowed!
           } else if (stepDepDataOnly && peerDepDataOnly) {
-            // Can only merge if the data-only dependencies match the step's polymorphism exactly (otherwise we can't join them)
-            if (
-              !setsExistAndMatch(
-                sstep.polymorphicPaths,
-                stepDep.polymorphicPaths,
-              )
-            ) {
+            // Can only merge if the data-only dependencies don't overlap in
+            // polymorphism (otherwise we can't join them)
+            if (setsOverlap(stepPolymorphicPaths, peerDep.polymorphicPaths!)) {
               continue nextPeer;
             }
             if (
-              !setsExistAndMatch(
-                sstep.polymorphicPaths,
-                peerDep.polymorphicPaths,
-              )
+              setsOverlap(peerDep.polymorphicPaths!, stepDep.polymorphicPaths!)
             ) {
               continue nextPeer;
             }
@@ -4705,15 +4699,9 @@ type QueueTuple<
   T extends CommonPlanningParametersTuple = CommonPlanningParametersTuple,
 > = [(...params: T) => void, T];
 
-function setsExistAndMatch(
-  s1: ReadonlySet<string> | null,
-  s2: ReadonlySet<string> | null,
-) {
-  if (s1 == null) return false;
-  if (s2 == null) return false;
-  if (s1.size !== s2.size) return false;
+function setsOverlap(s1: ReadonlySet<string>, s2: ReadonlySet<string>) {
   for (const p of s1) {
-    if (!s2.has(p)) return false;
+    if (s2.has(p)) return true;
   }
-  return true;
+  return false;
 }
