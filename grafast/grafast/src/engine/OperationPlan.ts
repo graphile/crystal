@@ -2888,8 +2888,8 @@ export class OperationPlan {
             if (
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
-              peerFlags[0] === flags[0] &&
-              peerOnReject[0] === onReject[0]
+              peerFlags[dependencyIndex] === flags[dependencyIndex] &&
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
