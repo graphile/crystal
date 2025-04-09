@@ -3651,7 +3651,7 @@ export class OperationPlan {
                 dataOnlyDepIndex
               ] as __DataOnlyStep<any>;
               const wasLocked = isDev && unlock(dupeDep);
-              dupeDep.deduplicatedWith(keepDep);
+              dupeDep.mergeInto(keepDep);
               if (wasLocked) lock(dupeDep);
               this.stepTracker.replaceStep(dupeDep, keepDep);
             }
