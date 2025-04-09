@@ -23,7 +23,7 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
       | ConnectionCapableStep<Step<TData>, any>,
   ) {
     super();
-    this.addDependency(itemsOrStep(parentPlan));
+    this.addDataDependency(itemsOrStep(parentPlan));
   }
 
   execute({
