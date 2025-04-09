@@ -38,6 +38,7 @@ import {
   DEFAULT_FORBIDDEN_FLAGS,
   TRAPPABLE_FLAGS,
 } from "./interfaces.js";
+import type { __DataOnlyStep } from "./steps/__dataOnly.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
 
@@ -371,10 +372,16 @@ export /* abstract */ class Step<TData = any> {
   protected getDepOptions<TStep extends Step = Step>(
     depId: number,
   ): DependencyOptions<TStep> {
-    const step = this.dependencies[depId] as TStep;
+    let step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
-    const dataOnly = false; // Step will already be dataOnly
+    let dataOnly = false;
+    // TODO: replace this with instanceof __DataOnlyStep... except
+    // without creating a circular dependency
+    if (step.constructor.name === "__DataOnlyStep") {
+      step = (step as any as __DataOnlyStep<any>).getDepFor(this) as TStep;
+      dataOnly = true;
+    }
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
   }

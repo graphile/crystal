@@ -28,6 +28,27 @@ export class __DataOnlyStep<T> extends Step<T> {
       }),
     ];
   }
+  /** @internal */
+  public getDepFor(step: Step) {
+    if (this.depIndexes.length === 1) {
+      return this.getDepOptions(0).step;
+    } else {
+      // find the dep that matches the poly paths
+      const paths = [...(step.polymorphicPaths ?? [])];
+      for (const i of this.depIndexes) {
+        const $dep = this.getDepOptions(i).step;
+        if (
+          paths.every(
+            (p) =>
+              $dep.polymorphicPaths === null || $dep.polymorphicPaths.has(p),
+          )
+        ) {
+          return $dep;
+        }
+      }
+      throw new Error(`Failed to find dep of ${this} that matched ${step}`);
+    }
+  }
   public toStringMeta(): string | null {
     if (this.depIndexes.length === 1) {
       return this.getDepOptions(0).step.toString();
