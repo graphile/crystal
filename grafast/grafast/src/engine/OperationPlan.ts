@@ -3618,9 +3618,9 @@ export class OperationPlan {
           } else {
             continue nextPeer;
           }
-
-          // TODO: It very much could be a peer! Let's combine?
         }
+        // Looks like a peer
+        peers.push(potentialPeer);
       }
     }
   }
