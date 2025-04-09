@@ -20,6 +20,7 @@ export class __DataOnlyStep<T> extends Step<T> {
   constructor(dep: Step<T>) {
     super();
     this.__trappableFlags = TRAPPABLE_OR_POLY_SKIPPED;
+    this.allowMultipleOptimizations = true;
     this.depIndexes = [
       this.addStrongDependency({
         step: dep,

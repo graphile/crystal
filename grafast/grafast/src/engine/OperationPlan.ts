@@ -472,6 +472,9 @@ export class OperationPlan {
 
     // Replace/inline/optimise steps
     te.batch(() => {
+      this.optimizeDataOnlySteps();
+    });
+    te.batch(() => {
       this.optimizeSteps();
     });
 
@@ -3731,6 +3734,23 @@ export class OperationPlan {
     }
     step.isOptimized = true;
     return replacementStep;
+  }
+  private optimizeDataOnlySteps() {
+    this.processSteps(
+      "optimizeDataOnly",
+      "dependencies-first",
+      false,
+      (step) => {
+        if (step instanceof __DataOnlyStep) {
+          const wasLocked = isDev && unlock(step);
+          const replacement = step.optimize();
+          if (wasLocked) lock(step);
+          return replacement;
+        } else {
+          return step;
+        }
+      },
+    );
   }
 
   /**
