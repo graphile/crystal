@@ -312,7 +312,7 @@ export function planToMermaid(
       }
       if (!dataOnly && step.polymorphicPaths) {
         // TODO: only if step.polymorphicPaths.length !== bucket.polymorphicPaths.length
-        info.push(`strong`);
+        // info.push(`strong`);
       }
     }
     const str = info.join(";");
