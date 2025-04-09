@@ -1,5 +1,5 @@
 import type { ExecutionDetails } from "../index.js";
-import { $$inhibit } from "../index.js";
+import { $$inhibit, operationPlan } from "../index.js";
 import {
   FLAG_INHIBITED,
   FLAG_NULL,
@@ -27,7 +27,19 @@ export class __DataOnlyStep<T> extends Step<T> {
       }),
     ];
   }
-  public deduplicatedWith(replacement: __DataOnlyStep<T>): void {
+  public toStringMeta(): string | null {
+    if (this.depIndexes.length === 1) {
+      return this.getDepOptions(0).step.toString();
+    } else {
+      return this.depIndexes
+        .map((i) => this.getDepOptions(i).step.id)
+        .join(",");
+    }
+  }
+  public deduplicate(_peers: readonly Step[]): readonly Step[] {
+    return _peers;
+  }
+  public mergeInto(replacement: __DataOnlyStep<T>): void {
     for (const idx of this.depIndexes) {
       const options = this.getDepOptions(idx);
       replacement.depIndexes.push(
@@ -67,5 +79,10 @@ export function __dataOnly<T>(step: Step<T>) {
   if (step instanceof __DataOnlyStep) {
     return step;
   }
-  return new __DataOnlyStep<T>(step);
+  return operationPlan().cacheStep(
+    step,
+    "__dataOnly",
+    null,
+    () => new __DataOnlyStep<T>(step),
+  );
 }
