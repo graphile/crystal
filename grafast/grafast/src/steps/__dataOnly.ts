@@ -1,11 +1,14 @@
 import type { ExecutionDetails } from "../index.js";
 import { $$inhibit } from "../index.js";
 import {
+  FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import { Step } from "../step.js";
+
+const TRAPPABLE_OR_POLY_SKIPPED = TRAPPABLE_FLAGS | FLAG_POLY_SKIPPED;
 
 export class __DataOnlyStep<T> extends Step<T> {
   static $$export = {
@@ -16,11 +19,11 @@ export class __DataOnlyStep<T> extends Step<T> {
   depIndexes: number[];
   constructor(dep: Step<T>) {
     super();
-    this.__trappableFlags = TRAPPABLE_FLAGS | FLAG_POLY_SKIPPED;
+    this.__trappableFlags = TRAPPABLE_OR_POLY_SKIPPED;
     this.depIndexes = [
       this.addStrongDependency({
         step: dep,
-        acceptFlags: FLAG_POLY_SKIPPED | FLAG_NULL,
+        acceptFlags: TRAPPABLE_OR_POLY_SKIPPED,
       }),
     ];
   }
@@ -30,7 +33,7 @@ export class __DataOnlyStep<T> extends Step<T> {
       replacement.depIndexes.push(
         replacement.addStrongDependency({
           ...options,
-          acceptFlags: options.acceptFlags | FLAG_POLY_SKIPPED,
+          acceptFlags: TRAPPABLE_OR_POLY_SKIPPED,
         }),
       );
     }
@@ -42,10 +45,16 @@ export class __DataOnlyStep<T> extends Step<T> {
     return this;
   }
   execute(details: ExecutionDetails) {
+    console.log(`${this} executing with ${details.count} values`);
     return details.indexMap((i) => {
       for (const val of details.values) {
-        if ((val._flagsAt(i) & FLAG_POLY_SKIPPED) === 0) {
-          return val.at(i);
+        const flags = val._flagsAt(i);
+        if ((flags & FLAG_POLY_SKIPPED) === 0) {
+          if ((flags & FLAG_INHIBITED) === FLAG_INHIBITED) {
+            return $$inhibit;
+          } else {
+            return val.at(i);
+          }
         }
       }
       // This should only happen on error, and even then... we shouldn't
