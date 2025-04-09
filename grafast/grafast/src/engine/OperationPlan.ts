@@ -3549,7 +3549,9 @@ export class OperationPlan {
     const l = steps.length;
     for (let i = 0; i < l; i++) {
       const step = steps[i];
+      if (handledSteps.has(step)) continue;
       handledSteps.add(step);
+      if (!step.deduplicate) continue;
       const sstep = sudo(step);
       const stepConstructor = sstep.constructor;
       const stepPeerKey = sstep.peerKey;
@@ -3567,6 +3569,7 @@ export class OperationPlan {
        * - "internal" dependencies have been excluded already
        */
       const peers: Step[] = [];
+      const dataOnlyDepIndexesToMerge = new Set<number>();
       nextPeer: for (let j = i + 1; j < l; j++) {
         const rawPotentialPeer = steps[j];
         if (handledSteps.has(rawPotentialPeer)) continue;
@@ -3609,12 +3612,32 @@ export class OperationPlan {
             ) {
               continue nextPeer;
             }
+            dataOnlyDepIndexesToMerge.add(i);
           } else {
             continue nextPeer;
           }
         }
         // Looks like a peer
         peers.push(potentialPeer);
+      }
+      if (peers.length > 0) {
+        const duplicates = step.deduplicate(peers);
+        if (duplicates.length > 0) {
+          const polymorphicPaths = new Set(step.polymorphicPaths);
+          for (const dupe of duplicates) {
+            for (const p of dupe.polymorphicPaths!) {
+              polymorphicPaths.add(p);
+            }
+            handledSteps.add(dupe);
+            const wasLocked = isDev && unlock(dupe);
+            dupe.deduplicatedWith?.(step);
+            if (wasLocked) lock(dupe);
+            this.stepTracker.replaceStep(dupe, step);
+          }
+          step.polymorphicPaths = polymorphicPaths;
+
+          // TODO: merge `dataOnlyDepIndexesToMerge`
+        }
       }
     }
   }
