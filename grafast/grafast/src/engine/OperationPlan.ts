@@ -3591,9 +3591,10 @@ export class OperationPlan {
           const peerDepFFlags = potentialPeer.dependencyForbiddenFlags[i];
           const peerDepDataOnly = potentialPeer.dependencyDataOnly[i];
           if (
-            stepDep === peerDep ||
-            stepDepFFlags === peerDepFFlags ||
-            stepDepOnReject === peerDepOnReject
+            stepDep === peerDep &&
+            stepDepFFlags === peerDepFFlags &&
+            stepDepOnReject === peerDepOnReject &&
+            stepDepDataOnly === peerDepDataOnly
           ) {
             // Allowed!
           } else if (stepDepDataOnly && peerDepDataOnly) {
