@@ -2325,8 +2325,8 @@ __metadata:
     chalk: "npm:^4.1.2"
     jest: "npm:^29.6.4"
     jest-serializer-simple: "workspace:^"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     grafast: "workspace:^"
   languageName: unknown
@@ -2341,7 +2341,7 @@ __metadata:
     "@types/jest": "npm:^29.5.4"
     "@types/json5": "npm:^2.2.0"
     "@types/license-checker-webpack-plugin": "npm:^0.2.2"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/nodemon": "npm:1.19.2"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.4"
@@ -2362,8 +2362,8 @@ __metadata:
     terser-webpack-plugin: "npm:^5.3.9"
     ts-loader: "npm:^9.4.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     webpack: "npm:^5.94.0"
     webpack-cli: "npm:^5.1.4"
     webpack-node-externals: "npm:^3.0.0"
@@ -3592,6 +3592,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gerrit0/mini-shiki@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "@gerrit0/mini-shiki@npm:3.2.2"
+  dependencies:
+    "@shikijs/engine-oniguruma": "npm:^3.2.1"
+    "@shikijs/langs": "npm:^3.2.1"
+    "@shikijs/themes": "npm:^3.2.1"
+    "@shikijs/types": "npm:^3.2.1"
+    "@shikijs/vscode-textmate": "npm:^10.0.2"
+  checksum: 303670511561451c8220fdca77ab7c3dbb3131a365acbe91a47315be15fc52dffed295d95523510d6cbacff9b18ca10a94a0d623651dc67c55e338aa0fbe14ab
+  languageName: node
+  linkType: hard
+
 "@grafserv/persisted@workspace:grafast/grafserv-persisted":
   version: 0.0.0-use.local
   resolution: "@grafserv/persisted@workspace:grafast/grafserv-persisted"
@@ -3603,8 +3616,8 @@ __metadata:
     jest: "npm:^29.6.4"
     jest-serializer-graphql-schema: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     grafast: "workspace:^"
     grafserv: "workspace:^"
@@ -3625,8 +3638,8 @@ __metadata:
     jest: "npm:^29.6.4"
     pg: "npm:^8.13.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     ws: "npm:^8.17.1"
   bin:
     graphile-lds: ./dist/cli.js
@@ -3638,11 +3651,11 @@ __metadata:
   resolution: "@graphile/lru@workspace:utils/lru"
   dependencies:
     "@types/jest": "npm:^29.5.4"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     jest: "npm:^29.6.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -3650,9 +3663,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@graphile/simplify-inflection@workspace:graphile-build/graphile-simplify-inflection"
   dependencies:
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     postgraphile: "workspace:^"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -4505,8 +4518,8 @@ __metadata:
     graphql: "npm:^16.1.0-experimental-stream-defer.6"
     nodemon: "npm:^3.0.1"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   bin:
     grafast-bench: dist/cli-run.js
   languageName: unknown
@@ -5446,6 +5459,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shikijs/engine-oniguruma@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "@shikijs/engine-oniguruma@npm:3.2.1"
+  dependencies:
+    "@shikijs/types": "npm:3.2.1"
+    "@shikijs/vscode-textmate": "npm:^10.0.2"
+  checksum: 274646c02c40006e625786a81e82a9398ef8bda9fc6cc640e8a24d0824e61340f1e9f06aa8b8c470e516ded5d9ac7857156bf6fbc12f19a071e9fec4d0dc8b80
+  languageName: node
+  linkType: hard
+
+"@shikijs/langs@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "@shikijs/langs@npm:3.2.1"
+  dependencies:
+    "@shikijs/types": "npm:3.2.1"
+  checksum: a9dd40d2bf4d034ac094b8bb5f343a6b7469f972efbb3406bd1afea31b7c59c77d294846404950c06a1c1bf7151502de3042cf0fb139af2f1faf632f0dcf0471
+  languageName: node
+  linkType: hard
+
+"@shikijs/themes@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "@shikijs/themes@npm:3.2.1"
+  dependencies:
+    "@shikijs/types": "npm:3.2.1"
+  checksum: 305c6d242accb0940abc28757eab3a6916ad1195f07339c386961b1522c2c987e12db75689374f2f61247a78a09efb01477736b601eb1ff7e59f7937cfa499e3
+  languageName: node
+  linkType: hard
+
+"@shikijs/types@npm:3.2.1, @shikijs/types@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "@shikijs/types@npm:3.2.1"
+  dependencies:
+    "@shikijs/vscode-textmate": "npm:^10.0.2"
+    "@types/hast": "npm:^3.0.4"
+  checksum: 472f680f356c867a299f585067b6012485fb1dbe76b6cf334d82773e6835d026303df3a74f85deb8edd5072442e3346d487c32ee56f0cf5d63b5b340e7509841
+  languageName: node
+  linkType: hard
+
+"@shikijs/vscode-textmate@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "@shikijs/vscode-textmate@npm:10.0.2"
+  checksum: be56282d48c6d0c0526c7cc36b0b098a1db1fa24d101e278a2dd46a69c26731f50bc1998af6274496e42721c561ec6bd13b47a6ad0a0047fdd8a1bc846a9f3f9
+  languageName: node
+  linkType: hard
+
 "@sideway/address@npm:^4.1.5":
   version: 4.1.5
   resolution: "@sideway/address@npm:4.1.5"
@@ -5738,7 +5796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node16@npm:^16.1.1":
+"@tsconfig/node16@npm:^16.1.3":
   version: 16.1.3
   resolution: "@tsconfig/node16@npm:16.1.3"
   checksum: c3088e74537f27de5cdad2b3c3cf5e8475671a8b00f9a4aaebe7db73cdc22569b245dd4dff0cd3c819382651573dbb31fe4ac47bd516a6a10bb646c4c8f13f1c
@@ -6303,6 +6361,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hast@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@types/hast@npm:3.0.4"
+  dependencies:
+    "@types/unist": "npm:*"
+  checksum: 89dfa6ad94995557fef15e9c2b851f890aed0c817744d7c1572ef937a4648d72f2a4c21e0f3b1be2987e080ffb753d156708aca6a11131d1a606b6d8fcb7d870
+  languageName: node
+  linkType: hard
+
 "@types/history@npm:^4.7.11":
   version: 4.7.11
   resolution: "@types/history@npm:4.7.11"
@@ -6602,12 +6669,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.5.7":
-  version: 20.17.27
-  resolution: "@types/node@npm:20.17.27"
+"@types/node@npm:^20.17.30":
+  version: 20.17.30
+  resolution: "@types/node@npm:20.17.30"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 15f250c231a2a1df27e4d7e0116675039a4beff78733d6f0a87384e73eeb6c5355aeae4c1645c8f4384a7b3756c723045c07efafe4980fa146e0c771f733dce2
+  checksum: 9249c1bb4c6ba268028ef531eaa114154303b50a310cdac88869da76d2f8a6598cccbb40ff9742aeabcf96a9d3786cccdc0cd7f7d36d361632a22af1b2cabed7
   languageName: node
   linkType: hard
 
@@ -6882,6 +6949,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/unist@npm:*":
+  version: 3.0.3
+  resolution: "@types/unist@npm:3.0.3"
+  checksum: 1d5912709d1d13ebdaddaa99ba409fbfec21fd2db1c23db93250ec87a66ccf446a66caf6e97953dd0beb2759d04dcf5c2dffe6022e491fdeca9f4b868301d49e
+  languageName: node
+  linkType: hard
+
 "@types/unist@npm:^2, @types/unist@npm:^2.0.0, @types/unist@npm:^2.0.2, @types/unist@npm:^2.0.3":
   version: 2.0.11
   resolution: "@types/unist@npm:2.0.11"
@@ -6975,7 +7049,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^6.5.0":
+"@typescript-eslint/eslint-plugin@npm:^6.21.0":
   version: 6.21.0
   resolution: "@typescript-eslint/eslint-plugin@npm:6.21.0"
   dependencies:
@@ -7000,7 +7074,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^6.5.0":
+"@typescript-eslint/parser@npm:^6.21.0":
   version: 6.21.0
   resolution: "@typescript-eslint/parser@npm:6.21.0"
   dependencies:
@@ -7087,7 +7161,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/typescript-estree@npm:6.21.0, @typescript-eslint/typescript-estree@npm:^6.5.0":
+"@typescript-eslint/typescript-estree@npm:6.21.0, @typescript-eslint/typescript-estree@npm:^6.21.0":
   version: 6.21.0
   resolution: "@typescript-eslint/typescript-estree@npm:6.21.0"
   dependencies:
@@ -7734,13 +7808,6 @@ __metadata:
   version: 6.1.0
   resolution: "ansi-regex@npm:6.1.0"
   checksum: 8a6ce568799e704b0f029c1c073524b89ebfd236dab27b911556a116b991324499e6eb259f251e85fe2f0dec201461510b05bcde755fe15578569ecf4bb029d5
-  languageName: node
-  linkType: hard
-
-"ansi-sequence-parser@npm:^1.1.0":
-  version: 1.1.3
-  resolution: "ansi-sequence-parser@npm:1.1.3"
-  checksum: 41aaf32db3362c071ef583d024fdb9b5f1f32250812b8ff4b39f011892fe6ae63a8edbd755ca91c4fd791891231899b60b37874f526870da61bebc1a872dce8b
   languageName: node
   linkType: hard
 
@@ -11305,8 +11372,8 @@ __metadata:
     "@types/jest": "npm:^29.5.4"
     jest: "npm:^29.6.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
   languageName: unknown
@@ -12922,7 +12989,7 @@ __metadata:
     "@types/lodash": "npm:^4.14.197"
     "@types/mermaid": "npm:^9.2.0"
     "@types/mocha": "npm:^10.0.1"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/nodemon": "npm:1.19.2"
     chai: "npm:^4.3.8"
     chalk: "npm:^4.1.2"
@@ -12942,8 +13009,8 @@ __metadata:
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tsafe: "npm:^1.7.2"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     zx: "npm:^7.2.3"
   peerDependencies:
     "@envelop/core": ^5.0.0
@@ -12985,8 +13052,8 @@ __metadata:
     nodemon: "npm:^3.0.1"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     ws: "npm:^8.12.1"
   peerDependencies:
     "@envelop/core": ^5.0.0
@@ -13026,7 +13093,7 @@ __metadata:
     "@types/express": "npm:^4.17.17"
     "@types/jest": "npm:^29.5.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.3.4"
     express: "npm:^4.20.0"
@@ -13045,8 +13112,8 @@ __metadata:
     pg-introspection: "workspace:^"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/pg": "workspace:^"
@@ -13069,7 +13136,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:^4.1.8"
     "@types/jest": "npm:^29.5.4"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/pluralize": "npm:^0.0.30"
     "@types/semver": "npm:^7.5.1"
     chalk: "npm:^4.1.2"
@@ -13083,8 +13150,8 @@ __metadata:
     semver: "npm:^7.5.4"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
@@ -13099,7 +13166,7 @@ __metadata:
     "@types/debug": "npm:^4.1.8"
     "@types/interpret": "npm:^1.1.1"
     "@types/mocha": "npm:^10.0.1"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/semver": "npm:^7.5.1"
     chai: "npm:^4.3.8"
     chalk: "npm:^4.1.2"
@@ -13108,8 +13175,8 @@ __metadata:
     mocha: "npm:^10.2.0"
     semver: "npm:^7.5.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     yargs: "npm:^17.7.2"
   languageName: unknown
   linkType: soft
@@ -13126,13 +13193,13 @@ __metadata:
     "@types/babel__generator": "npm:^7.6.8"
     "@types/babel__template": "npm:^7.4.4"
     "@types/jest": "npm:^29.5.4"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/prettier": "npm:^3.0.0"
     jest: "npm:^29.6.4"
     prettier: "npm:^3.0.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     eslint: ^8.48.0
     grafast: "workspace:^"
@@ -13158,8 +13225,8 @@ __metadata:
     nodemon: "npm:^3.0.1"
     postgraphile: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     "@dataplan/pg": "workspace:^"
     grafast: "workspace:^"
@@ -13181,14 +13248,14 @@ __metadata:
   resolution: "graphile@workspace:utils/graphile"
   dependencies:
     "@types/jest": "npm:^29.5.4"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@typescript/vfs": "npm:^1.5.0"
     chalk: "npm:^4.1.2"
     graphile-config: "workspace:^"
     jest: "npm:^29.6.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     graphile-build: "workspace:^"
     graphile-config: "workspace:^"
@@ -15114,8 +15181,8 @@ __metadata:
     jest: "npm:^29.6.4"
     pretty-format: "npm:^29.6.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     graphql: ">=15 <17"
   languageName: unknown
@@ -15132,8 +15199,8 @@ __metadata:
     prettier: "npm:^3.0.3"
     pretty-format: "npm:^29.6.3"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -15403,13 +15470,6 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: 26cc8c0cba94bd7faddd8aaad59e5270d552c04ea2a271f4c610d075f638d666c4168213062341c577597a2b973554262972ccb6637cd071d73595886133c5a0
-  languageName: node
-  linkType: hard
-
-"jsonc-parser@npm:^3.2.0":
-  version: 3.3.1
-  resolution: "jsonc-parser@npm:3.3.1"
-  checksum: f9cc19570f866e507065597f83615fe8304107b2c2a98af4809de87e93b1abd66be59c759633c906bb493ce07ac79d9af01a329d172af8b2fd75427cd06c1e56
   languageName: node
   linkType: hard
 
@@ -16213,15 +16273,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^4.3.0":
-  version: 4.3.0
-  resolution: "marked@npm:4.3.0"
-  bin:
-    marked: bin/marked.js
-  checksum: 89bcab317027e68f7ecf3d19aa8e9933575399250a54e757bd3d922f183d76bb51051dbc7f73317259c99abc91982641ebbe68b731a08744742a807588137223
-  languageName: node
-  linkType: hard
-
 "math-intrinsics@npm:^1.1.0":
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
@@ -16554,7 +16605,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.3, minimatch@npm:^9.0.4":
+"minimatch@npm:^9.0.4, minimatch@npm:^9.0.5":
   version: 9.0.5
   resolution: "minimatch@npm:9.0.5"
   dependencies:
@@ -17767,8 +17818,8 @@ __metadata:
     "@types/node": "npm:20.5.7"
     jest: "npm:^29.6.4"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -17806,8 +17857,8 @@ __metadata:
     jest: "npm:^29.6.4"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -17872,7 +17923,7 @@ __metadata:
     "@types/express": "npm:^4.17.17"
     "@types/jest": "npm:^29.5.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/nodemon": "npm:1.19.2"
     "@types/pg": "npm:^8.10.2"
     debug: "npm:^4.3.4"
@@ -17892,8 +17943,8 @@ __metadata:
     postgraphile: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     ws: "npm:^8.17.1"
   bin:
     pgl: ./dist/cli-run.js
@@ -18534,7 +18585,7 @@ __metadata:
     "@types/express": "npm:^4.17.17"
     "@types/jest": "npm:^29.5.4"
     "@types/jsonwebtoken": "npm:^9.0.2"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/nodemon": "npm:1.19.2"
     "@types/pg": "npm:^8.10.2"
     debug: "npm:^4.3.4"
@@ -18555,8 +18606,8 @@ __metadata:
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/json": "workspace:*"
@@ -19899,15 +19950,15 @@ __metadata:
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
     "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
     "@localrepo/prettier2-for-jest": "npm:prettier@^2"
-    "@tsconfig/node16": "npm:^16.1.1"
+    "@tsconfig/node16": "npm:^16.1.3"
     "@types/jest": "npm:^29.5.4"
     "@types/mock-fs": "npm:4.13.1"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/rimraf": "npm:^4.0.5"
     "@types/ws": "npm:^8"
-    "@typescript-eslint/eslint-plugin": "npm:^6.5.0"
-    "@typescript-eslint/parser": "npm:^6.5.0"
-    "@typescript-eslint/typescript-estree": "npm:^6.5.0"
+    "@typescript-eslint/eslint-plugin": "npm:^6.21.0"
+    "@typescript-eslint/parser": "npm:^6.21.0"
+    "@typescript-eslint/typescript-estree": "npm:^6.21.0"
     babel-jest: "npm:^29.7.0"
     babel-plugin-transform-import-meta: "npm:^2.2.1"
     concurrently: "npm:^8.2.1"
@@ -19930,9 +19981,9 @@ __metadata:
     pg: "npm:^8.13.3"
     prettier: "npm:^3.0.3"
     rimraf: "npm:^5.0.1"
-    typedoc: "npm:^0.25.0"
+    typedoc: "npm:^0.28.2"
     typedoc-monorepo-link-types: "npm:^0.0.4"
-    typescript: "npm:^5.2.2"
+    typescript: "npm:^5.8.3"
     webpack: "npm:^5.94.0"
     ws: "npm:^8.18.0"
     zx: "npm:^7.2.3"
@@ -19991,7 +20042,7 @@ __metadata:
     "@types/codemirror": "npm:^5.60.9"
     "@types/debug": "npm:^4.1.8"
     "@types/jest": "npm:^29.5.4"
-    "@types/node": "npm:^20.5.7"
+    "@types/node": "npm:^20.17.30"
     "@types/nodemon": "npm:1.19.2"
     "@types/react": "npm:^18.2.21"
     "@types/react-dom": "npm:^18.2.7"
@@ -20003,8 +20054,8 @@ __metadata:
     nodemon: "npm:^3.0.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
     tamedevil: "workspace:^"
@@ -20031,8 +20082,8 @@ __metadata:
     style-loader: "npm:^3.3.3"
     svg-inline-loader: "npm:^0.8.2"
     ts-loader: "npm:^9.4.4"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
     webpack: "npm:^5.94.0"
     webpack-bundle-analyzer: "npm:^4.9.1"
     webpack-cli: "npm:^5.1.4"
@@ -20487,18 +20538,6 @@ __metadata:
   bin:
     shjs: bin/shjs
   checksum: ecf61d3b6d544d405cd5fae2f6004b87744f617bc246ff4fd884c457886f9447299b87a3a20da7e8e4270e6bf7051f2eb872b97c6dfd98ec2b9607f8b717f615
-  languageName: node
-  linkType: hard
-
-"shiki@npm:^0.14.7":
-  version: 0.14.7
-  resolution: "shiki@npm:0.14.7"
-  dependencies:
-    ansi-sequence-parser: "npm:^1.1.0"
-    jsonc-parser: "npm:^3.2.0"
-    vscode-oniguruma: "npm:^1.7.0"
-    vscode-textmate: "npm:^8.0.0"
-  checksum: 9bb69cc2e33c967c75e9caa28cdea3374c5b9fd918403a25234c62b499021d7e0f84c4fb55450334d75f7589437aa05ce04d0cd4cd53029fb366f07db97ce8b2
   languageName: node
   linkType: hard
 
@@ -21406,8 +21445,8 @@ __metadata:
     jest: "npm:^29.6.4"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:^2.6.2"
-    typescript: "npm:^5.2.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -21825,7 +21864,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2, tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0, tslib@npm:^2.6.2, tslib@npm:^2.6.3, tslib@npm:^2.8.1":
+"tslib@npm:^2, tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0, tslib@npm:^2.6.3, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 080be9a9b50485142bd6dc8f159187fc90b8a0cd7e83b29a38d63f3a6a59a86ab729ece36ab5ced67c775416c9cf4465e8fb52ff03f3aa6a2e661c9c69e26909
@@ -22012,39 +22051,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.25.0":
-  version: 0.25.13
-  resolution: "typedoc@npm:0.25.13"
+"typedoc@npm:^0.28.2":
+  version: 0.28.2
+  resolution: "typedoc@npm:0.28.2"
   dependencies:
+    "@gerrit0/mini-shiki": "npm:^3.2.2"
     lunr: "npm:^2.3.9"
-    marked: "npm:^4.3.0"
-    minimatch: "npm:^9.0.3"
-    shiki: "npm:^0.14.7"
+    markdown-it: "npm:^14.1.0"
+    minimatch: "npm:^9.0.5"
+    yaml: "npm:^2.7.1"
   peerDependencies:
-    typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x
+    typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x
   bin:
     typedoc: bin/typedoc
-  checksum: 2b2550170b402b5dc048faa1f56473df7a5381ac88718e594790b83d113dbfed576ffcbb74184960fc2e4684665ba86eb1d24f6d393a6c0e3907b225c375e8f1
+  checksum: 7a0162107c82ee75314fd88220f194487fb66577272daaa5794e1948d8d5d416d2e7aaddc3f89ff869580886b1ba0989a2d6cc432d6f12dfabbc117ac9f769e6
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.2.2":
-  version: 5.8.2
-  resolution: "typescript@npm:5.8.2"
+"typescript@npm:^5.8.3":
+  version: 5.8.3
+  resolution: "typescript@npm:5.8.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: bfedf36113fa76a5753c1ff8b444f6f492504cade4374204b18d89cb309d43af64e0d47eba1911cab900db9b8f3263e8bf2847e9385a7a9a75b22f43d8dec069
+  checksum: 798d5595e7d0e9e54e3ed3173bf50d7d47fd757cb91ce61a7e8f7c104b3cd061e7cf588c0357009812c4c76d0a62af0939313e8f21232cdee3241e6115f3f8c7
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>":
-  version: 5.8.2
-  resolution: "typescript@patch:typescript@npm%3A5.8.2#optional!builtin<compat/typescript>::version=5.8.2&hash=ad5954"
+"typescript@patch:typescript@npm%3A^5.8.3#optional!builtin<compat/typescript>":
+  version: 5.8.3
+  resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=ad5954"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 20ae1762d7b3aa416ee942ec2fdbcc8fe4913796b6f492d23b196a913459cb913d60bdc2b2ca90daceefe2fdc4809731c544d52acd03161a73ac5b2e6143d10b
+  checksum: 6b8b0c9f5fe454117b9c7dc44c6af724486536c9c7b2bf613c0cef606dd265718498e6beed083dc03eccf0f017a48cde400f66ec44e9c421eed9f28263856e71
   languageName: node
   linkType: hard
 
@@ -22687,20 +22727,6 @@ __metadata:
   bin:
     installServerIntoExtension: bin/installServerIntoExtension
   checksum: d0b580aa9934d101a3ddda7300ac29722c24eaa12995bd9533921a8641c3500d3a3173eb7705ed4370be7be1a917e4172fc678e0bbe9e7709b21407bb9343a2c
-  languageName: node
-  linkType: hard
-
-"vscode-oniguruma@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "vscode-oniguruma@npm:1.7.0"
-  checksum: be926f3eda5c37574ac42f9630969576e1035b3eb78a724921de367e76c84888847864bc2d9779e73ca61789fb27e5a0cda207c3a0aeb55dbb6b2f84449ab807
-  languageName: node
-  linkType: hard
-
-"vscode-textmate@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "vscode-textmate@npm:8.0.0"
-  checksum: 19efb37dda3a3090aec8b97267b5ac71fedbf155140ab560b5f5aced5c8d4ca565060748eabe85e820735415cc64f970b47126cfa1ee00c29d25b9f322b42eb0
   languageName: node
   linkType: hard
 
@@ -23384,6 +23410,15 @@ __metadata:
   bin:
     yaml: bin.mjs
   checksum: c86e0f6dfaa04c8edb462532a93520b2b760dae838af0acc145fa3c8aebc7cab9efd6fa03999b40cbbebdfecf1032e90d4c0d5561c480f40922bfd34071c8b9a
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.7.1":
+  version: 2.7.1
+  resolution: "yaml@npm:2.7.1"
+  bin:
+    yaml: bin.mjs
+  checksum: c5c5aeb3818eec334594bd44cb8549771f81e7ed35a70709576f4aa5cfb8273dbe7ddceb4727a6dd222c1931e181d362d4812e03a9acfddc26fbbbe4ca8df8b5
   languageName: node
   linkType: hard
 

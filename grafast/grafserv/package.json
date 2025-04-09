@@ -87,7 +87,7 @@
     "graphile-config": "workspace:^",
     "graphql-ws": "^5.14.0",
     "ruru": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=16.10"
@@ -136,7 +136,7 @@
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.8.3",
     "ws": "^8.12.1"
   },
   "files": [
