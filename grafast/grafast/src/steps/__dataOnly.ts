@@ -40,7 +40,7 @@ export class __DataOnlyStep<T> extends Step<T> {
   }
   optimize(): Step<T> {
     if (this.depIndexes.length === 1) {
-      return this.getDep(0);
+      return this.getDepOptions(0).step;
     }
     return this;
   }
