@@ -484,17 +484,39 @@ export /* abstract */ class Step<TData = any> {
     return stepAMayDependOnStepB(this, step);
   }
 
-  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof Step
-        ? { step: stepOrOptions, skipDeduplication: false }
-        : stepOrOptions;
+  protected _addDependency(options: AddDependencyOptions): number {
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
         `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
+  }
+  /**
+   * @deprecated Please use `.addDataDependency($step)` or
+   * `.addStrongDependency($step)` instead. The behavior of `addDependency`
+   * will change in a future release to mean "data" dependency.
+   */
+  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof Step
+        ? { dataOnly: false, skipDeduplication: false, step: stepOrOptions }
+        : { dataOnly: false, skipDeduplication: false, ...stepOrOptions };
+    return this._addDependency(options);
+  }
+  protected addDataDependency(step: Step): number {
+    return this._addDependency({
+      step,
+      dataOnly: true,
+      skipDeduplication: false,
+    });
+  }
+  protected addStrongDependency(step: Step): number {
+    return this._addDependency({
+      step,
+      dataOnly: false,
+      skipDeduplication: false,
+    });
   }
 
   /**
