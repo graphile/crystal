@@ -295,7 +295,6 @@ export function planToMermaid(
   const depDeets = (step: GrafastPlanStepJSONv1, idx: number) => {
     const forbiddenFlags = step.dependencyForbiddenFlags[idx];
     const onReject = step.dependencyOnReject[idx];
-    const dataOnly = step.dependencyDataOnly[idx];
     const info: string[] = [];
     if (forbiddenFlags) {
       if ((forbiddenFlags & 2) === 2) {
@@ -309,10 +308,6 @@ export function planToMermaid(
       }
       if (onReject) {
         info.push(`onReject=${trim(stripAnsi(onReject))}`);
-      }
-      if (!dataOnly && step.polymorphicPaths) {
-        // TODO: only if step.polymorphicPaths.length !== bucket.polymorphicPaths.length
-        // info.push(`strong`);
       }
     }
     const str = info.join(";");

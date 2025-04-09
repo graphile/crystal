@@ -71,6 +71,7 @@ import {
   isPolymorphicStep,
   isUnbatchedStep,
 } from "../step.js";
+import { __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
@@ -2777,7 +2778,6 @@ export class OperationPlan {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
       dependencyOnReject: onReject,
-      dependencyDataOnly: dataOnly,
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
@@ -2846,15 +2846,13 @@ export class OperationPlan {
           layerPlan: peerLayerPlan,
           dependencyForbiddenFlags: peerFlags,
           dependencyOnReject: peerOnReject,
-          dependencyDataOnly: peerDataOnly,
         } = possiblyPeer;
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-          peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
-          peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
+          peerOnReject[dependencyIndex] === onReject[dependencyIndex]
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2914,15 +2912,13 @@ export class OperationPlan {
               layerPlan: peerLayerPlan,
               dependencyForbiddenFlags: peerFlags,
               dependencyOnReject: peerOnReject,
-              dependencyDataOnly: peerDataOnly,
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-              peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
-              peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
@@ -3588,22 +3584,32 @@ export class OperationPlan {
           const stepDep = sstep.dependencies[i];
           const stepDepOnReject = sstep.dependencyOnReject[i];
           const stepDepFFlags = sstep.dependencyForbiddenFlags[i];
-          const stepDepDataOnly = sstep.dependencyDataOnly[i];
           const stepPolymorphicPaths = sstep.polymorphicPaths!;
           const peerDep = potentialPeer.dependencies[i];
           const peerDepOnReject = potentialPeer.dependencyOnReject[i];
           const peerDepFFlags = potentialPeer.dependencyForbiddenFlags[i];
-          const peerDepDataOnly = potentialPeer.dependencyDataOnly[i];
           if (
             stepDep === peerDep &&
             stepDepFFlags === peerDepFFlags &&
-            stepDepOnReject === peerDepOnReject &&
-            stepDepDataOnly === peerDepDataOnly
+            stepDepOnReject === peerDepOnReject
           ) {
             // Allowed!
-          } else if (stepDepDataOnly && peerDepDataOnly) {
+          } else if (
+            stepDep instanceof __DataOnlyStep &&
+            peerDep instanceof __DataOnlyStep
+          ) {
+            if (!setsMatch(stepPolymorphicPaths, stepDep.polymorphicPaths)) {
+              continue nextPeer;
+            }
+            if (
+              !setsMatch(peerDep.polymorphicPaths, peerDep.polymorphicPaths)
+            ) {
+              continue nextPeer;
+            }
             // Can only merge if the data-only dependencies don't overlap in
             // polymorphism (otherwise we can't join them)
+            /*
+             * No need to check this because the above already covers it.
             if (setsOverlap(stepPolymorphicPaths, peerDep.polymorphicPaths!)) {
               continue nextPeer;
             }
@@ -3612,6 +3618,7 @@ export class OperationPlan {
             ) {
               continue nextPeer;
             }
+            */
             dataOnlyDepIndexesToMerge.add(i);
           } else {
             continue nextPeer;
@@ -3624,7 +3631,8 @@ export class OperationPlan {
         const duplicates = step.deduplicate(peers);
         if (duplicates.length > 0) {
           const polymorphicPaths = new Set(step.polymorphicPaths);
-          for (const dupe of duplicates) {
+          for (const rawDupe of duplicates) {
+            const dupe = sudo(rawDupe);
             for (const p of dupe.polymorphicPaths!) {
               polymorphicPaths.add(p);
             }
@@ -3633,10 +3641,26 @@ export class OperationPlan {
             dupe.deduplicatedWith?.(step);
             if (wasLocked) lock(dupe);
             this.stepTracker.replaceStep(dupe, step);
+
+            // Merge `dataOnlyDepIndexesToMerge`
+            for (const dataOnlyDepIndex of dataOnlyDepIndexesToMerge) {
+              const keepDep = sstep.dependencies[
+                dataOnlyDepIndex
+              ] as __DataOnlyStep<any>;
+              const dupeDep = dupe.dependencies[
+                dataOnlyDepIndex
+              ] as __DataOnlyStep<any>;
+              const wasLocked = isDev && unlock(dupeDep);
+              dupeDep.deduplicatedWith(keepDep);
+              if (wasLocked) lock(dupeDep);
+              this.stepTracker.replaceStep(dupeDep, keepDep);
+            }
           }
           step.polymorphicPaths = polymorphicPaths;
-
-          // TODO: merge `dataOnlyDepIndexesToMerge`
+          for (const dataOnlyDepIndex of dataOnlyDepIndexesToMerge) {
+            const keepDep = sstep.dependencies[dataOnlyDepIndex];
+            keepDep.polymorphicPaths = polymorphicPaths;
+          }
         }
       }
     }
@@ -3806,16 +3830,10 @@ export class OperationPlan {
           const {
             $dependent,
             dependencyIndex,
-            inlineDetails: {
-              onReject,
-              dataOnly = false,
-              acceptFlags = DEFAULT_ACCEPT_FLAGS,
-            },
+            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
           } = todo;
           writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
             onReject;
-          writeableArray($dependent.dependencyDataOnly)[dependencyIndex] =
-            dataOnly;
           writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
             ALL_FLAGS & ~acceptFlags;
         }
@@ -4248,7 +4266,6 @@ export class OperationPlan {
         dependencyOnReject: sstep.dependencyOnReject.map((or) =>
           or ? String(or) : or,
         ),
-        dependencyDataOnly: sstep.dependencyDataOnly.slice(),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
@@ -4722,9 +4739,24 @@ type QueueTuple<
   T extends CommonPlanningParametersTuple = CommonPlanningParametersTuple,
 > = [(...params: T) => void, T];
 
+/*
 function setsOverlap(s1: ReadonlySet<string>, s2: ReadonlySet<string>) {
   for (const p of s1) {
     if (s2.has(p)) return true;
   }
   return false;
+}
+*/
+
+function setsMatch(
+  s1: ReadonlySet<string> | null,
+  s2: ReadonlySet<string> | null,
+) {
+  if (s1 == null) return false;
+  if (s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+  for (const p of s1) {
+    if (!s2.has(p)) return false;
+  }
+  return true;
 }

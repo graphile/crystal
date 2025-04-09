@@ -14,7 +14,6 @@ export interface GrafastPlanStepJSONv1 {
   dependencyIds: ReadonlyArray<string | number>;
   dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   dependencyOnReject: ReadonlyArray<string | null | undefined>;
-  dependencyDataOnly: ReadonlyArray<boolean>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;

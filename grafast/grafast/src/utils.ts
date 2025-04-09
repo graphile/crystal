@@ -880,7 +880,6 @@ export type Sudo<T> =
         implicitSideEffectStep: Step | null;
         dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
         dependencyOnReject: ReadonlyArray<Error | null | undefined>;
-        dependencyDataOnly: ReadonlyArray<boolean>;
         defaultForbiddenFlags: ExecutionEntryFlags;
         getDepOptions: Step["getDepOptions"];
       }

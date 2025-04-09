@@ -4,6 +4,7 @@ import { inspect } from "../inspect.js";
 import type { AddDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { Step } from "../step.js";
+import { __dataOnly } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
@@ -312,7 +313,9 @@ export class StepTracker {
     options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
-    const $dependency = sudo(options.step);
+    const $dependency = options.dataOnly
+      ? sudo(__dataOnly(options.step))
+      : sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -353,9 +356,6 @@ export class StepTracker {
     const dependentDependencyOnReject = writeableArray(
       $dependent.dependencyOnReject,
     );
-    const dependentDependencyDataOnly = writeableArray(
-      $dependent.dependencyDataOnly,
-    );
     const {
       skipDeduplication,
       acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
@@ -390,7 +390,6 @@ export class StepTracker {
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
     dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
     dependentDependencyOnReject[dependencyIndex] = onReject;
-    dependentDependencyDataOnly[dependencyIndex] = dataOnly;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
