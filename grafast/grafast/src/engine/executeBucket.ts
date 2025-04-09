@@ -620,6 +620,11 @@ export function executeBucket(
               if (forceIndexValue == null && rejectValue != null) {
                 indexFlags |= FLAG_ERROR;
                 forceIndexValue = rejectValue;
+              } else if (
+                (indexFlags & FLAG_POLY_SKIPPED) ===
+                FLAG_POLY_SKIPPED
+              ) {
+                // Already skipped
               } else {
                 indexFlags |= FLAG_INHIBITED;
               }
