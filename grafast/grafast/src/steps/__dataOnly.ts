@@ -45,7 +45,6 @@ export class __DataOnlyStep<T> extends Step<T> {
     return this;
   }
   execute(details: ExecutionDetails) {
-    console.log(`${this} executing with ${details.count} values`);
     return details.indexMap((i) => {
       for (const val of details.values) {
         const flags = val._flagsAt(i);
