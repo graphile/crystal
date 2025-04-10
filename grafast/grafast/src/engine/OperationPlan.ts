@@ -3372,7 +3372,37 @@ export class OperationPlan {
       const pending = new Set<Step>(layerPlan.pendingSteps);
       const processed = new Set<Step>();
 
-      let latestSideEffectStep: Step | null = null;
+      const latestSideEffectStepByPolymorphicPath = new Map<
+        string,
+        Step | undefined
+      >();
+
+      function getLatestSideEffectStepFor(step: Step) {
+        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
+        const latestSideEffectStep = latestSideEffectStepByPolymorphicPath.get(
+          polymorphicPaths[0],
+        );
+        for (let i = 1, l = polymorphicPaths.length; i < l; i++) {
+          const se = latestSideEffectStepByPolymorphicPath.get(
+            polymorphicPaths[i],
+          );
+          if (se !== latestSideEffectStep) {
+            throw new Error(
+              `You shouldn't have side effects in polymorphic positions; ${step} exists in ${polymorphicPaths} but these positions have mixed side effects`,
+            );
+          }
+        }
+        return latestSideEffectStep;
+      }
+
+      function setLatestSideEffectStep(step: Step) {
+        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
+        // Store this side effect for use from now on
+        for (let i = 0, l = polymorphicPaths.length; i < l; i++) {
+          latestSideEffectStepByPolymorphicPath.set(polymorphicPaths[i], step);
+        }
+      }
+
       const processSideEffectPlan = (step: Step) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
@@ -3408,14 +3438,17 @@ export class OperationPlan {
           processSideEffectPlan(dep);
         }
 
+        const latestSideEffectStep = getLatestSideEffectStepFor(step);
+
         if (
-          latestSideEffectStep !== null &&
+          latestSideEffectStep !== undefined &&
           !stepADependsOnStepB(sstep, latestSideEffectStep)
         ) {
           sstep.implicitSideEffectStep = latestSideEffectStep;
         }
+
         if (step.hasSideEffects) {
-          latestSideEffectStep = step;
+          setLatestSideEffectStep(step);
         }
 
         const phase = /*#__INLINE__*/ newLayerPlanPhase();
@@ -3460,8 +3493,9 @@ export class OperationPlan {
           processed.add(step);
           pending.delete(step);
           const sstep = sudo(step);
+          const latestSideEffectStep = getLatestSideEffectStepFor(step);
           if (
-            latestSideEffectStep !== null &&
+            latestSideEffectStep !== undefined &&
             !stepADependsOnStepB(sstep, latestSideEffectStep)
           ) {
             sstep.implicitSideEffectStep = latestSideEffectStep;
@@ -3499,8 +3533,9 @@ export class OperationPlan {
                 processed.add(step);
                 pending.delete(step);
                 const sstep = sudo(step);
+                const latestSideEffectStep = getLatestSideEffectStepFor(step);
                 if (
-                  latestSideEffectStep !== null &&
+                  latestSideEffectStep !== undefined &&
                   !stepADependsOnStepB(sstep, latestSideEffectStep)
                 ) {
                   sstep.implicitSideEffectStep = latestSideEffectStep;
