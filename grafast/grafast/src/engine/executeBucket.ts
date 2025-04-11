@@ -566,7 +566,7 @@ export function executeBucket(
                 ? /*
                    * already asserted that it matches;
                    * !! search "f4ce2c83"
-                   */ true
+                   */ false
                 : /* batch check */
                   !stepPolymorphicPaths.has(
                     bucket.polymorphicPathList[dataIndex] as string,
