@@ -902,9 +902,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex < parentBucket.size;
             originalIndex++
           ) {
-            const value = sourceStore.at(originalIndex);
-            const newIndex = values.push(value) - 1;
-            ev._flags[newIndex] = sourceStore._flagsAt(originalIndex);
+            const newIndex = values.length;
+            ev._copyResult(newIndex, sourceStore, originalIndex);
             map.set(originalIndex, newIndex);
             polymorphicPathList[newIndex] =
               parentBucket.polymorphicPathList[originalIndex];
