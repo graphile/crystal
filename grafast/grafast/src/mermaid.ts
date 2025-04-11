@@ -258,7 +258,7 @@ export function planToMermaid(
               : ["[[", "]]"];
       const planString = `${planNameText}[${plan.id}${`∈${plan.bucketId}`}${
         plan.stream ? "@s" : ""
-      }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame ? "^" : ""}${
+      }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame && polyPaths !== "" ? "^" : ""}${
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
       const planClass = plan.hasSideEffects
