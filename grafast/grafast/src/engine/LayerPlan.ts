@@ -14,6 +14,7 @@ import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
+  FLAG_POLY_SKIPPED,
   FLAG_STOPPED,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
@@ -710,7 +711,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const flags = polymorphicPlanStore._flagsAt(originalIndex);
-          if (flags & (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL)) {
+          if (
+            flags &
+            (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL | FLAG_POLY_SKIPPED)
+          ) {
             continue;
           }
           if (
