@@ -1608,7 +1608,7 @@ export class OperationPlan {
         }
         this.frozenPlanningPaths.add(planningPath);
 
-        // Mess with batch[*][5] (i.e. the steps) to see if we can dedupe ignoring data-only deps
+        // Mess with batch[*][IDX_PARENT_STEP] (i.e. the steps) to see if we can dedupe ignoring data-only deps
 
         /**
          * Goes through the batch and extracts all the steps that have
@@ -1622,14 +1622,14 @@ export class OperationPlan {
           steps.clear();
           const seen = new Set<string | null>();
           for (const entry of batch) {
-            const polyPath = entry[1][3];
+            const polyPath = entry[1][IDX_POLYMORPHIC_PATH];
             if (polyPath == null) continue;
-            let step = entry[1][5];
+            let step = entry[1][IDX_PARENT_STEP];
             if (withUpdate) {
               const actualStep = this.stepTracker.getStepById(step.id);
               if (actualStep !== step) {
                 step = actualStep;
-                entry[1][5] = actualStep;
+                entry[1][IDX_PARENT_STEP] = actualStep;
               }
             }
             if (step.polymorphicPaths == null) continue;
@@ -1664,7 +1664,7 @@ export class OperationPlan {
 
             const grouped = Object.create(null) as Record<string, QueueTuple[]>;
             for (const t of batch) {
-              const type = t[1][6];
+              const type = t[1][IDX_POSITION_TYPE];
               if (isObjectType(type)) {
                 if (!grouped[type.name]) {
                   grouped[type.name] = [];
@@ -1677,10 +1677,12 @@ export class OperationPlan {
               if (tuplesAtSamePathForSameType.length === 1) continue;
               const first = tuplesAtSamePathForSameType[0];
               // All of these properties should be in common
-              const path = first[1][1];
-              const planningPath = first[1][2];
-              const polymorphicPaths = first[1][4];
-              const objectType = first[1][6] as GraphQLObjectType;
+              const path = first[1][IDX_PATH];
+              const planningPath = first[1][IDX_PLANNING_PATH];
+              const polymorphicPaths = first[1][IDX_POLYMORPHIC_PATHS];
+              const objectType = first[1][
+                IDX_POSITION_TYPE
+              ] as GraphQLObjectType;
               //const { loc, path, planningPath, objectType, isMutation } = first;
               //const oldLoc = this.loc;
               //this.loc = loc;
@@ -1691,10 +1693,12 @@ export class OperationPlan {
                   "GrafastInternalError<e7a5a50f-278c-47ce-8e63-62816bab25f9>: all pending selection sets should have the same object type",
                 );
                 for (const t of tuplesAtSamePathForSameType) {
-                  const tPath = t[1][1];
-                  const tPlanningPath = t[1][2];
-                  const tPolymorphicPaths = first[1][4];
-                  const tObjectType = t[1][6] as GraphQLObjectType;
+                  const tPath = t[1][IDX_PATH];
+                  const tPlanningPath = t[1][IDX_PLANNING_PATH];
+                  const tPolymorphicPaths = first[1][IDX_POLYMORPHIC_PATHS];
+                  const tObjectType = t[1][
+                    IDX_POSITION_TYPE
+                  ] as GraphQLObjectType;
 
                   // assert.strictEqual(
                   //   tPath.length,
@@ -1744,7 +1748,7 @@ export class OperationPlan {
                 const listOf$Data: Step[] = [];
                 const parentLayerPlans = new Set<LayerPlan>();
                 for (const t of tuplesAtSamePathForSameType) {
-                  const parentStep = t[1][5];
+                  const parentStep = t[1][IDX_PARENT_STEP];
                   parentLayerPlans.add(parentStep.layerPlan);
                 }
 
@@ -1758,9 +1762,9 @@ export class OperationPlan {
                   : null;
                 let isUnary = true;
                 for (const t of tuplesAtSamePathForSameType) {
-                  const outputPlan = t[1][0];
-                  const parentStep = t[1][5];
-                  const polymorphicPaths = t[1][4];
+                  const outputPlan = t[1][IDX_OUTPUT_PLAN];
+                  const parentStep = t[1][IDX_PARENT_STEP];
+                  const polymorphicPaths = t[1][IDX_POLYMORPHIC_PATHS];
                   if (!parentStep._isUnary) {
                     isUnary = false;
                   }
@@ -1804,9 +1808,9 @@ export class OperationPlan {
                 // Update the outputPlans to link to this new combined layer
                 // plan, and use the new common step
                 for (const t of tuplesAtSamePathForSameType) {
-                  const outputPlan = t[1][0];
+                  const outputPlan = t[1][IDX_OUTPUT_PLAN];
                   outputPlan.layerPlan = combinedLayerPlan;
-                  t[1][5] = commonParentStep;
+                  t[1][IDX_PARENT_STEP] = commonParentStep;
                 }
               }
 
@@ -4765,16 +4769,24 @@ export function layerPlanHeirarchyContains(
   }
 }
 
+const IDX_OUTPUT_PLAN = 0;
+const IDX_PATH = 1;
+const IDX_PLANNING_PATH = 2;
+const IDX_POLYMORPHIC_PATH = 3;
+const IDX_POLYMORPHIC_PATHS = 4;
+const IDX_PARENT_STEP = 5;
+const IDX_POSITION_TYPE = 6;
+
 type CommonPlanningParametersTuple<
   TType extends GraphQLOutputType = GraphQLOutputType,
 > = [
-  /* 0: */ outputPlan: OutputPlan,
-  /* 1: */ path: readonly string[],
-  /* 2: */ planningPath: string,
-  /* 3: */ polymorphicPath: string | null,
-  /* 4: */ polymorphicPaths: ReadonlySet<string> | null,
-  /* 5: */ parentStep: Step,
-  /* 6: */ positionType: TType,
+  /* IDX_OUTPUT_PLAN: */ outputPlan: OutputPlan,
+  /* IDX_PATH: */ path: readonly string[],
+  /* IDX_PLANNING_PATH: */ planningPath: string,
+  /* IDX_POLYMORPHIC_PATH: */ polymorphicPath: string | null,
+  /* IDX_POLYMORPHIC_PATHS: */ polymorphicPaths: ReadonlySet<string> | null,
+  /* IDX_PARENT_STEP: */ parentStep: Step,
+  /* IDX_POSITION_TYPE: */ positionType: TType,
   ...any[],
 ];
 type QueueTuple<
