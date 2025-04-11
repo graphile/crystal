@@ -204,7 +204,6 @@ interface PendingSelectionSet {
 
   // These differ on a per-selection-set basis
   outputPlan: OutputPlan;
-  polymorphicPath: string | null;
   polymorphicPaths: ReadonlySet<string> | null;
   selections: readonly SelectionNode[];
   resolverEmulation: boolean;
@@ -745,7 +744,6 @@ export class OperationPlan {
       outputPlan,
       [],
       rootType.name + ".",
-      POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
@@ -789,7 +787,6 @@ export class OperationPlan {
       outputPlan,
       [],
       rootType.name + ".",
-      POLYMORPHIC_ROOT_PATH,
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
@@ -928,7 +925,6 @@ export class OperationPlan {
         outputPlan,
         [],
         rootType.name + ".",
-        POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
@@ -1019,7 +1015,6 @@ export class OperationPlan {
         outputPlan,
         [],
         rootType.name + ".",
-        POLYMORPHIC_ROOT_PATH,
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
@@ -1077,7 +1072,6 @@ export class OperationPlan {
     outputPlan: OutputPlan,
     path: readonly string[],
     planningPath: string,
-    polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
     objectType: GraphQLObjectType,
@@ -1411,7 +1405,6 @@ export class OperationPlan {
             outputPlan,
             fieldPath,
             fieldPlanningPath,
-            polymorphicPath,
             polymorphicPaths,
             step,
             fieldType,
@@ -1458,7 +1451,6 @@ export class OperationPlan {
             deferredOutputPlan,
             path,
             planningPath,
-            polymorphicPath,
             polymorphicPaths,
             parentStep,
             objectType,
@@ -1487,7 +1479,6 @@ export class OperationPlan {
     outputPlan: OutputPlan,
     path: readonly string[],
     planningPath: string,
-    polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
     objectType: GraphQLObjectType,
@@ -1499,7 +1490,7 @@ export class OperationPlan {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
           outputPlan.layerPlan.id
-        } @ ${path.join(".")} @ ${polymorphicPath ?? ""})`,
+        } @ ${path.join(".")} @ ${polymorphicPaths ? [...polymorphicPaths] : ""})`,
       );
     }
 
@@ -1523,7 +1514,6 @@ export class OperationPlan {
       outputPlan,
       path,
       planningPath,
-      polymorphicPath,
       polymorphicPaths,
       parentStep,
       objectType,
@@ -1622,8 +1612,8 @@ export class OperationPlan {
           steps.clear();
           const seen = new Set<string | null>();
           for (const entry of batch) {
-            const polyPath = entry[1][IDX_POLYMORPHIC_PATH];
-            if (polyPath == null) continue;
+            const polyPaths = entry[1][IDX_POLYMORPHIC_PATHS];
+            if (polyPaths == null) continue;
             let step = entry[1][IDX_PARENT_STEP];
             if (withUpdate) {
               const actualStep = this.stepTracker.getStepById(step.id);
@@ -1639,14 +1629,16 @@ export class OperationPlan {
               // PERF: we need to set up correct tracking, then internal deps can be deduped
               continue;
             }
-            if (seen.has(polyPath)) {
-              throw new Error(
-                `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
-              );
-            }
-            seen.add(polyPath);
-            if (step.polymorphicPaths.has(polyPath)) {
-              steps.add(step);
+            for (const polyPath of polyPaths) {
+              if (seen.has(polyPath)) {
+                throw new Error(
+                  `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
+                );
+              }
+              seen.add(polyPath);
+              if (step.polymorphicPaths.has(polyPath)) {
+                steps.add(step);
+              }
             }
           }
         };
@@ -1837,7 +1829,6 @@ export class OperationPlan {
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
     path: readonly string[],
     planningPath: string,
-    polymorphicPath: string | null,
     polymorphicPaths: ReadonlySet<string> | null,
     $step: Step,
     fieldType: GraphQLOutputType,
@@ -1919,7 +1910,6 @@ export class OperationPlan {
           listOutputPlan,
           path,
           planningPath + "[#]",
-          polymorphicPath,
           polymorphicPaths,
           $item,
           nullableFieldType.ofType,
@@ -2084,7 +2074,6 @@ export class OperationPlan {
           objectOutputPlan,
           path,
           planningPath + ".",
-          polymorphicPath,
           polymorphicPaths,
           $step,
           nullableFieldType,
@@ -2183,7 +2172,7 @@ export class OperationPlan {
         /*
          * Now we need to loop through each type and plan it.
          */
-        const polyBase = polymorphicPath ?? "";
+        const polyBases = [...(polymorphicPaths ?? [""])];
         const $oldStep = $step;
         const polymorphicPlanningPath = planningPath + "<*>.";
         for (const type of allPossibleObjectTypes) {
@@ -2215,12 +2204,14 @@ export class OperationPlan {
             ) as typeof $oldStep;
 
             // Bit of a hack, but saves passing it around through all the arguments
-            const newPolymorphicPath = `${polyBase}>${type.name}`;
-            polymorphicLayerPlan.reason.polymorphicPaths.add(
-              newPolymorphicPath,
-            );
             const newPolymorphicPaths = new Set<string>();
-            newPolymorphicPaths.add(newPolymorphicPath);
+            for (const polyBase of polyBases) {
+              const newPolymorphicPath = `${polyBase}>${type.name}`;
+              polymorphicLayerPlan.reason.polymorphicPaths.add(
+                newPolymorphicPath,
+              );
+              newPolymorphicPaths.add(newPolymorphicPath);
+            }
 
             const $root = withGlobalLayerPlan(
               polymorphicLayerPlan,
@@ -2249,7 +2240,6 @@ export class OperationPlan {
               objectOutputPlan,
               path,
               polymorphicPlanningPath,
-              newPolymorphicPath,
               newPolymorphicPaths,
               $root,
               type,
@@ -4772,10 +4762,9 @@ export function layerPlanHeirarchyContains(
 const IDX_OUTPUT_PLAN = 0;
 const IDX_PATH = 1;
 const IDX_PLANNING_PATH = 2;
-const IDX_POLYMORPHIC_PATH = 3;
-const IDX_POLYMORPHIC_PATHS = 4;
-const IDX_PARENT_STEP = 5;
-const IDX_POSITION_TYPE = 6;
+const IDX_POLYMORPHIC_PATHS = 3;
+const IDX_PARENT_STEP = 4;
+const IDX_POSITION_TYPE = 5;
 
 type CommonPlanningParametersTuple<
   TType extends GraphQLOutputType = GraphQLOutputType,
@@ -4783,7 +4772,6 @@ type CommonPlanningParametersTuple<
   /* IDX_OUTPUT_PLAN: */ outputPlan: OutputPlan,
   /* IDX_PATH: */ path: readonly string[],
   /* IDX_PLANNING_PATH: */ planningPath: string,
-  /* IDX_POLYMORPHIC_PATH: */ polymorphicPath: string | null,
   /* IDX_POLYMORPHIC_PATHS: */ polymorphicPaths: ReadonlySet<string> | null,
   /* IDX_PARENT_STEP: */ parentStep: Step,
   /* IDX_POSITION_TYPE: */ positionType: TType,
