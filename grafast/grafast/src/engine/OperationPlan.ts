@@ -1043,7 +1043,18 @@ export class OperationPlan {
   ): __ItemStep<TData> {
     const itemStepId = this.itemStepIdByListStepId[listStep.id];
     if (itemStepId !== undefined) {
-      return this.stepTracker.getStepById(itemStepId) as __ItemStep<TData>;
+      const itemStep = this.stepTracker.getStepById(
+        itemStepId,
+      ) as __ItemStep<TData>;
+      if (
+        listStep.polymorphicPaths !== null &&
+        itemStep.polymorphicPaths !== null
+      ) {
+        for (const p of listStep.polymorphicPaths) {
+          (itemStep.polymorphicPaths as Set<string>).add(p);
+        }
+      }
+      return itemStep;
     }
     // Create a new LayerPlan for this list item
     const layerPlan = new LayerPlan(this, parentLayerPlan, {
@@ -1051,14 +1062,14 @@ export class OperationPlan {
       parentStep: listStep,
       stream,
     });
-    const itemPlan = withGlobalLayerPlan(
+    const itemStep = withGlobalLayerPlan(
       layerPlan,
       listStep.polymorphicPaths,
       () => new __ItemStep(listStep, depth),
     );
-    layerPlan.setRootStep(itemPlan);
-    this.itemStepIdByListStepId[listStep.id] = itemPlan.id;
-    return itemPlan;
+    layerPlan.setRootStep(itemStep);
+    this.itemStepIdByListStepId[listStep.id] = itemStep.id;
+    return itemStep;
   }
 
   processGroupedFieldSet(
