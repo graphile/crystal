@@ -3922,10 +3922,17 @@ export class OperationPlan {
           currentLayerPlan = null;
           // Figure out which of our parent layer plans contains the step
           for (const parentLayerPlan of prev.reason.parentLayerPlans) {
-            if (layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)) {
+            if (dep.layerPlan === parentLayerPlan) {
               currentLayerPlan = parentLayerPlan;
               break;
+            } else if (
+              layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)
+            ) {
+              ensurePlanAvailableInLayer(dep, parentLayerPlan);
             }
+          }
+          if (currentLayerPlan == null) {
+            return;
           }
         } else {
           currentLayerPlan = currentLayerPlan.parentLayerPlan;
