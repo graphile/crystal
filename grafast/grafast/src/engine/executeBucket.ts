@@ -557,59 +557,80 @@ export function executeBucket(
             let forceIndexValue: Error | null | undefined = undefined;
             let rejectValue: Error | null | undefined = undefined;
             let indexFlags: ExecutionEntryFlags = NO_FLAGS;
-            for (let i = 0, l = step.dependencies.length; i < l; i++) {
-              const $dep = step.dependencies[i];
-              const forbiddenFlags = step.dependencyForbiddenFlags[i];
-              const onReject = step.dependencyOnReject[i];
-              const depExecutionVal = bucket.store.get($dep.id)!;
 
-              // Search for "f2b3b1b3" for similar block
-              const flags = depExecutionVal._flagsAt(dataIndex);
-              const disallowedFlags = flags & forbiddenFlags;
-              if (disallowedFlags) {
-                indexFlags |= disallowedFlags;
-                // If there's a reject behavior and we're FRESHLY rejected (weren't
-                // already inhibited), use that as a fallback.
-                // TODO: validate this.
-                // If dep is inhibited and we don't allow inhibited, copy through (null or error).
-                // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
-                // If dep is not inhibited, but we're disallowed, use our onReject.
-                if (
-                  onReject !== undefined &&
-                  (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
-                ) {
-                  rejectValue ||= onReject;
-                }
-                if (forceIndexValue == null) {
-                  if ((flags & FLAG_ERROR) !== 0) {
-                    const v = depExecutionVal.at(dataIndex);
-                    forceIndexValue = v;
-                  } else {
-                    forceIndexValue = null;
+            // Check polymorphism matches
+            const stepPolymorphicPaths = step.polymorphicPaths;
+            if (
+              stepPolymorphicPaths !== null &&
+              (step._isUnary
+                ? /* unary check */
+                  // PERF: there must be a faster way of doing this
+                  bucket.polymorphicPathList.some(
+                    (p) => p != null && stepPolymorphicPaths.has(p),
+                  )
+                : /* batch check */
+                  !stepPolymorphicPaths.has(
+                    bucket.polymorphicPathList[dataIndex] as string,
+                  ))
+            ) {
+              indexFlags |= FLAG_POLY_SKIPPED;
+              forceIndexValue = null;
+            } else {
+              for (let i = 0, l = step.dependencies.length; i < l; i++) {
+                const $dep = step.dependencies[i];
+                const forbiddenFlags = step.dependencyForbiddenFlags[i];
+                const onReject = step.dependencyOnReject[i];
+                const depExecutionVal = bucket.store.get($dep.id)!;
+
+                // Search for "f2b3b1b3" for similar block
+                const flags = depExecutionVal._flagsAt(dataIndex);
+                const disallowedFlags = flags & forbiddenFlags;
+                if (disallowedFlags) {
+                  indexFlags |= disallowedFlags;
+                  // If there's a reject behavior and we're FRESHLY rejected (weren't
+                  // already inhibited), use that as a fallback.
+                  // TODO: validate this.
+                  // If dep is inhibited and we don't allow inhibited, copy through (null or error).
+                  // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
+                  // If dep is not inhibited, but we're disallowed, use our onReject.
+                  if (
+                    onReject !== undefined &&
+                    (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) ===
+                      NO_FLAGS
+                  ) {
+                    rejectValue ||= onReject;
                   }
-                } else {
-                  // First error wins, ignore this second error.
-                }
-                // End "f2b3b1b3" block
-              } else if (forceIndexValue === undefined) {
-                const depVal = depExecutionVal.at(dataIndex);
-                let depFlags;
-                if (
-                  (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-                  ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
-                    FLAG_ERROR) ===
-                    FLAG_ERROR
-                ) {
-                  if (step._isUnary) {
-                    // COPY the unary value
-                    bucket.store.set(step.id, depExecutionVal);
-                    bucket.flagUnion |= depFlags;
+                  if (forceIndexValue == null) {
+                    if ((flags & FLAG_ERROR) !== 0) {
+                      const v = depExecutionVal.at(dataIndex);
+                      forceIndexValue = v;
+                    } else {
+                      forceIndexValue = null;
+                    }
                   } else {
-                    bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+                    // First error wins, ignore this second error.
                   }
-                  continue stepLoop;
+                  // End "f2b3b1b3" block
+                } else if (forceIndexValue === undefined) {
+                  const depVal = depExecutionVal.at(dataIndex);
+                  let depFlags;
+                  if (
+                    (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
+                    ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
+                      FLAG_ERROR) ===
+                      FLAG_ERROR
+                  ) {
+                    if (step._isUnary) {
+                      // COPY the unary value
+                      bucket.store.set(step.id, depExecutionVal);
+                      bucket.flagUnion |= depFlags;
+                    } else {
+                      bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+                    }
+                    continue stepLoop;
+                  }
+                  deps.push(depVal);
                 }
-                deps.push(depVal);
               }
             }
 
@@ -617,14 +638,11 @@ export function executeBucket(
 
             if (forceIndexValue !== undefined) {
               // Search for "17217999b7a7" for similar block
-              if (forceIndexValue == null && rejectValue != null) {
+              if ((indexFlags & FLAG_POLY_SKIPPED) === FLAG_POLY_SKIPPED) {
+                // Already skipped
+              } else if (forceIndexValue == null && rejectValue != null) {
                 indexFlags |= FLAG_ERROR;
                 forceIndexValue = rejectValue;
-              } else if (
-                (indexFlags & FLAG_POLY_SKIPPED) ===
-                FLAG_POLY_SKIPPED
-              ) {
-                // Already skipped
               } else {
                 indexFlags |= FLAG_INHIBITED;
               }
