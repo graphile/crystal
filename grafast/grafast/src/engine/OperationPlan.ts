@@ -62,7 +62,7 @@ import {
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { PolymorphicStep } from "../step.js";
+import type { PolymorphicStep, UnbatchedExecutableStep } from "../step.js";
 import {
   $$noExec,
   assertExecutableStep,
@@ -4042,7 +4042,11 @@ export class OperationPlan {
           ) {
             sstep.implicitSideEffectStep = latestSideEffectStep;
           }
-          if (step.isSyncAndSafe && isUnbatchedStep(step)) {
+          if (
+            step.isSyncAndSafe &&
+            isUnbatchedStep(step) &&
+            isSafeForUnbatched(step)
+          ) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
                 step,
@@ -4744,4 +4748,15 @@ function setsMatch(
     if (!s2.has(p)) return false;
   }
   return true;
+}
+
+function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
+  // Non-unary steps are safe for unbatched execution
+  if (step._isUnary === false) return true;
+  // Unary steps are only safe for unbatched execution _if_ their polymorphic
+  // paths match that of their bucket.
+  // !! search "f4ce2c83"
+  if (step.polymorphicPaths === null) return true;
+  // PERF: this can probably be optimized further
+  return false;
 }

@@ -563,11 +563,10 @@ export function executeBucket(
             if (
               stepPolymorphicPaths !== null &&
               (step._isUnary
-                ? /* unary check */
-                  // PERF: there must be a faster way of doing this
-                  bucket.polymorphicPathList.some(
-                    (p) => p != null && stepPolymorphicPaths.has(p),
-                  )
+                ? /*
+                   * already asserted that it matches;
+                   * !! search "f4ce2c83"
+                   */ true
                 : /* batch check */
                   !stepPolymorphicPaths.has(
                     bucket.polymorphicPathList[dataIndex] as string,
