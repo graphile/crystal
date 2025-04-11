@@ -241,9 +241,14 @@ export function planToMermaid(
       const isUnbatched = plan.supportsUnbatched;
 
       const polyPaths = pp(plan.polymorphicPaths);
+      const depIdsInSameBucket = plan.dependencyIds.filter(
+        (id) => stepById[id].bucketId === plan.bucketId,
+      );
       const polyPathsAreSame =
-        plan.dependencyIds.length === 1 &&
-        pp(stepById[plan.dependencyIds[0]].polymorphicPaths) === polyPaths;
+        depIdsInSameBucket.length >= 1 &&
+        depIdsInSameBucket.every(
+          (id) => pp(stepById[id].polymorphicPaths) === polyPaths,
+        );
       const polyPathsIfDifferent = polyPathsAreSame ? "" : `\n${polyPaths}`;
 
       const [lBrace, rBrace, shape = "", planNameText = planName] =
