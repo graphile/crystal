@@ -579,8 +579,12 @@ export function executeBucket(
                 const $dep = step.dependencies[i];
                 const forbiddenFlags = step.dependencyForbiddenFlags[i];
                 const onReject = step.dependencyOnReject[i];
-                const depExecutionVal = bucket.store.get($dep.id)!;
-
+                const depExecutionVal = bucket.store.get($dep.id);
+                if (depExecutionVal === undefined) {
+                  throw new Error(
+                    `GrafastInternalError<480e7c98-a777-4efb-b826-c339129ccff8>: could not find value in ${bucket} for ${$dep}, dependency ${i} of ${step}`,
+                  );
+                }
                 // Search for "f2b3b1b3" for similar block
                 const flags = depExecutionVal._flagsAt(dataIndex);
                 const disallowedFlags = flags & forbiddenFlags;
