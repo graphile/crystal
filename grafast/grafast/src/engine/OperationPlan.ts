@@ -1610,7 +1610,6 @@ export class OperationPlan {
          */
         const populateStepsFromBatch = (withUpdate = false) => {
           steps.clear();
-          const seen = new Set<string | null>();
           for (const entry of batch) {
             const polyPaths = entry[1][IDX_POLYMORPHIC_PATHS];
             if (polyPaths == null) continue;
@@ -1630,12 +1629,8 @@ export class OperationPlan {
               continue;
             }
             for (const polyPath of polyPaths) {
-              if (seen.has(polyPath)) {
-                throw new Error(
-                  `GrafastInternalError<94d5f8b4-a19f-40cf-aafd-5167ce05353a>: didn't expect to see polymorphic path '${polyPath}' again`,
-                );
-              }
-              seen.add(polyPath);
+              // PERF: this polyPath might happen multiple times, we should
+              // consider amalgamating it to reduce this.
               if (step.polymorphicPaths.has(polyPath)) {
                 steps.add(step);
               }
@@ -1802,6 +1797,7 @@ export class OperationPlan {
                 for (const t of tuplesAtSamePathForSameType) {
                   const outputPlan = t[1][IDX_OUTPUT_PLAN];
                   outputPlan.layerPlan = combinedLayerPlan;
+                  t[1][IDX_POLYMORPHIC_PATHS] = combinedPolymorphicPaths;
                   t[1][IDX_PARENT_STEP] = commonParentStep;
                 }
               }
