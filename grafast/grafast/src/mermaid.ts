@@ -188,7 +188,7 @@ export function planToMermaid(
 
       const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}${
         plan.stream ? "@s" : ""
-      }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame ? "^" : ""}${
+      }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame && polyPaths !== "" ? "^" : ""}${
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
