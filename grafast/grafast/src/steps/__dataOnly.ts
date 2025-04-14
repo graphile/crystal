@@ -103,12 +103,9 @@ export function __dataOnly<T>(step: Step<T>) {
   }
   const opPlan = operationPlan();
   if (opPlan.phase === "plan") {
-    return operationPlan().cacheStep(
-      step,
-      "__dataOnly",
-      null,
-      () => new __DataOnlyStep<T>(step),
-    );
+    // WARN: DO NOT CACHE THIS! Different fields will want to use this in
+    // different ways, we must deduplicate them all separately.
+    return new __DataOnlyStep<T>(step);
   } else {
     // Only use data-only during planning phase
     return step;
