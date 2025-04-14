@@ -697,6 +697,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
+                  /*
                   pack(step: Step | PgSelectSingleStep) {
                     if ("record" in step && typeof step.record === "function") {
                       return step.record();
@@ -712,6 +713,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                         ) as PgSelectSingleStep<any>;
                       }
                     : undefined,
+                  */
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );
