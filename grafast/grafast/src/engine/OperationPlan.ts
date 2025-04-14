@@ -3506,19 +3506,34 @@ export class OperationPlan {
    * former SELECT additional fields, then transform the results back to what
    * our child plans would be expecting.
    */
-  private deduplicateSteps(depth = 0): void {
+  private deduplicateSteps(): void {
     const start = this.stepTracker.nextStepIdToDeduplicate;
-    const end = this.stepTracker.stepCount;
-    if (end === start) {
+    if (start === this.stepTracker.stepCount) {
+      // No action necessary since there are no new steps
       return;
     }
 
+    // Before deduplication, we try and pair up all the data-only steps across
+    // polymorphism
+    this.resolveDataOnlySince(start);
+
+    // Then we deduplicate
+    this._deduplicateStepsInner(start, 0);
+
+    // Finally, for any data only steps with just a single dependency we
+    // replace them with that dependency.
+    this.trimUnnecessaryDataOnlySince(start);
+  }
+
+  private _deduplicateStepsInner(start: number, depth: number): void {
+    const end = this.stepTracker.stepCount;
     const processed = new Set<Step>();
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
       if (!step || step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
+
     this.stepTracker.nextStepIdToDeduplicate = end;
 
     if (this.stepTracker.stepCount > end) {
@@ -3535,9 +3550,13 @@ export class OperationPlan {
             .join(", ")}.`,
         );
       }
-      return this.deduplicateSteps(depth + 1);
+      return this._deduplicateStepsInner(end, depth + 1);
     }
   }
+
+  resolveDataOnlySince(sinceStepId: number) {}
+
+  trimUnnecessaryDataOnlySince(sinceStepId: number) {}
 
   private deduplicateStepsAtPlanningPath(
     planningPath: string,

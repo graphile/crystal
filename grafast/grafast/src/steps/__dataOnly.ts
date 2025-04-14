@@ -101,10 +101,16 @@ export function __dataOnly<T>(step: Step<T>) {
   if (step instanceof __DataOnlyStep) {
     return step;
   }
-  return operationPlan().cacheStep(
-    step,
-    "__dataOnly",
-    null,
-    () => new __DataOnlyStep<T>(step),
-  );
+  const opPlan = operationPlan();
+  if (opPlan.phase === "plan") {
+    return operationPlan().cacheStep(
+      step,
+      "__dataOnly",
+      null,
+      () => new __DataOnlyStep<T>(step),
+    );
+  } else {
+    // Only use data-only during planning phase
+    return step;
+  }
 }
