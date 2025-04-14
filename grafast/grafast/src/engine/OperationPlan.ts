@@ -1593,7 +1593,6 @@ export class OperationPlan {
       this.planningQueueByPlanningPath.clear();
 
       for (const [planningPath, batch] of todo) {
-        console.log(`${planningPath.padEnd(PLANNING_PAD, " ")} processing`);
         // TODO: mess with batch[*][5] (i.e. the step)
       }
 
