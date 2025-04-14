@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 38<br /><br />ROOT Connectionᐸ8ᐳ[14]<br />1: PgSelect[16]<br />ᐳ: Access[21], Access[39]<br />2: PgSelectRows[18]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 21, 39<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 39, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 23, 24, 32, 41, 42<br />2: PgSelectRows[33]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 39, 19<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[20]<br />1: <br />ᐳ: 23, 24, 32, 40, 41<br />2: PgSelectRows[33]"):::bucket
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ33ᐳ[34]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -44,16 +44,16 @@ graph TD
     __Item19 --> PgSelectSingle20
     PgCursor23{{"PgCursor[23∈3]"}}:::plan
     PgSelectSingle20 & Access21 --> PgCursor23
-    List41{{"List[41∈3]<br />ᐸ39,19ᐳ"}}:::plan
-    Access39 & __Item19 --> List41
+    List40{{"List[40∈3]<br />ᐸ39,19ᐳ"}}:::plan
+    Access39 & __Item19 --> List40
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression24
     PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression32
     PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
-    Lambda42{{"Lambda[42∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    Lambda42 --> PgSelectRows33
-    List41 --> Lambda42
+    Lambda41{{"Lambda[41∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    Lambda41 --> PgSelectRows33
+    List40 --> Lambda41
     __Item34[/"__Item[34∈4]<br />ᐸ33ᐳ"\]:::itemplan
     PgSelectRows33 ==> __Item34
     PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸlog_entriesᐳ"}}:::plan
@@ -71,7 +71,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgCursor23,PgClassExpression24,PgClassExpression32,PgSelectRows33,List41,Lambda42 bucket3
+    class Bucket3,PgCursor23,PgClassExpression24,PgClassExpression32,PgSelectRows33,List40,Lambda41 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item34,PgSelectSingle35,PgClassExpression36,PgClassExpression37 bucket4
 

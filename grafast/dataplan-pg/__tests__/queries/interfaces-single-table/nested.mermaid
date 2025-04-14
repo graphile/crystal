@@ -10,7 +10,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-single-table/nested"
     Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[100]<br />ᐳ: Access[7], Access[9], Object[10]<br />2: PgSelect[6]<br />ᐳ: Access[101]<br />3: PgSelectRows[12]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 101, 10<br /><br />ROOT __Item{1}ᐸ12ᐳ[13]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 101, 13, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[14]<br />1: <br />ᐳ: 15, 103, 104<br />2: PgSelectRows[25]<br />3: __ListTransform[24]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 101, 13, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[14]<br />1: <br />ᐳ: 15, 102, 103<br />2: PgSelectRows[25]<br />3: __ListTransform[24]"):::bucket
     Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgSelectSingle{3}ᐸsingle_table_itemsᐳ[27]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 10<br /><br />ROOT __Item{4}ᐸ24ᐳ[28]<br />1: <br />ᐳ: 29, 30, 31, 50, 52<br />2: PgSingleTablePolymorphic[33]"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 29, 10, 33, 50, 30, 52<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[34]<br />2: PgSelect[35]<br />3: PgSelectRows[43]<br />ᐳ: 42, 45, 46, 47, 99<br />4: PgSingleTablePolymorphic[49]"):::bucket
@@ -44,14 +44,14 @@ graph TD
     __Item13 --> PgSelectSingle14
     __ListTransform24[["__ListTransform[24∈2]<br />ᐸeach:17ᐳ"]]:::plan
     PgSelectRows25[["PgSelectRows[25∈2]"]]:::plan
-    Lambda104{{"Lambda[104∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    PgSelectRows25 & Lambda104 --> __ListTransform24
-    List103{{"List[103∈2]<br />ᐸ101,13ᐳ"}}:::plan
-    Access101 & __Item13 --> List103
+    Lambda103{{"Lambda[103∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    PgSelectRows25 & Lambda103 --> __ListTransform24
+    List102{{"List[102∈2]<br />ᐸ101,13ᐳ"}}:::plan
+    Access101 & __Item13 --> List102
     PgClassExpression15{{"PgClassExpression[15∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression15
-    Lambda104 --> PgSelectRows25
-    List103 --> Lambda104
+    Lambda103 --> PgSelectRows25
+    List102 --> Lambda103
     __Item26[/"__Item[26∈3]<br />ᐸ25ᐳ"\]:::itemplan
     PgSelectRows25 -.-> __Item26
     PgSelectSingle27{{"PgSelectSingle[27∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
@@ -95,7 +95,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression15,__ListTransform24,PgSelectRows25,List103,Lambda104 bucket2
+    class Bucket2,PgClassExpression15,__ListTransform24,PgSelectRows25,List102,Lambda103 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item26,PgSelectSingle27 bucket3
     classDef bucket4 stroke:#0000ff

@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection.before1.variables"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 18, 19, 20, 68<br /><br />ROOT Connectionᐸ12ᐳ[19]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 18, 19, 20, 67<br /><br />ROOT Connectionᐸ12ᐳ[19]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 27, 16<br /><br />ROOT __Item{2}ᐸ66ᐳ[25]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26, 27, 16<br /><br />ROOT PgUnionAllSingle{2}[26]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 26, 16<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: <br />ᐳ: Access[30]<br />2: JSONParse[32]<br />ᐳ: Access[34]<br />3: PgSelect[36], PgSelect[50]<br />4: PgSelectRows[44], PgSelectRows[55]<br />ᐳ: 43, 46, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65"):::bucket
@@ -25,9 +25,9 @@ graph TD
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access13 & Access15 --> Object16
     Connection19{{"Connection[19∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant67{{"Constant[67∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Lambda20{{"Lambda[20∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant68 & Lambda20 --> Connection19
+    Constant67 & Lambda20 --> Connection19
     Access8{{"Access[8∈0] ➊<br />ᐸ0.valueᐳ"}}:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access8
@@ -38,7 +38,7 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant18{{"Constant[18∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgUnionAll22[["PgUnionAll[22∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
-    Object16 & Constant18 & Connection19 & Lambda20 & Constant68 --> PgUnionAll22
+    Object16 & Constant18 & Connection19 & Lambda20 & Constant67 --> PgUnionAll22
     Access27{{"Access[27∈1] ➊<br />ᐸ22.cursorDetailsᐳ"}}:::plan
     PgUnionAll22 --> Access27
     Access66{{"Access[66∈1] ➊<br />ᐸ22.itemsᐳ"}}:::plan
@@ -90,7 +90,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access8,Access13,Access15,Object16,Constant18,Connection19,Lambda20,Constant68 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,Access8,Access13,Access15,Object16,Constant18,Connection19,Lambda20,Constant67 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll22,Access27,Access66 bucket1
     classDef bucket2 stroke:#7f007f

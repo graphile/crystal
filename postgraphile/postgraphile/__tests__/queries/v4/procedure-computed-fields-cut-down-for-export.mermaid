@@ -8,8 +8,8 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/procedure-computed-fields-cut-down-for-export"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[37]<br />ᐳ: 8, 10, 20, 43, 11, 19, 21, 35<br />2: PgSelect[7]<br />ᐳ: Access[38]<br />3: PgSelectRows[15]<br />ᐳ: 14, 17, 40, 41"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 41<br /><br />ROOT PgSelectSingleᐸpostᐳ[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[36]<br />ᐳ: 8, 10, 20, 40, 11, 19, 21, 35<br />2: PgSelect[7]<br />ᐳ: Access[37]<br />3: PgSelectRows[15]<br />ᐳ: 14, 17, 38, 39"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 39<br /><br />ROOT PgSelectSingleᐸpostᐳ[17]"):::bucket
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ32ᐳ[33]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[34]"):::bucket
     end
@@ -20,17 +20,17 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     PgFromExpression35{{"PgFromExpression[35∈0] ➊"}}:::plan
-    PgSelectInlineApply37["PgSelectInlineApply[37∈0] ➊"]:::plan
-    Object11 & Constant43 & PgFromExpression35 & PgSelectInlineApply37 --> PgSelect7
+    PgSelectInlineApply36["PgSelectInlineApply[36∈0] ➊"]:::plan
+    Object11 & Constant40 & PgFromExpression35 & PgSelectInlineApply36 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access10 --> Object11
-    List40{{"List[40∈0] ➊<br />ᐸ38,14ᐳ"}}:::plan
-    Access38{{"Access[38∈0] ➊<br />ᐸ7.m.subqueryDetailsFor23ᐳ"}}:::plan
+    List38{{"List[38∈0] ➊<br />ᐸ37,14ᐳ"}}:::plan
+    Access37{{"Access[37∈0] ➊<br />ᐸ7.m.subqueryDetailsFor23ᐳ"}}:::plan
     First14{{"First[14∈0] ➊"}}:::plan
-    Access38 & First14 --> List40
+    Access37 & First14 --> List38
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access10
@@ -43,14 +43,14 @@ graph TD
     BakedInput21{{"BakedInput[21∈0] ➊"}}:::plan
     __InputObject19 --> BakedInput21
     BakedInput21 --> PgFromExpression35
-    PgSelect7 --> Access38
-    Lambda41{{"Lambda[41∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    List40 --> Lambda41
+    PgSelect7 --> Access37
+    Lambda39{{"Lambda[39∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    List38 --> Lambda39
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
     PgSelectRows32[["PgSelectRows[32∈1] ➊"]]:::plan
-    Lambda41 --> PgSelectRows32
+    Lambda39 --> PgSelectRows32
     __Item33[/"__Item[33∈2]<br />ᐸ32ᐳ"\]:::itemplan
     PgSelectRows32 ==> __Item33
     PgSelectSingle34{{"PgSelectSingle[34∈2]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
@@ -58,7 +58,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access10,Object11,First14,PgSelectRows15,PgSelectSingle17,__InputObject19,BakedInput21,PgFromExpression35,PgSelectInlineApply37,Access38,List40,Lambda41,Constant43 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access10,Object11,First14,PgSelectRows15,PgSelectSingle17,__InputObject19,BakedInput21,PgFromExpression35,PgSelectInlineApply36,Access37,List38,Lambda39,Constant40 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression18,PgSelectRows32 bucket1
     classDef bucket2 stroke:#7f007f

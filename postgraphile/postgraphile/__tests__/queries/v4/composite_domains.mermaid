@@ -9,9 +9,9 @@ graph TD
 
     subgraph "Buckets for queries/v4/composite_domains"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 31, 82, 41, 88, 58, 74<br /><br />ROOT Connectionᐸ8ᐳ[14]<br />1: PgSelect[16]<br />ᐳ: Access[83], Access[89]<br />2: PgSelectRows[18]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br />Deps: 83, 89, 12, 58, 74<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 83, 89, 19, 12, 58, 74<br /><br />ROOT PgSelectSingle{2}ᐸpostsᐳ[20]<br />1: <br />ᐳ: 21, 22, 42, 85, 90, 86, 91<br />2: PgSelectRows[33], PgSelectRows[43]<br />ᐳ: 32, 35, 46, 47"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 31, 82, 41, 86, 58, 74<br /><br />ROOT Connectionᐸ8ᐳ[14]<br />1: PgSelect[16]<br />ᐳ: Access[83], Access[87]<br />2: PgSelectRows[18]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 83, 87, 12, 58, 74<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 83, 87, 19, 12, 58, 74<br /><br />ROOT PgSelectSingle{2}ᐸpostsᐳ[20]<br />1: <br />ᐳ: 21, 22, 42, 84, 88, 85, 89<br />2: PgSelectRows[33], PgSelectRows[43]<br />ᐳ: 32, 35, 46, 47"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 12, 74<br /><br />ROOT __Item{4}ᐸ43ᐳ[44]"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 12, 58<br /><br />ROOT __Item{6}ᐸ47ᐳ[50]<br />1: PgSelect[51]<br />2: PgSelectRows[63]"):::bucket
     Bucket8("Bucket 8 (listItem)<br /><br />ROOT __Item{8}ᐸ63ᐳ[64]"):::bucket
@@ -41,23 +41,23 @@ graph TD
     PgFromExpression58{{"PgFromExpression[58∈0] ➊"}}:::plan
     PgFromExpression74{{"PgFromExpression[74∈0] ➊"}}:::plan
     PgSelectInlineApply82["PgSelectInlineApply[82∈0] ➊"]:::plan
-    PgSelectInlineApply88["PgSelectInlineApply[88∈0] ➊"]:::plan
+    PgSelectInlineApply86["PgSelectInlineApply[86∈0] ➊"]:::plan
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸpostsᐳ"]]:::plan
-    Object12 & Connection14 & PgFromExpression31 & PgSelectInlineApply82 & PgFromExpression41 & PgSelectInlineApply88 --> PgSelect16
+    Object12 & Connection14 & PgFromExpression31 & PgSelectInlineApply82 & PgFromExpression41 & PgSelectInlineApply86 --> PgSelect16
     PgSelectRows18[["PgSelectRows[18∈1] ➊"]]:::plan
     PgSelect16 --> PgSelectRows18
     Access83{{"Access[83∈1] ➊<br />ᐸ16.m.joinDetailsFor24ᐳ"}}:::plan
     PgSelect16 --> Access83
-    Access89{{"Access[89∈1] ➊<br />ᐸ16.m.subqueryDetailsFor37ᐳ"}}:::plan
-    PgSelect16 --> Access89
+    Access87{{"Access[87∈1] ➊<br />ᐸ16.m.subqueryDetailsFor37ᐳ"}}:::plan
+    PgSelect16 --> Access87
     __Item19[/"__Item[19∈2]<br />ᐸ18ᐳ"\]:::itemplan
     PgSelectRows18 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸpostsᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
-    List85{{"List[85∈3]<br />ᐸ83,20ᐳ"}}:::plan
-    Access83 & PgSelectSingle20 --> List85
-    List90{{"List[90∈3]<br />ᐸ89,19ᐳ"}}:::plan
-    Access89 & __Item19 --> List90
+    List84{{"List[84∈3]<br />ᐸ83,20ᐳ"}}:::plan
+    Access83 & PgSelectSingle20 --> List84
+    List88{{"List[88∈3]<br />ᐸ87,19ᐳ"}}:::plan
+    Access87 & __Item19 --> List88
     PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__posts__.”id”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__posts__.”user_id”ᐳ"}}:::plan
@@ -65,21 +65,21 @@ graph TD
     First32{{"First[32∈3]"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
     PgSelectRows33 --> First32
-    Lambda86{{"Lambda[86∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda86 --> PgSelectRows33
+    Lambda85{{"Lambda[85∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda85 --> PgSelectRows33
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸfrmcdc_userUpdateContentᐳ"}}:::plan
     First32 --> PgSelectSingle35
     PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__posts__.”created_at”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression42
     PgSelectRows43[["PgSelectRows[43∈3]"]]:::plan
-    Lambda91{{"Lambda[91∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    Lambda91 --> PgSelectRows43
+    Lambda89{{"Lambda[89∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    Lambda89 --> PgSelectRows43
     PgClassExpression46{{"PgClassExpression[46∈3]<br />ᐸ__frmcdc_u....”img_url”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression46
     PgClassExpression47{{"PgClassExpression[47∈3]<br />ᐸ__frmcdc_u...__.”lines”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression47
-    List85 --> Lambda86
-    List90 --> Lambda91
+    List84 --> Lambda85
+    List88 --> Lambda89
     __Item44[/"__Item[44∈4]<br />ᐸ43ᐳ"\]:::itemplan
     PgSelectRows43 ==> __Item44
     PgSelectSingle45{{"PgSelectSingle[45∈4]<br />ᐸfrmcdc_userUpdateContentᐳ"}}:::plan
@@ -119,13 +119,13 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access11,Object12,Connection14,PgFromExpression31,PgFromExpression41,PgFromExpression58,PgFromExpression74,PgSelectInlineApply82,PgSelectInlineApply88 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access11,Object12,Connection14,PgFromExpression31,PgFromExpression41,PgFromExpression58,PgFromExpression74,PgSelectInlineApply82,PgSelectInlineApply86 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect16,PgSelectRows18,Access83,Access89 bucket1
+    class Bucket1,PgSelect16,PgSelectRows18,Access83,Access87 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,First32,PgSelectRows33,PgSelectSingle35,PgClassExpression42,PgSelectRows43,PgClassExpression46,PgClassExpression47,List85,Lambda86,List90,Lambda91 bucket3
+    class Bucket3,PgClassExpression21,PgClassExpression22,First32,PgSelectRows33,PgSelectSingle35,PgClassExpression42,PgSelectRows43,PgClassExpression46,PgClassExpression47,List84,Lambda85,List88,Lambda89 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item44,PgSelectSingle45,PgClassExpression59,PgClassExpression60 bucket4
     classDef bucket6 stroke:#ff1493

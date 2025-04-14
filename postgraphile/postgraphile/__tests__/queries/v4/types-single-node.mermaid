@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for queries/v4/types-single-node"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756,List<br />Deps: 2, 8, 7, 4<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList<br /><br />1: 17, 19, 193, 195<br />ᐳ: Object[20]<br />2: 16, 28, 37, 46, 55, 64, 75, 85, 94, 103, 112, 121, 130, 139, 148, 157, 166, 175, 184<br />3: 24, 33, 42, 51, 60, 69, 81, 90, 99, 108, 117, 126, 135, 144, 153, 162, 171, 180, 189<br />ᐳ: 23, 26, 32, 35, 41, 44, 50, 53, 59, 62, 68, 71, 80, 83, 89, 92, 98, 101, 107, 110, 116, 119, 125, 128, 134, 137, 143, 146, 152, 155, 161, 164, 170, 173, 179, 182, 188, 191, 192"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756,List<br />Deps: 2, 8, 7, 4<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList<br /><br />1: 17, 19, 193, 194<br />ᐳ: Object[20]<br />2: 16, 28, 37, 46, 55, 64, 75, 85, 94, 103, 112, 121, 130, 139, 148, 157, 166, 175, 184<br />3: 24, 33, 42, 51, 60, 69, 81, 90, 99, 108, 117, 126, 135, 144, 153, 162, 171, 180, 189<br />ᐳ: 23, 26, 32, 35, 41, 44, 50, 53, 59, 62, 68, 71, 80, 83, 89, 92, 98, 101, 107, 110, 116, 119, 125, 128, 134, 137, 143, 146, 152, 155, 161, 164, 170, 173, 179, 182, 188, 191, 192"):::bucket
     end
     Bucket0 --> Bucket1
 
@@ -17,17 +17,17 @@ graph TD
     Node7{{"Node[7∈0] ➊"}}:::plan
     Lambda8{{"Lambda[8∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
     Lambda8 --> Node7
-    Constant196{{"Constant[196∈0] ➊<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
-    Constant196 --> Lambda8
+    Constant195{{"Constant[195∈0] ➊<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
+    Constant195 --> Lambda8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect75[["PgSelect[75∈1] ➊<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Object20{{"Object[20∈1] ➊^<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access193{{"Access[193∈1] ➊<br />ᐸ8.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
-    Access195{{"Access[195∈1] ➊<br />ᐸ8.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
+    Access194{{"Access[194∈1] ➊<br />ᐸ8.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
     Object20 -->|rejectNull| PgSelect75
     Access193 -->|rejectNull| PgSelect75
-    Access195 --> PgSelect75
+    Access194 --> PgSelect75
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
     Object20 -->|rejectNull| PgSelect16
     Access193 --> PgSelect16
@@ -204,11 +204,11 @@ graph TD
     PgClassExpression192{{"PgClassExpression[192∈1] ➊^<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression192
     Lambda8 --> Access193
-    Lambda8 --> Access195
+    Lambda8 --> Access194
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Node7,Lambda8,Constant196 bucket0
+    class Bucket0,__Value2,__Value4,Node7,Lambda8,Constant195 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect16,Access17,Access19,Object20,First23,PgSelectRows24,PgSelectSingle26,PgSelect28,First32,PgSelectRows33,PgSelectSingle35,PgSelect37,First41,PgSelectRows42,PgSelectSingle44,PgSelect46,First50,PgSelectRows51,PgSelectSingle53,PgSelect55,First59,PgSelectRows60,PgSelectSingle62,PgSelect64,First68,PgSelectRows69,PgSelectSingle71,PgSelect75,First80,PgSelectRows81,PgSelectSingle83,PgSelect85,First89,PgSelectRows90,PgSelectSingle92,PgSelect94,First98,PgSelectRows99,PgSelectSingle101,PgSelect103,First107,PgSelectRows108,PgSelectSingle110,PgSelect112,First116,PgSelectRows117,PgSelectSingle119,PgSelect121,First125,PgSelectRows126,PgSelectSingle128,PgSelect130,First134,PgSelectRows135,PgSelectSingle137,PgSelect139,First143,PgSelectRows144,PgSelectSingle146,PgSelect148,First152,PgSelectRows153,PgSelectSingle155,PgSelect157,First161,PgSelectRows162,PgSelectSingle164,PgSelect166,First170,PgSelectRows171,PgSelectSingle173,PgSelect175,First179,PgSelectRows180,PgSelectSingle182,PgSelect184,First188,PgSelectRows189,PgSelectSingle191,PgClassExpression192,Access193,Access195 bucket1
+    class Bucket1,PgSelect16,Access17,Access19,Object20,First23,PgSelectRows24,PgSelectSingle26,PgSelect28,First32,PgSelectRows33,PgSelectSingle35,PgSelect37,First41,PgSelectRows42,PgSelectSingle44,PgSelect46,First50,PgSelectRows51,PgSelectSingle53,PgSelect55,First59,PgSelectRows60,PgSelectSingle62,PgSelect64,First68,PgSelectRows69,PgSelectSingle71,PgSelect75,First80,PgSelectRows81,PgSelectSingle83,PgSelect85,First89,PgSelectRows90,PgSelectSingle92,PgSelect94,First98,PgSelectRows99,PgSelectSingle101,PgSelect103,First107,PgSelectRows108,PgSelectSingle110,PgSelect112,First116,PgSelectRows117,PgSelectSingle119,PgSelect121,First125,PgSelectRows126,PgSelectSingle128,PgSelect130,First134,PgSelectRows135,PgSelectSingle137,PgSelect139,First143,PgSelectRows144,PgSelectSingle146,PgSelect148,First152,PgSelectRows153,PgSelectSingle155,PgSelect157,First161,PgSelectRows162,PgSelectSingle164,PgSelect166,First170,PgSelectRows171,PgSelectSingle173,PgSelect175,First179,PgSelectRows180,PgSelectSingle182,PgSelect184,First188,PgSelectRows189,PgSelectSingle191,PgClassExpression192,Access193,Access194 bucket1
 

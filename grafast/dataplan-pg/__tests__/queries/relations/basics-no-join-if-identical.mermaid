@@ -8,8 +8,8 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/relations/basics-no-join-if-identical"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[33]<br />ᐳ: 8, 10, 39, 11<br />2: PgSelect[7]<br />ᐳ: Access[34]<br />3: PgSelectRows[15]<br />ᐳ: First[14], PgSelectSingle[17]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 34<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[17]<br />1: <br />ᐳ: 18, 19, 20, 36, 37<br />2: PgSelectRows[29]<br />ᐳ: First[28], PgSelectSingle[31]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[33]<br />ᐳ: 8, 10, 37, 11<br />2: PgSelect[7]<br />ᐳ: Access[34]<br />3: PgSelectRows[15]<br />ᐳ: First[14], PgSelectSingle[17]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 34<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[17]<br />1: <br />ᐳ: 18, 19, 20, 35, 36<br />2: PgSelectRows[29]<br />ᐳ: First[28], PgSelectSingle[31]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 31, 20<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[31]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -18,9 +18,9 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸmessagesᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
+    Constant37{{"Constant[37∈0] ➊<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
     PgSelectInlineApply33["PgSelectInlineApply[33∈0] ➊"]:::plan
-    Object11 & Constant39 & PgSelectInlineApply33 --> PgSelect7
+    Object11 & Constant37 & PgSelectInlineApply33 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access10 --> Object11
@@ -36,8 +36,8 @@ graph TD
     Access34{{"Access[34∈0] ➊<br />ᐸ7.m.joinDetailsFor21ᐳ"}}:::plan
     PgSelect7 --> Access34
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    List36{{"List[36∈1] ➊<br />ᐸ34,17ᐳ"}}:::plan
-    Access34 & PgSelectSingle17 --> List36
+    List35{{"List[35∈1] ➊<br />ᐸ34,17ᐳ"}}:::plan
+    Access34 & PgSelectSingle17 --> List35
     PgClassExpression18{{"PgClassExpression[18∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸ__messages__.”body”ᐳ"}}:::plan
@@ -47,17 +47,17 @@ graph TD
     First28{{"First[28∈1] ➊"}}:::plan
     PgSelectRows29[["PgSelectRows[29∈1] ➊"]]:::plan
     PgSelectRows29 --> First28
-    Lambda37{{"Lambda[37∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda37 --> PgSelectRows29
+    Lambda36{{"Lambda[36∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda36 --> PgSelectRows29
     PgSelectSingle31{{"PgSelectSingle[31∈1] ➊<br />ᐸforumsᐳ"}}:::plan
     First28 --> PgSelectSingle31
-    List36 --> Lambda37
+    List35 --> Lambda36
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access10,Object11,First14,PgSelectRows15,PgSelectSingle17,PgSelectInlineApply33,Access34,Constant39 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access10,Object11,First14,PgSelectRows15,PgSelectSingle17,PgSelectInlineApply33,Access34,Constant37 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression18,PgClassExpression19,PgClassExpression20,First28,PgSelectRows29,PgSelectSingle31,List36,Lambda37 bucket1
+    class Bucket1,PgClassExpression18,PgClassExpression19,PgClassExpression20,First28,PgSelectRows29,PgSelectSingle31,List35,Lambda36 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
 

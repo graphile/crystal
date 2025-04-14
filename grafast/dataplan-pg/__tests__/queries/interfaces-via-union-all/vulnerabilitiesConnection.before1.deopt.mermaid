@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection.before1"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 16, 17, 18, 66<br /><br />ROOT Connectionᐸ10ᐳ[17]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 16, 17, 18, 65<br /><br />ROOT Connectionᐸ10ᐳ[17]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 25, 14<br /><br />ROOT __Item{2}ᐸ64ᐳ[23]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 25, 14<br /><br />ROOT PgUnionAllSingle{2}[24]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 24, 14<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: <br />ᐳ: Access[28]<br />2: JSONParse[30]<br />ᐳ: Access[32]<br />3: PgSelect[34], PgSelect[48]<br />4: PgSelectRows[42], PgSelectRows[53]<br />ᐳ: 41, 44, 52, 55, 56, 57, 58, 59, 60, 61, 62, 63"):::bucket
@@ -25,18 +25,18 @@ graph TD
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access13 --> Object14
     Connection17{{"Connection[17∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Lambda18{{"Lambda[18∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant66 & Lambda18 --> Connection17
+    Constant65 & Lambda18 --> Connection17
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access13
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ'WyJkMTg1OWM4N2RhIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkᐳ"}}:::plan
-    Constant67 --> Lambda18
+    Constant66{{"Constant[66∈0] ➊<br />ᐸ'WyJkMTg1OWM4N2RhIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkᐳ"}}:::plan
+    Constant66 --> Lambda18
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant16{{"Constant[16∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgUnionAll20[["PgUnionAll[20∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
-    Object14 & Constant16 & Connection17 & Lambda18 & Constant66 --> PgUnionAll20
+    Object14 & Constant16 & Connection17 & Lambda18 & Constant65 --> PgUnionAll20
     Access25{{"Access[25∈1] ➊<br />ᐸ20.cursorDetailsᐳ"}}:::plan
     PgUnionAll20 --> Access25
     Access64{{"Access[64∈1] ➊<br />ᐸ20.itemsᐳ"}}:::plan
@@ -88,7 +88,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access13,Object14,Constant16,Connection17,Lambda18,Constant66,Constant67 bucket0
+    class Bucket0,__Value2,__Value4,Access11,Access13,Object14,Constant16,Connection17,Lambda18,Constant65,Constant66 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll20,Access25,Access64 bucket1
     classDef bucket2 stroke:#7f007f

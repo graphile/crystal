@@ -13,7 +13,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 20, 53, 62, 54<br /><br />ROOT Connectionᐸ17ᐳ[20]<br />1: PgSelect[33]<br />ᐳ: Access[63]<br />2: PgSelectRows[42]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 25<br /><br />ROOT Connectionᐸ22ᐳ[25]<br />1: PgSelect[35]<br />2: PgSelectRows[38]<br />ᐳ: 37, 40, 41"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 63, 54<br /><br />ROOT __Item{4}ᐸ42ᐳ[43]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 63, 43, 44, 54<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[44]<br />1: <br />ᐳ: List[65], Lambda[66]<br />2: PgSelectRows[58]<br />ᐳ: 57, 60, 61"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 63, 43, 44, 54<br /><br />ROOT PgSelectSingle{4}ᐸpersonᐳ[44]<br />1: <br />ᐳ: List[64], Lambda[65]<br />2: PgSelectRows[58]<br />ᐳ: 57, 60, 61"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2 & Bucket3
     Bucket2 --> Bucket4
@@ -54,18 +54,18 @@ graph TD
     PgSelectRows42 ==> __Item43
     PgSelectSingle44{{"PgSelectSingle[44∈4]<br />ᐸpersonᐳ"}}:::plan
     __Item43 --> PgSelectSingle44
-    List65{{"List[65∈5]<br />ᐸ63,43ᐳ"}}:::plan
-    Access63 & __Item43 --> List65
+    List64{{"List[64∈5]<br />ᐸ63,43ᐳ"}}:::plan
+    Access63 & __Item43 --> List64
     First57{{"First[57∈5]"}}:::plan
     PgSelectRows58[["PgSelectRows[58∈5]"]]:::plan
     PgSelectRows58 --> First57
-    Lambda66{{"Lambda[66∈5]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    Lambda66 --> PgSelectRows58
+    Lambda65{{"Lambda[65∈5]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    Lambda65 --> PgSelectRows58
     PgSelectSingle60{{"PgSelectSingle[60∈5]<br />ᐸperson_friendsᐳ"}}:::plan
     First57 --> PgSelectSingle60
     PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle60 --> PgClassExpression61
-    List65 --> Lambda66
+    List64 --> Lambda65
     PgSelect35[["PgSelect[35∈3] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
     Object12 & Connection25 --> PgSelect35
     First37{{"First[37∈3] ➊"}}:::plan
@@ -89,5 +89,5 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item43,PgSelectSingle44 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,First57,PgSelectRows58,PgSelectSingle60,PgClassExpression61,List65,Lambda66 bucket5
+    class Bucket5,First57,PgSelectRows58,PgSelectSingle60,PgClassExpression61,List64,Lambda65 bucket5
 

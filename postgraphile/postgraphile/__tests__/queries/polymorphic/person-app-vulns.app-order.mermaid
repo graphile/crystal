@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-order"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 78, 33, 32<br /><br />ROOT Connectionᐸ9ᐳ[15]<br />1: PgSelect[17]<br />2: PgSelectRows[19]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 77, 33, 32<br /><br />ROOT Connectionᐸ9ᐳ[15]<br />1: PgSelect[17]<br />2: PgSelectRows[19]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 13, 33, 32<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 13, 33, 32<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[21]<br />1: <br />ᐳ: 22, 23<br />2: PgUnionAll[34]<br />ᐳ: Access[76]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 34, 13<br /><br />ROOT __Item{4}ᐸ76ᐳ[37]"):::bucket
@@ -32,13 +32,13 @@ graph TD
     __Value2 --> Access10
     __Value2 --> Access12
     Connection15{{"Connection[15∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant78 --> Connection15
+    Constant77{{"Constant[77∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant77 --> Connection15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection32{{"Connection[32∈0] ➊<br />ᐸ25ᐳ"}}:::plan
     Constant33{{"Constant[33∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Connection15 & Constant78 --> PgSelect17
+    Object13 & Connection15 & Constant77 --> PgSelect17
     PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
     PgSelect17 --> PgSelectRows19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
@@ -98,7 +98,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access12,Object13,Connection15,Connection32,Constant33,Constant78 bucket0
+    class Bucket0,__Value2,__Value4,Access10,Access12,Object13,Connection15,Connection32,Constant33,Constant77 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows19 bucket1
     classDef bucket2 stroke:#7f007f
