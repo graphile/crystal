@@ -110,6 +110,13 @@ import { lock, unlock } from "./lock.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
+type ProcessStepActionDescription =
+  | "deduplicate"
+  | "hoist"
+  | "pushDown"
+  | "optimize"
+  | "optimizeDataOnly";
+
 const atpe =
   typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
@@ -2539,7 +2546,7 @@ export class OperationPlan {
   }
 
   private processStep(
-    actionDescription: string,
+    actionDescription: ProcessStepActionDescription,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
     callback: (plan: Step) => Step,
@@ -2640,7 +2647,9 @@ export class OperationPlan {
       if (replacementStep !== step) {
         this.replaceStep(step, replacementStep);
       }
-      this.deduplicateSteps();
+      if (actionDescription !== "deduplicate") {
+        this.deduplicateSteps();
+      }
     }
 
     return replacementStep;
@@ -2654,7 +2663,7 @@ export class OperationPlan {
    * @internal
    */
   public processSteps(
-    actionDescription: string,
+    actionDescription: ProcessStepActionDescription,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
     callback: (plan: Step) => Step,
