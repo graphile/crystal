@@ -11,8 +11,8 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14<br /><br />ROOT Connectionᐸ8ᐳ[14]<br />1: PgSelect[16]<br />2: PgSelectRows[18]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 12<br /><br />ROOT __Item{2}ᐸ18ᐳ[19]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[20]<br />1: <br />ᐳ: 21, 22, 23<br />2: PgUnionAll[24]<br />ᐳ: Access[66], First[32]<br />3: PgUnionAllSingle[35]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 35, 12<br />ᐳOrganization<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[36]<br />2: JSONParse[38]<br />ᐳ: Access[40]<br />3: PgSelect[42], PgSelect[56]<br />4: PgSelectRows[50], PgSelectRows[61]<br />ᐳ: 49, 52, 60, 63, 64, 65"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[20]<br />1: <br />ᐳ: 21, 22, 23<br />2: PgUnionAll[24]<br />ᐳ: Access[66], First[32]<br />3: PgUnionAllSingle[35]<br />ᐳ: Access[36]"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 36, 12, 35<br />ᐳOrganization<br />ᐳPerson<br /><br />1: JSONParse[38]<br />ᐳ: Access[40]<br />2: PgSelect[42], PgSelect[56]<br />3: PgSelectRows[50], PgSelectRows[61]<br />ᐳ: 49, 52, 60, 63, 64, 65"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -50,15 +50,15 @@ graph TD
     Access66 --> First32
     PgUnionAllSingle35["PgUnionAllSingle[35∈3]"]:::plan
     First32 --> PgUnionAllSingle35
+    Access36{{"Access[36∈3]<br />ᐸ35.1ᐳ"}}:::plan
+    PgUnionAllSingle35 --> Access36
     PgUnionAll24 --> Access66
     PgSelect42[["PgSelect[42∈4]<br />ᐸorganizationsᐳ<br />ᐳOrganization"]]:::plan
     Access40{{"Access[40∈4]^<br />ᐸ38.0ᐳ"}}:::plan
     Object12 & Access40 --> PgSelect42
     PgSelect56[["PgSelect[56∈4]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
     Object12 & Access40 --> PgSelect56
-    Access36{{"Access[36∈4]<br />ᐸ35.1ᐳ<br />ᐳOrganization<br />ᐳPerson"}}:::plan
-    PgUnionAllSingle35 --> Access36
-    JSONParse38[["JSONParse[38∈4]^<br />ᐸ36ᐳ"]]:::plan
+    JSONParse38[["JSONParse[38∈4]<br />ᐸ36ᐳ<br />ᐳOrganization<br />ᐳPerson"]]:::plan
     Access36 --> JSONParse38
     JSONParse38 --> Access40
     First49{{"First[49∈4]^"}}:::plan
@@ -86,7 +86,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item19,PgSelectSingle20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgUnionAll24,First32,PgUnionAllSingle35,Access66 bucket3
+    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgUnionAll24,First32,PgUnionAllSingle35,Access36,Access66 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,Access36,JSONParse38,Access40,PgSelect42,First49,PgSelectRows50,PgSelectSingle52,PgSelect56,First60,PgSelectRows61,PgSelectSingle63,PgClassExpression64,PgClassExpression65 bucket4
+    class Bucket4,JSONParse38,Access40,PgSelect42,First49,PgSelectRows50,PgSelectSingle52,PgSelect56,First60,PgSelectRows61,PgSelectSingle63,PgClassExpression64,PgClassExpression65 bucket4
 

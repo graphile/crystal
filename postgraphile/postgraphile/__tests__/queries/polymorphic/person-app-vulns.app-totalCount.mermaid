@@ -9,9 +9,9 @@ graph TD
 
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-totalCount"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 40, 31<br /><br />ROOT Connectionᐸ9ᐳ[15]<br />1: PgSelect[17]<br />2: PgSelectRows[19]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 15, 39, 31<br /><br />ROOT Connectionᐸ9ᐳ[15]<br />1: PgSelect[17]<br />2: PgSelectRows[19]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 13, 31<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 13, 31<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[21]<br />1: <br />ᐳ: 22, 23<br />2: PgUnionAll[32]<br />ᐳ: Access[39], First[34]<br />3: PgUnionAllSingle[37]<br />ᐳ: PgClassExpression[38]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 13, 31<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[21]<br />1: <br />ᐳ: 22, 23<br />2: PgUnionAll[32]<br />ᐳ: Access[38], First[33]<br />3: PgUnionAllSingle[36]<br />ᐳ: PgClassExpression[37]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -26,12 +26,12 @@ graph TD
     __Value2 --> Access10
     __Value2 --> Access12
     Connection15{{"Connection[15∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant40 --> Connection15
+    Constant39{{"Constant[39∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant39 --> Connection15
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection31{{"Connection[31∈0] ➊<br />ᐸ24ᐳ"}}:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object13 & Connection15 & Constant40 --> PgSelect17
+    Object13 & Connection15 & Constant39 --> PgSelect17
     PgSelectRows19[["PgSelectRows[19∈1] ➊"]]:::plan
     PgSelect17 --> PgSelectRows19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
@@ -44,22 +44,22 @@ graph TD
     PgSelectSingle21 --> PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression23
-    First34{{"First[34∈3]"}}:::plan
-    Access39{{"Access[39∈3]<br />ᐸ32.itemsᐳ"}}:::plan
-    Access39 --> First34
-    PgUnionAllSingle37["PgUnionAllSingle[37∈3]"]:::plan
-    First34 --> PgUnionAllSingle37
-    PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle37 --> PgClassExpression38
-    PgUnionAll32 --> Access39
+    First33{{"First[33∈3]"}}:::plan
+    Access38{{"Access[38∈3]<br />ᐸ32.itemsᐳ"}}:::plan
+    Access38 --> First33
+    PgUnionAllSingle36["PgUnionAllSingle[36∈3]"]:::plan
+    First33 --> PgUnionAllSingle36
+    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgUnionAllSingle36 --> PgClassExpression37
+    PgUnionAll32 --> Access38
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access12,Object13,Connection15,Connection31,Constant40 bucket0
+    class Bucket0,__Value2,__Value4,Access10,Access12,Object13,Connection15,Connection31,Constant39 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows19 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item20,PgSelectSingle21 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23,PgUnionAll32,First34,PgUnionAllSingle37,PgClassExpression38,Access39 bucket3
+    class Bucket3,PgClassExpression22,PgClassExpression23,PgUnionAll32,First33,PgUnionAllSingle36,PgClassExpression37,Access38 bucket3
 
