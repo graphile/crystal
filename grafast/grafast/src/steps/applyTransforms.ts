@@ -47,7 +47,7 @@ export class ApplyTransformsStep extends Step {
   ) {
     super();
     const listPlan = itemsOrStep($step);
-    this.addDependency(listPlan);
+    this.addDataDependency(listPlan);
 
     // Plan this subroutine
     this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
