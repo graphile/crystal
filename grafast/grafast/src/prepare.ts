@@ -679,6 +679,9 @@ function newIterator<T = any>(
     [Symbol.asyncIterator]() {
       return this;
     },
+    async [Symbol.asyncDispose]() {
+      await this.return();
+    },
     push(v: T | PromiseLike<T>) {
       if (done) {
         // LOGGING: should we raise this as a bigger issue?

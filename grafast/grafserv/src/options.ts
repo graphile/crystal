@@ -119,6 +119,9 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
       [Symbol.asyncIterator]() {
         return this;
       },
+      async [Symbol.asyncDispose]() {
+        await this.return(undefined);
+      },
       return(value) {
         return result.return(value);
       },

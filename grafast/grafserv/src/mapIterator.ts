@@ -13,6 +13,9 @@ export function mapIterator<T, U>(
    */
   let status = -1;
   const mappedIterator: AsyncGenerator<U> = {
+    async [Symbol.asyncDispose]() {
+      await this.return(undefined);
+    },
     next() {
       if (status === -1) {
         status = 0;
