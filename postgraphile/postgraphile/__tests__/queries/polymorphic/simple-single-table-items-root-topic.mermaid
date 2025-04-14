@@ -15,7 +15,7 @@ graph TD
     Bucket4("Bucket 4 (listItem)<br />Deps: 288, 12, 305, 248, 327, 338<br /><br />ROOT __Item{4}ᐸ280ᐳ[281]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 264<br /><br />ROOT PgSelectSingle{2}ᐸsingle_table_itemsᐳ[264]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 279<br /><br />ROOT PgSelectSingle{3}ᐸsingle_table_itemsᐳ[279]"):::bucket
-    Bucket7("Bucket 7 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 288, 287, 12, 293, 305, 248, 327, 338, 282, 292<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[294]<br />ᐳ: 289, 306, 317, 328, 339<br />2: __DataOnly[291], PgSelectRows[302]<br />ᐳ: 290, 301, 304"):::bucket
+    Bucket7("Bucket 7 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 288, 287, 12, 293, 305, 248, 327, 338, 282, 292<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[294]<br />ᐳ: 289, 306, 317, 328, 339, 290, 307, 318, 329, 340<br />2: PgSelectRows[302]<br />ᐳ: First[301], PgSelectSingle[304]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 304<br /><br />ROOT PgSelectSingle{7}ᐸsingle_table_itemsᐳ[304]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2 & Bucket3
@@ -75,32 +75,34 @@ graph TD
     PgSelectSingle282 --> PgClassExpression292
     PgClassExpression293{{"PgClassExpression[293∈4]<br />ᐸ__single_t..._topic_id”ᐳ"}}:::plan
     PgSelectSingle282 --> PgClassExpression293
-    __DataOnly291["__DataOnly[291∈7]<br />ᐸ289,306,317,328,339ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]:::plan
     List289{{"List[289∈7]<br />ᐸ288,287ᐳ<br />ᐳSingleTableTopic"}}:::plan
-    List306{{"List[306∈7]<br />ᐸ305,287ᐳ<br />ᐳSingleTablePost"}}:::plan
-    List317{{"List[317∈7]<br />ᐸ248,287ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    List328{{"List[328∈7]<br />ᐸ327,287ᐳ<br />ᐳSingleTableChecklist"}}:::plan
-    List339{{"List[339∈7]<br />ᐸ338,287ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
-    List289 -->|"trapError;trapInhibited"| __DataOnly291
-    List306 -->|"trapError;trapInhibited"| __DataOnly291
-    List317 -->|"trapError;trapInhibited"| __DataOnly291
-    List328 -->|"trapError;trapInhibited"| __DataOnly291
-    List339 --> __DataOnly291
     Constant288 & PgClassExpression287 --> List289
     PgSelect294[["PgSelect[294∈7]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
     Object12 & PgClassExpression293 --> PgSelect294
+    List306{{"List[306∈7]<br />ᐸ305,287ᐳ<br />ᐳSingleTablePost"}}:::plan
     Constant305 & PgClassExpression287 --> List306
+    List317{{"List[317∈7]<br />ᐸ248,287ᐳ<br />ᐳSingleTableDivider"}}:::plan
     Constant248 & PgClassExpression287 --> List317
+    List328{{"List[328∈7]<br />ᐸ327,287ᐳ<br />ᐳSingleTableChecklist"}}:::plan
     Constant327 & PgClassExpression287 --> List328
+    List339{{"List[339∈7]<br />ᐸ338,287ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
     Constant338 & PgClassExpression287 --> List339
     Lambda290{{"Lambda[290∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    __DataOnly291 --> Lambda290
+    List289 --> Lambda290
     First301{{"First[301∈7]^"}}:::plan
     PgSelectRows302[["PgSelectRows[302∈7]^"]]:::plan
     PgSelectRows302 --> First301
     PgSelect294 --> PgSelectRows302
     PgSelectSingle304{{"PgSelectSingle[304∈7]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First301 --> PgSelectSingle304
+    Lambda307{{"Lambda[307∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List306 --> Lambda307
+    Lambda318{{"Lambda[318∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List317 --> Lambda318
+    Lambda329{{"Lambda[329∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List328 --> Lambda329
+    Lambda340{{"Lambda[340∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List339 --> Lambda340
     PgClassExpression349{{"PgClassExpression[349∈8]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle304 --> PgClassExpression349
     PgClassExpression350{{"PgClassExpression[350∈8]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
@@ -341,7 +343,7 @@ graph TD
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression285,PgClassExpression286 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,List289,Lambda290,__DataOnly291,PgSelect294,First301,PgSelectRows302,PgSelectSingle304,List306,List317,List328,List339 bucket7
+    class Bucket7,List289,Lambda290,PgSelect294,First301,PgSelectRows302,PgSelectSingle304,List306,Lambda307,List317,Lambda318,List328,Lambda329,List339,Lambda340 bucket7
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression349,PgClassExpression350 bucket8
 
