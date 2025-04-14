@@ -37,30 +37,30 @@ graph TD
     PgSelect18[["PgSelect[18∈1] ➊<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
     PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__single_t...parent_id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
     Object10 & PgClassExpression17 --> PgSelect18
-    PgSingleTablePolymorphic27["PgSingleTablePolymorphic[27∈1] ➊<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]:::plan
-    Lambda26{{"Lambda[26∈1] ➊"}}:::plan
-    PgSelectSingle24{{"PgSelectSingle[24∈1] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSingleTablePolymorphic27["PgSingleTablePolymorphic[27∈1] ➊^"]:::plan
+    Lambda26{{"Lambda[26∈1] ➊^"}}:::plan
+    PgSelectSingle24{{"PgSelectSingle[24∈1] ➊^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Lambda26 & PgSelectSingle24 --> PgSingleTablePolymorphic27
     PgSelectSingle13 --> PgClassExpression17
-    First22{{"First[22∈1] ➊"}}:::plan
-    PgSelectRows23[["PgSelectRows[23∈1] ➊"]]:::plan
+    First22{{"First[22∈1] ➊^"}}:::plan
+    PgSelectRows23[["PgSelectRows[23∈1] ➊^"]]:::plan
     PgSelectRows23 --> First22
     PgSelect18 --> PgSelectRows23
     First22 --> PgSelectSingle24
-    PgClassExpression25{{"PgClassExpression[25∈1] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈1] ➊^<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
     PgClassExpression25 --> Lambda26
-    PgClassExpression29{{"PgClassExpression[29∈1] ➊<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈1] ➊^<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression29
     PgSelect30[["PgSelect[30∈2] ➊<br />ᐸpeopleᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"]]:::plan
     Object10 & PgClassExpression29 --> PgSelect30
-    First34{{"First[34∈2] ➊"}}:::plan
-    PgSelectRows35[["PgSelectRows[35∈2] ➊"]]:::plan
+    First34{{"First[34∈2] ➊^"}}:::plan
+    PgSelectRows35[["PgSelectRows[35∈2] ➊^"]]:::plan
     PgSelectRows35 --> First34
     PgSelect30 --> PgSelectRows35
-    PgSelectSingle36{{"PgSelectSingle[36∈2] ➊<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈2] ➊^<br />ᐸpeopleᐳ"}}:::plan
     First34 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
 
     %% define steps

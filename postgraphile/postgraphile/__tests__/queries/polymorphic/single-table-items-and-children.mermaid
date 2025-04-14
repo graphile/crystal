@@ -32,11 +32,11 @@ graph TD
     PgSelectSingle17 --> PgClassExpression19
     PgSelect20[["PgSelect[20∈3]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
     Object11 & PgClassExpression18 --> PgSelect20
-    PgSelectRows24[["PgSelectRows[24∈3]"]]:::plan
+    PgSelectRows24[["PgSelectRows[24∈3]^"]]:::plan
     PgSelect20 --> PgSelectRows24
     __Item25[/"__Item[25∈4]<br />ᐸ24ᐳ<br />ᐳSingleTableTopic"\]:::itemplan
     PgSelectRows24 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle26{{"PgSelectSingle[26∈4]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle26 --> PgClassExpression27

@@ -97,38 +97,38 @@ graph TD
     Access23{{"Access[23∈3]<br />ᐸ20.1ᐳ"}}:::plan
     PgUnionAllSingle20 --> Access23
     PgSelect26[["PgSelect[26∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access25{{"Access[25∈4]<br />ᐸ24.0ᐳ"}}:::plan
+    Access25{{"Access[25∈4]^<br />ᐸ24.0ᐳ"}}:::plan
     Object13 & Access25 --> PgSelect26
     PgSelect38[["PgSelect[38∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Object13 & Access25 --> PgSelect38
     JSONParse24[["JSONParse[24∈4]<br />ᐸ23ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
     Access23 --> JSONParse24
     JSONParse24 --> Access25
-    First30{{"First[30∈4]"}}:::plan
-    PgSelectRows31[["PgSelectRows[31∈4]"]]:::plan
+    First30{{"First[30∈4]^"}}:::plan
+    PgSelectRows31[["PgSelectRows[31∈4]^"]]:::plan
     PgSelectRows31 --> First30
     PgSelect26 --> PgSelectRows31
-    PgSelectSingle32{{"PgSelectSingle[32∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle32{{"PgSelectSingle[32∈4]^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
     First30 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈4]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    PgClassExpression34{{"PgClassExpression[34∈4]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgClassExpression34{{"PgClassExpression[34∈4]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgClassExpression35{{"PgClassExpression[35∈4]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression35
-    First40{{"First[40∈4]"}}:::plan
-    PgSelectRows41[["PgSelectRows[41∈4]"]]:::plan
+    First40{{"First[40∈4]^"}}:::plan
+    PgSelectRows41[["PgSelectRows[41∈4]^"]]:::plan
     PgSelectRows41 --> First40
     PgSelect38 --> PgSelectRows41
-    PgSelectSingle42{{"PgSelectSingle[42∈4]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle42{{"PgSelectSingle[42∈4]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
     First40 --> PgSelectSingle42
-    PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    PgClassExpression43{{"PgClassExpression[43∈4]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression43
-    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈4]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈4]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
+    PgClassExpression46{{"PgClassExpression[46∈4]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression46
     __Item82[/"__Item[82∈5]<br />ᐸ112ᐳ"\]:::itemplan
     Access112 ==> __Item82
@@ -137,38 +137,38 @@ graph TD
     Access84{{"Access[84∈5]<br />ᐸ83.1ᐳ"}}:::plan
     PgUnionAllSingle83 --> Access84
     PgSelect87[["PgSelect[87∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Access86{{"Access[86∈6]<br />ᐸ85.0ᐳ"}}:::plan
+    Access86{{"Access[86∈6]^<br />ᐸ85.0ᐳ"}}:::plan
     Object13 & Access86 --> PgSelect87
     PgSelect99[["PgSelect[99∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
     Object13 & Access86 --> PgSelect99
     JSONParse85[["JSONParse[85∈6]<br />ᐸ84ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]]:::plan
     Access84 --> JSONParse85
     JSONParse85 --> Access86
-    First91{{"First[91∈6]"}}:::plan
-    PgSelectRows92[["PgSelectRows[92∈6]"]]:::plan
+    First91{{"First[91∈6]^"}}:::plan
+    PgSelectRows92[["PgSelectRows[92∈6]^"]]:::plan
     PgSelectRows92 --> First91
     PgSelect87 --> PgSelectRows92
-    PgSelectSingle93{{"PgSelectSingle[93∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle93{{"PgSelectSingle[93∈6]^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
     First91 --> PgSelectSingle93
-    PgClassExpression94{{"PgClassExpression[94∈6]<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
+    PgClassExpression94{{"PgClassExpression[94∈6]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle93 --> PgClassExpression94
-    PgClassExpression95{{"PgClassExpression[95∈6]<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
+    PgClassExpression95{{"PgClassExpression[95∈6]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle93 --> PgClassExpression95
-    PgClassExpression96{{"PgClassExpression[96∈6]<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
+    PgClassExpression96{{"PgClassExpression[96∈6]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle93 --> PgClassExpression96
-    First101{{"First[101∈6]"}}:::plan
-    PgSelectRows102[["PgSelectRows[102∈6]"]]:::plan
+    First101{{"First[101∈6]^"}}:::plan
+    PgSelectRows102[["PgSelectRows[102∈6]^"]]:::plan
     PgSelectRows102 --> First101
     PgSelect99 --> PgSelectRows102
-    PgSelectSingle103{{"PgSelectSingle[103∈6]<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle103{{"PgSelectSingle[103∈6]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
     First101 --> PgSelectSingle103
-    PgClassExpression104{{"PgClassExpression[104∈6]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    PgClassExpression104{{"PgClassExpression[104∈6]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle103 --> PgClassExpression104
-    PgClassExpression105{{"PgClassExpression[105∈6]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgClassExpression105{{"PgClassExpression[105∈6]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle103 --> PgClassExpression105
-    PgClassExpression106{{"PgClassExpression[106∈6]<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
+    PgClassExpression106{{"PgClassExpression[106∈6]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle103 --> PgClassExpression106
-    PgClassExpression107{{"PgClassExpression[107∈6]<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
+    PgClassExpression107{{"PgClassExpression[107∈6]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
     PgSelectSingle103 --> PgClassExpression107
 
     %% define steps

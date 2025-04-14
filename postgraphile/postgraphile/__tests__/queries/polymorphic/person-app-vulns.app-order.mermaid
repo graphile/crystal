@@ -49,36 +49,36 @@ graph TD
     Access34{{"Access[34∈5]<br />ᐸ31.1ᐳ"}}:::plan
     PgUnionAllSingle31 --> Access34
     PgSelect37[["PgSelect[37∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
-    Access36{{"Access[36∈6]<br />ᐸ35.0ᐳ"}}:::plan
+    Access36{{"Access[36∈6]^<br />ᐸ35.0ᐳ"}}:::plan
     Object12 & Access36 --> PgSelect37
     PgSelect49[["PgSelect[49∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & Access36 --> PgSelect49
     JSONParse35[["JSONParse[35∈6]<br />ᐸ34ᐳ<br />ᐳAwsApplication<br />ᐳGcpApplication"]]:::plan
     Access34 --> JSONParse35
     JSONParse35 --> Access36
-    First41{{"First[41∈6]"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈6]"]]:::plan
+    First41{{"First[41∈6]^"}}:::plan
+    PgSelectRows42[["PgSelectRows[42∈6]^"]]:::plan
     PgSelectRows42 --> First41
     PgSelect37 --> PgSelectRows42
-    PgSelectSingle43{{"PgSelectSingle[43∈6]<br />ᐸaws_applicationsᐳ"}}:::plan
+    PgSelectSingle43{{"PgSelectSingle[43∈6]^<br />ᐸaws_applicationsᐳ"}}:::plan
     First41 --> PgSelectSingle43
-    PgClassExpression44{{"PgClassExpression[44∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈6]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈6]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
+    PgClassExpression46{{"PgClassExpression[46∈6]^<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression46
-    First51{{"First[51∈6]"}}:::plan
-    PgSelectRows52[["PgSelectRows[52∈6]"]]:::plan
+    First51{{"First[51∈6]^"}}:::plan
+    PgSelectRows52[["PgSelectRows[52∈6]^"]]:::plan
     PgSelectRows52 --> First51
     PgSelect49 --> PgSelectRows52
-    PgSelectSingle53{{"PgSelectSingle[53∈6]<br />ᐸgcp_applicationsᐳ"}}:::plan
+    PgSelectSingle53{{"PgSelectSingle[53∈6]^<br />ᐸgcp_applicationsᐳ"}}:::plan
     First51 --> PgSelectSingle53
-    PgClassExpression54{{"PgClassExpression[54∈6]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈6]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression54
-    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈6]^<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression55
-    PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__gcp_appl..._deployed”ᐳ"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈6]^<br />ᐸ__gcp_appl..._deployed”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression56
 
     %% define steps

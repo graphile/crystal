@@ -181,15 +181,19 @@ export function planToMermaid(
       const isUnbatched = plan.supportsUnbatched;
 
       const polyPaths = pp(plan.polymorphicPaths);
-      const polyPathsIfDifferent =
-        plan.dependencyIds.length === 1 &&
-        pp(stepById[plan.dependencyIds[0]].polymorphicPaths) === polyPaths
-          ? ""
-          : `\n${polyPaths}`;
+      const depIdsInSameBucket = plan.dependencyIds.filter(
+        (id) => stepById[id].bucketId === plan.bucketId,
+      );
+      const polyPathsAreSame =
+        depIdsInSameBucket.length >= 1 &&
+        depIdsInSameBucket.every(
+          (id) => pp(stepById[id].polymorphicPaths) === polyPaths,
+        );
+      const polyPathsIfDifferent = polyPathsAreSame ? "" : `\n${polyPaths}`;
 
       const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}${
         plan.stream ? "@s" : ""
-      }]${plan.isUnary ? " ➊" : ""}${
+      }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame && polyPaths !== "" ? "^" : ""}${
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
