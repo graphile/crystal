@@ -33,6 +33,9 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const includeComments =
+  typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1";
+
 const nodeInspect: CustomInspectFunction = function (
   this: SQLNode | SQLQuery,
   depth,
@@ -1100,7 +1103,7 @@ export function placeholder(
 }
 
 export function comment(commentText: string): SQLCommentNode | SQLRawNode {
-  if (isDev) {
+  if (includeComments) {
     return makeCommentNode(commentText);
   } else {
     return sql.blank;
