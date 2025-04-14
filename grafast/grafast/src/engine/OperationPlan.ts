@@ -1577,6 +1577,8 @@ export class OperationPlan {
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
 
+      this.deduplicateSteps();
+
       const l = this.planningQueue.length;
       if (l === 0) break;
       if (depth === MAX_DEPTH) {
@@ -1604,23 +1606,22 @@ export class OperationPlan {
          * Goes through the batch and extracts all the steps that have
          * different polymorphic paths.
          *
-         * If `withUpdate` is set, we'll also update the tuple to point to the
-         * latest version of that step (e.g. if the step has been
-         * deduplicated).
+         * We'll also update the tuple to point to the latest version of that
+         * step (e.g. if the step has been deduplicated).
          */
-        const populateStepsFromBatch = (withUpdate = false) => {
+        {
           steps.clear();
           for (const entry of batch) {
-            const polyPaths = entry[1][IDX_POLYMORPHIC_PATHS];
-            if (polyPaths == null) continue;
             let step = entry[1][IDX_PARENT_STEP];
-            if (withUpdate) {
+            {
               const actualStep = this.stepTracker.getStepById(step.id);
               if (actualStep !== step) {
                 step = actualStep;
                 entry[1][IDX_PARENT_STEP] = actualStep;
               }
             }
+            const polyPaths = entry[1][IDX_POLYMORPHIC_PATHS];
+            if (polyPaths == null) continue;
             if (step.polymorphicPaths == null) continue;
             if (step.hasSideEffects) continue;
             if (step._stepOptions.stream != null) continue;
@@ -1636,17 +1637,10 @@ export class OperationPlan {
               }
             }
           }
-        };
+        }
 
-        populateStepsFromBatch();
         if (steps.size > 1) {
-          // TODO: try primary dedupe
-          this.deduplicateStepsAtPlanningPath(planningPath, steps);
-
-          // update batch and steps
-          populateStepsFromBatch(true);
-
-          if (steps.size > 1) {
+          {
             // Fallback: attempt to recombine using pack/unpack approach
 
             const grouped = Object.create(null) as Record<string, QueueTuple[]>;
@@ -1874,7 +1868,7 @@ export class OperationPlan {
             labelStepId: streamDetails.label.id,
           }
         : undefined;
-      let $__item = this.itemStepForListStep(
+      const $__item = this.itemStepForListStep(
         parentLayerPlan,
         $list,
         listDepth,
@@ -1891,11 +1885,6 @@ export class OperationPlan {
             $list,
             $__item,
           );
-
-          this.deduplicateSteps();
-          // Refetch steps following deduplicate
-          $__item = this.stepTracker.getStepById<typeof $__item>($__item.id);
-          $item = this.stepTracker.getStepById<typeof $item>($item.id);
         } else {
           $item = $__item;
         }
@@ -2403,18 +2392,6 @@ export class OperationPlan {
         };
         step._stepOptions.walkIterable = true;
       }
-
-      if (deduplicate) {
-        // Now that the field has been planned (including arguments, but NOT
-        // including selection set) we can deduplicate it to see if any of its
-        // peers are identical.
-        this.deduplicateSteps();
-
-        // After deduplication, this step may have been substituted; get the
-        // updated reference.
-        step = this.stepTracker.getStepById(step.id)!;
-      }
-
       return { step, haltTree };
     } catch (e) {
       if (ALWAYS_THROW_PLANNING_ERRORS) {
