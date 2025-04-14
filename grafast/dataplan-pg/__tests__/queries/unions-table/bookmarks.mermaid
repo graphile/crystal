@@ -73,74 +73,74 @@ graph TD
     List85 --> Lambda86
     PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression32
-    PgSelect62[["PgSelect[62∈5]<br />ᐸcommentsᐳ<br />ᐳComment"]]:::plan
+    PgSelect62[["PgSelect[62∈5]^<br />ᐸcommentsᐳ"]]:::plan
     PgSelectInlineApply91["PgSelectInlineApply[91∈5] ➊<br />ᐳComment"]:::plan
     PgSelectInlineApply95["PgSelectInlineApply[95∈5] ➊<br />ᐳComment"]:::plan
     Object10 & PgClassExpression36 & PgSelectInlineApply91 & PgSelectInlineApply95 --> PgSelect62
-    PgSelect48[["PgSelect[48∈5]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
+    PgSelect48[["PgSelect[48∈5]^<br />ᐸpostsᐳ"]]:::plan
     PgSelectInlineApply87["PgSelectInlineApply[87∈5] ➊<br />ᐳPost"]:::plan
     Object10 & PgClassExpression35 & PgSelectInlineApply87 --> PgSelect48
     PgSelect39[["PgSelect[39∈5]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
     Object10 & PgClassExpression34 --> PgSelect39
-    List89{{"List[89∈5]<br />ᐸ88,52ᐳ<br />ᐳPost"}}:::plan
-    Access88{{"Access[88∈5]<br />ᐸ48.m.joinDetailsFor55ᐳ"}}:::plan
-    PgSelectSingle52{{"PgSelectSingle[52∈5]<br />ᐸpostsᐳ"}}:::plan
+    List89{{"List[89∈5]^<br />ᐸ88,52ᐳ"}}:::plan
+    Access88{{"Access[88∈5]^<br />ᐸ48.m.joinDetailsFor55ᐳ"}}:::plan
+    PgSelectSingle52{{"PgSelectSingle[52∈5]^<br />ᐸpostsᐳ"}}:::plan
     Access88 & PgSelectSingle52 --> List89
-    List93{{"List[93∈5]<br />ᐸ92,66ᐳ<br />ᐳComment"}}:::plan
-    Access92{{"Access[92∈5]<br />ᐸ62.m.joinDetailsFor69ᐳ"}}:::plan
-    PgSelectSingle66{{"PgSelectSingle[66∈5]<br />ᐸcommentsᐳ"}}:::plan
+    List93{{"List[93∈5]^<br />ᐸ92,66ᐳ"}}:::plan
+    Access92{{"Access[92∈5]^<br />ᐸ62.m.joinDetailsFor69ᐳ"}}:::plan
+    PgSelectSingle66{{"PgSelectSingle[66∈5]^<br />ᐸcommentsᐳ"}}:::plan
     Access92 & PgSelectSingle66 --> List93
-    List97{{"List[97∈5]<br />ᐸ96,66ᐳ<br />ᐳComment"}}:::plan
-    Access96{{"Access[96∈5]<br />ᐸ62.m.joinDetailsFor76ᐳ"}}:::plan
+    List97{{"List[97∈5]^<br />ᐸ96,66ᐳ"}}:::plan
+    Access96{{"Access[96∈5]^<br />ᐸ62.m.joinDetailsFor76ᐳ"}}:::plan
     Access96 & PgSelectSingle66 --> List97
-    First43{{"First[43∈5]"}}:::plan
-    PgSelectRows44[["PgSelectRows[44∈5]"]]:::plan
+    First43{{"First[43∈5]^"}}:::plan
+    PgSelectRows44[["PgSelectRows[44∈5]^"]]:::plan
     PgSelectRows44 --> First43
     PgSelect39 --> PgSelectRows44
-    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle45{{"PgSelectSingle[45∈5]^<br />ᐸpeopleᐳ"}}:::plan
     First43 --> PgSelectSingle45
-    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    PgClassExpression46{{"PgClassExpression[46∈5]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression46
-    PgClassExpression47{{"PgClassExpression[47∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression47{{"PgClassExpression[47∈5]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression47
-    First50{{"First[50∈5]"}}:::plan
-    PgSelectRows51[["PgSelectRows[51∈5]"]]:::plan
+    First50{{"First[50∈5]^"}}:::plan
+    PgSelectRows51[["PgSelectRows[51∈5]^"]]:::plan
     PgSelectRows51 --> First50
     PgSelect48 --> PgSelectRows51
     First50 --> PgSelectSingle52
-    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
+    PgClassExpression53{{"PgClassExpression[53∈5]^<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression53
-    First57{{"First[57∈5]"}}:::plan
-    PgSelectRows58[["PgSelectRows[58∈5]"]]:::plan
+    First57{{"First[57∈5]^"}}:::plan
+    PgSelectRows58[["PgSelectRows[58∈5]^"]]:::plan
     PgSelectRows58 --> First57
-    Lambda90{{"Lambda[90∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda90{{"Lambda[90∈5]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda90 --> PgSelectRows58
-    PgSelectSingle59{{"PgSelectSingle[59∈5]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle59{{"PgSelectSingle[59∈5]^<br />ᐸpeopleᐳ"}}:::plan
     First57 --> PgSelectSingle59
-    PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgClassExpression61{{"PgClassExpression[61∈5]^<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression61
-    First64{{"First[64∈5]"}}:::plan
-    PgSelectRows65[["PgSelectRows[65∈5]"]]:::plan
+    First64{{"First[64∈5]^"}}:::plan
+    PgSelectRows65[["PgSelectRows[65∈5]^"]]:::plan
     PgSelectRows65 --> First64
     PgSelect62 --> PgSelectRows65
     First64 --> PgSelectSingle66
-    PgClassExpression67{{"PgClassExpression[67∈5]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
+    PgClassExpression67{{"PgClassExpression[67∈5]^<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
     PgSelectSingle66 --> PgClassExpression67
-    First71{{"First[71∈5]"}}:::plan
-    PgSelectRows72[["PgSelectRows[72∈5]"]]:::plan
+    First71{{"First[71∈5]^"}}:::plan
+    PgSelectRows72[["PgSelectRows[72∈5]^"]]:::plan
     PgSelectRows72 --> First71
-    Lambda94{{"Lambda[94∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda94{{"Lambda[94∈5]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda94 --> PgSelectRows72
-    PgSelectSingle73{{"PgSelectSingle[73∈5]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle73{{"PgSelectSingle[73∈5]^<br />ᐸpeopleᐳ"}}:::plan
     First71 --> PgSelectSingle73
-    First78{{"First[78∈5]"}}:::plan
-    PgSelectRows79[["PgSelectRows[79∈5]"]]:::plan
+    First78{{"First[78∈5]^"}}:::plan
+    PgSelectRows79[["PgSelectRows[79∈5]^"]]:::plan
     PgSelectRows79 --> First78
-    Lambda98{{"Lambda[98∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda98{{"Lambda[98∈5]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda98 --> PgSelectRows79
-    PgSelectSingle80{{"PgSelectSingle[80∈5]<br />ᐸpostsᐳ"}}:::plan
+    PgSelectSingle80{{"PgSelectSingle[80∈5]^<br />ᐸpostsᐳ"}}:::plan
     First78 --> PgSelectSingle80
-    PgClassExpression82{{"PgClassExpression[82∈5]<br />ᐸ__comments__.”body”ᐳ"}}:::plan
+    PgClassExpression82{{"PgClassExpression[82∈5]^<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle66 --> PgClassExpression82
     PgSelect48 --> Access88
     List89 --> Lambda90
@@ -148,11 +148,11 @@ graph TD
     List93 --> Lambda94
     PgSelect62 --> Access96
     List97 --> Lambda98
-    PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
     PgSelectSingle59 --> PgClassExpression60
-    PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle73 --> PgClassExpression74
-    PgClassExpression81{{"PgClassExpression[81∈8]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgClassExpression81{{"PgClassExpression[81∈8]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle80 --> PgClassExpression81
 
     %% define steps

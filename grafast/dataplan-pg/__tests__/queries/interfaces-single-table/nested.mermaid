@@ -59,20 +59,20 @@ graph TD
     PgSelect29[["PgSelect[29∈5]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
     PgClassExpression28{{"PgClassExpression[28∈5]<br />ᐸ__single_t...parent_id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
     Object9 & PgClassExpression28 --> PgSelect29
-    PgSingleTablePolymorphic38["PgSingleTablePolymorphic[38∈5]<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]:::plan
+    PgSingleTablePolymorphic38["PgSingleTablePolymorphic[38∈5]^"]:::plan
     Lambda37{{"Lambda[37∈5]<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle35{{"PgSelectSingle[35∈5]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle35{{"PgSelectSingle[35∈5]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Lambda37 & PgSelectSingle35 --> PgSingleTablePolymorphic38
     PgSelectSingle24 --> PgClassExpression28
-    First33{{"First[33∈5]"}}:::plan
-    PgSelectRows34[["PgSelectRows[34∈5]"]]:::plan
+    First33{{"First[33∈5]^"}}:::plan
+    PgSelectRows34[["PgSelectRows[34∈5]^"]]:::plan
     PgSelectRows34 --> First33
     PgSelect29 --> PgSelectRows34
     First33 --> PgSelectSingle35
     PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__single_t...s__.”type”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
     PgClassExpression36 --> Lambda37
-    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgClassExpression41{{"PgClassExpression[41∈5]^<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression41
 
     %% define steps

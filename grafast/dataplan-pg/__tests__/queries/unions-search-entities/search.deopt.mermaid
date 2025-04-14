@@ -48,75 +48,75 @@ graph TD
     Object10 & PgClassExpression18 --> PgSelect23
     PgSelect32[["PgSelect[32∈3]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
     Object10 & PgClassExpression19 --> PgSelect32
-    PgSelect39[["PgSelect[39∈3]<br />ᐸpeopleᐳ<br />ᐳPost"]]:::plan
-    PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
+    PgSelect39[["PgSelect[39∈3]^<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression38{{"PgClassExpression[38∈3]^<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
     Object10 & PgClassExpression38 --> PgSelect39
     PgSelect46[["PgSelect[46∈3]<br />ᐸcommentsᐳ<br />ᐳComment"]]:::plan
     Object10 & PgClassExpression20 --> PgSelect46
-    PgSelect53[["PgSelect[53∈3]<br />ᐸpeopleᐳ<br />ᐳComment"]]:::plan
-    PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__comments...author_id”ᐳ"}}:::plan
+    PgSelect53[["PgSelect[53∈3]^<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression52{{"PgClassExpression[52∈3]^<br />ᐸ__comments...author_id”ᐳ"}}:::plan
     Object10 & PgClassExpression52 --> PgSelect53
-    PgSelect60[["PgSelect[60∈3]<br />ᐸpostsᐳ<br />ᐳComment"]]:::plan
-    PgClassExpression59{{"PgClassExpression[59∈3]<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
+    PgSelect60[["PgSelect[60∈3]^<br />ᐸpostsᐳ"]]:::plan
+    PgClassExpression59{{"PgClassExpression[59∈3]^<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
     Object10 & PgClassExpression59 --> PgSelect60
-    First27{{"First[27∈3]"}}:::plan
-    PgSelectRows28[["PgSelectRows[28∈3]"]]:::plan
+    First27{{"First[27∈3]^"}}:::plan
+    PgSelectRows28[["PgSelectRows[28∈3]^"]]:::plan
     PgSelectRows28 --> First27
     PgSelect23 --> PgSelectRows28
-    PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle29{{"PgSelectSingle[29∈3]^<br />ᐸpeopleᐳ"}}:::plan
     First27 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈3]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression31
-    First34{{"First[34∈3]"}}:::plan
-    PgSelectRows35[["PgSelectRows[35∈3]"]]:::plan
+    First34{{"First[34∈3]^"}}:::plan
+    PgSelectRows35[["PgSelectRows[35∈3]^"]]:::plan
     PgSelectRows35 --> First34
     PgSelect32 --> PgSelectRows35
-    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸpostsᐳ"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈3]^<br />ᐸpostsᐳ"}}:::plan
     First34 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈3]^<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
     PgSelectSingle36 --> PgClassExpression38
-    First41{{"First[41∈3]"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈3]"]]:::plan
+    First41{{"First[41∈3]^"}}:::plan
+    PgSelectRows42[["PgSelectRows[42∈3]^"]]:::plan
     PgSelectRows42 --> First41
     PgSelect39 --> PgSelectRows42
-    PgSelectSingle43{{"PgSelectSingle[43∈3]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle43{{"PgSelectSingle[43∈3]^<br />ᐸpeopleᐳ"}}:::plan
     First41 --> PgSelectSingle43
-    PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈3]^<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression45
-    First48{{"First[48∈3]"}}:::plan
-    PgSelectRows49[["PgSelectRows[49∈3]"]]:::plan
+    First48{{"First[48∈3]^"}}:::plan
+    PgSelectRows49[["PgSelectRows[49∈3]^"]]:::plan
     PgSelectRows49 --> First48
     PgSelect46 --> PgSelectRows49
-    PgSelectSingle50{{"PgSelectSingle[50∈3]<br />ᐸcommentsᐳ"}}:::plan
+    PgSelectSingle50{{"PgSelectSingle[50∈3]^<br />ᐸcommentsᐳ"}}:::plan
     First48 --> PgSelectSingle50
-    PgClassExpression51{{"PgClassExpression[51∈3]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
+    PgClassExpression51{{"PgClassExpression[51∈3]^<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
     PgSelectSingle50 --> PgClassExpression51
     PgSelectSingle50 --> PgClassExpression52
-    First55{{"First[55∈3]"}}:::plan
-    PgSelectRows56[["PgSelectRows[56∈3]"]]:::plan
+    First55{{"First[55∈3]^"}}:::plan
+    PgSelectRows56[["PgSelectRows[56∈3]^"]]:::plan
     PgSelectRows56 --> First55
     PgSelect53 --> PgSelectRows56
-    PgSelectSingle57{{"PgSelectSingle[57∈3]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle57{{"PgSelectSingle[57∈3]^<br />ᐸpeopleᐳ"}}:::plan
     First55 --> PgSelectSingle57
     PgSelectSingle50 --> PgClassExpression59
-    First62{{"First[62∈3]"}}:::plan
-    PgSelectRows63[["PgSelectRows[63∈3]"]]:::plan
+    First62{{"First[62∈3]^"}}:::plan
+    PgSelectRows63[["PgSelectRows[63∈3]^"]]:::plan
     PgSelectRows63 --> First62
     PgSelect60 --> PgSelectRows63
-    PgSelectSingle64{{"PgSelectSingle[64∈3]<br />ᐸpostsᐳ"}}:::plan
+    PgSelectSingle64{{"PgSelectSingle[64∈3]^<br />ᐸpostsᐳ"}}:::plan
     First62 --> PgSelectSingle64
-    PgClassExpression67{{"PgClassExpression[67∈3]<br />ᐸ__comments__.”body”ᐳ"}}:::plan
+    PgClassExpression67{{"PgClassExpression[67∈3]^<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle50 --> PgClassExpression67
-    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
-    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle57 --> PgClassExpression58
-    PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
+    PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle64 --> PgClassExpression65
-    PgClassExpression66{{"PgClassExpression[66∈6]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgClassExpression66{{"PgClassExpression[66∈6]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle64 --> PgClassExpression66
 
     %% define steps

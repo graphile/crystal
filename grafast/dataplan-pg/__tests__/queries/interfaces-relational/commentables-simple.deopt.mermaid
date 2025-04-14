@@ -38,80 +38,80 @@ graph TD
     PgSelectSingle16 --> PgClassExpression17
     PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
-    PgSelect20[["PgSelect[20∈3]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
+    PgSelect20[["PgSelect[20∈3]^<br />ᐸrelational_postsᐳ"]]:::plan
     PgSelectInlineApply94["PgSelectInlineApply[94∈3] ➊<br />ᐳRelationalPost"]:::plan
     Object10 & PgClassExpression19 & PgSelectInlineApply94 --> PgSelect20
-    PgSelect46[["PgSelect[46∈3]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
+    PgSelect46[["PgSelect[46∈3]^<br />ᐸrelational_checklistsᐳ"]]:::plan
     PgSelectInlineApply98["PgSelectInlineApply[98∈3] ➊<br />ᐳRelationalChecklist"]:::plan
     Object10 & PgClassExpression19 & PgSelectInlineApply98 --> PgSelect46
-    PgSelect70[["PgSelect[70∈3]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
+    PgSelect70[["PgSelect[70∈3]^<br />ᐸrelational_checklist_itemsᐳ"]]:::plan
     PgSelectInlineApply102["PgSelectInlineApply[102∈3] ➊<br />ᐳRelationalChecklistItem"]:::plan
     Object10 & PgClassExpression19 & PgSelectInlineApply102 --> PgSelect70
-    List96{{"List[96∈3]<br />ᐸ95,26ᐳ<br />ᐳRelationalPost"}}:::plan
-    Access95{{"Access[95∈3]<br />ᐸ20.m.joinDetailsFor28ᐳ"}}:::plan
-    PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸrelational_postsᐳ"}}:::plan
+    List96{{"List[96∈3]^<br />ᐸ95,26ᐳ"}}:::plan
+    Access95{{"Access[95∈3]^<br />ᐸ20.m.joinDetailsFor28ᐳ"}}:::plan
+    PgSelectSingle26{{"PgSelectSingle[26∈3]^<br />ᐸrelational_postsᐳ"}}:::plan
     Access95 & PgSelectSingle26 --> List96
-    List100{{"List[100∈3]<br />ᐸ99,50ᐳ<br />ᐳRelationalChecklist"}}:::plan
-    Access99{{"Access[99∈3]<br />ᐸ46.m.joinDetailsFor52ᐳ"}}:::plan
-    PgSelectSingle50{{"PgSelectSingle[50∈3]<br />ᐸrelational_checklistsᐳ"}}:::plan
+    List100{{"List[100∈3]^<br />ᐸ99,50ᐳ"}}:::plan
+    Access99{{"Access[99∈3]^<br />ᐸ46.m.joinDetailsFor52ᐳ"}}:::plan
+    PgSelectSingle50{{"PgSelectSingle[50∈3]^<br />ᐸrelational_checklistsᐳ"}}:::plan
     Access99 & PgSelectSingle50 --> List100
-    List104{{"List[104∈3]<br />ᐸ103,74ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
-    Access103{{"Access[103∈3]<br />ᐸ70.m.joinDetailsFor76ᐳ"}}:::plan
-    PgSelectSingle74{{"PgSelectSingle[74∈3]<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
+    List104{{"List[104∈3]^<br />ᐸ103,74ᐳ"}}:::plan
+    Access103{{"Access[103∈3]^<br />ᐸ70.m.joinDetailsFor76ᐳ"}}:::plan
+    PgSelectSingle74{{"PgSelectSingle[74∈3]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     Access103 & PgSelectSingle74 --> List104
-    First24{{"First[24∈3]"}}:::plan
-    PgSelectRows25[["PgSelectRows[25∈3]"]]:::plan
+    First24{{"First[24∈3]^"}}:::plan
+    PgSelectRows25[["PgSelectRows[25∈3]^"]]:::plan
     PgSelectRows25 --> First24
     PgSelect20 --> PgSelectRows25
     First24 --> PgSelectSingle26
-    First30{{"First[30∈3]"}}:::plan
-    PgSelectRows31[["PgSelectRows[31∈3]"]]:::plan
+    First30{{"First[30∈3]^"}}:::plan
+    PgSelectRows31[["PgSelectRows[31∈3]^"]]:::plan
     PgSelectRows31 --> First30
-    Lambda97{{"Lambda[97∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda97{{"Lambda[97∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda97 --> PgSelectRows31
-    PgSelectSingle32{{"PgSelectSingle[32∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgSelectSingle32{{"PgSelectSingle[32∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
     First30 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression39
-    PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression45
-    First48{{"First[48∈3]"}}:::plan
-    PgSelectRows49[["PgSelectRows[49∈3]"]]:::plan
+    First48{{"First[48∈3]^"}}:::plan
+    PgSelectRows49[["PgSelectRows[49∈3]^"]]:::plan
     PgSelectRows49 --> First48
     PgSelect46 --> PgSelectRows49
     First48 --> PgSelectSingle50
-    First54{{"First[54∈3]"}}:::plan
-    PgSelectRows55[["PgSelectRows[55∈3]"]]:::plan
+    First54{{"First[54∈3]^"}}:::plan
+    PgSelectRows55[["PgSelectRows[55∈3]^"]]:::plan
     PgSelectRows55 --> First54
-    Lambda101{{"Lambda[101∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda101{{"Lambda[101∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda101 --> PgSelectRows55
-    PgSelectSingle56{{"PgSelectSingle[56∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgSelectSingle56{{"PgSelectSingle[56∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
     First54 --> PgSelectSingle56
-    PgClassExpression57{{"PgClassExpression[57∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgClassExpression57{{"PgClassExpression[57∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle56 --> PgClassExpression57
-    PgClassExpression63{{"PgClassExpression[63∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgClassExpression63{{"PgClassExpression[63∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
     PgSelectSingle56 --> PgClassExpression63
-    PgClassExpression69{{"PgClassExpression[69∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgClassExpression69{{"PgClassExpression[69∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
     PgSelectSingle56 --> PgClassExpression69
-    First72{{"First[72∈3]"}}:::plan
-    PgSelectRows73[["PgSelectRows[73∈3]"]]:::plan
+    First72{{"First[72∈3]^"}}:::plan
+    PgSelectRows73[["PgSelectRows[73∈3]^"]]:::plan
     PgSelectRows73 --> First72
     PgSelect70 --> PgSelectRows73
     First72 --> PgSelectSingle74
-    First78{{"First[78∈3]"}}:::plan
-    PgSelectRows79[["PgSelectRows[79∈3]"]]:::plan
+    First78{{"First[78∈3]^"}}:::plan
+    PgSelectRows79[["PgSelectRows[79∈3]^"]]:::plan
     PgSelectRows79 --> First78
-    Lambda105{{"Lambda[105∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda105{{"Lambda[105∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda105 --> PgSelectRows79
-    PgSelectSingle80{{"PgSelectSingle[80∈3]<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgSelectSingle80{{"PgSelectSingle[80∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
     First78 --> PgSelectSingle80
-    PgClassExpression81{{"PgClassExpression[81∈3]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgClassExpression81{{"PgClassExpression[81∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle80 --> PgClassExpression81
-    PgClassExpression87{{"PgClassExpression[87∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgClassExpression87{{"PgClassExpression[87∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
     PgSelectSingle80 --> PgClassExpression87
-    PgClassExpression93{{"PgClassExpression[93∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgClassExpression93{{"PgClassExpression[93∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
     PgSelectSingle80 --> PgClassExpression93
     PgSelect20 --> Access95
     List96 --> Lambda97
