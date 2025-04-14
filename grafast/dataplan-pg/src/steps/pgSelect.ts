@@ -1983,6 +1983,7 @@ export class PgSelectStep<
     $source: PgSelectStep<TResource>,
   ): StaticInfo<TResource> {
     return {
+      sourceStepDescription: `PgSelectStep[${$source.id}]`,
       forceIdentity: $source.forceIdentity,
       havingConditions: $source.havingConditions,
       mode: $source.mode,
@@ -2598,6 +2599,8 @@ interface PgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends PgStmtCommonQueryInfo,
     PgStmtCompileQueryInfo {
+  /** For debugging only */
+  readonly sourceStepDescription: string;
   readonly name: string;
   readonly resource: TResource;
   readonly mode: PgSelectMode;
@@ -2915,6 +2918,7 @@ function buildTheQuery<
     buildTheQueryCore(rawInfo);
 
   const {
+    sourceStepDescription,
     name,
     hasSideEffects,
     forceIdentity,
@@ -3244,6 +3248,7 @@ ${lateralText};`;
 }
 
 type StaticKeys =
+  | "sourceStepDescription"
   | "forceIdentity"
   | "havingConditions"
   | "mode"
@@ -3339,6 +3344,7 @@ class PgSelectInlineApplyStep<
 
           // Data that's independent of dependencies
           ...this.staticInfo,
+          sourceStepDescription: `PgSelectInlineApplyStep[${this.id}] (from ${this.staticInfo.sourceStepDescription})`,
         });
 
         const { cursorDigest, cursorIndicies, groupIndicies } = info;
@@ -3642,6 +3648,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
   return {
+    comment: sql.comment(`From ${info.sourceStepDescription}`),
     selects,
     from,
     joins: info.joins,
@@ -3674,6 +3681,7 @@ function buildQueryFromParts(
   options: { asArray?: boolean } = {},
 ) {
   const {
+    comment,
     selects,
     from,
     joins,
@@ -3690,7 +3698,7 @@ function buildQueryFromParts(
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
-  const baseQuery = sql`${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
+  const baseQuery = sql`${comment}${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   return { sql: baseQuery, extraSelectIndexes };
 }
 

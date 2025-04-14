@@ -407,9 +407,11 @@ ${duration}
             }
           }
 
-          const textAndValues = `${common.text}\n${JSON.stringify(
-            rawSqlValues,
-          )}`;
+          const text = isDev
+            ? common.text.replace(/\/\*.*?\*\//g, "")
+            : common.text;
+
+          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
             cacheForQuery = new Map();
