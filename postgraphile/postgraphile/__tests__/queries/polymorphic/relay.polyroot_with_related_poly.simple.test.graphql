@@ -1,0 +1,17 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+
+query {
+  allRelationalItems {
+    nodes {
+      id
+      type
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+}
