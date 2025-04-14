@@ -14,6 +14,7 @@ export const Mermaid: FC<{ plan: GrafastPlanJSON }> = ({ plan }) => {
         window.mermaid.initialize({
           startOnLoad: true,
           maxTextSize: 1000000,
+          maxEdges: 1000,
         });
       }
       if (diagram) {
