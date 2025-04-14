@@ -117,6 +117,10 @@ type ProcessStepActionDescription =
   | "optimize"
   | "optimizeDataOnly";
 
+type Todo = ReadonlyArray<
+  [string, QueueTuple<CommonPlanningParametersTuple<GraphQLOutputType>>[]]
+>;
+
 const atpe =
   typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
@@ -440,7 +444,7 @@ export class OperationPlan {
     );
     // this.rootLayerPlan.parentStep = this.trackedRootValueStep;
 
-    this.deduplicateSteps();
+    this.deduplicateSteps(null);
 
     this.lap("init");
 
@@ -477,9 +481,6 @@ export class OperationPlan {
     this.lap("treeShakeSteps", "optimize");
 
     // Replace/inline/optimise steps
-    te.batch(() => {
-      this.optimizeDataOnlySteps();
-    });
     te.batch(() => {
       this.optimizeSteps();
     });
@@ -1571,10 +1572,9 @@ export class OperationPlan {
   }
 
   private planPending() {
+    const steps = new Set<Step>();
     for (let depth = 0; depth < MAX_DEPTH; depth++) {
       // Process the next batch
-
-      this.deduplicateSteps();
 
       const l = this.planningQueue.length;
       if (l === 0) break;
@@ -1585,10 +1585,13 @@ export class OperationPlan {
       }
 
       const batch = this.planningQueue.splice(0, l);
-      const todo = [...this.planningQueueByPlanningPath.entries()];
+      const todo: Todo = [...this.planningQueueByPlanningPath.entries()];
       this.planningQueueByPlanningPath.clear();
 
-      const steps = new Set<Step>();
+      // First, do a planning-path-aware deduplicate
+      this.deduplicateSteps(todo);
+
+      // Now plan this layer
       for (const [planningPath, batch] of todo) {
         if (this.frozenPlanningPaths.has(planningPath)) {
           throw new Error(
@@ -1803,6 +1806,9 @@ export class OperationPlan {
         fn.apply(this, args as Parameters<typeof fn>);
       }
     }
+
+    // A final deduplicate and cleanup of data-only steps
+    this.deduplicateSteps([]);
   }
 
   private internalDependency<TStep extends Step>($step: TStep): TStep {
@@ -2638,7 +2644,7 @@ export class OperationPlan {
         this.replaceStep(step, replacementStep);
       }
       if (actionDescription !== "deduplicate") {
-        this.deduplicateSteps();
+        this.deduplicateSteps(null);
       }
     }
 
@@ -3482,7 +3488,7 @@ export class OperationPlan {
    * former SELECT additional fields, then transform the results back to what
    * our child plans would be expecting.
    */
-  private deduplicateSteps(): void {
+  private deduplicateSteps(todo: Todo | null): void {
     const start = this.stepTracker.nextStepIdToDeduplicate;
     if (start === this.stepTracker.stepCount) {
       // No action necessary since there are no new steps
@@ -3490,15 +3496,16 @@ export class OperationPlan {
     }
 
     // Before deduplication, we try and pair up all the data-only steps across
-    // polymorphism
-    this.resolveDataOnlySince(start);
+    // polymorphism, and trim any empty ones
+    if (todo != null) {
+      this.resolveDataOnlySince(start, todo);
+      // For any data only steps with just a single dependency we replace
+      // them with that dependency.
+      this.trimUnnecessaryDataOnlySince(start);
+    }
 
     // Then we deduplicate
     this._deduplicateStepsInner(start, 0);
-
-    // Finally, for any data only steps with just a single dependency we
-    // replace them with that dependency.
-    this.trimUnnecessaryDataOnlySince(start);
   }
 
   private _deduplicateStepsInner(start: number, depth: number): void {
@@ -3530,14 +3537,23 @@ export class OperationPlan {
     }
   }
 
-  resolveDataOnlySince(sinceStepId: number) {}
+  private resolveDataOnlySince(sinceStepId: number, todo: Todo) {
+    for (const [planningPath, batch] of todo) {
+      if (batch.length <= 1) continue;
+      const stepSet = new Set<Step>();
+      for (const entry of batch) {
+        const rawStep = entry[1][IDX_PARENT_STEP];
+        const $step = this.stepTracker.getStepById(rawStep.id);
+        if ($step.id < sinceStepId) continue; // < Wanted?
+        stepSet.add($step);
+      }
+      if (stepSet.size <= 1) continue;
+      this.deduplicateStepsAtPlanningPath(stepSet);
+    }
+  }
 
-  trimUnnecessaryDataOnlySince(sinceStepId: number) {}
-
-  private deduplicateStepsAtPlanningPath(
-    planningPath: string,
-    stepSet: Set<Step>,
-  ) {
+  private deduplicateStepsAtPlanningPath(stepSet: Set<Step>) {
+    // TODO: recurse
     const handledSteps = new Set<Step>();
     /** Guaranteed to not have duplicates */
     const steps = [...stepSet];
@@ -3731,22 +3747,20 @@ export class OperationPlan {
     step.isOptimized = true;
     return replacementStep;
   }
-  private optimizeDataOnlySteps() {
-    this.processSteps(
-      "optimizeDataOnly",
-      "dependencies-first",
-      false,
-      (step) => {
-        if (step instanceof __DataOnlyStep) {
-          const wasLocked = isDev && unlock(step);
-          const replacement = step.optimize();
-          if (wasLocked) lock(step);
-          return replacement;
-        } else {
-          return step;
-        }
-      },
-    );
+
+  private trimUnnecessaryDataOnlySince(sinceStepId: number) {
+    for (let i = sinceStepId, l = this.stepTracker.stepCount; i < l; i++) {
+      const step = this.stepTracker.stepById[i];
+      if (step == null || step.id !== i || !(step instanceof __DataOnlyStep)) {
+        continue;
+      }
+      const wasLocked = isDev && unlock(step);
+      const $replacement = step.optimize();
+      if (wasLocked) lock(step);
+      if ($replacement !== step) {
+        this.stepTracker.replaceStep(step, $replacement);
+      }
+    }
   }
 
   /**
