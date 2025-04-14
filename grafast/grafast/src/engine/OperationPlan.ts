@@ -771,8 +771,6 @@ export class OperationPlan {
       throw new SafeError("No mutation type found in schema");
     }
 
-    this.deduplicateSteps();
-
     const locationDetails: LocationDetails = {
       node: this.operation.selectionSet.selections,
       parentTypeName: null,
@@ -906,7 +904,7 @@ export class OperationPlan {
         () => new __ItemStep(subscribeStep),
       );
       subscriptionEventLayerPlan.setRootStep($__item);
-      let streamItemPlan = hasItemPlan(subscribeStep)
+      const streamItemPlan = hasItemPlan(subscribeStep)
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
@@ -915,10 +913,6 @@ export class OperationPlan {
             $__item,
           )
         : $__item;
-
-      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
-      this.deduplicateSteps();
-      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
 
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
@@ -996,7 +990,7 @@ export class OperationPlan {
 
       subscriptionEventLayerPlan.setRootStep($__item);
 
-      let streamItemPlan = hasItemPlan(subscribeStep)
+      const streamItemPlan = hasItemPlan(subscribeStep)
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
@@ -1005,10 +999,6 @@ export class OperationPlan {
             $__item,
           )
         : $__item;
-
-      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
-      this.deduplicateSteps();
-      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
 
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
