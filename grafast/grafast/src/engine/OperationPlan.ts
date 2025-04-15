@@ -3678,7 +3678,7 @@ export class OperationPlan {
         // Looks like a peer
         peers.push(potentialPeer);
       }
-      if (peers.length > 0) {
+      if (peers.length > 1) {
         const duplicates = step.deduplicate(peers);
         if (duplicates.length > 0) {
           const polymorphicPaths = new Set(step.polymorphicPaths);
@@ -3688,10 +3688,6 @@ export class OperationPlan {
               polymorphicPaths.add(p);
             }
             handledSteps.add(dupe);
-            const wasLocked = isDev && unlock(dupe);
-            dupe.deduplicatedWith?.(step);
-            if (wasLocked) lock(dupe);
-            this.stepTracker.replaceStep(dupe, step);
 
             // Merge `dataOnlyDepIndexesToMerge`
             for (const dataOnlyDepIndex of dataOnlyDepIndexesToMerge) {
