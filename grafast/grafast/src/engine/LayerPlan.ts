@@ -5,11 +5,7 @@ import te from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { inspect } from "../inspect.js";
-import type {
-  BatchExecutionValue,
-  ExecutionValue,
-  UnaryExecutionValue,
-} from "../interfaces.js";
+import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,

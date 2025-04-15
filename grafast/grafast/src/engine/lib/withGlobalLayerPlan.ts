@@ -1,5 +1,5 @@
 import type { Step } from "../..";
-import { operationPlan } from "../..";
+import { operationPlan } from "../../steps/index.js";
 import type { LayerPlan } from "../LayerPlan";
 
 let globalData_layerPlan: LayerPlan | undefined = undefined;

@@ -2918,7 +2918,6 @@ function buildTheQuery<
     buildTheQueryCore(rawInfo);
 
   const {
-    sourceStepDescription,
     name,
     hasSideEffects,
     forceIdentity,

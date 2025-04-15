@@ -3,7 +3,6 @@ import type { ExecutionDetails } from "../index.js";
 import { $$inhibit, operationPlan } from "../index.js";
 import {
   FLAG_INHIBITED,
-  FLAG_NULL,
   FLAG_POLY_SKIPPED,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";

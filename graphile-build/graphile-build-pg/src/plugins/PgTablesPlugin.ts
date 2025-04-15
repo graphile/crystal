@@ -4,14 +4,8 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgSelectSingleStep,
 } from "@dataplan/pg";
-import {
-  assertPgClassSingleStep,
-  makePgResourceOptions,
-  pgSelectSingleFromRecord,
-} from "@dataplan/pg";
-import type { Step } from "grafast";
+import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
@@ -685,9 +679,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
-              const resource = Object.values(
-                build.input.pgRegistry.pgResources,
-              ).find((r) => !r.parameters && r.codec === codec);
+              // const resource = Object.values(
+              //   build.input.pgRegistry.pgResources,
+              // ).find((r) => !r.parameters && r.codec === codec);
               build.registerObjectType(
                 tableTypeName,
                 {

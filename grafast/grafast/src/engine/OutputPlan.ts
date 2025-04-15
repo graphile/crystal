@@ -19,7 +19,6 @@ import type {
   ExecutionEntryFlags,
   JSONValue,
   LocationDetails,
-  Maybe,
 } from "../interfaces.js";
 import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
@@ -27,10 +26,7 @@ import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
-import {
-  layerPlanHeirarchyContains,
-  pathsFromAncestorToTargetLayerPlan,
-} from "./OperationPlan.js";
+import { pathsFromAncestorToTargetLayerPlan } from "./OperationPlan.js";
 
 const {
   executeSync,

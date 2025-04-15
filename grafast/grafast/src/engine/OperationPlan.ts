@@ -93,7 +93,6 @@ import {
 } from "../utils.js";
 import type {
   LayerPlanPhase,
-  LayerPlanReason,
   LayerPlanReasonCombined,
   LayerPlanReasonListItemStream,
   LayerPlanReasonPolymorphic,
@@ -201,24 +200,6 @@ const NO_ARGS: TrackedArguments = {
     throw new Error(`This field doesn't have any arguments`);
   },
 };
-
-interface PendingSelectionSet {
-  // These must be in common for all grouped selection sets
-  loc: string[] | null;
-  path: readonly string[];
-  planningPath: string;
-  objectType: GraphQLObjectType;
-  isMutation: boolean;
-
-  // This may be replaced via the export/import mechanic
-  parentStep: Step;
-
-  // These differ on a per-selection-set basis
-  outputPlan: OutputPlan;
-  polymorphicPaths: ReadonlySet<string> | null;
-  selections: readonly SelectionNode[];
-  resolverEmulation: boolean;
-}
 
 export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
@@ -2362,7 +2343,6 @@ export class OperationPlan {
     // If 'null' this is neither subscribe field nor list field
     // Otherwise, it's a list field that has the `@stream` directive applied
     streamDetails: StreamDetails | true | false | null,
-    deduplicate = true,
   ): { haltTree: boolean; step: Step } {
     const coordinate = `${typeName}.${fieldName}`;
 
@@ -4002,7 +3982,7 @@ export class OperationPlan {
         Step | undefined
       >();
 
-      function getLatestSideEffectStepFor(step: Step) {
+      const getLatestSideEffectStepFor = (step: Step) => {
         const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
         const latestSideEffectStep = latestSideEffectStepByPolymorphicPath.get(
           polymorphicPaths[0],
@@ -4018,15 +3998,15 @@ export class OperationPlan {
           }
         }
         return latestSideEffectStep;
-      }
+      };
 
-      function setLatestSideEffectStep(step: Step) {
+      const setLatestSideEffectStep = (step: Step) => {
         const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
         // Store this side effect for use from now on
         for (let i = 0, l = polymorphicPaths.length; i < l; i++) {
           latestSideEffectStepByPolymorphicPath.set(polymorphicPaths[i], step);
         }
-      }
+      };
 
       const processSideEffectPlan = (step: Step) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {

@@ -2,7 +2,7 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddDependencyOptions } from "../interfaces.js";
-import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
+import { $$subroutine, ALL_FLAGS } from "../interfaces.js";
 import { Step } from "../step.js";
 import { __dataOnly } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";
