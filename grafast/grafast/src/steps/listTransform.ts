@@ -159,6 +159,7 @@ export class __ListTransformStep<
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listStep.polymorphicPaths,
+      null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listStep);

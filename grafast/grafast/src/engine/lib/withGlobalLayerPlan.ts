@@ -1,9 +1,11 @@
 import type { Step } from "../..";
+import { operationPlan } from "../..";
 import type { LayerPlan } from "../LayerPlan";
 
 let globalData_layerPlan: LayerPlan | undefined = undefined;
 let globalData_polymorphicPaths: ReadonlySet<string> | null | undefined =
   undefined;
+let globalData_planningPath: string | undefined = undefined;
 
 export function withGlobalLayerPlan<
   T,
@@ -12,6 +14,7 @@ export function withGlobalLayerPlan<
 >(
   layerPlan: LayerPlan,
   polymorphicPaths: ReadonlySet<string> | null,
+  planningPath: string | null,
   callback: (this: TThis, ...args: TArgs) => T,
   callbackThis?: TThis,
   ...callbackArgs: TArgs
@@ -20,11 +23,17 @@ export function withGlobalLayerPlan<
   globalData_layerPlan = layerPlan;
   const oldPolymorphicPaths = globalData_polymorphicPaths;
   globalData_polymorphicPaths = polymorphicPaths;
+  const oldPlanningPath = globalData_planningPath;
+  // Keep the old planning path if we've not been given a new one
+  if (planningPath != null) {
+    globalData_planningPath = planningPath;
+  }
   try {
     return callback.apply(callbackThis as TThis, callbackArgs);
   } finally {
     globalData_layerPlan = oldLayerPlan;
     globalData_polymorphicPaths = oldPolymorphicPaths;
+    globalData_planningPath = oldPlanningPath;
   }
 }
 
@@ -45,6 +54,16 @@ export function currentPolymorphicPaths(): ReadonlySet<string> | null {
     );
   }
   return globalData_polymorphicPaths;
+}
+
+export function currentPlanningPath(): string | undefined {
+  const opPlan = operationPlan();
+  if (opPlan.phase === "plan" && globalData_planningPath === undefined) {
+    console.warn(
+      "GrafastInternalWarning<6a484dc3-a690-493c-b8b3-d6196bf2c290>: currentPlanningPath could not retrieve the current path even in 'plan' phase",
+    );
+  }
+  return globalData_planningPath;
 }
 
 export function isUnaryStep($step: Step): boolean {

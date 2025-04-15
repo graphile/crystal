@@ -357,12 +357,22 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
   }
 
   /** @experimental */
   public withLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
   }
 
   protected getStep(id: number): Step {

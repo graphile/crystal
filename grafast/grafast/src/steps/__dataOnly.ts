@@ -1,3 +1,4 @@
+import { currentPlanningPath } from "../engine/lib/withGlobalLayerPlan.js";
 import type { ExecutionDetails } from "../index.js";
 import { $$inhibit, operationPlan } from "../index.js";
 import {
@@ -103,9 +104,15 @@ export function __dataOnly<T>(step: Step<T>) {
   }
   const opPlan = operationPlan();
   if (opPlan.phase === "plan") {
-    // WARN: DO NOT CACHE THIS! Different fields will want to use this in
-    // different ways, we must deduplicate them all separately.
-    return new __DataOnlyStep<T>(step);
+    // WARN: DO NOT CACHE THIS beyond the current planning path! Different
+    // fields will want to use this in different ways, we must deduplicate them
+    // all separately.
+    return opPlan.cacheStep(
+      step,
+      "__dataOnly",
+      currentPlanningPath(),
+      () => new __DataOnlyStep<T>(step),
+    );
   } else {
     // Only use data-only during planning phase
     return step;
