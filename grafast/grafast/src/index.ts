@@ -38,6 +38,14 @@ import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
+import {
+  context,
+  debugPlans,
+  operationPlan,
+  rootValue,
+  trackedContext,
+  trackedRootValue,
+} from "./global.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
   $$cacheByOperation,
@@ -164,9 +172,7 @@ import {
   ConnectionStep,
   constant,
   ConstantStep,
-  context,
   createObjectAndApplyChildren,
-  debugPlans,
   each,
   EdgeCapableStep,
   EdgeStep,
@@ -214,7 +220,6 @@ import {
   object,
   ObjectPlanMeta,
   ObjectStep,
-  operationPlan,
   PageInfoCapableStep,
   partitionByIndex,
   polymorphicBranch,
@@ -228,15 +233,12 @@ import {
   reverse,
   reverseArray,
   ReverseStep,
-  rootValue,
   Setter,
   setter,
   SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
-  trackedContext,
-  trackedRootValue,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
