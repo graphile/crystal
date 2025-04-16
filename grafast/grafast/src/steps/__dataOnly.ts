@@ -23,11 +23,6 @@ export class __DataOnlyStep<T> extends Step<T> {
 
   constructor(dep: Step<T>, polymorphicPaths: ReadonlySet<string>) {
     super();
-
-    // This hack exists because how do we figure out which value to use
-    this._isUnary = false;
-    this._isUnaryLocked = true;
-
     this.__trappableFlags = TRAPPABLE_OR_POLY_SKIPPED;
     this.allowMultipleOptimizations = true;
     this.addDepForPaths(dep, polymorphicPaths);
@@ -143,6 +138,8 @@ export function __dataOnly<T>(step: Step<T>) {
       // Only needed for polymorphism
       return step;
     }
+    return new __DataOnlyStep<T>(step, polyPaths);
+    /*
     // WARN: DO NOT CACHE THIS beyond the current planning path! Different
     // fields will want to use this in different ways, we must deduplicate them
     // all separately.
@@ -152,6 +149,7 @@ export function __dataOnly<T>(step: Step<T>) {
       currentPlanningPath(),
       () => new __DataOnlyStep<T>(step, polyPaths),
     );
+    */
   } else {
     // Only use data-only during planning phase
     return step;

@@ -3608,6 +3608,7 @@ export class OperationPlan {
 
       const sstep = sudo(step);
       const stepConstructor = sstep.constructor;
+      const stepIsUnary = sstep._isUnary;
       const stepPeerKey = sstep.peerKey;
       const stepLayerPlan = sstep.layerPlan;
       const depCount = sstep.dependencies.length;
@@ -3633,6 +3634,7 @@ export class OperationPlan {
         // same layer plan.
         if (rawPotentialPeer.layerPlan !== stepLayerPlan) continue;
         if (rawPotentialPeer.constructor !== stepConstructor) continue;
+        if (rawPotentialPeer._isUnary !== stepIsUnary) continue;
         if (!rawPotentialPeer.polymorphicPaths) continue;
         for (const p of rawPotentialPeer.polymorphicPaths) {
           if (polymorphicPaths.has(p)) {
@@ -3660,6 +3662,9 @@ export class OperationPlan {
           ) {
             // Allowed!
           } else if (
+            // Cannot deduplicate data only step that is depended on by a
+            // unary step
+            !sstep._isUnary &&
             stepDep instanceof __DataOnlyStep &&
             peerDep instanceof __DataOnlyStep
           ) {
