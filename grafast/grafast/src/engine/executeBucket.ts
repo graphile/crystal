@@ -979,6 +979,9 @@ export function executeBucket(
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     // DELIBERATE SHADOWING!
     const size = step._isUnary ? 1 : bucket.size;
+    const polymorphicPathList = step._isUnary
+      ? [null] // TODO: this feels wrong
+      : bucket.polymorphicPathList;
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
@@ -1061,14 +1064,14 @@ export function executeBucket(
             dependencies,
             _rawForbiddenFlags,
             _rawOnReject,
-            bucket.polymorphicPathList,
+            polymorphicPathList,
             extra,
           )
         : reallyExecuteStepWithoutFiltering(
             size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
-            bucket.polymorphicPathList,
+            polymorphicPathList,
             extra,
           );
       if (isPromiseLike(result)) {
