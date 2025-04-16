@@ -104,9 +104,16 @@ export function executeBucket(
     size: number,
     step: Step,
     dependencies: ReadonlyArray<ExecutionValue>,
+    polymorphicPathList: ReadonlyArray<string | null>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
-    const results = executeOrStream(size, step, dependencies, extra);
+    const results = executeOrStream(
+      size,
+      step,
+      dependencies,
+      polymorphicPathList,
+      extra,
+    );
     const flags = arrayOfLength(size, NO_FLAGS);
     if (isPromiseLike(results)) {
       return results.then((results) => ({ flags, results }));
@@ -729,17 +736,25 @@ export function executeBucket(
     count: number,
     step: Step,
     values: ReadonlyArray<ExecutionValue>,
+    polymorphicPathList: ReadonlyArray<string | null>,
     extra: ExecutionExtra,
   ): ExecutionResults<any> {
-    if (isDev && step._isUnary && count !== 1) {
-      throw new Error(
-        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
-      );
-    }
-    if (step.execute.length > 1) {
-      throw new Error(
-        `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
-      );
+    if (isDev) {
+      if (step._isUnary && count !== 1) {
+        throw new Error(
+          `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
+        );
+      }
+      if (polymorphicPathList.length !== count) {
+        throw new Error(
+          `GrafastInternalError<1ad4fa5b-211d-4985-b8e9-b34400c78780>: Issue constructing polymorphicPathList for ${step}`,
+        );
+      }
+      if (step.execute.length > 1) {
+        throw new Error(
+          `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
+        );
+      }
     }
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
@@ -748,7 +763,7 @@ export function executeBucket(
       values,
       extra,
       stream: evaluateStream(bucket, step),
-      polymorphicPathList: bucket.polymorphicPathList,
+      polymorphicPathList,
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -789,6 +804,7 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
+    const newPolymorphicPathList: (string | null)[] = [];
     let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
     const dependenciesIncludingSideEffectsCount =
@@ -896,7 +912,8 @@ export function executeBucket(
         forcedValues.flags[dataIndex] = indexFlags;
         forcedValues.results[dataIndex] = forceIndexValue;
       } else {
-        newSize++;
+        const newIndex = newSize++;
+        newPolymorphicPathList[newIndex] = polymorphicPathList[dataIndex];
         if (needsTransform) {
           // dependenciesWithoutErrors has limited content; add this non-error value
           for (
@@ -923,6 +940,7 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
+        newPolymorphicPathList,
         extra,
       );
       if (isPromiseLike(resultWithoutErrors)) {
@@ -947,6 +965,7 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
+        polymorphicPathList,
         extra,
       );
     }
@@ -1049,6 +1068,7 @@ export function executeBucket(
             size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
+            bucket.polymorphicPathList,
             extra,
           );
       if (isPromiseLike(result)) {
