@@ -986,6 +986,7 @@ export function executeBucket(
     step: Step,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     // DELIBERATE SHADOWING!
+    const size = step._isUnary ? 1 : bucket.size;
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
