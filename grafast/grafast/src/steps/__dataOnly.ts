@@ -105,10 +105,11 @@ export class __DataOnlyStep<T> extends Step<T> {
   }
 
   optimize(): Step<T> {
-    if (this.dependencies.length === 1) {
-      return this.dependencies[0];
+    const firstDep = this.dependencies[0];
+    for (const dep of this.dependencies) {
+      if (dep !== firstDep) return this;
     }
-    return this;
+    return firstDep;
   }
 
   execute(details: ExecutionDetails) {
