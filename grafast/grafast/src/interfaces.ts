@@ -849,14 +849,24 @@ export type Maybe<T> = T | null | undefined;
 
 export type * from "./planJSONInterfaces.js";
 
-export interface AddDependencyOptions<TStep extends Step = Step> {
+export interface BaseDependencyOptions<TStep extends Step = Step> {
   step: TStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Maybe<Error>;
+}
+
+export interface AddDependencyOptions<TStep extends Step = Step>
+  extends BaseDependencyOptions<TStep> {
+  nonUnaryMessage?: never;
   dataOnly?: boolean;
+}
+
+export interface AddUnaryDependencyOptions<TStep extends Step = Step>
+  extends BaseDependencyOptions<TStep> {
   nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
+  dataOnly?: never;
 }
 
 export interface DependencyOptions<TStep extends Step = Step> {

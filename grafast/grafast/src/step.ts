@@ -20,6 +20,7 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   AddDependencyOptions,
+  AddUnaryDependencyOptions,
   DependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
@@ -558,9 +559,9 @@ export /* abstract */ class Step<TData = any> {
    * directly.
    */
   protected addUnaryDependency(
-    stepOrOptions: Step | AddDependencyOptions,
+    stepOrOptions: Step | AddUnaryDependencyOptions,
   ): number {
-    const options: AddDependencyOptions =
+    const options: AddUnaryDependencyOptions =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(

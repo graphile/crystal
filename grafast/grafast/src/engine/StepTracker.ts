@@ -1,7 +1,10 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
-import type { AddDependencyOptions } from "../interfaces.js";
+import type {
+  AddDependencyOptions,
+  AddUnaryDependencyOptions,
+} from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS } from "../interfaces.js";
 import { Step } from "../step.js";
 import { __dataOnly } from "../steps/__dataOnly.js";
@@ -401,15 +404,20 @@ export class StepTracker {
 
   public addStepUnaryDependency(
     $dependent: Step,
-    options: AddDependencyOptions,
+    options: AddUnaryDependencyOptions,
   ): number {
+    if (options.dataOnly) {
+      throw new Error(
+        `${$dependent} attempted to add dataOnly unary dependency; this is not permitted.`,
+      );
+    }
     const $dependency = options.step;
+    const { nonUnaryMessage = defaultNonUnaryMessage, ...rest } = options;
     if (!$dependency._isUnary) {
-      const { nonUnaryMessage = defaultNonUnaryMessage } = options;
       throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, options);
+    return this.addStepDependency($dependent, { ...rest, dataOnly: false });
   }
 
   public setOutputPlanRootStep(outputPlan: OutputPlan, $dependency: Step) {
