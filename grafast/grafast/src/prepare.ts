@@ -1054,28 +1054,32 @@ function processBatches(
   whenDone: Deferred<void>,
   asString: boolean,
 ) {
-  // Key is only used for batching
-  const promises: PromiseLike<void>[] = [];
-  for (const [requestContext, batches] of batchesByRequestTools.entries()) {
-    for (const [outputPlan, specs] of batches.entries()) {
-      const promise = processSingleDeferred(
-        requestContext,
-        outputPlan,
-        specs,
-        asString,
-      );
-      if (isPromiseLike(promise)) {
-        promises.push(promise);
+  try {
+    // Key is only used for batching
+    const promises: PromiseLike<void>[] = [];
+    for (const [requestContext, batches] of batchesByRequestTools.entries()) {
+      for (const [outputPlan, specs] of batches.entries()) {
+        const promise = processSingleDeferred(
+          requestContext,
+          outputPlan,
+          specs,
+          asString,
+        );
+        if (isPromiseLike(promise)) {
+          promises.push(promise);
+        }
       }
     }
-  }
-  if (promises.length > 0) {
-    Promise.all(promises).then(
-      () => whenDone.resolve(),
-      (e) => whenDone.reject(e),
-    );
-  } else {
-    whenDone.resolve();
+    if (promises.length > 0) {
+      Promise.all(promises).then(
+        () => whenDone.resolve(),
+        (e) => whenDone.reject(e),
+      );
+    } else {
+      whenDone.resolve();
+    }
+  } catch (e) {
+    whenDone.reject(e);
   }
 }
 
