@@ -9,9 +9,9 @@ graph TD
 
     subgraph "Buckets for mutations/v4/mutation-update-undefined.variables"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 28, 20<br /><br />1: PgUpdateSingle[15]<br />2: <br />ᐳ: Object[21]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgUpdateSingle{1}ᐸsimilar_table_1(id;)ᐳ[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 25, 18<br /><br />1: PgUpdateSingle[14]<br />2: <br />ᐳ: Object[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgUpdateSingle{1}ᐸsimilar_table_1(id;)ᐳ[14]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -19,47 +19,47 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ3ᐳ"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant28 & __InputObject9 --> __InputObject6
+    Constant25 & __InputObject9 --> __InputObject6
     Access10{{"Access[10∈0] ➊<br />ᐸ0.nnValueᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ0.nullValueᐳ"}}:::plan
-    Access10 & Access13 --> __InputObject9
-    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access16 & Access18 --> Object19
+    Access12{{"Access[12∈0] ➊<br />ᐸ0.nullValueᐳ"}}:::plan
+    Access10 & Access12 --> __InputObject9
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15 & Access16 --> Object17
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access10
-    __Value0 --> Access13
+    __Value0 --> Access12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access15
     __Value2 --> Access16
-    __Value2 --> Access18
-    ApplyInput20{{"ApplyInput[20∈0] ➊"}}:::plan
-    __InputObject6 --> ApplyInput20
+    ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput18
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸsimilar_table_1(id;)ᐳ"]]:::sideeffectplan
-    Object19 & Constant28 & ApplyInput20 --> PgUpdateSingle15
-    Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle15 --> Object21
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
-    Access23{{"Access[23∈3] ➊<br />ᐸ15.tᐳ"}}:::plan
-    Access23 --> PgClassExpression22
-    PgUpdateSingle15 --> Access23
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__similar_...1__.”col1”ᐳ"}}:::plan
-    Access23 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    Access23 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__similar_...1__.”col3”ᐳ"}}:::plan
-    Access23 --> PgClassExpression27
+    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸsimilar_table_1(id;)ᐳ"]]:::sideeffectplan
+    Object17 & Constant25 & ApplyInput18 --> PgUpdateSingle14
+    Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle14 --> Object19
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    Access21{{"Access[21∈3] ➊<br />ᐸ14.tᐳ"}}:::plan
+    Access21 --> PgClassExpression20
+    PgUpdateSingle14 --> Access21
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__similar_...1__.”col1”ᐳ"}}:::plan
+    Access21 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    Access21 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__similar_...1__.”col3”ᐳ"}}:::plan
+    Access21 --> PgClassExpression24
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputObject6,__InputObject9,Access10,Access13,Access16,Access18,Object19,ApplyInput20,Constant28 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,__InputObject6,__InputObject9,Access10,Access12,Access15,Access16,Object17,ApplyInput18,Constant25 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUpdateSingle15,Object21 bucket1
+    class Bucket1,PgUpdateSingle14,Object19 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,Access23,PgClassExpression25,PgClassExpression26,PgClassExpression27 bucket3
+    class Bucket3,PgClassExpression20,Access21,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
 

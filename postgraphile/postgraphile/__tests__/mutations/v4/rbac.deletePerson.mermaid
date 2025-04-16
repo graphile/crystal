@@ -9,45 +9,45 @@ graph TD
 
     subgraph "Buckets for mutations/v4/rbac.deletePerson"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 23, 14, 16<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[15]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 16, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 20, 13, 15<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 9, 15, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant23 --> __InputObject6
-    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant20 --> __InputObject6
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access10 & Access12 --> Object13
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
-    __Value2 --> Access12
-    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
-    __InputObject6 --> ApplyInput14
+    __Value2 --> Access11
+    ApplyInput13{{"ApplyInput[13∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant16{{"Constant[16∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    Constant15{{"Constant[15∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
-    Object13 & Constant23 & ApplyInput14 --> PgDeleteSingle9
-    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgDeleteSingle9 --> Object15
-    List20{{"List[20∈2] ➊<br />ᐸ16,17ᐳ"}}:::plan
-    PgClassExpression17{{"PgClassExpression[17∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant16 & PgClassExpression17 --> List20
-    Access18{{"Access[18∈2] ➊<br />ᐸ9.tᐳ"}}:::plan
-    Access18 --> PgClassExpression17
-    PgDeleteSingle9 --> Access18
-    Lambda21{{"Lambda[21∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List20 --> Lambda21
+    Object12 & Constant20 & ApplyInput13 --> PgDeleteSingle9
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgDeleteSingle9 --> Object14
+    List18{{"List[18∈2] ➊<br />ᐸ15,16ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant15 & PgClassExpression16 --> List18
+    Access17{{"Access[17∈2] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access17 --> PgClassExpression16
+    PgDeleteSingle9 --> Access17
+    Lambda19{{"Lambda[19∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List18 --> Lambda19
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access12,Object13,ApplyInput14,Constant16,Constant23 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant15,Constant20 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDeleteSingle9,Object15 bucket1
+    class Bucket1,PgDeleteSingle9,Object14 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression17,Access18,List20,Lambda21 bucket2
+    class Bucket2,PgClassExpression16,Access17,List18,Lambda19 bucket2
 

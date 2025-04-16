@@ -9,48 +9,48 @@ graph TD
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-bigNumbers"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 17, 26<br /><br />1: PgSelect[11]<br />2: PgSelectRows[22]<br />ᐳ: 21, 24, 25"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 24, 25<br /><br />ROOT Object{1}ᐸ{result}ᐳ[25]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
-    Constant28 & Constant29 & Constant30 --> __InputObject6
-    PgFromExpression17{{"PgFromExpression[17∈0] ➊"}}:::plan
-    Constant28 & Constant29 & Constant30 --> PgFromExpression17
-    Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant22{{"Constant[22∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ'1234567890123456789.123456789'ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸ'987654321098765432'ᐳ"}}:::plan
+    Constant22 & Constant23 & Constant24 --> __InputObject6
+    PgFromExpression15{{"PgFromExpression[15∈0] ➊"}}:::plan
+    Constant22 & Constant23 & Constant24 --> PgFromExpression15
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access12 & Access14 --> Object15
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access12 & Access13 --> Object14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
-    __Value2 --> Access14
-    ApplyInput26{{"ApplyInput[26∈0] ➊"}}:::plan
-    __InputObject6 --> ApplyInput26
+    __Value2 --> Access13
+    ApplyInput20{{"ApplyInput[20∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput20
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
-    Object15 & PgFromExpression17 & ApplyInput26 --> PgSelect11
-    First21{{"First[21∈1] ➊"}}:::plan
-    PgSelectRows22[["PgSelectRows[22∈1] ➊"]]:::plan
-    PgSelectRows22 --> First21
-    PgSelect11 --> PgSelectRows22
-    PgSelectSingle24{{"PgSelectSingle[24∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
-    First21 --> PgSelectSingle24
-    Object25{{"Object[25∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle24 --> Object25
-    PgClassExpression27{{"PgClassExpression[27∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression27
+    Object14 & PgFromExpression15 & ApplyInput20 --> PgSelect11
+    First16{{"First[16∈1] ➊"}}:::plan
+    PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
+    PgSelectRows17 --> First16
+    PgSelect11 --> PgSelectRows17
+    PgSelectSingle18{{"PgSelectSingle[18∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
+    First16 --> PgSelectSingle18
+    Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle18 --> Object19
+    PgClassExpression21{{"PgClassExpression[21∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression21
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access12,Access14,Object15,PgFromExpression17,ApplyInput26,Constant28,Constant29,Constant30 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access12,Access13,Object14,PgFromExpression15,ApplyInput20,Constant22,Constant23,Constant24 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect11,First21,PgSelectRows22,PgSelectSingle24,Object25 bucket1
+    class Bucket1,PgSelect11,First16,PgSelectRows17,PgSelectSingle18,Object19 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression27 bucket2
+    class Bucket2,PgClassExpression21 bucket2
 

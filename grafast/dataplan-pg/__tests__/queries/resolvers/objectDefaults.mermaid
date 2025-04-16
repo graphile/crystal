@@ -8,10 +8,10 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/resolvers/objectDefaults"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Constant[21]<br />2: GraphQLResolver[7]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Constant[15]<br />2: GraphQLResolver[7]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 7<br /><br />ROOT GraphQLResolverᐸresolveᐳ[7]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ10ᐳ[14]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 12, 7<br /><br />ROOT Access{1}ᐸ7.friendᐳ[12]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ9ᐳ[11]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 7<br /><br />ROOT Access{1}ᐸ7.friendᐳ[10]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
@@ -19,25 +19,25 @@ graph TD
     %% plan dependencies
     GraphQLResolver7[["GraphQLResolver[7∈0] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ§{}ᐳ"}}:::plan
+    Constant15{{"Constant[15∈0] ➊<br />ᐸ§{}ᐳ"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
-    Constant21 & __Value2 & __Value0 --> GraphQLResolver7
+    Constant15 & __Value2 & __Value0 --> GraphQLResolver7
     __Value4 -- 2 --> GraphQLResolver7
-    Access10{{"Access[10∈1] ➊<br />ᐸ7.numbersᐳ"}}:::plan
+    Access9{{"Access[9∈1] ➊<br />ᐸ7.numbersᐳ"}}:::plan
+    GraphQLResolver7 --> Access9
+    Access10{{"Access[10∈1] ➊<br />ᐸ7.friendᐳ"}}:::plan
     GraphQLResolver7 --> Access10
-    Access12{{"Access[12∈1] ➊<br />ᐸ7.friendᐳ"}}:::plan
-    GraphQLResolver7 --> Access12
-    __Item14[/"__Item[14∈2]<br />ᐸ10ᐳ"\]:::itemplan
-    Access10 ==> __Item14
+    __Item11[/"__Item[11∈2]<br />ᐸ9ᐳ"\]:::itemplan
+    Access9 ==> __Item11
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,GraphQLResolver7,Constant21 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,GraphQLResolver7,Constant15 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access10,Access12 bucket1
+    class Bucket1,Access9,Access10 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item14 bucket2
+    class Bucket2,__Item11 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
 

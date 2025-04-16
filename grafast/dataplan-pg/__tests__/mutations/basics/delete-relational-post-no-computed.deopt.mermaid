@@ -9,54 +9,54 @@ graph TD
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 26"):::bucket
-    Bucket2("Bucket 2 (mutationField)<br />Deps: 27, 2<br /><br />1: Access[16]<br />2: Access[18]<br />3: Object[19]<br />4: PgDeleteSingle[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 22"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 23, 2<br /><br />1: Access[15]<br />2: Access[16]<br />3: Object[17]<br />4: PgDeleteSingle[14]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8<br /><br />ROOT PgDeleteSingle{1}ᐸrelational_posts(id)ᐳ[8]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 15<br /><br />ROOT PgDeleteSingle{2}ᐸrelational_posts(id)ᐳ[15]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgDeleteSingle{2}ᐸrelational_posts(id)ᐳ[14]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket3
     Bucket2 --> Bucket4
 
     %% plan dependencies
-    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access9 & Access11 --> Object12
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
-    __Value2 --> Access11
+    __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
+    Constant22{{"Constant[22∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object12 & Constant26 --> PgDeleteSingle8
-    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    Access21{{"Access[21∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
-    Access21 --> PgClassExpression20
-    PgDeleteSingle8 --> Access21
-    PgDeleteSingle15[["PgDeleteSingle[15∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object19{{"Object[19∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object19 & Constant27 --> PgDeleteSingle15
-    Access16{{"Access[16∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access16 & Access18 --> Object19
+    Object11 & Constant22 --> PgDeleteSingle8
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
+    Access19 --> PgClassExpression18
+    PgDeleteSingle8 --> Access19
+    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
+    Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object17 & Constant23 --> PgDeleteSingle14
+    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15 & Access16 --> Object17
+    __Value2 --> Access15
     __Value2 --> Access16
-    __Value2 --> Access18
-    PgClassExpression23{{"PgClassExpression[23∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    Access24{{"Access[24∈4] ➊<br />ᐸ15.tᐳ"}}:::plan
-    Access24 --> PgClassExpression23
-    PgDeleteSingle15 --> Access24
+    PgClassExpression20{{"PgClassExpression[20∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    Access21{{"Access[21∈4] ➊<br />ᐸ14.tᐳ"}}:::plan
+    Access21 --> PgClassExpression20
+    PgDeleteSingle14 --> Access21
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access11,Object12,Constant26,Constant27 bucket0
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant22,Constant23 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle8 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgDeleteSingle15,Access16,Access18,Object19 bucket2
+    class Bucket2,PgDeleteSingle14,Access15,Access16,Object17 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression20,Access21 bucket3
+    class Bucket3,PgClassExpression18,Access19 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression23,Access24 bucket4
+    class Bucket4,PgClassExpression20,Access21 bucket4
 

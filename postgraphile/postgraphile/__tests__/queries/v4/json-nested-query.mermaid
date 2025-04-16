@@ -8,37 +8,37 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/json-nested-query"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 11, 13, 6, 14, 16<br />2: PgSelect[10]<br />3: PgSelectRows[19]<br />ᐳ: 18, 21, 22"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 10, 11, 6, 12, 13<br />2: PgSelect[9]<br />3: PgSelectRows[15]<br />ᐳ: 14, 16, 17"):::bucket
     end
 
     %% plan dependencies
-    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸjson_identityᐳ"]]:::plan
-    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression16{{"PgFromExpression[16∈0] ➊"}}:::plan
-    Object14 & PgFromExpression16 --> PgSelect10
-    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access11 & Access13 --> Object14
+    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸjson_identityᐳ"]]:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgFromExpression13{{"PgFromExpression[13∈0] ➊"}}:::plan
+    Object12 & PgFromExpression13 --> PgSelect9
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
     __InputDynamicScalar6{{"__InputDynamicScalar[6∈0] ➊"}}:::plan
     Access7{{"Access[7∈0] ➊<br />ᐸ0.valueᐳ"}}:::plan
     Access7 --> __InputDynamicScalar6
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access7
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access10
     __Value2 --> Access11
-    __Value2 --> Access13
-    __InputDynamicScalar6 --> PgFromExpression16
-    First18{{"First[18∈0] ➊"}}:::plan
-    PgSelectRows19[["PgSelectRows[19∈0] ➊"]]:::plan
-    PgSelectRows19 --> First18
-    PgSelect10 --> PgSelectRows19
-    PgSelectSingle21{{"PgSelectSingle[21∈0] ➊<br />ᐸjson_identityᐳ"}}:::plan
-    First18 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈0] ➊<br />ᐸ__json_identity__.vᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression22
+    __InputDynamicScalar6 --> PgFromExpression13
+    First14{{"First[14∈0] ➊"}}:::plan
+    PgSelectRows15[["PgSelectRows[15∈0] ➊"]]:::plan
+    PgSelectRows15 --> First14
+    PgSelect9 --> PgSelectRows15
+    PgSelectSingle16{{"PgSelectSingle[16∈0] ➊<br />ᐸjson_identityᐳ"}}:::plan
+    First14 --> PgSelectSingle16
+    PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__json_identity__.vᐳ"}}:::plan
+    PgSelectSingle16 --> PgClassExpression17
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputDynamicScalar6,Access7,PgSelect10,Access11,Access13,Object14,PgFromExpression16,First18,PgSelectRows19,PgSelectSingle21,PgClassExpression22 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,__InputDynamicScalar6,Access7,PgSelect9,Access10,Access11,Object12,PgFromExpression13,First14,PgSelectRows15,PgSelectSingle16,PgClassExpression17 bucket0
 

@@ -9,8 +9,8 @@ graph TD
 
     subgraph "Buckets for mutations/v4/d.deletePerson"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 13, 27, 14<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[15]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 9<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 25, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 9<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 9<br /><br />ROOT PgDeleteSingle{1}ᐸperson(id)ᐳ[9]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -19,50 +19,50 @@ graph TD
 
     %% plan dependencies
     __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant27 --> __InputObject6
-    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant25{{"Constant[25∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant25 --> __InputObject6
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access10 & Access12 --> Object13
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
-    __Value2 --> Access12
-    ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
-    __InputObject6 --> ApplyInput14
+    __Value2 --> Access11
+    ApplyInput13{{"ApplyInput[13∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
-    Object13 & Constant27 & ApplyInput14 --> PgDeleteSingle9
-    Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgDeleteSingle9 --> Object15
-    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Access17{{"Access[17∈3] ➊<br />ᐸ9.tᐳ"}}:::plan
-    Access17 --> PgClassExpression16
-    PgDeleteSingle9 --> Access17
-    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    Access17 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    Access17 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    Access17 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    Access17 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    Access17 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    Access17 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    Access17 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-    Access17 --> PgClassExpression26
+    Object12 & Constant25 & ApplyInput13 --> PgDeleteSingle9
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgDeleteSingle9 --> Object14
+    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Access16{{"Access[16∈3] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access16 --> PgClassExpression15
+    PgDeleteSingle9 --> Access16
+    PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    Access16 --> PgClassExpression17
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    Access16 --> PgClassExpression18
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    Access16 --> PgClassExpression19
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    Access16 --> PgClassExpression20
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    Access16 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    Access16 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    Access16 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    Access16 --> PgClassExpression24
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access12,Object13,ApplyInput14,Constant27 bucket0
+    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant25 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgDeleteSingle9,Object15 bucket1
+    class Bucket1,PgDeleteSingle9,Object14 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression16,Access17,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26 bucket3
+    class Bucket3,PgClassExpression15,Access16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24 bucket3
 
