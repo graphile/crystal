@@ -840,7 +840,7 @@ export interface GrafastArgs extends GraphQLArgs {
 }
 export type Maybe<T> = T | null | undefined;
 
-export * from "./planJSONInterfaces.js";
+export type * from "./planJSONInterfaces.js";
 
 export interface AddDependencyOptions<TStep extends Step = Step> {
   step: TStep;
