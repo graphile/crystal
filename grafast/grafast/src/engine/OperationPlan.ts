@@ -3564,12 +3564,29 @@ export class OperationPlan {
         stepSet.add($step);
       }
       if (stepSet.size <= 1) continue;
-      this.deduplicateStepsAtPlanningPath(stepSet);
+      this.deduplicateStepsAtPlanningPath(sinceStepId, stepSet, planningPath);
     }
   }
 
-  private deduplicateStepsAtPlanningPath(stepSet: Set<Step>) {
-    // TODO: recurse
+  /**
+   * When `deduplicateStepsAtPlanningPath` is called externally, `stepSet` contains
+   * all of the steps that represent the given `planningPath` (which may refer to
+   * a field, list item, or union/interface member). If there is more than one
+   * such step, then the steps must have non-overlapping polymorphic paths,
+   * but in some cases each step may represent more than one polymorphic path.
+   *
+   * This function performs a parallel recursive descent by grouping similar
+   * steps (same step class, same layerPlan, same peerKey, same number of
+   * dependencies, etc), and for each dependency index N, creates a new
+   * `stepSet` from the Nth dependency of each step in the group, and then
+   * recurses.
+   */
+  private deduplicateStepsAtPlanningPath(
+    sinceStepId: number,
+    stepSet: Set<Step>,
+    planningPath: string,
+  ) {
+    if (stepSet.size <= 1) return;
     const handledSteps = new Set<Step>();
     /** Guaranteed to not have duplicates */
     const steps = [...stepSet];
@@ -3578,7 +3595,17 @@ export class OperationPlan {
       const step = steps[i];
       if (handledSteps.has(step)) continue;
       handledSteps.add(step);
-      if (!step.deduplicate) continue;
+      if (step instanceof __DataOnlyStep) continue;
+      if (step.id < sinceStepId) continue;
+      // This method only serves to merge data across polymorphic paths
+      if (!step.polymorphicPaths) continue;
+      /** Used to ensure that we only recognise peers from different polymorphic paths. */
+      const polymorphicPaths = new Set([...step.polymorphicPaths]);
+
+      // We explicitly want to handle all steps for our recursive descent, it
+      // doesn't matter whether or not they have a deduplicate method.
+      //if (!step.deduplicate) continue;
+
       const sstep = sudo(step);
       const stepConstructor = sstep.constructor;
       const stepPeerKey = sstep.peerKey;
@@ -3595,16 +3622,23 @@ export class OperationPlan {
        * - steps that might stream have been excluded already
        * - "internal" dependencies have been excluded already
        */
-      const peers: Step[] = [];
+      const peers: Sudo<Step>[] = [];
       const dataOnlyDepIndexesToMerge = new Set<number>();
       nextPeer: for (let j = i + 1; j < l; j++) {
         const rawPotentialPeer = steps[j];
+        if (rawPotentialPeer.id < sinceStepId) continue;
         if (handledSteps.has(rawPotentialPeer)) continue;
         if (rawPotentialPeer.peerKey !== stepPeerKey) continue;
         // TODO: this check is too strict, we don't strictly require it's the
         // same layer plan.
         if (rawPotentialPeer.layerPlan !== stepLayerPlan) continue;
         if (rawPotentialPeer.constructor !== stepConstructor) continue;
+        if (!rawPotentialPeer.polymorphicPaths) continue;
+        for (const p of rawPotentialPeer.polymorphicPaths) {
+          if (polymorphicPaths.has(p)) {
+            continue nextPeer;
+          }
+        }
 
         const potentialPeer = sudo(rawPotentialPeer);
         if (potentialPeer.dependencies.length !== depCount) continue;
@@ -3657,16 +3691,13 @@ export class OperationPlan {
         }
         // Looks like a peer
         peers.push(potentialPeer);
+        for (const p of rawPotentialPeer.polymorphicPaths) {
+          polymorphicPaths.add(p);
+        }
       }
-      if (peers.length > 1) {
-        const duplicates = step.deduplicate(peers);
-        if (duplicates.length > 0) {
-          const polymorphicPaths = new Set(step.polymorphicPaths);
-          for (const rawDupe of duplicates) {
-            const dupe = sudo(rawDupe);
-            for (const p of dupe.polymorphicPaths!) {
-              polymorphicPaths.add(p);
-            }
+      if (peers.length > 0) {
+        {
+          for (const dupe of peers) {
             handledSteps.add(dupe);
 
             // Merge `dataOnlyDepIndexesToMerge`
@@ -3681,13 +3712,42 @@ export class OperationPlan {
               dupeDep.mergeInto(keepDep);
               if (wasLocked) lock(dupeDep);
               this.stepTracker.replaceStep(dupeDep, keepDep);
+              console.log(
+                `Merged ${dupeDep} (${sudo(dupeDep).dependencies[0]}) into ${keepDep} (${sudo(keepDep).dependencies[0]})`,
+              );
             }
           }
-          step.polymorphicPaths = polymorphicPaths;
+          // step.polymorphicPaths = polymorphicPaths;
           for (const dataOnlyDepIndex of dataOnlyDepIndexesToMerge) {
             const keepDep = sstep.dependencies[dataOnlyDepIndex];
             keepDep.polymorphicPaths = polymorphicPaths;
           }
+        }
+
+        // Now recurse
+        for (let i = 0, l = sstep.dependencies.length; i < l; i++) {
+          const depSet = new Set<Step>();
+          const addToDepSet = (step: Step) => {
+            if (step instanceof __DataOnlyStep) {
+              // ignore
+
+              // TODO: or should we recurse?
+              // for (const dep of sudo(step).dependencies) {
+              //   addToDepSet(dep);
+              // }
+            } else {
+              depSet.add(step);
+            }
+          };
+          addToDepSet(sstep.dependencies[i]);
+          for (const rawDupe of peers) {
+            addToDepSet(rawDupe.dependencies[i]);
+          }
+          this.deduplicateStepsAtPlanningPath(
+            sinceStepId,
+            depSet,
+            planningPath,
+          );
         }
       }
     }
