@@ -370,21 +370,20 @@ export class StepTracker {
     // such, we should only dedupe by default but allow opting out.
     // TODO: change this to `!skipDeduplication`
     if (skipDeduplication === false) {
+      const $searchForMe = options.step;
+      const existingIndex = dependentDependencies.indexOf($searchForMe);
+      if (existingIndex >= 0) {
+        return existingIndex;
+      }
       if (options.dataOnly) {
         for (let i = 0, l = dependentDependencies.length; i < l; i++) {
-          const dep = sudo(dependentDependencies[i]);
+          const dep = dependentDependencies[i];
           if (
             dep instanceof __DataOnlyStep &&
-            dep.dependencies.length === 1 &&
-            dep.dependencies[0] === $dependency
+            sudo(dep).dependencies[0] === $searchForMe
           ) {
             return i;
           }
-        }
-      } else {
-        const existingIndex = dependentDependencies.indexOf($dependency);
-        if (existingIndex >= 0) {
-          return existingIndex;
         }
       }
     }
