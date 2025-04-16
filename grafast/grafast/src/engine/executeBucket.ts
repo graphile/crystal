@@ -747,7 +747,7 @@ export function executeBucket(
       }
       if (polymorphicPathList.length !== count) {
         throw new Error(
-          `GrafastInternalError<1ad4fa5b-211d-4985-b8e9-b34400c78780>: Issue constructing polymorphicPathList for ${step}`,
+          `GrafastInternalError<1ad4fa5b-211d-4985-b8e9-b34400c78780>: Issue constructing polymorphicPathList for ${step}; expected ${count} entries, but found ${polymorphicPathList.length}`,
         );
       }
       if (step.execute.length > 1) {
@@ -965,7 +965,7 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
-        polymorphicPathList,
+        newPolymorphicPathList,
         extra,
       );
     }
