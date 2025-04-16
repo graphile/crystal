@@ -91,6 +91,14 @@ function mergeErrorsBackIn(
   return { flags: finalFlags, results: finalResults };
 }
 
+/**
+ * It has already been filtered at this point, unary can exist across
+ * many poly paths, so we can't detail the singular poly path it belongs
+ * to... so just lie and say it belongs to all of them. It's an internal
+ * property and we only use it in __dataOnly step anyway.
+ */
+const UNARY_POLYPATH_HACK = [null] as const;
+
 /** @internal */
 export function executeBucket(
   bucket: Bucket,
@@ -111,7 +119,7 @@ export function executeBucket(
       size,
       step,
       dependencies,
-      polymorphicPathList,
+      step._isUnary ? UNARY_POLYPATH_HACK : polymorphicPathList,
       extra,
     );
     const flags = arrayOfLength(size, NO_FLAGS);
@@ -978,10 +986,6 @@ export function executeBucket(
     step: Step,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     // DELIBERATE SHADOWING!
-    const size = step._isUnary ? 1 : bucket.size;
-    const polymorphicPathList = step._isUnary
-      ? [null] // TODO: this feels wrong
-      : bucket.polymorphicPathList;
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
@@ -1064,14 +1068,14 @@ export function executeBucket(
             dependencies,
             _rawForbiddenFlags,
             _rawOnReject,
-            polymorphicPathList,
+            bucket.polymorphicPathList,
             extra,
           )
         : reallyExecuteStepWithoutFiltering(
             size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
-            polymorphicPathList,
+            bucket.polymorphicPathList,
             extra,
           );
       if (isPromiseLike(result)) {
