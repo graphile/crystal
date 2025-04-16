@@ -3712,9 +3712,6 @@ export class OperationPlan {
               dupeDep.mergeInto(keepDep);
               if (wasLocked) lock(dupeDep);
               this.stepTracker.replaceStep(dupeDep, keepDep);
-              console.log(
-                `Merged ${dupeDep} (${sudo(dupeDep).dependencies[0]}) into ${keepDep} (${sudo(keepDep).dependencies[0]})`,
-              );
             }
           }
           // step.polymorphicPaths = polymorphicPaths;
