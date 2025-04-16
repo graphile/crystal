@@ -119,7 +119,11 @@ export function executeBucket(
       size,
       step,
       dependencies,
-      step._isUnary ? UNARY_POLYPATH_HACK : polymorphicPathList,
+      step._isUnary
+        ? bucket.size === 1
+          ? bucket.polymorphicPathList
+          : UNARY_POLYPATH_HACK
+        : polymorphicPathList,
       extra,
     );
     const flags = arrayOfLength(size, NO_FLAGS);
