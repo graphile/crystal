@@ -7,7 +7,7 @@ import type {
 } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS } from "../interfaces.js";
 import { Step } from "../step.js";
-import { __dataOnly } from "../steps/__dataOnly.js";
+import { __dataOnly, __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
@@ -370,9 +370,22 @@ export class StepTracker {
     // such, we should only dedupe by default but allow opting out.
     // TODO: change this to `!skipDeduplication`
     if (skipDeduplication === false) {
-      const existingIndex = dependentDependencies.indexOf($dependency);
-      if (existingIndex >= 0) {
-        return existingIndex;
+      if (options.dataOnly) {
+        for (let i = 0, l = dependentDependencies.length; i < l; i++) {
+          const dep = sudo(dependentDependencies[i]);
+          if (
+            dep instanceof __DataOnlyStep &&
+            dep.dependencies.length === 1 &&
+            dep.dependencies[0] === $dependency
+          ) {
+            return i;
+          }
+        }
+      } else {
+        const existingIndex = dependentDependencies.indexOf($dependency);
+        if (existingIndex >= 0) {
+          return existingIndex;
+        }
       }
     }
 
