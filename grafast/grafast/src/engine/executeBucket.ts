@@ -748,6 +748,7 @@ export function executeBucket(
       values,
       extra,
       stream: evaluateStream(bucket, step),
+      polymorphicPathList: bucket.polymorphicPathList,
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(

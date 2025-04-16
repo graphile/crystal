@@ -810,6 +810,13 @@ export interface ExecutionDetails<
   };
   extra: ExecutionExtra;
   stream: ExecutionDetailsStream | null;
+
+  /**
+   * Needed by __dataOnly; has `count` entries and each one is the polymorphic
+   * path at that index.
+   * @internal
+   */
+  polymorphicPathList: ReadonlyArray<string | null>;
 }
 
 export interface LocationDetails {
