@@ -23,6 +23,11 @@ export class __DataOnlyStep<T> extends Step<T> {
 
   constructor(dep: Step<T>, polymorphicPaths: ReadonlySet<string>) {
     super();
+
+    // This hack exists because how do we figure out which value to use
+    this._isUnary = false;
+    this._isUnaryLocked = true;
+
     this.__trappableFlags = TRAPPABLE_OR_POLY_SKIPPED;
     this.allowMultipleOptimizations = true;
     this.addDepForPaths(dep, polymorphicPaths);
