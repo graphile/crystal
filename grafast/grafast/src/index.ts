@@ -6,6 +6,7 @@ import type { MiddlewareHandlers } from "graphile-config";
 import type {
   DocumentNode,
   GraphQLError,
+  GraphQLObjectType,
   OperationDefinitionNode,
 } from "graphql";
 
@@ -743,6 +744,41 @@ declare global {
        * to make available to its plan resolvers.
        */
       unpack?: (step: Step) => Step;
+
+      /**
+       * Equivalent to InterfaceTypeExtensions.planType or
+       * UnionTypeExtensions.planType, except the type, `t`, is implicit
+       * because it is this object type.
+       */
+      plan?($data: Step): Step;
+    }
+
+    interface InterfaceTypeExtensions {
+      /**
+       * Given:
+       *
+       * 1. a GraphQL object type `t` that implements this interface, and
+       * 2. a step, $data, representing data that matches this type as
+       *    determined by the interface's resolveType method;
+       *
+       * return an appropriate step to use to resolve selection sets on this
+       * concrete type.
+       */
+      planType?(t: GraphQLObjectType, $data: Step): Step;
+    }
+
+    interface UnionTypeExtensions {
+      /**
+       * Given:
+       *
+       * 1. a GraphQL object type `t` that belongs to this union, and
+       * 2. a step, $data, representing data that matches this type as
+       *    determined by the union's resolveType method;
+       *
+       * return an appropriate step to use to resolve selection sets on this
+       * concrete type.
+       */
+      planType?(t: GraphQLObjectType, $data: Step): Step;
     }
 
     interface EnumTypeExtensions {}
@@ -881,6 +917,14 @@ declare module "graphql" {
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
     grafast?: Grafast.ObjectTypeExtensions;
+  }
+
+  interface GraphQLInterfaceTypeExtensions {
+    grafast?: Grafast.InterfaceTypeExtensions;
+  }
+
+  interface GraphQLUnionTypeExtensions {
+    grafast?: Grafast.UnionTypeExtensions;
   }
 
   interface GraphQLEnumTypeExtensions {
