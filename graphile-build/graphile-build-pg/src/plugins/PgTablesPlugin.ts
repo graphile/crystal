@@ -6,6 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
+import type { ObjectLikeStep } from "grafast";
 import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
@@ -656,9 +657,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build, _context) {
         const {
+          grafast: { access },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
+          EXPORTABLE,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
@@ -679,9 +682,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
-              // const resource = Object.values(
-              //   build.input.pgRegistry.pgResources,
-              // ).find((r) => !r.parameters && r.codec === codec);
+              const resource = Object.values(
+                build.input.pgRegistry.pgResources,
+              ).find((r) => !r.parameters && r.codec === codec);
+              const pk =
+                resource?.uniques.find((u) => u.isPrimary) ??
+                resource?.uniques[0];
+              const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,
                 {
@@ -691,23 +698,25 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
-                  /*
-                  pack(step: Step | PgSelectSingleStep) {
-                    if ("record" in step && typeof step.record === "function") {
-                      return step.record();
-                    } else {
-                      return step;
-                    }
-                  },
-                  unpack: resource
-                    ? function (step) {
-                        return pgSelectSingleFromRecord(
-                          resource,
-                          step,
-                        ) as PgSelectSingleStep<any>;
-                      }
-                    : undefined,
-                  */
+                  plan:
+                    resource && pkCols
+                      ? // TODO: optimize this function to look like `return resource.get({...})` via eval
+                        EXPORTABLE(
+                          (pkCols, resource) =>
+                            function (step) {
+                              const spec = Object.create(null);
+                              for (const pkCol of pkCols) {
+                                spec[pkCol] =
+                                  "get" in step &&
+                                  typeof step.get === "function"
+                                    ? step.get(pkCol)
+                                    : access(step, pkCol);
+                              }
+                              return resource.get(spec);
+                            },
+                          [pkCols, resource],
+                        )
+                      : undefined,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

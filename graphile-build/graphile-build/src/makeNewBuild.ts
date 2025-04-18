@@ -534,8 +534,8 @@ function generateSpecFromDetails(details: TypeDetails) {
     if (details.klass === GraphQLObjectType) {
       // Merge in the Grafast stuff
       const s = spec as GraphileBuild.GrafastObjectTypeConfig;
-      const { assertStep, pack, unpack } = s;
-      if (assertStep || pack || unpack) {
+      const { assertStep, plan } = s;
+      if (assertStep || plan) {
         if (!s.extensions) {
           s.extensions = Object.create(null);
         }
@@ -544,8 +544,7 @@ function generateSpecFromDetails(details: TypeDetails) {
         }
         const o = s.extensions!.grafast!;
         if (assertStep) o.assertStep = assertStep;
-        if (pack) o.pack = pack;
-        if (unpack) o.unpack = unpack;
+        if (plan) o.plan = plan;
       }
     }
     return spec;
