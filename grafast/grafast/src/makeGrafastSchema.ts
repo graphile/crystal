@@ -84,6 +84,7 @@ export type InputObjectPlans = {
  */
 export type InterfaceOrUnionPlans = {
   __resolveType?: (o: unknown) => string;
+  __planType?: (objectType: graphql.GraphQLObjectType, $data: Step) => Step;
 };
 
 /**
@@ -480,6 +481,12 @@ export function makeGrafastSchema(details: {
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
+        }
+        if (polyPlans?.__planType) {
+          exportNameHint(polyPlans.__planType, `${typeName}_planType`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.planType = polyPlans.__planType;
         }
         return new graphql.GraphQLInterfaceType(config);
       } else if (isUnionType(astType)) {
