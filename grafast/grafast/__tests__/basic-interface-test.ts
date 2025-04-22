@@ -36,7 +36,7 @@ const makeSchema = () =>
       },
       Query: {
         notifications() {
-          constant([
+          return constant([
             { type: "ready", isReady: true, id: "1" },
             { type: "ready", isReady: false, id: "2" },
           ]);
