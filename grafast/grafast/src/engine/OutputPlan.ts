@@ -1183,7 +1183,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
       if (!polyPath) {
         throw coerceError(
           new Error(
-            "GrafastInternalError<d6915bab-b4c2-4955-ad06-9b6e93499747>: Expected polymorphic path",
+            `GrafastInternalError<d6915bab-b4c2-4955-ad06-9b6e93499747>: Expected polymorphic path in bucket ${bucket} at index ${bucketIndex} (path: ${mutablePath.slice(1).join(".")})`,
           ),
           this.locationDetails,
           mutablePath.slice(1),

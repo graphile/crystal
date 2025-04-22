@@ -737,6 +737,7 @@ export class OperationPlan {
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
+      this.rootLayerPlan,
       this.operation.selectionSet.selections,
       true,
     );
@@ -778,6 +779,7 @@ export class OperationPlan {
       POLYMORPHIC_ROOT_PATHS,
       this.trackedRootValueStep,
       rootType,
+      this.rootLayerPlan,
       this.operation.selectionSet.selections,
       true,
       true,
@@ -918,6 +920,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
+        this.rootLayerPlan,
         selectionSet.selections,
         false,
       );
@@ -1007,6 +1010,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
+        this.rootLayerPlan,
         selectionSet.selections,
         true,
       );
@@ -1480,6 +1484,7 @@ export class OperationPlan {
     polymorphicPaths: ReadonlySet<string> | null,
     parentStep: Step,
     objectType: GraphQLObjectType,
+    layerPlan: LayerPlan,
     selections: readonly SelectionNode[],
     resolverEmulation: boolean,
     isMutation = false,
@@ -1494,9 +1499,14 @@ export class OperationPlan {
 
     if (isDev) {
       assertObjectType(objectType);
+      if (outputPlan.layerPlan !== layerPlan) {
+        throw new Error(
+          `GrafastInternalError<3ea1a3dd-1e11-4eb7-a31b-e125996d7eb4>: expected ${outputPlan} to have layer plan ${layerPlan}`,
+        );
+      }
     }
     const groupedFieldSet = withGlobalLayerPlan(
-      outputPlan.layerPlan,
+      layerPlan,
       polymorphicPaths,
       planningPath,
       graphqlCollectFields,
@@ -1522,28 +1532,6 @@ export class OperationPlan {
     );
 
     if (this.loc !== null) this.loc.pop();
-  }
-
-  private getCombinedLayerPlanForLayerPlans(
-    setOfParentLayerPlans: Set<LayerPlan>,
-  ) {
-    const parentLayerPlans = [...setOfParentLayerPlans];
-
-    // See if one already exists with the same layer plans in the same order
-    for (const lp of this.stepTracker.layerPlans) {
-      if (
-        lp?.reason.type === "combined" &&
-        arraysMatch(parentLayerPlans, lp.reason.parentLayerPlans)
-      ) {
-        return lp;
-      }
-    }
-
-    const firstLayerPlan = parentLayerPlans[0];
-    return new LayerPlan(this, firstLayerPlan, {
-      type: "combined",
-      parentLayerPlans,
-    });
   }
 
   // This is the queue of things to be done _IN ORDER_
@@ -1584,14 +1572,20 @@ export class OperationPlan {
         );
       }
 
+      // NOTE: `batch` and `todo` are different views of the same information,
+      // specifically: `batch` is stored in the order in which the calls were
+      // made (critical for ensuring the OutputPlans output fields in the
+      // correct order); whereas `todo` is the result of grouping `batch` into
+      // groups where the planning paths match.
       const batch = this.planningQueue.splice(0, l);
       const todo: Todo = [...this.planningQueueByPlanningPath.entries()];
+
       this.planningQueueByPlanningPath.clear();
 
       // First, do a planning-path-aware deduplicate
       this.deduplicateSteps(todo);
 
-      // Now plan this layer
+      // Update the step references (and freeze the paths)
       for (const [planningPath, batch] of todo) {
         if (this.frozenPlanningPaths.has(planningPath)) {
           throw new Error(
@@ -1609,6 +1603,12 @@ export class OperationPlan {
         }
       }
 
+      // Then, apply the per-method batch tweaks (such as grouping
+      // polymorphicResolveType calls' layer plans into the same resolveType
+      // layer plan with a root __ValueStep)
+      this.mutateTodos(todo);
+
+      // Finally plan this layer
       for (const [fn, args] of batch) {
         fn.apply(this, args as Parameters<typeof fn>);
       }
@@ -1616,6 +1616,175 @@ export class OperationPlan {
 
     // A final deduplicate and cleanup of data-only steps
     this.deduplicateSteps([]);
+  }
+
+  private mutateTodos(todo: Todo) {
+    for (const [planningPath, batch] of todo) {
+      const polymorphicResolveTypeEntriesByPolyType = new Map<
+        GraphQLUnionType | graphql.GraphQLInterfaceType,
+        CommonPlanningParametersTuple[]
+      >();
+      const polymorphicPlanObjectTypeEntriesByRootStep = new Map<
+        Step,
+        CommonPlanningParametersTuple[]
+      >();
+      for (const entry of batch) {
+        const [method, args] = entry;
+        if (method == this.polymorphicResolveType) {
+          const polyType = args[IDX_POSITION_TYPE];
+          if (!isUnionType(polyType) && !isInterfaceType(polyType)) {
+            throw new Error(
+              `GrafastInternalError<b0a276d0-134f-4a26-9c33-00af5ead38e6>: expected ${polyType} to be an interface or union type`,
+            );
+          }
+          let list = polymorphicResolveTypeEntriesByPolyType.get(polyType);
+          if (!list) {
+            list = [];
+            polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
+          }
+          list.push(args);
+        } else if (method == this.polymorphicPlanObjectType) {
+          const $root = args[IDX_PARENT_STEP];
+          let list = polymorphicPlanObjectTypeEntriesByRootStep.get($root);
+          if (!list) {
+            list = [];
+            polymorphicPlanObjectTypeEntriesByRootStep.set($root, list);
+          }
+          list.push(args);
+        }
+      }
+
+      // Handle calls to `polymorphicResolveType` by creating the relevant
+      // `resolveType` layer plan and creating the data-only step in it.
+      for (const [
+        graphqlType,
+        // Its `args[]` where args itself is a tuple of the arguments. `args` was
+        // confusing, `argses` even moreso... So `argsTupleList` it is.
+        argsTupleList,
+      ] of polymorphicResolveTypeEntriesByPolyType) {
+        const firstArgs = argsTupleList[0];
+        const allPossibleObjectTypes = firstArgs[8] as GraphQLObjectType<
+          any,
+          any
+        >[]; // TODO: rewrite all of these to use objects rather than tuple indexes because it's DISGUSTING
+        const firstLayerPlan = firstArgs[IDX_LAYER_PLAN];
+        const parentLayerPlans = [
+          ...new Set(argsTupleList.map((a) => a[IDX_LAYER_PLAN])),
+        ];
+        const resolveTypeLayerPlan = new LayerPlan(this, firstLayerPlan, {
+          type: "resolveType",
+          graphqlType,
+          parentLayerPlans,
+        });
+        const basePolyPaths = new Set<string | null>();
+        const add = ($step: Step, p: string | null) => {
+          if (basePolyPaths.has(p)) {
+            throw new Error(
+              `GrafastInternalError<2641aafe-db44-4572-883b-74eeea897493>: Saw ${$step} at ${planningPath} with polyPath of ${p}, but that path was already registered!`,
+            );
+          }
+          basePolyPaths.add(p);
+        };
+        for (const args of argsTupleList) {
+          const $step = args[IDX_PARENT_STEP];
+          if ($step.polymorphicPaths) {
+            for (const p of $step.polymorphicPaths) {
+              add($step, p);
+            }
+          } else {
+            add($step, null);
+          }
+        }
+        const resolveTypePolymorphicPaths = new Set<string>();
+        for (const basePath of basePolyPaths) {
+          for (const objectType of allPossibleObjectTypes) {
+            const newPath = basePath
+              ? `${basePath}>${objectType.name}`
+              : objectType.name;
+            resolveTypePolymorphicPaths.add(newPath);
+          }
+        }
+        const $data = withGlobalLayerPlan(
+          resolveTypeLayerPlan,
+          resolveTypePolymorphicPaths,
+          planningPath,
+          newValueStepCallback,
+          null,
+          false,
+        );
+        const sourceSteps = argsTupleList.map((args) => args[IDX_PARENT_STEP]);
+        resolveTypeLayerPlan.addCombo(sourceSteps, $data);
+
+        /*
+         * An output plan for it (knows how to branch the different object
+         * output plans).
+         */
+
+        // Now replace references to layer plan and step
+        for (const args of argsTupleList) {
+          args[IDX_PARENT_STEP] = $data;
+          args[IDX_LAYER_PLAN] = resolveTypeLayerPlan;
+          const parentOutputPlan = args[IDX_OUTPUT_PLAN];
+          const locationDetails = args[9];
+          const parentObjectType = args[10];
+          const responseKey = args[11];
+          const isNonNull = args[12];
+          const polymorphicOutputPlan = new OutputPlan(
+            resolveTypeLayerPlan,
+            $data,
+            {
+              mode: "polymorphic",
+              deferLabel: undefined,
+              typeNames: allPossibleObjectTypes.map((t) => t.name),
+            },
+            locationDetails,
+          );
+          args[IDX_OUTPUT_PLAN] = polymorphicOutputPlan;
+          parentOutputPlan.addChild(parentObjectType, responseKey, {
+            type: "outputPlan",
+            outputPlan: polymorphicOutputPlan,
+            isNonNull,
+            locationDetails,
+          });
+        }
+      }
+
+      // Handle calls to this.polymorphicPlanObjectType by creating a
+      // polymorphic layer plan for each unique $root
+      for (const [
+        parentStep,
+        argsTupleList,
+      ] of polymorphicPlanObjectTypeEntriesByRootStep) {
+        const typeNames = argsTupleList.map(
+          (a) => (a[IDX_POSITION_TYPE] as GraphQLObjectType).name,
+        );
+        const firstArgs = argsTupleList[0];
+        const resolveTypeLayerPlan = firstArgs[IDX_LAYER_PLAN];
+        if (isDev) {
+          if (resolveTypeLayerPlan.reason.type !== "resolveType") {
+            throw new Error(
+              `GrafastInternalError<cf75a4c4-4bb3-47d0-a3c5-77fcd05a1187>: the parent of a polymorphic layer plan must always be a resolveType layer plan`,
+            );
+          }
+          for (const args of argsTupleList) {
+            assert.strictEqual(
+              args[IDX_LAYER_PLAN],
+              resolveTypeLayerPlan,
+              `GrafastInternalError<6552e87e-6b94-43e7-a50a-001da359032e>: all batched polymorphic steps must belong to the same layer plan`,
+            );
+          }
+        }
+        const polymorphicLayerPlan = new LayerPlan(this, resolveTypeLayerPlan, {
+          type: "polymorphic",
+          polymorphicPaths: new Set(parentStep.polymorphicPaths!),
+          typeNames,
+          parentStep,
+        });
+        for (const args of argsTupleList) {
+          args[IDX_LAYER_PLAN] = polymorphicLayerPlan;
+        }
+      }
+    }
   }
 
   private internalDependency<TStep extends Step>($step: TStep): TStep {
@@ -1877,6 +2046,7 @@ export class OperationPlan {
           polymorphicPaths,
           $step,
           nullableFieldType,
+          objectLayerPlan,
           selections!,
           resolverEmulation,
         );
@@ -1929,31 +2099,10 @@ export class OperationPlan {
           locationDetails,
         });
       } else {
-        /*
-         * An output plan for it (knows how to branch the different object
-         * output plans).
-         */
-        const polymorphicOutputPlan = new OutputPlan(
-          parentLayerPlan,
-          $step,
-          {
-            mode: "polymorphic",
-            deferLabel: undefined,
-            typeNames: allPossibleObjectTypes.map((t) => t.name),
-          },
-          locationDetails,
-        );
-        parentOutputPlan.addChild(parentObjectType, responseKey, {
-          type: "outputPlan",
-          outputPlan: polymorphicOutputPlan,
-          isNonNull,
-          locationDetails,
-        });
-
         const polymorphicResolvePlanningPath = planningPath + "<*>";
         this.queueNextLayer(
           this.polymorphicResolveType,
-          polymorphicOutputPlan,
+          parentOutputPlan,
           path,
           polymorphicResolvePlanningPath,
           polymorphicPaths,
@@ -1963,6 +2112,8 @@ export class OperationPlan {
           selections,
           allPossibleObjectTypes,
           locationDetails,
+          parentObjectType,
+          responseKey,
           isNonNull,
         );
 
@@ -1995,6 +2146,8 @@ export class OperationPlan {
     selections: readonly SelectionNode[],
     allPossibleObjectTypes: readonly GraphQLObjectType<any, any>[],
     locationDetails: LocationDetails,
+    _parentObjectType: GraphQLObjectType | null, // Used by this.mutateTodos
+    _responseKey: string | null, // Used by this.mutateTodos
     isNonNull: boolean,
   ) {
     if (outputPlan.type.mode !== "polymorphic") {
@@ -2037,7 +2190,7 @@ export class OperationPlan {
      * Now we need to loop through each type and plan it.
      */
     const polyBases = [...(polymorphicPaths ?? [""])];
-    const polymorphicPlanningPath = polymorphicResolvePlanningPath + ".";
+    const polymorphicPlanningPath = polymorphicResolvePlanningPath + "!";
     for (const type of allPossibleObjectTypes) {
       const $sideEffect = resolveTypeLayerPlan.latestSideEffectStep;
       try {
@@ -2139,10 +2292,11 @@ export class OperationPlan {
       this.actuallyPlanSelectionSet,
       objectOutputPlan,
       path,
-      polymorphicPlanningPath,
+      polymorphicPlanningPath + ".",
       newPolymorphicPaths,
       $root,
       type,
+      polymorphicLayerPlan,
       fieldNodes,
       false,
     );
@@ -3884,7 +4038,10 @@ export class OperationPlan {
           targetStep._isUnaryLocked = true;
         }
         currentLayerPlan.copyStepIds.push(dep.id);
-        if (currentLayerPlan.reason.type === "combined") {
+        if (
+          currentLayerPlan.reason.type === "combined" ||
+          currentLayerPlan.reason.type === "resolveType"
+        ) {
           const prev = currentLayerPlan as LayerPlan<LayerPlanReasonCombined>;
           currentLayerPlan = null;
           // Figure out which of our parent layer plans contains the step
@@ -4713,7 +4870,7 @@ export function pathsFromAncestorToTargetLayerPlan(
     return [[]];
   }
 
-  if (lp.reason.type === "combined") {
+  if (lp.reason.type === "combined" || lp.reason.type === "resolveType") {
     const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
       pathsFromAncestorToTargetLayerPlan(ancestor, plp),
     );
@@ -4740,7 +4897,7 @@ export function layerPlanHeirarchyContains(
   targetLp: LayerPlan,
 ): boolean {
   if (lp === targetLp) return true;
-  if (lp.reason.type === "combined") {
+  if (lp.reason.type === "combined" || lp.reason.type === "resolveType") {
     return lp.reason.parentLayerPlans.some((plp) =>
       layerPlanHeirarchyContains(plp, targetLp),
     );
@@ -4758,6 +4915,7 @@ const IDX_PLANNING_PATH = 2;
 const IDX_POLYMORPHIC_PATHS = 3;
 const IDX_PARENT_STEP = 4;
 const IDX_POSITION_TYPE = 5;
+const IDX_LAYER_PLAN = 6;
 
 type CommonPlanningParametersTuple<
   TType extends
@@ -4771,6 +4929,7 @@ type CommonPlanningParametersTuple<
   /* IDX_POLYMORPHIC_PATHS: */ polymorphicPaths: ReadonlySet<string> | null,
   /* IDX_PARENT_STEP: */ parentStep: Step,
   /* IDX_POSITION_TYPE: */ positionType: TType,
+  /* IDX_LAYER_PLAN: */ layerPlan: LayerPlan,
   ...any[],
 ];
 type QueueTuple<

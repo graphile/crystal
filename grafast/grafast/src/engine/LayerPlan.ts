@@ -1079,8 +1079,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     targetStepId: number;
   }> = [];
   public addCombo(sourceSteps: Step[], $target: __ValueStep<any>): void {
-    if (this.reason.type !== "combined") {
-      throw new Error(`Combinations may only be added to combined layer plans`);
+    if (this.reason.type !== "combined" && this.reason.type !== "resolveType") {
+      throw new Error(
+        `Combinations may only be added to combined or resolveType layer plans`,
+      );
     }
     this.combinations.push({
       sources: sourceSteps.map((s) => ({
