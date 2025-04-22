@@ -1,0 +1,47 @@
+---
+title: "V5 Beta Status"
+hide_table_of_contents: true
+---
+
+import styles from "@site/src/css/common.module.css";
+import v5betaStyles from "./v5beta.module.css";
+
+import CalloutSection from "@site/src/components/CalloutSection";
+import SecondarySection from "@site/src/components/SecondarySection";
+import TertiarySection from "@site/src/components/TertiarySection";
+import clsx from "clsx";
+
+## PostGraphile V5 Beta Status
+
+<div className={v5betaStyles.progressBackground}>
+  <div className={v5betaStyles.progressForeground}>
+    <div className={v5betaStyles.progressLabel}>75%</div>
+  </div>
+</div>
+
+<br />
+<br />
+
+## Milestones
+
+- Global dependencies
+- Early exit
+- Eradicating eval
+- The polymorphism problem
+
+<CalloutSection
+  title={`Crowd-funded open-source software`}
+  body={`We're extremely grateful to our sponsors, for helping to fund ongoing development on PostGraphile, Graphile Engine, Graphile Worker and Graphile Migrate.
+  THANK YOU!`}
+  link={`https://graphile.org/sponsor/`}
+  buttonText={`Learn more about sponsors and sponsorship`}
+/>
+
+<TertiarySection
+  title={`Development Support`}
+  tagline={`Priority text support straight from the maintainer`}
+  body={`Give your company access to the knowledge and experience of the Graphile team through your chat server and GitHub/GitLab organisation. Reference your code verbatim and arrange calls for any trickier topics.`}
+  Svg={require("@site/static/img/homepage/support.svg").default}
+  link={`https://www.graphile.org/support/`}
+  buttonText={`Learn more`}
+/>

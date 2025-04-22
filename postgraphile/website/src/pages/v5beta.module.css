@@ -1,0 +1,29 @@
+.progressBackground {
+  background-color: var(--ifm-color-primary-lighter);
+  border-radius: 8px;
+}
+
+.progressForeground {
+  height: 3rem;
+  width: 75%;
+  background-color: var(--ifm-color-primary-dark);
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+.progressLabel {
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding-right: 1rem;
+}
+
+[data-theme="dark"] .progressBackground {
+  background-color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .progressForeground {
+  background-color: var(--ifm-color-primary-dark);
+}
