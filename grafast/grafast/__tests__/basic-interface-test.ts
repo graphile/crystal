@@ -19,6 +19,11 @@ const makeSchema = () =>
         isReady: Boolean!
       }
 
+      type UserNotificationLogout implements UserNotification {
+        id: ID!
+        username: String!
+      }
+
       type Query {
         notifications: [UserNotification!]!
       }
@@ -27,11 +32,10 @@ const makeSchema = () =>
       UserNotification: {
         __resolveType(obj: any) {
           if (obj.type === "ready") return "UserNotificationReady";
+          if (obj.type === "logout") return "UserNotificationLogout";
         },
         __planType(objectType: GraphQLObjectType, $data: Step) {
-          if (objectType.name === "UserNotificationReady") {
-            return $data;
-          }
+          return $data;
         },
       },
       Query: {
@@ -39,6 +43,7 @@ const makeSchema = () =>
           return constant([
             { type: "ready", isReady: true, id: "1" },
             { type: "ready", isReady: false, id: "2" },
+            { type: "logout", username: "benjie", id: "3" },
           ]);
         },
       },
@@ -76,6 +81,9 @@ it(`works with plans`, async () => {
       {
         id: "2",
       },
+      {
+        id: "3",
+      },
     ],
   });
 });
@@ -91,6 +99,9 @@ it(`works with plans and __typename`, async () => {
           id
           ... on UserNotificationReady {
             isReady
+          }
+          ... on UserNotificationLogout {
+            username
           }
         }
       }
@@ -108,6 +119,11 @@ it(`works with plans and __typename`, async () => {
         __typename: "UserNotificationReady",
         id: "2",
         isReady: false,
+      },
+      {
+        __typename: "UserNotificationLogout",
+        id: "3",
+        username: "benjie",
       },
     ],
   });
