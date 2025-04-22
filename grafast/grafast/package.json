@@ -28,7 +28,7 @@
   },
   "scripts": {
     "test": "yarn test:mocha",
-    "test:mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=TEST mocha '**/__tests__/**/*-test.ts'",
+    "test:mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
     "build": "zx scripts/build-npm.mjs",
     "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
