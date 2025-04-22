@@ -1,4 +1,4 @@
-const $$concreteType = Symbol("concreteType");
+export const $$concreteType = Symbol("concreteType");
 export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;
   data: TData;
