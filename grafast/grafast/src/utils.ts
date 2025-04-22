@@ -1008,6 +1008,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "nullableBoundary":
       case "subroutine":
       case "combined": // TODO: CHECK ME!
+      case "resolveType": // TODO: CHECK ME!
       case "mutationField": {
         continue;
       }
@@ -1041,6 +1042,7 @@ export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
     case "nullableBoundary":
     case "subroutine":
     case "combined": // TODO: CHECK ME!
+    case "resolveType": // TODO: CHECK ME!
     case "mutationField": {
       return false;
     }

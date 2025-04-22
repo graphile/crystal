@@ -112,7 +112,6 @@ import {
   NodeIdCodec,
   NodeIdHandler,
   OutputPlanForType,
-  PolymorphicData,
   PromiseOrDirect,
   ScalarPlanResolver,
   StepOptimizeOptions,
@@ -124,6 +123,7 @@ import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";
 import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
+import type { PolymorphicData } from "./polymorphic.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -137,7 +137,6 @@ import {
   ListCapableStep,
   ListLikeStep,
   ObjectLikeStep,
-  PolymorphicStep,
   Step,
   UnbatchedStep,
 } from "./step.js";
@@ -223,10 +222,6 @@ import {
   ObjectStep,
   PageInfoCapableStep,
   partitionByIndex,
-  polymorphicBranch,
-  PolymorphicBranchMatcher,
-  PolymorphicBranchMatchers,
-  PolymorphicBranchStep,
   proxy,
   ProxyStep,
   remapKeys,
@@ -462,12 +457,7 @@ export {
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
-  polymorphicBranch,
-  PolymorphicBranchMatcher,
-  PolymorphicBranchMatchers,
-  PolymorphicBranchStep,
   PolymorphicData,
-  PolymorphicStep,
   polymorphicWrap,
   PromiseOrDirect,
   proxy,
@@ -575,13 +565,12 @@ exportAsMany("grafast", {
   groupBy,
   filter,
   partitionByIndex,
+  polymorphicWrap,
   listTransform,
   first,
   node,
   specFromNodeId,
   nodeIdFromNode,
-  polymorphicBranch,
-  PolymorphicBranchStep,
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
   proxy,
@@ -614,7 +603,6 @@ exportAsMany("grafast", {
   Setter,
   listen,
   ListenStep,
-  polymorphicWrap,
   stripAnsi,
   arraysMatch,
   inputObjectFieldSpec,

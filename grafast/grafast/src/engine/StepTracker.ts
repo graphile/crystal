@@ -180,7 +180,8 @@ export class StepTracker {
           layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
         break;
       }
-      case "combined": {
+      case "combined":
+      case "resolveType": {
         // TODO: tell the parent layer plans to expect me ;)
         break;
       }

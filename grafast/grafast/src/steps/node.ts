@@ -5,11 +5,9 @@ import { inspect } from "../inspect.js";
 import type {
   Maybe,
   NodeIdHandler,
-  PolymorphicData,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { polymorphicWrap } from "../polymorphic.js";
-import type { PolymorphicStep, Step } from "../step.js";
+import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { access } from "./access.js";
 import { constant } from "./constant.js";
@@ -21,7 +19,10 @@ import { lambda } from "./lambda.js";
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
  */
-export class NodeStep extends UnbatchedStep implements PolymorphicStep {
+export class NodeStep extends UnbatchedStep<{
+  typeName: string;
+  specifier: any;
+} | null> {
   static $$export = {
     moduleName: "grafast",
     exportName: "NodeStep",
@@ -70,15 +71,12 @@ export class NodeStep extends UnbatchedStep implements PolymorphicStep {
     return null;
   }
 
-  unbatchedExecute = (
-    _extra: UnbatchedExecutionExtra,
-    specifier: any,
-  ): PolymorphicData<string, ReadonlyArray<any>> | null => {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, specifier: any) {
     const typeName = specifier
       ? this.getTypeNameFromSpecifier(specifier)
       : null;
-    return typeName ? polymorphicWrap(typeName) : null;
-  };
+    return typeName != null ? { typeName, specifier } : null;
+  }
 }
 
 /**

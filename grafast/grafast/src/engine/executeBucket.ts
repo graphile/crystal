@@ -1220,7 +1220,8 @@ function markLayerPlanAsDone(
 
         break;
       }
-      case "combined": {
+      case "combined":
+      case "resolveType": {
         // First, see if _all_ parent layer plans are ready
         let allParentLayerPlansAreReady = true;
         for (const lp of childLayerPlan.reason.parentLayerPlans) {

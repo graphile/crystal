@@ -9,7 +9,6 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
   Maybe,
-  PolymorphicStep,
 } from "grafast";
 import {
   __ItemStep,
@@ -189,10 +188,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
   direction: "ASC" | "DESC";
 }
 
-export class PgUnionAllSingleStep
-  extends Step
-  implements PolymorphicStep, EdgeCapableStep<any>
-{
+export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",

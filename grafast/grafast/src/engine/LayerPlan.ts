@@ -1,4 +1,10 @@
 import LRU from "@graphile/lru";
+import type {
+  GraphQLInterfaceType,
+  GraphQLResolveInfo,
+  GraphQLUnionType,
+} from "graphql";
+import { defaultTypeResolver, GraphQLError } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
@@ -15,10 +21,9 @@ import {
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../interfaces.js";
-import { resolveType } from "../polymorphic.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
-import { arrayOfLength } from "../utils.js";
+import { arrayOfLength, isPromiseLike } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -112,6 +117,12 @@ export interface LayerPlanReasonCombined {
   type: "combined";
   parentLayerPlans: ReadonlyArray<LayerPlan>;
 }
+/** Anti-branching, non-deferred */
+export interface LayerPlanReasonResolveType {
+  type: "resolveType";
+  graphqlType: GraphQLUnionType | GraphQLInterfaceType;
+  parentLayerPlans: ReadonlyArray<LayerPlan>;
+}
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
   return layerPlan.reason.type === "polymorphic";
@@ -139,7 +150,8 @@ export type LayerPlanReason =
   | LayerPlanReasonDefer
   | LayerPlanReasonPolymorphic
   | LayerPlanReasonSubroutine
-  | LayerPlanReasonCombined;
+  | LayerPlanReasonCombined
+  | LayerPlanReasonResolveType;
 
 // The `A extends any ? ... : never` tells TypeScript to make this
 // distributive. TypeScript can be a bit arcane.
@@ -434,6 +446,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     if (this.reason.type === "combined") {
       throw new Error(`Use newCombinedBucket instead.`);
     }
+    if (this.reason.type === "resolveType") {
+      throw new Error(`Use newCombinedBucket instead.`);
+    }
     const { copyStepIds } = this;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] =
@@ -719,8 +734,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           ) {
             continue;
           }
-          const value = polymorphicPlanStore.at(originalIndex);
-          const typeName = resolveType(value);
+          // const value = polymorphicPlanStore.at(originalIndex);
+          // PERF: ideally we can just use the object type at this index
+          const polymorphicPath =
+            parentBucket.polymorphicPathList.at(originalIndex);
+          const i = polymorphicPath?.lastIndexOf(">");
+          const typeName =
+            i === -1
+              ? polymorphicPath!
+              : i != null && i >= 0
+                ? polymorphicPath!.slice(i + 1)
+                : "__ERROR";
           if (!targetTypeNames.includes(typeName)) {
             continue;
           }
@@ -747,6 +771,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         break;
       }
       // case "combined": See newCombinedBucket below
+      // case "resolveType": See newCombinedBucket below
       case "subscription":
       case "defer": {
         // TODO
@@ -798,11 +823,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   public newCombinedBucket(
     finalParentBucket: Pick<Bucket, "sharedState">,
   ): Bucket | null {
-    if (this.reason.type !== "combined") {
+    const t = this.reason.type;
+    const isResolveType = t === "resolveType";
+    if (t !== "combined" && !isResolveType) {
       throw new Error(
-        `GrafastInternalError<59c54cd0-ee32-478a-9e0e-4123eec2f8f5>: newCombinedBucket must only be called on combined layer plans`,
+        `GrafastInternalError<59c54cd0-ee32-478a-9e0e-4123eec2f8f5>: newCombinedBucket must only be called on combined or resolveType layer plans`,
       );
     }
+    const graphqlType = isResolveType ? this.reason.graphqlType : null;
     const { sharedState } = finalParentBucket;
     const { copyStepIds } = this;
     const store: Bucket["store"] = new Map();
@@ -905,8 +933,90 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             const newIndex = values.length;
             ev._copyResult(newIndex, sourceStore, originalIndex);
             map.set(originalIndex, newIndex);
-            polymorphicPathList[newIndex] =
+            const sourcePolyPath =
               parentBucket.polymorphicPathList[originalIndex];
+
+            // Now set the polymorphic path for this new entry
+            if (isResolveType) {
+              // A `resolveType` layer plan must resolve the type to determine
+              // the new poly path
+              const flags = ev._flagsAt(newIndex);
+              if (flags & (FLAG_ERROR | FLAG_STOPPED | FLAG_INHIBITED)) {
+                polymorphicPathList[newIndex] = sourcePolyPath + ">__ERROR";
+              } else {
+                try {
+                  if (!graphqlType) {
+                    throw new Error(
+                      `GrafastInternalError<b7210c1c-db97-435b-b387-714a57e4910a>: resolveType layer plan must have a graphqlType it relates to`,
+                    );
+                  }
+                  const value = ev.at(newIndex);
+
+                  // TODO: implement this!
+                  const graphqlContext = null as unknown;
+                  // TODO: implement this!
+                  const info = null as unknown as GraphQLResolveInfo;
+
+                  const resolvedType = graphqlType!.resolveType
+                    ? graphqlType.resolveType(
+                        value,
+                        graphqlContext,
+                        info,
+                        graphqlType,
+                      )
+                    : // TODO: use the defaultTypeResolver from the GraphQLExecutionArgs
+                      //executionArgs.typeResolver ??
+                      defaultTypeResolver(
+                        value,
+                        graphqlContext,
+                        info,
+                        graphqlType,
+                      );
+                  if (!resolvedType) {
+                    throw new GraphQLError(
+                      `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "Query.poly". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
+                      // TODO: add all the error paths and stuff
+                    );
+                  }
+                  if (isPromiseLike(resolvedType)) {
+                    // Ensure the system doesn't fully crash
+                    resolvedType.catch((e) => {});
+                    throw new GraphQLError(
+                      `Abstract type "${graphqlType}" returned a promise from resolveType; Grafast does not currently support this but will in the future - indicate your interest at https://github.com/graphile/crystal/issues/2457`,
+                      // TODO: add all the error paths and stuff
+                    );
+                  }
+
+                  // Older versions of GraphQL.js allowed returning the type
+                  // directly, this turns that into the String of the name. The
+                  // performance cost of doing this is fairly minimal,
+                  // `String(string)` can be called around 500M times per
+                  // second so does not have significant overhead.
+                  const resolvedTypeName = String(resolvedType);
+
+                  const type =
+                    this.operationPlan.schema.getType(resolvedTypeName);
+                  if (!type) {
+                    // (isDev && !isObjectType(type))) {
+                    throw new GraphQLError(
+                      `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" that does not exist inside the schema.`,
+                      // TODO: add all the error paths and stuff
+                    );
+                  }
+
+                  polymorphicPathList[newIndex] =
+                    sourcePolyPath + ">" + resolvedTypeName;
+                } catch (originalError) {
+                  // If an error happens here, we must overwrite the value in `ev`
+                  const flags = FLAG_ERROR | FLAG_STOPPED;
+                  flagUnion |= flags;
+                  ev._setResult(newIndex, originalError, flags);
+                }
+              }
+            } else {
+              polymorphicPathList[newIndex] = sourcePolyPath;
+            }
+
             iterators[newIndex] = parentBucket.iterators[originalIndex];
           }
         }

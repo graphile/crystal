@@ -1,9 +1,4 @@
-import type {
-  ExecutableStep,
-  PolymorphicData,
-  PolymorphicStep,
-  UnbatchedExecutionExtra,
-} from "grafast";
+import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
 import {
   exportAs,
   isDev,
@@ -40,14 +35,11 @@ export interface PgPolymorphicTypeMap<
  * handle it.
  */
 export class PgPolymorphicStep<
-    TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
-    TTypeSpecifier,
-    TTypeSpecifierStep extends
-      ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
-  >
-  extends UnbatchedStep<any>
-  implements PolymorphicStep
-{
+  TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
+  TTypeSpecifier,
+  TTypeSpecifierStep extends
+    ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
+> extends UnbatchedStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgPolymorphicStep",
@@ -124,14 +116,10 @@ export class PgPolymorphicStep<
     return t;
   }
 
-  unbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
-    _item: any,
-    specifier: any,
-  ): PolymorphicData<string> | null {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, item: any, specifier: any) {
     if (specifier) {
       const typeName = this.getTypeNameFromSpecifier(specifier);
-      return polymorphicWrap(typeName);
+      return polymorphicWrap(typeName, item);
     } else {
       return null;
     }

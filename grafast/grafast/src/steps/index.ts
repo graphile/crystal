@@ -102,10 +102,4 @@ export {
   LoadOptions,
   LoadStep,
 } from "./load.js";
-export {
-  polymorphicBranch,
-  PolymorphicBranchMatcher,
-  PolymorphicBranchMatchers,
-  PolymorphicBranchStep,
-} from "./polymorphicBranch.js";
 export { proxy, ProxyStep } from "./proxy.js";

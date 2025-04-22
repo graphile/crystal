@@ -851,17 +851,6 @@ export function isListLikeStep<TData extends [...Step[]] = [...Step[]]>(
   return "at" in plan && typeof (plan as any).at === "function";
 }
 
-export type PolymorphicStep = Step & {
-  planForType(objectType: GraphQLObjectType): Step;
-};
-
-export function isPolymorphicStep(s: Step): s is PolymorphicStep {
-  return (
-    "planForType" in s &&
-    typeof (s as PolymorphicStep).planForType === "function"
-  );
-}
-
 export interface ListCapableStep<
   TOutputData,
   TItemStep extends Step<TOutputData> = Step<TOutputData>,

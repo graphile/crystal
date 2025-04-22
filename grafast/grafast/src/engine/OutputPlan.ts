@@ -20,8 +20,7 @@ import type {
   JSONValue,
   LocationDetails,
 } from "../interfaces.js";
-import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
-import { isPolymorphicData } from "../polymorphic.js";
+import { $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
@@ -1174,28 +1173,24 @@ const stringLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
   },
 });
 
-// NOTE: the reference to $$concreteType here is a (temporary) optimization; it
-// should be `resolveType(bucketRootValue)` but it's not worth the function
-// call overhead. Longer term it should just be read directly from a different
-// store.
-
+// TODO: do we need this or can we skip it?
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor({
     inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
-      if (isDev) {
-        if (!isPolymorphicData(bucketRootValue)) {
-          throw coerceError(
-            new Error(
-              "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
-            ),
-            this.locationDetails,
-            mutablePath.slice(1),
-          );
-        }
+      const polyPath = bucket.polymorphicPathList[bucketIndex];
+      if (!polyPath) {
+        throw coerceError(
+          new Error(
+            "GrafastInternalError<d6915bab-b4c2-4955-ad06-9b6e93499747>: Expected polymorphic path",
+          ),
+          this.locationDetails,
+          mutablePath.slice(1),
+        );
       }
-      const typeName = bucketRootValue[$$concreteType];
+      const i = polyPath.lastIndexOf(">");
+      const typeName = i >= 0 ? polyPath.slice(i + 1) : polyPath;
       const childOutputPlan = this.childByTypeName![typeName];
       if (isDev) {
         assert.ok(

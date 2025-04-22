@@ -151,11 +151,6 @@ export const $$data = Symbol("data");
 export const $$extensions = Symbol("extensions");
 
 /**
- * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
- */
-export const $$concreteType = Symbol("concreteType");
-
-/**
  * Set this key on a type if that type's serialization is idempotent (that is
  * to say `serialize(serialize(thing)) === serialize(thing)`). This means we
  * don't have to "roll-back" serialization if we need to fallback to graphql-js
@@ -189,15 +184,6 @@ export const $$timeout = Symbol("timeout");
 
 /** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
 export const $$ts = Symbol("timestamp");
-
-/**
- * When dealing with a polymorphic thing we need to be able to determine what
- * the concrete type of it is, we use the $$concreteType property for that.
- */
-export interface PolymorphicData<TType extends string = string, TData = any> {
-  [$$concreteType]: TType;
-  [$$data]?: TData;
-}
 
 export interface IndexByListItemStepId {
   [listItemStepId: number]: number;

@@ -2,7 +2,6 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   PolymorphicData,
-  PolymorphicStep,
   PromiseOrDirect,
 } from "grafast";
 import { exportAs, polymorphicWrap, Step } from "grafast";
@@ -19,11 +18,8 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
  * that represents a row from this table.
  */
 export class PgSingleTablePolymorphicStep<
-    TResource extends PgResource<any, any, any, any, any>,
-  >
-  extends Step<unknown>
-  implements PolymorphicStep
-{
+  TResource extends PgResource<any, any, any, any, any>,
+> extends Step<unknown> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgSingleTablePolymorphicStep",
@@ -64,11 +60,12 @@ export class PgSingleTablePolymorphicStep<
     ReadonlyArray<unknown[]>
   > | null> {
     const valuesDep = values[this.typeStepId];
+    const rowsDep = values[this.rowStepId];
     return indexMap<
       PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
     >((i) => {
       const v = valuesDep.at(i);
-      return v ? polymorphicWrap(v) : null;
+      return v ? polymorphicWrap(v, rowsDep.at(i)) : null;
     });
   }
 }

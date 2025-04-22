@@ -16,7 +16,6 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
-import type { PolymorphicStep } from "../step.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
@@ -196,7 +195,7 @@ export class GraphQLResolverStep extends UnbatchedStep {
 }
 
 /** @internal */
-export class GraphQLItemHandler extends Step implements PolymorphicStep {
+export class GraphQLItemHandler extends Step {
   static $$export = {
     moduleName: "grafast",
     exportName: "GraphQLItemHandler",
@@ -226,10 +225,6 @@ export class GraphQLItemHandler extends Step implements PolymorphicStep {
       }
       this.abstractType = nullableType;
     }
-  }
-
-  planForType() {
-    return this;
   }
 
   listItem($item: __ItemStep<any>) {
