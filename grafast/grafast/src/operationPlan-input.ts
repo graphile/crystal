@@ -45,7 +45,7 @@ export function withFieldArgsForArguments<T extends Step>(
   applyAfterMode: ApplyAfterModeArg,
   coordinate: string,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
-): Exclude<T, undefined | null> | null {
+): T | null {
   if (operationPlan.loc !== null)
     operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
 
@@ -208,6 +208,11 @@ export function withFieldArgsForArguments<T extends Step>(
   }
 
   const result = callback(fieldArgs);
+  if (result === undefined) {
+    throw new Error(
+      `Field ${coordinate} returned 'undefined'; perhaps you forgot the 'return' statement?`,
+    );
+  }
   assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied && result != null) {
@@ -216,7 +221,7 @@ export function withFieldArgsForArguments<T extends Step>(
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
 
-  return (result ?? null) as Exclude<T, null | undefined> | null;
+  return result;
 }
 
 function processAfter(
