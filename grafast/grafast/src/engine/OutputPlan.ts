@@ -308,6 +308,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     }∈${this.layerPlan.id}!${this.rootStep.id}${processRootString}>`;
   }
 
+  // HACK: ensure output objects are ordered correctly
+  expectChild(type: GraphQLObjectType | null, key: string | null) {
+    if (this.type.mode === "root" || this.type.mode === "object") {
+      this.keys[key!] = undefined as any; // placeholder
+    }
+  }
+
   addChild(
     type: GraphQLObjectType | null,
     key: string | null,

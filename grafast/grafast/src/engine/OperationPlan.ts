@@ -1401,6 +1401,7 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
+          outputPlan.expectChild(objectType, responseKey);
           this.queueNextLayer(
             this.planIntoOutputPlan,
             outputPlan,
