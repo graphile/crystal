@@ -94,7 +94,7 @@ export class RemapKeysStep extends UnbatchedStep {
       }
     }
     // If we're not actually remapping, just return the parent
-    return this.getDep(0);
+    return this.getDep(0) as Step;
   }
 
   finalize(): void {
