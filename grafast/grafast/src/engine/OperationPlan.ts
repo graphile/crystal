@@ -9,10 +9,10 @@ import type {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
+  GraphQLUnionType,
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
-import { GraphQLUnionType } from "graphql";
 import * as graphql from "graphql";
 import te from "tamedevil";
 
@@ -4142,10 +4142,9 @@ export class OperationPlan {
         case "resolveType": {
           polyPaths = new Set();
           const graphqlType = layerPlan.reason.graphqlType;
-          const allPossibleObjectTypes =
-            graphqlType instanceof GraphQLUnionType
-              ? graphqlType.getTypes()
-              : this.schema.getImplementations(graphqlType).objects;
+          const allPossibleObjectTypes = isUnionType(graphqlType)
+            ? graphqlType.getTypes()
+            : this.schema.getImplementations(graphqlType).objects;
           for (const lp of layerPlan.reason.parentLayerPlans) {
             const paths = processPolymorphicPathsInLayerPlan(lp);
             for (const baseP of paths) {
