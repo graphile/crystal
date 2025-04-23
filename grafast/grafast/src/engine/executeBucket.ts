@@ -1060,13 +1060,7 @@ export function executeBucket(
           `GrafastInternalError<c33328fe-6758-4699-8ac6-7be41ce58bfb>: a step without polymorphic paths cannot belong to a polymorphic bucket`,
         );
       }
-      if (!needsFiltering) {
-        const isSelectiveStep =
-          step.layerPlan.reason.type === "polymorphic" &&
-          step.polymorphicPaths!.size !==
-            step.layerPlan.reason.polymorphicPaths.size;
-        needsFiltering ||= isSelectiveStep;
-      }
+      needsFiltering ||= step._isSelectiveStep;
       const result = needsFiltering
         ? reallyExecuteStepWithFiltering(
             step,

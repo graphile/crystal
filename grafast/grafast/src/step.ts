@@ -121,6 +121,13 @@ export /* abstract */ class Step<TData = any> {
   /** @internal */
   public _isUnaryLocked: boolean;
   /**
+   * Set `true` if this step should only run for certain of the polymorphic
+   * paths available in its LayerPlan.
+   *
+   * @internal
+   */
+  public _isSelectiveStep: boolean;
+  /**
    * For input values, set `true` if it comes from variables/arguments since
    * they cannot be modified (even by mutations), set `false` otherwise.
    *
@@ -280,6 +287,8 @@ export /* abstract */ class Step<TData = any> {
     this.operationPlan = layerPlan.operationPlan;
     this._isUnary = true;
     this._isUnaryLocked = false;
+    // Populated in `OperationPlan` during `finalizeLayerPlans`
+    this._isSelectiveStep = false;
 
     this.implicitSideEffectStep = null;
     this.hasSideEffects ??= false;

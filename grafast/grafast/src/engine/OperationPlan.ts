@@ -9,10 +9,10 @@ import type {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
-  GraphQLUnionType,
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
+import { GraphQLUnionType } from "graphql";
 import * as graphql from "graphql";
 import te from "tamedevil";
 
@@ -4086,6 +4086,7 @@ export class OperationPlan {
       }
     };
 
+    // Track exactly which steps are in which layer plans
     for (const layerPlan of this.stepTracker.layerPlans) {
       if (!layerPlan) {
         continue;
@@ -4094,6 +4095,95 @@ export class OperationPlan {
     }
     for (const step of this.stepTracker.activeSteps) {
       step.layerPlan.steps.push(step);
+    }
+
+    // For each layer plan, track the polymorphic types, and mark the steps in
+    // that layer plan as selective if they don't possess the same number of
+    // poly paths.
+    const polyPathsByLayerPlan = new Map<LayerPlan, Set<string>>();
+    const processPolymorphicPathsInLayerPlan = (
+      layerPlan: LayerPlan,
+    ): Set<string> => {
+      const existing = polyPathsByLayerPlan.get(layerPlan);
+      if (existing) {
+        return existing;
+      }
+
+      const parentPolyPaths = layerPlan.parentLayerPlan
+        ? processPolymorphicPathsInLayerPlan(layerPlan.parentLayerPlan)
+        : new Set<string>();
+      let polyPaths: Set<string>;
+      switch (layerPlan.reason.type) {
+        case "root":
+        case "nullableBoundary":
+        case "listItem":
+        case "defer":
+        case "subroutine":
+        case "subscription":
+        case "mutationField": {
+          polyPaths = parentPolyPaths;
+          break;
+        }
+        case "combined": {
+          polyPaths = new Set();
+          for (const lp of layerPlan.reason.parentLayerPlans) {
+            const paths = processPolymorphicPathsInLayerPlan(lp);
+            for (const p of paths) {
+              if (polyPaths.has(p)) {
+                throw new Error(
+                  `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} found for ${layerPlan}`,
+                );
+              }
+              polyPaths.add(p);
+            }
+          }
+          break;
+        }
+        case "resolveType": {
+          polyPaths = new Set();
+          const graphqlType = layerPlan.reason.graphqlType;
+          const allPossibleObjectTypes =
+            graphqlType instanceof GraphQLUnionType
+              ? graphqlType.getTypes()
+              : this.schema.getImplementations(graphqlType).objects;
+          for (const lp of layerPlan.reason.parentLayerPlans) {
+            const paths = processPolymorphicPathsInLayerPlan(lp);
+            for (const baseP of paths) {
+              for (const ot of allPossibleObjectTypes) {
+                const p = `${baseP || ""}>${ot.name}`;
+
+                if (polyPaths.has(p)) {
+                  throw new Error(
+                    `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} found for ${layerPlan}`,
+                  );
+                }
+                polyPaths.add(p);
+              }
+            }
+          }
+          break;
+        }
+        case "polymorphic": {
+          polyPaths = layerPlan.reason.polymorphicPaths;
+          break;
+        }
+      }
+
+      for (const step of layerPlan.steps) {
+        if (
+          step.polymorphicPaths !== null &&
+          step.polymorphicPaths.size !== polyPaths.size
+        ) {
+          step._isSelectiveStep = true;
+        }
+      }
+
+      polyPathsByLayerPlan.set(layerPlan, polyPaths);
+      return polyPaths;
+    };
+    for (const layerPlan of this.stepTracker.layerPlans) {
+      if (!layerPlan) continue;
+      processPolymorphicPathsInLayerPlan(layerPlan);
     }
 
     for (const layerPlan of this.stepTracker.layerPlans) {
