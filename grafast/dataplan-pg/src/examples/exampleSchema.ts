@@ -26,10 +26,12 @@ import type {
   GrafastSubscriber,
   ListStep,
   Maybe,
+  Step,
 } from "grafast";
 import {
   __ListTransformStep,
   __ValueStep,
+  access,
   bakedInput,
   connection,
   ConnectionStep,
@@ -1924,6 +1926,10 @@ export function makeExampleSchema(
 
   const User = newObjectTypeBuilder<UserStep>(PgSelectSingleStep)({
     name: "User",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<string>;
+      return userResource.get({ id: $id });
+    },
     fields: () => ({
       // Here we don't use `attrField` because we want to explicitly test the default plan resolver
       // username: attrField("username", GraphQLString),
@@ -2066,6 +2072,10 @@ export function makeExampleSchema(
   });
   const Message = newObjectTypeBuilder<MessageStep>(PgSelectSingleStep)({
     name: "Message",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<string>;
+      return messageResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLString),
       featured: attrField("featured", GraphQLBoolean),
@@ -2427,6 +2437,10 @@ export function makeExampleSchema(
   type GQLObj = GraphQLObjectType<any, OurGraphQLContext>;
   const Forum: GQLObj = newObjectTypeBuilder<ForumStep>(PgSelectSingleStep)({
     name: "Forum",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<string>;
+      return forumResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLString),
       name: attrField("name", GraphQLString),
@@ -3003,6 +3017,10 @@ export function makeExampleSchema(
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonBookmarkStep>(PgSelectSingleStep)({
       name: "PersonBookmark",
+      getBySpecifier($specifier) {
+        const $id = access($specifier, "id") as Step<number>;
+        return personBookmarksResource.get({ id: $id });
+      },
       fields: () => ({
         id: attrField("id", GraphQLInt),
         person: singleRelationField("person", Person),
@@ -3023,6 +3041,10 @@ export function makeExampleSchema(
   const Person: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonStep>(PgSelectSingleStep)({
       name: "Person",
+      getBySpecifier($specifier) {
+        const $personId = access($specifier, "person_id") as Step<number>;
+        return personResource.get({ person_id: $personId });
+      },
       fields: () => ({
         personId: attrField("person_id", GraphQLInt),
         username: attrField("username", GraphQLString),
@@ -3095,6 +3117,10 @@ export function makeExampleSchema(
 
   const Post: GQLObj = newObjectTypeBuilder<PostStep>(PgSelectSingleStep)({
     name: "Post",
+    getBySpecifier($specifier) {
+      const $postId = access($specifier, "post_id") as Step<number>;
+      return postResource.get({ post_id: $postId });
+    },
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
       body: attrField("body", GraphQLString),
@@ -3105,6 +3131,10 @@ export function makeExampleSchema(
   const Comment: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<CommentStep>(PgSelectSingleStep)({
       name: "Comment",
+      getBySpecifier($specifier) {
+        const $commentId = access($specifier, "comment_id") as Step<number>;
+        return commentResource.get({ comment_id: $commentId });
+      },
       fields: () => ({
         commentId: attrField("comment_id", GraphQLInt),
         author: singleRelationField("author", Person),
@@ -3168,6 +3198,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableTopic",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3179,6 +3213,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTablePost",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3192,6 +3230,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableDivider",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3204,6 +3246,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklist",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3215,6 +3261,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklistItem",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3283,6 +3333,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalTopic",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return relationalTopicsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3294,6 +3348,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalPost",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return relationalPostsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3331,6 +3389,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalDivider",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return relationalDividersResource.get({ id: $id });
+    },
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3343,6 +3405,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalChecklist",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return relationalChecklistsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3354,6 +3420,10 @@ export function makeExampleSchema(
   type RC = RelationalChecklistItemStep;
   const RelationalChecklistItem = newObjectTypeBuilder<RC>(PgSelectSingleStep)({
     name: "RelationalChecklistItem",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return relationalChecklistItemsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3377,6 +3447,10 @@ export function makeExampleSchema(
 
   const UnionTopic = newObjectTypeBuilder<UnionTopicStep>(PgSelectSingleStep)({
     name: "UnionTopic",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return unionTopicsResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3385,6 +3459,10 @@ export function makeExampleSchema(
 
   const UnionPost = newObjectTypeBuilder<UnionPostStep>(PgSelectSingleStep)({
     name: "UnionPost",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return unionPostsResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3397,6 +3475,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionDivider",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return unionDividersResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3408,6 +3490,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklist",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return unionChecklistsResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3418,6 +3504,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklistItem",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return unionChecklistItemsResource.get({ id: $id });
+    },
     fields: () => ({
       id: attrField("id", GraphQLInt),
       description: attrField("description", GraphQLString),
@@ -3445,6 +3535,10 @@ export function makeExampleSchema(
 
   const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "FirstPartyVulnerability",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return firstPartyVulnerabilitiesResource.get({ id: $id });
+    },
     interfaces: [Vulnerability],
     fields: {
       id: {
@@ -3492,6 +3586,10 @@ export function makeExampleSchema(
 
   const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "ThirdPartyVulnerability",
+    getBySpecifier($specifier) {
+      const $id = access($specifier, "id") as Step<number>;
+      return thirdPartyVulnerabilitiesResource.get({ id: $id });
+    },
     interfaces: [Vulnerability],
     fields: {
       id: {
