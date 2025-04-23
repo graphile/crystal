@@ -709,12 +709,12 @@ function flag(f: number): ExecutionEntryFlags {
   return f as ExecutionEntryFlags;
 }
 
-export const NO_FLAGS = flag(0);
-export const FLAG_ERROR = flag(1 << 0);
-export const FLAG_NULL = flag(1 << 1);
-export const FLAG_INHIBITED = flag(1 << 2);
-export const FLAG_POLY_SKIPPED = flag(1 << 3);
-export const FLAG_STOPPED = flag(1 << 4);
+export const NO_FLAGS = flag(0); // 0
+export const FLAG_ERROR = flag(1 << 0); // 1
+export const FLAG_NULL = flag(1 << 1); // 2
+export const FLAG_INHIBITED = flag(1 << 2); // 4
+export const FLAG_POLY_SKIPPED = flag(1 << 3); // 8
+export const FLAG_STOPPED = flag(1 << 4); // 16
 export const ALL_FLAGS = flag(
   FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED | FLAG_STOPPED,
 );
