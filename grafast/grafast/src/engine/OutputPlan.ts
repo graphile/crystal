@@ -284,9 +284,28 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   toString() {
+    let processRootString = "";
+    if (this.processRoot != null) {
+      const fnBody = this.processRoot.toString();
+      const VALUE_ARROW = "value => ";
+      if (fnBody.startsWith(VALUE_ARROW)) {
+        const sliced = fnBody.slice(VALUE_ARROW.length);
+        if (
+          sliced.startsWith("(value") &&
+          sliced.endsWith(")") &&
+          sliced.replace(/[()]/g, "").length === sliced.length - 2
+        ) {
+          processRootString = sliced.slice(6, -1);
+        } else {
+          processRootString = `:value=>${sliced}`;
+        }
+      } else {
+        processRootString = `:${fnBody}`;
+      }
+    }
     return `OutputPlan<${this.type.mode}${
       this.sideEffectStep ? `^${this.sideEffectStep.id}` : ""
-    }∈${this.layerPlan.id}!${this.rootStep.id}>`;
+    }∈${this.layerPlan.id}!${this.rootStep.id}${processRootString}>`;
   }
 
   addChild(
