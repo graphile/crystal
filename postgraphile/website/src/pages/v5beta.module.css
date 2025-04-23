@@ -7,7 +7,7 @@
 
 .progressForeground {
   height: 3rem;
-  width: 75%;
+  width: 80%;
   background-color: var(--ifm-color-primary-dark);
   color: white;
   border-radius: 6px;
