@@ -1147,8 +1147,7 @@ export class OperationPlan {
         const usesDefaultResolver =
           resolvedResolver == null || resolvedResolver === defaultFieldResolver;
 
-        const isPolymorphic =
-          isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+        // const isPolymorphic = isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
 
         // We should use a resolver if:
         // 1. they give us a non-default resolver
@@ -1156,7 +1155,7 @@ export class OperationPlan {
         const resolver =
           resolvedResolver && !usesDefaultResolver
             ? resolvedResolver
-            : resolverEmulation && isPolymorphic
+            : resolverEmulation //  && isPolymorphic
               ? defaultFieldResolver
               : null;
 
@@ -2114,6 +2113,7 @@ export class OperationPlan {
           parentObjectType,
           responseKey,
           isNonNull,
+          resolverEmulation,
         );
 
         //if (allPossibleObjectTypes.length > 0) {
@@ -2148,6 +2148,7 @@ export class OperationPlan {
     _parentObjectType: GraphQLObjectType | null, // Used by this.mutateTodos
     _responseKey: string | null, // Used by this.mutateTodos
     isNonNull: boolean,
+    resolverEmulation: boolean,
   ) {
     if (outputPlan.type.mode !== "polymorphic") {
       throw new Error(
@@ -2237,6 +2238,7 @@ export class OperationPlan {
           fieldNodes,
           locationDetails,
           isNonNull,
+          resolverEmulation,
         );
       } finally {
         resolveTypeLayerPlan.latestSideEffectStep = $sideEffect;
@@ -2259,6 +2261,7 @@ export class OperationPlan {
     fieldNodes: readonly FieldNode[],
     locationDetails: LocationDetails,
     isNonNull: boolean,
+    resolverEmulation: boolean,
   ) {
     if (outputPlan.type.mode !== "polymorphic") {
       throw new Error(
@@ -2297,7 +2300,7 @@ export class OperationPlan {
       type,
       polymorphicLayerPlan,
       fieldNodes,
-      false,
+      resolverEmulation,
     );
     polymorphicOutputPlan.addChild(type, null, {
       type: "outputPlan",
