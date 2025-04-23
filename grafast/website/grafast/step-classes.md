@@ -539,6 +539,25 @@ class MyQueryStep extends Step {
 }
 ```
 
+### specifier()
+
+This is used for polymorphism to get a "specifier" object to be used by the
+polymorphic types `resolveType` method to a) determine which type the value is,
+and b) detail the information necessary to fetch the relevant node (think:
+database primary keys). <grafast /> does not require that a specifier takes a
+particular form, it's an agreement between the steps you're using and the
+polymorphic types (unions and interfaces) that you've implemented. We strongly
+recommend it's a plain-old JavaScript object though!
+
+```ts
+  specifier() {
+    return object({
+      __typename: this.get("type"),
+      id: this.get("id"),
+    });
+  }
+```
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come

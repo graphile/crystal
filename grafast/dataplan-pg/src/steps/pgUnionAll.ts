@@ -19,6 +19,7 @@ import {
   first,
   isDev,
   isPromiseLike,
+  lambda,
   polymorphicWrap,
   reverseArray,
   SafeError,
@@ -32,7 +33,12 @@ import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor, PgExecutorInput } from "../executor.js";
-import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
+import type {
+  PgCodecRefPath,
+  PgCodecRelation,
+  PgCodecWithAttributes,
+  PgGroupSpec,
+} from "../index.js";
 import type {
   PgCodec,
   PgOrderFragmentSpec,
@@ -252,11 +258,16 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    // TODO: we should add validation of this!
-    const $item = this.getDep<any>(0);
-    const $rows = $item.getDep(0);
-    const $pgUnionAll = $rows.getDep(0);
-    return $pgUnionAll;
+    let $parent = this.getDepDeep(0);
+    if ($parent instanceof PgUnionAllRowsStep) {
+      $parent = $parent.getClassStep();
+    }
+    if (!($parent instanceof PgUnionAllStep)) {
+      throw new Error(
+        `${this} failed to get the parent PgUnionAllStep; last step found was ${$parent}`,
+      );
+    }
+    return $parent;
   }
 
   public getMeta(key: string) {
@@ -314,29 +325,45 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
+  specifier() {
+    if (this.typeKey == null || this.pkKey == null) {
+      throw new Error("Cannot call `specifier` unless in normal mode");
+    }
+    const $type = access(this, this.typeKey) as Step<string>;
+    const $pk = access(this, this.pkKey) as Step<string>;
+    return lambda([$type, $pk], ([__typename, pkJson]) => {
+      if (__typename == null || pkJson == null) return null;
+      const pkObj = JSON.parse(pkJson);
+      const finalResource = this.spec.resourceByTypeName[__typename];
+      const codec = finalResource.codec as PgCodecWithAttributes;
+      const pk = (finalResource.uniques as PgResourceUnique[])?.find(
+        (u) => u.isPrimary === true,
+      );
+      if (!pk) {
+        throw new Error(`Could not determine primary key for ${__typename}`);
+      }
+      const result: Record<string, any> = { __typename };
+      for (let i = 0, l = pk.attributes.length; i < l; i++) {
+        const rawVal = pkObj[i];
+        const attrName = pk.attributes[i];
+        const attr = codec.attributes[attrName];
+        result[attrName] = rawVal == null ? rawVal : attr.codec.fromPg(rawVal);
+      }
+      return result;
+    });
+  }
+
   execute({
     count,
     values: [values0],
   }: ExecutionDetails): GrafastResultsList<any> {
-    if (this.typeKey !== null) {
-      const typeKey = this.typeKey;
-      return values0.isBatch
-        ? values0.entries.map((v) => {
-            if (v == null) return null;
-            const type = v[typeKey];
-            return polymorphicWrap(type, v);
-          })
-        : arrayOfLength(
-            count,
-            values0.value == null
-              ? null
-              : polymorphicWrap(values0.value[typeKey], values0.value),
-          );
-    } else {
-      return values0.isBatch
-        ? values0.entries
-        : arrayOfLength(count, values0.value);
-    }
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
+  }
+
+  [$$toSQL]() {
+    return this.getClassStep().alias;
   }
 }
 

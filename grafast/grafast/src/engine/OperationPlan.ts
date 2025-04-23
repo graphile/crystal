@@ -2098,13 +2098,28 @@ export class OperationPlan {
         });
       } else {
         const polymorphicResolvePlanningPath = planningPath + "<*>";
+        const $specifier =
+          "specifier" in $step && typeof $step.specifier === "function"
+            ? withGlobalLayerPlan(
+                parentLayerPlan,
+                polymorphicPaths,
+                planningPath,
+                $step.specifier as (this: typeof $step) => Step,
+                $step,
+              )
+            : $step;
+        if (isDev && !($specifier instanceof Step)) {
+          throw new Error(
+            `Expected ${$step}.specifier() to return a step, instead found ${inspect($specifier)}`,
+          );
+        }
         this.queueNextLayer(
           this.polymorphicResolveType,
           parentOutputPlan,
           path,
           polymorphicResolvePlanningPath,
           polymorphicPaths,
-          $step, // NOTE: This will be batched and turned into a data step
+          $specifier, // NOTE: This will be batched and turned into a data step
           nullableFieldType,
           parentLayerPlan, // NOTE: This will be batched and turned into a resolveType layer plan
           selections,
