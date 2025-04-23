@@ -1675,17 +1675,22 @@ export class OperationPlan {
           graphqlType,
           parentLayerPlans,
         });
-        const basePolyPaths = new Set<string | null>();
+        // PERF: we only actually need the keys of this, the values are just
+        // for debugging (see the error message), so we could use a Set
+        // instead.
+        const basePolyPaths = new Map<string | null, Step>();
         const add = ($step: Step, p: string | null) => {
           if (basePolyPaths.has(p)) {
             throw new Error(
-              `GrafastInternalError<2641aafe-db44-4572-883b-74eeea897493>: Saw ${$step} at ${planningPath} with polyPath of ${p}, but that path was already registered!`,
+              `GrafastInternalError<2641aafe-db44-4572-883b-74eeea897493>: Saw ${$step} at ${planningPath} with polyPath of ${p}, but that path was already registered to ${basePolyPaths.get(p)}!`,
             );
           }
-          basePolyPaths.add(p);
+          basePolyPaths.set(p, $step);
         };
-        for (const args of argsTupleList) {
-          const $step = args[IDX_PARENT_STEP];
+        const sourceSteps = new Set(
+          argsTupleList.map((args) => args[IDX_PARENT_STEP]),
+        );
+        for (const $step of sourceSteps) {
           if ($step.polymorphicPaths) {
             for (const p of $step.polymorphicPaths) {
               add($step, p);
@@ -1695,7 +1700,7 @@ export class OperationPlan {
           }
         }
         const resolveTypePolymorphicPaths = new Set<string>();
-        for (const basePath of basePolyPaths) {
+        for (const basePath of basePolyPaths.keys()) {
           for (const objectType of allPossibleObjectTypes) {
             const newPath = `${basePath ?? ""}>${objectType.name}`;
             resolveTypePolymorphicPaths.add(newPath);
@@ -1710,8 +1715,7 @@ export class OperationPlan {
           false,
         );
         $data._isUnary = false;
-        const sourceSteps = argsTupleList.map((args) => args[IDX_PARENT_STEP]);
-        resolveTypeLayerPlan.addCombo(sourceSteps, $data);
+        resolveTypeLayerPlan.addCombo([...sourceSteps], $data);
 
         /*
          * An output plan for it (knows how to branch the different object
