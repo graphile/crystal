@@ -936,7 +936,20 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   // TODO: implement this!
                   const graphqlContext = null as unknown;
                   // TODO: implement this!
-                  const info = null as unknown as GraphQLResolveInfo;
+                  const info: GraphQLResolveInfo = {
+                    // TODO: populate a version of this as a unary step in the
+                    // plan (maybe step 0?) so everything can trivially inherit
+                    // from it.
+                    ...this.operationPlan.resolveInfoOperationBase,
+                    rootValue: null as any,
+                    variableValues: null as any,
+
+                    fieldName: null as any,
+                    fieldNodes: null as any,
+                    parentType: null as any,
+                    returnType: null as any,
+                    path: null as any,
+                  };
 
                   if (isPolymorphicData(value)) {
                     // Legacy hack

@@ -354,6 +354,12 @@ export class OperationPlan {
     // TODO: actually tidy this up
   }
 
+  /** @internal */
+  public resolveInfoOperationBase: Pick<
+    graphql.GraphQLResolveInfo,
+    "schema" | "operation" | "fragments"
+  >;
+
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly operation: OperationDefinitionNode,
@@ -368,6 +374,11 @@ export class OperationPlan {
     public readonly rootValue: any,
     private readonly planningTimeout: number | null,
   ) {
+    this.resolveInfoOperationBase = {
+      schema,
+      operation,
+      fragments,
+    };
     this.variableValuesConstraints = variableValuesConstraints;
     this.contextConstraints = contextConstraints;
     this.rootValueConstraints = rootValueConstraints;
@@ -945,13 +956,11 @@ export class OperationPlan {
             this.trackedRootValueStep,
             $args,
             {
+              ...this.resolveInfoOperationBase,
               fieldName,
               fieldNodes: fields,
-              fragments: this.fragments,
-              operation: this.operation,
               parentType: this.subscriptionType!,
               returnType: fieldSpec.type,
-              schema: this.schema,
               // @ts-ignore
               path: {
                 typename: this.subscriptionType!.name,
@@ -1372,13 +1381,11 @@ export class OperationPlan {
                 }, Object.create(null)) ?? Object.create(null),
               );
               return graphqlResolver(resolver, subscriber, step, $args, {
+                ...this.resolveInfoOperationBase,
                 fieldName,
                 fieldNodes,
-                fragments: this.fragments,
-                operation: this.operation,
                 parentType: objectType,
                 returnType: fieldType,
-                schema: this.schema,
               });
             },
           );
