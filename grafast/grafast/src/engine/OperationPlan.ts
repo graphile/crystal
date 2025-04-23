@@ -1698,9 +1698,7 @@ export class OperationPlan {
         const resolveTypePolymorphicPaths = new Set<string>();
         for (const basePath of basePolyPaths) {
           for (const objectType of allPossibleObjectTypes) {
-            const newPath = basePath
-              ? `${basePath}>${objectType.name}`
-              : objectType.name;
+            const newPath = `${basePath ?? ""}>${objectType.name}`;
             resolveTypePolymorphicPaths.add(newPath);
           }
         }
@@ -1712,6 +1710,7 @@ export class OperationPlan {
           null,
           false,
         );
+        $data._isUnary = false;
         const sourceSteps = argsTupleList.map((args) => args[IDX_PARENT_STEP]);
         resolveTypeLayerPlan.addCombo(sourceSteps, $data);
 

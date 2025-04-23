@@ -124,13 +124,15 @@ export class GraphQLResolverStep extends UnbatchedStep {
   }
 
   toStringMeta() {
-    return (
+    const resolverName =
       this.resolver?.displayName ||
       this.resolver?.name ||
       this.subscriber?.displayName ||
       this.subscriber?.name ||
-      null
-    );
+      null;
+    return `${this.resolveInfoBase.parentType.name}.${this.resolveInfoBase.fieldName}${
+      resolverName && resolverName !== "resolve" ? `:${resolverName}` : ""
+    }`;
   }
 
   unbatchedExecute(
@@ -225,6 +227,10 @@ export class GraphQLItemHandler extends Step {
       }
       this.abstractType = nullableType;
     }
+  }
+
+  public toStringMeta(): string | null {
+    return String(this.getDepOptions(0).step.id);
   }
 
   listItem($item: __ItemStep<any>) {

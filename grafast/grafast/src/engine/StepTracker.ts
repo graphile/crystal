@@ -259,7 +259,10 @@ export class StepTracker {
           .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
       }
     }
-    if (layerPlan.reason.type === "combined") {
+    if (
+      layerPlan.reason.type === "combined" ||
+      layerPlan.reason.type === "resolveType"
+    ) {
       for (const combo of layerPlan.combinations) {
         for (const source of combo.sources) {
           const step = this.getStepById(source.stepId);

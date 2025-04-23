@@ -443,7 +443,10 @@ export function planToMermaid(
   // Handle concat for any "combination" layer plans
   for (let i = 0, l = layerPlans.length; i < l; i++) {
     const layerPlan = layerPlans[i];
-    if (layerPlan.reason.type === "combined") {
+    if (
+      layerPlan.reason.type === "combined" ||
+      layerPlan.reason.type === "resolveType"
+    ) {
       for (const { targetStepId, sources } of layerPlan.reason.combinations) {
         const targetStep = stepById[targetStepId];
         for (const { stepId } of sources) {

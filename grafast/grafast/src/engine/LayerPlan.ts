@@ -365,7 +365,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         reason.type != "root",
         "Non-root LayerPlan must have a parentStep",
       );
-      if (reason.type === "combined") {
+      if (reason.type === "combined" || reason.type === "resolveType") {
         assert.ok(
           reason.parentLayerPlans.includes(parentLayerPlan),
           "GrafastInternalError<f68525c6-d82d-41ff-9648-8227134690f3>: combined layer plan parent inconsistency",
@@ -695,10 +695,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
 
-        // We're only copying over the entries that match this type (note:
-        // they may end up being null, but that's okay)
-        const targetTypeNames = this.reason.typeNames;
-
         for (const stepId of copyStepIds) {
           const ev = parentBucket.store.get(stepId);
           if (!ev) {
@@ -735,30 +731,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           ) {
             continue;
           }
-          // const value = polymorphicPlanStore.at(originalIndex);
-          // PERF: ideally we can just use the object type at this index
-          const polymorphicPath =
-            parentBucket.polymorphicPathList.at(originalIndex);
-          const i = polymorphicPath?.lastIndexOf(">");
-          const typeName =
-            i === -1
-              ? polymorphicPath!
-              : i != null && i >= 0
-                ? polymorphicPath!.slice(i + 1)
-                : "__ERROR";
-          if (!targetTypeNames.includes(typeName)) {
-            continue;
-          }
           const newIndex = size++;
           map.set(originalIndex, newIndex);
-
-          // PERF: might be faster if we look this up as a constant rather than using concatenation here
-          const newPolymorphicPath =
-            (parentBucket.polymorphicPathList[originalIndex] ?? "") +
-            ">" +
-            typeName;
-
-          polymorphicPathList[newIndex] = newPolymorphicPath;
+          const polymorphicPath =
+            parentBucket.polymorphicPathList.at(originalIndex)!;
+          polymorphicPathList[newIndex] = polymorphicPath;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
           for (const planId of copyStepIds) {
             const ev = store.get(planId)!;
@@ -943,7 +920,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               // the new poly path
               const flags = ev._flagsAt(newIndex);
               if (flags & (FLAG_ERROR | FLAG_STOPPED | FLAG_INHIBITED)) {
-                polymorphicPathList[newIndex] = sourcePolyPath + ">__ERROR";
+                const resolvedTypeName = "__ERROR";
+                polymorphicPathList[newIndex] =
+                  (sourcePolyPath || "") + ">" + resolvedTypeName;
               } else {
                 try {
                   if (!graphqlType) {
@@ -1016,12 +995,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   }
 
                   polymorphicPathList[newIndex] =
-                    sourcePolyPath + ">" + resolvedTypeName;
+                    (sourcePolyPath || "") + ">" + resolvedTypeName;
                 } catch (originalError) {
                   // If an error happens here, we must overwrite the value in `ev`
                   const flags = FLAG_ERROR | FLAG_STOPPED;
                   flagUnion |= flags;
                   ev._setResult(newIndex, originalError, flags);
+                  const resolvedTypeName = "__ERROR";
+                  polymorphicPathList[newIndex] =
+                    (sourcePolyPath || "") + ">" + resolvedTypeName;
                 }
               }
             } else {
