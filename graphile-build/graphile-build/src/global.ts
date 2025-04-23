@@ -235,7 +235,7 @@ declare global {
             | ((step: Step) => asserts step is TParentStep)
             | { new (...args: any[]): TParentStep }
         : null;
-      plan?: (step: Step) => TParentStep;
+      getBySpecifier?: ($specifier: Step) => TParentStep;
     }
 
     /** Our take on GraphQLInputObjectTypeConfig that allows for plans */

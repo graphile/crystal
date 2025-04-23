@@ -550,12 +550,38 @@ polymorphic types (unions and interfaces) that you've implemented. We strongly
 recommend it's a plain-old JavaScript object though!
 
 ```ts
+class MyStep extends Step {
+  // ...
   specifier() {
     return object({
       __typename: this.get("type"),
       id: this.get("id"),
     });
   }
+}
+
+const Animal = new GraphQLInterfaceType({
+  name: "Animal",
+  // ... fields ...
+  resolveType(specifier) {
+    // Extract the property that indicates the type from above
+    return specifier.__typename;
+  },
+});
+
+const Cat = new GraphQLObjectType({
+  name: "Cat",
+  interfaces: [Animal],
+  // ... fields ...
+  extensions: {
+    grafast: {
+      getBySpecifier($specifier) {
+        const $id = access($specifier, "id");
+        return cats.get({ id: $id });
+      },
+    },
+  },
+});
 ```
 
 ## Built in methods

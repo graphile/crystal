@@ -2217,22 +2217,22 @@ export class OperationPlan {
           newPolymorphicPaths.add(newPolymorphicPath);
         }
 
-        const $root = nullableFieldType.extensions?.grafast?.planType
+        const $root = nullableFieldType.extensions?.grafast?.getBySpecifier
           ? withGlobalLayerPlan(
               resolveTypeLayerPlan,
               newPolymorphicPaths,
               polymorphicPlanningPath,
-              nullableFieldType.extensions.grafast.planType,
+              nullableFieldType.extensions.grafast.getBySpecifier,
               nullableFieldType.extensions.grafast,
               type,
               $data,
             )
-          : type.extensions.grafast?.plan
+          : type.extensions.grafast?.getBySpecifier
             ? withGlobalLayerPlan(
                 resolveTypeLayerPlan,
                 newPolymorphicPaths,
                 polymorphicPlanningPath,
-                type.extensions.grafast.plan,
+                type.extensions.grafast.getBySpecifier,
                 type.extensions.grafast,
                 $data,
               )

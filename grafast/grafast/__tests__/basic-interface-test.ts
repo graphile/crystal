@@ -34,8 +34,8 @@ const makeSchema = () =>
           if (obj.type === "ready") return "UserNotificationReady";
           if (obj.type === "logout") return "UserNotificationLogout";
         },
-        __planType(objectType: GraphQLObjectType, $data: Step) {
-          return $data;
+        __getBySpecifier(objectType: GraphQLObjectType, $specifier: Step) {
+          return $specifier;
         },
       },
       Query: {
@@ -57,7 +57,8 @@ it(`sets the relevant properties on the schema`, async () => {
   ) as GraphQLInterfaceType;
   expect(UserNotification).to.be.instanceof(GraphQLInterfaceType);
   expect(UserNotification.resolveType, "resolveType").to.exist;
-  expect(UserNotification.extensions?.grafast?.planType, "planType").to.exist;
+  expect(UserNotification.extensions?.grafast?.getBySpecifier, "getBySpecifier")
+    .to.exist;
 });
 
 it(`works with plans`, async () => {

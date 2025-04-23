@@ -347,6 +347,7 @@ export type ObjectTypeSpec<
         | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
+  getBySpecifier?: ($specifier: Step) => TParentStep;
 };
 
 /**
@@ -358,15 +359,16 @@ export function objectSpec<
 >(
   spec: ObjectTypeSpec<TParentStep, TFields>,
 ): GraphQLObjectTypeConfig<any, Grafast.Context> {
-  const { assertStep, ...rest } = spec;
+  const { assertStep, getBySpecifier, ...rest } = spec;
   const modifiedSpec: GraphQLObjectTypeConfig<any, Grafast.Context> = {
     ...rest,
-    ...(assertStep
+    ...(assertStep || getBySpecifier
       ? {
           extensions: {
             ...spec.extensions,
             grafast: {
-              assertStep,
+              ...(assertStep ? { assertStep } : null),
+              ...(getBySpecifier ? { getBySpecifier } : null),
               ...spec.extensions?.grafast,
             },
           },

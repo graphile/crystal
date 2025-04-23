@@ -698,23 +698,22 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
-                  plan:
+                  getBySpecifier:
                     resource && pkCols
                       ? // TODO: optimize this function to look like `return resource.get({...})` via eval
                         EXPORTABLE(
-                          (pkCols, resource) =>
-                            function (step) {
+                          (access, pkCols, resource) => function ($specifier) {
                               const spec = Object.create(null);
                               for (const pkCol of pkCols) {
                                 spec[pkCol] =
-                                  "get" in step &&
-                                  typeof step.get === "function"
-                                    ? step.get(pkCol)
-                                    : access(step, pkCol);
+                                  "get" in $specifier &&
+                                  typeof $specifier.get === "function"
+                                    ? $specifier.get(pkCol)
+                                    : access($specifier, pkCol);
                               }
                               return resource.get(spec);
                             },
-                          [pkCols, resource],
+                          [access, pkCols, resource],
                         )
                       : undefined,
                 }),

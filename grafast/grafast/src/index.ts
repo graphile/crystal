@@ -709,11 +709,11 @@ declare global {
         | null;
 
       /**
-       * Equivalent to InterfaceTypeExtensions.planType or
-       * UnionTypeExtensions.planType, except the type, `t`, is implicit
+       * Equivalent to InterfaceTypeExtensions.getBySpecifier or
+       * UnionTypeExtensions.getBySpecifier, except the type, `t`, is implicit
        * because it is this object type.
        */
-      plan?($data: Step): Step;
+      getBySpecifier?($specifier: Step): Step;
     }
 
     interface InterfaceTypeExtensions {
@@ -721,13 +721,14 @@ declare global {
        * Given:
        *
        * 1. a GraphQL object type `t` that implements this interface, and
-       * 2. a step, $data, representing data that matches this type as
-       *    determined by the interface's resolveType method;
+       * 2. a step, $specifier, representing data that matches this type as
+       *    determined by the interface's resolveType method and contains
+       *    the required information to fetch this value;
        *
        * return an appropriate step to use to resolve selection sets on this
        * concrete type.
        */
-      planType?(t: GraphQLObjectType, $data: Step): Step;
+      getBySpecifier?(t: GraphQLObjectType, $specifier: Step): Step;
     }
 
     interface UnionTypeExtensions {
@@ -735,13 +736,14 @@ declare global {
        * Given:
        *
        * 1. a GraphQL object type `t` that belongs to this union, and
-       * 2. a step, $data, representing data that matches this type as
-       *    determined by the union's resolveType method;
+       * 2. a step, $specifier, representing data that matches this type as
+       *    determined by the union's resolveType method and contains
+       *    the required information to fetch this value;
        *
        * return an appropriate step to use to resolve selection sets on this
        * concrete type.
        */
-      planType?(t: GraphQLObjectType, $data: Step): Step;
+      getBySpecifier?(t: GraphQLObjectType, $specifier: Step): Step;
     }
 
     interface EnumTypeExtensions {}

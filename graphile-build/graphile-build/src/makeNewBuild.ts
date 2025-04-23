@@ -534,8 +534,8 @@ function generateSpecFromDetails(details: TypeDetails) {
     if (details.klass === GraphQLObjectType) {
       // Merge in the Grafast stuff
       const s = spec as GraphileBuild.GrafastObjectTypeConfig;
-      const { assertStep, plan } = s;
-      if (assertStep || plan) {
+      const { assertStep, getBySpecifier } = s;
+      if (assertStep || getBySpecifier) {
         if (!s.extensions) {
           s.extensions = Object.create(null);
         }
@@ -544,7 +544,7 @@ function generateSpecFromDetails(details: TypeDetails) {
         }
         const o = s.extensions!.grafast!;
         if (assertStep) o.assertStep = assertStep;
-        if (plan) o.plan = plan;
+        if (getBySpecifier) o.getBySpecifier = getBySpecifier;
       }
     }
     return spec;
