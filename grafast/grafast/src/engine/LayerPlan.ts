@@ -900,7 +900,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           if (!sourceStore) {
             const step = this.operationPlan.stepTracker.getStepById(stepId);
             throw new Error(
-              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} in ${this}`,
+              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
             );
           }
           for (

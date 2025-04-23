@@ -4382,6 +4382,28 @@ export class OperationPlan {
           }
         }
       }
+
+      if (
+        layerPlan.reason.type === "combined" ||
+        layerPlan.reason.type === "resolveType"
+      ) {
+        // Loop through combinations and ensure source step is available in parent layer plan
+        for (const combo of layerPlan.combinations) {
+          for (const source of combo.sources) {
+            const { stepId, layerPlanId } = source;
+            const sourceLayerPlan = layerPlan.reason.parentLayerPlans.find(
+              (p) => p.id === layerPlanId,
+            );
+            if (!sourceLayerPlan) {
+              throw new Error(
+                `GrafastInternalError<86d15f1e-7ec8-4095-869a-548daa2cea0e>: Could not find the parent layer plan ${layerPlanId} of ${layerPlan}`,
+              );
+            }
+            const step = this.stepTracker.getStepById(stepId);
+            ensurePlanAvailableInLayer(step, sourceLayerPlan);
+          }
+        }
+      }
     }
 
     // Populate copyPlanIds for output plans' rootStepId
