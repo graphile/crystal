@@ -19,23 +19,84 @@ import clsx from "clsx";
   </div>
 </div>
 
-<br />
-<br />
+PostGraphile Version 5 is about 75% of the way to release candidate stage.
+Factors which can increase the rate of release include
+adoption and testing by the community and increased sponsorship of the project.
 
 ## Milestones
 
-- Global dependencies
-- Early exit
-- Eradicating eval
+In the first Gra*fast* working group, four major issues were outlined which need to be addressed before a general release of Gra*fast* and PostGraphile Version 5.
+The first three of these have now been reached, hurrah!
+
+- ✅ Global dependencies
+- ✅ Early exit
+- ✅ Eradicating eval
 - The polymorphism problem
+
+There are many other areas which will influence moving PostGraphile V5 to release candidate stage:
+
+- We need users to upgrade to Version 5 and test it out on real use cases. You don't have to do this in your live production server &mdash; you can run it on a mirror and see the differences before migration. Most importantly, **you should send us feedback** &mdash; good &amp; bad &mdash; through our [community Discord](https://discord.gg/graphile) or email.
+- Smaller issues outside of the above milestones are listed in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. This board is dynamic, new issues get shown here and some of the tasks may be migrated to a V5.1 or later release.
 
 <CalloutSection
   title={`Crowd-funded open-source software`}
-  body={`We're extremely grateful to our sponsors, for helping to fund ongoing development on PostGraphile, Graphile Engine, Graphile Worker and Graphile Migrate.
-  THANK YOU!`}
+  body={`Sponsoring the Graphile project directly increases the time and resources we can spend on getting PostGraphile V5 to release candidate stage. THANK YOU to all our sponsors!`}
   link={`https://graphile.org/sponsor/`}
-  buttonText={`Learn more about sponsors and sponsorship`}
+  buttonText={`Learn more about sponsorship`}
 />
+
+## Recent Releases
+
+Some of the more notable recent releases are listed below. [Graphile sponsors](https://graphile.org/sponsor) have access to release notes through our community support channels.
+Everyone else can see some detail in the PostGraphile [changelog](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md).
+
+<table className={v5betaStyles.releasesTable}>
+
+<thead>
+
+<tr>
+  <th>Date</th>
+  <th>Release</th>
+  <th>Details</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+  <td>2025-03-25</td>
+  <td>beta.40</td>
+  <td>Eradicating eval milestone reached</td>
+</tr>
+
+<tr>
+  <td>2024-12-11</td>
+  <td>beta.36</td>
+  <td>Introduce safe step caching methods</td>
+</tr>
+
+<tr>
+  <td>2024-10-07</td>
+  <td>beta.30</td>
+  <td>Behavior system overhaul</td>
+</tr>
+
+<tr>
+  <td>2024-07-17</td>
+  <td>beta.27</td>
+  <td>Error handling overhaul</td>
+</tr>
+
+<tr>
+  <td>2024-05-09</td>
+  <td>beta.22</td>
+  <td>Early exit and global dependencies milestone reached</td>
+</tr>
+
+</tbody>
+
+</table>
 
 <TertiarySection
   title={`Development Support`}

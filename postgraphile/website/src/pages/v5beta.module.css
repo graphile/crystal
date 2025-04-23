@@ -1,6 +1,8 @@
 .progressBackground {
   background-color: var(--ifm-color-primary-lighter);
   border-radius: 8px;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .progressForeground {
@@ -26,4 +28,52 @@
 
 [data-theme="dark"] .progressForeground {
   background-color: var(--ifm-color-primary-dark);
+}
+
+.releasesTable thead tr,
+.releasesTable thead th,
+.releasesTable tfoot td,
+.releasesTable tfoot th {
+  background-color: white;
+  border: none;
+  border-bottom: 3px solid var(--ifm-color-primary-darker);
+  text-align: left;
+}
+[data-theme="dark"] .releasesTable thead tr,
+[data-theme="dark"] .releasesTable thead th,
+[data-theme="dark"] .releasesTable tfoot td,
+[data-theme="dark"] .releasesTable tfoot th {
+  background-color: var(--ifm-background-color);
+}
+
+.releasesTable tbody td,
+.releasesTable tbody th {
+  border: none;
+  border-bottom: 1px solid var(--ifm-color-primary-darker);
+  background-color: white;
+  text-align: left;
+}
+
+[data-theme="dark"] .releasesTable tbody td,
+[data-theme="dark"] .releasesTable tbody th {
+  background-color: var(--ifm-background-color);
+}
+
+.releasesTable td:first-child,
+.releasesTable th:first-child {
+  padding-left: 2rem;
+}
+
+.releasesTable td,
+.releasesTable th {
+  padding-right: 2rem;
+}
+
+.releasesTable td:last-child,
+.releasesTable th:last-child {
+  width: 100%;
+}
+
+.releasesTable {
+  padding-bottom: 2rem;
 }
