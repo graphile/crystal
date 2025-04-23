@@ -15,8 +15,7 @@ interface CommonOptions {
 /**
  * So we don't reach too wide we only want to match objects that look like
  * they're probably plan configurations. For now this is the GraphQLFieldConfig
- * keys, GraphQLArgumentConfig keys, plus `match/plan` for pgPolymorphic and
- * plan/type/name for pgSelect.
+ * keys, GraphQLArgumentConfig keys, plus plan/type/name for pgSelect.
  */
 const ALLOWED_SIBLING_KEYS: string[] = [
   // GraphQLFieldConfig
@@ -39,9 +38,6 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "serialize",
   "parseValue",
   "parseLiteral",
-
-  // pgPolymorphic
-  "match",
 
   // pgSelect args
   "name",
