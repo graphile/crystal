@@ -24,7 +24,6 @@ import type {
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastSubscriber,
-  ListStep,
   Maybe,
   Step,
 } from "grafast";
@@ -44,7 +43,6 @@ import {
   getNullableInputTypeAtPath,
   groupBy,
   lambda,
-  list,
   listen,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
@@ -99,7 +97,6 @@ import {
   PgExecutor,
   pgInsertSingle,
   PgManyFilter,
-  pgPolymorphic,
   PgResource,
   pgSelect,
   pgSelectSingleFromRecord,
@@ -2844,6 +2841,7 @@ export function makeExampleSchema(
     [pgSingleTablePolymorphic, singleTableTypeName],
   );
 
+  /*
   const relationalItemPolymorphicTypeMap = EXPORTABLE(
     (
       deoptimizeIfAppropriate,
@@ -2887,7 +2885,27 @@ export function makeExampleSchema(
         ),
     [pgPolymorphic, relationalItemPolymorphicTypeMap],
   );
+  */
+  const relationalItemTypeNameFromType = (type: string) =>
+    ({
+      TOPIC: "RelationalTopic",
+      POST: "RelationalPost",
+      DIVIDER: "RelationalDivider",
+      CHECKLIST: "RelationalChecklist",
+      CHECKLIST_ITEM: "RelationalChecklistItem",
+    })[type];
+  const relationalItemInterface = EXPORTABLE(
+    (lambda, object, relationalItemTypeNameFromType) =>
+      ($item: RelationalItemStep) => {
+        const $type = $item.get("type");
+        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
+        const $id = $item.get("id");
+        return object({ __typename: $__typename, id: $id });
+      },
+    [lambda, object, relationalItemTypeNameFromType],
+  );
 
+  /*
   const unionItemPolymorphicTypeMap = EXPORTABLE(
     (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemStep, string> => ({
       UnionTopic: {
@@ -2924,7 +2942,26 @@ export function makeExampleSchema(
       pgPolymorphic($item, $item.get("type"), unionItemPolymorphicTypeMap),
     [pgPolymorphic, unionItemPolymorphicTypeMap],
   );
+  */
+  const unionItemTypeNameFromType = (type: string) =>
+    ({
+      TOPIC: "UnionTopic",
+      POST: "UnionPost",
+      DIVIDER: "UnionDivider",
+      CHECKLIST: "UnionChecklist",
+      CHECKLIST_ITEM: "UnionChecklistItem",
+    })[type];
+  const unionItemUnion = EXPORTABLE(
+    (lambda, object, unionItemTypeNameFromType) => ($item: UnionItemStep) => {
+      const $type = $item.get("type");
+      const $__typename = lambda($type, unionItemTypeNameFromType, true);
+      const $id = $item.get("id");
+      return object({ __typename: $__typename, id: $id });
+    },
+    [lambda, object, unionItemTypeNameFromType],
+  );
 
+  /*
   const relationalCommentablePolymorphicTypeMap = EXPORTABLE(
     (
       deoptimizeIfAppropriate,
@@ -2958,7 +2995,20 @@ export function makeExampleSchema(
         ),
     [pgPolymorphic, relationalCommentablePolymorphicTypeMap],
   );
+  */
 
+  const relationalCommentableInterface = EXPORTABLE(
+    (lambda, object, relationalItemTypeNameFromType) =>
+      ($item: RelationalCommentableStep) => {
+        const $type = $item.get("type");
+        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
+        const $id = $item.get("id");
+        return object({ __typename: $__typename, id: $id });
+      },
+    [lambda, object, relationalItemTypeNameFromType],
+  );
+
+  /*
   const entityPolymorphicTypeMap = EXPORTABLE(
     (
       commentResource,
@@ -2985,7 +3035,7 @@ export function makeExampleSchema(
     [commentResource, personResource, postResource],
   );
 
-  /**
+  / **
    * This makes a polymorphic plan that returns the "entity" represented by the
    * "interfaces_and_unions.union__entity" type in the database (a composite
    * type with an attribute that's a "foreign key" to each table that's
@@ -2994,7 +3044,7 @@ export function makeExampleSchema(
    * i.e. if `$item.get('person_id')` is set, then it's a Person and we should
    * grab that person from the `personResource`. If `post_id` is set it's a Post,
    * and so on.
-   */
+   * /
   const entityUnion = EXPORTABLE(
     (entityPolymorphicTypeMap, list, pgPolymorphic) =>
       <TCodec extends typeof unionEntityCodec>(
@@ -3012,6 +3062,36 @@ export function makeExampleSchema(
           entityPolymorphicTypeMap,
         ),
     [entityPolymorphicTypeMap, list, pgPolymorphic],
+  );
+  */
+
+  const entityUnion = EXPORTABLE(
+    (lambda) =>
+      <TCodec extends typeof unionEntityCodec>(
+        $item:
+          | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
+          | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,
+      ) => {
+        return lambda(
+          [
+            $item.get("person_id"),
+            $item.get("post_id"),
+            $item.get("comment_id"),
+          ],
+          ([person_id, post_id, comment_id]) => {
+            if (person_id != null) {
+              return { __typename: "Person", person_id };
+            } else if (post_id != null) {
+              return { __typename: "Post", post_id };
+            } else if (comment_id != null) {
+              return { __typename: "Comment", comment_id };
+            } else {
+              return null;
+            }
+          },
+        );
+      },
+    [lambda],
   );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
