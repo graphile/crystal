@@ -166,7 +166,12 @@ function indent(level: number, string: string) {
 export function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
   return indent(
     indentLevel,
-    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
+    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):${
+      bucket.polymorphicPathList.some((p) => p != null)
+        ? `
+${bucket.polymorphicPathList.map((p, i) => `${String(i).padStart(4, " ")}: ${p}`)}`
+        : ""
+    }
   Store:
 ${indent(4, printStore(bucket))}
   Children:
@@ -204,7 +209,7 @@ export function printStore(bucket: Bucket): string {
         true,
       );
       output.push(
-        `${printKey} (BATCH): ${step ?? "-"}\n${indent(
+        `${printKey} (BATCH): ${step ?? "-"} ${[...(step?.polymorphicPaths ?? [])]}\n${indent(
           2,
           val.entries
             .map(
@@ -226,7 +231,7 @@ export function printStore(bucket: Bucket): string {
       output.push(
         `${printKey} (UNARY/${String(val._entryFlags).padStart(2, " ")}) ${
           step ?? "-"
-        }\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
+        } ${[...(step?.polymorphicPaths ?? [])]}\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
       );
     }
   }
