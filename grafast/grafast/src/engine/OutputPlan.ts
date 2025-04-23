@@ -1,4 +1,5 @@
 import LRU from "@graphile/lru";
+import debugFactory from "debug";
 import type {
   DocumentNode,
   FieldNode,
@@ -26,6 +27,9 @@ import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
 import { pathsFromAncestorToTargetLayerPlan } from "./OperationPlan.js";
+
+const debug = debugFactory("grafast:OutputPlan");
+const debugVerbose = debug.extend("verbose");
 
 const {
   executeSync,
@@ -1245,9 +1249,20 @@ function makePolymorphicExecutor<TAsString extends boolean>(
           bucketIndex,
         );
         if (!c) {
-          throw new Error(
-            `GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket. childOutputPlan=${childOutputPlan}, couldOutputPlan.layerPlan=${childOutputPlan.layerPlan}, bucket=${bucket}`,
-          );
+          // TODO: Implies that the bucket didn't run; is this a normal
+          // situation? We should be able to detect it and handle it more
+          // cleanly.
+          if (isDev) {
+            debugVerbose(
+              `GrafastInternalWarning<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket. childOutputPlan=%c, childOutputPlan.layerPlan=%c, bucket=%c`,
+              childOutputPlan,
+              childOutputPlan.layerPlan,
+              bucket,
+            );
+          }
+          return (asString ? "null" : null) as TAsString extends true
+            ? string
+            : JSONValue;
         }
         const [childBucket, childBucketIndex] = c;
         return childOutputPlan[asString ? "executeString" : "execute"](

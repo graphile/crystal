@@ -101,7 +101,6 @@ import {
   pgSelect,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
-  pgSingleTablePolymorphic,
   pgUpdateSingle,
   PgUpdateSingleStep,
   recordCodec,
@@ -2835,10 +2834,13 @@ export function makeExampleSchema(
   );
 
   const singleTableItemInterface = EXPORTABLE(
-    (pgSingleTablePolymorphic, singleTableTypeName) =>
-      ($item: SingleTableItemStep) =>
-        pgSingleTablePolymorphic(singleTableTypeName($item), $item),
-    [pgSingleTablePolymorphic, singleTableTypeName],
+    (object, singleTableTypeName) => ($item: SingleTableItemStep) => {
+      return object({
+        __typename: singleTableTypeName($item),
+        id: $item.get("id"),
+      });
+    },
+    [object, singleTableTypeName],
   );
 
   /*
