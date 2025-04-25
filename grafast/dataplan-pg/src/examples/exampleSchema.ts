@@ -42,6 +42,7 @@ import {
   filter,
   getNullableInputTypeAtPath,
   groupBy,
+  inhibitOnNull,
   lambda,
   listen,
   newGrafastFieldConfigBuilder,
@@ -2805,89 +2806,28 @@ export function makeExampleSchema(
   });
 
   const singleTableTypeNameCallback = EXPORTABLE(
-    () => (v: string) => {
-      if (v == null) {
-        return v;
-      }
-      const type = {
+    () => (v: string) =>
+      ({
         TOPIC: "SingleTableTopic",
         POST: "SingleTablePost",
         DIVIDER: "SingleTableDivider",
         CHECKLIST: "SingleTableChecklist",
         CHECKLIST_ITEM: "SingleTableChecklistItem",
-      }[v];
-      if (!type) {
-        throw new Error(`Could not determine type for '${v}'`);
-      }
-      return type;
-    },
+      })[v],
     [],
   );
 
-  const singleTableTypeName = EXPORTABLE(
-    (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemStep) => {
-      const $type = $entity.get("type");
-      const $typeName = lambda($type, singleTableTypeNameCallback, true);
-      return $typeName;
-    },
-    [lambda, singleTableTypeNameCallback],
-  );
-
   const singleTableItemInterface = EXPORTABLE(
-    (object, singleTableTypeName) => ($item: SingleTableItemStep) => {
-      return object({
-        __typename: singleTableTypeName($item),
-        id: $item.get("id"),
-      });
-    },
-    [object, singleTableTypeName],
+    (inhibitOnNull, lambda, object, singleTableTypeNameCallback) =>
+      ($item: SingleTableItemStep) => {
+        const $id = inhibitOnNull($item.get("id"));
+        const $type = inhibitOnNull($item.get("type"));
+        const $typeName = lambda($type, singleTableTypeNameCallback, true);
+        return object({ __typename: $typeName, id: $id });
+      },
+    [inhibitOnNull, lambda, object, singleTableTypeNameCallback],
   );
 
-  /*
-  const relationalItemPolymorphicTypeMap = EXPORTABLE(
-    (
-      deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalItemStep, string> => ({
-      RelationalTopic: {
-        match: (t) => t === "TOPIC",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("topic")),
-      },
-      RelationalPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      RelationalDivider: {
-        match: (t) => t === "DIVIDER",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("divider")),
-      },
-      RelationalChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      RelationalChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
-
-  const relationalItemInterface = EXPORTABLE(
-    (pgPolymorphic, relationalItemPolymorphicTypeMap) =>
-      ($item: RelationalItemStep) =>
-        pgPolymorphic(
-          $item,
-          $item.get("type"),
-          relationalItemPolymorphicTypeMap,
-        ),
-    [pgPolymorphic, relationalItemPolymorphicTypeMap],
-  );
-  */
   const relationalItemTypeNameFromType = (type: string) =>
     ({
       TOPIC: "RelationalTopic",
@@ -2897,54 +2837,16 @@ export function makeExampleSchema(
       CHECKLIST_ITEM: "RelationalChecklistItem",
     })[type];
   const relationalItemInterface = EXPORTABLE(
-    (lambda, object, relationalItemTypeNameFromType) =>
+    (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
       ($item: RelationalItemStep) => {
-        const $type = $item.get("type");
+        const $id = inhibitOnNull($item.get("id"));
+        const $type = inhibitOnNull($item.get("type"));
         const $__typename = lambda($type, relationalItemTypeNameFromType, true);
-        const $id = $item.get("id");
         return object({ __typename: $__typename, id: $id });
       },
-    [lambda, object, relationalItemTypeNameFromType],
+    [inhibitOnNull, lambda, object, relationalItemTypeNameFromType],
   );
 
-  /*
-  const unionItemPolymorphicTypeMap = EXPORTABLE(
-    (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemStep, string> => ({
-      UnionTopic: {
-        match: (t) => t === "TOPIC",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("topic")),
-      },
-      UnionPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      UnionDivider: {
-        match: (t) => t === "DIVIDER",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("divider")),
-      },
-      UnionChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      UnionChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
-
-  const unionItemUnion = EXPORTABLE(
-    (pgPolymorphic, unionItemPolymorphicTypeMap) => ($item: UnionItemStep) =>
-      pgPolymorphic($item, $item.get("type"), unionItemPolymorphicTypeMap),
-    [pgPolymorphic, unionItemPolymorphicTypeMap],
-  );
-  */
   const unionItemTypeNameFromType = (type: string) =>
     ({
       TOPIC: "UnionTopic",
@@ -2954,118 +2856,26 @@ export function makeExampleSchema(
       CHECKLIST_ITEM: "UnionChecklistItem",
     })[type];
   const unionItemUnion = EXPORTABLE(
-    (lambda, object, unionItemTypeNameFromType) => ($item: UnionItemStep) => {
-      const $type = $item.get("type");
-      const $__typename = lambda($type, unionItemTypeNameFromType, true);
-      const $id = $item.get("id");
-      return object({ __typename: $__typename, id: $id });
-    },
-    [lambda, object, unionItemTypeNameFromType],
-  );
-
-  /*
-  const relationalCommentablePolymorphicTypeMap = EXPORTABLE(
-    (
-      deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalCommentableStep, string> => ({
-      RelationalPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      RelationalChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      RelationalChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
-
-  const relationalCommentableInterface = EXPORTABLE(
-    (pgPolymorphic, relationalCommentablePolymorphicTypeMap) =>
-      ($item: RelationalCommentableStep) =>
-        pgPolymorphic(
-          $item,
-          $item.get("type"),
-          relationalCommentablePolymorphicTypeMap,
-        ),
-    [pgPolymorphic, relationalCommentablePolymorphicTypeMap],
-  );
-  */
-
-  const relationalCommentableInterface = EXPORTABLE(
-    (lambda, object, relationalItemTypeNameFromType) =>
-      ($item: RelationalCommentableStep) => {
-        const $type = $item.get("type");
-        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
-        const $id = $item.get("id");
+    (inhibitOnNull, lambda, object, unionItemTypeNameFromType) =>
+      ($item: UnionItemStep) => {
+        const $id = inhibitOnNull($item.get("id"));
+        const $type = inhibitOnNull($item.get("type"));
+        const $__typename = lambda($type, unionItemTypeNameFromType, true);
         return object({ __typename: $__typename, id: $id });
       },
-    [lambda, object, relationalItemTypeNameFromType],
+    [inhibitOnNull, lambda, object, unionItemTypeNameFromType],
   );
 
-  /*
-  const entityPolymorphicTypeMap = EXPORTABLE(
-    (
-      commentResource,
-      personResource,
-      postResource,
-    ): PgPolymorphicTypeMap<
-      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodec, any>,
-      readonly number[],
-      ListStep<readonly ExecutableStep[]>
-    > => ({
-      Person: {
-        match: (v) => v[0] != null,
-        plan: ($list) => personResource.get({ person_id: $list.at(0) }),
+  const relationalCommentableInterface = EXPORTABLE(
+    (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
+      ($item: RelationalCommentableStep) => {
+        const $id = inhibitOnNull($item.get("id"));
+        const $type = inhibitOnNull($item.get("type"));
+        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
+        return object({ __typename: $__typename, id: $id });
       },
-      Post: {
-        match: (v) => v[1] != null,
-        plan: ($list) => postResource.get({ post_id: $list.at(1) }),
-      },
-      Comment: {
-        match: (v) => v[2] != null,
-        plan: ($list) => commentResource.get({ comment_id: $list.at(2) }),
-      },
-    }),
-    [commentResource, personResource, postResource],
+    [inhibitOnNull, lambda, object, relationalItemTypeNameFromType],
   );
-
-  / **
-   * This makes a polymorphic plan that returns the "entity" represented by the
-   * "interfaces_and_unions.union__entity" type in the database (a composite
-   * type with an attribute that's a "foreign key" to each table that's
-   * included in the union).
-   *
-   * i.e. if `$item.get('person_id')` is set, then it's a Person and we should
-   * grab that person from the `personResource`. If `post_id` is set it's a Post,
-   * and so on.
-   * /
-  const entityUnion = EXPORTABLE(
-    (entityPolymorphicTypeMap, list, pgPolymorphic) =>
-      <TCodec extends typeof unionEntityCodec>(
-        $item:
-          | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
-          | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,
-      ) =>
-        pgPolymorphic(
-          $item,
-          list([
-            $item.get("person_id"),
-            $item.get("post_id"),
-            $item.get("comment_id"),
-          ]),
-          entityPolymorphicTypeMap,
-        ),
-    [entityPolymorphicTypeMap, list, pgPolymorphic],
-  );
-  */
 
   const entityUnion = EXPORTABLE(
     (lambda) =>
