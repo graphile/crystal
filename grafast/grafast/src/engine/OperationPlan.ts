@@ -4761,21 +4761,7 @@ export class OperationPlan {
     if (cachedStep) {
       // Fix poly paths
       if (paths) {
-        const fixStepPolyPaths = (step: Step) => {
-          if (step.polymorphicPaths && step.layerPlan === layerPlan) {
-            // Add these poly paths to the cached step
-            const polymorphicPaths = new Set<string>([
-              ...step.polymorphicPaths,
-              ...paths,
-            ]);
-            step.polymorphicPaths = polymorphicPaths;
-            // And fix its dependencies
-            for (const dep of sudo(step).dependencies) {
-              fixStepPolyPaths(dep);
-            }
-          }
-        };
-        fixStepPolyPaths(cachedStep);
+        fixStepPolyPaths(layerPlan, paths, cachedStep);
       }
 
       return cachedStep;
@@ -5083,4 +5069,23 @@ function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
   if (step.polymorphicPaths === null) return true;
   // PERF: this can probably be optimized further
   return false;
+}
+
+function fixStepPolyPaths(
+  layerPlan: LayerPlan,
+  paths: ReadonlySet<string>,
+  step: Step,
+) {
+  if (step.polymorphicPaths && step.layerPlan === layerPlan) {
+    // Add these poly paths to the cached step
+    const polymorphicPaths = new Set<string>([
+      ...step.polymorphicPaths,
+      ...paths,
+    ]);
+    step.polymorphicPaths = polymorphicPaths;
+    // And fix its dependencies
+    for (const dep of sudo(step).dependencies) {
+      fixStepPolyPaths(layerPlan, paths, dep);
+    }
+  }
 }
