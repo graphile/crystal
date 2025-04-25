@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/computed-columns/
 title: Computed Columns
 ---
 
@@ -12,14 +10,14 @@ it can accept arguments that influence its result, and may return either a
 scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections) or lists, depending on the behavior configuration.
 
-:::tip
+:::tip Performance Note
 
 We inline these function calls into the original `SELECT` statement for
 efficiency, so no additional SQL queries need to be issued to the database.
 That said, SQL function calls do have a performance overhead, which can build
-up if you're doing this on thousands of rows. PostgreSQL can [sometimes inline
+up if you’re doing this on thousands of rows. PostgreSQL can [sometimes inline
 your SQL functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions)
-for great performance, but if this fails and you're seeing performance issues
+for great performance, but if this fails and you’re seeing performance issues
 you might want to investigate using
 [`makeExtendSchemaPlugin`](./make-extend-schema-plugin) instead.
 
@@ -41,9 +39,9 @@ must obey the following rules:
 For example, assuming a table called `person` exists, the function:
 
 ```sql
-CREATE FUNCTION person_full_name(person person) RETURNS text AS $$
-  SELECT person.given_name || ' ' || person.family_name
-$$ LANGUAGE sql STABLE;
+create function person_full_name(person person) returns text as $$
+  select person.given_name || ' ' || person.family_name
+$$ language sql stable;
 ```
 
 Will create a computed column for your table named `person`, which can be
@@ -58,6 +56,55 @@ queried like this:
   }
 }
 ```
+
+PostgreSQL's documentation on [function
+calls](https://www.postgresql.org/docs/17/sql-expressions.html#SQL-EXPRESSIONS-FUNCTION-CALLS)
+notes:
+
+> A function that takes a single argument of composite type can optionally be
+> called using field-selection syntax, and conversely field selection can be
+> written in functional style. That is, **the notations `col(table)` and `table.col`
+> are interchangeable**. This behavior is not SQL-standard but is provided in
+> PostgreSQL because it allows use of functions to emulate “computed fields”.
+>
+> -- https://www.postgresql.org/docs/17/sql-expressions.html, emphasis added.
+
+Thus to query this computed column yourself outside of PostGraphile you could
+execute:
+
+```sql {3,5}
+select
+  person.id,
+  person.person_full_name as full_name
+  -- or, equivalently:
+  -- person_full_name(person) as full_name
+from person
+where id = $1;
+```
+
+This `person.person_full_name` syntax makes the function `person_full_name`
+appear as if it were a column of `person` even though no such column exists,
+hence our name for it: computed column function.
+
+:::note Computed columns can also return sets
+
+If your function, for example `person_favorite_posts(person)`, returns a set
+then PostGraphile will automatically wrap this selection in a subquery
+aggregation for you to prevent the parent query from yielding more rows than
+expected; if you wanted to query it yourself it might look something like:
+
+```sql {3-6}
+select
+  person.id,
+  array(
+    select posts.*
+    from person_favorite_posts(person) posts
+  ) as favorite_posts
+from person
+where id = $1;
+```
+
+:::
 
 ### Example
 

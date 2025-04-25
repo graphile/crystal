@@ -62,7 +62,7 @@ In V5, the signature has changed a little.
 The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
-The second change, however, is much more significant - order generation now
+The second change, however, is much more significant — order generation now
 operates based on the Gra*fast* plan system (which operates based on "steps"
 which represent all possible values) rather than V4's lookahead engine (which
 deals in concrete runtime values).

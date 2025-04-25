@@ -6,7 +6,7 @@ title: "makeWrapResolversPlugin"
 
 Since PostGraphile V5 no longer uses resolvers, wrapping resolvers is
 meaningless. And yet! Since we now use `plans`, you can suddenly do a lot more
-by wrapping the plans than you ever could by wrapping resolvers - not only does
+by wrapping the plans than you ever could by wrapping resolvers — not only does
 it allow you to affect the data that's returned, it also allows you to change
 the very plan of what will be done!
 
@@ -29,7 +29,7 @@ Now let's look at some of the things you might have used
 You could use `makeWrapResolversPlugin` in V4 as a clumsy workaround to set
 specific column values in a built-in CRUD mutation by overriding what the system
 thought the arguments were. Fortunately, V5's plan system means that you no
-longer need to do this and you can address the problem more directly - you don't
+longer need to do this and you can address the problem more directly — you don't
 even have to have the column in your GraphQL schema in order to set it any more!
 :sweat_smile:
 

@@ -75,7 +75,10 @@
         "type": "doc",
         "id": "realtime"
       },
-      "items": ["subscriptions", "live-queries"]
+      "items": [
+        "subscriptions",
+        "live-queries"
+      ]
     },
     "background-tasks",
     "exporting-schema",
@@ -93,7 +96,10 @@
         "type": "doc",
         "id": "smart-tags"
       },
-      "items": ["smart-tags-file", "smart-comments"]
+      "items": [
+        "smart-tags-file",
+        "smart-comments"
+      ]
     },
     {
       "type": "category",
