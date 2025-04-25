@@ -28,10 +28,10 @@ adoption and testing by the community and increased sponsorship of the project.
 Four major issues have been outlined which need to be addressed before a general release of PostGraphile Version 5. These milestones are actually for Gra*fast*, the new execution engine upon which PostGraphile Version 5 has been built.
 The first three of the issues have now been reached, hurrah!
 
-- ✅ Global dependencies
-- ✅ Early exit
-- ✅ Eradicating eval
-- The polymorphism problem
+- ✅ Global dependencies (solved via "unary" steps that represent exactly one value)
+- ✅ Early exit (solved via value "flags" tracking when a value should inhibit dependents)
+- ✅ Solve excessive branching due to planning of nested input values (aka [removing `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
+- 🔜 Solve excessive polymorphic branching
 
 There are many other areas which will influence moving PostGraphile V5 to release candidate stage:
 
