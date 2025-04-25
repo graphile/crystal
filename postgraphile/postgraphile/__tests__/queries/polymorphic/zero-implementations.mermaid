@@ -9,8 +9,8 @@ graph TD
 
 
     %% plan dependencies
-    Connection8{{"Connection[8∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection8{{"Connection[8∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     PgUnionAll9[["PgUnionAll[9∈1] ➊"]]:::plan
     Connection8 --> PgUnionAll9
     Access13{{"Access[13∈1] ➊<br />ᐸ9.itemsᐳ"}}:::plan
@@ -26,7 +26,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value4,Connection8 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8, 6<br /><br />ROOT Connectionᐸ7ᐳ[8]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 8<br /><br />ROOT Connectionᐸ7ᐳ[8]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll9,Access13 bucket1
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ13ᐳ[11]"):::bucket

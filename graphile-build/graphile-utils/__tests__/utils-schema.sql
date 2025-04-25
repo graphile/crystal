@@ -62,3 +62,44 @@ create table graphile_utils_2.user_emails (
     email text not null,
     constraint unique_user_email unique (email)
 );
+
+-- See https://github.com/benjie/ouch-my-finger/pull/21
+create schema achintha_side_effects;
+
+create table achintha_side_effects.shop(
+  id serial primary key,
+  name text,
+  type text not null,
+  has_clinic boolean
+);
+insert into achintha_side_effects.shop
+  (name, type, has_clinic) values
+  ('Super Axinom', 'super', true),
+  ('Local Keells', 'local', false);
+
+create table achintha_side_effects.animal(
+  id serial primary key,
+  name text,
+  type text not null,
+  shop_id integer not null
+);
+comment on table achintha_side_effects.animal is $$
+  @interface mode:single type:type
+  @type cat name:CatAnimal
+  @type dog name:DogAnimal
+$$;
+insert into achintha_side_effects.animal
+  (name, type, shop_id) values
+  ('Niki', 'dog', 1),
+  ('Milo', 'cat', 2);
+
+create table achintha_side_effects.owner(
+  id serial primary key,
+  animal_id integer not null,
+  owner_type text not null,
+  owner_id integer not null
+);
+insert into achintha_side_effects.owner
+  (animal_id, owner_type, owner_id) values
+  (1, 'person', 5),
+  (2, 'shop', 6);

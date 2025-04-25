@@ -2110,7 +2110,7 @@ async function lint(code: string, rawFilePath: string | URL) {
     overrideConfig: {
       reportUnusedDisableDirectives: false,
       parserOptions: {
-        ecmaVersion: 2020,
+        ecmaVersion: 2022,
         sourceType: "module",
       },
       rules: {

@@ -86,98 +86,6 @@ left outer join lateral (select (__func_out_complex__."z").*) as __person__
 on TRUE;
 
 select
-  __query_output_two_rows__."txt" as "0",
-  (not (__query_output_two_rows__ is null))::text as "1",
-  __left_arm__."id"::text as "2",
-  __left_arm__."length_in_metres"::text as "3",
-  __left_arm__."mood" as "4",
-  __left_arm__."person_id"::text as "5",
-  __person__."person_full_name" as "6",
-  __person_secret__."sekrit" as "7",
-  __person_secret__."person_id"::text as "8",
-  __post__."id"::text as "9",
-  __post__."headline" as "10",
-  __post__."author_id"::text as "11",
-  __person_2."person_full_name" as "12",
-  __person_secret_2."sekrit" as "13",
-  __person_secret_2."person_id"::text as "14"
-from "c"."query_output_two_rows"(
-  $1::"int4",
-  $2::"int4",
-  $3::"text"
-) as __query_output_two_rows__
-left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
-on TRUE
-left outer join "c"."person" as __person__
-on (
-/* WHERE becoming ON */ (
-  __person__."id" = __left_arm__."person_id"
-))
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
-left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
-on TRUE
-left outer join "c"."person" as __person_2
-on (
-/* WHERE becoming ON */ (
-  __person_2."id" = __post__."author_id"
-))
-left outer join "c"."person_secret" as __person_secret_2
-on (
-/* WHERE becoming ON */ (
-  __person_secret_2."person_id" = __person_2."id"
-));
-
-select
-  __query_output_two_rows__."txt" as "0",
-  (not (__query_output_two_rows__ is null))::text as "1",
-  __left_arm__."id"::text as "2",
-  __left_arm__."length_in_metres"::text as "3",
-  __left_arm__."mood" as "4",
-  __left_arm__."person_id"::text as "5",
-  __person__."person_full_name" as "6",
-  __person_secret__."sekrit" as "7",
-  __person_secret__."person_id"::text as "8",
-  __post__."id"::text as "9",
-  __post__."headline" as "10",
-  __post__."author_id"::text as "11",
-  __person_2."person_full_name" as "12",
-  __person_secret_2."sekrit" as "13",
-  __person_secret_2."person_id"::text as "14"
-from "c"."query_output_two_rows"(
-  $1::"int4",
-  $2::"int4",
-  $3::"text"
-) as __query_output_two_rows__
-left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
-on TRUE
-left outer join "c"."person" as __person__
-on (
-/* WHERE becoming ON */ (
-  __person__."id" = __left_arm__."person_id"
-))
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
-left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
-on TRUE
-left outer join "c"."person" as __person_2
-on (
-/* WHERE becoming ON */ (
-  __person_2."id" = __post__."author_id"
-))
-left outer join "c"."person_secret" as __person_secret_2
-on (
-/* WHERE becoming ON */ (
-  __person_secret_2."person_id" = __person_2."id"
-));
-
-select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   "c"."person_computed_inout"(
@@ -242,6 +150,98 @@ on TRUE
 where (
   __person__."id" = $5::"int4"
 );
+
+select
+  __query_output_two_rows__."txt" as "0",
+  (not (__query_output_two_rows__ is null))::text as "1",
+  __left_arm__."id"::text as "2",
+  __left_arm__."length_in_metres"::text as "3",
+  __left_arm__."mood" as "4",
+  __left_arm__."person_id"::text as "5",
+  __person__."person_full_name" as "6",
+  __person_secret__."sekrit" as "7",
+  __person_secret__."person_id"::text as "8",
+  __post__."id"::text as "9",
+  __post__."headline" as "10",
+  __post__."author_id"::text as "11",
+  __person_2."person_full_name" as "12",
+  __person_secret_2."sekrit" as "13",
+  __person_secret_2."person_id"::text as "14"
+from "c"."query_output_two_rows"(
+  $1::"int4",
+  $2::"int4",
+  $3::"text"
+) as __query_output_two_rows__
+left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
+on TRUE
+left outer join "c"."person" as __person__
+on (
+/* WHERE becoming ON */ (
+  __person__."id" = __left_arm__."person_id"
+))
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
+left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
+on TRUE
+left outer join "c"."person" as __person_2
+on (
+/* WHERE becoming ON */ (
+  __person_2."id" = __post__."author_id"
+))
+left outer join "c"."person_secret" as __person_secret_2
+on (
+/* WHERE becoming ON */ (
+  __person_secret_2."person_id" = __person_2."id"
+));
+
+select
+  __query_output_two_rows__."txt" as "0",
+  (not (__query_output_two_rows__ is null))::text as "1",
+  __left_arm__."id"::text as "2",
+  __left_arm__."length_in_metres"::text as "3",
+  __left_arm__."mood" as "4",
+  __left_arm__."person_id"::text as "5",
+  __person__."person_full_name" as "6",
+  __person_secret__."sekrit" as "7",
+  __person_secret__."person_id"::text as "8",
+  __post__."id"::text as "9",
+  __post__."headline" as "10",
+  __post__."author_id"::text as "11",
+  __person_2."person_full_name" as "12",
+  __person_secret_2."sekrit" as "13",
+  __person_secret_2."person_id"::text as "14"
+from "c"."query_output_two_rows"(
+  $1::"int4",
+  $2::"int4",
+  $3::"text"
+) as __query_output_two_rows__
+left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
+on TRUE
+left outer join "c"."person" as __person__
+on (
+/* WHERE becoming ON */ (
+  __person__."id" = __left_arm__."person_id"
+))
+left outer join "c"."person_secret" as __person_secret__
+on (
+/* WHERE becoming ON */ (
+  __person_secret__."person_id" = __person__."id"
+))
+left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
+on TRUE
+left outer join "c"."person" as __person_2
+on (
+/* WHERE becoming ON */ (
+  __person_2."id" = __post__."author_id"
+))
+left outer join "c"."person_secret" as __person_secret_2
+on (
+/* WHERE becoming ON */ (
+  __person_secret_2."person_id" = __person_2."id"
+));
 
 select
   __func_out_complex_setof__."x"::text as "0",

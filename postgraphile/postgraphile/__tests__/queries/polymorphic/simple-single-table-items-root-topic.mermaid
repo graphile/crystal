@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelect69[["PgSelect[69∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access67{{"Access[67∈0] ➊<br />ᐸ66.1ᐳ"}}:::plan
@@ -39,6 +38,7 @@ graph TD
     Access247{{"Access[247∈0] ➊<br />ᐸ69.m.joinDetailsFor80ᐳ"}}:::plan
     PgSelect69 --> Access247
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Constant19{{"Constant[19∈0] ➊<br />ᐸ'SingleTableTopic'ᐳ"}}:::plan
     Constant33{{"Constant[33∈0] ➊<br />ᐸ'SingleTablePost'ᐳ"}}:::plan
     Constant41{{"Constant[41∈0] ➊<br />ᐸ'SingleTableDivider'ᐳ"}}:::plan
@@ -70,25 +70,25 @@ graph TD
     Constant49 & PgClassExpression18 --> List50
     List58{{"List[58∈3]<br />ᐸ57,18ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
     Constant57 & PgClassExpression18 --> List58
-    Lambda21{{"Lambda[21∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda21{{"Lambda[21∈3]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List20 --> Lambda21
-    First28{{"First[28∈3]"}}:::plan
-    PgSelectRows29[["PgSelectRows[29∈3]"]]:::plan
+    First28{{"First[28∈3]^"}}:::plan
+    PgSelectRows29[["PgSelectRows[29∈3]^"]]:::plan
     PgSelectRows29 --> First28
     PgSelect24 --> PgSelectRows29
-    PgSelectSingle30{{"PgSelectSingle[30∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle30{{"PgSelectSingle[30∈3]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First28 --> PgSelectSingle30
-    Lambda35{{"Lambda[35∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda35{{"Lambda[35∈3]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List34 --> Lambda35
-    Lambda43{{"Lambda[43∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda43{{"Lambda[43∈3]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List42 --> Lambda43
-    Lambda51{{"Lambda[51∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda51{{"Lambda[51∈3]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List50 --> Lambda51
-    Lambda59{{"Lambda[59∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda59{{"Lambda[59∈3]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List58 --> Lambda59
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle30 --> PgClassExpression32
     List76{{"List[76∈5] ➊<br />ᐸ41,74ᐳ"}}:::plan
     PgClassExpression74{{"PgClassExpression[74∈5] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
@@ -152,7 +152,7 @@ graph TD
     PgSelect166[["PgSelect[166∈7] ➊<br />ᐸprioritiesᐳ<br />ᐳPriority"]]:::plan
     Object11 -->|rejectNull| PgSelect166
     Access255 --> PgSelect166
-    List180{{"List[180∈7] ➊<br />ᐸ41,177ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    List180{{"List[180∈7] ➊^<br />ᐸ41,177ᐳ"}}:::plan
     PgClassExpression177{{"PgClassExpression[177∈7] ➊<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     Constant41 & PgClassExpression177 --> List180
     PgSelect204[["PgSelect[204∈7] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
@@ -178,145 +178,145 @@ graph TD
     Access255 --> PgSelect241
     List252{{"List[252∈7] ➊<br />ᐸ251,101ᐳ<br />ᐳSingleTableDivider"}}:::plan
     Access251{{"Access[251∈7] ➊<br />ᐸ95.m.joinDetailsFor184ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle101{{"PgSelectSingle[101∈7] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle101{{"PgSelectSingle[101∈7] ➊^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Access251 & PgSelectSingle101 --> List252
-    First99{{"First[99∈7] ➊"}}:::plan
-    PgSelectRows100[["PgSelectRows[100∈7] ➊"]]:::plan
+    First99{{"First[99∈7] ➊^"}}:::plan
+    PgSelectRows100[["PgSelectRows[100∈7] ➊^"]]:::plan
     PgSelectRows100 --> First99
     PgSelect95 --> PgSelectRows100
     First99 --> PgSelectSingle101
-    First105{{"First[105∈7] ➊"}}:::plan
-    PgSelectRows106[["PgSelectRows[106∈7] ➊"]]:::plan
+    First105{{"First[105∈7] ➊^"}}:::plan
+    PgSelectRows106[["PgSelectRows[106∈7] ➊^"]]:::plan
     PgSelectRows106 --> First105
     PgSelect103 --> PgSelectRows106
-    PgSelectSingle107{{"PgSelectSingle[107∈7] ➊<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle107{{"PgSelectSingle[107∈7] ➊^<br />ᐸpeopleᐳ"}}:::plan
     First105 --> PgSelectSingle107
-    First111{{"First[111∈7] ➊"}}:::plan
-    PgSelectRows112[["PgSelectRows[112∈7] ➊"]]:::plan
+    First111{{"First[111∈7] ➊^"}}:::plan
+    PgSelectRows112[["PgSelectRows[112∈7] ➊^"]]:::plan
     PgSelectRows112 --> First111
     PgSelect109 --> PgSelectRows112
-    PgSelectSingle113{{"PgSelectSingle[113∈7] ➊<br />ᐸlog_entriesᐳ"}}:::plan
+    PgSelectSingle113{{"PgSelectSingle[113∈7] ➊^<br />ᐸlog_entriesᐳ"}}:::plan
     First111 --> PgSelectSingle113
-    First117{{"First[117∈7] ➊"}}:::plan
-    PgSelectRows118[["PgSelectRows[118∈7] ➊"]]:::plan
+    First117{{"First[117∈7] ➊^"}}:::plan
+    PgSelectRows118[["PgSelectRows[118∈7] ➊^"]]:::plan
     PgSelectRows118 --> First117
     PgSelect115 --> PgSelectRows118
-    PgSelectSingle119{{"PgSelectSingle[119∈7] ➊<br />ᐸorganizationsᐳ"}}:::plan
+    PgSelectSingle119{{"PgSelectSingle[119∈7] ➊^<br />ᐸorganizationsᐳ"}}:::plan
     First117 --> PgSelectSingle119
-    First123{{"First[123∈7] ➊"}}:::plan
-    PgSelectRows124[["PgSelectRows[124∈7] ➊"]]:::plan
+    First123{{"First[123∈7] ➊^"}}:::plan
+    PgSelectRows124[["PgSelectRows[124∈7] ➊^"]]:::plan
     PgSelectRows124 --> First123
     PgSelect121 --> PgSelectRows124
-    PgSelectSingle125{{"PgSelectSingle[125∈7] ➊<br />ᐸaws_applicationsᐳ"}}:::plan
+    PgSelectSingle125{{"PgSelectSingle[125∈7] ➊^<br />ᐸaws_applicationsᐳ"}}:::plan
     First123 --> PgSelectSingle125
-    First129{{"First[129∈7] ➊"}}:::plan
-    PgSelectRows130[["PgSelectRows[130∈7] ➊"]]:::plan
+    First129{{"First[129∈7] ➊^"}}:::plan
+    PgSelectRows130[["PgSelectRows[130∈7] ➊^"]]:::plan
     PgSelectRows130 --> First129
     PgSelect127 --> PgSelectRows130
-    PgSelectSingle131{{"PgSelectSingle[131∈7] ➊<br />ᐸgcp_applicationsᐳ"}}:::plan
+    PgSelectSingle131{{"PgSelectSingle[131∈7] ➊^<br />ᐸgcp_applicationsᐳ"}}:::plan
     First129 --> PgSelectSingle131
-    First135{{"First[135∈7] ➊"}}:::plan
-    PgSelectRows136[["PgSelectRows[136∈7] ➊"]]:::plan
+    First135{{"First[135∈7] ➊^"}}:::plan
+    PgSelectRows136[["PgSelectRows[136∈7] ➊^"]]:::plan
     PgSelectRows136 --> First135
     PgSelect133 --> PgSelectRows136
-    PgSelectSingle137{{"PgSelectSingle[137∈7] ➊<br />ᐸrelational_item_relationsᐳ"}}:::plan
+    PgSelectSingle137{{"PgSelectSingle[137∈7] ➊^<br />ᐸrelational_item_relationsᐳ"}}:::plan
     First135 --> PgSelectSingle137
-    First143{{"First[143∈7] ➊"}}:::plan
-    PgSelectRows144[["PgSelectRows[144∈7] ➊"]]:::plan
+    First143{{"First[143∈7] ➊^"}}:::plan
+    PgSelectRows144[["PgSelectRows[144∈7] ➊^"]]:::plan
     PgSelectRows144 --> First143
     PgSelect141 --> PgSelectRows144
-    PgSelectSingle145{{"PgSelectSingle[145∈7] ➊<br />ᐸrelational_item_relation_composite_pksᐳ"}}:::plan
+    PgSelectSingle145{{"PgSelectSingle[145∈7] ➊^<br />ᐸrelational_item_relation_composite_pksᐳ"}}:::plan
     First143 --> PgSelectSingle145
-    First149{{"First[149∈7] ➊"}}:::plan
-    PgSelectRows150[["PgSelectRows[150∈7] ➊"]]:::plan
+    First149{{"First[149∈7] ➊^"}}:::plan
+    PgSelectRows150[["PgSelectRows[150∈7] ➊^"]]:::plan
     PgSelectRows150 --> First149
     PgSelect147 --> PgSelectRows150
-    PgSelectSingle151{{"PgSelectSingle[151∈7] ➊<br />ᐸsingle_table_item_relationsᐳ"}}:::plan
+    PgSelectSingle151{{"PgSelectSingle[151∈7] ➊^<br />ᐸsingle_table_item_relationsᐳ"}}:::plan
     First149 --> PgSelectSingle151
-    First156{{"First[156∈7] ➊"}}:::plan
-    PgSelectRows157[["PgSelectRows[157∈7] ➊"]]:::plan
+    First156{{"First[156∈7] ➊^"}}:::plan
+    PgSelectRows157[["PgSelectRows[157∈7] ➊^"]]:::plan
     PgSelectRows157 --> First156
     PgSelect154 --> PgSelectRows157
-    PgSelectSingle158{{"PgSelectSingle[158∈7] ➊<br />ᐸsingle_table_item_relation_composite_pksᐳ"}}:::plan
+    PgSelectSingle158{{"PgSelectSingle[158∈7] ➊^<br />ᐸsingle_table_item_relation_composite_pksᐳ"}}:::plan
     First156 --> PgSelectSingle158
-    First168{{"First[168∈7] ➊"}}:::plan
-    PgSelectRows169[["PgSelectRows[169∈7] ➊"]]:::plan
+    First168{{"First[168∈7] ➊^"}}:::plan
+    PgSelectRows169[["PgSelectRows[169∈7] ➊^"]]:::plan
     PgSelectRows169 --> First168
     PgSelect166 --> PgSelectRows169
-    PgSelectSingle170{{"PgSelectSingle[170∈7] ➊<br />ᐸprioritiesᐳ"}}:::plan
+    PgSelectSingle170{{"PgSelectSingle[170∈7] ➊^<br />ᐸprioritiesᐳ"}}:::plan
     First168 --> PgSelectSingle170
     PgSelectSingle101 --> PgClassExpression177
-    Lambda181{{"Lambda[181∈7] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda181{{"Lambda[181∈7] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List180 --> Lambda181
     PgClassExpression182{{"PgClassExpression[182∈7] ➊<br />ᐸ__single_t...s__.”type”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle101 --> PgClassExpression182
     PgClassExpression183{{"PgClassExpression[183∈7] ➊<br />ᐸ__single_t..._topic_id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle101 --> PgClassExpression183
-    First186{{"First[186∈7] ➊"}}:::plan
-    PgSelectRows187[["PgSelectRows[187∈7] ➊"]]:::plan
+    First186{{"First[186∈7] ➊^"}}:::plan
+    PgSelectRows187[["PgSelectRows[187∈7] ➊^"]]:::plan
     PgSelectRows187 --> First186
-    Lambda253{{"Lambda[253∈7] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda253{{"Lambda[253∈7] ➊^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda253 --> PgSelectRows187
-    PgSelectSingle188{{"PgSelectSingle[188∈7] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle188{{"PgSelectSingle[188∈7] ➊^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First186 --> PgSelectSingle188
-    First206{{"First[206∈7] ➊"}}:::plan
-    PgSelectRows207[["PgSelectRows[207∈7] ➊"]]:::plan
+    First206{{"First[206∈7] ➊^"}}:::plan
+    PgSelectRows207[["PgSelectRows[207∈7] ➊^"]]:::plan
     PgSelectRows207 --> First206
     PgSelect204 --> PgSelectRows207
-    PgSelectSingle208{{"PgSelectSingle[208∈7] ➊<br />ᐸrelational_topicsᐳ"}}:::plan
+    PgSelectSingle208{{"PgSelectSingle[208∈7] ➊^<br />ᐸrelational_topicsᐳ"}}:::plan
     First206 --> PgSelectSingle208
-    First212{{"First[212∈7] ➊"}}:::plan
-    PgSelectRows213[["PgSelectRows[213∈7] ➊"]]:::plan
+    First212{{"First[212∈7] ➊^"}}:::plan
+    PgSelectRows213[["PgSelectRows[213∈7] ➊^"]]:::plan
     PgSelectRows213 --> First212
     PgSelect210 --> PgSelectRows213
-    PgSelectSingle214{{"PgSelectSingle[214∈7] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    PgSelectSingle214{{"PgSelectSingle[214∈7] ➊^<br />ᐸrelational_postsᐳ"}}:::plan
     First212 --> PgSelectSingle214
-    First218{{"First[218∈7] ➊"}}:::plan
-    PgSelectRows219[["PgSelectRows[219∈7] ➊"]]:::plan
+    First218{{"First[218∈7] ➊^"}}:::plan
+    PgSelectRows219[["PgSelectRows[219∈7] ➊^"]]:::plan
     PgSelectRows219 --> First218
     PgSelect216 --> PgSelectRows219
-    PgSelectSingle220{{"PgSelectSingle[220∈7] ➊<br />ᐸrelational_dividersᐳ"}}:::plan
+    PgSelectSingle220{{"PgSelectSingle[220∈7] ➊^<br />ᐸrelational_dividersᐳ"}}:::plan
     First218 --> PgSelectSingle220
-    First224{{"First[224∈7] ➊"}}:::plan
-    PgSelectRows225[["PgSelectRows[225∈7] ➊"]]:::plan
+    First224{{"First[224∈7] ➊^"}}:::plan
+    PgSelectRows225[["PgSelectRows[225∈7] ➊^"]]:::plan
     PgSelectRows225 --> First224
     PgSelect222 --> PgSelectRows225
-    PgSelectSingle226{{"PgSelectSingle[226∈7] ➊<br />ᐸrelational_checklistsᐳ"}}:::plan
+    PgSelectSingle226{{"PgSelectSingle[226∈7] ➊^<br />ᐸrelational_checklistsᐳ"}}:::plan
     First224 --> PgSelectSingle226
-    First230{{"First[230∈7] ➊"}}:::plan
-    PgSelectRows231[["PgSelectRows[231∈7] ➊"]]:::plan
+    First230{{"First[230∈7] ➊^"}}:::plan
+    PgSelectRows231[["PgSelectRows[231∈7] ➊^"]]:::plan
     PgSelectRows231 --> First230
     PgSelect228 --> PgSelectRows231
-    PgSelectSingle232{{"PgSelectSingle[232∈7] ➊<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
+    PgSelectSingle232{{"PgSelectSingle[232∈7] ➊^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First230 --> PgSelectSingle232
-    First237{{"First[237∈7] ➊"}}:::plan
-    PgSelectRows238[["PgSelectRows[238∈7] ➊"]]:::plan
+    First237{{"First[237∈7] ➊^"}}:::plan
+    PgSelectRows238[["PgSelectRows[238∈7] ➊^"]]:::plan
     PgSelectRows238 --> First237
     PgSelect235 --> PgSelectRows238
-    PgSelectSingle239{{"PgSelectSingle[239∈7] ➊<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle239{{"PgSelectSingle[239∈7] ➊^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
     First237 --> PgSelectSingle239
-    First243{{"First[243∈7] ➊"}}:::plan
-    PgSelectRows244[["PgSelectRows[244∈7] ➊"]]:::plan
+    First243{{"First[243∈7] ➊^"}}:::plan
+    PgSelectRows244[["PgSelectRows[244∈7] ➊^"]]:::plan
     PgSelectRows244 --> First243
     PgSelect241 --> PgSelectRows244
-    PgSelectSingle245{{"PgSelectSingle[245∈7] ➊<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    PgSelectSingle245{{"PgSelectSingle[245∈7] ➊^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
     First243 --> PgSelectSingle245
     PgSelect95 --> Access251
     List252 --> Lambda253
     Lambda91 --> Access255
     Lambda91 --> Access256
-    PgClassExpression189{{"PgClassExpression[189∈8] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgClassExpression189{{"PgClassExpression[189∈8] ➊<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle188 --> PgClassExpression189
-    PgClassExpression190{{"PgClassExpression[190∈8] ➊<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
+    PgClassExpression190{{"PgClassExpression[190∈8] ➊<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle188 --> PgClassExpression190
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/simple-single-table-items-root-topic"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[246]<br />ᐳ: 6, 9, 10, 19, 33, 41, 49, 57, 254, 11, 12, 66, 67, 91, 90<br />2: PgSelect[69]<br />ᐳ: Access[247]<br />3: PgSelectRows[72]<br />ᐳ: First[71], PgSelectSingle[73]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[246]<br />ᐳ: 9, 10, 12, 19, 33, 41, 49, 57, 254, 11, 66, 67, 91, 90<br />2: PgSelect[69]<br />ᐳ: Access[247]<br />3: PgSelectRows[72]<br />ᐳ: First[71], PgSelectSingle[73]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant19,Constant33,Constant41,Constant49,Constant57,Lambda66,Access67,PgSelect69,First71,PgSelectRows72,PgSelectSingle73,Node90,Lambda91,PgSelectInlineApply246,Access247,Constant254 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 19, 33, 41, 49, 57<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 19, 33, 41, 49, 57<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 19, 11, 33, 41, 49, 57<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket

@@ -9,10 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Connection22{{"Connection[22∈0] ➊<br />ᐸ20ᐳ"}}:::plan
-    Connection34{{"Connection[34∈0] ➊<br />ᐸ29ᐳ"}}:::plan
-    Connection42{{"Connection[42∈0] ➊<br />ᐸ40ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -21,7 +17,11 @@ graph TD
     __Value2 --> Access9
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
+    Connection22{{"Connection[22∈0] ➊<br />ᐸ20ᐳ"}}:::plan
     PgFromExpression33{{"PgFromExpression[33∈0] ➊"}}:::plan
+    Connection34{{"Connection[34∈0] ➊<br />ᐸ29ᐳ"}}:::plan
+    Connection42{{"Connection[42∈0] ➊<br />ᐸ40ᐳ"}}:::plan
     PgSelectInlineApply48["PgSelectInlineApply[48∈0] ➊"]:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
     Object11 & Connection12 --> PgSelect14
@@ -75,7 +75,7 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[16]<br />ᐳ: 15, 17, 18"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,First15,PgSelectRows16,PgSelectSingle17,PgClassExpression18 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 22, 6, 33, 48, 34<br /><br />ROOT Connectionᐸ20ᐳ[22]<br />1: PgSelect[24]<br />ᐳ: Access[49]<br />2: PgSelectRows[25]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 22, 33, 48, 34<br /><br />ROOT Connectionᐸ20ᐳ[22]<br />1: PgSelect[24]<br />ᐳ: Access[49]<br />2: PgSelectRows[25]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect24,PgSelectRows25,Access49 bucket2
     Bucket3("Bucket 3 (listItem)<br />Deps: 49, 34<br /><br />ROOT __Item{3}ᐸ25ᐳ[26]"):::bucket

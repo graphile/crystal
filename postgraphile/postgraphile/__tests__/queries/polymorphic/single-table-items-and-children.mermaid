@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -18,6 +17,7 @@ graph TD
     __Value2 --> Access9
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
     Object11 & Connection12 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
@@ -32,11 +32,11 @@ graph TD
     PgSelectSingle17 --> PgClassExpression19
     PgSelect20[["PgSelect[20∈3]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
     Object11 & PgClassExpression18 --> PgSelect20
-    PgSelectRows24[["PgSelectRows[24∈3]"]]:::plan
+    PgSelectRows24[["PgSelectRows[24∈3]^"]]:::plan
     PgSelect20 --> PgSelectRows24
     __Item25[/"__Item[25∈4]<br />ᐸ24ᐳ<br />ᐳSingleTableTopic"\]:::itemplan
     PgSelectRows24 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    PgSelectSingle26{{"PgSelectSingle[26∈4]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle26 --> PgClassExpression27
@@ -49,13 +49,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 11, 6<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item16,PgSelectSingle17,PgClassExpression18,PgClassExpression19 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 11, 18, 6, 17, 19<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[20]<br />2: PgSelectRows[24]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 11, 18, 17, 19<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[20]<br />2: PgSelectRows[24]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgSelect20,PgSelectRows24 bucket3
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ24ᐳ[25]"):::bucket

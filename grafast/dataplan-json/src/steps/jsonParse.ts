@@ -51,6 +51,11 @@ export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
     return access(this, [index]);
   }
 
+  public deduplicate(_peers: readonly Step[]): readonly Step[] {
+    // We're all the same
+    return _peers;
+  }
+
   execute({
     indexMap,
     values: [stringDep],

@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const EMPTY_ARRAY = [];
@@ -14307,7 +14307,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -14732,7 +14736,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -14974,7 +14982,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -15233,7 +15245,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -15484,7 +15500,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -19706,7 +19726,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();
@@ -19747,7 +19771,11 @@ export const plans = {
         only($parent, $connection, fieldArgs) {
           const $union = $connection.getSubplan();
           const $ltt = fieldArgs.getRaw();
-          $union.apply(lambda($ltt, limitToTypes));
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
+          }
         },
         orderBy(parent, $connection, value) {
           const $select = $connection.getSubplan();

@@ -9,8 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Connection40{{"Connection[40∈0] ➊<br />ᐸ38ᐳ"}}:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -19,6 +17,8 @@ graph TD
     __Value2 --> Access9
     __Value2 --> Access10
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
+    Connection40{{"Connection[40∈0] ➊<br />ᐸ38ᐳ"}}:::plan
     PgSelectInlineApply66["PgSelectInlineApply[66∈0] ➊"]:::plan
     PgSelectInlineApply70["PgSelectInlineApply[70∈0] ➊"]:::plan
     PgSelectInlineApply74["PgSelectInlineApply[74∈0] ➊"]:::plan
@@ -124,7 +124,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection40,PgSelectInlineApply66,PgSelectInlineApply70,PgSelectInlineApply74,PgSelectInlineApply78 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 6, 66, 70<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[67], Access[71]<br />2: PgSelectRows[15]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 66, 70<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[67], Access[71]<br />2: PgSelectRows[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access67,Access71 bucket1
     Bucket2("Bucket 2 (listItem)<br />Deps: 67, 71<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
@@ -139,7 +139,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[34]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression35,PgClassExpression36 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 11, 40, 6, 74, 78<br /><br />ROOT Connectionᐸ38ᐳ[40]<br />1: PgSelect[42]<br />ᐳ: Access[75], Access[79]<br />2: PgSelectRows[43]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 11, 40, 74, 78<br /><br />ROOT Connectionᐸ38ᐳ[40]<br />1: PgSelect[42]<br />ᐳ: Access[75], Access[79]<br />2: PgSelectRows[43]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect42,PgSelectRows43,Access75,Access79 bucket6
     Bucket7("Bucket 7 (listItem)<br />Deps: 75, 79<br /><br />ROOT __Item{7}ᐸ43ᐳ[44]"):::bucket

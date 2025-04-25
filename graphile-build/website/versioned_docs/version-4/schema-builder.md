@@ -68,7 +68,7 @@ function GraphQLObjectTypeLogNamePlugin(builder) {
 }
 ```
 
-See [Hooks](./hooks/) for details
+See [Hooks](./hooks) for details
 
 #### `registerWatcher(watcher, unwatcher)`
 

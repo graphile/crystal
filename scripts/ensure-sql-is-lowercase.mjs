@@ -106,7 +106,7 @@ async function main() {
     );
     for (const [filename, failures] of Object.entries(wrongSQL)) {
       console.log(
-        `${path.relative(`${__dirname}/..`, filename)}:\n\n  ${failures
+        `${path.relative(`${__dirname}/..`, filename)}:\n\n    ${failures
           .join("\n\n---\n\n")
           .replace(/\n/g, "\n    ")}\n`,
       );
