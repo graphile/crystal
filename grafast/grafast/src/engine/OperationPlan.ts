@@ -1765,9 +1765,13 @@ export class OperationPlan {
         parentStep,
         argsTupleList,
       ] of polymorphicPlanObjectTypeEntriesByRootStep) {
-        const typeNames = argsTupleList.map(
-          (a) => (a[IDX_POSITION_TYPE] as GraphQLObjectType).name,
-        );
+        const typeNames = [
+          ...new Set(
+            argsTupleList.map(
+              (a) => (a[IDX_POSITION_TYPE] as GraphQLObjectType).name,
+            ),
+          ),
+        ];
         const firstArgs = argsTupleList[0];
         const resolveTypeLayerPlan = firstArgs[IDX_LAYER_PLAN];
         if (isDev) {
