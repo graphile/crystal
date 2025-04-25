@@ -1,12 +1,11 @@
 import Link from "@docusaurus/Link";
-import v5betaStyles from "@site/src/pages/v5beta.module.css";
 import styles from "@site/src/components/WarningSection/styles.module.css";
+import v5betaStyles from "@site/src/pages/v5beta.module.css";
 import clsx from "clsx";
 import React from "react";
 
 export default function WarningContent({
   title,
-  body,
   primaryLink,
   primaryButtonText,
   secondaryLink,
