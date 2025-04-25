@@ -931,7 +931,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
-        this.rootLayerPlan,
+        subscriptionEventLayerPlan,
         selectionSet.selections,
         false,
       );
@@ -1019,7 +1019,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         streamItemPlan,
         rootType,
-        this.rootLayerPlan,
+        subscriptionEventLayerPlan,
         selectionSet.selections,
         true,
       );
