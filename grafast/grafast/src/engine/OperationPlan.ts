@@ -4760,12 +4760,22 @@ export class OperationPlan {
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
     if (cachedStep) {
       // Fix poly paths
-      if (paths && cachedStep.polymorphicPaths) {
-        const polymorphicPaths = new Set<string>([
-          ...cachedStep.polymorphicPaths,
-          ...paths,
-        ]);
-        cachedStep.polymorphicPaths = polymorphicPaths;
+      if (paths) {
+        const fixStepPolyPaths = (step: Step) => {
+          if (step.polymorphicPaths && step.layerPlan === layerPlan) {
+            // Add these poly paths to the cached step
+            const polymorphicPaths = new Set<string>([
+              ...step.polymorphicPaths,
+              ...paths,
+            ]);
+            step.polymorphicPaths = polymorphicPaths;
+            // And fix its dependencies
+            for (const dep of sudo(step).dependencies) {
+              fixStepPolyPaths(dep);
+            }
+          }
+        };
+        fixStepPolyPaths(cachedStep);
       }
 
       return cachedStep;
