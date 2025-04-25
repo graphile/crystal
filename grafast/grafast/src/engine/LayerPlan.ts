@@ -28,6 +28,10 @@ import { arrayOfLength, isPromiseLike } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
+/** If any of these flags are set on a value, its type should not be resolved and it should be treated as null */
+const SKIP_RESOLVE_TYPE_FLAGS =
+  FLAG_NULL | FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
+
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a
@@ -908,6 +912,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex < parentBucket.size;
             originalIndex++
           ) {
+            const flags = sourceStore._flagsAt(originalIndex);
+            if ((flags & SKIP_RESOLVE_TYPE_FLAGS) !== 0) {
+              // No need to process this value
+              continue;
+            }
             const newIndex = values.length;
             ev._copyResult(newIndex, sourceStore, originalIndex);
             map.set(originalIndex, newIndex);
@@ -918,21 +927,21 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             if (isResolveType) {
               // A `resolveType` layer plan must resolve the type to determine
               // the new poly path
-              const flags = ev._flagsAt(newIndex);
-              if (flags & (FLAG_ERROR | FLAG_STOPPED | FLAG_INHIBITED)) {
-                const resolvedTypeName = "__ERROR";
-                polymorphicPathList[newIndex] =
-                  (sourcePolyPath || "") + ">" + resolvedTypeName;
-              } else {
-                try {
-                  if (!graphqlType) {
-                    throw new Error(
-                      `GrafastInternalError<b7210c1c-db97-435b-b387-714a57e4910a>: resolveType layer plan must have a graphqlType it relates to`,
-                    );
-                  }
-                  let value = ev.at(newIndex);
-                  let resolvedTypeName: string;
+              try {
+                if (!graphqlType) {
+                  throw new Error(
+                    `GrafastInternalError<b7210c1c-db97-435b-b387-714a57e4910a>: resolveType layer plan must have a graphqlType it relates to`,
+                  );
+                }
+                let value = ev.at(newIndex);
+                let resolvedTypeName: string;
 
+                if (isPolymorphicData(value)) {
+                  // Legacy hack
+                  resolvedTypeName = value[$$concreteType];
+                  value = value.data;
+                  ev._setResult(newIndex, value, 0);
+                } else {
                   // TODO: implement this!
                   const graphqlContext = null as unknown;
                   // TODO: implement this!
@@ -951,73 +960,64 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                     path: null as any,
                   };
 
-                  if (isPolymorphicData(value)) {
-                    // Legacy hack
-                    resolvedTypeName = value[$$concreteType];
-                    value = value.data;
-                    ev._setResult(newIndex, value, 0);
-                  } else {
-                    const resolvedType = isPolymorphicData(value)
-                      ? value[$$concreteType]
-                      : graphqlType!.resolveType
-                        ? graphqlType.resolveType(
-                            value,
-                            graphqlContext,
-                            info,
-                            graphqlType,
-                          )
-                        : // TODO: use the defaultTypeResolver from the GraphQLExecutionArgs
-                          //executionArgs.typeResolver ??
-                          defaultTypeResolver(
-                            value,
-                            graphqlContext,
-                            info,
-                            graphqlType,
-                          );
-                    if (!resolvedType) {
-                      throw new GraphQLError(
-                        `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "Query.poly". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
-                        // TODO: add all the error paths and stuff
+                  const resolvedType = graphqlType!.resolveType
+                    ? graphqlType.resolveType(
+                        value,
+                        graphqlContext,
+                        info,
+                        graphqlType,
+                      )
+                    : // TODO: use the defaultTypeResolver from the GraphQLExecutionArgs
+                      //executionArgs.typeResolver ??
+                      defaultTypeResolver(
+                        value,
+                        graphqlContext,
+                        info,
+                        graphqlType,
                       );
-                    }
-                    if (isPromiseLike(resolvedType)) {
-                      // Ensure the system doesn't fully crash
-                      resolvedType.catch((e) => {});
-                      throw new GraphQLError(
-                        `Abstract type "${graphqlType}" returned a promise from resolveType; Grafast does not currently support this but will in the future - indicate your interest at https://github.com/graphile/crystal/issues/2457`,
-                        // TODO: add all the error paths and stuff
-                      );
-                    }
-
-                    // Older versions of GraphQL.js allowed returning the type
-                    // directly, this turns that into the String of the name. The
-                    // performance cost of doing this is fairly minimal,
-                    // `String(string)` can be called around 500M times per
-                    // second so does not have significant overhead.
-                    resolvedTypeName = String(resolvedType);
-                  }
-
-                  const type =
-                    this.operationPlan.schema.getType(resolvedTypeName);
-                  if (!type) {
-                    // (isDev && !isObjectType(type))) {
+                  if (!resolvedType) {
                     throw new GraphQLError(
-                      `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" that does not exist inside the schema.`,
+                      `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "Query.poly". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
+                      // TODO: add all the error paths and stuff
+                    );
+                  }
+                  if (isPromiseLike(resolvedType)) {
+                    // Ensure the system doesn't fully crash
+                    resolvedType.catch((e) => {});
+                    throw new GraphQLError(
+                      `Abstract type "${graphqlType}" returned a promise from resolveType; Grafast does not currently support this but will in the future - indicate your interest at https://github.com/graphile/crystal/issues/2457`,
                       // TODO: add all the error paths and stuff
                     );
                   }
 
-                  polymorphicPathList[newIndex] =
-                    (sourcePolyPath || "") + ">" + resolvedTypeName;
-                } catch (originalError) {
-                  // If an error happens here, we must overwrite the value in `ev`
-                  const flags = FLAG_ERROR | FLAG_STOPPED;
-                  flagUnion |= flags;
-                  ev._setResult(newIndex, originalError, flags);
-                  const resolvedTypeName = "__ERROR";
-                  polymorphicPathList[newIndex] =
-                    (sourcePolyPath || "") + ">" + resolvedTypeName;
+                  // Older versions of GraphQL.js allowed returning the type
+                  // directly, this turns that into the String of the name. The
+                  // performance cost of doing this is fairly minimal,
+                  // `String(string)` can be called around 500M times per
+                  // second so does not have significant overhead.
+                  resolvedTypeName = String(resolvedType);
                 }
+
+                const type =
+                  this.operationPlan.schema.getType(resolvedTypeName);
+                if (!type) {
+                  // (isDev && !isObjectType(type))) {
+                  throw new GraphQLError(
+                    `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" that does not exist inside the schema.`,
+                    // TODO: add all the error paths and stuff
+                  );
+                }
+
+                polymorphicPathList[newIndex] =
+                  (sourcePolyPath || "") + ">" + resolvedTypeName;
+              } catch (originalError) {
+                // If an error happens here, we must overwrite the value in `ev`
+                const flags = FLAG_ERROR | FLAG_STOPPED;
+                flagUnion |= flags;
+                ev._setResult(newIndex, originalError, flags);
+                const resolvedTypeName = "__ERROR";
+                polymorphicPathList[newIndex] =
+                  (sourcePolyPath || "") + ">" + resolvedTypeName;
               }
             } else {
               polymorphicPathList[newIndex] = sourcePolyPath;
