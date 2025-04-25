@@ -2972,6 +2972,7 @@ export function makeExampleSchema(
 
         relationalItemsList: {
           type: new GraphQLList(RelationalItem),
+          args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
           plan: EXPORTABLE(
             (
               deoptimizeIfAppropriate,
@@ -2979,12 +2980,14 @@ export function makeExampleSchema(
               relationalItemInterface,
               relationalItemsResource,
             ) =>
-              function plan($person) {
+              function plan($person, { $first, $offset }) {
                 const $personId = $person.get("person_id");
                 const $items: RelationalItemsStep =
                   relationalItemsResource.find({
                     author_id: $personId,
                   });
+                $items.setFirst($first);
+                $items.setOffset($offset);
                 deoptimizeIfAppropriate($items);
                 return each($items, ($item) => relationalItemInterface($item));
               },
