@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import type { GraphQLObjectType } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
