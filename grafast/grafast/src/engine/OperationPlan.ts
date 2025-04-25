@@ -3170,44 +3170,6 @@ export class OperationPlan {
       "GrafastInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
     );
 
-    // 1: adjust polymorphicPaths to fit new layerPlan
-    if (step.layerPlan.reason.type === "polymorphic") {
-      // PERF: this is cacheable
-      /** The closest ancestor layer plan that is polymorphic */
-      let ancestor: LayerPlan | null = step.layerPlan;
-      while ((ancestor = ancestor.parentLayerPlan)) {
-        if (ancestor.reason.type === "polymorphic") {
-          break;
-        }
-      }
-      const parentPolymorphicPaths = ancestor
-        ? (ancestor as LayerPlan<LayerPlanReasonPolymorphic>).reason
-            .polymorphicPaths
-        : POLYMORPHIC_ROOT_PATHS;
-
-      const myPaths = [...step.polymorphicPaths!];
-      if (parentPolymorphicPaths?.has(myPaths[0])) {
-        // All the others must be valid too
-      } else if (parentPolymorphicPaths === null) {
-        step.polymorphicPaths = null;
-      } else {
-        const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
-        const newPaths = new Set<string>();
-        for (const path of parentPolymorphicPaths) {
-          const prefix = path + ">";
-          const matches = myPaths.filter((p) => p.startsWith(prefix));
-          const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
-          if (matches.length !== layerMatches.length) {
-            // Can't hoist because it's not used for all polymorphicPaths of this type
-            return;
-          } else if (matches.length > 0) {
-            newPaths.add(path);
-          }
-        }
-        step.polymorphicPaths = newPaths;
-      }
-    }
-
     const $subroutine =
       step.layerPlan.reason.type === "subroutine"
         ? step.layerPlan.reason.parentStep
