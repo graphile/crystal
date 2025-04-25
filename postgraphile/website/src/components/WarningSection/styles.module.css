@@ -1,30 +1,21 @@
 .warningSection {
-  background-color: #ad1f32;
+  background-color: var(--ifm-color-primary-darkest);
   color: var(--ifm-color-primary-lightest);
 }
 
-.warningContainer {
-  display: flex;
+[data-theme="dark"] .warningSection {
+  background-color: var(--ifm-color-primary-light);
+  color: var(--ifm-background-color);
+}
+
+.warningRow {
   align-items: center;
   justify-content: center;
   width: 100%;
 }
 
-.warningRow {
-  align-items: center;
-  background-color: var(--ifm-color-primary-darker);
-  color: var(--ifm-color-primary-lightest);
-}
-
 .inner {
-  display: grid;
-  justify-content: center;
   text-align: center;
-}
-
-[data-theme="dark"] .warningRow {
-  background-color: var(--ifm-color-primary);
-  color: var(--ifm-background-color);
 }
 
 .header {
@@ -51,4 +42,25 @@
 .button:hover {
   color: var(--ifm-color-primary-dark);
   border: 1px solid var(--ifm-color-dark);
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.progressLink {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .progressLink {
+  color: var(--ifm-color-primary-darker);
+}
+
+.progressBarContainer {
+  width: 100%;
+  margin: auto;
+  margin-top: none;
 }

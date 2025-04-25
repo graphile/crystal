@@ -1,0 +1,127 @@
+---
+title: "V5 Beta Status"
+hide_table_of_contents: true
+---
+
+import styles from "@site/src/css/common.module.css";
+import v5betaStyles from "./v5beta.module.css";
+
+import CalloutSection from "@site/src/components/CalloutSection";
+import SecondarySection from "@site/src/components/SecondarySection";
+import TertiarySection from "@site/src/components/TertiarySection";
+import clsx from "clsx";
+
+## PostGraphile V5 Beta Status
+
+<div className={v5betaStyles.progressContainer}>
+  <div className={v5betaStyles.progressBackground}>
+    <div className={v5betaStyles.progressForeground}>
+      <div className={v5betaStyles.progressLabel}>80%</div>
+    </div>
+  </div>
+</div>
+
+PostGraphile Version 5 is about 80% of the way to release candidate stage.
+Factors which can increase the rate of release include
+adoption and testing by the community and increased sponsorship of the project.
+
+You can see the remaining issues to solve in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. Many of these are things that any community member can contribute to.
+However, some are highly technical issues which we call “Epics”.
+
+## Epics
+
+We have identified four large re-architecture issues which fundamentally change core parts of the system, addressing issues discovered during the alpha and beta stages. These epics are actually linked to Gra*fast*, the new execution engine upon which PostGraphile Version 5 has been built.
+The first three of them have now been reached, hurrah!
+
+- ✅ Global dependencies (solved via “unary” steps that represent exactly one value)
+- ✅ Early exit (solved via value “flags” tracking when a value should inhibit dependents)
+- ✅ Solve excessive branching due to planning of nested input values (aka [removing `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
+- 🔜 Solve excessive polymorphic branching
+
+There are many other areas which will also influence moving PostGraphile V5 to release candidate stage:
+
+- We need users to upgrade to Version 5 and test it out on real use cases. You don’t have to do this in your live production server &mdash; you can run it on a mirror and see the differences before migration. Most importantly, **you should send us feedback** &mdash; good & bad &mdash; through our [community Discord](https://discord.gg/graphile) or email.
+- Smaller issues outside of the above Epics are listed in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. This board is dynamic, new issues get shown here and some of the tasks are “nice to haves” while others may be migrated to a V5.1 or later release.
+
+<CalloutSection
+  title={`Crowd-funded open-source software`}
+  body={`Sponsoring the Graphile project directly increases the time and resources we can spend on getting PostGraphile V5 to release candidate stage. THANK YOU to all our sponsors!`}
+  link={`https://graphile.org/sponsor/`}
+  buttonText={`Learn more about sponsorship`}
+/>
+
+## Recent Releases
+
+Some of the more notable recent releases are listed below. [Graphile sponsors](https://graphile.org/sponsor) have access to release notes through our community support channels.
+Everyone else can see some detail in the PostGraphile [changelog](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md).
+
+<table className={v5betaStyles.releasesTable}>
+
+<thead>
+
+<tr>
+  <th>Date</th>
+  <th>Release</th>
+  <th>Details</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+  <td>2025-03-25</td>
+  <td>beta.40</td>
+  <td>
+    Eradicating eval Epic reached.{" "}
+    <a href="https://www.graphile.org/news/20250324-major-grafast-beta/">
+      Read more on graphile.org.
+    </a>
+  </td>
+</tr>
+
+<tr>
+  <td>2024-12-11</td>
+  <td>beta.36</td>
+  <td>Introduce safe step caching methods</td>
+</tr>
+
+<tr>
+  <td>2024-10-07</td>
+  <td>beta.30</td>
+  <td>Behavior system overhaul</td>
+</tr>
+
+<tr>
+  <td>2024-07-17</td>
+  <td>beta.27</td>
+  <td>Error handling overhaul</td>
+</tr>
+
+<tr>
+  <td>2024-05-09</td>
+  <td>beta.22</td>
+  <td>Early exit and global dependencies Epics reached</td>
+</tr>
+
+<tr>
+  <td>2023-08-03</td>
+  <td>beta.1</td>
+  <td>
+    Version 5 beta public release.{" "}
+    <a href="./news/2023-08-03-version-5-beta">Read more on the news site.</a>
+  </td>
+</tr>
+
+</tbody>
+
+</table>
+
+<TertiarySection
+  title={`Development Support`}
+  tagline={`Priority text support straight from the maintainer`}
+  body={`Give your company access to the knowledge and experience of the Graphile team through your chat server and GitHub/GitLab organization. Reference your code verbatim and arrange calls for any trickier topics.`}
+  Svg={require("@site/static/img/homepage/support.svg").default}
+  link={`https://www.graphile.org/support/`}
+  buttonText={`Learn more`}
+/>
