@@ -3132,6 +3132,7 @@ export function makeExampleSchema(
         username: attrField("username", GraphQLString),
         singleTableItemsList: {
           type: new GraphQLList(SingleTableItem),
+          args: { first: { type: GraphQLInt } },
           plan: EXPORTABLE(
             (
               deoptimizeIfAppropriate,
@@ -3139,12 +3140,13 @@ export function makeExampleSchema(
               singleTableItemInterface,
               singleTableItemsResource,
             ) =>
-              function plan($person) {
+              function plan($person, { $first }) {
                 const $personId = $person.get("person_id");
                 const $items: SingleTableItemsStep =
                   singleTableItemsResource.find({
                     author_id: $personId,
                   });
+                $items.setFirst($first);
                 deoptimizeIfAppropriate($items);
                 return each($items, singleTableItemInterface);
               },
@@ -4206,10 +4208,12 @@ export function makeExampleSchema(
 
       people: {
         type: new GraphQLList(Person),
+        args: { first: { type: GraphQLInt } },
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, personResource) =>
-            function plan() {
+            function plan(_, { $first }) {
               const $people = personResource.find();
+              $people.setFirst($first);
               deoptimizeIfAppropriate($people);
               return $people;
             },
