@@ -3,7 +3,7 @@
   people(first: 1) {
     __typename
     username
-    items: singleTableItemsList(first: 1) {
+    items: singleTableItemsList(first: 1, offset: 1) {
       __typename
       parent {
         __typename
