@@ -13,9 +13,11 @@ import clsx from "clsx";
 
 ## PostGraphile V5 Beta Status
 
-<div className={v5betaStyles.progressBackground}>
-  <div className={v5betaStyles.progressForeground}>
-    <div className={v5betaStyles.progressLabel}>80%</div>
+<div className={v5betaStyles.progressContainer}>
+  <div className={v5betaStyles.progressBackground}>
+    <div className={v5betaStyles.progressForeground}>
+      <div className={v5betaStyles.progressLabel}>80%</div>
+    </div>
   </div>
 </div>
 
@@ -23,20 +25,23 @@ PostGraphile Version 5 is about 80% of the way to release candidate stage.
 Factors which can increase the rate of release include
 adoption and testing by the community and increased sponsorship of the project.
 
-## Milestones
+You can see the remaining issues to solve in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. Many of these are things that any community member can contribute to.
+However, some are highly technical issues which we call “Epics”.
 
-Four major issues have been outlined which need to be addressed before a general release of PostGraphile Version 5. These milestones are actually for Gra*fast*, the new execution engine upon which PostGraphile Version 5 has been built.
-The first three of the issues have now been reached, hurrah!
+## Epics
 
-- ✅ Global dependencies (solved via "unary" steps that represent exactly one value)
-- ✅ Early exit (solved via value "flags" tracking when a value should inhibit dependents)
+We have identified four large re-architecture issues which fundamentally change core parts of the system, addressing issues discovered during the alpha and beta stages. These epics are actually linked to Gra*fast*, the new execution engine upon which PostGraphile Version 5 has been built.
+The first three of them have now been reached, hurrah!
+
+- ✅ Global dependencies (solved via “unary” steps that represent exactly one value)
+- ✅ Early exit (solved via value “flags” tracking when a value should inhibit dependents)
 - ✅ Solve excessive branching due to planning of nested input values (aka [removing `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
 - 🔜 Solve excessive polymorphic branching
 
-There are many other areas which will influence moving PostGraphile V5 to release candidate stage:
+There are many other areas which will also influence moving PostGraphile V5 to release candidate stage:
 
-- We need users to upgrade to Version 5 and test it out on real use cases. You don't have to do this in your live production server &mdash; you can run it on a mirror and see the differences before migration. Most importantly, **you should send us feedback** &mdash; good &amp; bad &mdash; through our [community Discord](https://discord.gg/graphile) or email.
-- Smaller issues outside of the above milestones are listed in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. This board is dynamic, new issues get shown here and some of the tasks are &ldquo;nice to haves&rdquo; while others may be migrated to a V5.1 or later release.
+- We need users to upgrade to Version 5 and test it out on real use cases. You don’t have to do this in your live production server &mdash; you can run it on a mirror and see the differences before migration. Most importantly, **you should send us feedback** &mdash; good & bad &mdash; through our [community Discord](https://discord.gg/graphile) or email.
+- Smaller issues outside of the above Epics are listed in the [V5 Project Board](https://github.com/orgs/graphile/projects/3) on GitHub. This board is dynamic, new issues get shown here and some of the tasks are “nice to haves” while others may be migrated to a V5.1 or later release.
 
 <CalloutSection
   title={`Crowd-funded open-source software`}
@@ -68,7 +73,7 @@ Everyone else can see some detail in the PostGraphile [changelog](https://github
   <td>2025-03-25</td>
   <td>beta.40</td>
   <td>
-    Eradicating eval milestone reached.{" "}
+    Eradicating eval Epic reached.{" "}
     <a href="https://www.graphile.org/news/20250324-major-grafast-beta/">
       Read more on graphile.org.
     </a>
@@ -96,7 +101,7 @@ Everyone else can see some detail in the PostGraphile [changelog](https://github
 <tr>
   <td>2024-05-09</td>
   <td>beta.22</td>
-  <td>Early exit and global dependencies milestones reached</td>
+  <td>Early exit and global dependencies Epics reached</td>
 </tr>
 
 <tr>

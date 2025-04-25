@@ -1,8 +1,11 @@
+.progressContainer {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .progressBackground {
   background-color: var(--ifm-color-primary-lighter);
   border-radius: 8px;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
 }
 
 .progressForeground {
@@ -23,7 +26,7 @@
 }
 
 [data-theme="dark"] .progressBackground {
-  background-color: var(--ifm-color-primary-light);
+  background-color: var(--ifm-color-primary-lightest);
 }
 
 [data-theme="dark"] .progressForeground {

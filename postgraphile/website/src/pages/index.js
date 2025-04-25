@@ -52,6 +52,18 @@ function HomepageHeader() {
                 Overview - 5min ⏱
               </Link>
             </div>
+            <div className={clsx("margin-top--md", styles.buttons)}>
+              <Link
+                className={clsx(
+                  "button button--outline button--lg margin-left--none",
+                  styles.buttonHero,
+                  styles.buttonHeroOutline,
+                )}
+                to="/postgraphile/4"
+              >
+                V4 Documentation (legacy)
+              </Link>
+            </div>
           </div>
           <div className="col col--6">
             <HeroImage
@@ -74,22 +86,10 @@ export default function Home() {
     >
       <WarningSection
         title={`PostGraphile Version 5 Public Beta`}
-        body={
-          <>
-            <h3 className={styles.warningInfo}>
-              This website and the associated software is still a
-              work-in-progress. Whilst{" "}
-              <strong>suitable to run in production</strong>, we need your help
-              to get it past the finish line; please read the beta announcement{" "}
-              <strong>and get involved</strong>.
-            </h3>
-            <h3 className={styles.warningInfo}> </h3>
-          </>
-        }
         primaryLink={`/news/2023-08-03-version-5-beta/`}
         primaryButtonText={`Beta Announcement`}
         secondaryLink={`/postgraphile/5/migrating-from-v4/`}
-        secondaryButtonText={`V4 Migration Guide`}
+        secondaryButtonText={<>V4&rarr;V5 Migration Guide</>}
       />
       <HomepageHeader />
       <main>
