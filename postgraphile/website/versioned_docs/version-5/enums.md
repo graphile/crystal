@@ -1,10 +1,8 @@
 ---
-layout: page
-path: /postgraphile/enums/
 title: Enums
 ---
 
-PostGraphile will automatically map PostgreSQL enums into GraphQL enums; they'll
+PostGraphile will automatically map PostgreSQL enums into GraphQL enums; they’ll
 be automatically renamed in order to make sure they conform to the GraphQL
 naming requirements and conventions.
 
@@ -37,11 +35,11 @@ enums to PostGraphile:
 
 ### Enum tables
 
-We can leverage PostgreSQL's foreign key relations to enforce that a value is
+We can leverage PostgreSQL’s foreign key relations to enforce that a value is
 contained within a small set, defined by the values in some other table. To use
 this feature, we must have a table in which to contain our enums, and we must
 tell PostGraphile that it is an enum table using the `@enum` [smart
-tag](./smart-tags). You may also include a column named 'description' to
+tag](./smart-tags). You may also include a column named ‘description’ to
 provide the description for the enum value.
 
 ```sql
@@ -64,7 +62,7 @@ create table pets (
 
 We also support the `@enum` smart tag on unique constraints (not indexes) so
 you could use a single table to contain all your enums should you wish. We do
-not recommend this specific pattern, but it's sometimes used in the ecosystem.
+not recommend this specific pattern, but it’s sometimes used in the ecosystem.
 
 Should you wish to use a column other than `description` for the description of
 the enum, put the smart comment `@enumDescription` on the desired column.

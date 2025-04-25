@@ -1,10 +1,8 @@
 ---
-layout: page
-path: /postgraphile/smart-tags/
-title: Smart tags
+title: Smart Tags
 ---
 
-You can customise your PostGraphile GraphQL schema by tagging tables, columns,
+You can customize your PostGraphile GraphQL schema by tagging tables, columns,
 functions, relations, etc. These changes could be renaming something, omitting
 things from your GraphQL schema, or anything else a plugin supports!
 
@@ -422,7 +420,7 @@ Primary key columns will automatically be marked as `@notNull`, as they would in
 PostgreSQL.
 
 If you declare something as a primary key it _must_ be unique. We do not check
-it's unique - we trust you - but if it isn't unique then we're not sure what
+it's unique — we trust you — but if it isn't unique then we're not sure what
 will happen...
 
 ```json5 title="postgraphile.tags.json5"
@@ -624,9 +622,13 @@ table!):
 
 </div>
 
-> **Warning:** This functionality is not intended for implementing permissions,
-> it's for removing things from your API that you don't need. You should back
-> these up with database permissions if needed.
+:::warning Don't rely on @omit for permissions
+
+This functionality is not intended for implementing permissions,
+it's for removing things from your API that you don't need. You should back
+these up with database permissions if needed.
+
+:::
 
 Multiple actions can be listed using commas (no spaces!), as in the following
 example which disables mutations on a table:
@@ -697,7 +699,7 @@ for the features to disable._
 You can control whether simple collections are enabled by default using
 `--simple-collections omit|both|only` (or
 `simpleCollections: "omit"|"both"|"only"`); however sometimes you want to
-override this on a case by case setting - for example if you want relay
+override this on a case by case setting — for example if you want relay
 connections for almost all collections, except when it comes to a user's email
 addresses where you want to use a simple list.
 
@@ -812,14 +814,14 @@ sort and/or filter by. For example:
 
 ```sql
 -- non scalar function
-CREATE OR REPLACE FUNCTION user_object(user user) RETURNS object AS $$
-SELECT * FROM object where id = user.object_id;
-$$ language SQL STABLE;
+create or replace function user_object(user user) returns object as $$
+select * from object where id = user.object_id;
+$$ language sql stable;
 
 -- wrapper. Note the () for notation. Failing to use them will throw an error
-CREATE OR REPLACE FUNCTION user_object_field(user user) RETURNS varchar AS $$
-SELECT (user_object(user)).field;
-$$ language SQL STABLE;
+create or replace function user_object_field(user user) returns varchar as $$
+select (user_object(user)).field;
+$$ language sql stable;
 
 -- don't forget the comments...
 comment on function user_object_field() is E'@sortable';
@@ -832,14 +834,14 @@ the
 
 ```sql
 -- non scalar setof function
-CREATE OR REPLACE FUNCTION user_objects(user user) RETURNS SETOF object AS $$
-SELECT * FROM object where owner_id = user.id; -- one user, many objects
-$$ language SQL STABLE;
+create or replace function user_objects(user user) returns setof object as $$
+select * from object where owner_id = user.id; -- one user, many objects
+$$ language sql stable;
 
 -- wrapper. Note the () for notation. Failing to use them will throw an error
-CREATE OR REPLACE FUNCTION user_object_fields(user user) RETURNS varchar[] AS $$
-SELECT ARRAY_AGG((user_objects(user)).field);
-$$ language SQL STABLE;
+create or replace function user_object_fields(user user) returns varchar[] as $$
+select array_agg((user_objects(user)).field);
+$$ language sql stable;
 
 -- don't forget the comments...
 comment on function user_object_fields() is E'@sortable';

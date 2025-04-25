@@ -1,14 +1,20 @@
 ---
-layout: page
-path: /postgraphile/subscriptions/
-title: GraphQL Subscriptions
+title: Subscriptions
 ---
+
+import styles from "@site/src/css/common.module.css";
+
+# GraphQL Subscriptions
+
+<p className={styles.intro}>
 
 Subscriptions notify you when an event occurs on the server side. PostGraphile
 supports subscriptions out of the box (assuming you are using it with a
 supported webserver), but you are responsible for adding subscription fields to
-your schema - without any subscription fields, the `subscription` operation is
+your schema — without any subscription fields, the `subscription` operation is
 not possible.
+
+</p>
 
 ## Websockets
 
@@ -162,9 +168,9 @@ always `id`. If this is not the case, you should delete the line containing
 `'id', v_record.id`.
 
 ```sql
-CREATE FUNCTION tg__graphql_subscription() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $_$
+create function tg__graphql_subscription() returns trigger
+    language plpgsql
+    as $_$
 declare
   v_process_new bool = (TG_OP = 'INSERT' OR TG_OP = 'UPDATE');
   v_process_old bool = (TG_OP = 'UPDATE' OR TG_OP = 'DELETE');
@@ -217,10 +223,10 @@ Hooking the database up to a GraphQL subscription can be achieved via `CREATE
 TRIGGER`:
 
 ```sql
-CREATE TRIGGER _500_gql_insert
-  AFTER INSERT ON messages
-  FOR EACH ROW
-  EXECUTE FUNCTION tg__graphql_subscription(
+create trigger _500_gql_insert
+  after insert on messages
+  for each row
+  execute function tg__graphql_subscription(
     'create', -- the "event" string, useful for the client to know what happened
     'forum:$1:message', -- the "topic" the event will be published to, as a template
     'forum_id' -- If specified, `$1` above will be replaced with NEW.forum_id or OLD.forum_id from the trigger.

@@ -1,15 +1,13 @@
 ---
-layout: page
-path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
 PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
-you; but it's rare that these will cover all your needs - and many people just
+you; but it’s rare that these will cover all your needs — and many people just
 disable them outright. Custom mutations enable you to write exactly the business
 logic you need with access to all of your data all wrapped up in a PostgreSQL
 function. You can even bypass the RLS and GRANT checks, should you so choose, by
-tagging your function as `SECURITY DEFINER` - but be very careful when you do
+tagging your function as `SECURITY DEFINER` — but be very careful when you do
 so!
 
 ### Rules
@@ -28,7 +26,7 @@ that is compatible with the
 For example the function
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS text AS $$ … $$ LANGUAGE sql VOLATILE;
+create function my_function(a int, b int) returns text as $$ … $$ language sql volatile;
 ```
 
 could be called from GraphQL like this:
@@ -45,20 +43,20 @@ Look at the documentation in Ruru/Graph*i*QL to find the parameters you may use.
 
 ### Example
 
-Here's an example of a custom mutation, which will generate the GraphQL
+Here’s an example of a custom mutation, which will generate the GraphQL
 `acceptTeamInvite` mutation:
 
 ```sql
-CREATE FUNCTION app_public.accept_team_invite(team_id integer)
-RETURNS app_public.team_members
-AS $$
-  UPDATE app_public.team_members
-    SET accepted_at = now()
-    WHERE accepted_at IS NULL
-    AND team_members.team_id = accept_team_invite.team_id
-    AND member_id = app_public.current_user_id()
-    RETURNING *;
-$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+create function app_public.accept_team_invite(team_id integer)
+returns app_public.team_members
+as $$
+  update app_public.team_members
+    set accepted_at = now()
+    where accepted_at is null
+    and team_members.team_id = accept_team_invite.team_id
+    and member_id = app_public.current_user_id()
+    returning *;
+$$ language sql volatile strict security definer;
 ```
 
 Notes on the above function:
@@ -80,7 +78,7 @@ Notes on the above function:
 
 ### pgStrictFunctions
 
-If you'd like PostGraphile to treat all function arguments as required
+If you’d like PostGraphile to treat all function arguments as required
 (non-null) unless they have a default then you can use the
 `preset.gather.pgStrictFunctions` setting:
 
@@ -97,24 +95,24 @@ This is similar to marking the function as `STRICT` but with the subtle
 difference that arguments with defaults may be specified as `NULL` without
 necessitating that the function returns null. With this setting enabled,
 arguments without default value will be set mandatory while arguments with
-default value will be optional. For example: `CREATE FUNCTION foo(a int, b int,
+default value will be optional. For example: `create function foo(a int, b int,
 c int = 0, d int = null)...` would give a mutation `foo(a: Int!, b: Int!, c:
 Int, d: Int)`.
 
 ### Bulk Insert Example
 
-Here's an example of a custom mutation that performs a "bulk insert" - inserting
+Here’s an example of a custom mutation that performs a “bulk insert” — inserting
 and returning a set of records:
 
 ```sql
-CREATE FUNCTION app_public.create_documents(num integer, type text, location text)
-RETURNS SETOF app_public.document
-AS $$
-  INSERT INTO app_public.document (type, location)
-    SELECT create_documents.type, create_documents.location
-    FROM generate_series(1, num) i
-    RETURNING *;
-$$ LANGUAGE sql STRICT VOLATILE;
+create function app_public.create_documents(num integer, type text, location text)
+returns setof app_public.document
+as $$
+  insert into app_public.document (type, location)
+    select create_documents.type, create_documents.location
+    from generate_series(1, num) i
+    returning *;
+$$ language sql strict volatile;
 ```
 
 <!--
