@@ -18,7 +18,7 @@ be needed between updates. Postgres-centric users who leverage [trusted
 documents](https://benjie.dev/graphql/trusted-documents) (highly recommended!)
 should experience particularly smooth sailing!
 
-- **→ V5 status page: https://postgraphile.org/v5beta**
+- [**→ V5 status page**](https://postgraphile.org/v5beta) at postgraphile.org
 - [**Overview of new features**](https://postgraphile.org/postgraphile/next/migrating-from-v4/v5-new-feature-summary)
   at postgraphile.org
 - [Intro to V5 series](https://dev.to/benjie/series/23459) on dev.to
