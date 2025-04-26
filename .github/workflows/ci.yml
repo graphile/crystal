@@ -28,7 +28,7 @@ jobs:
       - name: "Lint Code"
         run: yarn lint
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |
@@ -53,13 +53,8 @@ jobs:
       fail-fast: false
       matrix:
         postgres-version:
-          - 12
-          - 13
-          - 14
           - 15
         node-version:
-          - 12.x
-          - 14.x
           - 16.x
 
     services:
@@ -82,7 +77,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
       - name: Configure PostgreSQL
@@ -92,8 +87,9 @@ jobs:
           docker restart postgres
       - name: Install pg_dump
         run: |
-          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+          sudo mkdir -p /usr/share/keyrings
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/pgdg-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }} postgresql-${{ matrix.postgres-version }}-wal2json
       - run: yarn --immutable --ignore-engines
