@@ -41,7 +41,7 @@ focus of eradicating eval from Gra*fast* has given PostGraphile users some new b
 ### SQL generation moved to runtime
 
 PostGraphile's various SQL-running steps like PgSelectStep now build their
-queries at runtime rather than plantime. They use the "builder" pattern, where
+queries at runtime rather than plan-time. They use the "builder" pattern, where
 much of the SQL query can be established at plan-time, but final tweaks can be
 applied at run-time (register tweaks via the `$pgSelect.apply($callback)`
 method) before the query is built.
