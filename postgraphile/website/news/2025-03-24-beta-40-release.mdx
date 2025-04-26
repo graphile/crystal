@@ -1,0 +1,122 @@
+---
+title: Major PostGraphile V5 beta release
+description: A lot has been written behind the scenes to make PostGraphile V5 even better!
+slug: 2025-03-24-beta-40-release
+authors:
+  - name: Benjie
+    title: PostGraphile Maintainer
+    url: https://github.com/Benjie
+    image_url: https://github.com/Benjie.png
+tags: [Beta]
+hide_table_of_contents: false
+toc_max_heading_level: 2
+---
+
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
+In the first Gra<em>fast</em> Working Group, we outlined 4 <em>major</em> issues in Gra<em>fast</em>
+that needed to be addressed before we could think about general release. With
+this release, 3 of these are now complete!
+
+- ✅⤵️ Global dependencies - solved via "unary" steps
+- ✅⤵️ Early exit - solved via "flags"
+- ✅🎉 **Eradicating eval - this release!**
+- 🤔🔜 Polymorphism
+
+We’re proud to announce that the third of these, eradicating eval, is now
+addressed with the launch of `grafast@0.1.1-beta.21`, and the approach has been
+fully adopted and tested via incorporation into `postgraphile@5.0.0-beta.40`.
+
+</p>
+
+## What does this mean for PostGraphile?
+
+Gra*fast* is a cutting-edge GraphQL planning and execution engine that leverages
+the declarative nature of GraphQL to execute your requests with maximal
+efficiency no matter the data sources you're working with. PostGraphile V5 uses
+Gra*fast* as the underlying execution engine, allowing it to build much more
+efficient SQL queries than PostGraphile V4 could achieve whilst also
+significantly expanding the capabilities of the system - not to mention solving
+some longstanding issues!
+
+Whilst users of PostGraphile are not required to deeply understand the internals
+of Gra*fast*, this focus of eradicating `$step.eval*()` methods from Gra*fast*
+has given PostGraphile users some new benefits.
+
+### SQL generation moved to runtime
+
+PostGraphile's various SQL-running steps like PgSelectStep now build their
+queries at runtime rather than plan-time. They use the "builder" pattern, where
+much of the SQL query can be established at plan-time, but final tweaks can be
+applied at run-time (register tweaks via the `$pgSelect.apply($callback)`
+method) before the query is built.
+
+### SQL efficiency increased
+
+Since we have more information at run-time, our SQL queries were able to become
+even simpler, 10% smaller on average across our test suite! This nets us a
+modest performance improvement inside PostgreSQL, but the shift to runtime does
+cost us a little performance in the JS layer since queries now need to be built
+for every request, rather than once per plan. We're happy with this tradeoff;
+one of the core goals of PostGraphile V5 (and the motivation for Gra*fast* in the
+first place) was to shift load from the PostgreSQL layer (which is non-trivial
+to scale) to the Node.js layer (which is easy to scale horizontally).
+
+<!-- truncate-->
+
+### Postgres Arrays now parse 5x faster
+
+We've also [backported](https://github.com/bendrucker/postgres-array/pull/19)
+these [fixes](https://github.com/bendrucker/postgres-array/pull/20) into the
+`postgres-array` npm module for everyone that uses `pg` to benefit from.
+
+### Easier to write SQL fragments
+
+Added a new feature to `pg-sql2` that allows us to handle non-SQL parameter
+embeds with custom code, making it easier to write custom SQL, e.g. if a value
+is already coming from SQL you can embed it directly without having to invoke
+placeholder:
+
+```diff
+ const $fooId = $foo.get('id');
+-$pgSelect.where(sql`foo_id = ${$pgSelect.placeholder($fooId)}`);
++$pgSelect.where(sql`foo_id = ${$fooId}`);
+```
+
+We've also added the ability to embed dynamic SQL fragments that can be
+dependent on runtime values (these values must be unary, i.e. they must come
+from GraphQL field arguments or derivatives thereof):
+
+```ts
+const $includeArchived = fieldArgs.getRaw("includeArchived");
+const $condition = lambda($includeArchived, (includeArchived) =>
+  includeArchived ? sql.true : sql`is_archived is false`,
+);
+$pgSelect.where($condition);
+```
+
+### Join our testing community
+
+If you use Discord, join our server at [https://discord.gg/graphile](https://discord.gg/graphile) and chat away with other V5 users — talk over the new features, discuss any issues you encounter and explore different ways of using the new projects. We look forward to welcoming you and hearing of your suggestions and successes with V5!
+
+## Thank you sponsors!
+
+PostGraphile is crowd-funded open-source software, it relies on
+crowd-sourced funding from individuals and companies to keep advancing.
+
+If your company benefits from PostGraphile or the wider Graphile
+suite, you should consider asking them to fund our work. By significantly
+reducing the amount of work needed to achieve business goals and reducing
+running costs, Graphile’s software results in huge time and money savings for
+users. We encourage companies to contribute a portion of these savings back,
+enabling the projects to advance more rapidly, and result in even greater
+savings for your company.
+[Find out more about sponsorship on graphile.org](https://graphile.org/sponsor/).
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>

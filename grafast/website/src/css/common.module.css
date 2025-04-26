@@ -49,6 +49,10 @@
   font-size: 1.25rem;
 }
 
+[data-theme="dark"] .intro {
+  color: var(--ifm-color-primary-lighter);
+}
+
 .intro li,
 code {
   font-style: normal;
