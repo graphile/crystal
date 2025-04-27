@@ -1,3 +1,26 @@
+.warningSection {
+  background-color: var(--ifm-color-primary-darkest);
+  color: var(--ifm-color-primary-lightest);
+  padding: 2rem 4.75rem 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+[data-theme="dark"] .warningSection {
+  background-color: var(--ifm-color-primary-light);
+  color: var(--ifm-background-color);
+}
+
+.warningSectionInner {
+  max-width: var(--ifm-container-width-xl);
+  padding: 0 1rem;
+  margin: 0 auto;
+}
+
+.progressContainer,
+.progressContainerStatusPage {
+  margin-bottom: 1rem;
+}
 .progressContainer {
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -10,7 +33,6 @@
 
 .progressForeground {
   height: 3rem;
-  width: 80%;
   background-color: var(--ifm-color-primary-dark);
   color: white;
   border-radius: 6px;
@@ -62,6 +84,11 @@
   background-color: var(--ifm-background-color);
 }
 
+.releasesTable {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
 .releasesTable td:first-child,
 .releasesTable th:first-child {
   padding-left: 2rem;
@@ -79,4 +106,9 @@
 
 .releasesTable {
   padding-bottom: 2rem;
+}
+
+.prose {
+  max-width: 42rem;
+  margin: 0 auto;
 }
