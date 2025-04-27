@@ -120,3 +120,12 @@ figure figcaption {
   padding-left: 30px;
   list-style-type: none;
 }
+
+.full-width main.container,
+.full-width main.container > .row,
+.full-width main.container > .row > .col {
+  margin: 0;
+  margin-top: 0 !important;
+  padding: 0;
+  max-width: initial;
+}

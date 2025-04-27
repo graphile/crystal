@@ -19,7 +19,10 @@ export default function WarningContent({
             <h2 className={styles.header}>{title}</h2>
             <div className={styles.progressBarContainer}>
               <div className={v5betaStyles.progressBackground}>
-                <div className={v5betaStyles.progressForeground}>
+                <div
+                  className={v5betaStyles.progressForeground}
+                  style={{ width: "80%" }}
+                >
                   <div className={v5betaStyles.progressLabel}>80%</div>
                 </div>
               </div>

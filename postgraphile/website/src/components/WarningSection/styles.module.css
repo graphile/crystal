@@ -8,10 +8,13 @@
   color: var(--ifm-background-color);
 }
 
+.warningSection h2 {
+  font-weight: bold;
+}
+
 .warningRow {
   align-items: center;
   justify-content: center;
-  width: 100%;
 }
 
 .inner {
