@@ -1,14 +1,10 @@
 import "graphile-config";
 
-import type {
-  ExecutableStep,
-  Maybe,
-  NodeIdCodec,
-  NodeIdHandler,
-} from "grafast";
-import { node } from "grafast";
+import type { NodeIdCodec, NodeIdHandler } from "grafast";
+import { isDev, makeDecodeNodeId, makeDecodeNodeIdRuntime } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
+import { inspect } from "../../../../grafast/grafast/src/inspect.js";
 import { EXPORTABLE } from "../utils.js";
 
 declare global {
@@ -145,27 +141,83 @@ export const NodePlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const {
           graphql: { GraphQLNonNull, GraphQLID },
+          grafast: { access },
         } = build;
         const nodeTypeName = build.inflection.builtin("Node");
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
         build.registerInterfaceType(
           nodeTypeName,
           {},
-          () => ({
-            description: build.wrapDescription(
-              "An object with a globally unique `ID`.",
-              "type",
-            ),
-            fields: {
-              [nodeIdFieldName]: {
-                description: build.wrapDescription(
-                  "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
-                  "field",
-                ),
-                type: new GraphQLNonNull(GraphQLID),
+          () => {
+            const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
+            const decodeNodeId = makeDecodeNodeId(
+              Object.values(nodeIdHandlerByTypeName),
+            );
+            const decodeNodeIdRuntime = makeDecodeNodeIdRuntime(
+              Object.values(nodeIdHandlerByTypeName),
+            );
+            return {
+              description: build.wrapDescription(
+                "An object with a globally unique `ID`.",
+                "type",
+              ),
+              fields: {
+                [nodeIdFieldName]: {
+                  description: build.wrapDescription(
+                    "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+                    "field",
+                  ),
+                  type: new GraphQLNonNull(GraphQLID),
+                },
               },
-            },
-          }),
+              resolveType: EXPORTABLE(
+                (
+                  decodeNodeIdRuntime,
+                  inspect,
+                  isDev,
+                  nodeIdHandlerByTypeName,
+                ) =>
+                  function resolveType(nodeId) {
+                    const specifier = decodeNodeIdRuntime(nodeId);
+                    if (!specifier) return null;
+                    for (const [typeName, typeSpec] of Object.entries(
+                      nodeIdHandlerByTypeName,
+                    )) {
+                      const value = specifier[typeSpec.codec.name];
+                      if (value != null && typeSpec.match(value)) {
+                        return typeName;
+                      }
+                    }
+                    if (isDev) {
+                      console.error(
+                        `Could not find a type that matched the specifier '${inspect(
+                          specifier,
+                        )}'`,
+                      );
+                    }
+                    return null;
+                  },
+                [decodeNodeIdRuntime, inspect, isDev, nodeIdHandlerByTypeName],
+              ),
+              extensions: {
+                grafast: {
+                  getBySpecifier(type, $nodeId) {
+                    const spec = nodeIdHandlerByTypeName[type.name];
+                    if (spec) {
+                      const $specifier = decodeNodeId($nodeId);
+                      return spec.get(
+                        spec.getSpec(access($specifier, [spec.codec.name])),
+                      );
+                    } else {
+                      throw new Error(
+                        `Failed to find handler for ${type.name}`,
+                      );
+                    }
+                  },
+                },
+              },
+            } as Omit<GraphileBuild.GrafastInterfaceTypeConfig<any>, "name">;
+          },
           "Node interface from NodePlugin",
         );
         return _;
@@ -186,7 +238,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLNonNull, GraphQLID },
           inflection,
         } = build;
-        const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
         const nodeType = getTypeByName(inflection.builtin("Node")) as
           | GraphQLObjectType
@@ -218,16 +269,11 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (node, nodeIdFieldName, nodeIdHandlerByTypeName) =>
-                    function plan(_$root, args) {
-                      return node(
-                        nodeIdHandlerByTypeName!,
-                        args.getRaw(nodeIdFieldName) as ExecutableStep<
-                          Maybe<string>
-                        >,
-                      );
+                  (nodeIdFieldName) =>
+                    function plan(_$root, fieldArgs) {
+                      return fieldArgs.getRaw(nodeIdFieldName);
                     },
-                  [node, nodeIdFieldName, nodeIdHandlerByTypeName],
+                  [nodeIdFieldName],
                 ),
               }),
             ),
