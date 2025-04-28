@@ -140,6 +140,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
 
       init(_, build) {
         const {
+          EXPORTABLE,
           graphql: { GraphQLNonNull, GraphQLID },
           grafast: { access },
         } = build;
@@ -150,11 +151,15 @@ export const NodePlugin: GraphileConfig.Plugin = {
           {},
           () => {
             const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
-            const decodeNodeId = makeDecodeNodeId(
-              Object.values(nodeIdHandlerByTypeName),
+            const decodeNodeId = EXPORTABLE(
+              (makeDecodeNodeId, nodeIdHandlerByTypeName) =>
+                makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName)),
+              [makeDecodeNodeId, nodeIdHandlerByTypeName],
             );
-            const decodeNodeIdRuntime = makeDecodeNodeIdRuntime(
-              Object.values(nodeIdHandlerByTypeName),
+            const decodeNodeIdRuntime = EXPORTABLE(
+              (makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName) =>
+                makeDecodeNodeIdRuntime(Object.values(nodeIdHandlerByTypeName)),
+              [makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName],
             );
             return {
               description: build.wrapDescription(
