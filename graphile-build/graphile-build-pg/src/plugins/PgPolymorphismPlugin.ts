@@ -1080,21 +1080,28 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: codec.description,
-                    resolveType: EXPORTABLE(() => function resolveType(value) {
-                      return value.__typename;
-                    }, []),
+                    resolveType: EXPORTABLE(
+                      () =>
+                        function resolveType(value) {
+                          return value.__typename;
+                        },
+                      [],
+                    ),
                     extensions: {
                       grafast: {
-                        getBySpecifier: EXPORTABLE((access, pk, resource) => (t, $specifier) => {
-                          return resource.get(
-                            Object.fromEntries(
-                              pk.map((attrName) => [
-                                attrName,
-                                access($specifier, attrName),
-                              ]),
-                            ),
-                          );
-                        }, [access, pk, resource]),
+                        getBySpecifier: EXPORTABLE(
+                          (access, pk, resource) => (t, $specifier) => {
+                            return resource.get(
+                              Object.fromEntries(
+                                pk.map((attrName) => [
+                                  attrName,
+                                  access($specifier, attrName),
+                                ]),
+                              ),
+                            );
+                          },
+                          [access, pk, resource],
+                        ),
                       },
                     },
                   }),
