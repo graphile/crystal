@@ -1737,7 +1737,13 @@ export class OperationPlan {
           false,
         );
         $data._isUnary = false;
-        resolveTypeLayerPlan.addCombo([...sourceSteps], $data);
+        const sources: Array<{ layerPlan: LayerPlan; step: Step }> = [];
+        for (const args of argsTupleList) {
+          const layerPlan = args[IDX_LAYER_PLAN];
+          const step = args[IDX_PARENT_STEP];
+          sources.push({ layerPlan, step });
+        }
+        resolveTypeLayerPlan.addCombo(sources, $data);
 
         /*
          * An output plan for it (knows how to branch the different object

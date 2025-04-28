@@ -1101,25 +1101,28 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }[];
     targetStepId: number;
   }> = [];
-  public addCombo(sourceSteps: Step[], $target: __ValueStep<any>): void {
+  public addCombo(
+    sources: ReadonlyArray<{ layerPlan: LayerPlan; step: Step }>,
+    $target: __ValueStep<any>,
+  ): void {
     if (this.reason.type !== "combined" && this.reason.type !== "resolveType") {
       throw new Error(
         `Combinations may only be added to combined or resolveType layer plans`,
       );
     }
     this.combinations.push({
-      sources: sourceSteps.map((s) => ({
+      sources: sources.map((s) => ({
         layerPlanId: s.layerPlan.id,
-        stepId: s.id,
+        stepId: s.step.id,
       })),
       targetStepId: $target.id,
     });
     const { layerPlansByDependentStep } = this.operationPlan.stepTracker;
-    sourceSteps.forEach(($step) => {
-      let set = layerPlansByDependentStep.get($step);
+    sources.forEach(({ step }) => {
+      let set = layerPlansByDependentStep.get(step);
       if (!set) {
         set = new Set();
-        layerPlansByDependentStep.set($step, set);
+        layerPlansByDependentStep.set(step, set);
       }
       set.add(this as LayerPlan<LayerPlanReasonCombined>);
     });
