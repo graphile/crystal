@@ -1,6 +1,7 @@
 import LRU from "@graphile/lru";
 import type {
   GraphQLInterfaceType,
+  GraphQLObjectType,
   GraphQLResolveInfo,
   GraphQLUnionType,
 } from "graphql";
@@ -127,6 +128,8 @@ export interface LayerPlanReasonResolveType {
   type: "resolveType";
   graphqlType: GraphQLUnionType | GraphQLInterfaceType;
   parentLayerPlans: ReadonlyArray<LayerPlan>;
+  parentType: GraphQLObjectType;
+  fieldName: string;
 }
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
@@ -928,6 +931,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               // A `resolveType` layer plan must resolve the type to determine
               // the new poly path
               try {
+                const parentType: GraphQLObjectType = this.reason.parentType;
+                const fieldName: string = this.reason.fieldName;
+                const returnType = parentType?.getFields()[fieldName].type;
                 if (!graphqlType) {
                   throw new Error(
                     `GrafastInternalError<b7210c1c-db97-435b-b387-714a57e4910a>: resolveType layer plan must have a graphqlType it relates to`,
@@ -953,10 +959,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                     rootValue: null as any,
                     variableValues: null as any,
 
-                    fieldName: null as any,
+                    fieldName,
                     fieldNodes: null as any,
-                    parentType: null as any,
-                    returnType: null as any,
+                    parentType,
+                    returnType,
                     path: null as any,
                   };
 
@@ -977,7 +983,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                       );
                   if (!resolvedType) {
                     throw new GraphQLError(
-                      `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "Query.poly". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
+                      `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "${parentType}.${fieldName}". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
                       // TODO: add all the error paths and stuff
                     );
                   }
@@ -985,7 +991,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                     // Ensure the system doesn't fully crash
                     resolvedType.catch((e) => {});
                     throw new GraphQLError(
-                      `Abstract type "${graphqlType}" returned a promise from resolveType; Grafast does not currently support this but will in the future - indicate your interest at https://github.com/graphile/crystal/issues/2457`,
+                      `Abstract type "${graphqlType}" returned a promise from resolveType for field "${parentType}.${fieldName}"; Grafast does not currently support this but will in the future - indicate your interest at https://github.com/graphile/crystal/issues/2457`,
                       // TODO: add all the error paths and stuff
                     );
                   }
@@ -1003,7 +1009,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 if (!type) {
                   // (isDev && !isObjectType(type))) {
                   throw new GraphQLError(
-                    `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" that does not exist inside the schema.`,
+                    `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" for field "${parentType}.${fieldName}"; that does not exist inside the schema.`,
                     // TODO: add all the error paths and stuff
                   );
                 }

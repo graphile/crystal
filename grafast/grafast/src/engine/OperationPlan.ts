@@ -1678,10 +1678,24 @@ export class OperationPlan {
         const parentLayerPlans = [
           ...new Set(argsTupleList.map((a) => a[IDX_LAYER_PLAN])),
         ];
+        const locationDetails = firstArgs[9] as LocationDetails;
+        const parentType = this.schema.getType(
+          locationDetails.parentTypeName!,
+        ) as GraphQLObjectType;
+        const fieldName = locationDetails.fieldName!;
+        if (isDev) {
+          if (!isObjectType(parentType) || typeof fieldName !== "string") {
+            throw new Error(
+              `GrafastInternalError<1844abca-a6ea-42d4-86f1-d13866b8b746>: failed to determine parentType/fieldName`,
+            );
+          }
+        }
         const resolveTypeLayerPlan = new LayerPlan(this, firstLayerPlan, {
           type: "resolveType",
           graphqlType,
           parentLayerPlans,
+          parentType,
+          fieldName,
         });
         // PERF: we only actually need the keys of this, the values are just
         // for debugging (see the error message), so we could use a Set
