@@ -921,8 +921,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               continue;
             }
             const newIndex = values.length;
-            ev._copyResult(newIndex, sourceStore, originalIndex);
-            map.set(originalIndex, newIndex);
             const sourcePolyPath =
               parentBucket.polymorphicPathList[originalIndex];
 
@@ -939,7 +937,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                     `GrafastInternalError<b7210c1c-db97-435b-b387-714a57e4910a>: resolveType layer plan must have a graphqlType it relates to`,
                   );
                 }
-                let value = ev.at(newIndex);
+                let value = sourceStore.at(sourceIndex);
                 let resolvedTypeName: string;
 
                 if (isPolymorphicData(value)) {
@@ -947,6 +945,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   resolvedTypeName = value[$$concreteType];
                   value = value.data;
                   ev._setResult(newIndex, value, 0);
+                  map.set(originalIndex, newIndex);
                 } else {
                   // TODO: implement this!
                   const graphqlContext = null as unknown;
@@ -981,6 +980,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                         info,
                         graphqlType,
                       );
+                  if (
+                    resolvedType === null &&
+                    graphqlType!.resolveType != null
+                  ) {
+                    // Treat the value as if it was null all along
+                    continue;
+                  }
                   if (!resolvedType) {
                     throw new GraphQLError(
                       `Abstract type "${graphqlType}" must resolve to an Object type at runtime for field "${parentType}.${fieldName}". Either the "Union" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
@@ -1002,12 +1008,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   // `String(string)` can be called around 500M times per
                   // second so does not have significant overhead.
                   resolvedTypeName = String(resolvedType);
+                  ev._copyResult(newIndex, sourceStore, originalIndex);
+                  map.set(originalIndex, newIndex);
                 }
 
                 const type =
                   this.operationPlan.schema.getType(resolvedTypeName);
                 if (!type) {
-                  // (isDev && !isObjectType(type))) {
+                  // (isDev && !isObjectType(type)))
                   throw new GraphQLError(
                     `Abstract type "${graphqlType}" was resolved to a type "${resolvedTypeName}" for field "${parentType}.${fieldName}"; that does not exist inside the schema.`,
                     // TODO: add all the error paths and stuff
@@ -1021,11 +1029,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 const flags = FLAG_ERROR | FLAG_STOPPED;
                 flagUnion |= flags;
                 ev._setResult(newIndex, originalError, flags);
+                map.set(originalIndex, newIndex);
                 const resolvedTypeName = "__ERROR";
                 polymorphicPathList[newIndex] =
                   (sourcePolyPath || "") + ">" + resolvedTypeName;
               }
             } else {
+              ev._copyResult(newIndex, sourceStore, originalIndex);
+              map.set(originalIndex, newIndex);
               polymorphicPathList[newIndex] = sourcePolyPath;
             }
 
