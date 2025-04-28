@@ -1,0 +1,120 @@
+# Polymorphic step migration
+
+We determined that one of the ways to reduce the amount of time spent planning
+is to ensure that all polymorphic types are planned in a "data only" approach.
+This allows us to ensure that polymorphism doesn't multiply, but will only ever
+branch to as many types as you have in a polymorphic type, and will then fold
+back in before branching out again (see [diagrams](#diagrams) at the bottom of
+the page).
+
+To accomplish this, we had to split `planForType` into two parts: the new
+`dataForType` (which just retrieves the data necessary to fetch the relevant
+record - for example, it's identifier), and a new _static_ `planForType` method
+which accepts the type to plan and a step representing this data.
+
+It's important this new method is static, as it prevents referencing any other
+non-ambient steps, which allows for the plan to fold back in again.
+
+Previously:
+
+```ts
+class PolymorphicBranchStep extends Step {
+  //...
+  planForType(objectType: GraphQLObjectType): Step {
+    const matcher = this.matchers[objectType.name];
+    const $step = this.getDep<TStep>(0, true);
+    if (matcher) {
+      if (typeof matcher.plan === "function") {
+        return matcher.plan($step);
+      } else {
+        return $step;
+      }
+    } else {
+      // TODO: should this be an error?
+      return constant(null);
+    }
+  }
+}
+```
+
+Afterwards:
+
+```ts
+class MyClass extends Step {
+  //...
+  static planForType() {
+    //...
+  }
+  dataForType() {
+    //...
+  }
+}
+```
+
+## Diagrams
+
+### Before
+
+```mermaid
+flowchart TD
+subgraph before
+allPets-->Cat
+allPets-->Dog
+allPets-->Fish
+Cat-->C1[owner]
+C1-->C2[Business]
+C1-->C3[Person]
+C2-->CZ4[firstPet]
+CZ4-->CZ41[Cat]
+CZ4-->CZ42[Dog]
+CZ4-->CZ43[Fish]
+C3-->C4[firstPet]
+C4-->C41[Cat]
+C4-->C42[Dog]
+C4-->C43[Fish]
+Dog-->D1[owner]
+D1-->D2[Business]
+D1-->D3[Person]
+D2-->DZ4[firstPet]
+DZ4-->DZ41[Cat]
+DZ4-->DZ42[Dog]
+DZ4-->DZ43[Fish]
+D3-->D4[firstPet]
+D4-->D41[Cat]
+D4-->D42[Dog]
+D4-->D43[Fish]
+Fish-->F1[owner]
+F1-->F2[Business]
+F1-->F3[Person]
+F2-->FZ4[firstPet]
+FZ4-->FZ41[Cat]
+FZ4-->FZ42[Dog]
+FZ4-->FZ43[Fish]
+F3-->F4[firstPet]
+F4-->F41[Cat]
+F4-->F42[Dog]
+F4-->F43[Fish]
+
+end
+```
+
+### After
+
+```mermaid
+flowchart TD
+subgraph after
+_allPets-->_Cat[Cat]
+_allPets-->_Dog[Dog]
+_allPets-->_Fish[Fish]
+_Cat-->owner
+_Dog-->owner
+_Fish-->owner
+owner-->Business
+owner-->Person
+Person-->firstPet
+Business-->firstPet
+firstPet-->_FP1[Cat]
+firstPet-->_FP2[Dog]
+firstPet-->_FP3[Fish]
+end
+```
