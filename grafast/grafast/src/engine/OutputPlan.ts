@@ -573,15 +573,34 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         const childIsNonNull = this.childIsNonNull;
-        let directLayerPlanChild = this.child.layerPlan;
-        while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
-          const parent = directLayerPlanChild.parentLayerPlan;
-          if (!parent) {
-            throw new Error(
-              `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
-            );
+        const getDirectLayerPlanChild = (lp: LayerPlan): LayerPlan | null => {
+          let directLayerPlanChild = lp;
+          while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
+            if (
+              directLayerPlanChild.reason.type === "resolveType" ||
+              directLayerPlanChild.reason.type === "combined"
+            ) {
+              for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
+                const dlpc = getDirectLayerPlanChild(plp);
+                if (dlpc) return dlpc;
+              }
+              return null;
+            }
+            const parent = directLayerPlanChild.parentLayerPlan;
+            if (!parent) {
+              return null;
+            }
+            directLayerPlanChild = parent;
           }
-          directLayerPlanChild = parent;
+          return directLayerPlanChild;
+        };
+        const directLayerPlanChild = getDirectLayerPlanChild(
+          this.child.layerPlan,
+        );
+        if (directLayerPlanChild == null) {
+          throw new Error(
+            `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
+          );
         }
         const canStream =
           directLayerPlanChild.reason.type === "listItem" &&
