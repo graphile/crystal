@@ -1019,6 +1019,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
           grafast: { list, constant, access, inhibitOnNull },
+          EXPORTABLE,
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -1055,6 +1056,18 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   codec,
                   "interface:node",
                 );
+                const resource = build.pgTableResource(
+                  codec as PgCodecWithAttributes,
+                );
+                const primaryKey = resource
+                  ? (resource.uniques as PgResourceUnique[]).find(
+                      (u) => u.isPrimary === true,
+                    )
+                  : undefined;
+                const pk = primaryKey?.attributes;
+                if (!pk || !resource) {
+                  return;
+                }
                 const interfaceTypeName = inflection.tableType(codec);
                 build.registerInterfaceType(
                   interfaceTypeName,
@@ -1067,6 +1080,23 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: codec.description,
+                    resolveType: EXPORTABLE(() => function resolveType(value) {
+                      return value.__typename;
+                    }, []),
+                    extensions: {
+                      grafast: {
+                        getBySpecifier: EXPORTABLE((access, pk, resource) => (t, $specifier) => {
+                          return resource.get(
+                            Object.fromEntries(
+                              pk.map((attrName) => [
+                                attrName,
+                                access($specifier, attrName),
+                              ]),
+                            ),
+                          );
+                        }, [access, pk, resource]),
+                      },
+                    },
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );
@@ -1081,15 +1111,6 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   nonNullNode: pgForbidSetofFunctionsToReturnNull,
                 });
-                const resource = build.pgTableResource(
-                  codec as PgCodecWithAttributes,
-                );
-                const primaryKey = resource
-                  ? (resource.uniques as PgResourceUnique[]).find(
-                      (u) => u.isPrimary === true,
-                    )
-                  : undefined;
-                const pk = primaryKey?.attributes;
                 for (const [typeIdentifier, spec] of Object.entries(
                   polymorphism.types,
                 ) as Array<
