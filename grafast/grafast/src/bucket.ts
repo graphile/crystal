@@ -95,8 +95,8 @@ export interface Bucket {
    * travelled. This influences the steps that will be executed using the
    * related inputs.
    *
-   // * @deprecated Use latestPolymorphicType instead
    */
+  // * @deprecated Use latestPolymorphicType instead
   polymorphicPathList: readonly (string | null)[];
 
   //   /**

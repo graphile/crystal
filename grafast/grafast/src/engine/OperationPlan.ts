@@ -1823,8 +1823,7 @@ export class OperationPlan {
             type: "polymorphic",
             polymorphicPaths,
             typeNames: [type.name],
-            parentStep: commonStep,
-            typenameStep: polymorphicTypePlanner.$__typename,
+            parentStep: polymorphicTypePlanner.$__typename,
           });
           const $stepForType = polymorphicTypePlanner.planForType
             ? withGlobalLayerPlan(
@@ -2419,71 +2418,6 @@ export class OperationPlan {
       outputPlan: objectOutputPlan,
       locationDetails,
     });
-  }
-
-  private polymorphicLayerPlanByPathByLayerPlan = new Map<
-    LayerPlan,
-    Map<
-      string,
-      { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
-    >
-  >();
-  private getPolymorphicLayerPlan(
-    parentLayerPlan: LayerPlan,
-    path: readonly string[],
-    $step: Step,
-    allPossibleObjectTypes: readonly GraphQLObjectType[],
-  ): LayerPlan<LayerPlanReasonPolymorphic> {
-    // OPTIMIZE: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
-    // https://github.com/benjie/crystal/issues/109
-    const pathString = `${path.join("|")}!${$step.id}`;
-    const polymorphicLayerPlanByPath =
-      this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
-      new Map<
-        string,
-        { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
-      >();
-    if (polymorphicLayerPlanByPath.size === 0) {
-      this.polymorphicLayerPlanByPathByLayerPlan.set(
-        parentLayerPlan,
-        polymorphicLayerPlanByPath,
-      );
-    }
-    const prev = polymorphicLayerPlanByPath.get(pathString);
-    if (prev !== undefined) {
-      // NOTE: this is typically hit when you have a polymorphic field inside
-      // another polymorphic field - in these cases rather than having the
-      // polymorphism multiply out, we can aim for fewer polymorphic buckets
-      // keeping the plan simpler (and more efficient).
-      const { stepId, layerPlan } = prev;
-      const stepByStepId = this.stepTracker.getStepById(stepId);
-      const stepBy$stepId = this.stepTracker.getStepById($step.id);
-      if (stepByStepId !== stepBy$stepId) {
-        throw new Error(
-          `GrafastInternalError<e01bdc40-7c89-41c6-8d84-56efa22c872a>: unexpected inconsistency when determining the polymorphic LayerPlan to use (pathString = ${pathString}, ${stepByStepId} (${stepId}) != ${stepBy$stepId} (${$step.id}))`,
-        );
-      }
-      for (const t of allPossibleObjectTypes) {
-        if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // Since we're re-using an existing LayerPlan, we should be careful to
-          // ensure none of the previous assumptions have been broken.
-          layerPlan.reason.typeNames.push(t.name);
-        }
-      }
-      return layerPlan;
-    } else {
-      const layerPlan = new LayerPlan(this, parentLayerPlan, {
-        type: "polymorphic",
-        typeNames: allPossibleObjectTypes.map((t) => t.name),
-        parentStep: $step,
-        polymorphicPaths: new Set(),
-      });
-      polymorphicLayerPlanByPath.set(pathString, {
-        stepId: $step.id,
-        layerPlan,
-      });
-      return layerPlan;
-    }
   }
 
   private planField(

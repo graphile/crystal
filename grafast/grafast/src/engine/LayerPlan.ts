@@ -106,9 +106,9 @@ export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
   typeNames: string[];
   /**
-   * Needed for execution (see `executeBucket`).
+   * Stores the __typename, needed for execution (see `executeBucket`).
    */
-  parentStep: Step;
+  parentStep: Step<string | null>;
   polymorphicPaths: Set<string>;
 }
 /** Non-branching, non-deferred */
@@ -726,18 +726,25 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           ) {
             continue;
           }
-          const newIndex = size++;
-          map.set(originalIndex, newIndex);
           const polymorphicPath =
-            parentBucket.polymorphicPathList.at(originalIndex)!;
-          polymorphicPathList[newIndex] = polymorphicPath;
-          iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of copyStepIds) {
-            const ev = store.get(planId)!;
-            if (ev.isBatch) {
-              const orig = parentBucket.store.get(planId)!;
-              ev._copyResult(newIndex, orig, originalIndex);
+            parentBucket.polymorphicPathList.at(originalIndex);
+          const typeName = polymorphicPlanStore.at(originalIndex);
+          if (this.reason.typeNames.includes(typeName)) {
+            const newIndex = size++;
+            map.set(originalIndex, newIndex);
+            polymorphicPathList[newIndex] =
+              (polymorphicPath ?? "") + ">" + typeName;
+            iterators[newIndex] = parentBucket.iterators[originalIndex];
+            for (const planId of copyStepIds) {
+              const ev = store.get(planId)!;
+              if (ev.isBatch) {
+                const orig = parentBucket.store.get(planId)!;
+                ev._copyResult(newIndex, orig, originalIndex);
+              }
             }
+          } else {
+            // TODO: should we error?
+            // Skip
           }
         }
 

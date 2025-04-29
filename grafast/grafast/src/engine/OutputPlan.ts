@@ -1225,18 +1225,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
 ) {
   return makeExecutor({
     inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
-      const polyPath = bucket.polymorphicPathList[bucketIndex];
-      if (!polyPath) {
-        throw coerceError(
-          new Error(
-            `GrafastInternalError<d6915bab-b4c2-4955-ad06-9b6e93499747>: Expected polymorphic path in bucket ${bucket} at index ${bucketIndex} (path: ${mutablePath.slice(1).join(".")})`,
-          ),
-          this.locationDetails,
-          mutablePath.slice(1),
-        );
-      }
-      const i = polyPath.lastIndexOf(">");
-      const typeName = i >= 0 ? polyPath.slice(i + 1) : polyPath;
+      const typeName = bucketRootValue;
       const childOutputPlan = this.childByTypeName![typeName];
       if (isDev) {
         assert.ok(
