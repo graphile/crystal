@@ -1812,7 +1812,7 @@ export class OperationPlan {
           null,
           commonStep,
         );
-        const stepForType = new Map<GraphQLObjectType, Step>();
+        const deetsForType = new Map<GraphQLObjectType, PolyDeets>();
         for (const type of allPossibleObjectTypes) {
           const polymorphicPaths = new Set(
             [...(combinedPolymorphicPaths ?? [""])].map(
@@ -1845,7 +1845,7 @@ export class OperationPlan {
                   commonStep,
                 )
               : commonStep;
-          stepForType.set(type, $stepForType);
+          deetsForType.set(type, { step: $stepForType, polymorphicLayerPlan });
         }
 
         // Now replace references to layer plan and step
@@ -1878,8 +1878,8 @@ export class OperationPlan {
             isNonNull,
             locationDetails,
           });
-          const IDX_STEP_FOR_TYPE = 14;
-          argsTuple[IDX_STEP_FOR_TYPE] = stepForType;
+          const IDX_DEETS_FOR_TYPE = 14;
+          argsTuple[IDX_DEETS_FOR_TYPE] = deetsForType;
         }
       }
 
@@ -2284,11 +2284,11 @@ export class OperationPlan {
     resolverEmulation: boolean,
 
     // Populated by mutateTodos
-    stepForType?: ReadonlyMap<GraphQLObjectType, Step>,
+    deetsForType?: ReadonlyMap<GraphQLObjectType, PolyDeets>,
   ) {
-    if (!stepForType) {
+    if (!deetsForType) {
       throw new Error(
-        "GrafastInternalError<6afce944-f963-470f-8575-0d0420b4c838>: stepForType wasn't set!",
+        "GrafastInternalError<6afce944-f963-470f-8575-0d0420b4c838>: deetsForType wasn't set!",
       );
     }
     if (outputPlan.type.mode !== "polymorphic") {
@@ -2333,7 +2333,7 @@ export class OperationPlan {
         }
 
         // TODO: fall back to null output plan?
-        const $root = stepForType.get(type)!;
+        const { step: $root, polymorphicLayerPlan } = deetsForType.get(type)!;
 
         // find all selections compatible with `type`
         const fieldNodes = fieldSelectionsForType(this, type, selections);
@@ -2345,7 +2345,7 @@ export class OperationPlan {
           newPolymorphicPaths,
           $root,
           type,
-          layerPlan,
+          polymorphicLayerPlan,
           fieldNodes,
           locationDetails,
           isNonNull,
@@ -5126,4 +5126,13 @@ function fixStepPolyPaths(
 function defaultPlanType($specifier: Step): PolymorphicTypePlanner {
   const $__typename = get($specifier, "__typename");
   return { $__typename };
+}
+
+/**
+ * The step and layer plan to use for a specific object type during
+ * polymorphism.
+ */
+interface PolyDeets {
+  step: Step;
+  polymorphicLayerPlan: LayerPlan<LayerPlanReasonPolymorphic>;
 }
