@@ -2092,8 +2092,9 @@ export class OperationPlan {
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
       if (!(isUnion || isInterface)) {
+        const never: never = nullableFieldType;
         throw new Error(
-          `GrafastInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
+          `GrafastInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${never}`,
         );
       }
       assert.ok(
