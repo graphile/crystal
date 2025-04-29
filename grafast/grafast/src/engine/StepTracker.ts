@@ -180,8 +180,7 @@ export class StepTracker {
           layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
         break;
       }
-      case "combined":
-      case "resolveType": {
+      case "combined": {
         // TODO: tell the parent layer plans to expect me ;)
         break;
       }
@@ -259,10 +258,7 @@ export class StepTracker {
           .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
       }
     }
-    if (
-      layerPlan.reason.type === "combined" ||
-      layerPlan.reason.type === "resolveType"
-    ) {
+    if (layerPlan.reason.type === "combined") {
       for (const combo of layerPlan.combinations) {
         for (const source of combo.sources) {
           const step = this.getStepById(source.stepId);

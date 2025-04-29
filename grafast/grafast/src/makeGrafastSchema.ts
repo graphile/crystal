@@ -14,6 +14,7 @@ import type {
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
+  PromiseOrDirect,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
@@ -80,14 +81,51 @@ export type InputObjectPlans = {
 };
 
 /**
+ * When planning a polymorphic type, the interface or union should have a
+ * `extensions.grafast.planType` method which accepts an incoming step
+ * representing the polymorphic data (we call this the `$specifier`) and will
+ * return a PolymorphicTypePlanner object. This object has a key `$__typename`
+ * whose value must be a step that represents the GraphQL type name to use for
+ * the given $specifier, and a method `planForType` that should return the step
+ * to use for a specific object type within the interface/union.
+ */
+export interface PolymorphicTypePlanner {
+  /**
+   * Must be a step representing the name of the object type associated with
+   * the given `$speicifer`, or `null` if no such type could be determined.
+   */
+  $__typename: Step<string | null>;
+
+  /**
+   * If not provided, will call `t.planType($specifier)`
+   */
+  planForType?(t: graphql.GraphQLObjectType): Step;
+}
+
+/**
  * The plan config for an interface or union type.
  */
 export type InterfaceOrUnionPlans = {
-  __resolveType?: (o: unknown) => string;
-  __getBySpecifier?: (
-    objectType: graphql.GraphQLObjectType,
-    $specifier: Step,
-  ) => Step;
+  /**
+   * Runtime. If the polymorphic data just needs resolving to a type name, this
+   * method can be used to return said type name. If planning of polymorphism
+   * is more complex for this polymorphic type (for example, if it includes
+   * fetching of data) then the `__planType` method should be used instead.
+   *
+   * Warning: this method is more expensive than __planType because it requires
+   * the implementation of GraphQL.js emulation.
+   */
+  __resolveType?: graphql.GraphQLTypeResolver<any, Grafast.Context>;
+
+  /**
+   * Plantime. `$specifier` is either a step returned from a polymorphic field
+   * or list position, or a `__ValueStep` that represents the combined values
+   * of such steps (to prevent unbounded plan branching). `__planType` must
+   * then construct a step that represents the `__typename` related to this
+   * given specifier (or `null` if no match can be found) and a `planForType`
+   * method which, when called, should return the step for the given type.
+   */
+  __planType?: ($specifier: Step) => PolymorphicTypePlanner;
 };
 
 /**
@@ -485,15 +523,11 @@ export function makeGrafastSchema(details: {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
         }
-        if (polyPlans?.__getBySpecifier) {
-          exportNameHint(
-            polyPlans.__getBySpecifier,
-            `${typeName}_getBySpecifier`,
-          );
+        if (polyPlans?.__planType) {
+          exportNameHint(polyPlans.__planType, `${typeName}_planType`);
           config.extensions ??= Object.create(null);
           (config.extensions as any).grafast ??= Object.create(null);
-          config.extensions!.grafast!.getBySpecifier =
-            polyPlans.__getBySpecifier;
+          config.extensions!.grafast!.planType = polyPlans.__planType;
         }
         return new graphql.GraphQLInterfaceType(config);
       } else if (isUnionType(astType)) {

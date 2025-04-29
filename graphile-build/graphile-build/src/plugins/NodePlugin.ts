@@ -142,7 +142,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
         const {
           EXPORTABLE,
           graphql: { GraphQLNonNull, GraphQLID },
-          grafast: { access },
+          grafast: { access, lambda },
         } = build;
         const nodeTypeName = build.inflection.builtin("Node");
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
@@ -161,6 +161,28 @@ export const NodePlugin: GraphileConfig.Plugin = {
                 makeDecodeNodeIdRuntime(Object.values(nodeIdHandlerByTypeName)),
               [makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName],
             );
+            const findTypeNameMatch = EXPORTABLE(
+              (inspect, isDev, nodeIdHandlerByTypeName) => (specifier) => {
+                if (!specifier) return null;
+                for (const [typeName, typeSpec] of Object.entries(
+                  nodeIdHandlerByTypeName,
+                )) {
+                  const value = specifier[typeSpec.codec.name];
+                  if (value != null && typeSpec.match(value)) {
+                    return typeName;
+                  }
+                }
+                if (isDev) {
+                  console.error(
+                    `Could not find a type that matched the specifier '${inspect(
+                      specifier,
+                    )}'`,
+                  );
+                }
+                return null;
+              },
+              [inspect, isDev, nodeIdHandlerByTypeName],
+            );
             return {
               description: build.wrapDescription(
                 "An object with a globally unique `ID`.",
@@ -175,41 +197,14 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   type: new GraphQLNonNull(GraphQLID),
                 },
               },
-              resolveType: EXPORTABLE(
-                (
-                  decodeNodeIdRuntime,
-                  inspect,
-                  isDev,
-                  nodeIdHandlerByTypeName,
-                ) =>
-                  function resolveType(nodeId) {
-                    const specifier = decodeNodeIdRuntime(nodeId);
-                    if (!specifier) return null;
-                    for (const [typeName, typeSpec] of Object.entries(
-                      nodeIdHandlerByTypeName,
-                    )) {
-                      const value = specifier[typeSpec.codec.name];
-                      if (value != null && typeSpec.match(value)) {
-                        return typeName;
-                      }
-                    }
-                    if (isDev) {
-                      console.error(
-                        `Could not find a type that matched the specifier '${inspect(
-                          specifier,
-                        )}'`,
-                      );
-                    }
-                    return null;
-                  },
-                [decodeNodeIdRuntime, inspect, isDev, nodeIdHandlerByTypeName],
-              ),
-              extensions: {
-                grafast: {
-                  getBySpecifier(type, $nodeId) {
+              planType($nodeId) {
+                const $specifier = decodeNodeId($nodeId);
+                const $__typename = lambda($specifier, findTypeNameMatch, true);
+                return {
+                  $__typename,
+                  planForType(type) {
                     const spec = nodeIdHandlerByTypeName[type.name];
                     if (spec) {
-                      const $specifier = decodeNodeId($nodeId);
                       return spec.get(
                         spec.getSpec(access($specifier, [spec.codec.name])),
                       );
@@ -219,7 +214,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                       );
                     }
                   },
-                },
+                };
               },
             } as Omit<GraphileBuild.GrafastInterfaceTypeConfig<any>, "name">;
           },

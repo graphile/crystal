@@ -17,6 +17,7 @@ type PromiseOrValue<T> = T | Promise<T>;
 
 import { exportAs, exportAsMany } from "./exportAs.js";
 import { grafastPrint } from "./grafastPrint.js";
+import type { PolymorphicTypePlanner } from "./makeGrafastSchema.js";
 import {
   EnumPlans,
   FieldPlans,
@@ -182,6 +183,7 @@ import {
   FilterPlanMemo,
   first,
   FirstStep,
+  get,
   GraphQLItemHandler,
   graphqlItemHandler,
   graphqlResolver,
@@ -354,6 +356,7 @@ export {
   first,
   FirstStep,
   flagError,
+  get,
   getEnumValueConfig,
   getEnumValueConfigs,
   getGrafastMiddleware,
@@ -531,6 +534,7 @@ exportAsMany("grafast", {
   __TrackedValueStep,
   __ValueStep,
   access,
+  get,
   AccessStep,
   applyInput,
   ApplyInputStep,
@@ -709,41 +713,36 @@ declare global {
         | null;
 
       /**
-       * Equivalent to InterfaceTypeExtensions.getBySpecifier or
-       * UnionTypeExtensions.getBySpecifier, except the type, `t`, is implicit
-       * because it is this object type.
+       * Plantime. Given `$specifier`, a step that _hopefully_ represents
+       * relevant data for this object type, return a step that can be used for
+       * planning this object type. Used in the default implementation of
+       * `PolymorphicTypePlanner.planForType` if that method is not provided.
        */
-      getBySpecifier?($specifier: Step): Step;
+      planType?($specifier: Step): Step;
     }
 
     interface InterfaceTypeExtensions {
       /**
-       * Given:
-       *
-       * 1. a GraphQL object type `t` that implements this interface, and
-       * 2. a step, $specifier, representing data that matches this type as
-       *    determined by the interface's resolveType method and contains
-       *    the required information to fetch this value;
-       *
-       * return an appropriate step to use to resolve selection sets on this
-       * concrete type.
+       * Plantime. `$specifier` is either a step returned from a polymorphic field
+       * or list position, or a `__ValueStep` that represents the combined values
+       * of such steps (to prevent unbounded plan branching). `__planType` must
+       * then construct a step that represents the `__typename` related to this
+       * given specifier (or `null` if no match can be found) and a `planForType`
+       * method which, when called, should return the step for the given type.
        */
-      getBySpecifier?(t: GraphQLObjectType, $specifier: Step): Step;
+      planType?($specifier: Step): PolymorphicTypePlanner;
     }
 
     interface UnionTypeExtensions {
       /**
-       * Given:
-       *
-       * 1. a GraphQL object type `t` that belongs to this union, and
-       * 2. a step, $specifier, representing data that matches this type as
-       *    determined by the union's resolveType method and contains
-       *    the required information to fetch this value;
-       *
-       * return an appropriate step to use to resolve selection sets on this
-       * concrete type.
+       * Plantime. `$specifier` is either a step returned from a polymorphic field
+       * or list position, or a `__ValueStep` that represents the combined values
+       * of such steps (to prevent unbounded plan branching). `__planType` must
+       * then construct a step that represents the `__typename` related to this
+       * given specifier (or `null` if no match can be found) and a `planForType`
+       * method which, when called, should return the step for the given type.
        */
-      getBySpecifier?(t: GraphQLObjectType, $specifier: Step): Step;
+      planType?($specifier: Step): PolymorphicTypePlanner;
     }
 
     interface EnumTypeExtensions {}

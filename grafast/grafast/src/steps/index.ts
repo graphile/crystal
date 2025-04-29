@@ -10,7 +10,7 @@ export {
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
 } from "./__flag.js";
-export { access, AccessStep } from "./access.js";
+export { access, AccessStep, get } from "./access.js";
 export {
   assertEdgeCapableStep,
   assertPageInfoCapableStep,

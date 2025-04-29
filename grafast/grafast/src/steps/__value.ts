@@ -22,10 +22,7 @@ export class __ValueStep<TData> extends Step<TData> {
   }
 
   public planJSONExtra(): undefined | Record<string, JSONValue> {
-    if (
-      this.layerPlan.reason.type === "combined" ||
-      this.layerPlan.reason.type === "resolveType"
-    ) {
+    if (this.layerPlan.reason.type === "combined") {
       return { combined: true };
     }
   }

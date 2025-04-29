@@ -1018,7 +1018,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
-          grafast: { list, constant, access, inhibitOnNull },
+          grafast: { list, constant, access, inhibitOnNull, get },
           EXPORTABLE,
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
@@ -1080,29 +1080,23 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: codec.description,
-                    resolveType: EXPORTABLE(
-                      () =>
-                        function resolveType(value) {
-                          return value.__typename;
-                        },
-                      [],
-                    ),
-                    extensions: {
-                      grafast: {
-                        getBySpecifier: EXPORTABLE(
-                          (access, pk, resource) => (t, $specifier) => {
-                            return resource.get(
-                              Object.fromEntries(
-                                pk.map((attrName) => [
-                                  attrName,
-                                  access($specifier, attrName),
-                                ]),
-                              ),
-                            );
-                          },
-                          [access, pk, resource],
+                    // All types have the same plan
+                    planType($specifier) {
+                      const $__typename = get($specifier, "__typename");
+                      const $row = resource.get(
+                        Object.fromEntries(
+                          pk.map((attrName) => [
+                            attrName,
+                            get($specifier, attrName),
+                          ]),
                         ),
-                      },
+                      );
+                      return {
+                        $__typename,
+                        planForType() {
+                          return $row;
+                        },
+                      };
                     },
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,

@@ -36,8 +36,7 @@ export type GrafastPlanBucketReasonJSONv1 =
   | GrafastPlanBucketReasonDeferJSONv1
   | GrafastPlanBucketReasonPolymorphicJSONv1
   | GrafastPlanBucketReasonSubroutineJSONv1
-  | GrafastPlanBucketReasonCombinedJSONv1
-  | GrafastPlanBucketReasonResolveTypeJSONv1;
+  | GrafastPlanBucketReasonCombinedJSONv1;
 
 export interface GrafastPlanBucketReasonRootJSONv1 {
   type: "root";
@@ -88,18 +87,6 @@ export interface GrafastPlanBucketReasonSubroutineJSONv1 {
 /** Anti-branching, non-deferred */
 export interface GrafastPlanBucketReasonCombinedJSONv1 {
   type: "combined";
-  parentLayerPlanIds: ReadonlyArray<string | number>;
-  combinations: ReadonlyArray<{
-    sources: readonly {
-      layerPlanId: string | number;
-      stepId: string | number;
-    }[];
-    targetStepId: number;
-  }>;
-}
-export interface GrafastPlanBucketReasonResolveTypeJSONv1 {
-  type: "resolveType";
-  graphqlTypeName: string;
   parentLayerPlanIds: ReadonlyArray<string | number>;
   combinations: ReadonlyArray<{
     sources: readonly {

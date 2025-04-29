@@ -657,7 +657,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build, _context) {
         const {
-          grafast: { access },
+          grafast: { get },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
@@ -698,22 +698,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
-                  getBySpecifier:
+                  planType:
                     resource && pkCols
                       ? // TODO: optimize this function to look like `return resource.get({...})` via eval
                         EXPORTABLE(
-                          (access, pkCols, resource) => function ($specifier) {
+                          (get, pkCols, resource) =>
+                            function ($specifier) {
                               const spec = Object.create(null);
                               for (const pkCol of pkCols) {
-                                spec[pkCol] =
-                                  "get" in $specifier &&
-                                  typeof $specifier.get === "function"
-                                    ? $specifier.get(pkCol)
-                                    : access($specifier, pkCol);
+                                spec[pkCol] = get($specifier, pkCol);
                               }
                               return resource.get(spec);
                             },
-                          [access, pkCols, resource],
+                          [get, pkCols, resource],
                         )
                       : undefined,
                 }),

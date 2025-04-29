@@ -576,10 +576,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         const getDirectLayerPlanChild = (lp: LayerPlan): LayerPlan | null => {
           let directLayerPlanChild = lp;
           while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
-            if (
-              directLayerPlanChild.reason.type === "resolveType" ||
-              directLayerPlanChild.reason.type === "combined"
-            ) {
+            if (directLayerPlanChild.reason.type === "combined") {
               for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
                 const dlpc = getDirectLayerPlanChild(plp);
                 if (dlpc) return dlpc;

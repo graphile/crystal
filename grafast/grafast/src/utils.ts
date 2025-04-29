@@ -347,7 +347,7 @@ export type ObjectTypeSpec<
         | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
-  getBySpecifier?: ($specifier: Step) => TParentStep;
+  planType?: ($specifier: Step) => TParentStep;
 };
 
 /**
@@ -359,16 +359,16 @@ export function objectSpec<
 >(
   spec: ObjectTypeSpec<TParentStep, TFields>,
 ): GraphQLObjectTypeConfig<any, Grafast.Context> {
-  const { assertStep, getBySpecifier, ...rest } = spec;
+  const { assertStep, planType, ...rest } = spec;
   const modifiedSpec: GraphQLObjectTypeConfig<any, Grafast.Context> = {
     ...rest,
-    ...(assertStep || getBySpecifier
+    ...(assertStep || planType
       ? {
           extensions: {
             ...spec.extensions,
             grafast: {
               ...(assertStep ? { assertStep } : null),
-              ...(getBySpecifier ? { getBySpecifier } : null),
+              ...(planType ? { planType } : null),
               ...spec.extensions?.grafast,
             },
           },
@@ -1010,7 +1010,6 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "nullableBoundary":
       case "subroutine":
       case "combined": // TODO: CHECK ME!
-      case "resolveType": // TODO: CHECK ME!
       case "mutationField": {
         continue;
       }
@@ -1044,7 +1043,6 @@ export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
     case "nullableBoundary":
     case "subroutine":
     case "combined": // TODO: CHECK ME!
-    case "resolveType": // TODO: CHECK ME!
     case "mutationField": {
       return false;
     }

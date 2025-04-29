@@ -539,12 +539,25 @@ class MyQueryStep extends Step {
 }
 ```
 
-### specifier()
+### toSpecifier()
 
-This is used for polymorphism to get a "specifier" object to be used by the
-polymorphic types `resolveType` method to a) determine which type the value is,
-and b) detail the information necessary to fetch the relevant node (think:
-database primary keys). <grafast /> does not require that a specifier takes a
+When we plan a polymorphic field, each different object type the polymorphic
+type could be needs planning. If we were to do this naively then after a few
+layers of planning, this would result in an exponentially increasing number of
+branches. To avoid this issue, we always "recombine" polymorphic values before
+branching out again.
+
+Depending on your planning logic, the "recombine" mentioned above may result in
+the same data being fetched twice. The `$step.toSpecifier()` method exists to
+give you a chance to turn a step that represents a record into a "specifier"
+for that record, something that details the information required to fetch it.
+Often this can be determined without actually fetching the record itself (e.g.
+if you are fetching a User by their ID, then the specifier can be simply the ID
+and the fact it was a User, avoiding up-front fetching altogether). This then
+means you can delay the actual fetch of the data until the polymorphic
+`planType($stepOrSpecifier)` is called
+
+Importantly, <grafast /> does not require that a specifier takes a
 particular form, it's an agreement between the steps you're using and the
 polymorphic types (unions and interfaces) that you've implemented. We strongly
 recommend it's a plain-old JavaScript object though!
@@ -552,7 +565,7 @@ recommend it's a plain-old JavaScript object though!
 ```ts
 class MyStep extends Step {
   // ...
-  specifier() {
+  toSpecifier() {
     return object({
       __typename: this.get("type"),
       id: this.get("id"),
@@ -575,8 +588,8 @@ const Cat = new GraphQLObjectType({
   // ... fields ...
   extensions: {
     grafast: {
-      getBySpecifier($specifier) {
-        const $id = access($specifier, "id");
+      planType($specifier) {
+        const $id = get($specifier, "id");
         return cats.get({ id: $id });
       },
     },

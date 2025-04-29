@@ -4,6 +4,7 @@ import {
   access,
   constant,
   ExecutableStep,
+  get,
   list,
   object,
   ObjectStep,
@@ -16,6 +17,9 @@ import { gql, makeExtendSchemaPlugin } from "../src/index.js";
 // Changes to this file should be reflected in `postgraphile/website/postgraphile/make-extend-schema-plugin.md`
 
 export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
+  const {
+    grafast: { lambda },
+  } = build;
   const { users } = build.input.pgRegistry.pgResources;
   const executor = build.input.pgRegistry.pgExecutors.main;
   return {
@@ -48,21 +52,30 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
     `,
     plans: {
       RegisterUserResult: {
-        resolveType(obj) {
-          if (obj.__typename != null) {
-            return obj.__typename;
-          }
-          if (obj.id !== null) {
-            return "User";
-          }
-        },
-        getBySpecifier(T: GraphQLObjectType, $specifier: Step) {
-          if (T.name === "User") {
-            const $id = access($specifier, "id");
-            return users.get({ id: $id });
-          } else {
-            return $specifier;
-          }
+        __planType($specifier) {
+          const $__typename = lambda(
+            $specifier as Step<Record<string, any>>,
+            (obj) => {
+              if (obj.__typename != null) {
+                return obj.__typename;
+              }
+              if (obj.id !== null) {
+                return "User";
+              }
+              return null;
+            },
+          );
+          return {
+            $__typename,
+            planForType(t: GraphQLObjectType) {
+              if (t.name === "User") {
+                const $id = get($specifier, "id");
+                return users.get({ id: $id });
+              } else {
+                return $specifier;
+              }
+            },
+          };
         },
       },
       Mutation: {

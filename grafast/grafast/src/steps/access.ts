@@ -279,3 +279,15 @@ export function access<TData>(
   }
   return new AccessStep<TData>(parentPlan, path, fallback);
 }
+
+/**
+ * Call `$step.get(attr)` if possible, falling back to `access($step, attr)`.
+ */
+export function get<TData, TAttr extends string>(
+  $step: Step<TData>,
+  attr: TAttr,
+): Step<TData extends Record<string, any> ? TData[TAttr] : any> {
+  return "get" in $step && typeof $step.get === "function"
+    ? $step.get(attr)
+    : access($step, attr);
+}
