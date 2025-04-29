@@ -162,25 +162,26 @@ export const NodePlugin: GraphileConfig.Plugin = {
               [makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName],
             );
             const findTypeNameMatch = EXPORTABLE(
-              (inspect, isDev, nodeIdHandlerByTypeName) => (specifier) => {
-                if (!specifier) return null;
-                for (const [typeName, typeSpec] of Object.entries(
-                  nodeIdHandlerByTypeName,
-                )) {
-                  const value = specifier[typeSpec.codec.name];
-                  if (value != null && typeSpec.match(value)) {
-                    return typeName;
+              (inspect, isDev, nodeIdHandlerByTypeName) =>
+                (specifier: Record<string, any> | null) => {
+                  if (!specifier) return null;
+                  for (const [typeName, typeSpec] of Object.entries(
+                    nodeIdHandlerByTypeName,
+                  )) {
+                    const value = specifier[typeSpec.codec.name];
+                    if (value != null && typeSpec.match(value)) {
+                      return typeName;
+                    }
                   }
-                }
-                if (isDev) {
-                  console.error(
-                    `Could not find a type that matched the specifier '${inspect(
-                      specifier,
-                    )}'`,
-                  );
-                }
-                return null;
-              },
+                  if (isDev) {
+                    console.error(
+                      `Could not find a type that matched the specifier '${inspect(
+                        specifier,
+                      )}'`,
+                    );
+                  }
+                  return null;
+                },
               [inspect, isDev, nodeIdHandlerByTypeName],
             );
             return {
