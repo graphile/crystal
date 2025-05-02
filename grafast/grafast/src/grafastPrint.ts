@@ -4,6 +4,13 @@ import type { Bucket } from "./bucket.js";
 import { bucketToString } from "./engine/executeBucket.js";
 import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
+import {
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
+  FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
+} from "./interfaces.js";
 import { Step } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {
@@ -214,9 +221,9 @@ export function printStore(bucket: Bucket): string {
           val.entries
             .map(
               (e, i) =>
-                `${String(i).padStart(3, " ")}: flags=${String(
+                `${String(i).padStart(3, " ")}: flags=${printFlags(
                   val._flagsAt(i),
-                ).padStart(2, " ")} value=${indentIfMultiline(
+                ).padEnd(5, " ")} value=${indentIfMultiline(
                   inspect(val.at(i), PRINT_STORE_INSPECT_OPTIONS),
                 )}`,
             )
@@ -308,4 +315,31 @@ export function ansiPad(
   } else {
     return ansiString;
   }
+}
+
+function printFlags(flags: number | undefined) {
+  if (flags === undefined) return "-";
+  if (flags === 0) return "0";
+  let flagString = "";
+  // Alphabetically sorted to avoid an unfortunate word they would spell
+  if (flags & FLAG_ERROR) flagString += "E";
+  if (flags & FLAG_INHIBITED) flagString += "I";
+  if (flags & FLAG_NULL) flagString += "N";
+  if (flags & FLAG_POLY_SKIPPED) flagString += "P";
+  if (flags & FLAG_STOPPED) flagString += "S";
+
+  // This should not fire, added in case we add future flags and forget to update this
+  if (
+    flags !==
+    (flags &
+      (FLAG_POLY_SKIPPED |
+        FLAG_ERROR |
+        FLAG_NULL |
+        FLAG_INHIBITED |
+        FLAG_STOPPED))
+  ) {
+    flagString += flags;
+  }
+
+  return flagString;
 }
