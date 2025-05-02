@@ -3224,15 +3224,7 @@ export function makeExampleSchema(
     extensions: {
       grafast: {
         planType: EXPORTABLE(
-          (
-            PgSelectSingleStep,
-            RELATIONAL_LOOKUP,
-            get,
-            lambda,
-            relationalItemTypeNameFromType,
-            relationalItemsResource,
-          ) =>
-            function planType($stepOrSpecifier) {
+          (PgSelectSingleStep, RELATIONAL_LOOKUP, deoptimizeIfAppropriate, get, lambda, relationalItemTypeNameFromType, relationalItemsResource) => function planType($stepOrSpecifier) {
               const $type = get($stepOrSpecifier, "type");
               const $__typename = lambda(
                 $type,
@@ -3252,7 +3244,8 @@ export function makeExampleSchema(
                     $stepOrSpecifier instanceof PgSelectSingleStep &&
                     $stepOrSpecifier.resource === relationalItemsResource
                   ) {
-                    return $stepOrSpecifier.singleRelation(relation);
+                    const $relation = $stepOrSpecifier.singleRelation(relation);
+                    return deoptimizeIfAppropriate($relation);
                   } else if (
                     $stepOrSpecifier instanceof PgSelectSingleStep &&
                     $stepOrSpecifier.resource === resource
@@ -3265,14 +3258,7 @@ export function makeExampleSchema(
                 },
               };
             },
-          [
-            PgSelectSingleStep,
-            RELATIONAL_LOOKUP,
-            get,
-            lambda,
-            relationalItemTypeNameFromType,
-            relationalItemsResource,
-          ],
+          [PgSelectSingleStep, RELATIONAL_LOOKUP, deoptimizeIfAppropriate, get, lambda, relationalItemTypeNameFromType, relationalItemsResource],
         ),
       },
     },
