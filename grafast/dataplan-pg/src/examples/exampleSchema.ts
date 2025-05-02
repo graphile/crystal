@@ -2848,16 +2848,6 @@ export function makeExampleSchema(
       CHECKLIST: "RelationalChecklist",
       CHECKLIST_ITEM: "RelationalChecklistItem",
     })[type] ?? null;
-  const relationalItemInterface = EXPORTABLE(
-    (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
-      ($item: RelationalItemStep) => {
-        const $id = inhibitOnNull($item.get("id"));
-        const $type = inhibitOnNull($item.get("type"));
-        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
-        return object({ __typename: $__typename, id: $id });
-      },
-    [inhibitOnNull, lambda, object, relationalItemTypeNameFromType],
-  );
 
   const unionItemTypeNameFromType = (type: string) =>
     ({
@@ -3307,13 +3297,13 @@ export function makeExampleSchema(
       parent: {
         type: RelationalItem,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, relationalItemInterface) =>
+          (deoptimizeIfAppropriate) =>
             function plan($entity) {
               const $plan = $entity.singleRelation("parent");
               deoptimizeIfAppropriate($plan);
-              return relationalItemInterface($plan);
+              return $plan;
             },
-          [deoptimizeIfAppropriate, relationalItemInterface],
+          [deoptimizeIfAppropriate],
         ),
       },
       author: singleRelationField("author", Person),
@@ -4224,14 +4214,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (relationalItemInterface, relationalItemsResource) =>
+          (relationalItemsResource) =>
             function plan(_$root, { $id }) {
               const $item: RelationalItemStep = relationalItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return relationalItemInterface($item);
+              return $item;
             },
-          [relationalItemInterface, relationalItemsResource],
+          [relationalItemsResource],
         ),
       },
 
