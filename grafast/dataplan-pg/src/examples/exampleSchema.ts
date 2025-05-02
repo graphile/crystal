@@ -30,7 +30,6 @@ import type {
 import {
   __ListTransformStep,
   __ValueStep,
-  access,
   bakedInput,
   connection,
   ConnectionStep,
@@ -2825,19 +2824,8 @@ export function makeExampleSchema(
         DIVIDER: "SingleTableDivider",
         CHECKLIST: "SingleTableChecklist",
         CHECKLIST_ITEM: "SingleTableChecklistItem",
-      })[v],
+      })[v] ?? null,
     [],
-  );
-
-  const singleTableItemInterface = EXPORTABLE(
-    (inhibitOnNull, lambda, object, singleTableTypeNameCallback) =>
-      ($item: SingleTableItemStep) => {
-        const $id = inhibitOnNull($item.get("id"));
-        const $type = inhibitOnNull($item.get("type"));
-        const $typeName = lambda($type, singleTableTypeNameCallback, true);
-        return object({ __typename: $typeName, id: $id });
-      },
-    [inhibitOnNull, lambda, object, singleTableTypeNameCallback],
   );
 
   const relationalItemTypeNameFromType = (type: string) =>
@@ -2954,12 +2942,7 @@ export function makeExampleSchema(
           type: new GraphQLList(SingleTableItem),
           args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
           plan: EXPORTABLE(
-            (
-              deoptimizeIfAppropriate,
-              each,
-              singleTableItemInterface,
-              singleTableItemsResource,
-            ) =>
+            (deoptimizeIfAppropriate, singleTableItemsResource) =>
               function plan($person, { $first, $offset }) {
                 const $personId = $person.get("person_id");
                 const $items: SingleTableItemsStep =
@@ -2969,14 +2952,9 @@ export function makeExampleSchema(
                 $items.setFirst($first);
                 $items.setOffset($offset);
                 deoptimizeIfAppropriate($items);
-                return each($items, singleTableItemInterface);
+                return $items;
               },
-            [
-              deoptimizeIfAppropriate,
-              each,
-              singleTableItemInterface,
-              singleTableItemsResource,
-            ],
+            [deoptimizeIfAppropriate, singleTableItemsResource],
           ),
         },
 
@@ -3065,6 +3043,49 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
+    extensions: {
+      grafast: {
+        planType: EXPORTABLE(
+          (
+            PgSelectSingleStep,
+            get,
+            lambda,
+            singleTableItemsResource,
+            singleTableTypeNameCallback,
+          ) =>
+            function planType($stepOrSpecifier) {
+              const $type = get($stepOrSpecifier, "type");
+              const $__typename = lambda(
+                $type,
+                singleTableTypeNameCallback,
+                true,
+              );
+              return {
+                $__typename,
+                planForType() {
+                  if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    ($stepOrSpecifier.resource as PgResource).codec ===
+                      singleTableItemsResource.codec
+                  ) {
+                    return $stepOrSpecifier;
+                  } else {
+                    const $id = get($stepOrSpecifier, "id");
+                    return singleTableItemsResource.get({ id: $id });
+                  }
+                },
+              };
+            },
+          [
+            PgSelectSingleStep,
+            get,
+            lambda,
+            singleTableItemsResource,
+            singleTableTypeNameCallback,
+          ],
+        ),
+      },
+    },
   });
 
   const commonSingleTableItemFields = {
@@ -3074,13 +3095,13 @@ export function makeExampleSchema(
     parent: {
       type: SingleTableItem,
       plan: EXPORTABLE(
-        (deoptimizeIfAppropriate, singleTableItemInterface) =>
+        (deoptimizeIfAppropriate) =>
           function plan($entity) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
-            return singleTableItemInterface($plan);
+            return $plan;
           },
-        [deoptimizeIfAppropriate, singleTableItemInterface],
+        [deoptimizeIfAppropriate],
       ),
     },
     author: singleRelationField("author", Person),
@@ -3224,7 +3245,16 @@ export function makeExampleSchema(
     extensions: {
       grafast: {
         planType: EXPORTABLE(
-          (PgSelectSingleStep, RELATIONAL_LOOKUP, deoptimizeIfAppropriate, get, lambda, relationalItemTypeNameFromType, relationalItemsResource) => function planType($stepOrSpecifier) {
+          (
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            deoptimizeIfAppropriate,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ) =>
+            function planType($stepOrSpecifier) {
               const $type = get($stepOrSpecifier, "type");
               const $__typename = lambda(
                 $type,
@@ -3258,7 +3288,15 @@ export function makeExampleSchema(
                 },
               };
             },
-          [PgSelectSingleStep, RELATIONAL_LOOKUP, deoptimizeIfAppropriate, get, lambda, relationalItemTypeNameFromType, relationalItemsResource],
+          [
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            deoptimizeIfAppropriate,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ],
         ),
       },
     },
@@ -4161,14 +4199,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (singleTableItemInterface, singleTableItemsResource) =>
+          (singleTableItemsResource) =>
             function plan(_$root, { $id }) {
               const $item: SingleTableItemStep = singleTableItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return singleTableItemInterface($item);
+              return $item;
             },
-          [singleTableItemInterface, singleTableItemsResource],
+          [singleTableItemsResource],
         ),
       },
 
