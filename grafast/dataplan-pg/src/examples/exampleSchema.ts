@@ -3434,7 +3434,8 @@ export function makeExampleSchema(
 
   const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "FirstPartyVulnerability",
-    planType($specifier) {
+    planType($stepOrSpecifier) {
+      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
       const $id = get($specifier, "id") as Step<number>;
       return firstPartyVulnerabilitiesResource.get({ id: $id });
     },
@@ -3485,7 +3486,8 @@ export function makeExampleSchema(
 
   const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "ThirdPartyVulnerability",
-    planType($specifier) {
+    planType($stepOrSpecifier) {
+      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
       const $id = get($specifier, "id") as Step<number>;
       return thirdPartyVulnerabilitiesResource.get({ id: $id });
     },

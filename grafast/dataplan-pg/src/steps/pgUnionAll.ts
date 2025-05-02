@@ -216,32 +216,29 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): Step {
+  toSpecifier() {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const resource = this.spec.resourceByTypeName[objectType.name];
-    if (!resource) {
-      // This type isn't handled; so it should never occur
-      return constant(null);
-    }
-    const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
-      (u) => u.isPrimary === true,
+    const $__typename = access(this, this.typeKey) as Step<string>;
+    const $pk = access(this, this.pkKey) as Step<string>;
+    const { resourceByTypeName } = this.spec;
+    return lambda(
+      [$__typename, $pk, constant(resourceByTypeName)],
+      toSpecifier,
+      true,
     );
-    if (!pk) {
+  }
+
+  toTypename() {
+    if (this.typeKey === null) {
       throw new Error(
-        `No PK found for ${objectType.name}; this should have been caught earlier?!`,
+        `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const spec = Object.create(null);
-    const $parsed = jsonParse(access(this, [this.pkKey]));
-    for (let i = 0, l = pk.attributes.length; i < l; i++) {
-      const col = pk.attributes[i];
-      spec[col] = access($parsed, [i]);
-    }
-    return resource.get(spec);
+    return access(this, this.typeKey) as Step<string>;
   }
 
   /**
@@ -365,6 +362,31 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   [$$toSQL]() {
     return this.getClassStep().alias;
   }
+}
+
+function toSpecifier([__typename, pkValue, resourceByTypeName]: readonly [
+  string,
+  string,
+  Record<string, PgResource<any, any, any, any, any>>,
+]) {
+  const resource = resourceByTypeName[__typename];
+  if (!resource) return null;
+  const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
+    (u) => u.isPrimary === true,
+  );
+  if (!pk) {
+    throw new Error(
+      `No PK found for ${__typename}; this should have been caught earlier?!`,
+    );
+  }
+  const spec = Object.create(null);
+  spec.__typename = __typename;
+  const parsed = JSON.parse(pkValue);
+  for (let i = 0, l = pk.attributes.length; i < l; i++) {
+    const col = pk.attributes[i];
+    spec[col] = parsed[i];
+  }
+  return spec;
 }
 
 interface MemberDigest<TTypeNames extends string> {
