@@ -2844,17 +2844,7 @@ export function makeExampleSchema(
       DIVIDER: "UnionDivider",
       CHECKLIST: "UnionChecklist",
       CHECKLIST_ITEM: "UnionChecklistItem",
-    })[type];
-  const unionItemUnion = EXPORTABLE(
-    (inhibitOnNull, lambda, object, unionItemTypeNameFromType) =>
-      ($item: UnionItemStep) => {
-        const $id = inhibitOnNull($item.get("id"));
-        const $type = inhibitOnNull($item.get("type"));
-        const $__typename = lambda($type, unionItemTypeNameFromType, true);
-        return object({ __typename: $__typename, id: $id });
-      },
-    [inhibitOnNull, lambda, object, unionItemTypeNameFromType],
-  );
+    })[type] ?? null;
 
   const relationalCommentableInterface = EXPORTABLE(
     (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
@@ -4321,14 +4311,35 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (unionItemUnion, unionItemsResource) =>
+          (
+            inhibitOnNull,
+            lambda,
+            object,
+            unionItemTypeNameFromType,
+            unionItemsResource,
+          ) =>
             function plan(_$root, { $id }) {
               const $item: UnionItemStep = unionItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return unionItemUnion($item);
+              const $type = inhibitOnNull($item.get("type"));
+              const $__typename = lambda(
+                $type,
+                unionItemTypeNameFromType,
+                true,
+              );
+              return object({
+                __typename: $__typename,
+                id: $item.get("id"),
+              });
             },
-          [unionItemUnion, unionItemsResource],
+          [
+            inhibitOnNull,
+            lambda,
+            object,
+            unionItemTypeNameFromType,
+            unionItemsResource,
+          ],
         ),
       },
 
@@ -4399,7 +4410,7 @@ export function makeExampleSchema(
       allUnionItemsList: {
         type: new GraphQLList(new GraphQLNonNull(UnionItem)),
         plan: EXPORTABLE(
-          (TYPES, each, sql, unionItemUnion, unionItemsResource) =>
+          (TYPES, sql, unionItemsResource) =>
             function plan() {
               const $items: UnionItemsStep = unionItemsResource.find();
               $items.orderBy({
@@ -4407,9 +4418,9 @@ export function makeExampleSchema(
                 fragment: sql`${$items.alias}.id`,
                 direction: "ASC",
               });
-              return each($items, ($item) => unionItemUnion($item));
+              return $items;
             },
-          [TYPES, each, sql, unionItemUnion, unionItemsResource],
+          [TYPES, sql, unionItemsResource],
         ),
       },
 
