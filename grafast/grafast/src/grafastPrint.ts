@@ -223,7 +223,7 @@ export function printStore(bucket: Bucket): string {
               (e, i) =>
                 `${String(i).padStart(3, " ")}: flags=${printFlags(
                   val._flagsAt(i),
-                ).padEnd(5, " ")} value=${indentIfMultiline(
+                ).padEnd(4, " ")} value=${indentIfMultiline(
                   inspect(val.at(i), PRINT_STORE_INSPECT_OPTIONS),
                 )}`,
             )
@@ -236,7 +236,7 @@ export function printStore(bucket: Bucket): string {
         true,
       );
       output.push(
-        `${printKey} (UNARY/${String(val._entryFlags).padStart(2, " ")}) ${
+        `${printKey} (UNARY/${printFlags(val._entryFlags).padEnd(4, " ")}) ${
           step ?? "-"
         } ${[...(step?.polymorphicPaths ?? [])]}\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
       );
