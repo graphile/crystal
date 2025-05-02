@@ -8,164 +8,151 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/interfaces-single-table/nested-more-fragments"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[10]"):::bucket
-    Bucket1("Bucket 1 (listItem)<br />Deps: 9<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 9<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[12]<br />1: <br />ᐳ: 13, 14<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />4: __ListTransform[19]"):::bucket
-    Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgSelectSingle{3}ᐸsingle_table_itemsᐳ[22]"):::bucket
-    Bucket4("Bucket 4 (listItem)<br />Deps: 9<br /><br />ROOT __Item{4}ᐸ19ᐳ[23]<br />1: <br />ᐳ: 24, 25, 26, 28, 45, 47, 48, 57, 58, 59, 60, 61<br />2: PgSingleTablePolymorphic[27]"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 9, 28, 48, 24, 27, 45, 25, 47, 57, 58, 59, 60, 61<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[29], PgSelect[49]<br />ᐳ: 62, 83, 84, 105<br />2: PgSelectRows[38], PgSelectRows[54]<br />ᐳ: 37, 40, 41, 42, 53, 56, 148, 149, 162, 163, 164, 165, 166<br />3: PgSingleTablePolymorphic[44]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 9, 149, 40, 44, 28, 41, 148, 162, 163, 164, 165, 166<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem<br /><br />1: PgSelect[150]<br />ᐳ: 167, 176, 177, 186<br />2: PgSelectRows[159]<br />ᐳ: First[158], PgSelectSingle[161]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 56<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[56]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 161<br /><br />ROOT PgSelectSingle{6}ᐸpeopleᐳ[161]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 10<br />2: PgSelect[7]<br />3: PgSelectRows[11]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />Deps: 10, 6<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 10, 6<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 15<br />2: PgSelect[16]<br />3: PgSelectRows[20]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 25, 41, 22, 24, 38, 23, 40, 50, 51, 52, 53, 54<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br /><br />1: PgSelect[26], PgSelect[42]<br />ᐳ: 55, 72, 73, 90<br />2: PgSelectRows[35], PgSelectRows[47]<br />ᐳ: 34, 37, 46, 49, 123, 124, 129, 130, 143, 144, 145, 146, 147"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 49<br /><br />ROOT PgSelectSingle{4}ᐸpeopleᐳ[49]"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />SingleTableTopic,SingleTablePost,SingleTableDivider,SingleTableChecklist,SingleTableChecklistItem<br />Deps: 10, 130, 37, 124, 25, 123, 129, 143, 144, 145, 146, 147<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem<br /><br />1: PgSelect[131]<br />ᐳ: 148, 157, 158, 167<br />2: PgSelectRows[140]<br />ᐳ: First[139], PgSelectSingle[142]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 142<br /><br />ROOT PgSelectSingle{6}ᐸpeopleᐳ[142]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    Bucket2 --> Bucket3 & Bucket4
-    Bucket4 --> Bucket5
-    Bucket5 --> Bucket6 & Bucket7
-    Bucket6 --> Bucket8
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5 & Bucket6
+    Bucket6 --> Bucket7
 
     %% plan dependencies
-    Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object9 --> PgSelect6
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object10 --> PgSelect7
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8 & Access9 --> Object10
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access7
     __Value2 --> Access8
-    PgSelectRows10[["PgSelectRows[10∈0] ➊"]]:::plan
-    PgSelect6 --> PgSelectRows10
+    __Value2 --> Access9
+    PgSelectRows11[["PgSelectRows[11∈0] ➊"]]:::plan
+    PgSelect7 --> PgSelectRows11
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    __Item11[/"__Item[11∈1]<br />ᐸ10ᐳ"\]:::itemplan
-    PgSelectRows10 ==> __Item11
-    PgSelectSingle12{{"PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"}}:::plan
-    __Item11 --> PgSelectSingle12
-    PgSelect15[["PgSelect[15∈2]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object9 & PgClassExpression14 --> PgSelect15
-    __ListTransform19[["__ListTransform[19∈2]<br />ᐸeach:15ᐳ"]]:::plan
+    __Item12[/"__Item[12∈1]<br />ᐸ11ᐳ"\]:::itemplan
+    PgSelectRows11 ==> __Item12
+    PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸpeopleᐳ"}}:::plan
+    __Item12 --> PgSelectSingle13
+    PgSelect16[["PgSelect[16∈2]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgClassExpression15{{"PgClassExpression[15∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Object10 & PgClassExpression15 --> PgSelect16
+    PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectSingle13 --> PgClassExpression15
     PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
-    PgSelectRows20 & PgSelect15 --> __ListTransform19
-    PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle12 --> PgClassExpression13
-    PgSelectSingle12 --> PgClassExpression14
-    PgSelect15 --> PgSelectRows20
+    PgSelect16 --> PgSelectRows20
     __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelectRows20 -.-> __Item21
+    PgSelectRows20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
-    PgSingleTablePolymorphic27["PgSingleTablePolymorphic[27∈4]"]:::plan
-    Lambda26{{"Lambda[26∈4]"}}:::plan
-    PgSelectSingle24{{"PgSelectSingle[24∈4]<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    Lambda26 & PgSelectSingle24 --> PgSingleTablePolymorphic27
-    __Item23[/"__Item[23∈4]<br />ᐸ19ᐳ"\]:::itemplan
-    __ListTransform19 ==> __Item23
-    __Item23 --> PgSelectSingle24
-    PgClassExpression25{{"PgClassExpression[25∈4]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression25
-    PgClassExpression25 --> Lambda26
-    PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression28
-    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression45
-    PgClassExpression47{{"PgClassExpression[47∈4]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression47
-    PgClassExpression48{{"PgClassExpression[48∈4]<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression48
-    PgClassExpression57{{"PgClassExpression[57∈4]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression57
-    PgClassExpression58{{"PgClassExpression[58∈4]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression58
-    PgClassExpression59{{"PgClassExpression[59∈4]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression59
-    PgClassExpression60{{"PgClassExpression[60∈4]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression60
-    PgClassExpression61{{"PgClassExpression[61∈4]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression61
-    PgSelect29[["PgSelect[29∈5]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
-    Object9 & PgClassExpression28 --> PgSelect29
-    PgSingleTablePolymorphic44["PgSingleTablePolymorphic[44∈5]^"]:::plan
-    Lambda42{{"Lambda[42∈5]^"}}:::plan
-    PgSelectSingle40{{"PgSelectSingle[40∈5]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    Lambda42 & PgSelectSingle40 --> PgSingleTablePolymorphic44
-    PgSelect49[["PgSelect[49∈5]<br />ᐸpeopleᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
-    Object9 & PgClassExpression48 --> PgSelect49
-    First37{{"First[37∈5]^"}}:::plan
-    PgSelectRows38[["PgSelectRows[38∈5]^"]]:::plan
-    PgSelectRows38 --> First37
-    PgSelect29 --> PgSelectRows38
-    First37 --> PgSelectSingle40
-    PgClassExpression41{{"PgClassExpression[41∈5]^<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression41
-    PgClassExpression41 --> Lambda42
-    First53{{"First[53∈5]^"}}:::plan
-    PgSelectRows54[["PgSelectRows[54∈5]^"]]:::plan
-    PgSelectRows54 --> First53
-    PgSelect49 --> PgSelectRows54
-    PgSelectSingle56{{"PgSelectSingle[56∈5]^<br />ᐸpeopleᐳ"}}:::plan
-    First53 --> PgSelectSingle56
-    PgClassExpression62{{"PgClassExpression[62∈5]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist"}}:::plan
-    PgSelectSingle24 --> PgClassExpression62
-    PgClassExpression83{{"PgClassExpression[83∈5]<br />ᐸ__single_t...scription”ᐳ<br />ᐳSingleTablePost<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle24 --> PgClassExpression83
-    PgClassExpression84{{"PgClassExpression[84∈5]<br />ᐸ__single_t...s__.”note”ᐳ<br />ᐳSingleTablePost<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle24 --> PgClassExpression84
-    PgClassExpression105{{"PgClassExpression[105∈5]<br />ᐸ__single_t...__.”color”ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle24 --> PgClassExpression105
-    PgClassExpression148{{"PgClassExpression[148∈5]^<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression148
-    PgClassExpression149{{"PgClassExpression[149∈5]^<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression149
-    PgClassExpression162{{"PgClassExpression[162∈5]^<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression162
-    PgClassExpression163{{"PgClassExpression[163∈5]^<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression163
-    PgClassExpression164{{"PgClassExpression[164∈5]^<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression164
-    PgClassExpression165{{"PgClassExpression[165∈5]^<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression165
-    PgClassExpression166{{"PgClassExpression[166∈5]^<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression166
-    PgSelect150[["PgSelect[150∈6]<br />ᐸpeopleᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"]]:::plan
-    Object9 & PgClassExpression149 --> PgSelect150
-    First158{{"First[158∈6]^"}}:::plan
-    PgSelectRows159[["PgSelectRows[159∈6]^"]]:::plan
-    PgSelectRows159 --> First158
-    PgSelect150 --> PgSelectRows159
-    PgSelectSingle161{{"PgSelectSingle[161∈6]^<br />ᐸpeopleᐳ"}}:::plan
-    First158 --> PgSelectSingle161
-    PgClassExpression167{{"PgClassExpression[167∈6]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist"}}:::plan
-    PgSelectSingle40 --> PgClassExpression167
-    PgClassExpression176{{"PgClassExpression[176∈6]<br />ᐸ__single_t...scription”ᐳ<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle40 --> PgClassExpression176
-    PgClassExpression177{{"PgClassExpression[177∈6]<br />ᐸ__single_t...s__.”note”ᐳ<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle40 --> PgClassExpression177
-    PgClassExpression186{{"PgClassExpression[186∈6]<br />ᐸ__single_t...__.”color”ᐳ<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableDivider"}}:::plan
-    PgSelectSingle40 --> PgClassExpression186
-    PgClassExpression364{{"PgClassExpression[364∈8]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle161 --> PgClassExpression364
-    PgClassExpression203{{"PgClassExpression[203∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle56 --> PgClassExpression203
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression23
+    Lambda24{{"Lambda[24∈3]"}}:::plan
+    PgClassExpression23 --> Lambda24
+    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression25
+    PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression38
+    PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression40
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression41
+    PgClassExpression50{{"PgClassExpression[50∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression50
+    PgClassExpression51{{"PgClassExpression[51∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression51
+    PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression52
+    PgClassExpression53{{"PgClassExpression[53∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression53
+    PgClassExpression54{{"PgClassExpression[54∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression54
+    PgSelect26[["PgSelect[26∈4]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
+    Object10 & PgClassExpression25 --> PgSelect26
+    PgSelect42[["PgSelect[42∈4]<br />ᐸpeopleᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
+    Object10 & PgClassExpression41 --> PgSelect42
+    First34{{"First[34∈4]^"}}:::plan
+    PgSelectRows35[["PgSelectRows[35∈4]^"]]:::plan
+    PgSelectRows35 --> First34
+    PgSelect26 --> PgSelectRows35
+    PgSelectSingle37{{"PgSelectSingle[37∈4]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First34 --> PgSelectSingle37
+    First46{{"First[46∈4]^"}}:::plan
+    PgSelectRows47[["PgSelectRows[47∈4]^"]]:::plan
+    PgSelectRows47 --> First46
+    PgSelect42 --> PgSelectRows47
+    PgSelectSingle49{{"PgSelectSingle[49∈4]^<br />ᐸpeopleᐳ"}}:::plan
+    First46 --> PgSelectSingle49
+    PgClassExpression55{{"PgClassExpression[55∈4]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist"}}:::plan
+    PgSelectSingle22 --> PgClassExpression55
+    PgClassExpression72{{"PgClassExpression[72∈4]<br />ᐸ__single_t...scription”ᐳ<br />ᐳSingleTablePost<br />ᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle22 --> PgClassExpression72
+    PgClassExpression73{{"PgClassExpression[73∈4]<br />ᐸ__single_t...s__.”note”ᐳ<br />ᐳSingleTablePost<br />ᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle22 --> PgClassExpression73
+    PgClassExpression90{{"PgClassExpression[90∈4]<br />ᐸ__single_t...__.”color”ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    PgSelectSingle22 --> PgClassExpression90
+    PgClassExpression123{{"PgClassExpression[123∈4]^<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression123
+    Lambda124{{"Lambda[124∈4]^"}}:::plan
+    PgClassExpression123 --> Lambda124
+    PgClassExpression129{{"PgClassExpression[129∈4]^<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression129
+    PgClassExpression130{{"PgClassExpression[130∈4]^<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression130
+    PgClassExpression143{{"PgClassExpression[143∈4]^<br />ᐸ__single_t...”position”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression143
+    PgClassExpression144{{"PgClassExpression[144∈4]^<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression144
+    PgClassExpression145{{"PgClassExpression[145∈4]^<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression145
+    PgClassExpression146{{"PgClassExpression[146∈4]^<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression146
+    PgClassExpression147{{"PgClassExpression[147∈4]^<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression147
+    PgClassExpression126{{"PgClassExpression[126∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle49 --> PgClassExpression126
+    PgSelect131[["PgSelect[131∈6]<br />ᐸpeopleᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"]]:::plan
+    Object10 & PgClassExpression130 --> PgSelect131
+    First139{{"First[139∈6]^"}}:::plan
+    PgSelectRows140[["PgSelectRows[140∈6]^"]]:::plan
+    PgSelectRows140 --> First139
+    PgSelect131 --> PgSelectRows140
+    PgSelectSingle142{{"PgSelectSingle[142∈6]^<br />ᐸpeopleᐳ"}}:::plan
+    First139 --> PgSelectSingle142
+    PgClassExpression148{{"PgClassExpression[148∈6]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist"}}:::plan
+    PgSelectSingle37 --> PgClassExpression148
+    PgClassExpression157{{"PgClassExpression[157∈6]<br />ᐸ__single_t...scription”ᐳ<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle37 --> PgClassExpression157
+    PgClassExpression158{{"PgClassExpression[158∈6]<br />ᐸ__single_t...s__.”note”ᐳ<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle37 --> PgClassExpression158
+    PgClassExpression167{{"PgClassExpression[167∈6]<br />ᐸ__single_t...__.”color”ᐳ<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableDivider"}}:::plan
+    PgSelectSingle37 --> PgClassExpression167
+    PgClassExpression344{{"PgClassExpression[344∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
+    PgSelectSingle142 --> PgClassExpression344
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,PgSelectRows10 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgSelectRows11 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item11,PgSelectSingle12 bucket1
+    class Bucket1,__Item12,PgSelectSingle13 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression13,PgClassExpression14,PgSelect15,__ListTransform19,PgSelectRows20 bucket2
+    class Bucket2,PgClassExpression14,PgClassExpression15,PgSelect16,PgSelectRows20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22 bucket3
+    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,Lambda24,PgClassExpression25,PgClassExpression38,PgClassExpression40,PgClassExpression41,PgClassExpression50,PgClassExpression51,PgClassExpression52,PgClassExpression53,PgClassExpression54 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item23,PgSelectSingle24,PgClassExpression25,Lambda26,PgSingleTablePolymorphic27,PgClassExpression28,PgClassExpression45,PgClassExpression47,PgClassExpression48,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60,PgClassExpression61 bucket4
+    class Bucket4,PgSelect26,First34,PgSelectRows35,PgSelectSingle37,PgSelect42,First46,PgSelectRows47,PgSelectSingle49,PgClassExpression55,PgClassExpression72,PgClassExpression73,PgClassExpression90,PgClassExpression123,Lambda124,PgClassExpression129,PgClassExpression130,PgClassExpression143,PgClassExpression144,PgClassExpression145,PgClassExpression146,PgClassExpression147 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgSelect29,First37,PgSelectRows38,PgSelectSingle40,PgClassExpression41,Lambda42,PgSingleTablePolymorphic44,PgSelect49,First53,PgSelectRows54,PgSelectSingle56,PgClassExpression62,PgClassExpression83,PgClassExpression84,PgClassExpression105,PgClassExpression148,PgClassExpression149,PgClassExpression162,PgClassExpression163,PgClassExpression164,PgClassExpression165,PgClassExpression166 bucket5
+    class Bucket5,PgClassExpression126 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgSelect150,First158,PgSelectRows159,PgSelectSingle161,PgClassExpression167,PgClassExpression176,PgClassExpression177,PgClassExpression186 bucket6
+    class Bucket6,PgSelect131,First139,PgSelectRows140,PgSelectSingle142,PgClassExpression148,PgClassExpression157,PgClassExpression158,PgClassExpression167 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression203 bucket7
-    classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression364 bucket8
+    class Bucket7,PgClassExpression344 bucket7
 

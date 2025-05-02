@@ -10,9 +10,9 @@ graph TD
     subgraph "Buckets for queries/resolvers/basics-object-recursive"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 8, 34, 9<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />ᐳ: First[10], PgSelectSingle[12]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 34, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]<br />1: <br />ᐳ: PgClassExpression[13]<br />2: GraphQLResolver[15]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸresolveᐳ[15]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{2}ᐸresolveᐳ[21]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 23, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{3}ᐸresolveᐳ[23]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸUser.usernameHashesᐳ[15]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{2}ᐸHashes.selfᐳ[21]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 23, 34, 2, 0, 4<br /><br />ROOT GraphQLResolver{3}ᐸHashes.selfᐳ[23]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -38,27 +38,27 @@ graph TD
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant34{{"Constant[34∈0] ➊<br />ᐸ§{}ᐳ"}}:::plan
-    GraphQLResolver15[["GraphQLResolver[15∈1] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver15[["GraphQLResolver[15∈1] ➊<br />ᐸUser.usernameHashesᐳ"]]:::unbatchedplan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgClassExpression13 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver15
     PgSelectSingle12 --> PgClassExpression13
-    GraphQLResolver17[["GraphQLResolver[17∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver17[["GraphQLResolver[17∈2] ➊<br />ᐸHashes.md5ᐳ"]]:::unbatchedplan
     GraphQLResolver15 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
-    GraphQLResolver19[["GraphQLResolver[19∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver19[["GraphQLResolver[19∈2] ➊<br />ᐸHashes.sha256ᐳ"]]:::unbatchedplan
     GraphQLResolver15 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver19
-    GraphQLResolver21[["GraphQLResolver[21∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver21[["GraphQLResolver[21∈2] ➊<br />ᐸHashes.selfᐳ"]]:::unbatchedplan
     GraphQLResolver15 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver21
-    GraphQLResolver23[["GraphQLResolver[23∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver23[["GraphQLResolver[23∈3] ➊<br />ᐸHashes.selfᐳ"]]:::unbatchedplan
     GraphQLResolver21 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver23
-    GraphQLResolver25[["GraphQLResolver[25∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver25[["GraphQLResolver[25∈3] ➊<br />ᐸHashes.md5ᐳ"]]:::unbatchedplan
     GraphQLResolver21 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver25
-    GraphQLResolver27[["GraphQLResolver[27∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver27[["GraphQLResolver[27∈3] ➊<br />ᐸHashes.sha256ᐳ"]]:::unbatchedplan
     GraphQLResolver21 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver27
-    GraphQLResolver29[["GraphQLResolver[29∈3] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver29[["GraphQLResolver[29∈3] ➊<br />ᐸHashes.sha256ᐳ"]]:::unbatchedplan
     GraphQLResolver21 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver29
-    GraphQLResolver31[["GraphQLResolver[31∈4] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver31[["GraphQLResolver[31∈4] ➊<br />ᐸHashes.md5ᐳ"]]:::unbatchedplan
     GraphQLResolver23 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver31
-    GraphQLResolver33[["GraphQLResolver[33∈4] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver33[["GraphQLResolver[33∈4] ➊<br />ᐸHashes.sha256ᐳ"]]:::unbatchedplan
     GraphQLResolver23 & Constant34 & __Value2 & __Value0 & __Value4 --> GraphQLResolver33
 
     %% define steps
