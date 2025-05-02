@@ -319,13 +319,95 @@ export function arraysMatch<T>(
   }
   if (comparator !== undefined) {
     for (let i = 0; i < l; i++) {
-      if (!comparator(array1[i], array2[i])) {
+      const a = array1[i]!;
+      const b = array2[i]!;
+      if (a !== b && !comparator(a, b)) {
         return false;
       }
     }
   } else {
     for (let i = 0; i < l; i++) {
       if (array1[i] !== array2[i]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns true if map1 and map2 have the same keys, and every matching entry
+ * value within them pass the `comparator` check (which defaults to `===`).
+ */
+export function mapsMatch<TKey, TVal>(
+  map1: ReadonlyMap<TKey, TVal>,
+  map2: ReadonlyMap<TKey, TVal>,
+  comparator?: (
+    k: TKey,
+    val1: TVal | undefined,
+    val2: TVal | undefined,
+  ) => boolean,
+): boolean {
+  if (map1 === map2) return true;
+  const l = map1.size;
+  if (l !== map2.size) {
+    return false;
+  }
+  const allKeys = new Set([...map1.keys(), ...map2.keys()]);
+  if (allKeys.size !== l) {
+    return false;
+  }
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = map1.get(k);
+      const b = map2.get(k);
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (map1.get(k) !== map2.get(k)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns true if record1 and record2 are equivalent, i.e. every value within
+ * them pass the `comparator` check (which defaults to `===`).
+ *
+ * Currently keys are ignored (`record[key] = undefined` is treated the same as
+ * `record[key]` being unset), but this may not always be the case.
+ */
+export function recordsMatch<
+  TRecord extends { readonly [k: string | symbol | number]: any },
+>(
+  record1: TRecord,
+  record2: TRecord,
+  comparator?: (
+    k: keyof TRecord,
+    val1: TRecord[typeof k],
+    val2: TRecord[typeof k],
+  ) => boolean,
+): boolean {
+  if (record1 === record2) return true;
+  const k1 = Object.keys(record1) as (keyof TRecord)[];
+  const k2 = Object.keys(record2) as (keyof TRecord)[];
+  const allKeys = new Set([...k1, ...k2]);
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = record1[k];
+      const b = record2[k];
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (record1[k] !== record2[k]) {
         return false;
       }
     }
