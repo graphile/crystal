@@ -5078,10 +5078,11 @@ function fixStepPolyPaths(
     }
   }
 }
-function defaultPlanType($specifier: Step): PolymorphicTypePlanner {
+
+function defaultPlanType($stepOrSpecifier: Step): PolymorphicTypePlanner {
   // TODO: need to call resolveType here?
   const $__typename =
-    $specifier.toTypename?.() ?? get($specifier, "__typename");
+    $stepOrSpecifier.toTypename?.() ?? get($stepOrSpecifier, "__typename");
   return { $__typename };
 }
 
