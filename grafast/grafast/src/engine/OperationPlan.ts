@@ -3187,6 +3187,26 @@ export class OperationPlan {
       "GrafastInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
     );
 
+    // 1: adjust polymorphicPaths to fit new layerPlan
+    if (step.layerPlan.reason.type === "polymorphic") {
+      // PERF: this is cacheable
+      const newPolyPaths: null | Set<string> = new Set();
+      for (const polyPath of step.polymorphicPaths!) {
+        const i = polyPath.lastIndexOf(">");
+        if (i > 0) {
+          const newPath = polyPath.slice(0, i);
+          newPolyPaths.add(newPath);
+        } else if (i === 0) {
+          newPolyPaths;
+        } else {
+          throw new Error(
+            `GrafastInternalError<42f1c7e7-e544-46d2-81b3-00db11eb5def>: invalid poly path ${polyPath}`,
+          );
+        }
+      }
+      step.polymorphicPaths = newPolyPaths;
+    }
+
     const $subroutine =
       step.layerPlan.reason.type === "subroutine"
         ? step.layerPlan.reason.parentStep
