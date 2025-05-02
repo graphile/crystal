@@ -19,7 +19,6 @@ import {
   __TrackedValueStep,
   access,
   arrayOfLength,
-  arraysMatch,
   ConstantStep,
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
@@ -28,8 +27,6 @@ import {
   isDev,
   isPromiseLike,
   lambda,
-  mapsMatch,
-  recordsMatch,
   reverseArray,
   SafeError,
   Step,
@@ -38,7 +35,7 @@ import {
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import sql, { $$symbolToIdentifier, $$toSQL } from "pg-sql2";
+import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
@@ -3299,10 +3296,9 @@ class PgSelectInlineApplyStep<
   private afterStepId: number | null;
   private beforeStepId: number | null;
   private applyDepIds: number[];
-  private identifiers: string[];
 
   constructor(
-    identifier: string,
+    private identifier: string,
     private viaSubquery: boolean,
     details: {
       staticInfo: StaticInfo<TResource>;
@@ -3315,7 +3311,6 @@ class PgSelectInlineApplyStep<
     },
   ) {
     super();
-    this.identifiers = [identifier];
     const { staticInfo, $first, $last, $offset, $after, $before, applySteps } =
       details;
     this.staticInfo = staticInfo;
@@ -3327,200 +3322,6 @@ class PgSelectInlineApplyStep<
     this.applyDepIds = applySteps.map(($apply) =>
       this.addUnaryDependency($apply),
     );
-  }
-
-  public toStringMeta(): string | null {
-    return this.identifiers.join(",");
-  }
-
-  public deduplicate(
-    peers: readonly PgSelectInlineApplyStep<any>[],
-  ): readonly Step[] {
-    return peers.filter((peer) => {
-      if (peer === this) return true;
-
-      if (peer.viaSubquery !== this.viaSubquery) return false;
-
-      // Check if staticInfo is equivalent
-      /** me */
-      const m = this.staticInfo;
-      /** peer */
-      const p = peer.staticInfo;
-      if (m !== p) {
-        // Handle symbols
-        const symbolSubstitutes = new Map<symbol, symbol>();
-        for (const [s, sub] of m._symbolSubstitutes) {
-          symbolSubstitutes.set(s, sub);
-        }
-        for (const [s, sub] of p._symbolSubstitutes) {
-          symbolSubstitutes.set(s, sub);
-        }
-        {
-          const l = m.placeholderSymbols.length;
-          if (p.placeholderSymbols.length !== l) {
-            return false;
-          }
-          for (let i = 0; i < l; i++) {
-            symbolSubstitutes.set(
-              m.placeholderSymbols[i],
-              p.placeholderSymbols[i],
-            );
-          }
-        }
-        const options = { symbolSubstitutes };
-        if (typeof m.symbol === "symbol" && typeof p.symbol === "symbol") {
-          if (m.symbol !== p.symbol) {
-            symbolSubstitutes.set(m.symbol, p.symbol);
-          } else {
-            // Fine :)
-          }
-        } else if (m.symbol !== p.symbol) {
-          return false;
-        }
-
-        const sqlIsEquivalent = (s1: Maybe<SQL>, s2: Maybe<SQL>) => {
-          if (s1 == null || s2 == null) return s1 === s2;
-          return sql.isEquivalent(s1, s2, options);
-        };
-        if (
-          !recordsMatch(m, p, (k, v1, v2) => {
-            switch (k) {
-              case "_symbolSubstitutes": // Ignore; they'll get merged
-              case "symbol": // Already handled
-              case "placeholderSymbols": // Already handled
-              case "sourceStepDescription": // Just for debugging, don't care
-                return true;
-              case "from":
-              case "alias": {
-                return sqlIsEquivalent(m[k], p[k]);
-              }
-              case "orders": {
-                return arraysMatch(m[k], p[k], (m, p) =>
-                  recordsMatch(m, p, (k, v1, v2) => {
-                    switch (k) {
-                      case "fragment": {
-                        return sqlIsEquivalent(m[k], p[k]);
-                      }
-                      case "codec":
-                      case "nulls":
-                      case "direction":
-                      case "attribute":
-                      case "callback":
-                      case "nullable":
-                      default: {
-                        return v1 === v2;
-                      }
-                    }
-                  }),
-                );
-              }
-              case "groups": {
-                return arraysMatch(m[k], p[k], (m, p) =>
-                  recordsMatch(m, p, (k) => {
-                    switch (k) {
-                      case "fragment": {
-                        return sqlIsEquivalent(m[k], p[k]);
-                      }
-                      case "guaranteedNotNull":
-                      case "codec":
-                      default: {
-                        return m[k] === p[k];
-                      }
-                    }
-                  }),
-                );
-              }
-              case "fixedPlaceholderValues": {
-                return mapsMatch(m[k], p[k]);
-              }
-              case "deferredSymbols": {
-                return arraysMatch(m[k], p[k]);
-              }
-              case "meta": {
-                return recordsMatch(m[k], p[k]);
-              }
-              case "selects":
-              case "conditions":
-              case "havingConditions": {
-                return arraysMatch(m[k], p[k], sqlIsEquivalent);
-              }
-              case "relationJoins": {
-                return mapsMatch(m[k], p[k], (k, v1, v2) =>
-                  sqlIsEquivalent(v1, v2),
-                );
-              }
-              case "joins": {
-                return arraysMatch(m[k], p[k], (m, p) =>
-                  recordsMatch(m, p, (k) => {
-                    switch (k) {
-                      case "alias":
-                      case "from":
-                      case "attributeNames": {
-                        return sqlIsEquivalent(m[k], p[k]);
-                      }
-                      case "lateral":
-                      case "type":
-                      default: {
-                        return m[k] === p[k];
-                      }
-                    }
-                  }),
-                );
-              }
-              // Default: require equality
-              case "mode":
-              case "name":
-              case "hasSideEffects":
-              case "resource":
-              case "isUnique":
-              case "needsGroups":
-              case "needsCursor":
-              case "forceIdentity":
-              case "isOrderUnique":
-              case "joinAsLateral":
-              case "fetchOneExtra":
-              default: {
-                return v1 === v2;
-              }
-            }
-          })
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }
-
-  public deduplicatedWith(replacement: PgSelectInlineApplyStep<any>): void {
-    for (const identifier of this.identifiers) {
-      replacement.identifiers.push(identifier);
-    }
-    const newSubs = new Map(replacement.staticInfo._symbolSubstitutes);
-    if (
-      typeof this.staticInfo.symbol === "symbol" &&
-      typeof replacement.staticInfo.symbol === "symbol"
-    ) {
-      if (this.staticInfo.symbol !== replacement.staticInfo.symbol) {
-        newSubs.set(this.staticInfo.symbol, replacement.staticInfo.symbol);
-      } else {
-        // Fine :)
-      }
-    }
-    for (const [s, sub] of this.staticInfo._symbolSubstitutes) {
-      newSubs.set(s, sub);
-    }
-    for (let i = 0, l = this.staticInfo.placeholderSymbols.length; i < l; i++) {
-      newSubs.set(
-        this.staticInfo.placeholderSymbols[i],
-        replacement.staticInfo.placeholderSymbols[i],
-      );
-    }
-    replacement.staticInfo = {
-      ...replacement.staticInfo,
-      _symbolSubstitutes: newSubs,
-    };
   }
 
   execute(executionDetails: ExecutionDetails) {
@@ -3573,9 +3374,7 @@ class PgSelectInlineApplyStep<
             last,
             meta,
           };
-          for (const identifier of this.identifiers) {
-            queryBuilder.setMeta(identifier, details);
-          }
+          queryBuilder.setMeta(this.identifier, details);
         } else {
           const { whereConditions, joins, selects } = parts;
           const { from, alias, resource, joinAsLateral } = this.staticInfo;
@@ -3605,9 +3404,7 @@ class PgSelectInlineApplyStep<
             groupDetails,
             meta,
           };
-          for (const identifier of this.identifiers) {
-            queryBuilder.setMeta(identifier, details);
-          }
+          queryBuilder.setMeta(this.identifier, details);
         }
       },
     ];
