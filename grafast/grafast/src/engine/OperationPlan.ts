@@ -3190,14 +3190,15 @@ export class OperationPlan {
     // 1: adjust polymorphicPaths to fit new layerPlan
     if (step.layerPlan.reason.type === "polymorphic") {
       // PERF: this is cacheable
-      const newPolyPaths: null | Set<string> = new Set();
+      let newPolyPaths: null | Set<string> = new Set();
       for (const polyPath of step.polymorphicPaths!) {
         const i = polyPath.lastIndexOf(">");
         if (i > 0) {
           const newPath = polyPath.slice(0, i);
           newPolyPaths.add(newPath);
         } else if (i === 0) {
-          newPolyPaths;
+          newPolyPaths = null;
+          break;
         } else {
           throw new Error(
             `GrafastInternalError<42f1c7e7-e544-46d2-81b3-00db11eb5def>: invalid poly path ${polyPath}`,
