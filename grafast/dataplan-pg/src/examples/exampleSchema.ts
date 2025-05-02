@@ -3371,19 +3371,23 @@ export function makeExampleSchema(
     ],
     extensions: {
       grafast: {
-        planType: EXPORTABLE((get) => function planType($stepOrSpecifier) {
-          const $specifier =
-            $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
-          const $__typename = get($specifier, "__typename");
-          return {
-            $__typename,
-            planForType(t) {
-              return (
-                t.extensions?.grafast?.planType?.($specifier) ?? $specifier
-              );
+        planType: EXPORTABLE(
+          (get) =>
+            function planType($stepOrSpecifier) {
+              const $specifier =
+                $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+              const $__typename = get($specifier, "__typename");
+              return {
+                $__typename,
+                planForType(t) {
+                  return (
+                    t.extensions?.grafast?.planType?.($specifier) ?? $specifier
+                  );
+                },
+              };
             },
-          };
-        }, [get]),
+          [get],
+        ),
       },
     },
   });
