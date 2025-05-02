@@ -223,7 +223,7 @@ export function printStore(bucket: Bucket): string {
               (e, i) =>
                 `${String(i).padStart(3, " ")}: flags=${printFlags(
                   val._flagsAt(i),
-                ).padEnd(4, " ")} value=${indentIfMultiline(
+                )} value=${indentIfMultiline(
                   inspect(val.at(i), PRINT_STORE_INSPECT_OPTIONS),
                 )}`,
             )
@@ -236,7 +236,7 @@ export function printStore(bucket: Bucket): string {
         true,
       );
       output.push(
-        `${printKey} (UNARY/${printFlags(val._entryFlags).padEnd(4, " ")}) ${
+        `${printKey} (UNARY/${printFlags(val._entryFlags)}) ${
           step ?? "-"
         } ${[...(step?.polymorphicPaths ?? [])]}\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
       );
@@ -318,15 +318,8 @@ export function ansiPad(
 }
 
 function printFlags(flags: number | undefined) {
-  if (flags === undefined) return "-";
-  if (flags === 0) return "0";
-  let flagString = "";
-  // Alphabetically sorted to avoid an unfortunate word they would spell
-  if (flags & FLAG_ERROR) flagString += "E";
-  if (flags & FLAG_INHIBITED) flagString += "I";
-  if (flags & FLAG_NULL) flagString += "N";
-  if (flags & FLAG_POLY_SKIPPED) flagString += "P";
-  if (flags & FLAG_STOPPED) flagString += "S";
+  if (flags === undefined) return "  ?  ";
+  if (flags === 0) return "     ";
 
   // This should not fire, added in case we add future flags and forget to update this
   if (
@@ -338,8 +331,17 @@ function printFlags(flags: number | undefined) {
         FLAG_INHIBITED |
         FLAG_STOPPED))
   ) {
-    flagString += flags;
+    return String(flags).padStart(5, " ");
   }
+
+  let flagString = "";
+
+  // Alphabetically sorted to avoid an unfortunate word they would spell
+  flagString += flags & FLAG_ERROR ? "E" : " ";
+  flagString += flags & FLAG_INHIBITED ? "I" : " ";
+  flagString += flags & FLAG_NULL ? "N" : " ";
+  flagString += flags & FLAG_POLY_SKIPPED ? "P" : " ";
+  flagString += flags & FLAG_STOPPED ? "S" : " ";
 
   return flagString;
 }
