@@ -114,7 +114,6 @@ import type {
   PgSelectQueryBuilderCallback,
 } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
-import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type {
   PgSelectParsedCursorStep,
   PgSelectQueryBuilder,
@@ -1924,10 +1923,14 @@ export function makeExampleSchema(
 
   const User = newObjectTypeBuilder<UserStep>(PgSelectSingleStep)({
     name: "User",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<string>;
-      return userResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, userResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return userResource.get({ id: $id });
+        },
+      [get, userResource],
+    ),
     fields: () => ({
       // Here we don't use `attrField` because we want to explicitly test the default plan resolver
       // username: attrField("username", GraphQLString),
@@ -2070,10 +2073,14 @@ export function makeExampleSchema(
   });
   const Message = newObjectTypeBuilder<MessageStep>(PgSelectSingleStep)({
     name: "Message",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<string>;
-      return messageResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, messageResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return messageResource.get({ id: $id });
+        },
+      [get, messageResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLString),
       featured: attrField("featured", GraphQLBoolean),
@@ -2435,10 +2442,14 @@ export function makeExampleSchema(
   type GQLObj = GraphQLObjectType<any, OurGraphQLContext>;
   const Forum: GQLObj = newObjectTypeBuilder<ForumStep>(PgSelectSingleStep)({
     name: "Forum",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<string>;
-      return forumResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (forumResource, get) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return forumResource.get({ id: $id });
+        },
+      [forumResource, get],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLString),
       name: attrField("name", GraphQLString),
@@ -2910,10 +2921,14 @@ export function makeExampleSchema(
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonBookmarkStep>(PgSelectSingleStep)({
       name: "PersonBookmark",
-      planType($specifier) {
-        const $id = get($specifier, "id") as Step<number>;
-        return personBookmarksResource.get({ id: $id });
-      },
+      planType: EXPORTABLE(
+        (get, personBookmarksResource) =>
+          function planType($specifier) {
+            const $id = get($specifier, "id") as Step<number>;
+            return personBookmarksResource.get({ id: $id });
+          },
+        [get, personBookmarksResource],
+      ),
       fields: () => ({
         id: attrField("id", GraphQLInt),
         person: singleRelationField("person", Person),
@@ -2934,10 +2949,14 @@ export function makeExampleSchema(
   const Person: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonStep>(PgSelectSingleStep)({
       name: "Person",
-      planType($specifier) {
-        const $personId = get($specifier, "person_id") as Step<number>;
-        return personResource.get({ person_id: $personId });
-      },
+      planType: EXPORTABLE(
+        (get, personResource) =>
+          function planType($specifier) {
+            const $personId = get($specifier, "person_id") as Step<number>;
+            return personResource.get({ person_id: $personId });
+          },
+        [get, personResource],
+      ),
       fields: () => ({
         personId: attrField("person_id", GraphQLInt),
         username: attrField("username", GraphQLString),
@@ -3016,10 +3035,14 @@ export function makeExampleSchema(
 
   const Post: GQLObj = newObjectTypeBuilder<PostStep>(PgSelectSingleStep)({
     name: "Post",
-    planType($specifier) {
-      const $postId = get($specifier, "post_id") as Step<number>;
-      return postResource.get({ post_id: $postId });
-    },
+    planType: EXPORTABLE(
+      (get, postResource) =>
+        function planType($specifier) {
+          const $postId = get($specifier, "post_id") as Step<number>;
+          return postResource.get({ post_id: $postId });
+        },
+      [get, postResource],
+    ),
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
       body: attrField("body", GraphQLString),
@@ -3030,10 +3053,14 @@ export function makeExampleSchema(
   const Comment: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<CommentStep>(PgSelectSingleStep)({
       name: "Comment",
-      planType($specifier) {
-        const $commentId = get($specifier, "comment_id") as Step<number>;
-        return commentResource.get({ comment_id: $commentId });
-      },
+      planType: EXPORTABLE(
+        (commentResource, get) =>
+          function planType($specifier) {
+            const $commentId = get($specifier, "comment_id") as Step<number>;
+            return commentResource.get({ comment_id: $commentId });
+          },
+        [commentResource, get],
+      ),
       fields: () => ({
         commentId: attrField("comment_id", GraphQLInt),
         author: singleRelationField("author", Person),
@@ -3346,10 +3373,14 @@ export function makeExampleSchema(
 
   const UnionTopic = newObjectTypeBuilder<UnionTopicStep>(PgSelectSingleStep)({
     name: "UnionTopic",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return unionTopicsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, unionTopicsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionTopicsResource.get({ id: $id });
+        },
+      [get, unionTopicsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3358,10 +3389,14 @@ export function makeExampleSchema(
 
   const UnionPost = newObjectTypeBuilder<UnionPostStep>(PgSelectSingleStep)({
     name: "UnionPost",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return unionPostsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, unionPostsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionPostsResource.get({ id: $id });
+        },
+      [get, unionPostsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3374,10 +3409,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionDivider",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return unionDividersResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, unionDividersResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionDividersResource.get({ id: $id });
+        },
+      [get, unionDividersResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3389,10 +3428,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklist",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return unionChecklistsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, unionChecklistsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionChecklistsResource.get({ id: $id });
+        },
+      [get, unionChecklistsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3403,10 +3446,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklistItem",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return unionChecklistItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, unionChecklistItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionChecklistItemsResource.get({ id: $id });
+        },
+      [get, unionChecklistItemsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       description: attrField("description", GraphQLString),

@@ -1,11 +1,4 @@
 import LRU from "@graphile/lru";
-import type {
-  GraphQLInterfaceType,
-  GraphQLObjectType,
-  GraphQLResolveInfo,
-  GraphQLUnionType,
-} from "graphql";
-import { defaultTypeResolver, GraphQLError } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
@@ -22,10 +15,9 @@ import {
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../interfaces.js";
-import { $$concreteType, isPolymorphicData } from "../polymorphic.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
-import { arrayOfLength, isPromiseLike } from "../utils.js";
+import { arrayOfLength } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
