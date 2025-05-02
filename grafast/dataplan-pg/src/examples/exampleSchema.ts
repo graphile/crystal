@@ -2847,7 +2847,7 @@ export function makeExampleSchema(
       DIVIDER: "RelationalDivider",
       CHECKLIST: "RelationalChecklist",
       CHECKLIST_ITEM: "RelationalChecklistItem",
-    })[type];
+    })[type] ?? null;
   const relationalItemInterface = EXPORTABLE(
     (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
       ($item: RelationalItemStep) => {
@@ -2994,12 +2994,7 @@ export function makeExampleSchema(
           type: new GraphQLList(RelationalItem),
           args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
           plan: EXPORTABLE(
-            (
-              deoptimizeIfAppropriate,
-              each,
-              relationalItemInterface,
-              relationalItemsResource,
-            ) =>
+            (deoptimizeIfAppropriate, relationalItemsResource) =>
               function plan($person, { $first, $offset }) {
                 const $personId = $person.get("person_id");
                 const $items: RelationalItemsStep =
@@ -3009,14 +3004,9 @@ export function makeExampleSchema(
                 $items.setFirst($first);
                 $items.setOffset($offset);
                 deoptimizeIfAppropriate($items);
-                return each($items, ($item) => relationalItemInterface($item));
+                return $items;
               },
-            [
-              deoptimizeIfAppropriate,
-              each,
-              relationalItemInterface,
-              relationalItemsResource,
-            ],
+            [deoptimizeIfAppropriate, relationalItemsResource],
           ),
         },
 
@@ -3200,6 +3190,32 @@ export function makeExampleSchema(
   });
 
   ////////////////////////////////////////
+  const RELATIONAL_LOOKUP = EXPORTABLE(
+    (
+      relationalChecklistItemsResource,
+      relationalChecklistsResource,
+      relationalDividersResource,
+      relationalPostsResource,
+      relationalTopicsResource,
+    ) =>
+      ({
+        RelationalTopic: ["topic", relationalTopicsResource],
+        RelationalPost: ["post", relationalPostsResource],
+        RelationalDivider: ["divider", relationalDividersResource],
+        RelationalChecklist: ["checklist", relationalChecklistsResource],
+        RelationalChecklistItem: [
+          "checklistItem",
+          relationalChecklistItemsResource,
+        ],
+      }) as const,
+    [
+      relationalChecklistItemsResource,
+      relationalChecklistsResource,
+      relationalDividersResource,
+      relationalPostsResource,
+      relationalTopicsResource,
+    ],
+  );
 
   const RelationalItem: GraphQLInterfaceType = new GraphQLInterfaceType({
     name: "RelationalItem",
@@ -3215,6 +3231,61 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
+    extensions: {
+      grafast: {
+        planType: EXPORTABLE(
+          (
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ) =>
+            function planType($stepOrSpecifier) {
+              const $type = get($stepOrSpecifier, "type");
+              const $__typename = lambda(
+                $type,
+                relationalItemTypeNameFromType,
+                true,
+              );
+              return {
+                $__typename,
+                planForType(t) {
+                  const deets =
+                    RELATIONAL_LOOKUP[t.name as keyof typeof RELATIONAL_LOOKUP];
+                  if (!deets) {
+                    throw new Error(`Unexpected type ${t}`);
+                  }
+                  const [relation, resource] = deets;
+                  if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    $stepOrSpecifier.resource === relationalItemsResource
+                  ) {
+                    return $stepOrSpecifier.singleRelation(relation);
+                  } else if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    $stepOrSpecifier.resource === resource
+                  ) {
+                    return $stepOrSpecifier;
+                  } else {
+                    const $id = get($stepOrSpecifier, "id") as Step<number>;
+                    return resource.get({ id: $id });
+                  }
+                },
+              };
+            },
+          [
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ],
+        ),
+      },
+    },
   });
 
   const RelationalCommentable: GraphQLInterfaceType = new GraphQLInterfaceType({
