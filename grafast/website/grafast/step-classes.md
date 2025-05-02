@@ -539,6 +539,14 @@ class MyQueryStep extends Step {
 }
 ```
 
+### toTypename()
+
+Enables a step to return a step resolving to the typename, used by the
+`defaultPlanType` polymorphic type resolver function when the GraphQL union or
+interface type does not implement the `planType` method. If not implemented,
+this default function will fall back to `$step.get('__typename')`, and failing
+that, `access($step, '__typename')`.
+
 ### toSpecifier()
 
 When we plan a polymorphic field, each different object type the polymorphic

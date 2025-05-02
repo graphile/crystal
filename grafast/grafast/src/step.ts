@@ -679,6 +679,12 @@ export /* abstract */ class Step<TData = any> {
     this.finalize = throwDestroyed;
     this.execute = throwDestroyed;
   }
+
+  public toRecord?(): Step;
+  public toSpecifier?(): Step;
+  public toTypename?(): Step<string>;
+  public cursor?(): Step;
+  // public itemPlan?($item: Step): Step;
 }
 
 function _buildOptimizedExecuteV2Expression(
