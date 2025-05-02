@@ -1813,18 +1813,20 @@ export class OperationPlan {
           commonStep,
         );
         const deetsForType = new Map<GraphQLObjectType, PolyDeets>();
+        const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
+        const basePaths = [...(combinedPolymorphicPaths ?? [""])];
+        const polymorphicLayerPlan = new LayerPlan(this, commonLayerPlan, {
+          type: "polymorphic",
+          polymorphicPaths: new Set(
+            allTypeNames.flatMap((t) => basePaths.map((p) => `${p}>${t}`)),
+          ),
+          typeNames: allTypeNames,
+          parentStep: polymorphicTypePlanner.$__typename,
+        });
         for (const type of allPossibleObjectTypes) {
           const polymorphicPaths = new Set(
-            [...(combinedPolymorphicPaths ?? [""])].map(
-              (p) => p + `>${type.name}`,
-            ),
+            basePaths.map((p) => p + `>${type.name}`),
           );
-          const polymorphicLayerPlan = new LayerPlan(this, commonLayerPlan, {
-            type: "polymorphic",
-            polymorphicPaths,
-            typeNames: [type.name],
-            parentStep: polymorphicTypePlanner.$__typename,
-          });
           const $stepForType = polymorphicTypePlanner.planForType
             ? withGlobalLayerPlan(
                 polymorphicLayerPlan,
