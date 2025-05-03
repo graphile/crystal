@@ -415,6 +415,19 @@ export function recordsMatch<
   return true;
 }
 
+export function setsMatch(
+  s1: ReadonlySet<string> | null,
+  s2: ReadonlySet<string> | null,
+) {
+  if (s1 == null) return false;
+  if (s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+  for (const p of s1) {
+    if (!s2.has(p)) return false;
+  }
+  return true;
+}
+
 export type ObjectTypeFields<TParentStep extends Step> = {
   [key: string]: GrafastFieldConfig<GraphQLOutputType, TParentStep, any, any>;
 };

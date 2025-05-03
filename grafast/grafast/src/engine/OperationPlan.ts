@@ -90,6 +90,7 @@ import {
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
+  setsMatch,
   stepADependsOnStepB,
   sudo,
   writeableArray,
@@ -1671,6 +1672,10 @@ export class OperationPlan {
       //   Step,
       //   CommonPlanningDetails[]
       // >();
+      const planFieldReturnTypeEntriesByStep = new Map<
+        Step,
+        Array<Parameters<typeof this.planFieldReturnType>[0]>
+      >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
         if (method === this.polymorphicResolveType) {
@@ -1701,7 +1706,14 @@ export class OperationPlan {
           const args = rawArgs as Parameters<
             typeof this.planFieldReturnType
           >[0];
-          // TODO: DO SOME STUFF FOR POLYMORPHISM - polymorphicPartition
+          const step = args.parentStep;
+          let list = planFieldReturnTypeEntriesByStep.get(step);
+          if (list) {
+            list.push(args);
+          } else {
+            list = [args];
+            planFieldReturnTypeEntriesByStep.set(step, list);
+          }
         }
       }
 
@@ -1941,6 +1953,48 @@ export class OperationPlan {
         }
       }
       */
+
+      if (planFieldReturnTypeEntriesByStep.size > 1) {
+        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
+          // We already know the planningPath lines up.
+          // We know all `entries` resolved to the same `step`.
+          // I'm not sure if we care if the field result type is the same or not. I don't think so?
+          // We want to create a polymorphicPartition layer plan for these, if it makes sense.
+          // It makes sense if there are multiple different groups; which we checked in the `if` above. So, yes.
+          // Check assumption: the different groups should relate to different types.
+
+          const parentObjectTypes = new Set(
+            entries.map((e) => e.parentObjectType),
+          );
+          const typeNames = [...parentObjectTypes].map((t) => t.name);
+
+          const parentLayerPlans = new Set(entries.map((e) => e.layerPlan));
+          // TODO: eliminate this
+          const polymorphicPaths = new Set(
+            entries.flatMap((e) => [...(e.polymorphicPaths ?? [])]),
+          );
+          const newLayerPlanByLayerPlan = new Map<
+            LayerPlan,
+            LayerPlan<LayerPlanReasonPolymorphicPartition>
+          >();
+          for (const parentLayerPlan of parentLayerPlans) {
+            const filtered = parentLayerPlan.getFiltered(
+              typeNames,
+              step,
+              polymorphicPaths,
+            );
+            newLayerPlanByLayerPlan.set(parentLayerPlan, filtered);
+          }
+
+          // TODO: create a new (or find an existing) LayerPlan<PolymorphicPartition> for ${parentObjectTypes}
+          // and then update these {entries} to run in that new layerPlan
+          // ???: Do we need to update the outputPlan.layerPlan too?
+          // Need to find the nearest polymorphicFilter, polymorphic, or combination layer plan. Maybe. Maybe not.
+          for (const entry of entries) {
+            entry.layerPlan = newLayerPlanByLayerPlan.get(entry.layerPlan)!;
+          }
+        }
+      }
     }
   }
 
@@ -1960,7 +2014,7 @@ export class OperationPlan {
     // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
     layerPlan: LayerPlan;
     selections: readonly SelectionNode[] | undefined;
-    parentObjectType: GraphQLObjectType | null;
+    parentObjectType: GraphQLObjectType;
     responseKey: string | null;
     locationDetails: LocationDetails;
     resolverEmulation: boolean;
@@ -4192,10 +4246,10 @@ export class OperationPlan {
     // For each layer plan, track the polymorphic types, and mark the steps in
     // that layer plan as selective if they don't possess the same number of
     // poly paths.
-    const polyPathsByLayerPlan = new Map<LayerPlan, Set<string>>();
+    const polyPathsByLayerPlan = new Map<LayerPlan, ReadonlySet<string>>();
     const processPolymorphicPathsInLayerPlan = (
       layerPlan: LayerPlan,
-    ): Set<string> => {
+    ): ReadonlySet<string> => {
       const existing = polyPathsByLayerPlan.get(layerPlan);
       if (existing) {
         return existing;
@@ -4204,7 +4258,7 @@ export class OperationPlan {
       const parentPolyPaths = layerPlan.parentLayerPlan
         ? processPolymorphicPathsInLayerPlan(layerPlan.parentLayerPlan)
         : new Set<string>();
-      let polyPaths: Set<string>;
+      let polyPaths: ReadonlySet<string>;
       const reason = layerPlan.reason;
       switch (reason.type) {
         case "root":
@@ -4218,8 +4272,8 @@ export class OperationPlan {
           break;
         }
         case "combined": {
-          polyPaths = new Set();
-          for (const lp of layerPlan.reason.parentLayerPlans) {
+          const newPolyPaths = new Set<string>();
+          for (const lp of reason.parentLayerPlans) {
             const paths = processPolymorphicPathsInLayerPlan(lp);
             for (const p of paths) {
               if (polyPaths.has(p)) {
@@ -4227,9 +4281,10 @@ export class OperationPlan {
                   `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} found for ${layerPlan}`,
                 );
               }
-              polyPaths.add(p);
+              newPolyPaths.add(p);
             }
           }
+          polyPaths = newPolyPaths;
           break;
         }
         case "polymorphic":
@@ -5120,19 +5175,6 @@ function setsOverlap(s1: ReadonlySet<string>, s2: ReadonlySet<string>) {
   return false;
 }
 */
-
-function setsMatch(
-  s1: ReadonlySet<string> | null,
-  s2: ReadonlySet<string> | null,
-) {
-  if (s1 == null) return false;
-  if (s2 == null) return false;
-  if (s1.size !== s2.size) return false;
-  for (const p of s1) {
-    if (!s2.has(p)) return false;
-  }
-  return true;
-}
 
 function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
   // Non-unary steps are safe for unbatched execution

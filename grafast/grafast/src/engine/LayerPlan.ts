@@ -1,4 +1,5 @@
 import LRU from "@graphile/lru";
+import { GraphQLObjectType } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
@@ -17,7 +18,7 @@ import {
 } from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
-import { arrayOfLength } from "../utils.js";
+import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -111,7 +112,7 @@ export interface LayerPlanReasonPolymorphicPartition {
    * Stores the step that represents the value to use for all of the above typeNames.
    */
   parentStep: Step<string | null>;
-  polymorphicPaths: Set<string>;
+  polymorphicPaths: ReadonlySet<string>;
 }
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
@@ -1016,6 +1017,34 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         layerPlansByDependentStep.set(step, set);
       }
       set.add(this as LayerPlan<LayerPlanReasonCombined>);
+    });
+  }
+
+  /** @internal */
+  public getFiltered(
+    typeNames: string[],
+    step: Step,
+    polymorphicPaths: ReadonlySet<string>,
+  ): LayerPlan<LayerPlanReasonPolymorphicPartition> {
+    const existing = this.children.find(
+      (c): c is LayerPlan<LayerPlanReasonPolymorphicPartition> =>
+        c.reason.type === "polymorphicPartition" &&
+        c.reason.parentStep.id === step.id &&
+        // Note: it's probably okay to use arraysMatch here even though order is
+        // unimportant because probably the order of all subsets will be the
+        // same, so we don't need to do an order-independent comparison (which
+        // would be more expensiv)
+        arraysMatch(c.reason.typeNames, typeNames) &&
+        setsMatch(c.reason.polymorphicPaths, polymorphicPaths),
+    );
+    if (existing) {
+      return existing;
+    }
+    return new LayerPlan(this.operationPlan, this, {
+      type: "polymorphicPartition",
+      typeNames,
+      parentStep: step,
+      polymorphicPaths,
     });
   }
 }
