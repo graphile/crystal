@@ -99,6 +99,7 @@ import type {
   LayerPlanReasonCombined,
   LayerPlanReasonListItemStream,
   LayerPlanReasonPolymorphic,
+  LayerPlanReasonPolymorphicPartition,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
@@ -1435,7 +1436,7 @@ export class OperationPlan {
         } else {
           outputPlan.expectChild(objectType, responseKey);
           this.queueNextLayer(
-            this.planIntoOutputPlan,
+            this.planFieldReturnType,
             outputPlan,
             fieldPath,
             fieldPlanningPath,
@@ -1655,10 +1656,10 @@ export class OperationPlan {
         GraphQLUnionType | graphql.GraphQLInterfaceType,
         CommonPlanningParametersTuple[]
       >();
-      const polymorphicPlanObjectTypeEntriesByRootStep = new Map<
-        Step,
-        CommonPlanningParametersTuple[]
-      >();
+      // const polymorphicPlanObjectTypeEntriesByRootStep = new Map<
+      //   Step,
+      //   CommonPlanningParametersTuple[]
+      // >();
       for (const entry of batch) {
         const [method, args] = entry;
         if (method == this.polymorphicResolveType) {
@@ -1674,14 +1675,16 @@ export class OperationPlan {
             polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
           }
           list.push(args);
-        } else if (method == this.polymorphicPlanObjectType) {
-          const $root = args[IDX_PARENT_STEP];
-          let list = polymorphicPlanObjectTypeEntriesByRootStep.get($root);
-          if (!list) {
-            list = [];
-            polymorphicPlanObjectTypeEntriesByRootStep.set($root, list);
-          }
-          list.push(args);
+          //} else if (method == this.polymorphicPlanObjectType) {
+          //  const $root = args[IDX_PARENT_STEP];
+          //  let list = polymorphicPlanObjectTypeEntriesByRootStep.get($root);
+          //  if (!list) {
+          //    list = [];
+          //    polymorphicPlanObjectTypeEntriesByRootStep.set($root, list);
+          //  }
+          //  list.push(args);
+        } else if (method == this.planFieldReturnType) {
+          // TODO: DO SOME STUFF FOR POLYMORPHISM - polymorphicPartition
         }
       }
 
@@ -1933,7 +1936,46 @@ export class OperationPlan {
     return $step;
   }
 
-  // Similar to the old 'planFieldReturnType'
+  private planFieldReturnType(
+    parentOutputPlan: OutputPlan,
+    // This is the LAYER-RELATIVE path, not the absolute path! It resets!
+    path: readonly string[],
+    planningPath: string,
+    polymorphicPaths: ReadonlySet<string> | null,
+    $step: Step,
+    fieldType: GraphQLOutputType,
+    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
+    parentLayerPlan: LayerPlan,
+    selections: readonly SelectionNode[] | undefined,
+    parentObjectType: GraphQLObjectType | null,
+    responseKey: string | null,
+    locationDetails: LocationDetails,
+    resolverEmulation: boolean,
+    listDepth: number,
+    streamDetails: StreamDetails | null,
+  ): void {
+    if (listDepth !== 0) {
+      throw new Error(
+        "GrafastInternalError<84d93ee7-29f3-467e-82ca-bd893bb7cdee>: unexpected call to planFieldReturnType",
+      );
+    }
+    return this.planIntoOutputPlan(
+      parentOutputPlan,
+      path,
+      planningPath,
+      polymorphicPaths,
+      $step,
+      fieldType,
+      parentLayerPlan,
+      selections,
+      parentObjectType,
+      responseKey,
+      locationDetails,
+      resolverEmulation,
+      listDepth,
+      streamDetails,
+    );
+  }
   private planIntoOutputPlan(
     parentOutputPlan: OutputPlan,
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
@@ -2402,8 +2444,7 @@ export class OperationPlan {
       },
       locationDetails,
     );
-    this.queueNextLayer(
-      this.actuallyPlanSelectionSet,
+    this.actuallyPlanSelectionSet(
       objectOutputPlan,
       path,
       polymorphicPlanningPath + ".",
