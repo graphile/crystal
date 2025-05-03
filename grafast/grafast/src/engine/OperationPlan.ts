@@ -1815,7 +1815,7 @@ export class OperationPlan {
           null,
           commonStep,
         );
-        const deetsForType = new Map<GraphQLObjectType, PolyDeets>();
+        const stepForType = new Map<GraphQLObjectType, Step>();
         const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
         const basePaths = [...(combinedPolymorphicPaths ?? [""])];
         const polymorphicLayerPlan = new LayerPlan(this, commonLayerPlan, {
@@ -1849,13 +1849,13 @@ export class OperationPlan {
                   commonStep,
                 )
               : commonStep;
-          deetsForType.set(type, { step: $stepForType, polymorphicLayerPlan });
+          stepForType.set(type, $stepForType);
         }
 
         // Now replace references to layer plan and step
         for (const argsTuple of argsTupleList) {
           argsTuple[IDX_PARENT_STEP] = commonStep;
-          argsTuple[IDX_LAYER_PLAN] = commonLayerPlan;
+          argsTuple[IDX_LAYER_PLAN] = polymorphicLayerPlan;
 
           // TODO: do we want to set the polymorphic paths here or not?
           //argsTuple[IDX_POLYMORPHIC_PATHS] = combinedPolymorphicPaths;
@@ -1882,8 +1882,8 @@ export class OperationPlan {
             isNonNull,
             locationDetails,
           });
-          const IDX_DEETS_FOR_TYPE = 14;
-          argsTuple[IDX_DEETS_FOR_TYPE] = deetsForType;
+          const IDX_STEP_FOR_TYPE = 14;
+          argsTuple[IDX_STEP_FOR_TYPE] = stepForType;
         }
       }
 
@@ -2327,11 +2327,11 @@ export class OperationPlan {
     resolverEmulation: boolean,
 
     // Populated by mutateTodos
-    deetsForType?: ReadonlyMap<GraphQLObjectType, PolyDeets>,
+    planForType?: ReadonlyMap<GraphQLObjectType, Step>,
   ) {
-    if (!deetsForType) {
+    if (!planForType) {
       throw new Error(
-        "GrafastInternalError<6afce944-f963-470f-8575-0d0420b4c838>: deetsForType wasn't set!",
+        "GrafastInternalError<6afce944-f963-470f-8575-0d0420b4c838>: planForType wasn't set!",
       );
     }
     if (outputPlan.type.mode !== "polymorphic") {
@@ -2376,7 +2376,7 @@ export class OperationPlan {
         }
 
         // TODO: fall back to null output plan?
-        const { step: $root, polymorphicLayerPlan } = deetsForType.get(type)!;
+        const $root = planForType.get(type)!;
 
         // find all selections compatible with `type`
         const fieldNodes = fieldSelectionsForType(this, type, selections);
@@ -2388,7 +2388,7 @@ export class OperationPlan {
           newPolymorphicPaths,
           $root,
           type,
-          polymorphicLayerPlan,
+          layerPlan,
           fieldNodes,
           locationDetails,
           isNonNull,
