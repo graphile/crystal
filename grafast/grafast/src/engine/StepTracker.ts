@@ -149,7 +149,8 @@ export class StepTracker {
       }
       case "nullableBoundary":
       case "listItem":
-      case "polymorphic": {
+      case "polymorphic":
+      case "polymorphicPartition": {
         const store = this.layerPlansByParentStep.get(
           layerPlan.reason.parentStep,
         )!;

@@ -3106,22 +3106,27 @@ export class OperationPlan {
         }
       }
       case "polymorphic": {
-        // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
+        // Only hoist steps that are executed for all the types
         if (
-          step.isSyncAndSafe &&
-          step.polymorphicPaths!.size ===
+          step.polymorphicPaths === null ||
+          step.polymorphicPaths.size ===
             step.layerPlan.reason.polymorphicPaths.size
         ) {
-          // It's cheap and covers all types, try and hoist it.
-          // NOTE: I have concerns about whether this is safe or not, but I
-          // have not been able to come up with a counterexample that is
-          // unsafe. Should we do so, we should remove this.
+          // It covers all types, try and hoist it.
           break;
         } else if (step instanceof __FlagStep) {
+          // Flag step is cheap, try and hoist
           break;
         } else {
           return;
         }
+      }
+      case "polymorphicPartition": {
+        // Don't want to hoist out of a polymorphic partition
+        // TODO: revisit this, e.g. global unary steps should be hoistable? But
+        // we should only do that if they're cheap, we don't want to run
+        // expensive stuff at a higher level if only certain types need it.
+        return;
       }
       case "subroutine": {
         // Should be safe to hoist.
@@ -3246,6 +3251,7 @@ export class OperationPlan {
       case "subscription":
       case "defer":
       case "polymorphic":
+      case "polymorphicPartition":
       case "subroutine":
       case "nullableBoundary":
       case "listItem": {
@@ -3370,6 +3376,11 @@ export class OperationPlan {
     outerloop: for (let i = minPathLength - 1; i >= 0; i--) {
       const expected = paths[0][i];
       if (expected.reason.type === "polymorphic") {
+        // PERF: reconsider
+        // Let's not pass polymorphic boundaries for now
+        break;
+      }
+      if (expected.reason.type === "polymorphicPartition") {
         // PERF: reconsider
         // Let's not pass polymorphic boundaries for now
         break;
@@ -4123,7 +4134,8 @@ export class OperationPlan {
         ? processPolymorphicPathsInLayerPlan(layerPlan.parentLayerPlan)
         : new Set<string>();
       let polyPaths: Set<string>;
-      switch (layerPlan.reason.type) {
+      const reason = layerPlan.reason;
+      switch (reason.type) {
         case "root":
         case "nullableBoundary":
         case "listItem":
@@ -4149,9 +4161,16 @@ export class OperationPlan {
           }
           break;
         }
-        case "polymorphic": {
-          polyPaths = layerPlan.reason.polymorphicPaths;
+        case "polymorphic":
+        case "polymorphicPartition": {
+          polyPaths = reason.polymorphicPaths;
           break;
+        }
+        default: {
+          const never: never = reason;
+          throw new Error(
+            `GrafastInternalError<032aef95-97d8-4900-95f7-edc34a5d3703>: unexpected layer plan reason ${inspect(never)}`,
+          );
         }
       }
 
@@ -4427,7 +4446,10 @@ export class OperationPlan {
       }
 
       // Copy polymorphic parentStepId
-      if (layerPlan.reason.type === "polymorphic") {
+      if (
+        layerPlan.reason.type === "polymorphic" ||
+        layerPlan.reason.type === "polymorphicPartition"
+      ) {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan);
       }
@@ -4594,7 +4616,8 @@ export class OperationPlan {
           const { type, label } = reason;
           return { type, label };
         }
-        case "polymorphic": {
+        case "polymorphic":
+        case "polymorphicPartition": {
           const { type, typeNames, parentStep, polymorphicPaths } = reason;
           return {
             type,

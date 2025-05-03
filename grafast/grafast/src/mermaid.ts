@@ -181,7 +181,7 @@ export function planToMermaid(
       const layerPlan = layerPlans[i];
       const raisonDEtre =
         ` (${layerPlan.reason.type})` +
-        (layerPlan.reason.type === "polymorphic"
+        (layerPlan.reason.type === "polymorphicPartition"
           ? `\n${layerPlan.reason.typeNames}`
           : ``);
       graph.push(
@@ -199,7 +199,7 @@ export function planToMermaid(
                   .join(", ")}`
               : ""
           }${
-            layerPlan.reason.type === "polymorphic"
+            layerPlan.reason.type === "polymorphicPartition"
               ? "\n" + pp(layerPlan.reason.polymorphicPaths)
               : ""
           }\n${

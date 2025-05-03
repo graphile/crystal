@@ -1053,7 +1053,8 @@ export function executeBucket(
       }
       if (
         isDev &&
-        step.layerPlan.reason.type === "polymorphic" &&
+        (step.layerPlan.reason.type === "polymorphic" ||
+          step.layerPlan.reason.type === "polymorphicPartition") &&
         step.polymorphicPaths === null
       ) {
         throw new Error(
@@ -1176,7 +1177,8 @@ function markLayerPlanAsDone(
     switch (childLayerPlan.reason.type) {
       case "nullableBoundary":
       case "listItem":
-      case "polymorphic": {
+      case "polymorphic":
+      case "polymorphicPartition": {
         const childBucket =
           bucket == null ? null : childLayerPlan.newBucket(bucket);
         // Execute

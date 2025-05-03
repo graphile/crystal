@@ -1074,9 +1074,8 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
         // together (generally).
         return false;
       }
-      case "polymorphic": {
-        // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
-        // passes
+      case "polymorphicPartition": {
+        // TODO: think about this.
         return false;
       }
       case "listItem": {
@@ -1091,6 +1090,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "root":
       case "nullableBoundary":
       case "subroutine":
+      case "polymorphic": // TODO: CHECK ME!
       case "combined": // TODO: CHECK ME!
       case "mutationField": {
         continue;
@@ -1121,6 +1121,7 @@ export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
       }
     }
     case "polymorphic":
+    case "polymorphicPartition":
     case "root":
     case "nullableBoundary":
     case "subroutine":

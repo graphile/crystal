@@ -93,12 +93,22 @@ export interface LayerPlanReasonDefer {
   // examples.
   label?: string;
 }
-/** Branching, non-deferred */
+/** Non-branching, non-deferred */
 export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
   typeNames: string[];
   /**
    * Stores the __typename, needed for execution (see `executeBucket`).
+   */
+  parentStep: Step<string | null>;
+  polymorphicPaths: Set<string>;
+}
+/** Branching, non-deferred */
+export interface LayerPlanReasonPolymorphicPartition {
+  type: "polymorphicPartition";
+  typeNames: string[];
+  /**
+   * Stores the step that represents the value to use for all of the above typeNames.
    */
   parentStep: Step<string | null>;
   polymorphicPaths: Set<string>;
@@ -117,7 +127,7 @@ export interface LayerPlanReasonCombined {
 }
 
 export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
-  return layerPlan.reason.type === "polymorphic";
+  return layerPlan.reason.type === "polymorphicPartition";
 }
 export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
@@ -141,8 +151,9 @@ export type LayerPlanReason =
   | LayerPlanReasonMutationField
   | LayerPlanReasonDefer
   | LayerPlanReasonPolymorphic
-  | LayerPlanReasonSubroutine
-  | LayerPlanReasonCombined;
+  | LayerPlanReasonPolymorphicPartition
+  | LayerPlanReasonCombined
+  | LayerPlanReasonSubroutine;
 
 // The `A extends any ? ... : never` tells TypeScript to make this
 // distributive. TypeScript can be a bit arcane.
@@ -379,7 +390,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       chain = chain + `∈${current.id}`;
     }
     const reasonExtra =
-      this.reason.type === "polymorphic"
+      this.reason.type === "polymorphicPartition"
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
     const deps = this.copyStepIds.length > 0 ? `/${this.copyStepIds}` : "";
@@ -671,13 +682,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
         break;
       }
-      case "polymorphic": {
-        const polymorphicPlanId = this.reason.parentStep.id;
-        const polymorphicPlanStore = parentBucket.store.get(polymorphicPlanId);
-        if (!polymorphicPlanStore) {
+      case "polymorphic":
+      case "polymorphicPartition": {
+        const parentStepId = this.reason.parentStep.id;
+        const parentStepStore = parentBucket.store.get(parentStepId);
+        if (!parentStepStore) {
           throw new Error(
             `GrafastInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
-              polymorphicPlanId,
+              parentStepId,
             )}' not found in bucket for '${parentBucket.layerPlan}'`,
           );
         }
@@ -705,7 +717,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex < parentBucket.size;
           originalIndex++
         ) {
-          const flags = polymorphicPlanStore._flagsAt(originalIndex);
+          const flags = parentStepStore._flagsAt(originalIndex);
           if (
             flags &
             (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL | FLAG_POLY_SKIPPED)
@@ -720,12 +732,20 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
           const polymorphicPath =
             parentBucket.polymorphicPathList.at(originalIndex);
-          const typeName = polymorphicPlanStore.at(originalIndex);
+          const typeName =
+            this.reason.type === "polymorphic"
+              ? parentStepStore.at(originalIndex)
+              : // TODO: make this more efficient!
+                parentBucket.polymorphicPathList
+                  .at(originalIndex)!
+                  .replace(/^.*>([^>]+)$/, "$1");
           if (this.reason.typeNames.includes(typeName)) {
             const newIndex = size++;
             map.set(originalIndex, newIndex);
             polymorphicPathList[newIndex] =
-              (polymorphicPath ?? "") + ">" + typeName;
+              this.reason.type === "polymorphic"
+                ? (polymorphicPath ?? "") + ">" + typeName
+                : parentBucket.polymorphicPathList.at(originalIndex)!;
             iterators[newIndex] = parentBucket.iterators[originalIndex];
             for (const planId of copyStepIds) {
               const ev = store.get(planId)!;

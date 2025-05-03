@@ -35,8 +35,9 @@ export type GrafastPlanBucketReasonJSONv1 =
   | GrafastPlanBucketReasonMutationFieldJSONv1
   | GrafastPlanBucketReasonDeferJSONv1
   | GrafastPlanBucketReasonPolymorphicJSONv1
-  | GrafastPlanBucketReasonSubroutineJSONv1
-  | GrafastPlanBucketReasonCombinedJSONv1;
+  | GrafastPlanBucketReasonPolymorphicPartitionJSONv1
+  | GrafastPlanBucketReasonCombinedJSONv1
+  | GrafastPlanBucketReasonSubroutineJSONv1;
 
 export interface GrafastPlanBucketReasonRootJSONv1 {
   type: "root";
@@ -72,9 +73,16 @@ export interface GrafastPlanBucketReasonDeferJSONv1 {
   type: "defer";
   label?: string;
 }
-/** Branching, non-deferred */
+/** Non-branching, non-deferred */
 export interface GrafastPlanBucketReasonPolymorphicJSONv1 {
   type: "polymorphic";
+  typeNames: readonly string[];
+  parentStepId: string | number;
+  polymorphicPaths: ReadonlyArray<string>;
+}
+/** Branching, non-deferred */
+export interface GrafastPlanBucketReasonPolymorphicPartitionJSONv1 {
+  type: "polymorphicPartition";
   typeNames: readonly string[];
   parentStepId: string | number;
   polymorphicPaths: ReadonlyArray<string>;
