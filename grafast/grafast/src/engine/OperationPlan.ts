@@ -1990,7 +1990,6 @@ export class OperationPlan {
           for (const parentLayerPlan of parentLayerPlans) {
             const filtered = parentLayerPlan.getFiltered(
               typeNames,
-              step,
               polymorphicPaths,
             );
             newLayerPlanByLayerPlan.set(parentLayerPlan, filtered);
@@ -4582,10 +4581,7 @@ export class OperationPlan {
       }
 
       // Copy polymorphic parentStepId
-      if (
-        layerPlan.reason.type === "polymorphic" ||
-        layerPlan.reason.type === "polymorphicPartition"
-      ) {
+      if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
         ensurePlanAvailableInLayer(parentStep, layerPlan);
       }
@@ -4752,13 +4748,20 @@ export class OperationPlan {
           const { type, label } = reason;
           return { type, label };
         }
-        case "polymorphic":
-        case "polymorphicPartition": {
+        case "polymorphic": {
           const { type, typeNames, parentStep, polymorphicPaths } = reason;
           return {
             type,
-            typeNames,
+            typeNames: [...typeNames],
             parentStepId: parentStep.id,
+            polymorphicPaths: [...polymorphicPaths],
+          };
+        }
+        case "polymorphicPartition": {
+          const { type, typeNames, polymorphicPaths } = reason;
+          return {
+            type,
+            typeNames: [...typeNames],
             polymorphicPaths: [...polymorphicPaths],
           };
         }

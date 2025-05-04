@@ -84,7 +84,6 @@ export interface GrafastPlanBucketReasonPolymorphicJSONv1 {
 export interface GrafastPlanBucketReasonPolymorphicPartitionJSONv1 {
   type: "polymorphicPartition";
   typeNames: readonly string[];
-  parentStepId: string | number;
   polymorphicPaths: ReadonlyArray<string>;
 }
 /** Non-branching, non-deferred */

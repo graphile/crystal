@@ -144,13 +144,13 @@ export class StepTracker {
       case "root":
       case "subscription":
       case "mutationField":
+      case "polymorphicPartition":
       case "defer": {
         break;
       }
       case "nullableBoundary":
       case "listItem":
-      case "polymorphic":
-      case "polymorphicPartition": {
+      case "polymorphic": {
         const store = this.layerPlansByParentStep.get(
           layerPlan.reason.parentStep,
         )!;

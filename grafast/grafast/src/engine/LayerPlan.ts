@@ -108,10 +108,6 @@ export interface LayerPlanReasonPolymorphic {
 export interface LayerPlanReasonPolymorphicPartition {
   type: "polymorphicPartition";
   typeNames: string[];
-  /**
-   * Stores the step that represents the value to use for all of the above typeNames.
-   */
-  parentStep: Step<string | null>;
   polymorphicPaths: ReadonlySet<string>;
 }
 /** Non-branching, non-deferred */
@@ -683,8 +679,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
         break;
       }
-      case "polymorphic":
-      case "polymorphicPartition": {
+      case "polymorphic": {
         const parentStepId = this.reason.parentStep.id;
         const parentStepStore = parentBucket.store.get(parentStepId);
         if (!parentStepStore) {
@@ -695,6 +690,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
 
+        const batchCopyStepIds = [];
         for (const stepId of copyStepIds) {
           const ev = parentBucket.store.get(stepId);
           if (!ev) {
@@ -707,6 +703,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             );
           }
           if (ev.isBatch) {
+            batchCopyStepIds.push(stepId);
             store.set(stepId, batchExecutionValue([]));
           } else {
             store.set(stepId, ev);
@@ -740,24 +737,77 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 parentBucket.polymorphicPathList
                   .at(originalIndex)!
                   .replace(/^.*>([^>]+)$/, "$1");
-          if (this.reason.typeNames.includes(typeName)) {
-            const newIndex = size++;
-            map.set(originalIndex, newIndex);
-            polymorphicPathList[newIndex] =
-              this.reason.type === "polymorphic"
-                ? (polymorphicPath ?? "") + ">" + typeName
-                : parentBucket.polymorphicPathList.at(originalIndex)!;
-            iterators[newIndex] = parentBucket.iterators[originalIndex];
-            for (const planId of copyStepIds) {
-              const ev = store.get(planId)!;
-              if (ev.isBatch) {
-                const orig = parentBucket.store.get(planId)!;
-                ev._copyResult(newIndex, orig, originalIndex);
-              }
-            }
-          } else {
+          if (!this.reason.typeNames.includes(typeName)) {
             // TODO: should we error?
             // Skip
+            continue;
+          }
+          const newIndex = size++;
+          map.set(originalIndex, newIndex);
+          polymorphicPathList[newIndex] =
+            this.reason.type === "polymorphic"
+              ? (polymorphicPath ?? "") + ">" + typeName
+              : parentBucket.polymorphicPathList.at(originalIndex)!;
+          iterators[newIndex] = parentBucket.iterators[originalIndex];
+          for (const planId of batchCopyStepIds) {
+            const ev = store.get(planId)!;
+            const orig = parentBucket.store.get(planId)!;
+            ev._copyResult(newIndex, orig, originalIndex);
+          }
+        }
+
+        break;
+      }
+      case "polymorphicPartition": {
+        // Similar to polymorphic
+        const batchCopyStepIds = [];
+        for (const stepId of copyStepIds) {
+          const ev = parentBucket.store.get(stepId);
+          if (!ev) {
+            throw new Error(
+              `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
+                stepId,
+              )}, but bucket for ${
+                parentBucket.layerPlan
+              } doesn't contain that plan`,
+            );
+          }
+          if (ev.isBatch) {
+            batchCopyStepIds.push(stepId);
+            store.set(stepId, batchExecutionValue([]));
+          } else {
+            store.set(stepId, ev);
+          }
+        }
+
+        for (
+          let originalIndex = 0;
+          originalIndex < parentBucket.size;
+          originalIndex++
+        ) {
+          if (
+            parentSideEffectValue !== null &&
+            parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
+          ) {
+            continue;
+          }
+          const typeName =
+            // TODO: make this more efficient!
+            parentBucket.polymorphicPathList
+              .at(originalIndex)!
+              .replace(/^.*>([^>]+)$/, "$1");
+          if (!this.reason.typeNames.includes(typeName)) {
+            continue;
+          }
+          const newIndex = size++;
+          map.set(originalIndex, newIndex);
+          polymorphicPathList[newIndex] =
+            parentBucket.polymorphicPathList.at(originalIndex)!;
+          iterators[newIndex] = parentBucket.iterators[originalIndex];
+          for (const planId of batchCopyStepIds) {
+            const ev = store.get(planId)!;
+            const orig = parentBucket.store.get(planId)!;
+            ev._copyResult(newIndex, orig, originalIndex);
           }
         }
 
@@ -1023,13 +1073,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public getFiltered(
     typeNames: string[],
-    step: Step,
     polymorphicPaths: ReadonlySet<string>,
   ): LayerPlan<LayerPlanReasonPolymorphicPartition> {
     const existing = this.children.find(
       (c): c is LayerPlan<LayerPlanReasonPolymorphicPartition> =>
         c.reason.type === "polymorphicPartition" &&
-        c.reason.parentStep.id === step.id &&
         // Note: it's probably okay to use arraysMatch here even though order is
         // unimportant because probably the order of all subsets will be the
         // same, so we don't need to do an order-independent comparison (which
@@ -1043,7 +1091,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return new LayerPlan(this.operationPlan, this, {
       type: "polymorphicPartition",
       typeNames,
-      parentStep: step,
       polymorphicPaths,
     });
   }
