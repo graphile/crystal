@@ -1836,9 +1836,13 @@ export class OperationPlan {
         // Call planTypes and plan each of the types?
         const planType =
           graphqlType.extensions?.grafast?.planType ?? defaultPlanType;
+        const resolverEmulation =
+          argsTupleList.some((a) => a.resolverEmulation) &&
+          (graphqlType.resolveType != null ||
+            allPossibleObjectTypes.some((t) => t.isTypeOf != null));
         const info: PlanTypeInfo = {
           abstractType: graphqlType,
-          resolverEmulation: argsTupleList.some((a) => a.resolverEmulation),
+          resolverEmulation,
         };
         const polymorphicTypePlanner = withGlobalLayerPlan(
           commonLayerPlan,
