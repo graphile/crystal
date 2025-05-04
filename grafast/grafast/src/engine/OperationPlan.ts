@@ -1979,7 +1979,7 @@ export class OperationPlan {
       */
 
       for (const [
-        lp,
+        parentLayerPlan,
         planFieldReturnTypeEntriesByStep,
       ] of planFieldReturnTypeEntriesByStepByLayerPlan) {
         if (planFieldReturnTypeEntriesByStep.size <= 1) {
@@ -1998,7 +1998,6 @@ export class OperationPlan {
           );
           const typeNames = [...parentObjectTypes].map((t) => t.name);
 
-          const parentLayerPlans = new Set(entries.map((e) => e.layerPlan));
           // TODO: eliminate this
           const polymorphicPaths = new Set(
             entries.flatMap((e) => [...(e.polymorphicPaths ?? [])]),
@@ -2007,13 +2006,11 @@ export class OperationPlan {
             LayerPlan,
             LayerPlan<LayerPlanReasonPolymorphicPartition>
           >();
-          for (const parentLayerPlan of parentLayerPlans) {
-            const filtered = parentLayerPlan.getFiltered(
-              typeNames,
-              polymorphicPaths,
-            );
-            newLayerPlanByLayerPlan.set(parentLayerPlan, filtered);
-          }
+          const filtered = parentLayerPlan.getFiltered(
+            typeNames,
+            polymorphicPaths,
+          );
+          newLayerPlanByLayerPlan.set(parentLayerPlan, filtered);
 
           // TODO: create a new (or find an existing) LayerPlan<PolymorphicPartition> for ${parentObjectTypes}
           // and then update these {entries} to run in that new layerPlan
