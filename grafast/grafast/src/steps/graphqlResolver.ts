@@ -257,6 +257,8 @@ export class GraphQLResolveTypeStep extends Step {
     GraphQLResolveInfo,
     "rootValue" | "variableValues"
   >;
+  // Could be promises
+  public isSyncAndSafe = false;
   constructor($stepOrSpecifier: Step, info: PlanTypeInfo) {
     super();
     const { abstractType } = info;
