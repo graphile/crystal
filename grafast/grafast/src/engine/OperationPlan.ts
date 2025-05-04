@@ -1677,9 +1677,9 @@ export class OperationPlan {
       //   Step,
       //   CommonPlanningDetails[]
       // >();
-      const planFieldReturnTypeEntriesByStep = new Map<
-        Step,
-        Array<Parameters<typeof this.planFieldReturnType>[0]>
+      const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
+        LayerPlan,
+        Map<Step, Array<Parameters<typeof this.planFieldReturnType>[0]>>
       >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
@@ -1711,7 +1711,17 @@ export class OperationPlan {
           const args = rawArgs as Parameters<
             typeof this.planFieldReturnType
           >[0];
-          const step = args.parentStep;
+          const lp = args.layerPlan;
+          let planFieldReturnTypeEntriesByStep =
+            planFieldReturnTypeEntriesByStepByLayerPlan.get(lp);
+          if (!planFieldReturnTypeEntriesByStep) {
+            planFieldReturnTypeEntriesByStep = new Map();
+            planFieldReturnTypeEntriesByStepByLayerPlan.set(
+              lp,
+              planFieldReturnTypeEntriesByStep,
+            );
+          }
+          const step = this.stepTracker.getStepById(args.parentStep.id);
           let list = planFieldReturnTypeEntriesByStep.get(step);
           if (list) {
             list.push(args);
@@ -1968,7 +1978,13 @@ export class OperationPlan {
       }
       */
 
-      if (planFieldReturnTypeEntriesByStep.size > 1) {
+      for (const [
+        lp,
+        planFieldReturnTypeEntriesByStep,
+      ] of planFieldReturnTypeEntriesByStepByLayerPlan) {
+        if (planFieldReturnTypeEntriesByStep.size <= 1) {
+          continue;
+        }
         for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
