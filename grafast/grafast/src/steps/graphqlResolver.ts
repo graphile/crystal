@@ -17,12 +17,10 @@ import type {
   PlanTypeInfo,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { polymorphicWrap } from "../polymorphic.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
-const { defaultTypeResolver, getNamedType, isListType, isNonNullType } =
-  graphql;
+const { defaultTypeResolver, isListType, isNonNullType } = graphql;
 
 type ResolveInfoBase = Omit<
   GraphQLResolveInfo,
