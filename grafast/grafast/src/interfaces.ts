@@ -3,6 +3,7 @@ import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
+  FieldNode,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -13,12 +14,15 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  GraphQLUnionType,
   OperationDefinitionNode,
   Source,
   ValueNode,
@@ -909,4 +913,8 @@ export interface ExecuteStepEvent {
   args: GrafastExecutionArgs;
   step: Step;
   executeDetails: ExecutionDetails;
+}
+export interface PlanTypeInfo {
+  abstractType: GraphQLUnionType | GraphQLInterfaceType;
+  resolverEmulation: boolean;
 }

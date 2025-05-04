@@ -6,6 +6,7 @@ import type {
   GraphQLField,
   GraphQLFieldMap,
   GraphQLFieldResolver,
+  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
@@ -51,6 +52,7 @@ import type {
   GrafastPlanStepJSONv1,
   LocationDetails,
   Maybe,
+  PlanTypeInfo,
   TrackedArguments,
 } from "../interfaces.js";
 import {
@@ -78,7 +80,10 @@ import { __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
-import { graphqlResolver } from "../steps/graphqlResolver.js";
+import {
+  graphqlResolver,
+  graphqlResolveType,
+} from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
 import type { Sudo } from "../utils.js";
 import {
@@ -1665,7 +1670,7 @@ export class OperationPlan {
   private mutateTodos(todo: Todo) {
     for (const [planningPath, batch] of todo) {
       const polymorphicResolveTypeEntriesByPolyType = new Map<
-        GraphQLUnionType | graphql.GraphQLInterfaceType,
+        GraphQLUnionType | GraphQLInterfaceType,
         Array<Parameters<typeof this.polymorphicResolveType>[0]>
       >();
       // const polymorphicPlanObjectTypeEntriesByRootStep = new Map<
@@ -1831,6 +1836,10 @@ export class OperationPlan {
         // Call planTypes and plan each of the types?
         const planType =
           graphqlType.extensions?.grafast?.planType ?? defaultPlanType;
+        const info: PlanTypeInfo = {
+          abstractType: graphqlType,
+          resolverEmulation: argsTupleList.some((a) => a.resolverEmulation),
+        };
         const polymorphicTypePlanner = withGlobalLayerPlan(
           commonLayerPlan,
           combinedPolymorphicPaths,
@@ -1838,6 +1847,7 @@ export class OperationPlan {
           planType,
           null,
           commonStep,
+          info,
         );
         const stepForType = new Map<GraphQLObjectType, Step>();
         const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
@@ -2375,7 +2385,7 @@ export class OperationPlan {
     planningPath: string;
     polymorphicPaths: ReadonlySet<string> | null;
     parentStep: Step;
-    positionType: graphql.GraphQLInterfaceType | GraphQLUnionType;
+    positionType: GraphQLInterfaceType | GraphQLUnionType;
     layerPlan: LayerPlan;
     selections: readonly SelectionNode[];
     allPossibleObjectTypes: readonly GraphQLObjectType<any, any>[];
@@ -5154,7 +5164,7 @@ export function layerPlanHeirarchyContains(
 interface CommonPlanningDetails<
   TType extends
     | GraphQLOutputType
-    | graphql.GraphQLInterfaceType
+    | GraphQLInterfaceType
     | GraphQLUnionType = GraphQLOutputType,
 > {
   outputPlan: OutputPlan;
@@ -5206,10 +5216,15 @@ function fixStepPolyPaths(
   }
 }
 
-function defaultPlanType($stepOrSpecifier: Step): PolymorphicTypePlanner {
-  // TODO: need to call resolveType here?
+function defaultPlanType(
+  $stepOrSpecifier: Step,
+  info: PlanTypeInfo,
+): PolymorphicTypePlanner {
   const $__typename =
-    $stepOrSpecifier.toTypename?.() ?? get($stepOrSpecifier, "__typename");
+    $stepOrSpecifier.toTypename?.() ??
+    (info.resolverEmulation
+      ? graphqlResolveType($stepOrSpecifier, info)
+      : get($stepOrSpecifier, "__typename"));
   return { $__typename };
 }
 

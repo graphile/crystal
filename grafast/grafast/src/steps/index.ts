@@ -86,8 +86,8 @@ export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
 export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
 export { condition, ConditionStep } from "./condition.js";
 export {
-  GraphQLItemHandler,
   graphqlItemHandler,
+  GraphQLItemHandlerStep,
   graphqlResolver,
   GraphQLResolverStep,
 } from "./graphqlResolver.js";
