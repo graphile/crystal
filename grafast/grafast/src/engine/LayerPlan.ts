@@ -135,10 +135,6 @@ export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
     t === "defer"
   );
 }
-export function isPolymorphicLayerPlan(layerPlan: LayerPlan): boolean {
-  const t = layerPlan.reason.type;
-  return t === "polymorphic";
-}
 
 export type LayerPlanReason =
   | LayerPlanReasonRoot
