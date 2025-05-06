@@ -476,6 +476,19 @@ export /* abstract */ class Step<TData = any> {
     return undefined;
   }
 
+  protected addRef(step: Step): number {
+    if (!stepADependsOnStepB(this, step)) {
+      throw new Error(
+        `${this} may only reference steps that it depends on (directly or indirectly); it does not depend on ${step}`,
+      );
+    }
+    return -step.id;
+  }
+
+  protected getRef(id: number) {
+    return this.operationPlan.stepTracker.getStepById(-id);
+  }
+
   protected canAddDependency(step: Step): boolean {
     return stepAMayDependOnStepB(this, step);
   }
