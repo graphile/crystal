@@ -519,9 +519,9 @@ ${printDeps(step, 1)}
     return -step.id;
   }
 
-  protected getRef(id: number | null): Step | null {
+  protected getRef<TStep extends Step = Step>(id: number | null): TStep | null {
     if (id == null) return null;
-    return this.operationPlan.stepTracker.getStepById(-id) ?? null;
+    return (this.operationPlan.stepTracker.getStepById(-id) as TStep) ?? null;
   }
 
   protected canAddDependency(step: Step): boolean {
