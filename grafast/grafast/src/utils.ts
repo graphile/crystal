@@ -1081,6 +1081,10 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
     }
     const t = currentLayerPlan.reason.type;
     switch (t) {
+      case "combined": {
+        // Unsafe to browse up through a combined
+        return false;
+      }
       case "subscription":
       case "defer": {
         // These indicate boundaries over which plans shouldn't be optimized
@@ -1104,7 +1108,6 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "nullableBoundary":
       case "subroutine":
       case "polymorphic": // TODO: CHECK ME!
-      case "combined": // TODO: CHECK ME!
       case "mutationField": {
         continue;
       }
