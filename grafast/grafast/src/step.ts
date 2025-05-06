@@ -511,6 +511,10 @@ Reference:
 ${printDeps(step, 1)}
   `,
       );
+    } else if (!stepAMayDependOnStepB(this, step)) {
+      throw new Error(
+        `${this}.addRef(${step}) forbidden: invalid plan heirarchy`,
+      );
     }
     return -step.id;
   }
