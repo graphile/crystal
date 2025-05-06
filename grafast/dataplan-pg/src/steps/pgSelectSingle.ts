@@ -90,7 +90,8 @@ export class PgSelectSingleStep<
   public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
   private typeStepIndexList: number[] | null = null;
-  private fromRelation: { refId: number; relationName: string } | null = null;
+  private fromRelation: { refId: number | null; relationName: string } | null =
+    null;
 
   constructor(
     $class: PgSelectStep<TResource>,
@@ -99,18 +100,21 @@ export class PgSelectSingleStep<
   ) {
     super();
     this.itemStepId = this.addDependency($item);
-    if (options.fromRelation) {
-      const [$pgSelectSingle, relationName] = options.fromRelation;
-      this.fromRelation = {
-        refId: this.addRef($pgSelectSingle),
-        relationName,
-      };
-    }
     this.resource = $class.resource;
     this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
     this.mode = $class.mode;
     this.classStepId = $class.id;
     this.peerKey = this.resource.name;
+    if (options.fromRelation) {
+      const [$pgSelectSingle, relationName] = options.fromRelation;
+      this.fromRelation = {
+        refId: this.addRef(
+          $pgSelectSingle,
+          "Indirect reference allowed due to relational field potentially pulling from a parent relation",
+        ),
+        relationName,
+      };
+    }
   }
 
   public coalesceToEmptyObject(): void {

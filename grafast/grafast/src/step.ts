@@ -476,17 +476,48 @@ export /* abstract */ class Step<TData = any> {
     return undefined;
   }
 
-  protected addRef(step: Step): number {
-    if (!stepADependsOnStepB(this, step)) {
+  protected addRef(
+    rawStep: Step,
+    allowIndirectReason: string | null = null,
+  ): number | null {
+    const step = this.operationPlan.stepTracker.getStepById(rawStep.id);
+    if (isDev && !allowIndirectReason && !stepADependsOnStepB(this, step)) {
+      const allRefs = (
+        step: Step,
+        allDepIds = new Set<number>(),
+      ): Set<number> => {
+        allDepIds.add(step.id);
+        for (const dep of step.dependencies) {
+          allRefs(dep, allDepIds);
+        }
+        return allDepIds;
+      };
+      const refs1 = allRefs(this);
+      const refs2 = allRefs(step);
+      // const commonRefs = refs1.union(refs2);
+      const commonRefs = new Set([...refs1].filter((v) => refs2.has(v)));
+      const printDeps = (step: Step, depth: number): string => {
+        const isCommon = commonRefs.has(step.id);
+        const stepDesc = isCommon
+          ? chalk.bgWhite.black`<${step}>`
+          : String(step);
+        return `${"  ".repeat(depth)}${stepDesc}${!isCommon && step.dependencies.length > 0 ? `:\n${step.dependencies.map((d) => printDeps(d, depth + 1)).join("\n")}` : ""}`;
+      };
       throw new Error(
-        `${this} may only reference steps that it depends on (directly or indirectly); it does not depend on ${step}`,
+        `${this} has created a reference to ${step} which is not depended on (directly or indirectly)
+Self:
+${printDeps(this, 1)}
+Reference:
+${printDeps(step, 1)}
+  `,
       );
     }
     return -step.id;
   }
 
-  protected getRef(id: number) {
-    return this.operationPlan.stepTracker.getStepById(-id);
+  protected getRef(id: number | null): Step | null {
+    if (id == null) return null;
+    return this.operationPlan.stepTracker.getStepById(-id) ?? null;
   }
 
   protected canAddDependency(step: Step): boolean {
