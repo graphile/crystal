@@ -3237,9 +3237,6 @@ graph TD
     Access2226 --> Object2231
     Object2227{{"Object[2227∈199] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access2226 --> Object2227
-    __ListTransform1998[["__ListTransform[1998∈199] ➊<br />ᐸeach:1997ᐳ"]]:::plan
-    PgSelectRows1784[["PgSelectRows[1784∈199] ➊"]]:::plan
-    PgSelectRows1784 & PgSelect1783 --> __ListTransform1998
     PgSelect2217[["PgSelect[2217∈199] ➊<br />ᐸtype_function_connection(aggregate)ᐳ"]]:::plan
     Object11 & Connection1782 --> PgSelect2217
     PgCursor2238{{"PgCursor[2238∈199] ➊"}}:::plan
@@ -3249,7 +3246,10 @@ graph TD
     PgCursor2244{{"PgCursor[2244∈199] ➊"}}:::plan
     PgSelectSingle2242{{"PgSelectSingle[2242∈199] ➊<br />ᐸtype_function_connectionᐳ"}}:::plan
     PgSelectSingle2242 & Access2005 --> PgCursor2244
+    PgSelectRows1784[["PgSelectRows[1784∈199] ➊"]]:::plan
     PgSelect1783 --> PgSelectRows1784
+    __ListTransform1998[["__ListTransform[1998∈199] ➊<br />ᐸeach:1997ᐳ"]]:::plan
+    PgSelectRows1784 --> __ListTransform1998
     PgSelect1783 --> Access2005
     First2218{{"First[2218∈199] ➊"}}:::plan
     PgSelectRows2219[["PgSelectRows[2219∈199] ➊"]]:::plan
@@ -3947,9 +3947,6 @@ graph TD
     Access3136 --> Object3141
     Object3137{{"Object[3137∈258] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access3136 --> Object3137
-    __ListTransform2908[["__ListTransform[2908∈258] ➊<br />ᐸeach:2907ᐳ"]]:::plan
-    PgSelectRows2694[["PgSelectRows[2694∈258] ➊"]]:::plan
-    PgSelectRows2694 & Lambda4313 --> __ListTransform2908
     PgCursor3148{{"PgCursor[3148∈258] ➊"}}:::plan
     PgSelectSingle3146{{"PgSelectSingle[3146∈258] ➊<br />ᐸperson_type_function_connectionᐳ"}}:::plan
     Access2915{{"Access[2915∈258] ➊<br />ᐸ4313.cursorDetailsᐳ"}}:::plan
@@ -3968,7 +3965,10 @@ graph TD
     First2258 --> PgSelectSingle2260
     PgSelectRows2475[["PgSelectRows[2475∈258] ➊"]]:::plan
     Lambda4243 --> PgSelectRows2475
+    PgSelectRows2694[["PgSelectRows[2694∈258] ➊"]]:::plan
     Lambda4313 --> PgSelectRows2694
+    __ListTransform2908[["__ListTransform[2908∈258] ➊<br />ᐸeach:2907ᐳ"]]:::plan
+    PgSelectRows2694 --> __ListTransform2908
     Lambda4313 --> Access2915
     First3128{{"First[3128∈258] ➊"}}:::plan
     PgSelectRows3129[["PgSelectRows[3129∈258] ➊"]]:::plan

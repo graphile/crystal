@@ -32,10 +32,10 @@ graph TD
     PgSelect18[["PgSelect[18∈2]<br />ᐸforums_messages_list_setᐳ"]]:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__ᐳ"}}:::plan
     Object11 & PgClassExpression17 & PgFromExpression22 --> PgSelect18
+    PgSelectSingle16 --> PgClassExpression17
     __ListTransform23[["__ListTransform[23∈2]<br />ᐸpartitionByIndex1:18ᐳ"]]:::plan
     PgSelectRows24[["PgSelectRows[24∈2]"]]:::plan
-    PgSelectRows24 & PgSelect18 --> __ListTransform23
-    PgSelectSingle16 --> PgClassExpression17
+    PgSelectRows24 --> __ListTransform23
     PgSelect18 --> PgSelectRows24
     __Item25[/"__Item[25∈3]<br />ᐸ24ᐳ"\]:::itemplan
     PgSelectRows24 -.-> __Item25

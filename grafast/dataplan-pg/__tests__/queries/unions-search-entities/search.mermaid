@@ -16,14 +16,14 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __ListTransform12[["__ListTransform[12∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
-    PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
-    PgSelectRows13 & PgSelect7 --> __ListTransform12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
     Constant80{{"Constant[80∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
     Constant80 --> PgFromExpression11
+    __ListTransform12[["__ListTransform[12∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
+    PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
+    PgSelectRows13 --> __ListTransform12
     PgSelect7 --> PgSelectRows13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ13ᐳ"\]:::itemplan

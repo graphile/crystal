@@ -264,9 +264,6 @@ graph TD
     __Item109 --> PgSelectSingle110
     Lambda357{{"Lambda[357∈11]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List356 --> Lambda357
-    __ListTransform204[["__ListTransform[204∈12]<br />ᐸeach:203ᐳ"]]:::plan
-    PgSelectRows193[["PgSelectRows[193∈12]"]]:::plan
-    PgSelectRows193 & Lambda357 --> __ListTransform204
     List352{{"List[352∈12]<br />ᐸ351,109ᐳ"}}:::plan
     Access351 & __Item109 --> List352
     PgClassExpression111{{"PgClassExpression[111∈12]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
@@ -294,7 +291,10 @@ graph TD
     PgSelectSingle110 --> PgClassExpression176
     PgClassExpression179{{"PgClassExpression[179∈12]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression179
+    PgSelectRows193[["PgSelectRows[193∈12]"]]:::plan
     Lambda357 --> PgSelectRows193
+    __ListTransform204[["__ListTransform[204∈12]<br />ᐸeach:203ᐳ"]]:::plan
+    PgSelectRows193 --> __ListTransform204
     List352 --> Lambda353
     __Item162[/"__Item[162∈13]<br />ᐸ161ᐳ"\]:::itemplan
     PgSelectRows161 ==> __Item162
