@@ -403,9 +403,6 @@ graph TD
     Object10 & Connection197 & Constant1054 --> PgSelect198
     Object236{{"Object[236∈3] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1054 & Access235 --> Object236
-    __ListTransform199[["__ListTransform[199∈3] ➊<br />ᐸeach:198ᐳ"]]:::plan
-    PgSelectRows200[["PgSelectRows[200∈3] ➊"]]:::plan
-    PgSelectRows200 & PgSelect198 --> __ListTransform199
     PgCursor226{{"PgCursor[226∈3] ➊"}}:::plan
     PgSelectSingle224{{"PgSelectSingle[224∈3] ➊<br />ᐸcompound_type_set_queryᐳ"}}:::plan
     Access206{{"Access[206∈3] ➊<br />ᐸ198.cursorDetailsᐳ"}}:::plan
@@ -413,6 +410,9 @@ graph TD
     PgCursor232{{"PgCursor[232∈3] ➊"}}:::plan
     PgSelectSingle230{{"PgSelectSingle[230∈3] ➊<br />ᐸcompound_type_set_queryᐳ"}}:::plan
     PgSelectSingle230 & Access206 --> PgCursor232
+    __ListTransform199[["__ListTransform[199∈3] ➊<br />ᐸeach:198ᐳ"]]:::plan
+    PgSelectRows200[["PgSelectRows[200∈3] ➊"]]:::plan
+    PgSelectRows200 --> __ListTransform199
     PgSelect198 --> PgSelectRows200
     PgSelect198 --> Access206
     PgPageInfo220{{"PgPageInfo[220∈3] ➊"}}:::plan
@@ -493,9 +493,6 @@ graph TD
     Access314 --> Object315
     PgSelect287[["PgSelect[287∈13] ➊<br />ᐸtable_set_query+1ᐳ"]]:::plan
     Object10 & Connection286 --> PgSelect287
-    __ListTransform288[["__ListTransform[288∈13] ➊<br />ᐸeach:287ᐳ"]]:::plan
-    PgSelectRows289[["PgSelectRows[289∈13] ➊"]]:::plan
-    PgSelectRows289 & PgSelect287 --> __ListTransform288
     PgCursor305{{"PgCursor[305∈13] ➊"}}:::plan
     PgSelectSingle303{{"PgSelectSingle[303∈13] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access295{{"Access[295∈13] ➊<br />ᐸ287.cursorDetailsᐳ"}}:::plan
@@ -503,6 +500,9 @@ graph TD
     PgCursor311{{"PgCursor[311∈13] ➊"}}:::plan
     PgSelectSingle309{{"PgSelectSingle[309∈13] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle309 & Access295 --> PgCursor311
+    __ListTransform288[["__ListTransform[288∈13] ➊<br />ᐸeach:287ᐳ"]]:::plan
+    PgSelectRows289[["PgSelectRows[289∈13] ➊"]]:::plan
+    PgSelectRows289 --> __ListTransform288
     PgSelect287 --> PgSelectRows289
     PgSelect287 --> Access295
     PgPageInfo299{{"PgPageInfo[299∈13] ➊"}}:::plan
@@ -539,9 +539,6 @@ graph TD
     Access353 --> Object354
     PgSelect326[["PgSelect[326∈18] ➊<br />ᐸtable_set_query+1ᐳ"]]:::plan
     Object10 & Connection324 --> PgSelect326
-    __ListTransform327[["__ListTransform[327∈18] ➊<br />ᐸeach:326ᐳ"]]:::plan
-    PgSelectRows328[["PgSelectRows[328∈18] ➊"]]:::plan
-    PgSelectRows328 & PgSelect326 --> __ListTransform327
     PgCursor344{{"PgCursor[344∈18] ➊"}}:::plan
     PgSelectSingle342{{"PgSelectSingle[342∈18] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access334{{"Access[334∈18] ➊<br />ᐸ326.cursorDetailsᐳ"}}:::plan
@@ -549,6 +546,9 @@ graph TD
     PgCursor350{{"PgCursor[350∈18] ➊"}}:::plan
     PgSelectSingle348{{"PgSelectSingle[348∈18] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle348 & Access334 --> PgCursor350
+    __ListTransform327[["__ListTransform[327∈18] ➊<br />ᐸeach:326ᐳ"]]:::plan
+    PgSelectRows328[["PgSelectRows[328∈18] ➊"]]:::plan
+    PgSelectRows328 --> __ListTransform327
     PgSelect326 --> PgSelectRows328
     PgSelect326 --> Access334
     PgPageInfo338{{"PgPageInfo[338∈18] ➊"}}:::plan
@@ -585,9 +585,6 @@ graph TD
     Object10 & ApplyInput365 & Connection364 --> PgSelect366
     Object394{{"Object[394∈23] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access393 --> Object394
-    __ListTransform367[["__ListTransform[367∈23] ➊<br />ᐸeach:366ᐳ"]]:::plan
-    PgSelectRows368[["PgSelectRows[368∈23] ➊"]]:::plan
-    PgSelectRows368 & PgSelect366 --> __ListTransform367
     PgCursor384{{"PgCursor[384∈23] ➊"}}:::plan
     PgSelectSingle382{{"PgSelectSingle[382∈23] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access374{{"Access[374∈23] ➊<br />ᐸ366.cursorDetailsᐳ"}}:::plan
@@ -595,6 +592,9 @@ graph TD
     PgCursor390{{"PgCursor[390∈23] ➊"}}:::plan
     PgSelectSingle388{{"PgSelectSingle[388∈23] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle388 & Access374 --> PgCursor390
+    __ListTransform367[["__ListTransform[367∈23] ➊<br />ᐸeach:366ᐳ"]]:::plan
+    PgSelectRows368[["PgSelectRows[368∈23] ➊"]]:::plan
+    PgSelectRows368 --> __ListTransform367
     PgSelect366 --> PgSelectRows368
     PgSelect366 --> Access374
     PgPageInfo378{{"PgPageInfo[378∈23] ➊"}}:::plan
@@ -631,9 +631,6 @@ graph TD
     Access434 --> Object439
     Object435{{"Object[435∈28] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access434 --> Object435
-    __ListTransform408[["__ListTransform[408∈28] ➊<br />ᐸeach:407ᐳ"]]:::plan
-    PgSelectRows409[["PgSelectRows[409∈28] ➊"]]:::plan
-    PgSelectRows409 & PgSelect407 --> __ListTransform408
     PgCursor425{{"PgCursor[425∈28] ➊"}}:::plan
     PgSelectSingle423{{"PgSelectSingle[423∈28] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access415{{"Access[415∈28] ➊<br />ᐸ407.cursorDetailsᐳ"}}:::plan
@@ -641,6 +638,9 @@ graph TD
     PgCursor431{{"PgCursor[431∈28] ➊"}}:::plan
     PgSelectSingle429{{"PgSelectSingle[429∈28] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle429 & Access415 --> PgCursor431
+    __ListTransform408[["__ListTransform[408∈28] ➊<br />ᐸeach:407ᐳ"]]:::plan
+    PgSelectRows409[["PgSelectRows[409∈28] ➊"]]:::plan
+    PgSelectRows409 --> __ListTransform408
     PgSelect407 --> PgSelectRows409
     PgSelect407 --> Access415
     PgPageInfo419{{"PgPageInfo[419∈28] ➊"}}:::plan
@@ -677,9 +677,6 @@ graph TD
     Access475 --> Object480
     Object476{{"Object[476∈33] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Access475 --> Object476
-    __ListTransform449[["__ListTransform[449∈33] ➊<br />ᐸeach:448ᐳ"]]:::plan
-    PgSelectRows450[["PgSelectRows[450∈33] ➊"]]:::plan
-    PgSelectRows450 & PgSelect448 --> __ListTransform449
     PgCursor466{{"PgCursor[466∈33] ➊"}}:::plan
     PgSelectSingle464{{"PgSelectSingle[464∈33] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access456{{"Access[456∈33] ➊<br />ᐸ448.cursorDetailsᐳ"}}:::plan
@@ -687,6 +684,9 @@ graph TD
     PgCursor472{{"PgCursor[472∈33] ➊"}}:::plan
     PgSelectSingle470{{"PgSelectSingle[470∈33] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle470 & Access456 --> PgCursor472
+    __ListTransform449[["__ListTransform[449∈33] ➊<br />ᐸeach:448ᐳ"]]:::plan
+    PgSelectRows450[["PgSelectRows[450∈33] ➊"]]:::plan
+    PgSelectRows450 --> __ListTransform449
     PgSelect448 --> PgSelectRows450
     PgSelect448 --> Access456
     PgPageInfo460{{"PgPageInfo[460∈33] ➊"}}:::plan
@@ -723,9 +723,6 @@ graph TD
     Constant1053 & Access515 --> Object520
     Object516{{"Object[516∈38] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access515 --> Object516
-    __ListTransform489[["__ListTransform[489∈38] ➊<br />ᐸeach:488ᐳ"]]:::plan
-    PgSelectRows490[["PgSelectRows[490∈38] ➊"]]:::plan
-    PgSelectRows490 & PgSelect488 --> __ListTransform489
     PgCursor506{{"PgCursor[506∈38] ➊"}}:::plan
     PgSelectSingle504{{"PgSelectSingle[504∈38] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access496{{"Access[496∈38] ➊<br />ᐸ488.cursorDetailsᐳ"}}:::plan
@@ -733,6 +730,9 @@ graph TD
     PgCursor512{{"PgCursor[512∈38] ➊"}}:::plan
     PgSelectSingle510{{"PgSelectSingle[510∈38] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle510 & Access496 --> PgCursor512
+    __ListTransform489[["__ListTransform[489∈38] ➊<br />ᐸeach:488ᐳ"]]:::plan
+    PgSelectRows490[["PgSelectRows[490∈38] ➊"]]:::plan
+    PgSelectRows490 --> __ListTransform489
     PgSelect488 --> PgSelectRows490
     PgSelect488 --> Access496
     PgPageInfo500{{"PgPageInfo[500∈38] ➊"}}:::plan
@@ -769,9 +769,6 @@ graph TD
     Constant1053 & Access555 --> Object560
     Object556{{"Object[556∈43] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access555 --> Object556
-    __ListTransform529[["__ListTransform[529∈43] ➊<br />ᐸeach:528ᐳ"]]:::plan
-    PgSelectRows530[["PgSelectRows[530∈43] ➊"]]:::plan
-    PgSelectRows530 & PgSelect528 --> __ListTransform529
     PgCursor546{{"PgCursor[546∈43] ➊"}}:::plan
     PgSelectSingle544{{"PgSelectSingle[544∈43] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access536{{"Access[536∈43] ➊<br />ᐸ528.cursorDetailsᐳ"}}:::plan
@@ -779,6 +776,9 @@ graph TD
     PgCursor552{{"PgCursor[552∈43] ➊"}}:::plan
     PgSelectSingle550{{"PgSelectSingle[550∈43] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle550 & Access536 --> PgCursor552
+    __ListTransform529[["__ListTransform[529∈43] ➊<br />ᐸeach:528ᐳ"]]:::plan
+    PgSelectRows530[["PgSelectRows[530∈43] ➊"]]:::plan
+    PgSelectRows530 --> __ListTransform529
     PgSelect528 --> PgSelectRows530
     PgSelect528 --> Access536
     PgPageInfo540{{"PgPageInfo[540∈43] ➊"}}:::plan
@@ -815,9 +815,6 @@ graph TD
     Constant1053 & Access595 --> Object600
     Object596{{"Object[596∈48] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access595 --> Object596
-    __ListTransform569[["__ListTransform[569∈48] ➊<br />ᐸeach:568ᐳ"]]:::plan
-    PgSelectRows570[["PgSelectRows[570∈48] ➊"]]:::plan
-    PgSelectRows570 & PgSelect568 --> __ListTransform569
     PgCursor586{{"PgCursor[586∈48] ➊"}}:::plan
     PgSelectSingle584{{"PgSelectSingle[584∈48] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access576{{"Access[576∈48] ➊<br />ᐸ568.cursorDetailsᐳ"}}:::plan
@@ -825,6 +822,9 @@ graph TD
     PgCursor592{{"PgCursor[592∈48] ➊"}}:::plan
     PgSelectSingle590{{"PgSelectSingle[590∈48] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle590 & Access576 --> PgCursor592
+    __ListTransform569[["__ListTransform[569∈48] ➊<br />ᐸeach:568ᐳ"]]:::plan
+    PgSelectRows570[["PgSelectRows[570∈48] ➊"]]:::plan
+    PgSelectRows570 --> __ListTransform569
     PgSelect568 --> PgSelectRows570
     PgSelect568 --> Access576
     PgPageInfo580{{"PgPageInfo[580∈48] ➊"}}:::plan
@@ -863,9 +863,6 @@ graph TD
     Constant1053 -- 2 --> Object639
     Object635{{"Object[635∈53] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access634 --> Object635
-    __ListTransform608[["__ListTransform[608∈53] ➊<br />ᐸeach:607ᐳ"]]:::plan
-    PgSelectRows609[["PgSelectRows[609∈53] ➊"]]:::plan
-    PgSelectRows609 & PgSelect607 --> __ListTransform608
     PgCursor625{{"PgCursor[625∈53] ➊"}}:::plan
     PgSelectSingle623{{"PgSelectSingle[623∈53] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access615{{"Access[615∈53] ➊<br />ᐸ607.cursorDetailsᐳ"}}:::plan
@@ -873,6 +870,9 @@ graph TD
     PgCursor631{{"PgCursor[631∈53] ➊"}}:::plan
     PgSelectSingle629{{"PgSelectSingle[629∈53] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle629 & Access615 --> PgCursor631
+    __ListTransform608[["__ListTransform[608∈53] ➊<br />ᐸeach:607ᐳ"]]:::plan
+    PgSelectRows609[["PgSelectRows[609∈53] ➊"]]:::plan
+    PgSelectRows609 --> __ListTransform608
     PgSelect607 --> PgSelectRows609
     PgSelect607 --> Access615
     PgPageInfo619{{"PgPageInfo[619∈53] ➊"}}:::plan
@@ -909,9 +909,6 @@ graph TD
     Constant1053 & Constant1072 & Access673 --> Object678
     Object674{{"Object[674∈58] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access673 --> Object674
-    __ListTransform647[["__ListTransform[647∈58] ➊<br />ᐸeach:646ᐳ"]]:::plan
-    PgSelectRows648[["PgSelectRows[648∈58] ➊"]]:::plan
-    PgSelectRows648 & PgSelect646 --> __ListTransform647
     PgCursor664{{"PgCursor[664∈58] ➊"}}:::plan
     PgSelectSingle662{{"PgSelectSingle[662∈58] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access654{{"Access[654∈58] ➊<br />ᐸ646.cursorDetailsᐳ"}}:::plan
@@ -919,6 +916,9 @@ graph TD
     PgCursor670{{"PgCursor[670∈58] ➊"}}:::plan
     PgSelectSingle668{{"PgSelectSingle[668∈58] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle668 & Access654 --> PgCursor670
+    __ListTransform647[["__ListTransform[647∈58] ➊<br />ᐸeach:646ᐳ"]]:::plan
+    PgSelectRows648[["PgSelectRows[648∈58] ➊"]]:::plan
+    PgSelectRows648 --> __ListTransform647
     PgSelect646 --> PgSelectRows648
     PgSelect646 --> Access654
     PgPageInfo658{{"PgPageInfo[658∈58] ➊"}}:::plan
@@ -955,9 +955,6 @@ graph TD
     Constant1053 & Constant1073 & Access712 --> Object717
     Object713{{"Object[713∈63] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access712 --> Object713
-    __ListTransform686[["__ListTransform[686∈63] ➊<br />ᐸeach:685ᐳ"]]:::plan
-    PgSelectRows687[["PgSelectRows[687∈63] ➊"]]:::plan
-    PgSelectRows687 & PgSelect685 --> __ListTransform686
     PgCursor703{{"PgCursor[703∈63] ➊"}}:::plan
     PgSelectSingle701{{"PgSelectSingle[701∈63] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access693{{"Access[693∈63] ➊<br />ᐸ685.cursorDetailsᐳ"}}:::plan
@@ -965,6 +962,9 @@ graph TD
     PgCursor709{{"PgCursor[709∈63] ➊"}}:::plan
     PgSelectSingle707{{"PgSelectSingle[707∈63] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle707 & Access693 --> PgCursor709
+    __ListTransform686[["__ListTransform[686∈63] ➊<br />ᐸeach:685ᐳ"]]:::plan
+    PgSelectRows687[["PgSelectRows[687∈63] ➊"]]:::plan
+    PgSelectRows687 --> __ListTransform686
     PgSelect685 --> PgSelectRows687
     PgSelect685 --> Access693
     PgPageInfo697{{"PgPageInfo[697∈63] ➊"}}:::plan
@@ -1001,9 +1001,6 @@ graph TD
     Constant1074 & Constant1073 & Access751 --> Object756
     Object752{{"Object[752∈68] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1074 & Access751 --> Object752
-    __ListTransform725[["__ListTransform[725∈68] ➊<br />ᐸeach:724ᐳ"]]:::plan
-    PgSelectRows726[["PgSelectRows[726∈68] ➊"]]:::plan
-    PgSelectRows726 & PgSelect724 --> __ListTransform725
     PgCursor742{{"PgCursor[742∈68] ➊"}}:::plan
     PgSelectSingle740{{"PgSelectSingle[740∈68] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access732{{"Access[732∈68] ➊<br />ᐸ724.cursorDetailsᐳ"}}:::plan
@@ -1011,6 +1008,9 @@ graph TD
     PgCursor748{{"PgCursor[748∈68] ➊"}}:::plan
     PgSelectSingle746{{"PgSelectSingle[746∈68] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle746 & Access732 --> PgCursor748
+    __ListTransform725[["__ListTransform[725∈68] ➊<br />ᐸeach:724ᐳ"]]:::plan
+    PgSelectRows726[["PgSelectRows[726∈68] ➊"]]:::plan
+    PgSelectRows726 --> __ListTransform725
     PgSelect724 --> PgSelectRows726
     PgSelect724 --> Access732
     PgPageInfo736{{"PgPageInfo[736∈68] ➊"}}:::plan
@@ -1047,9 +1047,6 @@ graph TD
     Constant1053 & Access791 --> Object796
     Object792{{"Object[792∈73] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access791 --> Object792
-    __ListTransform765[["__ListTransform[765∈73] ➊<br />ᐸeach:764ᐳ"]]:::plan
-    PgSelectRows766[["PgSelectRows[766∈73] ➊"]]:::plan
-    PgSelectRows766 & PgSelect764 --> __ListTransform765
     PgCursor782{{"PgCursor[782∈73] ➊"}}:::plan
     PgSelectSingle780{{"PgSelectSingle[780∈73] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access772{{"Access[772∈73] ➊<br />ᐸ764.cursorDetailsᐳ"}}:::plan
@@ -1057,6 +1054,9 @@ graph TD
     PgCursor788{{"PgCursor[788∈73] ➊"}}:::plan
     PgSelectSingle786{{"PgSelectSingle[786∈73] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle786 & Access772 --> PgCursor788
+    __ListTransform765[["__ListTransform[765∈73] ➊<br />ᐸeach:764ᐳ"]]:::plan
+    PgSelectRows766[["PgSelectRows[766∈73] ➊"]]:::plan
+    PgSelectRows766 --> __ListTransform765
     PgSelect764 --> PgSelectRows766
     PgSelect764 --> Access772
     PgPageInfo776{{"PgPageInfo[776∈73] ➊"}}:::plan
@@ -1093,9 +1093,6 @@ graph TD
     Constant1053 & Constant1052 & Access832 --> Object837
     Object833{{"Object[833∈78] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access832 --> Object833
-    __ListTransform806[["__ListTransform[806∈78] ➊<br />ᐸeach:805ᐳ"]]:::plan
-    PgSelectRows807[["PgSelectRows[807∈78] ➊"]]:::plan
-    PgSelectRows807 & PgSelect805 --> __ListTransform806
     PgCursor823{{"PgCursor[823∈78] ➊"}}:::plan
     PgSelectSingle821{{"PgSelectSingle[821∈78] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     Access813{{"Access[813∈78] ➊<br />ᐸ805.cursorDetailsᐳ"}}:::plan
@@ -1103,6 +1100,9 @@ graph TD
     PgCursor829{{"PgCursor[829∈78] ➊"}}:::plan
     PgSelectSingle827{{"PgSelectSingle[827∈78] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     PgSelectSingle827 & Access813 --> PgCursor829
+    __ListTransform806[["__ListTransform[806∈78] ➊<br />ᐸeach:805ᐳ"]]:::plan
+    PgSelectRows807[["PgSelectRows[807∈78] ➊"]]:::plan
+    PgSelectRows807 --> __ListTransform806
     PgSelect805 --> PgSelectRows807
     PgSelect805 --> Access813
     PgPageInfo817{{"PgPageInfo[817∈78] ➊"}}:::plan
@@ -1139,9 +1139,6 @@ graph TD
     Object10 & Connection842 & Constant1053 --> PgSelect843
     Object871{{"Object[871∈83] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access870 --> Object871
-    __ListTransform844[["__ListTransform[844∈83] ➊<br />ᐸeach:843ᐳ"]]:::plan
-    PgSelectRows845[["PgSelectRows[845∈83] ➊"]]:::plan
-    PgSelectRows845 & PgSelect843 --> __ListTransform844
     PgCursor861{{"PgCursor[861∈83] ➊"}}:::plan
     PgSelectSingle859{{"PgSelectSingle[859∈83] ➊<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
     Access851{{"Access[851∈83] ➊<br />ᐸ843.cursorDetailsᐳ"}}:::plan
@@ -1149,6 +1146,9 @@ graph TD
     PgCursor867{{"PgCursor[867∈83] ➊"}}:::plan
     PgSelectSingle865{{"PgSelectSingle[865∈83] ➊<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
     PgSelectSingle865 & Access851 --> PgCursor867
+    __ListTransform844[["__ListTransform[844∈83] ➊<br />ᐸeach:843ᐳ"]]:::plan
+    PgSelectRows845[["PgSelectRows[845∈83] ➊"]]:::plan
+    PgSelectRows845 --> __ListTransform844
     PgSelect843 --> PgSelectRows845
     PgSelect843 --> Access851
     PgPageInfo855{{"PgPageInfo[855∈83] ➊"}}:::plan
@@ -1185,9 +1185,6 @@ graph TD
     Constant1053 & Access910 --> Object915
     Object911{{"Object[911∈88] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
     Constant1053 & Access910 --> Object911
-    __ListTransform884[["__ListTransform[884∈88] ➊<br />ᐸeach:883ᐳ"]]:::plan
-    PgSelectRows885[["PgSelectRows[885∈88] ➊"]]:::plan
-    PgSelectRows885 & PgSelect883 --> __ListTransform884
     PgCursor901{{"PgCursor[901∈88] ➊"}}:::plan
     PgSelectSingle899{{"PgSelectSingle[899∈88] ➊<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
     Access891{{"Access[891∈88] ➊<br />ᐸ883.cursorDetailsᐳ"}}:::plan
@@ -1195,6 +1192,9 @@ graph TD
     PgCursor907{{"PgCursor[907∈88] ➊"}}:::plan
     PgSelectSingle905{{"PgSelectSingle[905∈88] ➊<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
     PgSelectSingle905 & Access891 --> PgCursor907
+    __ListTransform884[["__ListTransform[884∈88] ➊<br />ᐸeach:883ᐳ"]]:::plan
+    PgSelectRows885[["PgSelectRows[885∈88] ➊"]]:::plan
+    PgSelectRows885 --> __ListTransform884
     PgSelect883 --> PgSelectRows885
     PgSelect883 --> Access891
     PgPageInfo895{{"PgPageInfo[895∈88] ➊"}}:::plan
@@ -1230,7 +1230,7 @@ graph TD
     Object10 & PgFromExpression921 & Connection922 --> PgSelect935
     __ListTransform924[["__ListTransform[924∈93] ➊<br />ᐸeach:923ᐳ"]]:::plan
     PgSelectRows925[["PgSelectRows[925∈93] ➊"]]:::plan
-    PgSelectRows925 & PgSelect923 --> __ListTransform924
+    PgSelectRows925 --> __ListTransform924
     PgSelect923 --> PgSelectRows925
     Access933{{"Access[933∈93] ➊<br />ᐸ923.cursorDetailsᐳ"}}:::plan
     PgSelect923 --> Access933
@@ -1260,11 +1260,11 @@ graph TD
     PgSelectSingle930 --> PgClassExpression931
     PgSelect949[["PgSelect[949∈97] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
     Object10 & Connection948 --> PgSelect949
-    __ListTransform950[["__ListTransform[950∈97] ➊<br />ᐸeach:949ᐳ"]]:::plan
-    PgSelectRows951[["PgSelectRows[951∈97] ➊"]]:::plan
-    PgSelectRows951 & PgSelect949 --> __ListTransform950
     PgSelect961[["PgSelect[961∈97] ➊<br />ᐸstatic_big_integer(aggregate)ᐳ"]]:::plan
     Object10 & Connection948 --> PgSelect961
+    __ListTransform950[["__ListTransform[950∈97] ➊<br />ᐸeach:949ᐳ"]]:::plan
+    PgSelectRows951[["PgSelectRows[951∈97] ➊"]]:::plan
+    PgSelectRows951 --> __ListTransform950
     PgSelect949 --> PgSelectRows951
     First962{{"First[962∈97] ➊"}}:::plan
     PgSelectRows963[["PgSelectRows[963∈97] ➊"]]:::plan
@@ -1314,12 +1314,12 @@ graph TD
     PgClassExpression1005 ==> __Item1006
     PgSelect1016[["PgSelect[1016∈107] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
     Object10 & Connection1015 --> PgSelect1016
-    __ListTransform1028[["__ListTransform[1028∈107] ➊<br />ᐸeach:1027ᐳ"]]:::plan
-    PgSelectRows1017[["PgSelectRows[1017∈107] ➊"]]:::plan
-    PgSelectRows1017 & PgSelect1016 --> __ListTransform1028
     PgSelect1042[["PgSelect[1042∈107] ➊<br />ᐸquery_interval_set(aggregate)ᐳ"]]:::plan
     Object10 & Connection1015 --> PgSelect1042
+    PgSelectRows1017[["PgSelectRows[1017∈107] ➊"]]:::plan
     PgSelect1016 --> PgSelectRows1017
+    __ListTransform1028[["__ListTransform[1028∈107] ➊<br />ᐸeach:1027ᐳ"]]:::plan
+    PgSelectRows1017 --> __ListTransform1028
     Access1037{{"Access[1037∈107] ➊<br />ᐸ1016.cursorDetailsᐳ"}}:::plan
     PgSelect1016 --> Access1037
     First1043{{"First[1043∈107] ➊"}}:::plan

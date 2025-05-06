@@ -21,10 +21,10 @@ graph TD
     Constant16{{"Constant[16∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgSelect12[["PgSelect[12∈1] ➊<br />ᐸbadly_behaved_functionᐳ"]]:::plan
     Object10 & Connection11 --> PgSelect12
-    __ListTransform23[["__ListTransform[23∈1] ➊<br />ᐸeach:22ᐳ"]]:::plan
     PgSelectRows13[["PgSelectRows[13∈1] ➊"]]:::plan
-    PgSelectRows13 & PgSelect12 --> __ListTransform23
     PgSelect12 --> PgSelectRows13
+    __ListTransform23[["__ListTransform[23∈1] ➊<br />ᐸeach:22ᐳ"]]:::plan
+    PgSelectRows13 --> __ListTransform23
     Access30{{"Access[30∈1] ➊<br />ᐸ12.cursorDetailsᐳ"}}:::plan
     PgSelect12 --> Access30
     __Item14[/"__Item[14∈2]<br />ᐸ13ᐳ"\]:::itemplan

@@ -28,14 +28,14 @@ graph TD
     PgSelectRows10 ==> __Item11
     PgSelectSingle12{{"PgSelectSingle[12∈1]<br />ᐸpeopleᐳ"}}:::plan
     __Item11 --> PgSelectSingle12
-    __ListTransform19[["__ListTransform[19∈2]<br />ᐸeach:15ᐳ"]]:::plan
-    PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
-    Lambda74{{"Lambda[74∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
-    PgSelectRows20 & Lambda74 --> __ListTransform19
     List73{{"List[73∈2]<br />ᐸ72,11ᐳ"}}:::plan
     Access72 & __Item11 --> List73
     PgClassExpression13{{"PgClassExpression[13∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
+    __ListTransform19[["__ListTransform[19∈2]<br />ᐸeach:15ᐳ"]]:::plan
+    PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
+    PgSelectRows20 --> __ListTransform19
+    Lambda74{{"Lambda[74∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda74 --> PgSelectRows20
     List73 --> Lambda74
     __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan

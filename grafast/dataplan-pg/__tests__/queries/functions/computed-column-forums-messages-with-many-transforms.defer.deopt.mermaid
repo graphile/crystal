@@ -34,8 +34,8 @@ graph TD
     PgSelectSingle16 --> PgClassExpression27
     __ListTransform22[["__ListTransform[22∈3]<br />ᐸfilter:18ᐳ"]]:::plan
     PgSelectRows23[["PgSelectRows[23∈3] ➊"]]:::plan
+    PgSelectRows23 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
     PgSelect18[["PgSelect[18∈3] ➊<br />ᐸmessagesᐳ"]]:::plan
-    PgSelectRows23 & PgSelect18 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
     Object11 --> PgSelect18
     PgSelect18 --> PgSelectRows23
     __ListTransform30[["__ListTransform[30∈3]<br />ᐸgroupBy:22ᐳ"]]:::plan
