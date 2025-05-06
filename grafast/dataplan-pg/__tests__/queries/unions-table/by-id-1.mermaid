@@ -9,9 +9,15 @@ graph TD
 
     subgraph "Buckets for queries/unions-table/by-id-1"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 77, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />UnionTopic,UnionPost,UnionDivider,UnionChecklist,UnionChecklistItem<br />Deps: 10, 17, 16<br />ᐳUnionTopic<br />ᐳUnionPost<br />ᐳUnionDivider<br />ᐳUnionChecklist<br />ᐳUnionChecklistItem<br /><br />1: 19, 31, 39, 47, 55<br />2: 28, 36, 44, 52, 60<br />ᐳ: 27, 30, 35, 38, 43, 46, 51, 54, 59, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />Deps: 10, 17, 16<br /><br />1: 19, 31, 39, 47, 55<br />2: 28, 36, 44, 52, 60<br />ᐳ: 27, 30, 35, 38, 43, 46, 51, 54, 59, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76"):::bucket
+    Bucket2("Bucket 2 (polymorphicPartition)<br />UnionTopic<br />Deps: 63, 64<br />ᐳUnionTopic"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />UnionPost<br />Deps: 65, 66, 67, 68<br />ᐳUnionPost"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />UnionDivider<br />Deps: 69, 70<br />ᐳUnionDivider"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />UnionChecklist<br />Deps: 72, 73<br />ᐳUnionChecklist"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />UnionChecklistItem<br />Deps: 74, 75, 76<br />ᐳUnionChecklistItem"):::bucket
     end
     Bucket0 --> Bucket1
+    Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
 
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunion_itemsᐳ"]]:::plan
@@ -111,4 +117,14 @@ graph TD
     class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,Lambda16,PgClassExpression17,Constant77 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,First27,PgSelectRows28,PgSelectSingle30,PgSelect31,First35,PgSelectRows36,PgSelectSingle38,PgSelect39,First43,PgSelectRows44,PgSelectSingle46,PgSelect47,First51,PgSelectRows52,PgSelectSingle54,PgSelect55,First59,PgSelectRows60,PgSelectSingle62,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgClassExpression67,PgClassExpression68,PgClassExpression69,PgClassExpression70,PgClassExpression71,PgClassExpression72,PgClassExpression73,PgClassExpression74,PgClassExpression75,PgClassExpression76 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
 

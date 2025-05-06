@@ -13,16 +13,20 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 111, 10<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 111, 10<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1: <br />ᐳ: 23, 33, 34, 35, 112, 36, 113<br />2: PgSelectRows[30], Lambda[37]<br />ᐳ: 29, 31, 38"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[31]"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Person,Post,Comment<br />Deps: 37, 10, 38<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br /><br />1: 114, 118, 122<br />ᐳ: Access[39], Access[53], Access[63]<br />2: 41, 55, 65<br />ᐳ: Access[115], Access[119], Access[123]<br />3: 50, 60, 70<br />ᐳ: 49, 52, 59, 62, 69, 72, 74, 75, 76, 86, 87, 106, 116, 117, 120, 121, 124, 125<br />4: 83, 94, 103<br />ᐳ: 82, 85, 93, 96, 102, 105"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 85<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[85]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 96<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[96]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 105<br /><br />ROOT PgSelectSingle{5}ᐸpostsᐳ[105]"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />Deps: 37, 10, 38<br /><br />1: 114, 118, 122<br />ᐳ: Access[39], Access[53], Access[63]<br />2: 41, 55, 65<br />ᐳ: Access[115], Access[119], Access[123]<br />3: 50, 60, 70<br />ᐳ: 49, 52, 59, 62, 69, 72, 74, 75, 76, 86, 87, 106, 116, 117, 120, 121, 124, 125<br />4: 83, 94, 103<br />ᐳ: 82, 85, 93, 96, 102, 105"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />Post<br />Deps: 85, 86<br />ᐳPost"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />Comment<br />Deps: 96, 106<br />ᐳComment"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 85<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[85]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 96<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[96]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 105<br /><br />ROOT PgSelectSingle{5}ᐸpostsᐳ[105]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5
-    Bucket5 --> Bucket6 & Bucket7 & Bucket8
+    Bucket5 --> Bucket6 & Bucket7 & Bucket10
+    Bucket6 --> Bucket8
+    Bucket7 --> Bucket9
 
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
@@ -170,11 +174,11 @@ graph TD
     List120 --> Lambda121
     PgSelect65 --> Access123
     List124 --> Lambda125
-    PgClassExpression107{{"PgClassExpression[107∈6]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
+    PgClassExpression107{{"PgClassExpression[107∈8]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
     PgSelectSingle85 --> PgClassExpression107
-    PgClassExpression108{{"PgClassExpression[108∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
+    PgClassExpression108{{"PgClassExpression[108∈9]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle96 --> PgClassExpression108
-    PgClassExpression109{{"PgClassExpression[109∈8]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
+    PgClassExpression109{{"PgClassExpression[109∈10]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle105 --> PgClassExpression109
 
     %% define steps
@@ -191,9 +195,13 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5,Access39,PgSelect41,First49,PgSelectRows50,PgSelectSingle52,Access53,PgSelect55,First59,PgSelectRows60,PgSelectSingle62,Access63,PgSelect65,First69,PgSelectRows70,PgSelectSingle72,PgClassExpression74,PgClassExpression75,PgClassExpression76,First82,PgSelectRows83,PgSelectSingle85,PgClassExpression86,PgClassExpression87,First93,PgSelectRows94,PgSelectSingle96,First102,PgSelectRows103,PgSelectSingle105,PgClassExpression106,PgSelectInlineApply114,Access115,List116,Lambda117,PgSelectInlineApply118,Access119,List120,Lambda121,PgSelectInlineApply122,Access123,List124,Lambda125 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression107 bucket6
+    class Bucket6 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression108 bucket7
+    class Bucket7 bucket7
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression109 bucket8
+    class Bucket8,PgClassExpression107 bucket8
+    classDef bucket9 stroke:#ff0000
+    class Bucket9,PgClassExpression108 bucket9
+    classDef bucket10 stroke:#ffff00
+    class Bucket10,PgClassExpression109 bucket10
 

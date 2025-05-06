@@ -49,9 +49,9 @@ graph TD
     PgSelectSingle16 --> PgClassExpression17
     __ListTransform22[["__ListTransform[22∈3]<br />ᐸfilter:18ᐳ"]]:::plan
     PgSelectRows23[["PgSelectRows[23∈3] ➊"]]:::plan
-    PgSelect18[["PgSelect[18∈3] ➊<br />ᐸmessagesᐳ"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgSelectRows23 & PgSelect18 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
+    PgSelectRows23 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
+    PgSelect18[["PgSelect[18∈3] ➊<br />ᐸmessagesᐳ"]]:::plan
     Object11 --> PgSelect18
     PgSelect18 --> PgSelectRows23
     PgSelectSingle16 --> PgClassExpression27

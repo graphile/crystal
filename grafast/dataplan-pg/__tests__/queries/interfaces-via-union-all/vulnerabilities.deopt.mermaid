@@ -10,10 +10,13 @@ graph TD
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilities"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 21, 62, 63, 11<br />2: PgUnionAll[8]<br />ᐳ: Access[61]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 21, 11<br /><br />ROOT __Item{1}ᐸ61ᐳ[14]"):::bucket
-    Bucket2("Bucket 2 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 11, 25, 16<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[27], PgSelect[45]<br />2: PgSelectRows[36], PgSelectRows[50]<br />ᐳ: 35, 38, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />Deps: 11, 25, 16<br /><br />1: PgSelect[27], PgSelect[45]<br />2: PgSelectRows[36], PgSelectRows[50]<br />ᐳ: 35, 38, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 53, 54, 55<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 57, 58, 59<br />ᐳThirdPartyVulnerability"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
+    Bucket2 --> Bucket3 & Bucket4
 
     %% plan dependencies
     PgUnionAll8[["PgUnionAll[8∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
@@ -86,4 +89,8 @@ graph TD
     class Bucket1,__Item14,PgUnionAllSingle15,Access16,Access19,List22,Lambda23,Access25 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect27,First35,PgSelectRows36,PgSelectSingle38,PgSelect45,First49,PgSelectRows50,PgSelectSingle52,PgClassExpression53,PgClassExpression54,PgClassExpression55,PgClassExpression56,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
 

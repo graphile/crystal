@@ -11,14 +11,18 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 107, 10, 11<br />2: PgSelect[7]<br />3: PgSelectRows[13]<br />4: __ListTransform[12]"):::bucket
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgSelectSingle{1}ᐸentity_searchᐳ[15]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 10<br /><br />ROOT __Item{2}ᐸ12ᐳ[16]<br />1: <br />ᐳ: 17, 18, 19, 20, 21<br />2: Lambda[22]<br />ᐳ: Access[23]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />Person,Post,Comment<br />Deps: 22, 10, 23<br />ᐳPerson<br />ᐳPost<br />ᐳComment<br /><br />1: 95, 99, 103<br />ᐳ: Access[24], Access[38], Access[48]<br />2: 26, 40, 50<br />ᐳ: Access[96], Access[100], Access[104]<br />3: 35, 45, 55<br />ᐳ: 34, 37, 44, 47, 54, 57, 58, 59, 60, 70, 71, 90, 97, 98, 101, 102, 105, 106<br />4: 67, 78, 87<br />ᐳ: 66, 69, 77, 80, 86, 89"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 69<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[69]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 80<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[80]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 89<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[89]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />Deps: 22, 10, 23<br /><br />1: 95, 99, 103<br />ᐳ: Access[24], Access[38], Access[48]<br />2: 26, 40, 50<br />ᐳ: Access[96], Access[100], Access[104]<br />3: 35, 45, 55<br />ᐳ: 34, 37, 44, 47, 54, 57, 58, 59, 60, 70, 71, 90, 97, 98, 101, 102, 105, 106<br />4: 67, 78, 87<br />ᐳ: 66, 69, 77, 80, 86, 89"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />Post<br />Deps: 69, 70<br />ᐳPost"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />Comment<br />Deps: 80, 90<br />ᐳComment"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 69<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[69]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 80<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[80]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 89<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[89]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3
-    Bucket3 --> Bucket4 & Bucket5 & Bucket6
+    Bucket3 --> Bucket4 & Bucket5 & Bucket8
+    Bucket4 --> Bucket6
+    Bucket5 --> Bucket7
 
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸentity_searchᐳ"]]:::plan
@@ -28,14 +32,14 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __ListTransform12[["__ListTransform[12∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
-    PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
-    PgSelectRows13 & PgSelect7 --> __ListTransform12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
     Constant107{{"Constant[107∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
     Constant107 --> PgFromExpression11
+    __ListTransform12[["__ListTransform[12∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
+    PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
+    PgSelectRows13 --> __ListTransform12
     PgSelect7 --> PgSelectRows13
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ13ᐳ"\]:::itemplan
@@ -139,13 +143,13 @@ graph TD
     List101 --> Lambda102
     PgSelect50 --> Access104
     List105 --> Lambda106
-    PgClassExpression91{{"PgClassExpression[91∈4]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
+    PgClassExpression91{{"PgClassExpression[91∈6]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
     PgSelectSingle69 --> PgClassExpression91
-    PgClassExpression92{{"PgClassExpression[92∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
+    PgClassExpression92{{"PgClassExpression[92∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle80 --> PgClassExpression92
-    PgClassExpression93{{"PgClassExpression[93∈6]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"}}:::plan
+    PgClassExpression93{{"PgClassExpression[93∈8]<br />ᐸ__posts__.”post_id”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle89 --> PgClassExpression93
-    PgClassExpression94{{"PgClassExpression[94∈6]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
+    PgClassExpression94{{"PgClassExpression[94∈8]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle89 --> PgClassExpression94
 
     %% define steps
@@ -158,9 +162,13 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,Access24,PgSelect26,First34,PgSelectRows35,PgSelectSingle37,Access38,PgSelect40,First44,PgSelectRows45,PgSelectSingle47,Access48,PgSelect50,First54,PgSelectRows55,PgSelectSingle57,PgClassExpression58,PgClassExpression59,PgClassExpression60,First66,PgSelectRows67,PgSelectSingle69,PgClassExpression70,PgClassExpression71,First77,PgSelectRows78,PgSelectSingle80,First86,PgSelectRows87,PgSelectSingle89,PgClassExpression90,PgSelectInlineApply95,Access96,List97,Lambda98,PgSelectInlineApply99,Access100,List101,Lambda102,PgSelectInlineApply103,Access104,List105,Lambda106 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression91 bucket4
+    class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression92 bucket5
+    class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression93,PgClassExpression94 bucket6
+    class Bucket6,PgClassExpression91 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgClassExpression92 bucket7
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8,PgClassExpression93,PgClassExpression94 bucket8
 

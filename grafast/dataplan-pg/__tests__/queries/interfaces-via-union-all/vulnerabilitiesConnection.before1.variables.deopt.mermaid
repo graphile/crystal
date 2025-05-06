@@ -12,12 +12,15 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 15, 16, 17, 70, 29<br /><br />ROOT Connectionᐸ11ᐳ[16]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 22, 29, 14<br /><br />ROOT __Item{2}ᐸ69ᐳ[20]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 22, 29, 14<br /><br />ROOT PgUnionAllSingle{2}[21]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 14, 33, 24<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[35], PgSelect[53]<br />2: PgSelectRows[44], PgSelectRows[58]<br />ᐳ: 43, 46, 57, 60, 61, 62, 63, 64, 65, 66, 67, 68"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />Deps: 14, 33, 24<br /><br />1: PgSelect[35], PgSelect[53]<br />2: PgSelectRows[44], PgSelectRows[58]<br />ᐳ: 43, 46, 57, 60, 61, 62, 63, 64, 65, 66, 67, 68"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 61, 62, 63<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 65, 66, 67<br />ᐳThirdPartyVulnerability"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
+    Bucket4 --> Bucket5 & Bucket6
 
     %% plan dependencies
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -104,4 +107,8 @@ graph TD
     class Bucket3,PgCursor23,Access24,Access27,List30,Lambda31,Access33 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect35,First43,PgSelectRows44,PgSelectSingle46,PgSelect53,First57,PgSelectRows58,PgSelectSingle60,PgClassExpression61,PgClassExpression62,PgClassExpression63,PgClassExpression64,PgClassExpression65,PgClassExpression66,PgClassExpression67,PgClassExpression68 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
 

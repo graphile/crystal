@@ -9,8 +9,8 @@ graph TD
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 44, 11, 13<br />2: PgSelect[8], PgSelect[18]<br />3: PgSelectRows[14], PgSelectRows[23]"):::bucket
-    Bucket1("Bucket 1 (listItem)<br />Deps: 23, 18<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 23, 18<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 27<br />2: __ListTransform[22]<br />3: __ListTransform[30]<br />ᐳ: Lambda[34]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />Deps: 23<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 23<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 27<br />2: __ListTransform[22]<br />3: __ListTransform[30]<br />ᐳ: Lambda[34]"):::bucket
     Bucket3("Bucket 3 (subroutine)<br />Deps: 27<br /><br />ROOT Lambda{3}[29]"):::bucket
     Bucket4("Bucket 4 (subroutine)<br /><br />ROOT PgClassExpression{4}ᐸ__messages__.”featured”ᐳ[33]"):::bucket
     Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ34ᐳ[37]"):::bucket
@@ -49,7 +49,7 @@ graph TD
     __Item15 --> PgSelectSingle16
     __ListTransform22[["__ListTransform[22∈2]<br />ᐸfilter:18ᐳ"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgSelectRows23 & PgSelect18 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
+    PgSelectRows23 & PgSelectSingle16 & PgClassExpression27 --> __ListTransform22
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
     PgSelectSingle16 --> PgClassExpression27

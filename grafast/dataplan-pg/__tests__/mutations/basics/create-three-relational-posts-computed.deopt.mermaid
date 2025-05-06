@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 12, 19, 26, 201, 202, 203, 4<br /><br />1: PgSelect[8]<br />2: PgSelect[15]<br />3: PgSelect[22]<br />4: PgSelectRows[28]<br />ᐳ: 27, 29, 30"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 201, 202, 203, 30, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[30]<br />1: 32, 40, 46<br />2: 37, 43, 49<br />ᐳ: 36, 38, 42, 44, 48, 50, 51, 52, 53, 98, 99, 100, 145, 146, 147"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 11, 53, 52, 100, 99, 147, 146<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 53, 52<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 54, 66, 74, 82, 90<br />2: 63, 71, 79, 87, 95<br />ᐳ: 62, 65, 70, 73, 78, 81, 86, 89, 94, 97, 192, 193, 194"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 100, 99<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 101, 113, 121, 129, 137<br />2: 110, 118, 126, 134, 142<br />ᐳ: 109, 112, 117, 120, 125, 128, 133, 136, 141, 144, 195, 196, 197"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 147, 146<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 148, 160, 168, 176, 184<br />2: 157, 165, 173, 181, 189<br />ᐳ: 156, 159, 164, 167, 172, 175, 180, 183, 188, 191, 198, 199, 200"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />Deps: 11, 53, 52<br /><br />1: 54, 66, 74, 82, 90<br />2: 63, 71, 79, 87, 95<br />ᐳ: 62, 65, 70, 73, 78, 81, 86, 89, 94, 97, 192, 193, 194"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />Deps: 11, 100, 99<br /><br />1: 101, 113, 121, 129, 137<br />2: 110, 118, 126, 134, 142<br />ᐳ: 109, 112, 117, 120, 125, 128, 133, 136, 141, 144, 195, 196, 197"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />Deps: 11, 147, 146<br /><br />1: 148, 160, 168, 176, 184<br />2: 157, 165, 173, 181, 189<br />ᐳ: 156, 159, 164, 167, 172, 175, 180, 183, 188, 191, 198, 199, 200"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
