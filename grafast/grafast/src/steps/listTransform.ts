@@ -186,7 +186,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getRef<TListStep>(this.rawListStepRefId)!;
+    return this.getRef(this.rawListStepRefId) as TListStep;
   }
 
   [$$deepDepSkip]() {
@@ -194,7 +194,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.getRef<TListStep>(this.rawListStepRefId)!;
+    return this.getRef(this.rawListStepRefId) as TListStep;
   }
 
   deduplicate(

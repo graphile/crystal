@@ -476,6 +476,24 @@ export /* abstract */ class Step<TData = any> {
     return undefined;
   }
 
+  /** @internal */
+  private _refs = new Set<number>();
+
+  /**
+   * **IF IN DOUBT, USE `.addDependency()` INSTEAD!
+   *
+   * This **DANGEROUS** method allows you to create a reference to another
+   * step. A reference is like a dependency except it has no runtime impact -
+   * the data is not passed into execute. In general you should only add
+   * references to steps that you directly or indirectly depend on (e.g. an
+   * ancestor step) so that you may communicate with said step during
+   * `optimize` (for example). Sometimes it's acceptable to reference steps
+   * that you don't transitively depend on; in those cases you're permitted to
+   * pass an `allowIndirectReason` to explain to yourself and others why you
+   * are breaking these rules.
+   *
+   * @experimental
+   */
   protected addRef(
     rawStep: Step,
     allowIndirectReason: string | null = null,
@@ -516,12 +534,33 @@ ${printDeps(step, 1)}
         `${this}.addRef(${step}) forbidden: invalid plan heirarchy`,
       );
     }
+    this._refs.add(-step.id);
     return -step.id;
   }
 
-  protected getRef<TStep extends Step = Step>(id: number | null): TStep | null {
+  /**
+   * Allows you to dereference a reference made via `addRef`. Will resolve to
+   * whatever that step is now (or null if not found). Note that referenced
+   * referenced steps may change to a new step instance due to lifecycle
+   * methods (e.g. deduplicate) or even to an entirely separate class
+   * altogether (e.g. due to optimize). References are not guaranteed to be
+   * honoured.
+   *
+   * @experimental
+   */
+  protected getRef(id: number | null): Step | null {
+    if (!["plan", "validate", "optimize"].includes(this.operationPlan.phase)) {
+      throw new Error(
+        `Cannot call ${this}.getRef() when the operation plan phase is ${this.operationPlan.phase}; getRef may only be called during planning.`,
+      );
+    }
     if (id == null) return null;
-    return (this.operationPlan.stepTracker.getStepById(-id) as TStep) ?? null;
+    if (!this._refs.has(id)) {
+      throw new Error(
+        `Attempted to get a ref from ${this}, but no matching ref was made. Use .addRef() to add a reference.`,
+      );
+    }
+    return this.operationPlan.stepTracker.getStepById(-id) ?? null;
   }
 
   protected canAddDependency(step: Step): boolean {
