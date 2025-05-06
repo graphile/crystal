@@ -267,6 +267,7 @@ import {
   recordsMatch,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepAShouldTryAndInlineIntoStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
 
@@ -488,6 +489,7 @@ export {
   Step,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepAShouldTryAndInlineIntoStepB,
   StepOptimizeOptions,
   stepsAreInSamePhase,
   StepStreamOptions,
@@ -627,6 +629,7 @@ exportAsMany("grafast", {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
+  stepAShouldTryAndInlineIntoStepB,
   isPromiseLike,
   isDev,
   noop,

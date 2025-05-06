@@ -95,6 +95,8 @@ import {
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
+  layerPlanHeirarchyContains,
+  pathsFromAncestorToTargetLayerPlan,
   setsMatch,
   stepADependsOnStepB,
   sudo,
@@ -5132,54 +5134,6 @@ type StreamDetails = {
   initialCount: Step<number>;
   label: Step<Maybe<string>>;
 };
-
-export function pathsFromAncestorToTargetLayerPlan(
-  ancestor: LayerPlan,
-  lp: LayerPlan,
-): readonly LayerPlan[][] {
-  if (lp === ancestor) {
-    // One path, and it's the null path - stay where you are.
-    return [[]];
-  }
-
-  if (lp.reason.type === "combined") {
-    const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
-      pathsFromAncestorToTargetLayerPlan(ancestor, plp),
-    );
-    for (const path of childPaths) {
-      path.push(lp);
-    }
-    return childPaths;
-  } else if (lp.parentLayerPlan) {
-    const childPaths = pathsFromAncestorToTargetLayerPlan(
-      ancestor,
-      lp.parentLayerPlan,
-    );
-    for (const path of childPaths) {
-      path.push(lp);
-    }
-    return childPaths;
-  } else {
-    // No paths found - lp doesn't inherit from ancestor.
-    return [];
-  }
-}
-export function layerPlanHeirarchyContains(
-  lp: LayerPlan,
-  targetLp: LayerPlan,
-): boolean {
-  if (lp === targetLp) return true;
-  if (lp.reason.type === "combined") {
-    return lp.reason.parentLayerPlans.some((plp) =>
-      layerPlanHeirarchyContains(plp, targetLp),
-    );
-  } else if (lp.parentLayerPlan) {
-    // PERF: loop would be faster than recursion
-    return layerPlanHeirarchyContains(lp.parentLayerPlan, targetLp);
-  } else {
-    return false;
-  }
-}
 
 interface CommonPlanningDetails<
   TType extends

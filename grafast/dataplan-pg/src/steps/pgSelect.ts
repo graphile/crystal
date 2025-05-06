@@ -31,7 +31,7 @@ import {
   SafeError,
   Step,
   stepAMayDependOnStepB,
-  stepsAreInSamePhase,
+  stepAShouldTryAndInlineIntoStepB,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -1525,7 +1525,7 @@ export class PgSelectStep<
         }
 
         // Don't allow merging across a stream/defer/subscription boundary
-        if (!stepsAreInSamePhase($depPgSelect, this)) {
+        if (!stepAShouldTryAndInlineIntoStepB(this, $depPgSelect)) {
           continue;
         }
 

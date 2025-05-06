@@ -23,7 +23,10 @@ import * as graphql from "graphql";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
-import type { LayerPlan } from "./engine/LayerPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonPolymorphic,
+} from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
@@ -1044,6 +1047,90 @@ export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
     return false;
   }
   return !stepADependsOnStepB($b, $a);
+}
+
+export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
+  if (isDev && !stepADependsOnStepB($a, $b)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
+  if (!stepsAreInSamePhase($b, $a)) return false;
+  const paths = pathsFromAncestorToTargetLayerPlan($b.layerPlan, $a.layerPlan);
+  if (paths.length > 1) return false;
+  if ($a.polymorphicPaths != null) {
+    if (
+      $b.polymorphicPaths != null &&
+      ![...$b.polymorphicPaths].every((p) =>
+        [...$a.polymorphicPaths!].some((p2) => p2.startsWith(p)),
+      )
+    ) {
+      return false;
+    }
+    const polyLps = paths[0].filter(
+      (lp): lp is LayerPlan<LayerPlanReasonPolymorphic> =>
+        lp.reason.type === "polymorphic",
+    );
+    if (polyLps.length > 0) {
+      if (
+        ![...polyLps[polyLps.length - 1].reason.polymorphicPaths].every((p) =>
+          [...$a.polymorphicPaths!].some((p2) => p2 === p),
+        )
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function pathsFromAncestorToTargetLayerPlan(
+  ancestor: LayerPlan,
+  lp: LayerPlan,
+): readonly LayerPlan[][] {
+  if (lp === ancestor) {
+    // One path, and it's the null path - stay where you are.
+    return [[]];
+  }
+
+  if (lp.reason.type === "combined") {
+    const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
+      pathsFromAncestorToTargetLayerPlan(ancestor, plp),
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  } else if (lp.parentLayerPlan) {
+    const childPaths = pathsFromAncestorToTargetLayerPlan(
+      ancestor,
+      lp.parentLayerPlan,
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  } else {
+    // No paths found - lp doesn't inherit from ancestor.
+    return [];
+  }
+}
+
+export function layerPlanHeirarchyContains(
+  lp: LayerPlan,
+  targetLp: LayerPlan,
+): boolean {
+  if (lp === targetLp) return true;
+  if (lp.reason.type === "combined") {
+    return lp.reason.parentLayerPlans.some((plp) =>
+      layerPlanHeirarchyContains(plp, targetLp),
+    );
+  } else if (lp.parentLayerPlan) {
+    // PERF: loop would be faster than recursion
+    return layerPlanHeirarchyContains(lp.parentLayerPlan, targetLp);
+  } else {
+    return false;
+  }
 }
 
 /**

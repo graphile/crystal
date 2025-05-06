@@ -24,9 +24,9 @@ import type {
 import { $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
+import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
-import { pathsFromAncestorToTargetLayerPlan } from "./OperationPlan.js";
 
 const debug = debugFactory("grafast:OutputPlan");
 const debugVerbose = debug.extend("verbose");
