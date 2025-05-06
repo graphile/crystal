@@ -3,6 +3,7 @@ import type {
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
+import { $$deepDepSkip } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import type { ConnectionCapableStep } from "./connection.js";
@@ -24,6 +25,10 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
   ) {
     super();
     this.addDataDependency(itemsOrStep(parentPlan));
+  }
+
+  [$$deepDepSkip](): Step {
+    return this.getDepOptions(0).step;
   }
 
   execute({

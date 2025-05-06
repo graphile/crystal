@@ -47,7 +47,7 @@ export class __ItemStep<TData> extends UnbatchedStep<TData> {
     return this.getDep(0);
   }
   [$$deepDepSkip](): Step {
-    return this.getDep(0);
+    return this.getDepOptions(0).step;
   }
 
   execute(): GrafastResultsList<TData> {
