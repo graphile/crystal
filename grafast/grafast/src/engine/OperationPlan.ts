@@ -4302,7 +4302,7 @@ export class OperationPlan {
           for (const lp of reason.parentLayerPlans) {
             const paths = processPolymorphicPathsInLayerPlan(lp);
             for (const p of paths) {
-              if (polyPaths.has(p)) {
+              if (newPolyPaths.has(p)) {
                 throw new Error(
                   `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} found for ${layerPlan}`,
                 );
