@@ -90,7 +90,7 @@ export class __ListTransformStep<
   isSyncAndSafe = false;
 
   private listStepDepId: number;
-  private rawListStepDepId: number;
+  private rawListStepRefId: number | null;
   public itemPlanCallback: ListTransformItemPlanCallback<
     ItemsStep<TListStep>,
     TDepsStep
@@ -134,11 +134,7 @@ export class __ListTransformStep<
     const listStep = itemsOrStep(rawListStep);
     this.listStepDepId = this.addDependency(listStep);
 
-    // PERF: This is just so we can populate getListStep() correctly... Ideally we could mark this as a "plan-time-only" dependency.
-    this.rawListStepDepId =
-      rawListStep === listStep
-        ? this.listStepDepId
-        : this.addDependency(rawListStep);
+    this.rawListStepRefId = this.addRef(rawListStep);
 
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
@@ -191,7 +187,7 @@ export class __ListTransformStep<
   }
 
   getListStep(): TListStep {
-    return this.getDepOptions<TListStep>(this.rawListStepDepId).step;
+    return this.getRef(this.rawListStepRefId) as TListStep;
   }
 
   [$$deepDepSkip]() {
@@ -199,7 +195,7 @@ export class __ListTransformStep<
   }
 
   dangerouslyGetListPlan(): TListStep {
-    return this.dependencies[this.rawListStepDepId] as TListStep;
+    return this.getRef(this.rawListStepRefId) as TListStep;
   }
 
   deduplicate(

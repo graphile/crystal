@@ -1,6 +1,4 @@
 ---
-layout: page
-path: /postgraphile/deploying-lambda/
 title: Deploying to AWS Lambda
 ---
 

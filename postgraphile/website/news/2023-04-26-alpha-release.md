@@ -4,7 +4,7 @@ description: PostGraphile Version 5 is now ready to run in some production envir
 slug: 2023-04-26-version-5-alpha
 authors:
   - name: Benjie
-    title: Creator of PostGraphile
+    title: PostGraphile Maintainer
     url: https://github.com/Benjie
     image_url: https://github.com/Benjie.png
   - name: Jem

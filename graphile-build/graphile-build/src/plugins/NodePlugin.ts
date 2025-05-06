@@ -1,10 +1,14 @@
 import "graphile-config";
 
 import type { NodeIdCodec, NodeIdHandler } from "grafast";
-import { isDev, makeDecodeNodeId, makeDecodeNodeIdRuntime } from "grafast";
+import {
+  inspect,
+  isDev,
+  makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
+} from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
-import { inspect } from "../../../../grafast/grafast/src/inspect.js";
 import { EXPORTABLE } from "../utils.js";
 
 declare global {

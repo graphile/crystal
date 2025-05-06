@@ -56,6 +56,14 @@ build the website and push to the `gh-pages` branch.
 
 In order to render the latest documentation at pleasant URLs whilst still allowing permalinking to a major revision's documentation, we have utilized symlinks in the `versioned_*` directories.
 
+#### Promote from draft
+
+To promote draft docs to the V5 docs run the following:
+
+```
+yarn promote
+```
+
 #### Pre-release
 
 When work begins on a new major version of the software, create a new versioned pre-release of the documentation: run the [docusaurus command](https://docusaurus.io/docs/versioning):

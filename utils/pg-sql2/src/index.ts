@@ -1158,7 +1158,7 @@ export function isEquivalent(
   sql1: SQL,
   sql2: SQL,
   options?: {
-    symbolSubstitutes?: Map<symbol, symbol>;
+    symbolSubstitutes?: ReadonlyMap<symbol, symbol>;
   },
 ): boolean {
   if (sql1 === sql2) {

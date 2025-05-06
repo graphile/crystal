@@ -90,11 +90,13 @@ export class PgSelectSingleStep<
   public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
   private typeStepIndexList: number[] | null = null;
+  private fromRelation: { refId: number | null; relationName: string } | null =
+    null;
 
   constructor(
     $class: PgSelectStep<TResource>,
     $item: Step<unknown[]>,
-    private options: PgSelectSinglePlanOptions = Object.create(null),
+    options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
     this.itemStepId = this.addDependency($item);
@@ -103,6 +105,16 @@ export class PgSelectSingleStep<
     this.mode = $class.mode;
     this.classStepId = $class.id;
     this.peerKey = this.resource.name;
+    if (options.fromRelation) {
+      const [$pgSelectSingle, relationName] = options.fromRelation;
+      this.fromRelation = {
+        refId: this.addRef(
+          $pgSelectSingle,
+          "Indirect reference allowed due to relational field potentially pulling from a parent relation",
+        ),
+        relationName,
+      };
+    }
   }
 
   public coalesceToEmptyObject(): void {
@@ -217,26 +229,29 @@ export class PgSelectSingleStep<
       }
     }
 
-    if (this.options.fromRelation) {
-      const [$fromPlan, fromRelationName] = this.options.fromRelation;
-      const matchingAttribute = (
-        Object.entries($fromPlan.resource.codec.attributes!) as Array<
-          [string, PgCodecAttribute]
-        >
-      ).find(([name, col]) => {
-        if (col.identicalVia) {
-          const { relation, attribute } = $fromPlan.resource.resolveVia(
-            col.identicalVia,
-            name,
-          );
-          if (attribute === attr && relation === fromRelationName) {
-            return true;
+    if (this.fromRelation) {
+      const { refId, relationName } = this.fromRelation;
+      const $fromPlan = this.getRef(refId);
+      if ($fromPlan instanceof PgSelectSingleStep) {
+        const matchingAttribute = (
+          Object.entries($fromPlan.resource.codec.attributes!) as Array<
+            [string, PgCodecAttribute]
+          >
+        ).find(([name, col]) => {
+          if (col.identicalVia) {
+            const { relation, attribute } = $fromPlan.resource.resolveVia(
+              col.identicalVia,
+              name,
+            );
+            if (attribute === attr && relation === relationName) {
+              return true;
+            }
           }
+          return false;
+        });
+        if (matchingAttribute) {
+          return $fromPlan.get(matchingAttribute[0]) as any;
         }
-        return false;
-      });
-      if (matchingAttribute) {
-        return $fromPlan.get(matchingAttribute[0]) as any;
       }
     }
 
@@ -339,19 +354,22 @@ export class PgSelectSingleStep<
   ): PgSelectSingleStep<
     GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > | null {
-    if (this.options.fromRelation) {
-      const [$fromPlan, fromRelationName] = this.options.fromRelation;
-      // check to see if we already came via this relationship
-      const reciprocal = this.resource.getReciprocal(
-        $fromPlan.resource.codec,
-        fromRelationName,
-      );
-      if (reciprocal) {
-        const reciprocalRelationName = reciprocal[0];
-        if (reciprocalRelationName === relationIdentifier) {
-          const reciprocalRelation = reciprocal[1];
-          if (reciprocalRelation.isUnique) {
-            return $fromPlan as PgSelectSingleStep<any>;
+    if (this.fromRelation) {
+      const { refId, relationName } = this.fromRelation;
+      const $fromPlan = this.getRef(refId);
+      if ($fromPlan instanceof PgSelectSingleStep) {
+        // check to see if we already came via this relationship
+        const reciprocal = this.resource.getReciprocal(
+          $fromPlan.resource.codec,
+          relationName,
+        );
+        if (reciprocal) {
+          const reciprocalRelationName = reciprocal[0];
+          if (reciprocalRelationName === relationIdentifier) {
+            const reciprocalRelation = reciprocal[1];
+            if (reciprocalRelation.isUnique) {
+              return $fromPlan as PgSelectSingleStep<any>;
+            }
           }
         }
       }

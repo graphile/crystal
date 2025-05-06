@@ -6,7 +6,6 @@ import type { MiddlewareHandlers } from "graphile-config";
 import type {
   DocumentNode,
   GraphQLError,
-  GraphQLObjectType,
   OperationDefinitionNode,
 } from "graphql";
 
@@ -49,6 +48,7 @@ import {
   trackedRootValue,
 } from "./global.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
+import { inspect } from "./inspect.js";
 import type {
   $$cacheByOperation,
   $$hooked,
@@ -395,6 +395,7 @@ export {
   InputObjectTypeBakedInfo,
   InputObjectTypeBakedResolver,
   InputObjectTypeSpec,
+  inspect,
   InterfaceOrUnionPlans,
   isDev,
   isExecutableStep,
@@ -537,6 +538,7 @@ exportAsMany("grafast", {
   __ListTransformStep,
   __TrackedValueStep,
   __ValueStep,
+  inspect,
   access,
   get,
   AccessStep,
