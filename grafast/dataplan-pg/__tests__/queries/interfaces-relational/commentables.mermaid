@@ -38,26 +38,26 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
     PgSelect20[["PgSelect[20∈3]^<br />ᐸrelational_postsᐳ"]]:::plan
-    PgSelectInlineApply100["PgSelectInlineApply[100∈3] ➊<br />ᐳRelationalPost"]:::plan
-    Object10 & PgClassExpression19 & PgSelectInlineApply100 --> PgSelect20
-    PgSelect49[["PgSelect[49∈3]^<br />ᐸrelational_checklistsᐳ"]]:::plan
-    PgSelectInlineApply104["PgSelectInlineApply[104∈3] ➊<br />ᐳRelationalChecklist"]:::plan
-    Object10 & PgClassExpression19 & PgSelectInlineApply104 --> PgSelect49
-    PgSelect74[["PgSelect[74∈3]^<br />ᐸrelational_checklist_itemsᐳ"]]:::plan
-    PgSelectInlineApply108["PgSelectInlineApply[108∈3] ➊<br />ᐳRelationalChecklistItem"]:::plan
-    Object10 & PgClassExpression19 & PgSelectInlineApply108 --> PgSelect74
-    List102{{"List[102∈3]^<br />ᐸ101,26ᐳ"}}:::plan
-    Access101{{"Access[101∈3]^<br />ᐸ20.m.joinDetailsFor28ᐳ"}}:::plan
+    PgSelectInlineApply106["PgSelectInlineApply[106∈3] ➊<br />ᐳRelationalPost"]:::plan
+    Object10 & PgClassExpression19 & PgSelectInlineApply106 --> PgSelect20
+    PgSelect50[["PgSelect[50∈3]^<br />ᐸrelational_checklistsᐳ"]]:::plan
+    PgSelectInlineApply110["PgSelectInlineApply[110∈3] ➊<br />ᐳRelationalChecklist"]:::plan
+    Object10 & PgClassExpression19 & PgSelectInlineApply110 --> PgSelect50
+    PgSelect78[["PgSelect[78∈3]^<br />ᐸrelational_checklist_itemsᐳ"]]:::plan
+    PgSelectInlineApply114["PgSelectInlineApply[114∈3] ➊<br />ᐳRelationalChecklistItem"]:::plan
+    Object10 & PgClassExpression19 & PgSelectInlineApply114 --> PgSelect78
+    List108{{"List[108∈3]^<br />ᐸ107,26ᐳ"}}:::plan
+    Access107{{"Access[107∈3]^<br />ᐸ20.m.joinDetailsFor28ᐳ"}}:::plan
     PgSelectSingle26{{"PgSelectSingle[26∈3]^<br />ᐸrelational_postsᐳ"}}:::plan
-    Access101 & PgSelectSingle26 --> List102
-    List106{{"List[106∈3]^<br />ᐸ105,53ᐳ"}}:::plan
-    Access105{{"Access[105∈3]^<br />ᐸ49.m.joinDetailsFor55ᐳ"}}:::plan
-    PgSelectSingle53{{"PgSelectSingle[53∈3]^<br />ᐸrelational_checklistsᐳ"}}:::plan
-    Access105 & PgSelectSingle53 --> List106
-    List110{{"List[110∈3]^<br />ᐸ109,78ᐳ"}}:::plan
-    Access109{{"Access[109∈3]^<br />ᐸ74.m.joinDetailsFor80ᐳ"}}:::plan
-    PgSelectSingle78{{"PgSelectSingle[78∈3]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
-    Access109 & PgSelectSingle78 --> List110
+    Access107 & PgSelectSingle26 --> List108
+    List112{{"List[112∈3]^<br />ᐸ111,56ᐳ"}}:::plan
+    Access111{{"Access[111∈3]^<br />ᐸ50.m.joinDetailsFor58ᐳ"}}:::plan
+    PgSelectSingle56{{"PgSelectSingle[56∈3]^<br />ᐸrelational_checklistsᐳ"}}:::plan
+    Access111 & PgSelectSingle56 --> List112
+    List116{{"List[116∈3]^<br />ᐸ115,84ᐳ"}}:::plan
+    Access115{{"Access[115∈3]^<br />ᐸ78.m.joinDetailsFor86ᐳ"}}:::plan
+    PgSelectSingle84{{"PgSelectSingle[84∈3]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
+    Access115 & PgSelectSingle84 --> List116
     First24{{"First[24∈3]^"}}:::plan
     PgSelectRows25[["PgSelectRows[25∈3]^"]]:::plan
     PgSelectRows25 --> First24
@@ -68,8 +68,8 @@ graph TD
     First30{{"First[30∈3]^"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈3]^"]]:::plan
     PgSelectRows31 --> First30
-    Lambda103{{"Lambda[103∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda103 --> PgSelectRows31
+    Lambda109{{"Lambda[109∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda109 --> PgSelectRows31
     PgSelectSingle32{{"PgSelectSingle[32∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
     First30 --> PgSelectSingle32
     PgClassExpression33{{"PgClassExpression[33∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
@@ -84,58 +84,58 @@ graph TD
     PgSelectSingle26 --> PgClassExpression47
     PgClassExpression48{{"PgClassExpression[48∈3]^<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression48
-    First51{{"First[51∈3]^"}}:::plan
-    PgSelectRows52[["PgSelectRows[52∈3]^"]]:::plan
-    PgSelectRows52 --> First51
-    PgSelect49 --> PgSelectRows52
-    First51 --> PgSelectSingle53
-    PgClassExpression54{{"PgClassExpression[54∈3]^<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression54
-    First57{{"First[57∈3]^"}}:::plan
-    PgSelectRows58[["PgSelectRows[58∈3]^"]]:::plan
-    PgSelectRows58 --> First57
-    Lambda107{{"Lambda[107∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda107 --> PgSelectRows58
-    PgSelectSingle59{{"PgSelectSingle[59∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
-    First57 --> PgSelectSingle59
-    PgClassExpression60{{"PgClassExpression[60∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression60
-    PgClassExpression66{{"PgClassExpression[66∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression66
-    PgClassExpression72{{"PgClassExpression[72∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression72
-    PgClassExpression73{{"PgClassExpression[73∈3]^<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression73
-    First76{{"First[76∈3]^"}}:::plan
-    PgSelectRows77[["PgSelectRows[77∈3]^"]]:::plan
-    PgSelectRows77 --> First76
-    PgSelect74 --> PgSelectRows77
-    First76 --> PgSelectSingle78
-    PgClassExpression79{{"PgClassExpression[79∈3]^<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle78 --> PgClassExpression79
+    First54{{"First[54∈3]^"}}:::plan
+    PgSelectRows55[["PgSelectRows[55∈3]^"]]:::plan
+    PgSelectRows55 --> First54
+    PgSelect50 --> PgSelectRows55
+    First54 --> PgSelectSingle56
+    PgClassExpression57{{"PgClassExpression[57∈3]^<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression57
+    First60{{"First[60∈3]^"}}:::plan
+    PgSelectRows61[["PgSelectRows[61∈3]^"]]:::plan
+    PgSelectRows61 --> First60
+    Lambda113{{"Lambda[113∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda113 --> PgSelectRows61
+    PgSelectSingle62{{"PgSelectSingle[62∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
+    First60 --> PgSelectSingle62
+    PgClassExpression63{{"PgClassExpression[63∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle62 --> PgClassExpression63
+    PgClassExpression69{{"PgClassExpression[69∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle62 --> PgClassExpression69
+    PgClassExpression75{{"PgClassExpression[75∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle62 --> PgClassExpression75
+    PgClassExpression76{{"PgClassExpression[76∈3]^<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression76
     First82{{"First[82∈3]^"}}:::plan
     PgSelectRows83[["PgSelectRows[83∈3]^"]]:::plan
     PgSelectRows83 --> First82
-    Lambda111{{"Lambda[111∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda111 --> PgSelectRows83
-    PgSelectSingle84{{"PgSelectSingle[84∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgSelect78 --> PgSelectRows83
     First82 --> PgSelectSingle84
-    PgClassExpression85{{"PgClassExpression[85∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgClassExpression85{{"PgClassExpression[85∈3]^<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle84 --> PgClassExpression85
-    PgClassExpression91{{"PgClassExpression[91∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle84 --> PgClassExpression91
-    PgClassExpression97{{"PgClassExpression[97∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle84 --> PgClassExpression97
-    PgClassExpression98{{"PgClassExpression[98∈3]^<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle78 --> PgClassExpression98
-    PgClassExpression99{{"PgClassExpression[99∈3]^<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle78 --> PgClassExpression99
-    PgSelect20 --> Access101
-    List102 --> Lambda103
-    PgSelect49 --> Access105
-    List106 --> Lambda107
-    PgSelect74 --> Access109
-    List110 --> Lambda111
+    First88{{"First[88∈3]^"}}:::plan
+    PgSelectRows89[["PgSelectRows[89∈3]^"]]:::plan
+    PgSelectRows89 --> First88
+    Lambda117{{"Lambda[117∈3]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda117 --> PgSelectRows89
+    PgSelectSingle90{{"PgSelectSingle[90∈3]^<br />ᐸrelational_itemsᐳ"}}:::plan
+    First88 --> PgSelectSingle90
+    PgClassExpression91{{"PgClassExpression[91∈3]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle90 --> PgClassExpression91
+    PgClassExpression97{{"PgClassExpression[97∈3]^<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle90 --> PgClassExpression97
+    PgClassExpression103{{"PgClassExpression[103∈3]^<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle90 --> PgClassExpression103
+    PgClassExpression104{{"PgClassExpression[104∈3]^<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgSelectSingle84 --> PgClassExpression104
+    PgClassExpression105{{"PgClassExpression[105∈3]^<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle84 --> PgClassExpression105
+    PgSelect20 --> Access107
+    List108 --> Lambda109
+    PgSelect50 --> Access111
+    List112 --> Lambda113
+    PgSelect78 --> Access115
+    List116 --> Lambda117
 
     %% define steps
 
@@ -149,9 +149,9 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 10<br /><br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15,PgSelectSingle16,PgClassExpression17,PgPolymorphic18,PgClassExpression19 bucket2
-    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 100, 104, 108<br />2: 20, 49, 74<br />ᐳ: Access[101], Access[105], Access[109]<br />3: 25, 52, 77<br />ᐳ: 24, 26, 27, 46, 47, 48, 51, 53, 54, 73, 76, 78, 79, 98, 99, 102, 103, 106, 107, 110, 111<br />4: 31, 58, 83<br />ᐳ: 30, 32, 33, 39, 45, 57, 59, 60, 66, 72, 82, 84, 85, 91, 97"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />RelationalPost,RelationalChecklist,RelationalChecklistItem<br />Deps: 10, 19, 18<br />ᐳRelationalPost<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br /><br />1: 106, 110, 114<br />2: 20, 50, 78<br />ᐳ: Access[107], Access[111], Access[115]<br />3: 25, 55, 83<br />ᐳ: 24, 26, 27, 46, 47, 48, 54, 56, 57, 76, 82, 84, 85, 104, 105, 108, 109, 112, 113, 116, 117<br />4: 31, 61, 89<br />ᐳ: 30, 32, 33, 39, 45, 60, 62, 63, 69, 75, 88, 90, 91, 97, 103"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect20,First24,PgSelectRows25,PgSelectSingle26,PgClassExpression27,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression39,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgClassExpression48,PgSelect49,First51,PgSelectRows52,PgSelectSingle53,PgClassExpression54,First57,PgSelectRows58,PgSelectSingle59,PgClassExpression60,PgClassExpression66,PgClassExpression72,PgClassExpression73,PgSelect74,First76,PgSelectRows77,PgSelectSingle78,PgClassExpression79,First82,PgSelectRows83,PgSelectSingle84,PgClassExpression85,PgClassExpression91,PgClassExpression97,PgClassExpression98,PgClassExpression99,PgSelectInlineApply100,Access101,List102,Lambda103,PgSelectInlineApply104,Access105,List106,Lambda107,PgSelectInlineApply108,Access109,List110,Lambda111 bucket3
+    class Bucket3,PgSelect20,First24,PgSelectRows25,PgSelectSingle26,PgClassExpression27,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,PgClassExpression39,PgClassExpression45,PgClassExpression46,PgClassExpression47,PgClassExpression48,PgSelect50,First54,PgSelectRows55,PgSelectSingle56,PgClassExpression57,First60,PgSelectRows61,PgSelectSingle62,PgClassExpression63,PgClassExpression69,PgClassExpression75,PgClassExpression76,PgSelect78,First82,PgSelectRows83,PgSelectSingle84,PgClassExpression85,First88,PgSelectRows89,PgSelectSingle90,PgClassExpression91,PgClassExpression97,PgClassExpression103,PgClassExpression104,PgClassExpression105,PgSelectInlineApply106,Access107,List108,Lambda109,PgSelectInlineApply110,Access111,List112,Lambda113,PgSelectInlineApply114,Access115,List116,Lambda117 bucket3
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3
     end
