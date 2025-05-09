@@ -105,11 +105,15 @@ export class __DataOnlyStep<T> extends Step<T> {
   optimize(): Step<T> {
     if (this.polymorphicPaths === null) {
       // No need for me to exist
-      if (this.dependencies.length !== 1)
-        throw new Error(
-          `${this} has multiple dependencies, but no polymorphism?`,
-        );
-      return this.dependencies[0];
+      const firstDep = this.dependencies[0];
+      for (const dep of this.dependencies) {
+        if (dep !== firstDep) {
+          throw new Error(
+            `${this} has multiple dependencies (${dep} != ${firstDep}), but no polymorphism?`,
+          );
+        }
+      }
+      return firstDep;
     }
 
     const firstDep = this.dependencies[0];
