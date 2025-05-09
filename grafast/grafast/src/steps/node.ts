@@ -1,5 +1,3 @@
-import type { GraphQLObjectType } from "graphql";
-
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
@@ -9,8 +7,6 @@ import type {
 } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import { access } from "./access.js";
-import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
 
 /**
@@ -20,7 +16,7 @@ import { lambda } from "./lambda.js";
  * etc), and finally the Node id string plan.
  */
 export class NodeStep extends UnbatchedStep<{
-  typeName: string;
+  __typename: string;
   specifier: any;
 } | null> {
   static $$export = {
@@ -30,8 +26,6 @@ export class NodeStep extends UnbatchedStep<{
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  private specPlanDep: number;
-
   constructor(
     private possibleTypes: {
       [typeName: string]: NodeIdHandler;
@@ -40,18 +34,7 @@ export class NodeStep extends UnbatchedStep<{
   ) {
     super();
     const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
-    this.specPlanDep = this.addDependency(decodeNodeId($id));
-  }
-
-  planForType(type: GraphQLObjectType): Step {
-    const spec = this.possibleTypes[type.name];
-    if (spec !== undefined) {
-      return spec.get(
-        spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codec.name])),
-      );
-    } else {
-      return constant(null);
-    }
+    this.addDependency(decodeNodeId($id));
   }
 
   private getTypeNameFromSpecifier(specifier: any) {
@@ -72,10 +55,9 @@ export class NodeStep extends UnbatchedStep<{
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, specifier: any) {
-    const typeName = specifier
-      ? this.getTypeNameFromSpecifier(specifier)
-      : null;
-    return typeName != null ? { typeName, specifier } : null;
+    const __typename =
+      specifier != null ? this.getTypeNameFromSpecifier(specifier) : null;
+    return __typename != null ? { __typename, specifier } : null;
   }
 }
 
