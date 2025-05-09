@@ -7,6 +7,7 @@ import type {
   GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInterfaceType,
+  GraphQLList,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
@@ -2154,49 +2155,21 @@ export class OperationPlan {
             labelStepId: streamDetails.label.id,
           }
         : undefined;
-      const $__item = this.itemStepForListStep(
-        parentLayerPlan,
-        listItemPlanningPath,
-        $list,
+
+      this.queueNextLayer(this.planListItem, {
+        outputPlan: listOutputPlan,
+        path,
+        planningPath: listItemPlanningPath,
+        polymorphicPaths,
+        parentStep: $list,
+        positionType: nullableFieldType,
+        layerPlan: parentLayerPlan,
+        selections,
         listDepth,
         stream,
-      );
-      const $sideEffect = $__item.layerPlan.latestSideEffectStep;
-      try {
-        let $item: Step;
-        if (isListCapableStep($list)) {
-          $item = withGlobalLayerPlan(
-            $__item.layerPlan,
-            $__item.polymorphicPaths,
-            listItemPlanningPath,
-            $list.listItem,
-            $list,
-            $__item,
-          );
-        } else {
-          $item = $__item;
-        }
-        //this.addStepAtPlanningPath(listItemPlanningPath, $item);
-
-        this.queueNextLayer(this.planIntoOutputPlan, {
-          outputPlan: listOutputPlan,
-          path,
-          planningPath: listItemPlanningPath,
-          polymorphicPaths,
-          parentStep: $item,
-          positionType: nullableFieldType.ofType,
-          layerPlan: $item.layerPlan,
-          selections,
-          parentObjectType: null,
-          responseKey: null,
-          locationDetails,
-          resolverEmulation,
-          listDepth: listDepth + 1,
-          streamDetails: null,
-        });
-      } finally {
-        $__item.layerPlan.latestSideEffectStep = $sideEffect;
-      }
+        locationDetails,
+        resolverEmulation,
+      });
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.grafast?.plan;
       const fnDescription = `${nullableFieldType.name}.plan`;
@@ -2425,6 +2398,80 @@ export class OperationPlan {
         //  this.analyzePlanningPath(polymorphicPlanningPath);
         //}
       }
+    }
+  }
+
+  /** @internal */
+  private planListItem(details: {
+    outputPlan: OutputPlan;
+    path: readonly string[];
+    planningPath: string;
+    polymorphicPaths: ReadonlySet<string> | null;
+    parentStep: Step;
+    positionType: GraphQLList<GraphQLOutputType>;
+    layerPlan: LayerPlan;
+    selections: readonly SelectionNode[] | undefined;
+    listDepth: number;
+    stream: LayerPlanReasonListItemStream | undefined;
+    locationDetails: LocationDetails;
+    resolverEmulation: boolean;
+  }) {
+    const {
+      outputPlan: listOutputPlan,
+      path,
+      planningPath: listItemPlanningPath,
+      polymorphicPaths,
+      parentStep: $list,
+      positionType: nullableFieldType,
+      layerPlan: parentLayerPlan,
+      selections,
+      listDepth,
+      stream,
+      locationDetails,
+      resolverEmulation,
+    } = details;
+    const $__item = this.itemStepForListStep(
+      parentLayerPlan,
+      listItemPlanningPath,
+      $list,
+      listDepth,
+      stream,
+    );
+    const $sideEffect = $__item.layerPlan.latestSideEffectStep;
+    try {
+      let $item: Step;
+      if (isListCapableStep($list)) {
+        $item = withGlobalLayerPlan(
+          $__item.layerPlan,
+          $__item.polymorphicPaths,
+          listItemPlanningPath,
+          $list.listItem,
+          $list,
+          $__item,
+        );
+      } else {
+        $item = $__item;
+      }
+      //this.addStepAtPlanningPath(listItemPlanningPath, $item);
+
+      this.planIntoOutputPlan({
+        outputPlan: listOutputPlan,
+        path,
+        planningPath: listItemPlanningPath,
+        polymorphicPaths,
+        parentStep: $item,
+        positionType: nullableFieldType.ofType,
+        layerPlan: $item.layerPlan,
+        selections,
+        parentObjectType: null,
+        responseKey: null,
+        locationDetails,
+        resolverEmulation,
+        listDepth: listDepth + 1,
+        streamDetails: null,
+      });
+    } finally {
+      $__item.layerPlan.latestSideEffectStep = $sideEffect;
     }
   }
 
