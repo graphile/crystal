@@ -21,9 +21,8 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
-  PgSelectSingleStep,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep } from "@dataplan/pg";
+import { assertPgClassSingleStep, PgSelectSingleStep } from "@dataplan/pg";
 import type {
   DataFromObjectSteps,
   ExecutableStep,
@@ -31,6 +30,8 @@ import type {
   ListStep,
   Maybe,
   NodeIdHandler,
+  Step,
+  PolymorphicTypePlanner,
 } from "grafast";
 import {
   access,
@@ -1069,6 +1070,153 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   return;
                 }
                 const interfaceTypeName = inflection.tableType(codec);
+
+                if (polymorphism.typeAttributes.length !== 1) {
+                  throw new Error(
+                    `Currently only support one polymorphic type attribute`,
+                  );
+                }
+                const typeAttrName = polymorphism.typeAttributes[0];
+                const typeNameFromType = EXPORTABLE(
+                  (polymorphism) =>
+                    function typeNameFromType(typeVal: string) {
+                      return polymorphism.types[typeVal]?.name ?? null;
+                    },
+                  [polymorphism],
+                  `${interfaceTypeName}_typeNameFromType`,
+                );
+
+                const planType = ((): ((
+                  $specifier: Step,
+                ) => PolymorphicTypePlanner) => {
+                  if (polymorphism.mode === "single") {
+                    return EXPORTABLE(
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ) =>
+                        function planType($specifier) {
+                          const $typeVal = get($specifier, typeAttrName);
+                          const $__typename = lambda(
+                            $typeVal,
+                            typeNameFromType,
+                            true,
+                          );
+                          return {
+                            $__typename,
+                            planType() {
+                              if ($specifier instanceof PgSelectSingleStep) {
+                                return $specifier;
+                              } else {
+                                return resource.get(
+                                  Object.fromEntries(
+                                    pk.map((attrName) => [
+                                      attrName,
+                                      get($specifier, attrName),
+                                    ]),
+                                  ),
+                                );
+                              }
+                            },
+                          };
+                        },
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ],
+                    );
+                  } else if (polymorphism.mode === "relational") {
+                    return EXPORTABLE(
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        polymorphism,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ) =>
+                        ($specifier) => {
+                          const $typeVal = get($specifier, typeAttrName);
+                          const $__typename = lambda(
+                            $typeVal,
+                            typeNameFromType,
+                            true,
+                          );
+                          return {
+                            $__typename,
+                            planForType(type) {
+                              const spec = Object.values(
+                                polymorphism.types,
+                              ).find((s) => s.name === type.name);
+                              if (!spec) {
+                                throw new Error(
+                                  `${this} Could not find matching name for relational polymorphic '${type.name}'`,
+                                );
+                              }
+                              const relationIdentifier = spec.relationName;
+                              if ($specifier instanceof PgSelectSingleStep) {
+                                return $specifier.singleRelation(
+                                  relationIdentifier,
+                                );
+                              } else {
+                                const relation = resource.getRelation(
+                                  relationIdentifier,
+                                ) as PgCodecRelation;
+                                if (!relation || !relation.isUnique) {
+                                  throw new Error(
+                                    `${String(relationIdentifier)} is not a unique relation on ${
+                                      resource
+                                    }`,
+                                  );
+                                }
+                                const {
+                                  remoteResource,
+                                  remoteAttributes,
+                                  localAttributes,
+                                } = relation;
+
+                                return remoteResource.get(
+                                  Object.fromEntries(
+                                    remoteAttributes.map(
+                                      (remoteAttribute, idx) => [
+                                        remoteAttribute,
+                                        get($specifier, localAttributes[idx]),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          };
+                        },
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        polymorphism,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ],
+                    );
+                  } else {
+                    const never: never = polymorphism;
+                    throw new Error(
+                      `${this}: Don't know how to plan polymorphism mode ${(never as any).mode}`,
+                    );
+                  }
+                })();
                 build.registerInterfaceType(
                   interfaceTypeName,
                   {
@@ -1081,23 +1229,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   () => ({
                     description: codec.description,
                     // All types have the same plan
-                    planType($specifier) {
-                      const $__typename = get($specifier, "__typename");
-                      const $row = resource.get(
-                        Object.fromEntries(
-                          pk.map((attrName) => [
-                            attrName,
-                            get($specifier, attrName),
-                          ]),
-                        ),
-                      );
-                      return {
-                        $__typename,
-                        planForType() {
-                          return $row;
-                        },
-                      };
-                    },
+                    planType,
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );

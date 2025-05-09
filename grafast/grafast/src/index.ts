@@ -463,6 +463,7 @@ export {
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
+  PolymorphicTypePlanner,
   PromiseOrDirect,
   proxy,
   ProxyStep,
