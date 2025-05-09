@@ -81,47 +81,9 @@ returned by `randomAnimals`.
 
 Operations may have any number (0 or higher) of polymorphic positions.
 
-## Polymorphic-capable steps
-
-**THIS IS ALL WRONG! Polymorphism doesn't work like this any more.**
-
-When a polymorphic position in an operation is being planned, Gra*fast* will
-call the field's plan resolver function as usual (or the resulting step's
-`itemPlan` method for polymorphic positions occurring inside of lists) to get
-the step representing this polymorphic position. Gra*fast* requires that this
-step must be a polymorphic-capable step, that is a step whose class implements
-the `planForType` method, otherwise a planning error will be raised.
-
-```ts
-  planForType(objectType: GraphQLObjectType): ExecutableStep;
-```
-
-Having determined the polymorphic-capable step that represents this polymorphic
-position, Gra*fast* will create a polymorphic LayerPlan and loop through all of
-the possible concrete object types valid at that location. For each concrete
-object type, Gra*fast* will pass the type to the polymorphic-capable step's
-`planForType` method and the resulting step will represent that concrete object
-type. Multiple concrete object types may be represented by the same step.
-
-Planning then continues with the child selection sets being traversed for each
-possible concrete object type and corresponding step.
-
-At run-time, when a polymorphic-capable step executes, each of the entries in
-the `execute()` result list must be either `null`, an error, or the result of
-calling Gra*fast*'s `polymorphicWrap` function, passing the concrete object
-type's name as the first argument, and optionally any associated data as the
-second argument. This allows Gra*fast* to determine which "polymorphic branch"
-has been taken, which will control which future steps will be executed against
-this data.
-
-```ts
-export function polymorphicWrap<TType extends string>(
-  type: TType,
-  data?: unknown,
-): PolymorphicData<TType>;
-```
-
 ## Caveats
+
+<!-- TODO: update this -->
 
 Highly polymorphic operations may result in very significant planning time,
 this is something we're working to optimize but for now we recommend that you
