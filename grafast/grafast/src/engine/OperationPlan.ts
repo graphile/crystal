@@ -3683,9 +3683,23 @@ export class OperationPlan {
 
     if (winner.polymorphicPaths !== null) {
       const polymorphicPaths = new Set<string>();
-      for (const s of stepsAtMinDepth) {
+      const layerPolymorphicPaths = polymorphicPathsForLayer(winner.layerPlan)!;
+      for (const s of equivalentSteps) {
         for (const p of s.polymorphicPaths!) {
-          polymorphicPaths.add(p);
+          let trimmed = p;
+          let i;
+          while (
+            !layerPolymorphicPaths.has(trimmed) &&
+            (i = trimmed.lastIndexOf(">")) >= 0
+          ) {
+            if (i === 0) {
+              throw new Error(
+                `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
+              );
+            }
+            trimmed = trimmed.slice(0, i);
+          }
+          polymorphicPaths.add(trimmed);
         }
       }
       winner.polymorphicPaths = polymorphicPaths;
@@ -5213,4 +5227,30 @@ function defaultPlanType(
 interface PolyDeets {
   step: Step;
   polymorphicLayerPlan: LayerPlan<LayerPlanReasonPolymorphic>;
+}
+
+function polymorphicPathsForLayer(
+  layer: LayerPlan,
+): ReadonlySet<string> | null {
+  switch (layer.reason.type) {
+    case "polymorphic":
+    case "polymorphicPartition": {
+      return layer.reason.polymorphicPaths;
+    }
+    case "combined": {
+      const set = new Set<string>();
+      for (const lp of layer.reason.parentLayerPlans) {
+        for (const p of polymorphicPathsForLayer(lp)!) {
+          set.add(p);
+        }
+      }
+      return set;
+    }
+    case "root": {
+      return null;
+    }
+    default: {
+      return polymorphicPathsForLayer(layer.parentLayerPlan!);
+    }
+  }
 }
