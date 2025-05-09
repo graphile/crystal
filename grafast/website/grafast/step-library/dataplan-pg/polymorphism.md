@@ -16,28 +16,6 @@ dealing with complex setups.
 Read on for examples of these.
 
 <!--
-## pgSingleTablePolymorphic
-
-`pgSingleTablePolymorphic` is useful only for the "single table" polymorphism
-style (see below) but is much simpler to use than `pgPolymorphic`.
-
-### pgSingleTablePolymorphic function
-
-The `pgSingleTablePolymorphic` function can only be used in the "single table"
-style, and accepts two arguments:
-
-1. `$typeName` - a step that resolves to the GraphQL type name of the row
-2. `$row` - a step representing the database row
-
-Here's a simplified description of the `pgSingleTablePolymorphic` function:
-
-```ts
-export function pgSingleTablePolymorphic(
-  $typePlan: ExecutableStep<string>,
-  $rowPlan: PgSelectSingleStep,
-): PgSingleTablePolymorphicStep;
-```
-
 ## pgPolymorphic
 
 `pgPolymorphic` works by matching the runtime value of a "specifier" step
@@ -174,99 +152,6 @@ itemResource.codec.polymorphism = {
   },
 };
 ```
-
-<details>
-<summary>Alternatively, if you'd rather not change your source/codec...</summary>
-
-If you'd rather not change your source/codec then you can use `pgSingleTablePolymorphic`:
-
-```ts
-// Map the SQL 'type' values to their GraphQL equivalents
-const sqlTypeToGraphQLType = (type) =>
-  ({
-    TOPIC: "Topic",
-    POST: "Post",
-    DIVIDER: "Divider",
-    CHECKLIST: "Checklist",
-    CHECKLIST_ITEM: "ChecklistItem",
-  })[type] ?? null;
-// Or: `const sqlTypeToGraphQLType = pascalCase;`
-
-/******/
-
-const plans = {
-  Comment: {
-    item($comment) {
-      // Get the 'item' related to this comment
-      const $item = $comment.singleRelation("item");
-
-      // Get the 'type' column from the item
-      const $type = $item.get("type");
-
-      // Convert the 'type' value into the name of a GraphQL type
-      const $typeName = lambda($type, sqlTypeToGraphQLType);
-
-      // Return the polymorphic step representing this item
-      return pgSingleTablePolymorphic($typeName, $item);
-    },
-  },
-};
-```
-
-<details>
-
-<summary>
-
-It's also possible to use `pgPolymorphic` to plan this style of polymorphism.
-
-</summary>
-
-:::note
-
-All `plan` methods just return the `$item` directly, since the `$item` represents all possible types.
-
-:::
-
-```ts
-const itemsTypeMap = {
-  Topic: {
-    match: (t) => t === "TOPIC",
-    plan: (_, $item) => $item,
-  },
-  Post: {
-    match: (t) => t === "POST",
-    plan: (_, $item) => $item,
-  },
-  Divider: {
-    match: (t) => t === "DIVIDER",
-    plan: (_, $item) => $item,
-  },
-  Checklist: {
-    match: (t) => t === "CHECKLIST",
-    plan: (_, $item) => $item,
-  },
-  ChecklistItem: {
-    match: (t) => t === "CHECKLIST_ITEM",
-    plan: (_, $item) => $item,
-  },
-};
-
-/******/
-
-const plans = {
-  Comment: {
-    item($comment) {
-      const $item = $comment.singleRelation("item");
-      const $type = $item.get("type");
-      return pgPolymorphic($item, $type, itemsTypeMap);
-    },
-  },
-};
-```
-
-</details>
-
-</details>
 
 ### Relational table
 

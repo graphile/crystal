@@ -174,10 +174,6 @@ import {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
-import {
-  pgSingleTablePolymorphic,
-  PgSingleTablePolymorphicStep,
-} from "./steps/pgSingleTablePolymorphic.js";
 import { PgTempTable } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
@@ -344,8 +340,6 @@ export {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
   PgSelectStep,
-  pgSingleTablePolymorphic,
-  PgSingleTablePolymorphicStep,
   PgTempTable,
   PgTypedStep,
   pgUnionAll,
@@ -429,12 +423,10 @@ exportAsMany("@dataplan/pg", {
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
-  pgSingleTablePolymorphic,
   pgUnionAll,
   PgUnionAllSingleStep,
   PgUnionAllRowsStep,
   PgUnionAllStep,
-  PgSingleTablePolymorphicStep,
   pgUpdateSingle,
   PgUpdateSingleStep,
   pgValidateParsedCursor,
