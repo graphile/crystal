@@ -1125,7 +1125,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           );
                           return {
                             $__typename,
-                            planType() {
+                            planForType() {
                               if ($step instanceof PgSelectSingleStep) {
                                 return $step;
                               } else {
