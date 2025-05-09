@@ -1116,7 +1116,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeNameFromType,
                       ) =>
                         function planType($specifier, { $original }) {
-                          const $typeVal = get($specifier, typeAttrName);
+                          const $step = $original ?? $specifier;
+                          const $typeVal = get($step, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
                             typeNameFromType,
@@ -1125,14 +1126,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           return {
                             $__typename,
                             planType() {
-                              if ($original instanceof PgSelectSingleStep) {
-                                return $original;
+                              if ($step instanceof PgSelectSingleStep) {
+                                return $step;
                               } else {
                                 return resource.get(
                                   Object.fromEntries(
                                     pk.map((attrName) => [
                                       attrName,
-                                      get($specifier, attrName),
+                                      get($step, attrName),
                                     ]),
                                   ),
                                 );
@@ -1183,7 +1184,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeNameFromType,
                       ) =>
                         ($specifier, { $original }) => {
-                          const $typeVal = get($specifier, typeAttrName);
+                          const $step = $original ?? $specifier;
+                          const $typeVal = get($step, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
                             typeNameFromType,
@@ -1201,14 +1203,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                 );
                               }
                               const relationIdentifier = spec.relationName;
-                              if ($original instanceof PgSelectSingleStep) {
-                                if ($original.resource === resource) {
+                              if ($step instanceof PgSelectSingleStep) {
+                                if ($step.resource === resource) {
                                   // It's the core table, redirect to the relation
-                                  return $original.singleRelation(
+                                  return $step.singleRelation(
                                     relationIdentifier,
                                   );
                                 } else {
-                                  return $original;
+                                  return $step;
                                 }
                               } else {
                                 const relation = resource.getRelation(
@@ -1232,7 +1234,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                     remoteAttributes.map(
                                       (remoteAttribute, idx) => [
                                         remoteAttribute,
-                                        get($specifier, localAttributes[idx]),
+                                        get($step, localAttributes[idx]),
                                       ],
                                     ),
                                   ),
