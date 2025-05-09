@@ -3729,7 +3729,7 @@ export class OperationPlan {
     const winner = stepsAtMinDepth[0];
 
     if (winner.polymorphicPaths !== null) {
-      const polymorphicPaths = new Set<string>();
+      const polymorphicPaths = new Set<string>(winner.polymorphicPaths);
       const layerPolymorphicPaths = polymorphicPathsForLayer(winner.layerPlan)!;
       for (const s of equivalentSteps) {
         for (const p of s.polymorphicPaths!) {
