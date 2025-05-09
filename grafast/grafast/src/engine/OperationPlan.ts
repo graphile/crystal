@@ -4936,7 +4936,7 @@ export class OperationPlan {
     const layerPlan = currentLayerPlan();
     const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${paths ? [...paths].join(",") : ""}`
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${paths == null ? "" : [...paths].join(",")}`
     ] ??= new Map());
 
     const cacheIt = () => {
