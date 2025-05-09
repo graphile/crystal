@@ -451,6 +451,10 @@ export class PgSelectSingleStep<
     )`${this.getClassStep().alias}`;
   }
 
+  public toRecord(): Step {
+    return this.record();
+  }
+
   /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
