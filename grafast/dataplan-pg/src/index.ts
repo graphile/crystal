@@ -145,11 +145,6 @@ import {
 } from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
-  pgPolymorphic,
-  PgPolymorphicStep,
-  PgPolymorphicTypeMap,
-} from "./steps/pgPolymorphic.js";
-import {
   generatePgParameterAnalysis,
   pgFromExpression,
   pgFromExpressionRuntime,
@@ -308,9 +303,6 @@ export {
   PgPath,
   PgPoint,
   PgPolygon,
-  pgPolymorphic,
-  PgPolymorphicStep,
-  PgPolymorphicTypeMap,
   PgRecordTypeCodecSpec,
   PgRefDefinition,
   PgRefDefinitionExtensions,
@@ -410,8 +402,6 @@ exportAsMany("@dataplan/pg", {
   PgInsertSingleStep,
   pgPageInfo,
   PgPageInfoStep,
-  pgPolymorphic,
-  PgPolymorphicStep,
   pgSelect,
   pgFromExpressionRuntime,
   pgFromExpression,

@@ -15,63 +15,6 @@ dealing with complex setups.
 
 Read on for examples of these.
 
-<!--
-## pgPolymorphic
-
-`pgPolymorphic` works by matching the runtime value of a "specifier" step
-against a "polymorphic type map" that defines the types supported, how to
-detect matches, and what to do when the type is matched.
-
-### Polymorphic type map
-
-Here's a simplified description of the polymorphic type map used by `pgPolymorphic`:
-
-```ts
-interface PgPolymorphicTypeMap {
-  [typeName: string]: {
-    match(specifier: any): boolean;
-    plan(
-      $specifier: ExecutableStep,
-      $item: PgSelectSingleStep | PgClassExpressionStep,
-    ): ExecutableStep;
-  };
-}
-```
-
-Every concrete GraphQL object type that the `pgPolymorphic` step should support
-must have an entry in this map, the key for which is the type's name, and the
-value is an object with two methods:
-
-1. `match(specifier)` - a function called at runtime that returns true if the
-   specifier matches this type, false otherwise
-2. `plan($specifier, $item)` - a plan resolver function that accepts the
-   specifier step and the item step and returns a step representing this
-   concrete object type
-
-The specifier can be anything you need it to be - for example it could be the
-value of a 'type' column, or it could be the entire composite record itself -
-you choose what it is when you feed a step representing it into the
-`pgPolymorphic` function.
-
-### pgPolymorphic function
-
-The `pgPolymorphic` function accepts three arguments:
-
-1. `$item` - a step representing the database row or composite type
-2. `$specifier` - a step representing the specifier used to identify a match - typically a derivative of `$item`
-3. `possibleTypes` - the polymorphic type map object discussed above
-
-Here's a simplified description of the `pgPolymorphic` function:
-
-```ts
-export function pgPolymorphic(
-  $item: PgSelectSingleStep | PgClassExpressionStep
-  $typeSpecifier: ExecutableStep,
-  possibleTypes: PgPolymorphicTypeMap
-): PgPolymorphicStep
-```
--->
-
 ## Types of polymorphism supported
 
 There are many ways of modelling polymorphism in the database, and they each
@@ -273,51 +216,6 @@ additional data for this type.
 
 :::
 
-<details>
-
-<summary>Alternatively, if you don't want to change your codec...</summary>
-
-This style of polymorphism could be planned via `pgPolymorphic` (note the
-`plan` method returns a step representing a row from the relevant underlying
-table):
-
-```ts
-const itemsTypeMap = {
-  Topic: {
-    match: (t) => t === "TOPIC",
-    plan: (_, $item) => $item.singleRelation("topic"),
-  },
-  Post: {
-    match: (t) => t === "POST",
-    plan: (_, $item) => $item.singleRelation("post"),
-  },
-  Divider: {
-    match: (t) => t === "DIVIDER",
-    plan: (_, $item) => $item.singleRelation("divider"),
-  },
-  Checklist: {
-    match: (t) => t === "CHECKLIST",
-    plan: (_, $item) => $item.singleRelation("checklist"),
-  },
-  ChecklistItem: {
-    match: (t) => t === "CHECKLIST_ITEM",
-    plan: (_, $item) => $item.singleRelation("checklistItem"),
-  },
-};
-
-const plans = {
-  Comment: {
-    item($comment) {
-      const $item = $comment.singleRelation("item");
-      const $type = $item.get("type");
-      return pgPolymorphic($item, $type, itemsTypeMap);
-    },
-  },
-};
-```
-
-</details>
-
 ### Composite type union
 
 One way to indicate a union would be to use a composite type with an attribute
@@ -339,35 +237,43 @@ create type entity as (
 This type could then be used as the return result for functions or as the type
 for a column to indicate a polymorphic relationship.
 
-This type style of polymorphism could be planned via `pgPolymorphic` (note
-we've modelled the specifier as a tuple):
-
 ```ts
-const entityTypeMap = {
-  Person: {
-    match: (specifier) => specifier[0] != null,
-    plan: ($specifier) => personResource.get({ person_id: $specifier.at(0) }),
-  },
-  Post: {
-    match: (specifier) => specifier[1] != null,
-    plan: ($specifier) => postResource.get({ post_id: $specifier.at(1) }),
-  },
-  Comment: {
-    match: (specifier) => specifier[2] != null,
-    plan: ($specifier) => commentResource.get({ comment_id: $specifier.at(2) }),
-  },
-};
-
 const plans = {
   PersonBookmark: {
     bookmarkedEntity($bookmark) {
-      const $item = $bookmark.get("bookmarked_entity");
-      const $specifier = list([
-        $item.get("person_id"),
-        $item.get("post_id"),
-        $item.get("comment_id"),
-      ]);
-      return pgPolymorphic($item, $specifier, entityTypeMap);
+      return $bookmark.get("bookmarked_entity");
+    },
+  },
+  Entity: {
+    planType($specifier) {
+      const $personId = $item.get("person_id");
+      const $postId = $item.get("post_id");
+      const $commentId = $item.get("comment_id");
+      const $__typename = lambda(
+        [$personId, $postId, $commentId],
+        ([personId, postId, commentId]) => {
+          if (personId != null) return "Person";
+          if (postId != null) return "Post";
+          if (commentId != null) return "Comment";
+          return null;
+        },
+        true,
+      );
+      return {
+        $__typename,
+        planForType(t) {
+          switch (t.name) {
+            case "Person":
+              return personResource.get({ person_id: $personId });
+            case "Post":
+              return postResource.get({ post_id: $postId });
+            case "Comment":
+              return commentResource.get({ comment_id: $commentId });
+            default:
+              throw new Error(`Don't know how to plan type ${t}`);
+          }
+        },
+      };
     },
   },
 };
@@ -462,53 +368,6 @@ const plans = {
   },
 };
 ```
-
-<details>
-
-<summary>Alternatively, you could use <tt>pgPolymorphic</tt>:</summary>
-
-Planning for this could be very similar to the composite type union above:
-
-```ts
-const personFavouriteEntityTypeMap = {
-  Person: {
-    match: (specifier) => specifier[0] != null,
-    plan: ($specifier) => personResource.get({ person_id: $specifier.at(0) }),
-  },
-  Post: {
-    match: (specifier) => specifier[1] != null,
-    plan: ($specifier) => postResource.get({ post_id: $specifier.at(1) }),
-  },
-  Comment: {
-    match: (specifier) => specifier[2] != null,
-    plan: ($specifier) => commentResource.get({ comment_id: $specifier.at(2) }),
-  },
-};
-
-const plans = {
-  Person: {
-    favourites($person) {
-      const $favourites = personFavouritesResource.find({
-        person_id: $person.get("id"),
-      });
-      return each($favourites, ($favourite) => {
-        const $specifier = list([
-          $favourite.get("liked_person_id"),
-          $favourite.get("liked_post_id"),
-          $favourite.get("liked_comment_id"),
-        ]);
-        return pgPolymorphic(
-          $favourite,
-          $specifier,
-          personFavouriteEntityTypeMap,
-        );
-      });
-    },
-  },
-};
-```
-
-</details>
 
 ### Completely separate tables
 
