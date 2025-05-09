@@ -41,39 +41,6 @@ export class __DataOnlyStep<T> extends Step<T> {
     }
   }
 
-  /** @internal */
-  public getDepFor(step: Step) {
-    const polyPaths = currentPolymorphicPaths() ?? step.polymorphicPaths;
-    if (polyPaths == null) {
-      return this;
-    }
-    let matchingIndex: number | null = null;
-    for (const path of polyPaths) {
-      const idx = this.indexByPath[path];
-      if (idx == null) {
-        console.warn(
-          `GrafastInternalWarning<1fe0eee2-bee0-4c04-ba14-cf1cb592f1de>: Could not determine data only step dependency to use with polymorphic path ${path}`,
-        );
-        return this;
-      }
-      if (matchingIndex !== null && matchingIndex !== idx) {
-        console.warn(
-          `GrafastInternalWarning<a173445b-7027-44ba-8985-f60743774cb1>: Data only steps did not match for current polymorphic paths!`,
-        );
-        return this;
-      }
-      matchingIndex = idx;
-    }
-    if (matchingIndex === null) {
-      console.warn(
-        `GrafastInternalWarning<1c9558d5-9952-43f9-aa2f-90267ba2a078>: Could not find a dataOnly match for ${[...polyPaths]}`,
-      );
-      return this;
-    }
-    const depOptions = this.getDepOptions(matchingIndex);
-    return depOptions.step;
-  }
-
   public toStringMeta(): string | null {
     if (this.dependencies.length === 1) {
       return this.getDepOptions(0).step.toString();

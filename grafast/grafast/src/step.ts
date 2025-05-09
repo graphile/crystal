@@ -391,16 +391,10 @@ export /* abstract */ class Step<TData = any> {
   protected getDepOptions<TStep extends Step = Step>(
     depId: number,
   ): DependencyOptions<TStep> {
-    let step = this.dependencies[depId] as TStep;
+    const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
-    let dataOnly = false;
-    // TODO: replace this with instanceof __DataOnlyStep... except
-    // without creating a circular dependency
-    if (step.constructor.name === "__DataOnlyStep") {
-      step = (step as any as __DataOnlyStep<any>).getDepFor(this) as TStep;
-      dataOnly = true;
-    }
+    const dataOnly = false;
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
   }
