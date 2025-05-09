@@ -4925,10 +4925,6 @@ export class OperationPlan {
    * need to regenerate it on future calls, significantly reducing the load on
    * deduplication later.
    *
-   * Note: automatically extends the cached step into other (relevant)
-   * polymorphic paths; if this shouldn't be the case then don't use cacheStep
-   * and instead rely on deduplication as usual.
-   *
    * @experimental
    */
   cacheStep<T extends Step>(
@@ -4940,7 +4936,7 @@ export class OperationPlan {
     const layerPlan = currentLayerPlan();
     const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${paths ? [...paths].join(",") : ""}`
     ] ??= new Map());
 
     const cacheIt = () => {
@@ -4963,11 +4959,6 @@ export class OperationPlan {
     const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
     if (cachedStep) {
-      // Fix poly paths
-      if (paths) {
-        fixStepPolyPaths(layerPlan, paths, cachedStep);
-      }
-
       return cachedStep;
     } else {
       return cacheIt();
@@ -5201,25 +5192,6 @@ function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
   if (step.polymorphicPaths === null) return true;
   // PERF: this can probably be optimized further
   return false;
-}
-
-function fixStepPolyPaths(
-  layerPlan: LayerPlan,
-  paths: ReadonlySet<string>,
-  step: Step,
-) {
-  if (step.polymorphicPaths && step.layerPlan === layerPlan) {
-    // Add these poly paths to the cached step
-    const polymorphicPaths = new Set<string>([
-      ...step.polymorphicPaths,
-      ...paths,
-    ]);
-    step.polymorphicPaths = polymorphicPaths;
-    // And fix its dependencies
-    for (const dep of sudo(step).dependencies) {
-      fixStepPolyPaths(layerPlan, paths, dep);
-    }
-  }
 }
 
 function defaultPlanType(
