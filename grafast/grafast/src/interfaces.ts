@@ -917,4 +917,11 @@ export interface ExecuteStepEvent {
 export interface PlanTypeInfo {
   abstractType: GraphQLUnionType | GraphQLInterfaceType;
   resolverEmulation: boolean;
+  /**
+   * If this polymorphic position was represented by exactly one source step,
+   * this will be that step and you may use it to implement a more optimal
+   * planType. If more than one step was combined as input to this
+   * polymorphism, this will be null.
+   */
+  $original: Step | null;
 }

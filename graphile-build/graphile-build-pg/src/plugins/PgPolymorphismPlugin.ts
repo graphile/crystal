@@ -31,7 +31,6 @@ import type {
   Maybe,
   NodeIdHandler,
   Step,
-  PolymorphicTypePlanner,
 } from "grafast";
 import {
   access,
@@ -1086,11 +1085,27 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   `${interfaceTypeName}_typeNameFromType`,
                 );
 
-                const planType = ((): ((
-                  $specifier: Step,
-                ) => PolymorphicTypePlanner) => {
-                  if (polymorphism.mode === "single") {
-                    return EXPORTABLE(
+                let grafastExtensions: Grafast.UnionTypeExtensions;
+                if (polymorphism.mode === "single") {
+                  grafastExtensions = {
+                    toSpecifier: EXPORTABLE(
+                      (PgSelectSingleStep, get, object, pk) => (step: Step) => {
+                        if (step instanceof PgSelectSingleStep) {
+                          return object(
+                            Object.fromEntries(
+                              pk.map((attrName) => [
+                                attrName,
+                                get(step, attrName),
+                              ]),
+                            ),
+                          );
+                        } else {
+                          return step;
+                        }
+                      },
+                      [PgSelectSingleStep, get, object, pk],
+                    ),
+                    planType: EXPORTABLE(
                       (
                         PgSelectSingleStep,
                         get,
@@ -1100,7 +1115,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeAttrName,
                         typeNameFromType,
                       ) =>
-                        function planType($specifier) {
+                        function planType($specifier, { $original }) {
                           const $typeVal = get($specifier, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
@@ -1110,8 +1125,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           return {
                             $__typename,
                             planType() {
-                              if ($specifier instanceof PgSelectSingleStep) {
-                                return $specifier;
+                              if ($original instanceof PgSelectSingleStep) {
+                                return $original;
                               } else {
                                 return resource.get(
                                   Object.fromEntries(
@@ -1134,9 +1149,30 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeAttrName,
                         typeNameFromType,
                       ],
-                    );
-                  } else if (polymorphism.mode === "relational") {
-                    return EXPORTABLE(
+                    ),
+                  };
+                } else if (polymorphism.mode === "relational") {
+                  grafastExtensions = {
+                    toSpecifier: EXPORTABLE(
+                      (PgSelectSingleStep, get, object, pk, typeAttrName) =>
+                        (step: Step) => {
+                          if (step instanceof PgSelectSingleStep) {
+                            return object({
+                              ...Object.fromEntries(
+                                pk.map((attrName) => [
+                                  attrName,
+                                  get(step, attrName),
+                                ]),
+                              ),
+                              [typeAttrName]: get(step, typeAttrName),
+                            });
+                          } else {
+                            return step;
+                          }
+                        },
+                      [PgSelectSingleStep, get, object, pk, typeAttrName],
+                    ),
+                    planType: EXPORTABLE(
                       (
                         PgSelectSingleStep,
                         get,
@@ -1146,7 +1182,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeAttrName,
                         typeNameFromType,
                       ) =>
-                        ($specifier) => {
+                        ($specifier, { $original }) => {
                           const $typeVal = get($specifier, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
@@ -1165,10 +1201,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                 );
                               }
                               const relationIdentifier = spec.relationName;
-                              if ($specifier instanceof PgSelectSingleStep) {
-                                return $specifier.singleRelation(
-                                  relationIdentifier,
-                                );
+                              if ($original instanceof PgSelectSingleStep) {
+                                if ($original.resource === resource) {
+                                  // It's the core table, redirect to the relation
+                                  return $original.singleRelation(
+                                    relationIdentifier,
+                                  );
+                                } else {
+                                  return $original;
+                                }
                               } else {
                                 const relation = resource.getRelation(
                                   relationIdentifier,
@@ -1209,14 +1250,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeAttrName,
                         typeNameFromType,
                       ],
-                    );
-                  } else {
-                    const never: never = polymorphism;
-                    throw new Error(
-                      `${this}: Don't know how to plan polymorphism mode ${(never as any).mode}`,
-                    );
-                  }
-                })();
+                    ),
+                  };
+                } else {
+                  const never: never = polymorphism;
+                  throw new Error(
+                    `${this}: Don't know how to plan polymorphism mode ${(never as any).mode}`,
+                  );
+                }
                 build.registerInterfaceType(
                   interfaceTypeName,
                   {
@@ -1228,8 +1269,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: codec.description,
-                    // All types have the same plan
-                    planType,
+                    extensions: {
+                      grafast: grafastExtensions,
+                    },
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );

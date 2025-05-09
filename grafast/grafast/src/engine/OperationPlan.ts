@@ -1757,9 +1757,11 @@ export class OperationPlan {
           : null;
 
         let commonLayerPlan: LayerPlan;
+        let $original: Step | null;
         let commonStep: Step;
         const steps = new Set(argsTupleList.map((t) => t.parentStep));
         if (steps.size > 1) {
+          $original = null;
           // Make combined
           const layerPlans = new Set(argsTupleList.map((t) => t.layerPlan));
           const combinedLayerPlan =
@@ -1778,23 +1780,32 @@ export class OperationPlan {
                 combinedPolymorphicPaths!.add(path);
               }
             }
-            const $data = stepHasToSpecifier(parentStep)
+            const $data = graphqlType.extensions?.grafast?.toSpecifier
               ? withGlobalLayerPlan(
                   layerPlan,
                   polymorphicPaths,
                   planningPath,
-                  parentStep.toSpecifier,
+                  graphqlType.extensions.grafast.toSpecifier,
+                  graphqlType.extensions.grafast,
                   parentStep,
                 )
-              : stepHasToRecord(parentStep)
+              : stepHasToSpecifier(parentStep)
                 ? withGlobalLayerPlan(
                     layerPlan,
                     polymorphicPaths,
                     planningPath,
-                    parentStep.toRecord,
+                    parentStep.toSpecifier,
                     parentStep,
                   )
-                : parentStep;
+                : stepHasToRecord(parentStep)
+                  ? withGlobalLayerPlan(
+                      layerPlan,
+                      polymorphicPaths,
+                      planningPath,
+                      parentStep.toRecord,
+                      parentStep,
+                    )
+                  : parentStep;
             toCombine.push({ step: $data, layerPlan });
           }
           // Create a __ValueStep in the new combined layer plan that
@@ -1826,8 +1837,28 @@ export class OperationPlan {
           commonLayerPlan = combinedLayerPlan;
           commonStep = $combined;
         } else {
-          commonStep = [...steps][0];
+          $original = [...steps][0];
           commonLayerPlan = firstArgsTuple.layerPlan;
+
+          commonStep = graphqlType.extensions?.grafast?.toSpecifier
+            ? withGlobalLayerPlan(
+                commonLayerPlan,
+                polymorphicPaths,
+                planningPath,
+                graphqlType.extensions.grafast.toSpecifier,
+                graphqlType.extensions.grafast,
+                $original,
+              )
+            : stepHasToSpecifier($original)
+              ? withGlobalLayerPlan(
+                  commonLayerPlan,
+                  polymorphicPaths,
+                  planningPath,
+                  $original.toSpecifier,
+                  $original,
+                )
+              : $original;
+
           for (const argsTuple of argsTupleList) {
             if (isDev) {
               if (argsTuple.layerPlan !== commonLayerPlan) {
@@ -1855,6 +1886,7 @@ export class OperationPlan {
         const info: PlanTypeInfo = {
           abstractType: graphqlType,
           resolverEmulation,
+          $original,
         };
         const polymorphicTypePlanner = withGlobalLayerPlan(
           commonLayerPlan,
