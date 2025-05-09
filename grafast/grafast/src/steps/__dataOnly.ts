@@ -50,7 +50,7 @@ export class __DataOnlyStep<T> extends Step<T> {
   }
 
   public deduplicate(_peers: readonly Step[]): readonly Step[] {
-    return _peers;
+    return _peers.filter((p) => p.layerPlan === this.layerPlan);
   }
   public deduplicatedWith(replacement: __DataOnlyStep<any>): void {
     this.mergeInto(replacement);

@@ -3293,6 +3293,9 @@ export class OperationPlan {
       // PERF: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
       return true;
     }
+    if (step instanceof __DataOnlyStep) {
+      return true;
+    }
     return false;
   }
 
