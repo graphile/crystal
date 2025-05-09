@@ -170,7 +170,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             name: typeName,
             ...(extensions || planType || assertStep
               ? {
-                  extension: {
+                  extensions: {
                     ...extensions,
                     ...(planType || assertStep
                       ? {
@@ -396,7 +396,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             name: typeName,
             ...(extensions || planType
               ? {
-                  extension: {
+                  extensions: {
                     ...extensions,
                     ...(planType
                       ? {
@@ -603,7 +603,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             name: typeName,
             ...(extensions || planType
               ? {
-                  extension: {
+                  extensions: {
                     ...extensions,
                     ...(planType
                       ? {
