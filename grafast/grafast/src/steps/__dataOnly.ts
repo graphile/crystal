@@ -85,6 +85,9 @@ export class __DataOnlyStep<T> extends Step<T> {
   public deduplicate(_peers: readonly Step[]): readonly Step[] {
     return _peers;
   }
+  public deduplicatedWith(replacement: __DataOnlyStep<any>): void {
+    this.mergeInto(replacement);
+  }
 
   public mergeInto(replacement: __DataOnlyStep<T>): void {
     for (let i = 0, l = this.dependencies.length; i < l; i++) {
@@ -100,6 +103,15 @@ export class __DataOnlyStep<T> extends Step<T> {
   }
 
   optimize(): Step<T> {
+    if (this.polymorphicPaths === null) {
+      // No need for me to exist
+      if (this.dependencies.length !== 1)
+        throw new Error(
+          `${this} has multiple dependencies, but no polymorphism?`,
+        );
+      return this.dependencies[0];
+    }
+
     const firstDep = this.dependencies[0];
     for (const dep of this.dependencies) {
       if (dep !== firstDep) return this;
@@ -116,6 +128,9 @@ export class __DataOnlyStep<T> extends Step<T> {
         );
       }
       const polyIndex = this.indexByPath[ppath];
+      if (polyIndex === undefined) {
+        return $$inhibit;
+      }
       const val = details.values[polyIndex];
       const flags = val._flagsAt(i);
       if ((flags & FLAG_INHIBITED) === FLAG_INHIBITED) {
