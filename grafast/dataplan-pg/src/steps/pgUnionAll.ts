@@ -20,12 +20,10 @@ import {
   isDev,
   isPromiseLike,
   lambda,
-  polymorphicWrap,
   reverseArray,
   SafeError,
   Step,
 } from "grafast";
-import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 

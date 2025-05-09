@@ -124,8 +124,6 @@ import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";
 import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
-import type { PolymorphicData } from "./polymorphic.js";
-import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
@@ -465,8 +463,6 @@ export {
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
-  PolymorphicData,
-  polymorphicWrap,
   PromiseOrDirect,
   proxy,
   ProxyStep,
@@ -577,7 +573,6 @@ exportAsMany("grafast", {
   groupBy,
   filter,
   partitionByIndex,
-  polymorphicWrap,
   listTransform,
   first,
   node,
