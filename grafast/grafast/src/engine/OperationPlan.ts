@@ -3863,10 +3863,6 @@ export class OperationPlan {
    * need to regenerate it on future calls, significantly reducing the load on
    * deduplication later.
    *
-   * Note: automatically extends the cached step into other (relevant)
-   * polymorphic paths; if this shouldn't be the case then don't use cacheStep
-   * and instead rely on deduplication as usual.
-   *
    * @experimental
    */
   cacheStep<T extends Step>(
@@ -3878,7 +3874,7 @@ export class OperationPlan {
     const layerPlan = currentLayerPlan();
     const paths = currentPolymorphicPaths();
     const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
+      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${paths ? [...paths].join(",") : ""}`
     ] ??= new Map());
 
     const cacheIt = () => {
@@ -3901,15 +3897,6 @@ export class OperationPlan {
     const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
     if (cachedStep) {
-      // Fix poly paths
-      if (paths && cachedStep.polymorphicPaths) {
-        const polymorphicPaths = new Set<string>([
-          ...cachedStep.polymorphicPaths,
-          ...paths,
-        ]);
-        cachedStep.polymorphicPaths = polymorphicPaths;
-      }
-
       return cachedStep;
     } else {
       return cacheIt();
