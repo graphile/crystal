@@ -1438,6 +1438,16 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
+          if (isDev && polymorphicPaths) {
+            const invalid = [...polymorphicPaths].filter(
+              (p) => !stepIsValidInPolyPath(step, p),
+            );
+            if (invalid.length > 0) {
+              throw new Error(
+                `${objectType}.${fieldName} (as ${responseKey}) returned ${step}, but that's not valid in ${invalid.length} out of ${polymorphicPaths.size} of the expected polymorphic paths. Invalid paths: ${invalid}`,
+              );
+            }
+          }
           outputPlan.expectChild(objectType, responseKey);
           this.queueNextLayer(this.planFieldReturnType, {
             outputPlan,
@@ -1932,6 +1942,25 @@ export class OperationPlan {
                 )
               : commonStep;
           stepForType.set(type, $stepForType);
+          if (isDev) {
+            // Check that this plan is compatible with every poly path
+            if ($stepForType.polymorphicPaths === null) {
+              // All good, valid in all paths
+            } else {
+              const missedPaths = [...polymorphicPaths].filter(
+                (p) => !stepIsValidInPolyPath($stepForType, p),
+              );
+              if (missedPaths.length > 0) {
+                console.warn(
+                  `When planning ${graphqlType}'s planForType for ${
+                    type.name
+                  }, returned step ${
+                    $stepForType
+                  } is not valid in ${missedPaths.length} out of ${polymorphicPaths.size} expected paths; missed paths: ${missedPaths}`,
+                );
+              }
+            }
+          }
         }
 
         // Now replace references to layer plan and step
@@ -1940,7 +1969,7 @@ export class OperationPlan {
           argsTuple.layerPlan = polymorphicLayerPlan;
 
           // TODO: do we want to set the polymorphic paths here or not?
-          //argsTuple[IDX_POLYMORPHIC_PATHS] = combinedPolymorphicPaths;
+          // argsTuple.polymorphicPaths = combinedPolymorphicPaths;
 
           const {
             locationDetails,
@@ -5293,4 +5322,15 @@ function polymorphicPathsForLayer(
       return polymorphicPathsForLayer(layer.parentLayerPlan!);
     }
   }
+}
+
+function stepIsValidInPolyPath($step: Step, polyPath: string): boolean {
+  if (!$step.polymorphicPaths) return true;
+  let trimmed = polyPath;
+  do {
+    if ($step.polymorphicPaths.has(trimmed)) return true;
+    const i = trimmed.lastIndexOf(">");
+    trimmed = trimmed.slice(0, i);
+  } while (trimmed.length > 0 && trimmed[0] === ">");
+  return false;
 }
