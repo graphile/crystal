@@ -1463,13 +1463,17 @@ return function (access, inhibitOnNull) {
                     }
                     return {
                       description: codec.description,
-                      toSpecifier($step) {
-                        if ($step instanceof PgUnionAllSingleStep) {
-                          return $step.toSpecifier();
-                        } else {
-                          return $step;
-                        }
-                      },
+                      toSpecifier: EXPORTABLE(
+                        (PgUnionAllSingleStep) =>
+                          function toSpecifier($step) {
+                            if ($step instanceof PgUnionAllSingleStep) {
+                              return $step.toSpecifier();
+                            } else {
+                              return $step;
+                            }
+                          },
+                        [PgUnionAllSingleStep],
+                      ),
                       planType: EXPORTABLE(
                         (get, resourceByTypeName) =>
                           function planType($specifier) {

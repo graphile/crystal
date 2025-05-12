@@ -6,7 +6,6 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
-import type { ObjectLikeStep } from "grafast";
 import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,

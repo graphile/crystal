@@ -1,5 +1,4 @@
 import LRU from "@graphile/lru";
-import { GraphQLObjectType } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 

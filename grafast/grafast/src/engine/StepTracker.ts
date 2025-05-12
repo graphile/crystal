@@ -376,7 +376,7 @@ export class StepTracker {
       if (existingIndex >= 0) {
         return existingIndex;
       }
-      if (options.dataOnly) {
+      if (dataOnly) {
         for (let i = 0, l = dependentDependencies.length; i < l; i++) {
           const dep = dependentDependencies[i];
           if (

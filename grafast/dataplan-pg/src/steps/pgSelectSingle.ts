@@ -514,14 +514,12 @@ export class PgSelectSingleStep<
     }
   }
 
-
   private nonNullAttribute: {
     attribute: PgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-
     const attributes = this.resource.codec.attributes;
     if (attributes && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
@@ -565,7 +563,6 @@ export class PgSelectSingleStep<
     }
     return this;
   }
-
 
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,

@@ -140,7 +140,7 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
-    layerPlan: { phases, children: childLayerPlans },
+    layerPlan: { phases },
   } = bucket;
 
   const phaseCount = phases.length;

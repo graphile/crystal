@@ -1,7 +1,4 @@
-import {
-  currentPlanningPath,
-  currentPolymorphicPaths,
-} from "../engine/lib/withGlobalLayerPlan.js";
+import { currentPolymorphicPaths } from "../engine/lib/withGlobalLayerPlan.js";
 import type { ExecutionDetails } from "../index.js";
 import { $$inhibit, operationPlan } from "../index.js";
 import {

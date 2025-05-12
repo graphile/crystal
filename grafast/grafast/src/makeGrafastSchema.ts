@@ -14,7 +14,6 @@ import type {
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
-  PromiseOrDirect,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { Step } from "./step.js";

@@ -3,7 +3,6 @@ import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
-  FieldNode,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -17,7 +16,6 @@ import type {
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,

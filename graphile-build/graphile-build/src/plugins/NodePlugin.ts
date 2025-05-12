@@ -1,12 +1,7 @@
 import "graphile-config";
 
 import type { NodeIdCodec, NodeIdHandler } from "grafast";
-import {
-  inspect,
-  isDev,
-  makeDecodeNodeId,
-  makeDecodeNodeIdRuntime,
-} from "grafast";
+import { inspect, isDev, makeDecodeNodeId } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
 import { EXPORTABLE } from "../utils.js";
@@ -160,11 +155,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
                 makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName)),
               [makeDecodeNodeId, nodeIdHandlerByTypeName],
             );
-            const decodeNodeIdRuntime = EXPORTABLE(
-              (makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName) =>
-                makeDecodeNodeIdRuntime(Object.values(nodeIdHandlerByTypeName)),
-              [makeDecodeNodeIdRuntime, nodeIdHandlerByTypeName],
-            );
             const findTypeNameMatch = EXPORTABLE(
               (inspect, isDev, nodeIdHandlerByTypeName) =>
                 (specifier: Record<string, any> | null) => {
@@ -202,25 +192,45 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   type: new GraphQLNonNull(GraphQLID),
                 },
               },
-              planType($nodeId) {
-                const $specifier = decodeNodeId($nodeId);
-                const $__typename = lambda($specifier, findTypeNameMatch, true);
-                return {
-                  $__typename,
-                  planForType(type) {
-                    const spec = nodeIdHandlerByTypeName[type.name];
-                    if (spec) {
-                      return spec.get(
-                        spec.getSpec(access($specifier, [spec.codec.name])),
-                      );
-                    } else {
-                      throw new Error(
-                        `Failed to find handler for ${type.name}`,
-                      );
-                    }
+              planType: EXPORTABLE(
+                (
+                  access,
+                  decodeNodeId,
+                  findTypeNameMatch,
+                  lambda,
+                  nodeIdHandlerByTypeName,
+                ) =>
+                  function planType($nodeId) {
+                    const $specifier = decodeNodeId($nodeId);
+                    const $__typename = lambda(
+                      $specifier,
+                      findTypeNameMatch,
+                      true,
+                    );
+                    return {
+                      $__typename,
+                      planForType(type) {
+                        const spec = nodeIdHandlerByTypeName[type.name];
+                        if (spec) {
+                          return spec.get(
+                            spec.getSpec(access($specifier, [spec.codec.name])),
+                          );
+                        } else {
+                          throw new Error(
+                            `Failed to find handler for ${type.name}`,
+                          );
+                        }
+                      },
+                    };
                   },
-                };
-              },
+                [
+                  access,
+                  decodeNodeId,
+                  findTypeNameMatch,
+                  lambda,
+                  nodeIdHandlerByTypeName,
+                ],
+              ),
             } as Omit<GraphileBuild.GrafastInterfaceTypeConfig<any>, "name">;
           },
           "Node interface from NodePlugin",

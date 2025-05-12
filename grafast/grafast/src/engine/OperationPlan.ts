@@ -107,7 +107,6 @@ import type {
   LayerPlanPhase,
   LayerPlanReasonCombined,
   LayerPlanReasonListItemStream,
-  LayerPlanReasonPolymorphic,
   LayerPlanReasonPolymorphicPartition,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
@@ -1671,7 +1670,7 @@ export class OperationPlan {
   }
 
   private mutateTodos(todo: Todo) {
-    for (const [planningPath, batch] of todo) {
+    for (const [_planningPath, batch] of todo) {
       const polymorphicResolveTypeEntriesByPolyType = new Map<
         GraphQLUnionType | GraphQLInterfaceType,
         Array<Parameters<typeof this.polymorphicResolveType>[0]>
@@ -1746,7 +1745,7 @@ export class OperationPlan {
         const firstArgsTuple = argsTupleList[0];
 
         // All of these properties should be in common
-        const path = firstArgsTuple.path;
+        // const path = firstArgsTuple.path;
         const planningPath = firstArgsTuple.planningPath;
         const allPossibleObjectTypes = firstArgsTuple.allPossibleObjectTypes;
 
@@ -2020,7 +2019,7 @@ export class OperationPlan {
         if (planFieldReturnTypeEntriesByStep.size <= 1) {
           continue;
         }
-        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
+        for (const [_step, entries] of planFieldReturnTypeEntriesByStep) {
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
           // I'm not sure if we care if the field result type is the same or not. I don't think so?
@@ -5268,15 +5267,6 @@ function defaultPlanType(
       ? graphqlResolveType($stepOrSpecifier, info)
       : get($stepOrSpecifier, "__typename"));
   return { $__typename };
-}
-
-/**
- * The step and layer plan to use for a specific object type during
- * polymorphism.
- */
-interface PolyDeets {
-  step: Step;
-  polymorphicLayerPlan: LayerPlan<LayerPlanReasonPolymorphic>;
 }
 
 function polymorphicPathsForLayer(
