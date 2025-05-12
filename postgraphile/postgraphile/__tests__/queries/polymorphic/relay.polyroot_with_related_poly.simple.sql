@@ -129,9 +129,33 @@ lateral (
   )
 ) as __relational_items_result__;
 
+select __relational_topics_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
+lateral (
+  select
+    __relational_topics__."topic_item_id"::text as "0",
+    __relational_items__."type"::text as "1",
+    __relational_topics_identifiers__.idx as "2"
+  from "polymorphic"."relational_topics" as __relational_topics__
+  left outer join "polymorphic"."relational_items" as __relational_items__
+  on (
+  /* WHERE becoming ON */ (
+    __relational_items__."id" = __relational_topics__."topic_item_id"
+  ))
+  where (
+    __relational_topics__."topic_item_id" = __relational_topics_identifiers__."id0"
+  )
+) as __relational_topics_result__;
+
 select
-  __relational_posts__."post_item_id"::text as "0"
+  __relational_posts__."post_item_id"::text as "0",
+  __relational_items__."type"::text as "1"
 from "polymorphic"."relational_posts" as __relational_posts__
+left outer join "polymorphic"."relational_items" as __relational_items__
+on (
+/* WHERE becoming ON */ (
+  __relational_items__."id" = __relational_posts__."post_item_id"
+))
 where (
   __relational_posts__."post_item_id" = $1::"int4"
 );
@@ -141,8 +165,14 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from js
 lateral (
   select
     __relational_checklists__."checklist_item_id"::text as "0",
-    __relational_checklists_identifiers__.idx as "1"
+    __relational_items__."type"::text as "1",
+    __relational_checklists_identifiers__.idx as "2"
   from "polymorphic"."relational_checklists" as __relational_checklists__
+  left outer join "polymorphic"."relational_items" as __relational_items__
+  on (
+  /* WHERE becoming ON */ (
+    __relational_items__."id" = __relational_checklists__."checklist_item_id"
+  ))
   where (
     __relational_checklists__."checklist_item_id" = __relational_checklists_identifiers__."id0"
   )
