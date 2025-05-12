@@ -1,4 +1,5 @@
 import type { UnbatchedExecutionExtra } from "../interfaces.js";
+import { $$deepDepSkip } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import type { ConnectionCapableStep } from "./connection.js";
@@ -20,6 +21,10 @@ export class LastStep<TData> extends UnbatchedStep<TData> {
   ) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
+  }
+
+  [$$deepDepSkip](): Step {
+    return this.getDepOptions(0).step;
   }
 
   unbatchedExecute = (
