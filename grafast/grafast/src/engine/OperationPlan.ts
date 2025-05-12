@@ -2174,7 +2174,13 @@ export class OperationPlan {
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
-      const listItemPlanningPath = planningPath + "[#]";
+      const listItemPlanningPath =
+        planningPath +
+        `[${
+          streamDetails
+            ? `#${streamDetails.initialCount.id}|${streamDetails.if.id}|${streamDetails.label.id}`
+            : ""
+        }]`;
       const $list = withGlobalLayerPlan(
         parentLayerPlan,
         polymorphicPaths,
