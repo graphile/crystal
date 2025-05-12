@@ -12,15 +12,15 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[19]<br />ᐳ: Access[27]<br />2: PgSelectRows[21]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 17<br /><br />ROOT Connectionᐸ15ᐳ[17]<br />1: PgSelect[20]<br />ᐳ: Access[29]<br />2: PgSelectRows[22]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 27<br /><br />ROOT __Item{3}ᐸ21ᐳ[23]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 24, 27<br /><br />ROOT PgSelectSingle{3}ᐸtestviewᐳ[24]"):::bucket
-    Bucket5("Bucket 5 (listItem)<br />Deps: 29<br /><br />ROOT __Item{5}ᐸ22ᐳ[25]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 26, 29<br /><br />ROOT PgSelectSingle{5}ᐸtestviewᐳ[26]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br />Deps: 29<br /><br />ROOT __Item{4}ᐸ22ᐳ[25]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 24, 27<br /><br />ROOT PgSelectSingle{3}ᐸtestviewᐳ[24]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 26, 29<br /><br />ROOT PgSelectSingle{4}ᐸtestviewᐳ[26]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket3
-    Bucket2 --> Bucket5
-    Bucket3 --> Bucket4
-    Bucket5 --> Bucket6
+    Bucket2 --> Bucket4
+    Bucket3 --> Bucket5
+    Bucket4 --> Bucket6
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
@@ -43,13 +43,13 @@ graph TD
     PgSelectRows21 ==> __Item23
     PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸtestviewᐳ"}}:::plan
     __Item23 --> PgSelectSingle24
-    PgCursor28{{"PgCursor[28∈4]"}}:::plan
+    PgCursor28{{"PgCursor[28∈5]"}}:::plan
     PgSelectSingle24 & Access27 --> PgCursor28
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈4]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈5]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression33
     PgSelect20[["PgSelect[20∈2] ➊<br />ᐸtestviewᐳ"]]:::plan
     Object11 & Connection17 --> PgSelect20
@@ -57,9 +57,9 @@ graph TD
     PgSelect20 --> PgSelectRows22
     Access29{{"Access[29∈2] ➊<br />ᐸ20.cursorDetailsᐳ"}}:::plan
     PgSelect20 --> Access29
-    __Item25[/"__Item[25∈5]<br />ᐸ22ᐳ"\]:::itemplan
+    __Item25[/"__Item[25∈4]<br />ᐸ22ᐳ"\]:::itemplan
     PgSelectRows22 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈5]<br />ᐸtestviewᐳ"}}:::plan
+    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸtestviewᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
     PgCursor30{{"PgCursor[30∈6]"}}:::plan
     PgSelectSingle26 & Access29 --> PgCursor30
@@ -80,9 +80,9 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item23,PgSelectSingle24 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgCursor28,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket4
+    class Bucket4,__Item25,PgSelectSingle26 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item25,PgSelectSingle26 bucket5
+    class Bucket5,PgCursor28,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket5
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgCursor30,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket6
 
