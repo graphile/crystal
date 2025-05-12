@@ -982,6 +982,7 @@ export type Sudo<T> =
         dependencyOnReject: ReadonlyArray<Error | null | undefined>;
         defaultForbiddenFlags: ExecutionEntryFlags;
         getDepOptions: Step["getDepOptions"];
+        _refs: Array<number>;
       }
     : T;
 

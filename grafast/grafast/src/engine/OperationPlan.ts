@@ -3292,10 +3292,15 @@ export class OperationPlan {
       let allPeers: Step[] | null = null;
       outerloop: for (const possiblyPeer of possiblePeers) {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
+        const speer = sudo(possiblyPeer);
+        // PERF: I'm not sure we strictly require this.
+        if (!arraysMatch(sstep._refs, speer._refs)) {
+          continue;
+        }
         // We know the final dependency matches and the dependency count
         // matches - check the other dependencies match.
         for (let i = 0; i < dependencyCount - 1; i++) {
-          if (deps[i] !== sudo(possiblyPeer).dependencies[i]) {
+          if (deps[i] !== speer.dependencies[i]) {
             continue outerloop;
           }
         }

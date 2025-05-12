@@ -174,6 +174,8 @@ export /* abstract */ class Step<TData = any> {
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<Step>;
+  /** @internal */
+  protected readonly _refs: Array<number> = [];
   /**
    * If this step follows a side effects, it must implicitly depend on it (so
    * that any errors the side effect generated will be respected).
@@ -507,9 +509,6 @@ export /* abstract */ class Step<TData = any> {
     return undefined;
   }
 
-  /** @internal */
-  private _refs = new Set<number>();
-
   /**
    * **IF IN DOUBT, USE `.addDependency()` INSTEAD!
    *
@@ -565,8 +564,7 @@ ${printDeps(step, 1)}
         `${this}.addRef(${step}) forbidden: invalid plan heirarchy`,
       );
     }
-    this._refs.add(-step.id);
-    return -step.id;
+    return this._refs.push(step.id) - 1;
   }
 
   /**
@@ -579,19 +577,16 @@ ${printDeps(step, 1)}
    *
    * @experimental
    */
-  protected getRef(id: number | null): Step | null {
+  protected getRef(refIdx: number | null): Step | null {
     if (!["plan", "validate", "optimize"].includes(this.operationPlan.phase)) {
       throw new Error(
         `Cannot call ${this}.getRef() when the operation plan phase is ${this.operationPlan.phase}; getRef may only be called during planning.`,
       );
     }
-    if (id == null) return null;
-    if (!this._refs.has(id)) {
-      throw new Error(
-        `Attempted to get a ref from ${this}, but no matching ref was made. Use .addRef() to add a reference.`,
-      );
-    }
-    return this.operationPlan.stepTracker.getStepById(-id) ?? null;
+    if (refIdx == null) return null;
+    return (
+      this.operationPlan.stepTracker.getStepById(this._refs[refIdx]) ?? null
+    );
   }
 
   protected canAddDependency(step: Step): boolean {
