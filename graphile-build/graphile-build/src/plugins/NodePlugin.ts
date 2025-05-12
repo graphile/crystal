@@ -157,7 +157,9 @@ export const NodePlugin: GraphileConfig.Plugin = {
             );
             const findTypeNameMatch = EXPORTABLE(
               (inspect, isDev, nodeIdHandlerByTypeName) =>
-                (specifier: Record<string, any> | null) => {
+                function findTypeNameMatch(
+                  specifier: Record<string, any> | null,
+                ) {
                   if (!specifier) return null;
                   for (const [typeName, typeSpec] of Object.entries(
                     nodeIdHandlerByTypeName,
