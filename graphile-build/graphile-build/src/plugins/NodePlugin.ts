@@ -4,7 +4,7 @@ import type { NodeIdCodec, NodeIdHandler } from "grafast";
 import { inspect, isDev, makeDecodeNodeId } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -124,6 +124,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   `Attempted to register Node ID handler for type '${typeName}', but that isn't an object type! (constructor: ${details.Constructor.name})`,
                 );
               }
+              exportNameHint(handler, `nodeIdHandler_${typeName}`);
               nodeIdHandlerByTypeName[typeName] = handler;
             },
             getNodeIdHandler(typeName) {
