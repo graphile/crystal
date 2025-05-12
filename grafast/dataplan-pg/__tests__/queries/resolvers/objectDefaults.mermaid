@@ -10,8 +10,8 @@ graph TD
     subgraph "Buckets for queries/resolvers/objectDefaults"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Constant[21]<br />2: GraphQLResolver[7]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 7, 21, 2, 0, 4<br /><br />ROOT GraphQLResolverᐸQuery.deepObjectᐳ[7]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ11ᐳ[14]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 13, 21, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸDeepObject.friend:defaultFieldResolverᐳ[13]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 21, 2, 0, 4<br /><br />ROOT GraphQLResolver{1}ᐸDeepObject.friend:defaultFieldResolverᐳ[13]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ11ᐳ[14]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
@@ -30,14 +30,14 @@ graph TD
     GraphQLResolver7 & Constant21 & __Value2 & __Value0 & __Value4 --> GraphQLResolver11
     GraphQLResolver13[["GraphQLResolver[13∈1] ➊<br />ᐸDeepObject.friend:defaultFieldResolverᐳ"]]:::unbatchedplan
     GraphQLResolver7 & Constant21 & __Value2 & __Value0 & __Value4 --> GraphQLResolver13
-    __Item14[/"__Item[14∈2]<br />ᐸ11ᐳ"\]:::itemplan
-    GraphQLResolver11 ==> __Item14
-    GraphQLResolver16[["GraphQLResolver[16∈3] ➊<br />ᐸDeepObjectFriend.name:defaultFieldResolverᐳ"]]:::unbatchedplan
+    GraphQLResolver16[["GraphQLResolver[16∈2] ➊<br />ᐸDeepObjectFriend.name:defaultFieldResolverᐳ"]]:::unbatchedplan
     GraphQLResolver13 & Constant21 & __Value2 & __Value0 & __Value4 --> GraphQLResolver16
-    GraphQLResolver18[["GraphQLResolver[18∈3] ➊<br />ᐸDeepObjectFriend.occupation:defaultFieldResolverᐳ"]]:::unbatchedplan
+    GraphQLResolver18[["GraphQLResolver[18∈2] ➊<br />ᐸDeepObjectFriend.occupation:defaultFieldResolverᐳ"]]:::unbatchedplan
     GraphQLResolver13 & Constant21 & __Value2 & __Value0 & __Value4 --> GraphQLResolver18
-    GraphQLResolver20[["GraphQLResolver[20∈3] ➊<br />ᐸDeepObjectFriend.status:defaultFieldResolverᐳ"]]:::unbatchedplan
+    GraphQLResolver20[["GraphQLResolver[20∈2] ➊<br />ᐸDeepObjectFriend.status:defaultFieldResolverᐳ"]]:::unbatchedplan
     GraphQLResolver13 & Constant21 & __Value2 & __Value0 & __Value4 --> GraphQLResolver20
+    __Item14[/"__Item[14∈3]<br />ᐸ11ᐳ"\]:::itemplan
+    GraphQLResolver11 ==> __Item14
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -45,7 +45,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,GraphQLResolver9,GraphQLResolver11,GraphQLResolver13 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item14 bucket2
+    class Bucket2,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,GraphQLResolver16,GraphQLResolver18,GraphQLResolver20 bucket3
+    class Bucket3,__Item14 bucket3
 
