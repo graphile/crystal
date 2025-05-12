@@ -149,6 +149,15 @@ cd postgraphile/postgraphile
 UPDATE_SNAPSHOTS=1 yarn jest __tests__/path/to/test.file.graphql
 ```
 
+If you're making planning updates (e.g. optimizations) that shouldn't affect the
+resulting data, you can tell the system to only update certain types of
+snapshots:
+
+```shell
+cd postgraphile/postgraphile
+UPDATE_SNAPSHOTS="sql,mermaid" yarn jest __tests__/path/to/test.file.graphql
+```
+
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected
