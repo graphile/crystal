@@ -1495,23 +1495,48 @@ export class OperationPlan {
         const $sideEffect = deferredOutputPlan.layerPlan.latestSideEffectStep;
         try {
           outputPlan.deferredOutputPlans.push(deferredOutputPlan);
-          this.processGroupedFieldSet(
-            deferredOutputPlan,
+          this.queueNextLayer(this.processDeferredFieldSet, {
+            outputPlan: deferredOutputPlan,
             path,
-            planningPath,
+            planningPath: planningPath + "#",
             polymorphicPaths,
             parentStep,
-            objectType,
+            positionType: objectType,
+            layerPlan: deferredLayerPlan,
             objectTypeFields,
             isMutation,
-            deferred,
-          );
+            groupedFieldSet: deferred,
+          });
           //this.planPending()
         } finally {
           deferredOutputPlan.layerPlan.latestSideEffectStep = $sideEffect;
         }
       }
     }
+  }
+  processDeferredFieldSet(details: {
+    outputPlan: OutputPlan;
+    path: readonly string[];
+    planningPath: string;
+    polymorphicPaths: ReadonlySet<string> | null;
+    parentStep: Step;
+    positionType: GraphQLObjectType;
+    layerPlan: LayerPlan;
+    objectTypeFields: GraphQLFieldMap<any, any>;
+    isMutation: boolean;
+    groupedFieldSet: SelectionSetDigest;
+  }) {
+    this.processGroupedFieldSet(
+      details.outputPlan,
+      details.path,
+      details.planningPath,
+      details.polymorphicPaths,
+      details.parentStep,
+      details.positionType,
+      details.objectTypeFields,
+      details.isMutation,
+      details.groupedFieldSet,
+    );
   }
 
   /**
