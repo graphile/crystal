@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, GraphQLString, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -9797,106 +9797,36 @@ const registry = makeRegistry({
     }
   }
 });
-const pgResource_person_secretPgResource = registry.pgResources["person_secret"];
-const pgResource_left_armPgResource = registry.pgResources["left_arm"];
-const pgResource_postPgResource = registry.pgResources["post"];
-const pgResource_personPgResource = registry.pgResources["person"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  PersonSecret: {
-    typeName: "PersonSecret",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: "This is deprecated (comment on table c.person_secret).",
-    plan($record) {
-      return list([constant("person_secrets", false), $record.get("person_id")]);
-    },
-    getSpec($list) {
-      return {
-        person_id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_person_secretPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "person_secrets";
-    }
-  },
-  LeftArm: {
-    typeName: "LeftArm",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("left_arms", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_left_armPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "left_arms";
-    }
-  },
-  Post: {
-    typeName: "Post",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("posts", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_postPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "posts";
-    }
-  },
-  Person: {
-    typeName: "Person",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("people", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_personPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "people";
-    }
-  }
-};
+const resource_person_secretPgResource = registry.pgResources["person_secret"];
+const resource_left_armPgResource = registry.pgResources["left_arm"];
+const resource_postPgResource = registry.pgResources["post"];
+const resource_personPgResource = registry.pgResources["person"];
 const EMPTY_ARRAY = [];
 const makeArgs_current_user_id = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
+const nodeIdHandler_PersonSecret = {
+  typeName: "PersonSecret",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: "This is deprecated (comment on table c.person_secret).",
+  plan($record) {
+    return list([constant("person_secrets", false), $record.get("person_id")]);
+  },
+  getSpec($list) {
+    return {
+      person_id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_person_secretPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "person_secrets";
+  }
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
@@ -9923,21 +9853,107 @@ const nodeFetcher_PersonSecret = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(nodeIdHandlerByTypeName.PersonSecret);
+})(nodeIdHandler_PersonSecret);
+const nodeIdHandler_LeftArm = {
+  typeName: "LeftArm",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("left_arms", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_left_armPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "left_arms";
+  }
+};
 const nodeFetcher_LeftArm = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.LeftArm));
-  return nodeIdHandlerByTypeName.LeftArm.get(nodeIdHandlerByTypeName.LeftArm.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LeftArm));
+  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec($decoded));
+};
+const nodeIdHandler_Post = {
+  typeName: "Post",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("posts", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_postPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "posts";
+  }
 };
 const nodeFetcher_Post = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Post));
-  return nodeIdHandlerByTypeName.Post.get(nodeIdHandlerByTypeName.Post.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+};
+const nodeIdHandler_Person = {
+  typeName: "Person",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("people", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_personPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "people";
+  }
 };
 const nodeFetcher_Person = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
-  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  PersonSecret: nodeIdHandler_PersonSecret,
+  LeftArm: nodeIdHandler_LeftArm,
+  Post: nodeIdHandler_Post,
+  Person: nodeIdHandler_Person
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  console.error(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
+  return null;
 }
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
 const isValidHstoreObject = obj => {
@@ -10024,23 +10040,23 @@ const makeArgs_left_arm_identity = (args, path = []) => argDetailsSimple_left_ar
 const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
 const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
 };
 const specFromArgs_LeftArm2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -11332,51 +11348,51 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     personSecretByPersonId(_$root, {
       $personId
     }) {
-      return pgResource_person_secretPgResource.get({
+      return resource_person_secretPgResource.get({
         person_id: $personId
       });
     },
     leftArmById(_$root, {
       $id
     }) {
-      return pgResource_left_armPgResource.get({
+      return resource_left_armPgResource.get({
         id: $id
       });
     },
     leftArmByPersonId(_$root, {
       $personId
     }) {
-      return pgResource_left_armPgResource.get({
+      return resource_left_armPgResource.get({
         person_id: $personId
       });
     },
     postById(_$root, {
       $id
     }) {
-      return pgResource_postPgResource.get({
+      return resource_postPgResource.get({
         id: $id
       });
     },
     personById(_$root, {
       $id
     }) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $id
       });
     },
     personByEmail(_$root, {
       $email
     }) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         email: $email
       });
     },
@@ -11406,7 +11422,7 @@ export const plans = {
     },
     allPersonSecrets: {
       plan() {
-        return connection(pgResource_person_secretPgResource.find());
+        return connection(resource_person_secretPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -11436,7 +11452,7 @@ export const plans = {
     },
     allLeftArms: {
       plan() {
-        return connection(pgResource_left_armPgResource.find());
+        return connection(resource_left_armPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -11466,7 +11482,7 @@ export const plans = {
     },
     allPosts: {
       plan() {
-        return connection(pgResource_postPgResource.find());
+        return connection(resource_postPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -11496,7 +11512,7 @@ export const plans = {
     },
     allPeople: {
       plan() {
-        return connection(pgResource_personPgResource.find());
+        return connection(resource_personPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -11525,11 +11541,28 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   PersonSecret: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.PersonSecret.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.PersonSecret.codec.name].encode);
+      const specifier = nodeIdHandler_PersonSecret.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
     },
     personId($record) {
       return $record.get("person_id");
@@ -11538,7 +11571,7 @@ export const plans = {
       return $record.get("sekrit");
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("person_id")
       });
     }
@@ -11546,8 +11579,8 @@ export const plans = {
   Person: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Person.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Person.codec.name].encode);
+      const specifier = nodeIdHandler_Person.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
     },
     name($record) {
       return $record.get("person_full_name");
@@ -11572,7 +11605,7 @@ export const plans = {
     },
     postsByAuthorId: {
       plan($record) {
-        const $records = pgResource_postPgResource.find({
+        const $records = resource_postPgResource.find({
           author_id: $record.get("id")
         });
         return connection($records);
@@ -11604,12 +11637,12 @@ export const plans = {
       }
     },
     personSecretByPersonId($record) {
-      return pgResource_person_secretPgResource.get({
+      return resource_person_secretPgResource.get({
         person_id: $record.get("id")
       });
     },
     leftArmByPersonId($record) {
-      return pgResource_left_armPgResource.get({
+      return resource_left_armPgResource.get({
         person_id: $record.get("id")
       });
     }
@@ -11695,14 +11728,14 @@ export const plans = {
   Post: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Post.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Post.codec.name].encode);
+      const specifier = nodeIdHandler_Post.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
     },
     authorId($record) {
       return $record.get("author_id");
     },
     personByAuthorId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("author_id")
       });
     }
@@ -11888,8 +11921,8 @@ export const plans = {
   LeftArm: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.LeftArm.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LeftArm.codec.name].encode);
+      const specifier = nodeIdHandler_LeftArm.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
     },
     personId($record) {
       return $record.get("person_id");
@@ -11898,7 +11931,7 @@ export const plans = {
       return $record.get("length_in_metres");
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("person_id")
       });
     }
@@ -11912,12 +11945,12 @@ export const plans = {
       return $record.get("person_id_1");
     },
     personByPersonId1($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("person_id_1")
       });
     },
     personByPersonId2($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("person_id_2")
       });
     }
@@ -12487,7 +12520,7 @@ export const plans = {
     },
     createPersonSecret: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_person_secretPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -12502,7 +12535,7 @@ export const plans = {
     },
     createLeftArm: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_left_armPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -12517,7 +12550,7 @@ export const plans = {
     },
     createPerson: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_personPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -12532,7 +12565,7 @@ export const plans = {
     },
     updateLeftArm: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_left_armPgResource, specFromArgs_LeftArm(args));
+        const $update = pgUpdateSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
         args.apply($update);
         return object({
           result: $update
@@ -12546,7 +12579,7 @@ export const plans = {
     },
     updateLeftArmById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_left_armPgResource, {
+        const $update = pgUpdateSingle(resource_left_armPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -12562,7 +12595,7 @@ export const plans = {
     },
     updateLeftArmByPersonId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_left_armPgResource, {
+        const $update = pgUpdateSingle(resource_left_armPgResource, {
           person_id: args.getRaw(['input', "personId"])
         });
         args.apply($update);
@@ -12578,7 +12611,7 @@ export const plans = {
     },
     updatePerson: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_personPgResource, specFromArgs_Person(args));
+        const $update = pgUpdateSingle(resource_personPgResource, specFromArgs_Person(args));
         args.apply($update);
         return object({
           result: $update
@@ -12592,7 +12625,7 @@ export const plans = {
     },
     updatePersonById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_personPgResource, {
+        const $update = pgUpdateSingle(resource_personPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -12608,7 +12641,7 @@ export const plans = {
     },
     updatePersonByEmail: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_personPgResource, {
+        const $update = pgUpdateSingle(resource_personPgResource, {
           email: args.getRaw(['input', "email"])
         });
         args.apply($update);
@@ -12624,7 +12657,7 @@ export const plans = {
     },
     deletePersonSecret: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_person_secretPgResource, specFromArgs_PersonSecret(args));
+        const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -12638,7 +12671,7 @@ export const plans = {
     },
     deletePersonSecretByPersonId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_person_secretPgResource, {
+        const $delete = pgDeleteSingle(resource_person_secretPgResource, {
           person_id: args.getRaw(['input', "personId"])
         });
         args.apply($delete);
@@ -12654,7 +12687,7 @@ export const plans = {
     },
     deleteLeftArm: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_left_armPgResource, specFromArgs_LeftArm2(args));
+        const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -12668,7 +12701,7 @@ export const plans = {
     },
     deleteLeftArmById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_left_armPgResource, {
+        const $delete = pgDeleteSingle(resource_left_armPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -12684,7 +12717,7 @@ export const plans = {
     },
     deleteLeftArmByPersonId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_left_armPgResource, {
+        const $delete = pgDeleteSingle(resource_left_armPgResource, {
           person_id: args.getRaw(['input', "personId"])
         });
         args.apply($delete);
@@ -12700,7 +12733,7 @@ export const plans = {
     },
     deletePerson: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_personPgResource, specFromArgs_Person2(args));
+        const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -12714,7 +12747,7 @@ export const plans = {
     },
     deletePersonById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_personPgResource, {
+        const $delete = pgDeleteSingle(resource_personPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -12730,7 +12763,7 @@ export const plans = {
     },
     deletePersonByEmail: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_personPgResource, {
+        const $delete = pgDeleteSingle(resource_personPgResource, {
           email: args.getRaw(['input', "email"])
         });
         args.apply($delete);
@@ -12770,7 +12803,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_left_armPgResource.find(spec);
+          return resource_left_armPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -12782,7 +12815,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -12844,7 +12877,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_person_secretPgResource.find(spec);
+          return resource_person_secretPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -12856,7 +12889,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -12905,7 +12938,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_left_armPgResource.find(spec);
+          return resource_left_armPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -12917,7 +12950,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -12966,7 +12999,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_personPgResource.find(spec);
+          return resource_personPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -13046,7 +13079,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_left_armPgResource.find(spec);
+          return resource_left_armPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -13058,7 +13091,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -13127,7 +13160,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_personPgResource.find(spec);
+          return resource_personPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -13213,7 +13246,7 @@ export const plans = {
     },
     deletedPersonSecretId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.PersonSecret.plan($record);
+      const specifier = nodeIdHandler_PersonSecret.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -13232,7 +13265,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_person_secretPgResource.find(spec);
+          return resource_person_secretPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -13244,7 +13277,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -13270,7 +13303,7 @@ export const plans = {
     },
     deletedLeftArmId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.LeftArm.plan($record);
+      const specifier = nodeIdHandler_LeftArm.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -13289,7 +13322,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_left_armPgResource.find(spec);
+          return resource_left_armPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -13301,7 +13334,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     personByPersonId($record) {
-      return pgResource_personPgResource.get({
+      return resource_personPgResource.get({
         id: $record.get("result").get("person_id")
       });
     }
@@ -13332,7 +13365,7 @@ export const plans = {
     },
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Person.plan($record);
+      const specifier = nodeIdHandler_Person.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -13351,7 +13384,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_personPgResource.find(spec);
+          return resource_personPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");

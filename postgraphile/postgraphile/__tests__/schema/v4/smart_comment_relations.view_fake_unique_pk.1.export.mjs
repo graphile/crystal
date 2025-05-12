@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -1146,171 +1146,33 @@ const registry = makeRegistry({
     }
   }
 });
-const pgResource_postsPgResource = registry.pgResources["posts"];
-const pgResource_offersPgResource = registry.pgResources["offers"];
-const pgResource_streetsPgResource = registry.pgResources["streets"];
-const pgResource_propertiesPgResource = registry.pgResources["properties"];
-const pgResource_street_propertyPgResource = registry.pgResources["street_property"];
-const pgResource_housesPgResource = registry.pgResources["houses"];
-const pgResource_buildingsPgResource = registry.pgResources["buildings"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  Post: {
-    typeName: "Post",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("post_views", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_postsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "post_views";
-    }
+const resource_postsPgResource = registry.pgResources["posts"];
+const resource_offersPgResource = registry.pgResources["offers"];
+const resource_streetsPgResource = registry.pgResources["streets"];
+const resource_propertiesPgResource = registry.pgResources["properties"];
+const resource_street_propertyPgResource = registry.pgResources["street_property"];
+const resource_housesPgResource = registry.pgResources["houses"];
+const resource_buildingsPgResource = registry.pgResources["buildings"];
+const nodeIdHandler_Post = {
+  typeName: "Post",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("post_views", false), $record.get("id")]);
   },
-  Offer: {
-    typeName: "Offer",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("offer_views", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_offersPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "offer_views";
-    }
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
   },
-  Street: {
-    typeName: "Street",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("streets", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_streetsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "streets";
-    }
+  getIdentifiers(value) {
+    return value.slice(1);
   },
-  Property: {
-    typeName: "Property",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("properties", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_propertiesPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "properties";
-    }
+  get(spec) {
+    return resource_postsPgResource.get(spec);
   },
-  StreetProperty: {
-    typeName: "StreetProperty",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("street_properties", false), $record.get("str_id"), $record.get("prop_id")]);
-    },
-    getSpec($list) {
-      return {
-        str_id: inhibitOnNull(access($list, [1])),
-        prop_id: inhibitOnNull(access($list, [2]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_street_propertyPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "street_properties";
-    }
-  },
-  House: {
-    typeName: "House",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("houses", false), $record.get("street_id"), $record.get("property_id")]);
-    },
-    getSpec($list) {
-      return {
-        street_id: inhibitOnNull(access($list, [1])),
-        property_id: inhibitOnNull(access($list, [2]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_housesPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "houses";
-    }
-  },
-  Building: {
-    typeName: "Building",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("buildings", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_buildingsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "buildings";
-    }
+  match(obj) {
+    return obj[0] === "post_views";
   }
 };
 function specForHandler(handler) {
@@ -1333,86 +1195,243 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_Post = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Post));
-  return nodeIdHandlerByTypeName.Post.get(nodeIdHandlerByTypeName.Post.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+};
+const nodeIdHandler_Offer = {
+  typeName: "Offer",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("offer_views", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_offersPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "offer_views";
+  }
 };
 const nodeFetcher_Offer = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Offer));
-  return nodeIdHandlerByTypeName.Offer.get(nodeIdHandlerByTypeName.Offer.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Offer));
+  return nodeIdHandler_Offer.get(nodeIdHandler_Offer.getSpec($decoded));
+};
+const nodeIdHandler_Street = {
+  typeName: "Street",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("streets", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_streetsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "streets";
+  }
 };
 const nodeFetcher_Street = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Street));
-  return nodeIdHandlerByTypeName.Street.get(nodeIdHandlerByTypeName.Street.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Street));
+  return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec($decoded));
+};
+const nodeIdHandler_Property = {
+  typeName: "Property",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("properties", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_propertiesPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "properties";
+  }
 };
 const nodeFetcher_Property = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Property));
-  return nodeIdHandlerByTypeName.Property.get(nodeIdHandlerByTypeName.Property.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Property));
+  return nodeIdHandler_Property.get(nodeIdHandler_Property.getSpec($decoded));
+};
+const nodeIdHandler_StreetProperty = {
+  typeName: "StreetProperty",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("street_properties", false), $record.get("str_id"), $record.get("prop_id")]);
+  },
+  getSpec($list) {
+    return {
+      str_id: inhibitOnNull(access($list, [1])),
+      prop_id: inhibitOnNull(access($list, [2]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_street_propertyPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "street_properties";
+  }
 };
 const nodeFetcher_StreetProperty = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.StreetProperty));
-  return nodeIdHandlerByTypeName.StreetProperty.get(nodeIdHandlerByTypeName.StreetProperty.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_StreetProperty));
+  return nodeIdHandler_StreetProperty.get(nodeIdHandler_StreetProperty.getSpec($decoded));
+};
+const nodeIdHandler_House = {
+  typeName: "House",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("houses", false), $record.get("street_id"), $record.get("property_id")]);
+  },
+  getSpec($list) {
+    return {
+      street_id: inhibitOnNull(access($list, [1])),
+      property_id: inhibitOnNull(access($list, [2]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_housesPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "houses";
+  }
 };
 const nodeFetcher_House = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.House));
-  return nodeIdHandlerByTypeName.House.get(nodeIdHandlerByTypeName.House.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_House));
+  return nodeIdHandler_House.get(nodeIdHandler_House.getSpec($decoded));
+};
+const nodeIdHandler_Building = {
+  typeName: "Building",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("buildings", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_buildingsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "buildings";
+  }
 };
 const nodeFetcher_Building = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Building));
-  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
+  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  Post: nodeIdHandler_Post,
+  Offer: nodeIdHandler_Offer,
+  Street: nodeIdHandler_Street,
+  Property: nodeIdHandler_Property,
+  StreetProperty: nodeIdHandler_StreetProperty,
+  House: nodeIdHandler_House,
+  Building: nodeIdHandler_Building
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  console.error(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
+  return null;
 }
 function CursorSerialize(value) {
   return "" + value;
 }
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
+  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
 };
 const specFromArgs_Street = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
+  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 const specFromArgs_Property = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
+  return specFromNodeId(nodeIdHandler_Property, $nodeId);
 };
 const specFromArgs_StreetProperty = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
+  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
 };
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_Offer2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
+  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
 };
 const specFromArgs_Street2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
+  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 const specFromArgs_Property2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
+  return specFromNodeId(nodeIdHandler_Property, $nodeId);
 };
 const specFromArgs_StreetProperty2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
+  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
 };
 const specFromArgs_Building2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -3670,44 +3689,44 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     postById(_$root, {
       $id
     }) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $id
       });
     },
     offerById(_$root, {
       $id
     }) {
-      return pgResource_offersPgResource.get({
+      return resource_offersPgResource.get({
         id: $id
       });
     },
     streetById(_$root, {
       $id
     }) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $id
       });
     },
     streetByName(_$root, {
       $name
     }) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         name: $name
       });
     },
     propertyById(_$root, {
       $id
     }) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $id
       });
     },
@@ -3715,7 +3734,7 @@ export const plans = {
       $strId,
       $propId
     }) {
-      return pgResource_street_propertyPgResource.get({
+      return resource_street_propertyPgResource.get({
         str_id: $strId,
         prop_id: $propId
       });
@@ -3724,7 +3743,7 @@ export const plans = {
       $streetId,
       $propertyId
     }) {
-      return pgResource_housesPgResource.get({
+      return resource_housesPgResource.get({
         street_id: $streetId,
         property_id: $propertyId
       });
@@ -3733,7 +3752,7 @@ export const plans = {
       $streetName,
       $propertyId
     }) {
-      return pgResource_housesPgResource.get({
+      return resource_housesPgResource.get({
         street_name: $streetName,
         property_id: $propertyId
       });
@@ -3742,7 +3761,7 @@ export const plans = {
       $streetId,
       $propertyNameOrNumber
     }) {
-      return pgResource_housesPgResource.get({
+      return resource_housesPgResource.get({
         street_id: $streetId,
         property_name_or_number: $propertyNameOrNumber
       });
@@ -3751,7 +3770,7 @@ export const plans = {
       $streetName,
       $buildingName
     }) {
-      return pgResource_housesPgResource.get({
+      return resource_housesPgResource.get({
         street_name: $streetName,
         building_name: $buildingName
       });
@@ -3759,7 +3778,7 @@ export const plans = {
     buildingById(_$root, {
       $id
     }) {
-      return pgResource_buildingsPgResource.get({
+      return resource_buildingsPgResource.get({
         id: $id
       });
     },
@@ -3793,7 +3812,7 @@ export const plans = {
     },
     allPosts: {
       plan() {
-        return connection(pgResource_postsPgResource.find());
+        return connection(resource_postsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3823,7 +3842,7 @@ export const plans = {
     },
     allOffers: {
       plan() {
-        return connection(pgResource_offersPgResource.find());
+        return connection(resource_offersPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3853,7 +3872,7 @@ export const plans = {
     },
     allStreets: {
       plan() {
-        return connection(pgResource_streetsPgResource.find());
+        return connection(resource_streetsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3883,7 +3902,7 @@ export const plans = {
     },
     allProperties: {
       plan() {
-        return connection(pgResource_propertiesPgResource.find());
+        return connection(resource_propertiesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3913,7 +3932,7 @@ export const plans = {
     },
     allStreetProperties: {
       plan() {
-        return connection(pgResource_street_propertyPgResource.find());
+        return connection(resource_street_propertyPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3943,7 +3962,7 @@ export const plans = {
     },
     allHouses: {
       plan() {
-        return connection(pgResource_housesPgResource.find());
+        return connection(resource_housesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -3973,7 +3992,7 @@ export const plans = {
     },
     allBuildings: {
       plan() {
-        return connection(pgResource_buildingsPgResource.find());
+        return connection(resource_buildingsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -4002,15 +4021,32 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   Post: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Post.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Post.codec.name].encode);
+      const specifier = nodeIdHandler_Post.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
     },
     offersByPostId: {
       plan($record) {
-        const $records = pgResource_offersPgResource.find({
+        const $records = resource_offersPgResource.find({
           post_id: $record.get("id")
         });
         return connection($records);
@@ -4051,14 +4087,14 @@ export const plans = {
   Offer: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Offer.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Offer.codec.name].encode);
+      const specifier = nodeIdHandler_Offer.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Offer.codec.name].encode);
     },
     postId($record) {
       return $record.get("post_id");
     },
     postByPostId($record) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $record.get("post_id")
       });
     }
@@ -4166,12 +4202,12 @@ export const plans = {
   Street: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Street.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Street.codec.name].encode);
+      const specifier = nodeIdHandler_Street.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Street.codec.name].encode);
     },
     propertiesByStreetId: {
       plan($record) {
-        const $records = pgResource_propertiesPgResource.find({
+        const $records = resource_propertiesPgResource.find({
           street_id: $record.get("id")
         });
         return connection($records);
@@ -4204,7 +4240,7 @@ export const plans = {
     },
     streetPropertiesByStrId: {
       plan($record) {
-        const $records = pgResource_street_propertyPgResource.find({
+        const $records = resource_street_propertyPgResource.find({
           str_id: $record.get("id")
         });
         return connection($records);
@@ -4237,7 +4273,7 @@ export const plans = {
     },
     buildingsNamedAfterStreet: {
       plan($record) {
-        const $records = pgResource_buildingsPgResource.find({
+        const $records = resource_buildingsPgResource.find({
           name: $record.get("name")
         });
         return connection($records);
@@ -4278,8 +4314,8 @@ export const plans = {
   Property: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Property.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Property.codec.name].encode);
+      const specifier = nodeIdHandler_Property.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Property.codec.name].encode);
     },
     streetId($record) {
       return $record.get("street_id");
@@ -4288,13 +4324,13 @@ export const plans = {
       return $record.get("name_or_number");
     },
     streetByStreetId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("street_id")
       });
     },
     streetPropertiesByPropId: {
       plan($record) {
-        const $records = pgResource_street_propertyPgResource.find({
+        const $records = resource_street_propertyPgResource.find({
           prop_id: $record.get("id")
         });
         return connection($records);
@@ -4327,7 +4363,7 @@ export const plans = {
     },
     buildingsByPropertyId: {
       plan($record) {
-        const $records = pgResource_buildingsPgResource.find({
+        const $records = resource_buildingsPgResource.find({
           property_id: $record.get("id")
         });
         return connection($records);
@@ -4368,8 +4404,8 @@ export const plans = {
   StreetProperty: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.StreetProperty.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.StreetProperty.codec.name].encode);
+      const specifier = nodeIdHandler_StreetProperty.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_StreetProperty.codec.name].encode);
     },
     strId($record) {
       return $record.get("str_id");
@@ -4381,12 +4417,12 @@ export const plans = {
       return $record.get("current_owner");
     },
     propertyByPropId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("prop_id")
       });
     },
     streetByStrId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("str_id")
       });
     }
@@ -4496,8 +4532,8 @@ export const plans = {
   Building: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
+      const specifier = nodeIdHandler_Building.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Building.codec.name].encode);
     },
     propertyId($record) {
       return $record.get("property_id");
@@ -4506,12 +4542,12 @@ export const plans = {
       return $record.get("is_primary");
     },
     propertyByPropertyId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("property_id")
       });
     },
     namedAfterStreet($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         name: $record.get("name")
       });
     }
@@ -4753,8 +4789,8 @@ export const plans = {
   House: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.House.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.House.codec.name].encode);
+      const specifier = nodeIdHandler_House.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_House.codec.name].encode);
     },
     buildingName($record) {
       return $record.get("building_name");
@@ -5110,7 +5146,7 @@ export const plans = {
     __assertStep: __ValueStep,
     createPost: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_postsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_postsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5125,7 +5161,7 @@ export const plans = {
     },
     createOffer: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_offersPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_offersPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5140,7 +5176,7 @@ export const plans = {
     },
     createStreet: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_streetsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_streetsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5155,7 +5191,7 @@ export const plans = {
     },
     createProperty: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_propertiesPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_propertiesPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5170,7 +5206,7 @@ export const plans = {
     },
     createStreetProperty: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_street_propertyPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_street_propertyPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5185,7 +5221,7 @@ export const plans = {
     },
     createBuilding: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_buildingsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_buildingsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -5200,7 +5236,7 @@ export const plans = {
     },
     updatePost: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_postsPgResource, specFromArgs_Post(args));
+        const $update = pgUpdateSingle(resource_postsPgResource, specFromArgs_Post(args));
         args.apply($update);
         return object({
           result: $update
@@ -5214,7 +5250,7 @@ export const plans = {
     },
     updatePostById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_postsPgResource, {
+        const $update = pgUpdateSingle(resource_postsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -5230,7 +5266,7 @@ export const plans = {
     },
     updateOffer: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_offersPgResource, specFromArgs_Offer(args));
+        const $update = pgUpdateSingle(resource_offersPgResource, specFromArgs_Offer(args));
         args.apply($update);
         return object({
           result: $update
@@ -5244,7 +5280,7 @@ export const plans = {
     },
     updateOfferById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_offersPgResource, {
+        const $update = pgUpdateSingle(resource_offersPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -5260,7 +5296,7 @@ export const plans = {
     },
     updateStreet: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_streetsPgResource, specFromArgs_Street(args));
+        const $update = pgUpdateSingle(resource_streetsPgResource, specFromArgs_Street(args));
         args.apply($update);
         return object({
           result: $update
@@ -5274,7 +5310,7 @@ export const plans = {
     },
     updateStreetById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_streetsPgResource, {
+        const $update = pgUpdateSingle(resource_streetsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -5290,7 +5326,7 @@ export const plans = {
     },
     updateStreetByName: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_streetsPgResource, {
+        const $update = pgUpdateSingle(resource_streetsPgResource, {
           name: args.getRaw(['input', "name"])
         });
         args.apply($update);
@@ -5306,7 +5342,7 @@ export const plans = {
     },
     updateProperty: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_propertiesPgResource, specFromArgs_Property(args));
+        const $update = pgUpdateSingle(resource_propertiesPgResource, specFromArgs_Property(args));
         args.apply($update);
         return object({
           result: $update
@@ -5320,7 +5356,7 @@ export const plans = {
     },
     updatePropertyById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_propertiesPgResource, {
+        const $update = pgUpdateSingle(resource_propertiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -5336,7 +5372,7 @@ export const plans = {
     },
     updateStreetProperty: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_street_propertyPgResource, specFromArgs_StreetProperty(args));
+        const $update = pgUpdateSingle(resource_street_propertyPgResource, specFromArgs_StreetProperty(args));
         args.apply($update);
         return object({
           result: $update
@@ -5350,7 +5386,7 @@ export const plans = {
     },
     updateStreetPropertyByStrIdAndPropId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_street_propertyPgResource, {
+        const $update = pgUpdateSingle(resource_street_propertyPgResource, {
           str_id: args.getRaw(['input', "strId"]),
           prop_id: args.getRaw(['input', "propId"])
         });
@@ -5367,7 +5403,7 @@ export const plans = {
     },
     updateBuilding: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_buildingsPgResource, specFromArgs_Building(args));
+        const $update = pgUpdateSingle(resource_buildingsPgResource, specFromArgs_Building(args));
         args.apply($update);
         return object({
           result: $update
@@ -5381,7 +5417,7 @@ export const plans = {
     },
     updateBuildingById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_buildingsPgResource, {
+        const $update = pgUpdateSingle(resource_buildingsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -5397,7 +5433,7 @@ export const plans = {
     },
     deletePost: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_postsPgResource, specFromArgs_Post2(args));
+        const $delete = pgDeleteSingle(resource_postsPgResource, specFromArgs_Post2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5411,7 +5447,7 @@ export const plans = {
     },
     deletePostById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_postsPgResource, {
+        const $delete = pgDeleteSingle(resource_postsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -5427,7 +5463,7 @@ export const plans = {
     },
     deleteOffer: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_offersPgResource, specFromArgs_Offer2(args));
+        const $delete = pgDeleteSingle(resource_offersPgResource, specFromArgs_Offer2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5441,7 +5477,7 @@ export const plans = {
     },
     deleteOfferById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_offersPgResource, {
+        const $delete = pgDeleteSingle(resource_offersPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -5457,7 +5493,7 @@ export const plans = {
     },
     deleteStreet: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_streetsPgResource, specFromArgs_Street2(args));
+        const $delete = pgDeleteSingle(resource_streetsPgResource, specFromArgs_Street2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5471,7 +5507,7 @@ export const plans = {
     },
     deleteStreetById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_streetsPgResource, {
+        const $delete = pgDeleteSingle(resource_streetsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -5487,7 +5523,7 @@ export const plans = {
     },
     deleteStreetByName: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_streetsPgResource, {
+        const $delete = pgDeleteSingle(resource_streetsPgResource, {
           name: args.getRaw(['input', "name"])
         });
         args.apply($delete);
@@ -5503,7 +5539,7 @@ export const plans = {
     },
     deleteProperty: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_propertiesPgResource, specFromArgs_Property2(args));
+        const $delete = pgDeleteSingle(resource_propertiesPgResource, specFromArgs_Property2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5517,7 +5553,7 @@ export const plans = {
     },
     deletePropertyById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_propertiesPgResource, {
+        const $delete = pgDeleteSingle(resource_propertiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -5533,7 +5569,7 @@ export const plans = {
     },
     deleteStreetProperty: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_street_propertyPgResource, specFromArgs_StreetProperty2(args));
+        const $delete = pgDeleteSingle(resource_street_propertyPgResource, specFromArgs_StreetProperty2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5547,7 +5583,7 @@ export const plans = {
     },
     deleteStreetPropertyByStrIdAndPropId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_street_propertyPgResource, {
+        const $delete = pgDeleteSingle(resource_street_propertyPgResource, {
           str_id: args.getRaw(['input', "strId"]),
           prop_id: args.getRaw(['input', "propId"])
         });
@@ -5564,7 +5600,7 @@ export const plans = {
     },
     deleteBuilding: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_buildingsPgResource, specFromArgs_Building2(args));
+        const $delete = pgDeleteSingle(resource_buildingsPgResource, specFromArgs_Building2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -5578,7 +5614,7 @@ export const plans = {
     },
     deleteBuildingById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_buildingsPgResource, {
+        const $delete = pgDeleteSingle(resource_buildingsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -5618,7 +5654,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_postsPgResource.find(spec);
+          return resource_postsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5674,7 +5710,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_offersPgResource.find(spec);
+          return resource_offersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5686,7 +5722,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     postByPostId($record) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $record.get("result").get("post_id")
       });
     }
@@ -5741,7 +5777,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_streetsPgResource.find(spec);
+          return resource_streetsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5803,7 +5839,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_propertiesPgResource.find(spec);
+          return resource_propertiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5815,7 +5851,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     streetByStreetId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("street_id")
       });
     }
@@ -5876,7 +5912,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_street_propertyPgResource.find(spec);
+          return resource_street_propertyPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5888,12 +5924,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("prop_id")
       });
     },
     streetByStrId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("str_id")
       });
     }
@@ -5954,7 +5990,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_buildingsPgResource.find(spec);
+          return resource_buildingsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -5966,12 +6002,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropertyId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("property_id")
       });
     },
     namedAfterStreet($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         name: $record.get("result").get("name")
       });
     }
@@ -6044,7 +6080,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_postsPgResource.find(spec);
+          return resource_postsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6110,7 +6146,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_offersPgResource.find(spec);
+          return resource_offersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6122,7 +6158,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     postByPostId($record) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $record.get("result").get("post_id")
       });
     }
@@ -6187,7 +6223,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_streetsPgResource.find(spec);
+          return resource_streetsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6269,7 +6305,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_propertiesPgResource.find(spec);
+          return resource_propertiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6281,7 +6317,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     streetByStreetId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("street_id")
       });
     }
@@ -6352,7 +6388,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_street_propertyPgResource.find(spec);
+          return resource_street_propertyPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6364,12 +6400,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("prop_id")
       });
     },
     streetByStrId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("str_id")
       });
     }
@@ -6440,7 +6476,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_buildingsPgResource.find(spec);
+          return resource_buildingsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6452,12 +6488,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropertyId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("property_id")
       });
     },
     namedAfterStreet($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         name: $record.get("result").get("name")
       });
     }
@@ -6526,7 +6562,7 @@ export const plans = {
     },
     deletedPostViewId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Post.plan($record);
+      const specifier = nodeIdHandler_Post.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6545,7 +6581,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_postsPgResource.find(spec);
+          return resource_postsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6578,7 +6614,7 @@ export const plans = {
     },
     deletedOfferViewId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Offer.plan($record);
+      const specifier = nodeIdHandler_Offer.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6597,7 +6633,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_offersPgResource.find(spec);
+          return resource_offersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6609,7 +6645,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     postByPostId($record) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $record.get("result").get("post_id")
       });
     }
@@ -6635,7 +6671,7 @@ export const plans = {
     },
     deletedStreetId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Street.plan($record);
+      const specifier = nodeIdHandler_Street.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6654,7 +6690,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_streetsPgResource.find(spec);
+          return resource_streetsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6692,7 +6728,7 @@ export const plans = {
     },
     deletedPropertyId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Property.plan($record);
+      const specifier = nodeIdHandler_Property.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6711,7 +6747,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_propertiesPgResource.find(spec);
+          return resource_propertiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6723,7 +6759,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     streetByStreetId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("street_id")
       });
     }
@@ -6749,7 +6785,7 @@ export const plans = {
     },
     deletedStreetPropertyId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.StreetProperty.plan($record);
+      const specifier = nodeIdHandler_StreetProperty.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6768,7 +6804,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_street_propertyPgResource.find(spec);
+          return resource_street_propertyPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6780,12 +6816,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("prop_id")
       });
     },
     streetByStrId($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         id: $record.get("result").get("str_id")
       });
     }
@@ -6811,7 +6847,7 @@ export const plans = {
     },
     deletedBuildingId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Building.plan($record);
+      const specifier = nodeIdHandler_Building.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -6830,7 +6866,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_buildingsPgResource.find(spec);
+          return resource_buildingsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -6842,12 +6878,12 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     propertyByPropertyId($record) {
-      return pgResource_propertiesPgResource.get({
+      return resource_propertiesPgResource.get({
         id: $record.get("result").get("property_id")
       });
     },
     namedAfterStreet($record) {
-      return pgResource_streetsPgResource.get({
+      return resource_streetsPgResource.get({
         name: $record.get("result").get("name")
       });
     }

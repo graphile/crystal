@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -1069,54 +1069,28 @@ const registry = makeRegistry({
     }
   }
 });
-const pgResource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
-const pgResource_referencing_tablePgResource = registry.pgResources["referencing_table"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  LetterDescription: {
-    typeName: "LetterDescription",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("letter_descriptions", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_letter_descriptionsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "letter_descriptions";
-    }
+const resource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
+const resource_referencing_tablePgResource = registry.pgResources["referencing_table"];
+const nodeIdHandler_LetterDescription = {
+  typeName: "LetterDescription",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("letter_descriptions", false), $record.get("id")]);
   },
-  ReferencingTable: {
-    typeName: "ReferencingTable",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("referencing_tables", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_referencing_tablePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "referencing_tables";
-    }
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_letter_descriptionsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "letter_descriptions";
   }
 };
 function specForHandler(handler) {
@@ -1139,15 +1113,55 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_LetterDescription = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.LetterDescription));
-  return nodeIdHandlerByTypeName.LetterDescription.get(nodeIdHandlerByTypeName.LetterDescription.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LetterDescription));
+  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec($decoded));
+};
+const nodeIdHandler_ReferencingTable = {
+  typeName: "ReferencingTable",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("referencing_tables", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_referencing_tablePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "referencing_tables";
+  }
 };
 const nodeFetcher_ReferencingTable = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.ReferencingTable));
-  return nodeIdHandlerByTypeName.ReferencingTable.get(nodeIdHandlerByTypeName.ReferencingTable.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReferencingTable));
+  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  LetterDescription: nodeIdHandler_LetterDescription,
+  ReferencingTable: nodeIdHandler_ReferencingTable
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  console.error(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
+  return null;
 }
 function CursorSerialize(value) {
   return "" + value;
@@ -1179,19 +1193,19 @@ const makeArgs_referencing_table_mutation = (args, path = []) => argDetailsSimpl
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
 const specFromArgs_LetterDescription = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
 const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
 const specFromArgs_LetterDescription2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
 const specFromArgs_ReferencingTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -2084,37 +2098,37 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     letterDescriptionById(_$root, {
       $id
     }) {
-      return pgResource_letter_descriptionsPgResource.get({
+      return resource_letter_descriptionsPgResource.get({
         id: $id
       });
     },
     letterDescriptionByLetter(_$root, {
       $letter
     }) {
-      return pgResource_letter_descriptionsPgResource.get({
+      return resource_letter_descriptionsPgResource.get({
         letter: $letter
       });
     },
     letterDescriptionByLetterViaView(_$root, {
       $letterViaView
     }) {
-      return pgResource_letter_descriptionsPgResource.get({
+      return resource_letter_descriptionsPgResource.get({
         letter_via_view: $letterViaView
       });
     },
     referencingTableById(_$root, {
       $id
     }) {
-      return pgResource_referencing_tablePgResource.get({
+      return resource_referencing_tablePgResource.get({
         id: $id
       });
     },
@@ -2128,7 +2142,7 @@ export const plans = {
     },
     allLetterDescriptions: {
       plan() {
-        return connection(pgResource_letter_descriptionsPgResource.find());
+        return connection(resource_letter_descriptionsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -2158,7 +2172,7 @@ export const plans = {
     },
     allReferencingTables: {
       plan() {
-        return connection(pgResource_referencing_tablePgResource.find());
+        return connection(resource_referencing_tablePgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -2187,11 +2201,28 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   LetterDescription: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.LetterDescription.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LetterDescription.codec.name].encode);
+      const specifier = nodeIdHandler_LetterDescription.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_LetterDescription.codec.name].encode);
     },
     letterViaView($record) {
       return $record.get("letter_via_view");
@@ -2200,8 +2231,8 @@ export const plans = {
   ReferencingTable: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.ReferencingTable.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ReferencingTable.codec.name].encode);
+      const specifier = nodeIdHandler_ReferencingTable.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_ReferencingTable.codec.name].encode);
     },
     enum1($record) {
       return $record.get("enum_1");
@@ -2596,7 +2627,7 @@ export const plans = {
     },
     createLetterDescription: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_letter_descriptionsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_letter_descriptionsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -2611,7 +2642,7 @@ export const plans = {
     },
     createReferencingTable: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_referencing_tablePgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_referencing_tablePgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -2626,7 +2657,7 @@ export const plans = {
     },
     updateLetterDescription: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_letter_descriptionsPgResource, specFromArgs_LetterDescription(args));
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription(args));
         args.apply($update);
         return object({
           result: $update
@@ -2640,7 +2671,7 @@ export const plans = {
     },
     updateLetterDescriptionById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -2656,7 +2687,7 @@ export const plans = {
     },
     updateLetterDescriptionByLetter: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
           letter: args.getRaw(['input', "letter"])
         });
         args.apply($update);
@@ -2672,7 +2703,7 @@ export const plans = {
     },
     updateLetterDescriptionByLetterViaView: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
           letter_via_view: args.getRaw(['input', "letterViaView"])
         });
         args.apply($update);
@@ -2688,7 +2719,7 @@ export const plans = {
     },
     updateReferencingTable: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_referencing_tablePgResource, specFromArgs_ReferencingTable(args));
+        const $update = pgUpdateSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable(args));
         args.apply($update);
         return object({
           result: $update
@@ -2702,7 +2733,7 @@ export const plans = {
     },
     updateReferencingTableById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_referencing_tablePgResource, {
+        const $update = pgUpdateSingle(resource_referencing_tablePgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -2718,7 +2749,7 @@ export const plans = {
     },
     deleteLetterDescription: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_letter_descriptionsPgResource, specFromArgs_LetterDescription2(args));
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -2732,7 +2763,7 @@ export const plans = {
     },
     deleteLetterDescriptionById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -2748,7 +2779,7 @@ export const plans = {
     },
     deleteLetterDescriptionByLetter: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
           letter: args.getRaw(['input', "letter"])
         });
         args.apply($delete);
@@ -2764,7 +2795,7 @@ export const plans = {
     },
     deleteLetterDescriptionByLetterViaView: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
           letter_via_view: args.getRaw(['input', "letterViaView"])
         });
         args.apply($delete);
@@ -2780,7 +2811,7 @@ export const plans = {
     },
     deleteReferencingTable: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_referencing_tablePgResource, specFromArgs_ReferencingTable2(args));
+        const $delete = pgDeleteSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -2794,7 +2825,7 @@ export const plans = {
     },
     deleteReferencingTableById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_referencing_tablePgResource, {
+        const $delete = pgDeleteSingle(resource_referencing_tablePgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -2885,7 +2916,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_letter_descriptionsPgResource.find(spec);
+          return resource_letter_descriptionsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -2959,7 +2990,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_referencing_tablePgResource.find(spec);
+          return resource_referencing_tablePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -3006,7 +3037,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_letter_descriptionsPgResource.find(spec);
+          return resource_letter_descriptionsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -3110,7 +3141,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_referencing_tablePgResource.find(spec);
+          return resource_referencing_tablePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -3186,7 +3217,7 @@ export const plans = {
     },
     deletedLetterDescriptionId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.LetterDescription.plan($record);
+      const specifier = nodeIdHandler_LetterDescription.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -3205,7 +3236,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_letter_descriptionsPgResource.find(spec);
+          return resource_letter_descriptionsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -3248,7 +3279,7 @@ export const plans = {
     },
     deletedReferencingTableId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.ReferencingTable.plan($record);
+      const specifier = nodeIdHandler_ReferencingTable.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -3267,7 +3298,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_referencing_tablePgResource.find(spec);
+          return resource_referencing_tablePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
