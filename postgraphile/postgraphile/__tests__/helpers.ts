@@ -66,7 +66,9 @@ import { makeV4Preset } from "../src/presets/v4.js";
  * comma separated list of snapshot types to update.
  */
 const { UPDATE_SNAPSHOTS } = process.env;
-const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",");
+const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",")
+  .map((s) => s.trim())
+  .filter((s) => s.length > 0);
 function shouldUpdateSnapshot(filePath: string) {
   // Never update snapshots in CI
   if (process.env.CI) return false;
