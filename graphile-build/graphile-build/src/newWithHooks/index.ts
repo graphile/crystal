@@ -378,6 +378,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             interfaces: baseInterfaces,
             extensions,
             planType,
+            toSpecifier,
             ...restOfConfig
           } = builder.applyHooks(
             "GraphQLInterfaceType",
@@ -394,15 +395,16 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const finalSpec = {
             name: typeName,
-            ...(extensions || planType
+            ...(extensions || planType || toSpecifier
               ? {
                   extensions: {
                     ...extensions,
-                    ...(planType
+                    ...(planType || toSpecifier
                       ? {
                           grafast: {
                             ...extensions?.grafast,
-                            planType,
+                            ...(planType ? { planType } : null),
+                            ...(toSpecifier ? { toSpecifier } : null),
                           },
                         }
                       : null),
@@ -583,6 +585,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           const {
             name: baseName,
             types: baseTypes,
+            toSpecifier,
             planType,
             extensions,
             ...restOfConfig
@@ -601,15 +604,16 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const finalSpec = {
             name: typeName,
-            ...(extensions || planType
+            ...(extensions || planType || toSpecifier
               ? {
                   extensions: {
                     ...extensions,
-                    ...(planType
+                    ...(planType || toSpecifier
                       ? {
                           grafast: {
                             ...extensions?.grafast,
-                            planType,
+                            ...(planType ? { planType } : null),
+                            ...(toSpecifier ? { toSpecifier } : null),
                           },
                         }
                       : null),
