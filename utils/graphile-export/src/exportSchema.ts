@@ -1194,6 +1194,15 @@ function objectToObjectProperties(o: {
     .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
+/** Only use when you're sure the keys are safe to use as identifiers */
+function dangerousObjectToObjectPropertiesWithIdentifierKeys(o: {
+  [key: string]: t.Expression | null;
+}): t.ObjectProperty[] {
+  return Object.entries(o)
+    .filter(([, value]) => value != null)
+    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
+}
+
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
@@ -1821,25 +1830,31 @@ function exportSchemaTypeDefs({
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
-              objectToObjectProperties({
-                __resolveType: convertToIdentifierViaAST(
-                  file,
-                  type.resolveType,
-                  `${type.name}ResolveType`,
-                  `${type.name}.resolveType`,
-                ),
-                __toSpecifier: convertToIdentifierViaAST(
-                  file,
-                  type.extensions?.grafast?.toSpecifier,
-                  `${type.name}ToSpecifier`,
-                  `${type.name}.toSpecifier`,
-                ),
-                __planType: convertToIdentifierViaAST(
-                  file,
-                  type.extensions?.grafast?.planType,
-                  `${type.name}PlanType`,
-                  `${type.name}.planType`,
-                ),
+              dangerousObjectToObjectPropertiesWithIdentifierKeys({
+                __resolveType: type.resolveType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.resolveType,
+                      `${type.name}ResolveType`,
+                      `${type.name}.resolveType`,
+                    )
+                  : null,
+                __toSpecifier: type.extensions?.grafast?.toSpecifier
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.toSpecifier,
+                      `${type.name}ToSpecifier`,
+                      `${type.name}.toSpecifier`,
+                    )
+                  : null,
+                __planType: type.extensions?.grafast?.planType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.planType,
+                      `${type.name}PlanType`,
+                      `${type.name}.planType`,
+                    )
+                  : null,
               }),
             ),
           ),
