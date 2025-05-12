@@ -201,9 +201,11 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
+  private parentRefId: number | null;
   constructor($parent: PgUnionAllStep<any, any>, $item: Step) {
     super();
     this.addDependency($item);
+    this.parentRefId = this.addRef($parent);
     this.spec = $parent.spec;
     if ($parent.mode === "normal") {
       this.typeKey = $parent.selectType();
@@ -253,10 +255,7 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    let $parent = this.getDepDeep(0);
-    if ($parent instanceof PgUnionAllRowsStep) {
-      $parent = $parent.getClassStep();
-    }
+    const $parent = this.getRef(this.parentRefId);
     if (!($parent instanceof PgUnionAllStep)) {
       throw new Error(
         `${this} failed to get the parent PgUnionAllStep; last step found was ${$parent}`,
