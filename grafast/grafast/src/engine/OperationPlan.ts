@@ -2482,10 +2482,10 @@ export class OperationPlan {
       }
       //this.addStepAtPlanningPath(listItemPlanningPath, $item);
 
-      this.planIntoOutputPlan({
+      this.queueNextLayer(this.planIntoOutputPlan, {
         outputPlan: listOutputPlan,
         path,
-        planningPath: listItemPlanningPath,
+        planningPath: listItemPlanningPath + "^",
         polymorphicPaths,
         parentStep: $item,
         positionType: nullableFieldType.ofType,
