@@ -1812,7 +1812,11 @@ function exportSchemaTypeDefs({
       type instanceof GraphQLUnionType
     ) {
       const config = type.toConfig();
-      if (config.resolveType) {
+      if (
+        config.resolveType ||
+        config.extensions.grafast?.toSpecifier ||
+        config.extensions.grafast?.planType
+      ) {
         plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
@@ -1823,6 +1827,18 @@ function exportSchemaTypeDefs({
                   type.resolveType,
                   `${type.name}ResolveType`,
                   `${type.name}.resolveType`,
+                ),
+                __toSpecifier: convertToIdentifierViaAST(
+                  file,
+                  type.extensions?.grafast?.toSpecifier,
+                  `${type.name}ToSpecifier`,
+                  `${type.name}.toSpecifier`,
+                ),
+                __planType: convertToIdentifierViaAST(
+                  file,
+                  type.extensions?.grafast?.planType,
+                  `${type.name}PlanType`,
+                  `${type.name}.planType`,
                 ),
               }),
             ),

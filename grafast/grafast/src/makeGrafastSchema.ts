@@ -117,6 +117,14 @@ export type InterfaceOrUnionPlans = {
   __resolveType?: graphql.GraphQLTypeResolver<any, Grafast.Context>;
 
   /**
+   * Takes a step representing this polymorphic position, and returns a
+   * "specifier" step that will be input to __planType. If not specified, the
+   * step's own `.toSpecifier()` will be used, if present, otherwise the
+   * step's own `.toRecord()`, and failing that the step itself.
+   */
+  __toSpecifier?($step: Step): Step;
+
+  /**
    * Plantime. `$specifier` is either a step returned from a polymorphic field
    * or list position, or a `__ValueStep` that represents the combined values
    * of such steps (to prevent unbounded plan branching). `__planType` must
@@ -521,6 +529,12 @@ export function makeGrafastSchema(details: {
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
+        }
+        if (polyPlans?.__toSpecifier) {
+          exportNameHint(polyPlans.__toSpecifier, `${typeName}_toSpecifier`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.toSpecifier = polyPlans.__toSpecifier;
         }
         if (polyPlans?.__planType) {
           exportNameHint(polyPlans.__planType, `${typeName}_planType`);
