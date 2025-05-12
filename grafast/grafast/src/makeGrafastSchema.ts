@@ -559,6 +559,18 @@ export function makeGrafastSchema(details: {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
         }
+        if (polyPlans?.__toSpecifier) {
+          exportNameHint(polyPlans.__toSpecifier, `${typeName}_toSpecifier`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.toSpecifier = polyPlans.__toSpecifier;
+        }
+        if (polyPlans?.__planType) {
+          exportNameHint(polyPlans.__planType, `${typeName}_planType`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.planType = polyPlans.__planType;
+        }
         return new graphql.GraphQLUnionType(config);
       } else if (isScalarType(astType)) {
         const rawConfig = astType.toConfig();
