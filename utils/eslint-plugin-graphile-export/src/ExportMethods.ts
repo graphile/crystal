@@ -33,6 +33,9 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "planType",
   "toSpecifier",
 
+  // GraphQLUnionType
+  "types",
+
   // GraphQLArgumentConfig
   "defaultValue",
 

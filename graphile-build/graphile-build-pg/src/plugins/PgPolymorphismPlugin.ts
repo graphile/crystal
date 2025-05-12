@@ -1564,31 +1564,32 @@ return function (access, inhibitOnNull) {
                           ) as GraphQLObjectType | undefined,
                       )
                       .filter(isNotNullish),
-                  planType($specifier) {
-                    console.log(
-                      `planType(${$specifier}) for union ${unionName} with codecs ${codecs.map((c) => c.name)}`,
-                    );
-                    const $__typename = get($specifier, "__typename");
-                    return {
-                      $__typename,
-                      planForType(t) {
-                        const resource = resourceByTypeName[t.name];
-                        if (!resource) {
-                          throw new Error(
-                            `Could not determine resource for ${t.name}`,
-                          );
-                        }
-                        const pk =
-                          resource.uniques.find((u) => u.isPrimary) ??
-                          resource.uniques[0];
-                        const spec = Object.create(null);
-                        for (const attrName of pk.attributes) {
-                          spec[attrName] = get($specifier, attrName);
-                        }
-                        return resource.get(spec);
+                  planType: EXPORTABLE(
+                    (get, resourceByTypeName) =>
+                      function planType($specifier) {
+                        const $__typename = get($specifier, "__typename");
+                        return {
+                          $__typename,
+                          planForType(t) {
+                            const resource = resourceByTypeName[t.name];
+                            if (!resource) {
+                              throw new Error(
+                                `Could not determine resource for ${t.name}`,
+                              );
+                            }
+                            const pk =
+                              resource.uniques.find((u) => u.isPrimary) ??
+                              resource.uniques[0];
+                            const spec = Object.create(null);
+                            for (const attrName of pk.attributes) {
+                              spec[attrName] = get($specifier, attrName);
+                            }
+                            return resource.get(spec);
+                          },
+                        };
                       },
-                    };
-                  },
+                    [get, resourceByTypeName],
+                  ),
                 };
               },
               "PgPolymorphismPlugin @unionMember unions",
