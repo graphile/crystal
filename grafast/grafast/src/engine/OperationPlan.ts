@@ -3294,7 +3294,16 @@ export class OperationPlan {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
         const speer = sudo(possiblyPeer);
         // PERF: I'm not sure we strictly require this.
-        if (!arraysMatch(sstep._refs, speer._refs)) {
+        if (
+          !arraysMatch(
+            sstep._refs,
+            speer._refs,
+            (refA, refB) =>
+              refA === refB ||
+              this.stepTracker.getStepById(refA) ===
+                this.stepTracker.getStepById(refB),
+          )
+        ) {
           continue;
         }
         // We know the final dependency matches and the dependency count
