@@ -2104,15 +2104,11 @@ async function lint(code: string, rawFilePath: string | URL) {
     typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
   const { ESLint } = eslintModule;
   const eslint = new ESLint({
-    useEslintrc: false, // Don't use external config
-    reportUnusedDisableDirectives: "off",
+    overrideConfigFile: true, // Don't use external config
     allowInlineConfig: false, // Ignore `/* eslint-disable ... */` comments
     overrideConfig: {
-      reportUnusedDisableDirectives: false,
-      parserOptions: {
-        ecmaVersion: 2022,
-        sourceType: "module",
-      },
+      linterOptions: { reportUnusedDisableDirectives: false },
+      languageOptions: { ecmaVersion: 2020, sourceType: "module" },
       rules: {
         "no-use-before-define": [
           "error",
