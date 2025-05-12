@@ -27,6 +27,7 @@ export const configs = {
             "plan",
             "planType",
             "planForType",
+            "toSpecifier",
             "subscribePlan",
             "isTypeOf",
             "resolveType",
