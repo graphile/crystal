@@ -1,0 +1,1 @@
+module.exports = {name: "@yarnpkg/plugin-interactive-tools"};
