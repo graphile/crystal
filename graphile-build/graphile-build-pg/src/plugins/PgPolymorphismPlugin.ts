@@ -21,8 +21,9 @@ import type {
   PgResource,
   PgResourceOptions,
   PgResourceUnique,
+  PgSelectSingleStep,
+  PgUnionAllStepMember,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep, PgSelectSingleStep } from "@dataplan/pg";
 import type {
   DataFromObjectSteps,
   ExecutableStep,
@@ -1019,6 +1020,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
           grafast: { list, constant, access, inhibitOnNull, get },
+          dataplanPg: {
+            assertPgClassSingleStep,
+            PgSelectSingleStep,
+            PgUnionAllSingleStep,
+          },
           EXPORTABLE,
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
@@ -1441,9 +1447,57 @@ return function (access, inhibitOnNull) {
                     pgPolymorphism: polymorphism,
                     supportsNodeInterface: nodeable,
                   },
-                  () => ({
-                    description: codec.description,
-                  }),
+                  () => {
+                    const spec =
+                      build.pgResourcesByPolymorphicTypeName[interfaceTypeName];
+                    const resourceByTypeName: Record<string, PgResource> =
+                      Object.create(null);
+                    const members: PgUnionAllStepMember<string>[] = [];
+                    for (const resource of spec.resources) {
+                      const typeName = inflection.tableType(resource.codec);
+                      resourceByTypeName[typeName] = resource;
+                      members.push({
+                        resource,
+                        typeName,
+                      });
+                    }
+                    return {
+                      description: codec.description,
+                      toSpecifier($step) {
+                        if ($step instanceof PgUnionAllSingleStep) {
+                          return $step.toSpecifier();
+                        } else {
+                          return $step;
+                        }
+                      },
+                      planType: EXPORTABLE(
+                        (get, resourceByTypeName) =>
+                          function planType($specifier) {
+                            const $__typename = get($specifier, "__typename");
+                            return {
+                              $__typename,
+                              planForType(t) {
+                                const resource = resourceByTypeName[t.name];
+                                if (!resource) {
+                                  throw new Error(
+                                    `Type ${t.name} has no associated resource`,
+                                  );
+                                }
+                                const pk =
+                                  resource.uniques.find((u) => u.isPrimary) ??
+                                  resource.uniques[0];
+                                const spec = Object.create(null);
+                                for (const attrName of pk.attributes) {
+                                  spec[attrName] = get($specifier, attrName);
+                                }
+                                return resource.get(spec);
+                              },
+                            };
+                          },
+                        [get, resourceByTypeName],
+                      ),
+                    };
+                  },
                   `PgPolymorphismPlugin union interface type for ${codec.name}`,
                 );
                 setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
@@ -1487,17 +1541,52 @@ return function (access, inhibitOnNull) {
             build.registerUnionType(
               unionName,
               { isPgUnionMemberUnion: true },
-              () => ({
-                types: () =>
-                  codecs
-                    .map(
-                      (codec) =>
-                        build.getTypeByName(
-                          build.inflection.tableType(codec),
-                        ) as GraphQLObjectType | undefined,
-                    )
-                    .filter(isNotNullish),
-              }),
+              () => {
+                const resourceByTypeName = Object.create(null) as Record<
+                  string,
+                  ReturnType<typeof build.pgTableResource>
+                >;
+                for (const codec of codecs) {
+                  resourceByTypeName[build.inflection.tableType(codec)] =
+                    build.pgTableResource(codec as PgCodecWithAttributes);
+                }
+                return {
+                  types: () =>
+                    codecs
+                      .map(
+                        (codec) =>
+                          build.getTypeByName(
+                            build.inflection.tableType(codec),
+                          ) as GraphQLObjectType | undefined,
+                      )
+                      .filter(isNotNullish),
+                  planType($specifier) {
+                    console.log(
+                      `planType(${$specifier}) for union ${unionName} with codecs ${codecs.map((c) => c.name)}`,
+                    );
+                    const $__typename = get($specifier, "__typename");
+                    return {
+                      $__typename,
+                      planForType(t) {
+                        const resource = resourceByTypeName[t.name];
+                        if (!resource) {
+                          throw new Error(
+                            `Could not determine resource for ${t.name}`,
+                          );
+                        }
+                        const pk =
+                          resource.uniques.find((u) => u.isPrimary) ??
+                          resource.uniques[0];
+                        const spec = Object.create(null);
+                        for (const attrName of pk.attributes) {
+                          spec[attrName] = get($specifier, attrName);
+                        }
+                        return resource.get(spec);
+                      },
+                    };
+                  },
+                };
+              },
               "PgPolymorphismPlugin @unionMember unions",
             );
             build.registerCursorConnection({
