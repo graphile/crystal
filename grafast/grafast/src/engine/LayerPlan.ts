@@ -122,9 +122,6 @@ export interface LayerPlanReasonCombined {
   parentLayerPlans: ReadonlyArray<LayerPlan>;
 }
 
-export function isBranchingLayerPlan(layerPlan: LayerPlan): boolean {
-  return layerPlan.reason.type === "polymorphicPartition";
-}
 export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
   const t = layerPlan.reason.type;
   return (
