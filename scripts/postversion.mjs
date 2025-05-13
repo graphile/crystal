@@ -1,3 +1,4 @@
+/* global $, fs */
 import "zx/globals";
 
 // 1. Determine packages updated
