@@ -225,6 +225,7 @@ const oldConfig = {
       rules: {
         "tsdoc/syntax": "off",
         "import/extensions": "off",
+        "@typescript-eslint/no-require-imports": "off",
       },
     },
 
