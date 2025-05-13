@@ -5945,10 +5945,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node16@npm:^16.1.3":
-  version: 16.1.3
-  resolution: "@tsconfig/node16@npm:16.1.3"
-  checksum: 10/097f33cb7fe9577cc3c4b7a8d26c7e8b6c45c868d3bda1e2cd120111693b98f88a5138e643e7a6f79d53d94717c3624dc33398804647bf6e0e8782604bbfad53
+"@tsconfig/node22@npm:^22.0.1":
+  version: 22.0.1
+  resolution: "@tsconfig/node22@npm:22.0.1"
+  checksum: 10/da42f21f1b1f8e88d584fae44bca19514ea5b8eca9a60e8b10ecbabc8db5f4067259979ceea3798c16ae443b9c564268c00215093a7230948f29f950f33dd585
   languageName: node
   linkType: hard
 
@@ -20429,7 +20429,7 @@ __metadata:
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
     "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
     "@localrepo/prettier2-for-jest": "npm:prettier@^2"
-    "@tsconfig/node16": "npm:^16.1.3"
+    "@tsconfig/node22": "npm:^22.0.1"
     "@types/jest": "npm:^29.5.4"
     "@types/mock-fs": "npm:4.13.1"
     "@types/node": "npm:^20.17.30"
