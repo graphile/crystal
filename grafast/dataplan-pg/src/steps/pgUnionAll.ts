@@ -318,34 +318,6 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
-  specifier() {
-    if (this.typeKey == null || this.pkKey == null) {
-      throw new Error("Cannot call `specifier` unless in normal mode");
-    }
-    const $type = access(this, this.typeKey) as Step<string>;
-    const $pk = access(this, this.pkKey) as Step<string>;
-    return lambda([$type, $pk], ([__typename, pkJson]) => {
-      if (__typename == null || pkJson == null) return null;
-      const pkObj = JSON.parse(pkJson);
-      const finalResource = this.spec.resourceByTypeName[__typename];
-      const codec = finalResource.codec as PgCodecWithAttributes;
-      const pk = (finalResource.uniques as PgResourceUnique[])?.find(
-        (u) => u.isPrimary === true,
-      );
-      if (!pk) {
-        throw new Error(`Could not determine primary key for ${__typename}`);
-      }
-      const result: Record<string, any> = { __typename };
-      for (let i = 0, l = pk.attributes.length; i < l; i++) {
-        const rawVal = pkObj[i];
-        const attrName = pk.attributes[i];
-        const attr = codec.attributes[attrName];
-        result[attrName] = rawVal == null ? rawVal : attr.codec.fromPg(rawVal);
-      }
-      return result;
-    });
-  }
-
   execute({
     count,
     values: [values0],
