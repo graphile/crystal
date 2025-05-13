@@ -31,6 +31,9 @@ const globalIgnoresFromFile = fs
   .map((line) => line.trim())
   .filter((line) => line && !line.startsWith("#"));
 
+const fixupExtends = (...strings) =>
+  fixupConfigRules(compat.extends(...strings));
+
 const config = {
   languageOptions: {
     parser: babelParser,
@@ -55,17 +58,15 @@ const config = {
     },
   },
 
-  extends: fixupConfigRules(
-    compat.extends(
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      //'plugin:@typescript-eslint/recommended-requiring-type-checking',
-      "plugin:import/errors",
-      "plugin:import/typescript",
-      "plugin:graphile-export/recommended",
-      "prettier",
-    ),
+  extends: fixupExtends(
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    "plugin:import/errors",
+    "plugin:import/typescript",
+    "plugin:graphile-export/recommended",
+    "prettier",
   ),
 
   plugins: {
