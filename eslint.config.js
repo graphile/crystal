@@ -105,6 +105,10 @@ const config = {
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
     "tsdoc/syntax": 2,
+    "@typescript-eslint/no-empty-object-type": [
+      "error",
+      { allowInterfaces: "always" },
+    ],
 
     // Rules that we should enable:
     "@typescript-eslint/no-inferrable-types": "warn",
@@ -192,8 +196,6 @@ const oldConfig = {
     {
       files: ["**/interfaces.ts"],
       rules: {
-        // Empty interfaces for later extending
-        "@typescript-eslint/no-empty-object-type": "off",
         "no-restricted-syntax": [
           "error",
           {
