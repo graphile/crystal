@@ -26,7 +26,7 @@ const compat = new FlatCompat({
 });
 
 const globalIgnoresFromFile = fs
-  .readFileSync(path.resolve(__dirname, ".eslintignore"), "utf8")
+  .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
   .split("\n")
   .map((line) => line.trim())
   .filter((line) => line && !line.startsWith("#"));
