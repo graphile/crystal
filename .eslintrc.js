@@ -6,6 +6,14 @@ module.exports = {
       jsx: true,
     },
   },
+  globals: {
+    jasmine: false,
+  },
+  env: {
+    jest: true,
+    node: true,
+    es6: true,
+  },
   settings: {
     react: {
       version: "detect",
@@ -30,14 +38,7 @@ module.exports = {
     "graphile-export",
     "react-hooks",
   ],
-  env: {
-    jest: true,
-    node: true,
-    es6: true,
-  },
-  globals: {
-    jasmine: false,
-  },
+
   rules: {
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-ts-ignore": "off",

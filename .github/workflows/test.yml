@@ -7,7 +7,6 @@ jobs:
     name: "@dataplan/pg tests"
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,@dataplan/pg}"
       package: "@dataplan/pg"
       testcommand: "test"
       args: "--ci"
@@ -16,7 +15,6 @@ jobs:
     name: PostGraphile jest tests
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
       testcommand: "test:jest"
       args: "--ci"
@@ -25,7 +23,6 @@ jobs:
     name: PostGraphile schema export tests
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
       testcommand: "test:schema-exports"
       args: "--ci"
@@ -34,7 +31,6 @@ jobs:
     name: PostGraphile tests (exported as typeDefs)
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
       testcommand: "test:operations-exports:typeDefs"
       args: "--ci"
@@ -43,7 +39,6 @@ jobs:
     name: PostGraphile tests (exported as graphql-js)
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
       testcommand: "test:operations-exports:graphql-js"
       args: "--ci"
@@ -52,7 +47,6 @@ jobs:
     name: Small package tests
     uses: ./.github/workflows/test-base.yml
     with:
-      prepackPackages: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
       package: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
       testcommand: "test"
       args: "--ci"

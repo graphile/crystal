@@ -321,11 +321,11 @@ then it's likely you're living in the past! This error happens because your
 times!
 
 The easiest solution is to use a really simple TSConfig.json such as the
-`@tsconfig/node20` default which already configures TypeScript to support this:
+`@tsconfig/node22` default which already configures TypeScript to support this:
 
 ```json title="tsconfig.json"
 {
-  "extends": "@tsconfig/node20"
+  "extends": "@tsconfig/node22"
 }
 ```
 
