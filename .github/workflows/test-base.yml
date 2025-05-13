@@ -95,9 +95,7 @@ jobs:
         run: yarn build
 
       - name: "Prepack"
-        run:
-          yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.prepackPackages }}' run prepack
+        run: yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.prepackPackages }}' run prepack
 
       - name: "Test Project"
-        run:
-          yarn run pretest && yarn workspaces foreach --verbose --parallel --recursive --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
+        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --recursive --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
