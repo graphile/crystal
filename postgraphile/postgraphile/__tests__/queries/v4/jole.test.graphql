@@ -1,0 +1,14 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+{
+  # works:
+  # allEdgeCases(orderBy: ROW_ID_ASC) {
+  # broken:
+  allEdgeCases(orderBy: COMPUTED_ASC) {
+    nodes {
+      computed
+      wontCastEasy
+      rowId
+    }
+  }
+}
