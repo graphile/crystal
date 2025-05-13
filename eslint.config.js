@@ -31,97 +31,97 @@ const globalIgnoresFromFile = fs
   .map((line) => line.trim())
   .filter((line) => line && !line.startsWith("#"));
 
-module.exports = defineConfig([
-  {
-    languageOptions: {
-      parser: babelParser,
-      sourceType: "module",
+const config = {
+  languageOptions: {
+    parser: babelParser,
+    sourceType: "module",
 
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-
-      globals: {
-        ...globals.jest,
-        ...globals.node,
-        jasmine: false,
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
       },
     },
 
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
-
-    extends: fixupConfigRules(
-      compat.extends(
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:import/errors",
-        "plugin:import/typescript",
-        "plugin:graphile-export/recommended",
-        "prettier",
-      ),
-    ),
-
-    plugins: {
-      jest,
-      graphql,
-      tsdoc,
-      "simple-import-sort": simpleImportSort,
-      import: fixupPluginRules(_import),
-      "graphile-export": fixupPluginRules(graphileExport),
-      "react-hooks": fixupPluginRules(reactHooks),
-    },
-
-    rules: {
-      "@typescript-eslint/ban-ts-comment": "off",
-      "@typescript-eslint/ban-ts-ignore": "off",
-      "@typescript-eslint/camelcase": "off",
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-namespace": "off",
-      "@typescript-eslint/no-use-before-define": "off",
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/consistent-type-imports": "off",
-      "no-confusing-arrow": 0,
-      "no-else-return": 0,
-      "no-underscore-dangle": 0,
-      "no-restricted-syntax": 0,
-      "no-await-in-loop": 0,
-      "jest/no-focused-tests": 2,
-      "jest/no-identical-title": 2,
-      "tsdoc/syntax": 2,
-      "@typescript-eslint/no-inferrable-types": "warn",
-      "no-inner-declarations": "warn",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          args: "after-used",
-          ignoreRestSiblings: true,
-        },
-      ],
-
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
-      "sort-imports": "off",
-      "import/order": "off",
-      "import/extensions": ["error", "ignorePackages"],
-      "import/no-deprecated": "warn",
-      "prefer-spread": "off",
-      "no-duplicate-imports": "off",
-      "import/no-duplicates": "error",
+    globals: {
+      ...globals.jest,
+      ...globals.node,
+      jasmine: false,
     },
   },
+
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+
+  extends: fixupConfigRules(
+    compat.extends(
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/errors",
+      "plugin:import/typescript",
+      "plugin:graphile-export/recommended",
+      "prettier",
+    ),
+  ),
+
+  plugins: {
+    jest,
+    graphql,
+    tsdoc,
+    "simple-import-sort": simpleImportSort,
+    import: fixupPluginRules(_import),
+    "graphile-export": fixupPluginRules(graphileExport),
+    "react-hooks": fixupPluginRules(reactHooks),
+  },
+
+  rules: {
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/consistent-type-imports": "off",
+    "no-confusing-arrow": 0,
+    "no-else-return": 0,
+    "no-underscore-dangle": 0,
+    "no-restricted-syntax": 0,
+    "no-await-in-loop": 0,
+    "jest/no-focused-tests": 2,
+    "jest/no-identical-title": 2,
+    "tsdoc/syntax": 2,
+    "@typescript-eslint/no-inferrable-types": "warn",
+    "no-inner-declarations": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        args: "after-used",
+        ignoreRestSiblings: true,
+      },
+    ],
+
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "sort-imports": "off",
+    "import/order": "off",
+    "import/extensions": ["error", "ignorePackages"],
+    "import/no-deprecated": "warn",
+    "prefer-spread": "off",
+    "no-duplicate-imports": "off",
+    "import/no-duplicates": "error",
+  },
+};
+const overrides = [
   {
     files: [
       "graphile-build/graphile-build/src/plugins/**/*.ts",
@@ -327,5 +327,10 @@ module.exports = defineConfig([
       ],
     },
   },
+];
+
+module.exports = defineConfig([
+  config,
+  ...overrides,
   globalIgnores(globalIgnoresFromFile),
 ]);
