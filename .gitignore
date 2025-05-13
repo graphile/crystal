@@ -19,9 +19,11 @@ _LOCAL
 grafast/dataplan-pg/__tests__/**/*.mermaid.png
 
 # yarn2 stuff
-.yarn
+.yarn/*
 !.yarn/releases
+!.yarn/releases/*
 !.yarn/plugins
+!.yarn/plugins/*
 .pnp.*
 
 # Generated documentation
