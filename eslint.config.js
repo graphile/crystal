@@ -43,9 +43,9 @@ const config = {
     },
 
     globals: {
+      jasmine: false,
       ...globals.jest,
       ...globals.node,
-      jasmine: false,
     },
   },
 
