@@ -136,221 +136,225 @@ const config = {
     "import/no-duplicates": "error",
   },
 };
-const overrides = [
-  // Rules for core plugins
-  {
-    files: [
-      "graphile-build/graphile-build/src/plugins/**/*.ts",
-      "graphile-build/graphile-build-pg/src/**/*.ts",
-    ],
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector:
-            "ImportDeclaration[importKind!='type'][source.value='graphql']",
-          message:
-            "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
-        },
+
+// This object only exists to make our new eslint.config.js look more like the old .eslintrc.js
+const oldConfig = {
+  overrides: [
+    // Rules for core plugins
+    {
+      files: [
+        "graphile-build/graphile-build/src/plugins/**/*.ts",
+        "graphile-build/graphile-build-pg/src/**/*.ts",
       ],
-    },
-  },
-
-  // Rules for non-core plugins
-  {
-    files: ["graphile-build/graphile-utils/src/**/*.ts"],
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector:
-            "ImportDeclaration[importKind!='type'][source.value='graphql']",
-          message:
-            "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
-        },
-        {
-          selector:
-            "ImportDeclaration[importKind!='type'][source.value='grafast']",
-          message:
-            "Please refer to `build.grafast` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `grafast` modules in the `node_modules` tree from causing issues for users.)",
-        },
-      ],
-    },
-  },
-
-  // Rules for interfaces.ts files
-  {
-    files: ["**/interfaces.ts"],
-    rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "TSModuleDeclaration[kind='global']",
-          message:
-            "No `declare global` allowed in `interface.ts` files since these type-only files may not be imported by dependents, recommend adding to `index.ts` instead.",
-        },
-      ],
-    },
-  },
-
-  // Rules for TypeScript only
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        project: "./tsconfig.json",
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector:
+              "ImportDeclaration[importKind!='type'][source.value='graphql']",
+            message:
+              "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
+          },
+        ],
       },
     },
 
-    rules: {
-      "@typescript-eslint/consistent-type-imports": "error",
-      "no-dupe-class-members": "off",
-      "no-undef": "off",
-      // This rule doesn't understand import of './js'
-      "import/no-unresolved": "off",
-    },
-  },
-
-  // Rules for JavaScript only
-  {
-    files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
-    rules: {
-      "@typescript-eslint/consistent-type-imports": "off",
-      "tsdoc/syntax": "off",
-      "import/extensions": "off",
-    },
-  },
-
-  // Stricter rules for source code
-  {
-    files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        project: true,
+    // Rules for non-core plugins
+    {
+      files: ["graphile-build/graphile-utils/src/**/*.ts"],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector:
+              "ImportDeclaration[importKind!='type'][source.value='graphql']",
+            message:
+              "Please refer to `build.graphql` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)",
+          },
+          {
+            selector:
+              "ImportDeclaration[importKind!='type'][source.value='grafast']",
+            message:
+              "Please refer to `build.grafast` instead, or use `import type` for type-only imports. (This helps us to avoid multiple `grafast` modules in the `node_modules` tree from causing issues for users.)",
+          },
+        ],
       },
     },
-    rules: {},
-  },
 
-  // Rules for tests only
-  {
-    files: ["**/__tests__/**/*.{ts,js}"],
-    rules: {
-      // Disable these to enable faster test writing
-      "prefer-const": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/explicit-function-return-type": "off",
-
-      // We don't normally care about race conditions in tests
-      "require-atomic-updates": "off",
+    // Rules for interfaces.ts files
+    {
+      files: ["**/interfaces.ts"],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector: "TSModuleDeclaration[kind='global']",
+            message:
+              "No `declare global` allowed in `interface.ts` files since these type-only files may not be imported by dependents, recommend adding to `index.ts` instead.",
+          },
+        ],
+      },
     },
-  },
 
-  // React rules
-  {
-    files: [
-      "grafast/ruru/src/**/*.ts",
-      "grafast/ruru/src/**/*.tsx",
-      "**/website/src/**",
-    ],
-    extends: compat.extends("plugin:react/recommended"),
-    rules: {
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": [
-        "warn",
-        {
-          enableDangerousAutofixThisMayCauseInfiniteLoops: true,
+    // Rules for TypeScript only
+    {
+      files: ["**/*.ts", "**/*.tsx"],
+
+      languageOptions: {
+        parser: tsParser,
+        parserOptions: {
+          project: "./tsconfig.json",
         },
-      ],
+      },
 
-      // Stuff I don't care about
-      "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
+      rules: {
+        "@typescript-eslint/consistent-type-imports": "error",
+        "no-dupe-class-members": "off",
+        "no-undef": "off",
+        // This rule doesn't understand import of './js'
+        "import/no-unresolved": "off",
+      },
     },
-  },
 
-  {
-    files: [
-      "**/vendor/**/__tests__/**/*.ts",
-      "**/vendor/**/__tests__/**/*.tsx",
-      "**/vendor/**/__testUtils__/**/*.ts",
-      "**/vendor/**/__testUtils__/**/*.tsx",
-      "**/website/examples/**",
-      "graphile-build/graphile-utils/__tests__/*Plugin.ts",
-    ],
-    rules: {
-      "graphile-export/exhaustive-deps": 0,
-      "graphile-export/export-methods": 0,
-      "graphile-export/export-instances": 0,
-      "graphile-export/export-subclasses": 0,
-      "graphile-export/no-nested": 0,
+    // Rules for JavaScript only
+    {
+      files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
+      rules: {
+        "@typescript-eslint/consistent-type-imports": "off",
+        "tsdoc/syntax": "off",
+        "import/extensions": "off",
+      },
     },
-  },
 
-  {
-    files: ["**/website/**"],
-    rules: {
-      "import/no-unresolved": "off",
-    },
-  },
-
-  // Don't use Node.js builtins
-  {
-    files: ["grafast/grafast/src/**", "utils/graphile-config/src/**"],
-    ignores: ["utils/graphile-config/src/loadConfig.ts"],
-    rules: {
-      "@typescript-eslint/no-restricted-imports": [
-        "error",
-        {
-          paths: [
-            "assert",
-            "buffer",
-            "child_process",
-            "cluster",
-            "crypto",
-            "dgram",
-            "dns",
-            "domain",
-            "events",
-            "freelist",
-            "fs",
-            "fs/promises",
-            { name: "http", allowTypeImports: true },
-            "https",
-            "module",
-            "net",
-            "os",
-            "path",
-            "punycode",
-            "querystring",
-            "readline",
-            "repl",
-            "smalloc",
-            "stream",
-            "string_decoder",
-            "sys",
-            "timers",
-            "tls",
-            "tracing",
-            "tty",
-            "url",
-            "util",
-            "vm",
-            "zlib",
-          ],
-          patterns: ["node:*"],
+    // Stricter rules for source code
+    {
+      files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
+      languageOptions: {
+        parser: tsParser,
+        parserOptions: {
+          project: true,
         },
-      ],
+      },
+      rules: {},
     },
-  },
-];
+
+    // Rules for tests only
+    {
+      files: ["**/__tests__/**/*.{ts,js}"],
+      rules: {
+        // Disable these to enable faster test writing
+        "prefer-const": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+
+        // We don't normally care about race conditions in tests
+        "require-atomic-updates": "off",
+      },
+    },
+
+    // React rules
+    {
+      files: [
+        "grafast/ruru/src/**/*.ts",
+        "grafast/ruru/src/**/*.tsx",
+        "**/website/src/**",
+      ],
+      extends: compat.extends("plugin:react/recommended"),
+      rules: {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": [
+          "warn",
+          {
+            enableDangerousAutofixThisMayCauseInfiniteLoops: true,
+          },
+        ],
+
+        // Stuff I don't care about
+        "react/react-in-jsx-scope": "off",
+        "react/prop-types": "off",
+      },
+    },
+
+    {
+      files: [
+        "**/vendor/**/__tests__/**/*.ts",
+        "**/vendor/**/__tests__/**/*.tsx",
+        "**/vendor/**/__testUtils__/**/*.ts",
+        "**/vendor/**/__testUtils__/**/*.tsx",
+        "**/website/examples/**",
+        "graphile-build/graphile-utils/__tests__/*Plugin.ts",
+      ],
+      rules: {
+        "graphile-export/exhaustive-deps": 0,
+        "graphile-export/export-methods": 0,
+        "graphile-export/export-instances": 0,
+        "graphile-export/export-subclasses": 0,
+        "graphile-export/no-nested": 0,
+      },
+    },
+
+    {
+      files: ["**/website/**"],
+      rules: {
+        "import/no-unresolved": "off",
+      },
+    },
+
+    // Don't use Node.js builtins
+    {
+      files: ["grafast/grafast/src/**", "utils/graphile-config/src/**"],
+      ignores: ["utils/graphile-config/src/loadConfig.ts"],
+      rules: {
+        "@typescript-eslint/no-restricted-imports": [
+          "error",
+          {
+            paths: [
+              "assert",
+              "buffer",
+              "child_process",
+              "cluster",
+              "crypto",
+              "dgram",
+              "dns",
+              "domain",
+              "events",
+              "freelist",
+              "fs",
+              "fs/promises",
+              { name: "http", allowTypeImports: true },
+              "https",
+              "module",
+              "net",
+              "os",
+              "path",
+              "punycode",
+              "querystring",
+              "readline",
+              "repl",
+              "smalloc",
+              "stream",
+              "string_decoder",
+              "sys",
+              "timers",
+              "tls",
+              "tracing",
+              "tty",
+              "url",
+              "util",
+              "vm",
+              "zlib",
+            ],
+            patterns: ["node:*"],
+          },
+        ],
+      },
+    },
+  ],
+};
 
 module.exports = defineConfig([
   config,
-  ...overrides,
+  ...oldConfig.overrides,
   globalIgnores(globalIgnoresFromFile),
 ]);
