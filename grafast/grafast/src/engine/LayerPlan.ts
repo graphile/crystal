@@ -43,6 +43,7 @@ const SKIP_RESOLVE_TYPE_FLAGS =
 export interface LayerPlanReasonRoot {
   type: "root";
 }
+
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonNullableField {
   type: "nullableBoundary";
@@ -55,11 +56,13 @@ export interface LayerPlanReasonNullableField {
    */
   parentStep: Step;
 }
+
 export interface LayerPlanReasonListItemStream {
   initialCountStepId?: number;
   ifStepId?: number;
   labelStepId?: number;
 }
+
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
   type: "listItem";
@@ -77,15 +80,18 @@ export interface LayerPlanReasonListItem {
    */
   stream?: LayerPlanReasonListItemStream;
 }
+
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
   type: "subscription";
 }
+
 /** Non-branching, deferred */
 export interface LayerPlanReasonMutationField {
   type: "mutationField";
   mutationIndex: number;
 }
+
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
@@ -93,7 +99,20 @@ export interface LayerPlanReasonDefer {
   // examples.
   label?: string;
 }
-/** Non-branching, non-deferred */
+
+/**
+ * Non-branching, non-deferred
+ *
+ * A polymorphic bucket indicates a transition between values of unknown type
+ * and values of a known polymorphic type. This is predicated based on the
+ * given typename - before the typename is known, we must run all steps for all
+ * types, but once the type is known we can be more selective about which steps
+ * to run.
+ *
+ * When a polymorphic type is met, there will always be a polymorphic layer
+ * plan, even if all steps within it run for all types. This is necessary to
+ * advance the `polymorphicPathList` index for the relevant indicies.
+ */
 export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
   typeNames: string[];
@@ -103,12 +122,21 @@ export interface LayerPlanReasonPolymorphic {
   parentStep: Step<string | null>;
   polymorphicPaths: Set<string>;
 }
-/** Branching, non-deferred */
+
+/**
+ * Branching, non-deferred
+ *
+ * A polymorphicPartition bucket accepts a subset of types and contains only
+ * steps relevant to those types; it's a way to avoid having to do a lot of
+ * filtering of values being passed into steps' execute methods by
+ * pre-filtering the values.
+ */
 export interface LayerPlanReasonPolymorphicPartition {
   type: "polymorphicPartition";
   typeNames: string[];
   polymorphicPaths: ReadonlySet<string>;
 }
+
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonSubroutine {
   // NOTE: the plan that has a subroutine should call executeBucket from within
@@ -116,7 +144,19 @@ export interface LayerPlanReasonSubroutine {
   type: "subroutine";
   parentStep: Step;
 }
-/** Anti-branching, non-deferred */
+
+/**
+ * Anti-branching, non-deferred
+ *
+ * A "combined" layer plan exists to re-combine values from multiple layer
+ * plans together again, to allow future steps to be more efficient. It's
+ * typically relevant when polymorphism has occurred and has caused branching,
+ * the combined layer plan allows the values to be recombined before branching
+ * again, such that L layers of polymorphism, where there are P different
+ * polymorphic branches at each layer, results in P*L branches rather than P^L
+ * branches - i.e. it scales linary with number of layers rather than
+ * exponentially.
+ */
 export interface LayerPlanReasonCombined {
   type: "combined";
   parentLayerPlans: ReadonlyArray<LayerPlan>;
