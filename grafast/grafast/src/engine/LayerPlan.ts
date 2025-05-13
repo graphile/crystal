@@ -611,9 +611,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              (ev.entries as any[])[newIndex] = list[j];
+              const v = list[j];
               // TODO: are these the right flags?
-              ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
+              ev._setResult(newIndex, v, v == null ? FLAG_NULL : NO_FLAGS);
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
@@ -861,7 +861,7 @@ function newBucketFactoryInnerExpression(
       copyBlocks.push(
         te`\
       if(${te_target}.isBatch) {
-        ${te_target}.entries[newIndex] = ${te_source}.at(originalIndex);
+        ${te_target}._copyResult(newIndex, ${te_source}, originalIndex);
       }
 `,
       );
@@ -917,7 +917,7 @@ ${te.join(copyBlocks, "")}
       );
       copyBlocks.push(te`\
         if (${te_target}.isBatch) {
-          ${te_target}.entries[newIndex] = ${te_source}.at(originalIndex);
+          ${te_target}._copyResult(newIndex, ${te_source}, originalIndex);
         }
         `);
     }

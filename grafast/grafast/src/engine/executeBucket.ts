@@ -874,8 +874,7 @@ export function executeBucket(
             const depList = dependencies[depListIndex];
             if (depList.isBatch) {
               const depVal = dependenciesIncludingSideEffects[depListIndex];
-              (depList.entries as any[]).push(depVal.at(dataIndex));
-              depList._flags.push(depVal._flagsAt(dataIndex));
+              depList._copyResult(depList.entries.length, depVal, dataIndex);
             }
           }
         }
