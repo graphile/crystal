@@ -2108,7 +2108,10 @@ async function lint(code: string, rawFilePath: string | URL) {
     allowInlineConfig: false, // Ignore `/* eslint-disable ... */` comments
     overrideConfig: {
       linterOptions: { reportUnusedDisableDirectives: false },
-      languageOptions: { ecmaVersion: 2020, sourceType: "module" },
+      languageOptions: {
+        ecmaVersion: 2022,
+        sourceType: "module",
+      },
       rules: {
         "no-use-before-define": [
           "error",
