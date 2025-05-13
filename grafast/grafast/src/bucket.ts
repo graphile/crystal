@@ -94,16 +94,8 @@ export interface Bucket {
    * The polymorphic path through which each of the entries (respectively) has
    * travelled. This influences the steps that will be executed using the
    * related inputs.
-   *
    */
-  // * @deprecated Use latestPolymorphicType instead
   polymorphicPathList: readonly (string | null)[];
-
-  //   /**
-  //    * The (concrete) object type name that this relates to as seen in the last
-  //    * polymorphic position, or the root operation type.
-  //    */
-  //   latestPolymorphicType: readonly string[];
 
   // PERF: this is only required when stream is enabled (and only for buckets
   // that may contain streamed things, directly or indirectly) - we should only
