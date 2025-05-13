@@ -1,7 +1,7 @@
-.git/
-node_modules/
-coverage/
-dist/
+.git
+node_modules
+coverage
+dist
 */*/release/
 /pg-omit-archived/
 /pg-simplify-inflector/
@@ -12,8 +12,8 @@ npm-debug.log
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 .env
-_LOCAL/
-.DS_Store/
+_LOCAL
+.DS_Store
 
 # mermaid pngs
 grafast/dataplan-pg/__tests__/**/*.mermaid.png
@@ -27,12 +27,12 @@ grafast/dataplan-pg/__tests__/**/*.mermaid.png
 .pnp.*
 
 # Generated documentation
-.docusaurus/
+.docusaurus
 
 # Generated code
 /graphile-build/graphile-build/temp.mjs
 /graphile-build/graphile-build-pg/temp.mjs
-/graphile-build/graphile-build-pg/webpacked/
+/graphile-build/graphile-build-pg/webpacked
 /graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 /graphile-build/graphile-build-pg/schema-export-output.mjs
 /postgraphile/postgraphile/.tests_tmp/
@@ -46,5 +46,5 @@ grafast/dataplan-pg/__tests__/**/*.mermaid.png
 # Benjie's stuff
 /Session.vim
 /WHAT_ARE_YOU_DOING.md
-contrib/
+contrib
 /env
