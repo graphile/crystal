@@ -318,6 +318,11 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
+  // Not needed at runtime
+  optimize() {
+    return this.getDep(0);
+  }
+
   execute({
     count,
     values: [values0],
