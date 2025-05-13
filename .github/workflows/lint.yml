@@ -11,7 +11,7 @@ jobs:
       CI: true # Should already be set to TRUE by Github?
       TERM: xterm
       FORCE_COLOR: 1
-      NODE_VERSION: 16.14 # Should be moved to repository env variable
+      NODE_VERSION: 22.x # Should be moved to a repo envvar
       NODE_OPTIONS: "--max-old-space-size=4096" # Give eslint more space?
 
     steps:
@@ -57,7 +57,7 @@ jobs:
     env:
       TERM: xterm
       FORCE_COLOR: 1
-      NODE_VERSION: 16.14 # Should be moved to repository env variable
+      NODE_VERSION: 22.x # Should be moved to a repo envvar
 
     steps:
       - name: Checkout
