@@ -42,7 +42,6 @@ import {
   get,
   getNullableInputTypeAtPath,
   groupBy,
-  inhibitOnNull,
   lambda,
   listen,
   newGrafastFieldConfigBuilder,
@@ -2847,14 +2846,14 @@ export function makeExampleSchema(
     })[type] ?? null;
 
   const relationalCommentableInterface = EXPORTABLE(
-    (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
+    (lambda, object, relationalItemTypeNameFromType) =>
       ($item: RelationalCommentableStep) => {
-        const $id = inhibitOnNull($item.get("id"));
-        const $type = inhibitOnNull($item.get("type"));
+        const $id = $item.get("id");
+        const $type = $item.get("type");
         const $__typename = lambda($type, relationalItemTypeNameFromType, true);
         return object({ __typename: $__typename, id: $id });
       },
-    [inhibitOnNull, lambda, object, relationalItemTypeNameFromType],
+    [lambda, object, relationalItemTypeNameFromType],
   );
 
   const entityUnion = EXPORTABLE(
@@ -4311,18 +4310,12 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (
-            inhibitOnNull,
-            lambda,
-            object,
-            unionItemTypeNameFromType,
-            unionItemsResource,
-          ) =>
+          (lambda, object, unionItemTypeNameFromType, unionItemsResource) =>
             function plan(_$root, { $id }) {
               const $item: UnionItemStep = unionItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              const $type = inhibitOnNull($item.get("type"));
+              const $type = $item.get("type");
               const $__typename = lambda(
                 $type,
                 unionItemTypeNameFromType,
@@ -4333,13 +4326,7 @@ export function makeExampleSchema(
                 id: $item.get("id"),
               });
             },
-          [
-            inhibitOnNull,
-            lambda,
-            object,
-            unionItemTypeNameFromType,
-            unionItemsResource,
-          ],
+          [lambda, object, unionItemTypeNameFromType, unionItemsResource],
         ),
       },
 
