@@ -3,12 +3,6 @@ name: Base Test Workflow
 on:
   workflow_call:
     inputs:
-      prepackPackages:
-        description:
-          List of packages to be prepacked given as {package-a,} the extra , is
-          important! or {package-A,package-B}
-        required: true
-        type: string
       package:
         description: Name of the package that should be tested
         type: string
@@ -95,7 +89,7 @@ jobs:
         run: yarn build
 
       - name: "Prepack"
-        run: yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.prepackPackages }}' run prepack
+        run: yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.package }}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --recursive --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
+        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --worktree --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
