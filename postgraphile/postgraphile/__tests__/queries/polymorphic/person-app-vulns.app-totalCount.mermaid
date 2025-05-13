@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 32, 25<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 12, 25<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[26]<br />ᐳ: Access[31], First[27]<br />3: PgUnionAllSingle[29]<br />ᐳ: PgClassExpression[30]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[26]<br />ᐳ: 31, 27, 30"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -47,10 +47,8 @@ graph TD
     First27{{"First[27∈3]"}}:::plan
     Access31{{"Access[31∈3]<br />ᐸ26.itemsᐳ"}}:::plan
     Access31 --> First27
-    PgUnionAllSingle29["PgUnionAllSingle[29∈3]"]:::plan
-    First27 --> PgUnionAllSingle29
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle29 --> PgClassExpression30
+    First27 --> PgClassExpression30
     PgUnionAll26 --> Access31
 
     %% define steps
@@ -61,5 +59,5 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item17,PgSelectSingle18 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,First27,PgUnionAllSingle29,PgClassExpression30,Access31 bucket3
+    class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,First27,PgClassExpression30,Access31 bucket3
 

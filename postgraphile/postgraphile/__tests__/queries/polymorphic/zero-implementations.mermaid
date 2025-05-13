@@ -24,8 +24,6 @@ graph TD
     PgUnionAll9 --> Access13
     __Item11[/"__Item[11∈2]<br />ᐸ13ᐳ"\]:::itemplan
     Access13 ==> __Item11
-    PgUnionAllSingle12["PgUnionAllSingle[12∈2]"]:::plan
-    __Item11 --> PgUnionAllSingle12
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -33,5 +31,5 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll9,Access13 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item11,PgUnionAllSingle12 bucket2
+    class Bucket2,__Item11 bucket2
 

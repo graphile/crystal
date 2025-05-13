@@ -36,15 +36,13 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant18{{"Constant[18∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
     List19{{"List[19∈1]<br />ᐸ16,17,18ᐳ"}}:::plan
-    Access16{{"Access[16∈1]<br />ᐸ15.0ᐳ"}}:::plan
-    Access17{{"Access[17∈1]<br />ᐸ15.1ᐳ"}}:::plan
+    Access16{{"Access[16∈1]<br />ᐸ14.0ᐳ"}}:::plan
+    Access17{{"Access[17∈1]<br />ᐸ14.1ᐳ"}}:::plan
     Access16 & Access17 & Constant18 --> List19
     __Item14[/"__Item[14∈1]<br />ᐸ58ᐳ"\]:::itemplan
     Access58 ==> __Item14
-    PgUnionAllSingle15["PgUnionAllSingle[15∈1]"]:::plan
-    __Item14 --> PgUnionAllSingle15
-    PgUnionAllSingle15 --> Access16
-    PgUnionAllSingle15 --> Access17
+    __Item14 --> Access16
+    __Item14 --> Access17
     Lambda20{{"Lambda[20∈1]<br />ᐸtoSpecifierᐳ"}}:::plan
     List19 --> Lambda20
     Access21{{"Access[21∈1]<br />ᐸ20.__typenameᐳ"}}:::plan
@@ -88,7 +86,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,PgUnionAll8,Access9,Access10,Object11,Constant12,Constant18,Access58,Constant59,Constant60 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item14,PgUnionAllSingle15,Access16,Access17,List19,Lambda20,Access21,Access22 bucket1
+    class Bucket1,__Item14,Access16,Access17,List19,Lambda20,Access21,Access22 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgSelect24,First32,PgSelectRows33,PgSelectSingle35,PgSelect38,First46,PgSelectRows47,PgSelectSingle49,PgClassExpression50,PgClassExpression51,PgClassExpression52,PgClassExpression53,PgClassExpression54,PgClassExpression55,PgClassExpression56,PgClassExpression57 bucket2
     classDef bucket3 stroke:#ffa500

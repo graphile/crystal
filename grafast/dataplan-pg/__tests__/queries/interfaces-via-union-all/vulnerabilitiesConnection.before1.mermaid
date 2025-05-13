@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 14, 15, 16, 66, 25<br /><br />ROOT Connectionᐸ10ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 21, 25, 13<br /><br />ROOT __Item{2}ᐸ65ᐳ[19]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 21, 25, 13<br /><br />ROOT PgUnionAllSingle{2}[20]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19, 21, 25, 13<br /><br />ROOT __Item{2}ᐸ65ᐳ[19]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />Deps: 13, 29, 28<br /><br />1: PgSelect[31], PgSelect[45]<br />2: PgSelectRows[40], PgSelectRows[54]<br />ᐳ: 39, 42, 53, 56, 57, 58, 59, 60, 61, 62, 63, 64"):::bucket
     Bucket5("Bucket 5 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 57, 58, 59<br />ᐳFirstPartyVulnerability"):::bucket
     Bucket6("Bucket 6 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 61, 62, 63<br />ᐳThirdPartyVulnerability"):::bucket
@@ -47,16 +47,14 @@ graph TD
     PgUnionAll17 --> Access65
     __Item19[/"__Item[19∈2]<br />ᐸ65ᐳ"\]:::itemplan
     Access65 ==> __Item19
-    PgUnionAllSingle20["PgUnionAllSingle[20∈2]"]:::plan
-    __Item19 --> PgUnionAllSingle20
     List26{{"List[26∈3]<br />ᐸ23,24,25ᐳ"}}:::plan
-    Access23{{"Access[23∈3]<br />ᐸ20.0ᐳ"}}:::plan
-    Access24{{"Access[24∈3]<br />ᐸ20.1ᐳ"}}:::plan
+    Access23{{"Access[23∈3]<br />ᐸ19.0ᐳ"}}:::plan
+    Access24{{"Access[24∈3]<br />ᐸ19.1ᐳ"}}:::plan
     Access23 & Access24 & Constant25 --> List26
     PgCursor22{{"PgCursor[22∈3]"}}:::plan
-    PgUnionAllSingle20 & Access21 --> PgCursor22
-    PgUnionAllSingle20 --> Access23
-    PgUnionAllSingle20 --> Access24
+    __Item19 & Access21 --> PgCursor22
+    __Item19 --> Access23
+    __Item19 --> Access24
     Lambda27{{"Lambda[27∈3]<br />ᐸtoSpecifierᐳ"}}:::plan
     List26 --> Lambda27
     Access28{{"Access[28∈3]<br />ᐸ27.__typenameᐳ"}}:::plan
@@ -102,7 +100,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll17,Access21,Access65 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item19,PgUnionAllSingle20 bucket2
+    class Bucket2,__Item19 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor22,Access23,Access24,List26,Lambda27,Access28,Access29 bucket3
     classDef bucket4 stroke:#0000ff

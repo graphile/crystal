@@ -11,14 +11,14 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 13, 381, 25, 41, 165, 173, 242, 250, 315, 323<br /><br />ROOT Connectionᐸ9ᐳ[13]<br />1: PgSelect[15]<br />2: PgSelectRows[16]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 12, 25, 41, 165, 173, 242, 250, 315, 323<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25, 41, 165, 173, 242, 250, 315, 323<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: 26, 31, 32<br />ᐳ: 370, 371, 380, 27<br />3: PgUnionAllSingle[29]<br />ᐳ: PgClassExpression[30]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25, 41, 165, 173, 242, 250, 315, 323<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: 26, 31, 32<br />ᐳ: 370, 371, 380, 27, 30"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 31, 41, 12<br /><br />ROOT __Item{4}ᐸ371ᐳ[35]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 41, 12, 165, 173, 242, 250, 315, 323<br /><br />ROOT __Item{5}ᐸ380ᐳ[37]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 36, 73, 41, 12<br /><br />ROOT PgUnionAllSingle{4}[36]"):::bucket
-    Bucket7("Bucket 7 (polymorphic)<br />Deps: 12, 45, 44, 165, 173, 242, 250, 315, 323<br /><br />1: 47, 61, 99, 124<br />2: PgSelectRows[56], PgSelectRows[70]<br />ᐳ: 55, 58, 69, 72, 75, 76, 77, 78, 79, 100, 101, 102, 103, 104<br />3: 80, 92, 105<br />ᐳ: 376, 379, 85, 110<br />4: 88, 89, 113, 114"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 35, 73, 41, 12<br /><br />ROOT __Item{4}ᐸ371ᐳ[35]"):::bucket
+    Bucket7("Bucket 7 (polymorphic)<br />Deps: 12, 45, 44, 165, 173, 242, 250, 315, 323<br /><br />1: 47, 61, 99, 124<br />2: PgSelectRows[56], PgSelectRows[70]<br />ᐳ: 55, 58, 69, 72, 75, 76, 77, 78, 79, 100, 101, 102, 103, 104<br />3: 80, 92, 105<br />ᐳ: 376, 379, 85, 110<br />4: PgUnionAll[89], PgUnionAll[114]"):::bucket
     Bucket8("Bucket 8 (polymorphic)<br />Deps: 12, 131, 130<br /><br />1: PgSelect[133], PgSelect[147]<br />2: PgSelectRows[142], PgSelectRows[156]<br />ᐳ: 141, 144, 155, 158, 208, 209"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />AwsApplication<br />Deps: 88, 165, 12, 76, 99, 89, 242, 315, 77<br />ᐳAwsApplication<br /><br />1: PgUnionAll[212], PgUnionAll[218]<br />ᐳ: 161, 163, 372, 166, 167, 374, 375, 213<br />2: PgUnionAllSingle[216]<br />ᐳ: PgClassExpression[217]"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />GcpApplication<br />Deps: 113, 173, 12, 101, 124, 114, 250, 323, 102<br />ᐳGcpApplication<br /><br />1: PgUnionAll[221], PgUnionAll[227]<br />ᐳ: 169, 171, 373, 174, 175, 377, 378, 222<br />2: PgUnionAllSingle[225]<br />ᐳ: PgClassExpression[226]"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />AwsApplication<br />Deps: 85, 165, 12, 76, 99, 89, 242, 315, 77<br />ᐳAwsApplication"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />GcpApplication<br />Deps: 110, 173, 12, 101, 124, 114, 250, 323, 102<br />ᐳGcpApplication"):::bucket
     Bucket11("Bucket 11 (combined)<br />Deps: 12"):::bucket
     Bucket12("Bucket 12 (polymorphic)<br />Deps: 177, 12, 178<br /><br />1: <br />ᐳ: Access[180], Access[194]<br />2: PgSelect[182], PgSelect[196]<br />3: PgSelectRows[191], PgSelectRows[205]<br />ᐳ: 190, 193, 204, 207, 228, 229, 230, 231"):::bucket
     Bucket13("Bucket 13 (listItem)<br />Deps: 242, 12<br /><br />ROOT __Item{13}ᐸ372ᐳ[210]"):::bucket
@@ -29,8 +29,8 @@ graph TD
     Bucket18("Bucket 18 (polymorphic)<br />Deps: 12, 257, 255<br /><br />1: PgSelect[259], PgSelect[273]<br />2: PgSelectRows[268], PgSelectRows[282]<br />ᐳ: 267, 270, 281, 284, 289, 290, 291, 292, 293, 294, 295, 296"):::bucket
     Bucket19("Bucket 19 (listItem)<br />Deps: 218, 315, 12<br /><br />ROOT __Item{19}ᐸ375ᐳ[285]"):::bucket
     Bucket20("Bucket 20 (listItem)<br />Deps: 227, 323, 12<br /><br />ROOT __Item{20}ᐸ378ᐳ[287]"):::bucket
-    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 286, 305, 315, 12<br /><br />ROOT PgUnionAllSingle{19}[286]"):::bucket
-    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 288, 308, 323, 12<br /><br />ROOT PgUnionAllSingle{20}[288]"):::bucket
+    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 285, 305, 315, 12<br /><br />ROOT __Item{19}ᐸ375ᐳ[285]"):::bucket
+    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 287, 308, 323, 12<br /><br />ROOT __Item{20}ᐸ378ᐳ[287]"):::bucket
     Bucket23("Bucket 23 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 290, 291, 292<br />ᐳAwsApplicationᐳFirstPartyVulnerability<br />ᐳGcpApplicationᐳFirstPartyVulnerability"):::bucket
     Bucket24("Bucket 24 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 294, 295, 296<br />ᐳAwsApplicationᐳThirdPartyVulnerability<br />ᐳGcpApplicationᐳThirdPartyVulnerability"):::bucket
     Bucket25("Bucket 25 (combined)<br />Deps: 12"):::bucket
@@ -102,10 +102,8 @@ graph TD
     First27{{"First[27∈3]"}}:::plan
     Access370{{"Access[370∈3]<br />ᐸ26.itemsᐳ"}}:::plan
     Access370 --> First27
-    PgUnionAllSingle29["PgUnionAllSingle[29∈3]"]:::plan
-    First27 --> PgUnionAllSingle29
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle29 --> PgClassExpression30
+    First27 --> PgClassExpression30
     PgUnionAll26 --> Access370
     Access371{{"Access[371∈3]<br />ᐸ31.itemsᐳ"}}:::plan
     PgUnionAll31 --> Access371
@@ -113,18 +111,16 @@ graph TD
     PgUnionAll32 --> Access380
     __Item35[/"__Item[35∈4]<br />ᐸ371ᐳ"\]:::itemplan
     Access371 ==> __Item35
-    PgUnionAllSingle36["PgUnionAllSingle[36∈4]"]:::plan
-    __Item35 --> PgUnionAllSingle36
     Access73{{"Access[73∈4]<br />ᐸ31.cursorDetailsᐳ"}}:::plan
     PgUnionAll31 --> Access73
     List128{{"List[128∈6]<br />ᐸ125,126,41ᐳ"}}:::plan
-    Access125{{"Access[125∈6]<br />ᐸ36.0ᐳ"}}:::plan
-    Access126{{"Access[126∈6]<br />ᐸ36.1ᐳ"}}:::plan
+    Access125{{"Access[125∈6]<br />ᐸ35.0ᐳ"}}:::plan
+    Access126{{"Access[126∈6]<br />ᐸ35.1ᐳ"}}:::plan
     Access125 & Access126 & Constant41 --> List128
     PgCursor74{{"PgCursor[74∈6]"}}:::plan
-    PgUnionAllSingle36 & Access73 --> PgCursor74
-    PgUnionAllSingle36 --> Access125
-    PgUnionAllSingle36 --> Access126
+    __Item35 & Access73 --> PgCursor74
+    __Item35 --> Access125
+    __Item35 --> Access126
     Lambda129{{"Lambda[129∈6]<br />ᐸtoSpecifierᐳ"}}:::plan
     List128 --> Lambda129
     Access130{{"Access[130∈6]<br />ᐸ129.__typenameᐳ"}}:::plan
@@ -152,15 +148,13 @@ graph TD
     PgClassExpression209{{"PgClassExpression[209∈8]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle158 --> PgClassExpression209
     List42{{"List[42∈5]<br />ᐸ39,40,41ᐳ"}}:::plan
-    Access39{{"Access[39∈5]<br />ᐸ38.0ᐳ"}}:::plan
-    Access40{{"Access[40∈5]<br />ᐸ38.1ᐳ"}}:::plan
+    Access39{{"Access[39∈5]<br />ᐸ37.0ᐳ"}}:::plan
+    Access40{{"Access[40∈5]<br />ᐸ37.1ᐳ"}}:::plan
     Access39 & Access40 & Constant41 --> List42
     __Item37[/"__Item[37∈5]<br />ᐸ380ᐳ"\]:::itemplan
     Access380 ==> __Item37
-    PgUnionAllSingle38["PgUnionAllSingle[38∈5]"]:::plan
-    __Item37 --> PgUnionAllSingle38
-    PgUnionAllSingle38 --> Access39
-    PgUnionAllSingle38 --> Access40
+    __Item37 --> Access39
+    __Item37 --> Access40
     Lambda43{{"Lambda[43∈5]<br />ᐸtoSpecifierᐳ"}}:::plan
     List42 --> Lambda43
     Access44{{"Access[44∈5]<br />ᐸ43.__typenameᐳ"}}:::plan
@@ -210,8 +204,6 @@ graph TD
     First85{{"First[85∈7]^"}}:::plan
     Access376{{"Access[376∈7]^<br />ᐸ80.itemsᐳ"}}:::plan
     Access376 --> First85
-    PgUnionAllSingle88["PgUnionAllSingle[88∈7]^"]:::plan
-    First85 --> PgUnionAllSingle88
     PgClassExpression100{{"PgClassExpression[100∈7]^<br />ᐸ__gcp_appl..._.”gcp_id”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression100
     PgSelectSingle72 --> PgClassExpression101
@@ -222,31 +214,27 @@ graph TD
     First110{{"First[110∈7]^"}}:::plan
     Access379{{"Access[379∈7]^<br />ᐸ105.itemsᐳ"}}:::plan
     Access379 --> First110
-    PgUnionAllSingle113["PgUnionAllSingle[113∈7]^"]:::plan
-    First110 --> PgUnionAllSingle113
     PgUnionAll80 --> Access376
     PgUnionAll105 --> Access379
     Connection99{{"Connection[99∈7] ➊<br />ᐸ94ᐳ<br />ᐳAwsApplication"}}:::plan
     Connection124{{"Connection[124∈7] ➊<br />ᐸ119ᐳ<br />ᐳGcpApplication"}}:::plan
     List166{{"List[166∈9]^<br />ᐸ161,163,165ᐳ"}}:::plan
-    Access161{{"Access[161∈9]<br />ᐸ88.0ᐳ<br />ᐳAwsApplication"}}:::plan
-    Access163{{"Access[163∈9]<br />ᐸ88.1ᐳ<br />ᐳAwsApplication"}}:::plan
+    Access161{{"Access[161∈9]<br />ᐸ85.0ᐳ<br />ᐳAwsApplication"}}:::plan
+    Access163{{"Access[163∈9]<br />ᐸ85.1ᐳ<br />ᐳAwsApplication"}}:::plan
     Access161 & Access163 & Constant165 --> List166
     PgUnionAll212[["PgUnionAll[212∈9]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     Object12 & PgClassExpression76 & Connection99 --> PgUnionAll212
     PgUnionAll218[["PgUnionAll[218∈9]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳAwsApplication"]]:::plan
     Object12 & PgClassExpression76 & Connection99 --> PgUnionAll218
-    PgUnionAllSingle88 --> Access161
-    PgUnionAllSingle88 --> Access163
+    First85 --> Access161
+    First85 --> Access163
     Lambda167{{"Lambda[167∈9]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List166 --> Lambda167
     First213{{"First[213∈9]^"}}:::plan
     Access374{{"Access[374∈9]^<br />ᐸ212.itemsᐳ"}}:::plan
     Access374 --> First213
-    PgUnionAllSingle216["PgUnionAllSingle[216∈9]^"]:::plan
-    First213 --> PgUnionAllSingle216
     PgClassExpression217{{"PgClassExpression[217∈9]^<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle216 --> PgClassExpression217
+    First213 --> PgClassExpression217
     Access372{{"Access[372∈9]<br />ᐸ89.itemsᐳ<br />ᐳAwsApplication"}}:::plan
     PgUnionAll89 --> Access372
     PgUnionAll212 --> Access374
@@ -284,15 +272,13 @@ graph TD
     PgClassExpression231{{"PgClassExpression[231∈12]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle207 --> PgClassExpression231
     List243{{"List[243∈13]^<br />ᐸ238,240,242ᐳ"}}:::plan
-    Access238{{"Access[238∈13]^<br />ᐸ211.0ᐳ"}}:::plan
-    Access240{{"Access[240∈13]^<br />ᐸ211.1ᐳ"}}:::plan
+    Access238{{"Access[238∈13]^<br />ᐸ210.0ᐳ"}}:::plan
+    Access240{{"Access[240∈13]^<br />ᐸ210.1ᐳ"}}:::plan
     Access238 & Access240 & Constant242 --> List243
     __Item210[/"__Item[210∈13]<br />ᐸ372ᐳ<br />ᐳAwsApplication"\]:::itemplan
     Access372 ==> __Item210
-    PgUnionAllSingle211["PgUnionAllSingle[211∈13]^"]:::plan
-    __Item210 --> PgUnionAllSingle211
-    PgUnionAllSingle211 --> Access238
-    PgUnionAllSingle211 --> Access240
+    __Item210 --> Access238
+    __Item210 --> Access240
     Lambda244{{"Lambda[244∈13]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List243 --> Lambda244
     Access255{{"Access[255∈17]^<br />ᐸ254.__typenameᐳ"}}:::plan
@@ -334,18 +320,16 @@ graph TD
     PgSelectSingle284 --> PgClassExpression296
     __Item285[/"__Item[285∈19]<br />ᐸ375ᐳ<br />ᐳAwsApplication"\]:::itemplan
     Access375 ==> __Item285
-    PgUnionAllSingle286["PgUnionAllSingle[286∈19]^"]:::plan
-    __Item285 --> PgUnionAllSingle286
     Access305{{"Access[305∈19]<br />ᐸ218.cursorDetailsᐳ<br />ᐳAwsApplication"}}:::plan
     PgUnionAll218 --> Access305
     List316{{"List[316∈21]^<br />ᐸ311,313,315ᐳ"}}:::plan
-    Access311{{"Access[311∈21]<br />ᐸ286.0ᐳ<br />ᐳAwsApplication"}}:::plan
-    Access313{{"Access[313∈21]<br />ᐸ286.1ᐳ<br />ᐳAwsApplication"}}:::plan
+    Access311{{"Access[311∈21]<br />ᐸ285.0ᐳ<br />ᐳAwsApplication"}}:::plan
+    Access313{{"Access[313∈21]<br />ᐸ285.1ᐳ<br />ᐳAwsApplication"}}:::plan
     Access311 & Access313 & Constant315 --> List316
     PgCursor307{{"PgCursor[307∈21]<br />ᐳAwsApplication"}}:::plan
-    PgUnionAllSingle286 & Access305 --> PgCursor307
-    PgUnionAllSingle286 --> Access311
-    PgUnionAllSingle286 --> Access313
+    __Item285 & Access305 --> PgCursor307
+    __Item285 --> Access311
+    __Item285 --> Access313
     Lambda317{{"Lambda[317∈21]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List316 --> Lambda317
     Access328{{"Access[328∈25]^<br />ᐸ327.__typenameᐳ"}}:::plan
@@ -382,55 +366,49 @@ graph TD
     PgClassExpression363{{"PgClassExpression[363∈26]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle357 --> PgClassExpression363
     List174{{"List[174∈10]^<br />ᐸ169,171,173ᐳ"}}:::plan
-    Access169{{"Access[169∈10]<br />ᐸ113.0ᐳ<br />ᐳGcpApplication"}}:::plan
-    Access171{{"Access[171∈10]<br />ᐸ113.1ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access169{{"Access[169∈10]<br />ᐸ110.0ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access171{{"Access[171∈10]<br />ᐸ110.1ᐳ<br />ᐳGcpApplication"}}:::plan
     Access169 & Access171 & Constant173 --> List174
     PgUnionAll221[["PgUnionAll[221∈10]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & PgClassExpression101 & Connection124 --> PgUnionAll221
     PgUnionAll227[["PgUnionAll[227∈10]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & PgClassExpression101 & Connection124 --> PgUnionAll227
-    PgUnionAllSingle113 --> Access169
-    PgUnionAllSingle113 --> Access171
+    First110 --> Access169
+    First110 --> Access171
     Lambda175{{"Lambda[175∈10]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List174 --> Lambda175
     First222{{"First[222∈10]^"}}:::plan
     Access377{{"Access[377∈10]^<br />ᐸ221.itemsᐳ"}}:::plan
     Access377 --> First222
-    PgUnionAllSingle225["PgUnionAllSingle[225∈10]^"]:::plan
-    First222 --> PgUnionAllSingle225
     PgClassExpression226{{"PgClassExpression[226∈10]^<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle225 --> PgClassExpression226
+    First222 --> PgClassExpression226
     Access373{{"Access[373∈10]<br />ᐸ114.itemsᐳ<br />ᐳGcpApplication"}}:::plan
     PgUnionAll114 --> Access373
     PgUnionAll221 --> Access377
     Access378{{"Access[378∈10]^<br />ᐸ227.itemsᐳ"}}:::plan
     PgUnionAll227 --> Access378
     List251{{"List[251∈14]^<br />ᐸ246,248,250ᐳ"}}:::plan
-    Access246{{"Access[246∈14]^<br />ᐸ220.0ᐳ"}}:::plan
-    Access248{{"Access[248∈14]^<br />ᐸ220.1ᐳ"}}:::plan
+    Access246{{"Access[246∈14]^<br />ᐸ219.0ᐳ"}}:::plan
+    Access248{{"Access[248∈14]^<br />ᐸ219.1ᐳ"}}:::plan
     Access246 & Access248 & Constant250 --> List251
     __Item219[/"__Item[219∈14]<br />ᐸ373ᐳ<br />ᐳGcpApplication"\]:::itemplan
     Access373 ==> __Item219
-    PgUnionAllSingle220["PgUnionAllSingle[220∈14]^"]:::plan
-    __Item219 --> PgUnionAllSingle220
-    PgUnionAllSingle220 --> Access246
-    PgUnionAllSingle220 --> Access248
+    __Item219 --> Access246
+    __Item219 --> Access248
     Lambda252{{"Lambda[252∈14]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List251 --> Lambda252
     __Item287[/"__Item[287∈20]<br />ᐸ378ᐳ<br />ᐳGcpApplication"\]:::itemplan
     Access378 ==> __Item287
-    PgUnionAllSingle288["PgUnionAllSingle[288∈20]^"]:::plan
-    __Item287 --> PgUnionAllSingle288
     Access308{{"Access[308∈20]<br />ᐸ227.cursorDetailsᐳ<br />ᐳGcpApplication"}}:::plan
     PgUnionAll227 --> Access308
     List324{{"List[324∈22]^<br />ᐸ319,321,323ᐳ"}}:::plan
-    Access319{{"Access[319∈22]<br />ᐸ288.0ᐳ<br />ᐳGcpApplication"}}:::plan
-    Access321{{"Access[321∈22]<br />ᐸ288.1ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access319{{"Access[319∈22]<br />ᐸ287.0ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access321{{"Access[321∈22]<br />ᐸ287.1ᐳ<br />ᐳGcpApplication"}}:::plan
     Access319 & Access321 & Constant323 --> List324
     PgCursor310{{"PgCursor[310∈22]<br />ᐳGcpApplication"}}:::plan
-    PgUnionAllSingle288 & Access308 --> PgCursor310
-    PgUnionAllSingle288 --> Access319
-    PgUnionAllSingle288 --> Access321
+    __Item287 & Access308 --> PgCursor310
+    __Item287 --> Access319
+    __Item287 --> Access321
     Lambda325{{"Lambda[325∈22]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List324 --> Lambda325
 
@@ -442,29 +420,29 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item17,PgSelectSingle18 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,First27,PgUnionAllSingle29,PgClassExpression30,PgUnionAll31,PgUnionAll32,Access370,Access371,Access380 bucket3
+    class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,First27,PgClassExpression30,PgUnionAll31,PgUnionAll32,Access370,Access371,Access380 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item35,PgUnionAllSingle36,Access73 bucket4
+    class Bucket4,__Item35,Access73 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item37,PgUnionAllSingle38,Access39,Access40,List42,Lambda43,Access44,Access45 bucket5
+    class Bucket5,__Item37,Access39,Access40,List42,Lambda43,Access44,Access45 bucket5
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgCursor74,Access125,Access126,List128,Lambda129,Access130,Access131 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgSelect47,First55,PgSelectRows56,PgSelectSingle58,PgSelect61,First69,PgSelectRows70,PgSelectSingle72,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression78,PgClassExpression79,PgUnionAll80,First85,PgUnionAllSingle88,PgUnionAll89,__DataOnly92,Connection99,PgClassExpression100,PgClassExpression101,PgClassExpression102,PgClassExpression103,PgClassExpression104,PgUnionAll105,First110,PgUnionAllSingle113,PgUnionAll114,Connection124,Access376,Access379 bucket7
+    class Bucket7,PgSelect47,First55,PgSelectRows56,PgSelectSingle58,PgSelect61,First69,PgSelectRows70,PgSelectSingle72,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression78,PgClassExpression79,PgUnionAll80,First85,PgUnionAll89,__DataOnly92,Connection99,PgClassExpression100,PgClassExpression101,PgClassExpression102,PgClassExpression103,PgClassExpression104,PgUnionAll105,First110,PgUnionAll114,Connection124,Access376,Access379 bucket7
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgSelect133,First141,PgSelectRows142,PgSelectSingle144,PgSelect147,First155,PgSelectRows156,PgSelectSingle158,PgClassExpression208,PgClassExpression209 bucket8
     classDef bucket9 stroke:#ff0000
-    class Bucket9,Access161,Access163,List166,Lambda167,PgUnionAll212,First213,PgUnionAllSingle216,PgClassExpression217,PgUnionAll218,Access372,Access374,Access375 bucket9
+    class Bucket9,Access161,Access163,List166,Lambda167,PgUnionAll212,First213,PgClassExpression217,PgUnionAll218,Access372,Access374,Access375 bucket9
     classDef bucket10 stroke:#ffff00
-    class Bucket10,Access169,Access171,List174,Lambda175,PgUnionAll221,First222,PgUnionAllSingle225,PgClassExpression226,PgUnionAll227,Access373,Access377,Access378 bucket10
+    class Bucket10,Access169,Access171,List174,Lambda175,PgUnionAll221,First222,PgClassExpression226,PgUnionAll227,Access373,Access377,Access378 bucket10
     classDef bucket11 stroke:#00ffff
     class Bucket11,__Value177,Access178 bucket11
     classDef bucket12 stroke:#4169e1
     class Bucket12,Access180,PgSelect182,First190,PgSelectRows191,PgSelectSingle193,Access194,PgSelect196,First204,PgSelectRows205,PgSelectSingle207,PgClassExpression228,PgClassExpression229,PgClassExpression230,PgClassExpression231 bucket12
     classDef bucket13 stroke:#3cb371
-    class Bucket13,__Item210,PgUnionAllSingle211,Access238,Access240,List243,Lambda244 bucket13
+    class Bucket13,__Item210,Access238,Access240,List243,Lambda244 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,__Item219,PgUnionAllSingle220,Access246,Access248,List251,Lambda252 bucket14
+    class Bucket14,__Item219,Access246,Access248,List251,Lambda252 bucket14
     classDef bucket15 stroke:#ff00ff
     class Bucket15 bucket15
     classDef bucket16 stroke:#f5deb3
@@ -474,9 +452,9 @@ graph TD
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgSelect259,First267,PgSelectRows268,PgSelectSingle270,PgSelect273,First281,PgSelectRows282,PgSelectSingle284,PgClassExpression289,PgClassExpression290,PgClassExpression291,PgClassExpression292,PgClassExpression293,PgClassExpression294,PgClassExpression295,PgClassExpression296 bucket18
     classDef bucket19 stroke:#7f007f
-    class Bucket19,__Item285,PgUnionAllSingle286,Access305 bucket19
+    class Bucket19,__Item285,Access305 bucket19
     classDef bucket20 stroke:#ffa500
-    class Bucket20,__Item287,PgUnionAllSingle288,Access308 bucket20
+    class Bucket20,__Item287,Access308 bucket20
     classDef bucket21 stroke:#0000ff
     class Bucket21,PgCursor307,Access311,Access313,List316,Lambda317 bucket21
     classDef bucket22 stroke:#7fff00

@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 13, 22<br /><br />ROOT Connectionᐸ8ᐳ[13]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 18, 22, 11<br /><br />ROOT __Item{2}ᐸ62ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 18, 22, 11<br /><br />ROOT PgUnionAllSingle{2}[17]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 18, 22, 11<br /><br />ROOT __Item{2}ᐸ62ᐳ[16]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />Deps: 11, 26, 25<br /><br />1: PgSelect[28], PgSelect[42]<br />2: PgSelectRows[37], PgSelectRows[51]<br />ᐳ: 36, 39, 50, 53, 54, 55, 56, 57, 58, 59, 60, 61"):::bucket
     Bucket5("Bucket 5 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 54, 55, 56<br />ᐳFirstPartyVulnerability"):::bucket
     Bucket6("Bucket 6 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 58, 59, 60<br />ᐳThirdPartyVulnerability"):::bucket
@@ -42,16 +42,14 @@ graph TD
     PgUnionAll14 --> Access62
     __Item16[/"__Item[16∈2]<br />ᐸ62ᐳ"\]:::itemplan
     Access62 ==> __Item16
-    PgUnionAllSingle17["PgUnionAllSingle[17∈2]"]:::plan
-    __Item16 --> PgUnionAllSingle17
     List23{{"List[23∈3]<br />ᐸ20,21,22ᐳ"}}:::plan
-    Access20{{"Access[20∈3]<br />ᐸ17.0ᐳ"}}:::plan
-    Access21{{"Access[21∈3]<br />ᐸ17.1ᐳ"}}:::plan
+    Access20{{"Access[20∈3]<br />ᐸ16.0ᐳ"}}:::plan
+    Access21{{"Access[21∈3]<br />ᐸ16.1ᐳ"}}:::plan
     Access20 & Access21 & Constant22 --> List23
     PgCursor19{{"PgCursor[19∈3]"}}:::plan
-    PgUnionAllSingle17 & Access18 --> PgCursor19
-    PgUnionAllSingle17 --> Access20
-    PgUnionAllSingle17 --> Access21
+    __Item16 & Access18 --> PgCursor19
+    __Item16 --> Access20
+    __Item16 --> Access21
     Lambda24{{"Lambda[24∈3]<br />ᐸtoSpecifierᐳ"}}:::plan
     List23 --> Lambda24
     Access25{{"Access[25∈3]<br />ᐸ24.__typenameᐳ"}}:::plan
@@ -97,7 +95,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll14,Access18,Access62 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item16,PgUnionAllSingle17 bucket2
+    class Bucket2,__Item16 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor19,Access20,Access21,List23,Lambda24,Access25,Access26 bucket3
     classDef bucket4 stroke:#0000ff

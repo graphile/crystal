@@ -14,8 +14,8 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 25, 32<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[26]<br />ᐳ: Access[92]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 32, 12<br /><br />ROOT __Item{4}ᐸ92ᐳ[28]"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />Deps: 12, 36, 35<br /><br />1: 38, 52, 70, 77<br />2: PgSelectRows[47], PgSelectRows[61]<br />ᐳ: 46, 49, 60, 63, 64, 71"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />AwsApplication<br />Deps: 12, 64, 70<br />ᐳAwsApplication<br /><br />1: PgUnionAll[78]<br />ᐳ: Access[90], First[79]<br />2: PgUnionAllSingle[82]<br />ᐳ: PgClassExpression[83]"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />GcpApplication<br />Deps: 12, 71, 77<br />ᐳGcpApplication<br /><br />1: PgUnionAll[84]<br />ᐳ: Access[91], First[85]<br />2: PgUnionAllSingle[88]<br />ᐳ: PgClassExpression[89]"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />AwsApplication<br />Deps: 12, 64, 70<br />ᐳAwsApplication"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />GcpApplication<br />Deps: 12, 71, 77<br />ᐳGcpApplication"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -55,15 +55,13 @@ graph TD
     Access92{{"Access[92∈3]<br />ᐸ26.itemsᐳ"}}:::plan
     PgUnionAll26 --> Access92
     List33{{"List[33∈4]<br />ᐸ30,31,32ᐳ"}}:::plan
-    Access30{{"Access[30∈4]<br />ᐸ29.0ᐳ"}}:::plan
-    Access31{{"Access[31∈4]<br />ᐸ29.1ᐳ"}}:::plan
+    Access30{{"Access[30∈4]<br />ᐸ28.0ᐳ"}}:::plan
+    Access31{{"Access[31∈4]<br />ᐸ28.1ᐳ"}}:::plan
     Access30 & Access31 & Constant32 --> List33
     __Item28[/"__Item[28∈4]<br />ᐸ92ᐳ"\]:::itemplan
     Access92 ==> __Item28
-    PgUnionAllSingle29["PgUnionAllSingle[29∈4]"]:::plan
-    __Item28 --> PgUnionAllSingle29
-    PgUnionAllSingle29 --> Access30
-    PgUnionAllSingle29 --> Access31
+    __Item28 --> Access30
+    __Item28 --> Access31
     Lambda34{{"Lambda[34∈4]<br />ᐸtoSpecifierᐳ"}}:::plan
     List33 --> Lambda34
     Access35{{"Access[35∈4]<br />ᐸ34.__typenameᐳ"}}:::plan
@@ -97,20 +95,16 @@ graph TD
     First79{{"First[79∈6]^"}}:::plan
     Access90{{"Access[90∈6]^<br />ᐸ78.itemsᐳ"}}:::plan
     Access90 --> First79
-    PgUnionAllSingle82["PgUnionAllSingle[82∈6]^"]:::plan
-    First79 --> PgUnionAllSingle82
     PgClassExpression83{{"PgClassExpression[83∈6]^<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle82 --> PgClassExpression83
+    First79 --> PgClassExpression83
     PgUnionAll78 --> Access90
     PgUnionAll84[["PgUnionAll[84∈7]<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />ᐳGcpApplication"]]:::plan
     Object12 & PgClassExpression71 & Connection77 --> PgUnionAll84
     First85{{"First[85∈7]^"}}:::plan
     Access91{{"Access[91∈7]^<br />ᐸ84.itemsᐳ"}}:::plan
     Access91 --> First85
-    PgUnionAllSingle88["PgUnionAllSingle[88∈7]^"]:::plan
-    First85 --> PgUnionAllSingle88
     PgClassExpression89{{"PgClassExpression[89∈7]^<br />ᐸcount(*)ᐳ"}}:::plan
-    PgUnionAllSingle88 --> PgClassExpression89
+    First85 --> PgClassExpression89
     PgUnionAll84 --> Access91
 
     %% define steps
@@ -123,11 +117,11 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll26,Access92 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item28,PgUnionAllSingle29,Access30,Access31,List33,Lambda34,Access35,Access36 bucket4
+    class Bucket4,__Item28,Access30,Access31,List33,Lambda34,Access35,Access36 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgSelect38,First46,PgSelectRows47,PgSelectSingle49,PgSelect52,First60,PgSelectRows61,PgSelectSingle63,PgClassExpression64,Connection70,PgClassExpression71,Connection77 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgUnionAll78,First79,PgUnionAllSingle82,PgClassExpression83,Access90 bucket6
+    class Bucket6,PgUnionAll78,First79,PgClassExpression83,Access90 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgUnionAll84,First85,PgUnionAllSingle88,PgClassExpression89,Access91 bucket7
+    class Bucket7,PgUnionAll84,First85,PgClassExpression89,Access91 bucket7
 

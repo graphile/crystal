@@ -13,7 +13,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 12, 31, 29, 30, 78, 40<br /><br />ROOT __Item{2}ᐸ16ᐳ[17]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 31, 29, 30, 78, 40<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[32]<br />ᐳ: Access[76]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 32, 40, 12<br /><br />ROOT __Item{4}ᐸ76ᐳ[34]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 36, 40, 12<br /><br />ROOT PgUnionAllSingle{4}[35]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34, 36, 40, 12<br /><br />ROOT __Item{4}ᐸ76ᐳ[34]"):::bucket
     Bucket6("Bucket 6 (polymorphic)<br />Deps: 12, 44, 43<br /><br />1: PgSelect[46], PgSelect[60]<br />2: PgSelectRows[55], PgSelectRows[69]<br />ᐳ: 54, 57, 68, 71, 72, 73, 74, 75"):::bucket
     Bucket7("Bucket 7 (polymorphicPartition)<br />AwsApplication<br />Deps: 72, 73<br />ᐳAwsApplication"):::bucket
     Bucket8("Bucket 8 (polymorphicPartition)<br />GcpApplication<br />Deps: 74, 75<br />ᐳGcpApplication"):::bucket
@@ -68,18 +68,16 @@ graph TD
     PgUnionAll32 --> Access76
     __Item34[/"__Item[34∈4]<br />ᐸ76ᐳ"\]:::itemplan
     Access76 ==> __Item34
-    PgUnionAllSingle35["PgUnionAllSingle[35∈4]"]:::plan
-    __Item34 --> PgUnionAllSingle35
     Access36{{"Access[36∈4]<br />ᐸ32.cursorDetailsᐳ"}}:::plan
     PgUnionAll32 --> Access36
     List41{{"List[41∈5]<br />ᐸ38,39,40ᐳ"}}:::plan
-    Access38{{"Access[38∈5]<br />ᐸ35.0ᐳ"}}:::plan
-    Access39{{"Access[39∈5]<br />ᐸ35.1ᐳ"}}:::plan
+    Access38{{"Access[38∈5]<br />ᐸ34.0ᐳ"}}:::plan
+    Access39{{"Access[39∈5]<br />ᐸ34.1ᐳ"}}:::plan
     Access38 & Access39 & Constant40 --> List41
     PgCursor37{{"PgCursor[37∈5]"}}:::plan
-    PgUnionAllSingle35 & Access36 --> PgCursor37
-    PgUnionAllSingle35 --> Access38
-    PgUnionAllSingle35 --> Access39
+    __Item34 & Access36 --> PgCursor37
+    __Item34 --> Access38
+    __Item34 --> Access39
     Lambda42{{"Lambda[42∈5]<br />ᐸtoSpecifierᐳ"}}:::plan
     List41 --> Lambda42
     Access43{{"Access[43∈5]<br />ᐸ42.__typenameᐳ"}}:::plan
@@ -121,7 +119,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgClassExpression20,PgUnionAll32,Access76 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item34,PgUnionAllSingle35,Access36 bucket4
+    class Bucket4,__Item34,Access36 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgCursor37,Access38,Access39,List41,Lambda42,Access43,Access44 bucket5
     classDef bucket6 stroke:#ff1493
