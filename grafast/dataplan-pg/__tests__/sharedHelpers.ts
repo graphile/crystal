@@ -152,6 +152,8 @@ export async function withTestWithPgClient<T>(
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const host = process.env.PGHOST ?? "localhost";
+
 async function runSqlAsRoot(sql: string, maxAttempts = 1) {
   let error: Error | undefined;
   for (let attempts = 0; attempts < maxAttempts; attempts++) {
@@ -160,8 +162,11 @@ async function runSqlAsRoot(sql: string, maxAttempts = 1) {
       await sleep((0.5 + Math.random()) * attempts * 200);
     }
     try {
+      const databaseName = process.env.OWNER_DATABASE ?? "postgres";
       const rootClient = new Client(
-        `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
+        host.includes("/")
+          ? `socket://${host}?db=${encodeURIComponent(databaseName)}`
+          : `postgres://${host}/${databaseName}`,
       );
       await rootClient.connect();
       await rootClient.query(sql);
@@ -182,8 +187,6 @@ export async function createTestDatabase() {
     5,
   );
 
-  const host = process.env.PGHOST ?? "localhost";
-
   const connectionString = host.includes("/")
     ? `socket://graphilecrystaltest:test@${host}?db=${encodeURIComponent(
         databaseName,
@@ -196,7 +199,8 @@ export async function dropTestDatabase(databaseName: string) {
   if (!databaseName) return;
   try {
     await runSqlAsRoot(`drop database ${databaseName};`, 2);
-  } catch {
+  } catch (e) {
+    console.error(`Failed to drop DB`, e);
     // Noop
   }
 }
