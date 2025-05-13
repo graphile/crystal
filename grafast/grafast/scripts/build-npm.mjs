@@ -1,8 +1,12 @@
 #!/usr/bin/env zx
 
+/* global $, cd, fs */
+
 import "zx/globals";
 
-import { esmHack, transformPackageJson } from "../../../scripts/build-core.mjs";
+import {
+  /* esmHack, */ transformPackageJson,
+} from "../../../scripts/build-core.mjs";
 
 cd(__dirname + "/..");
 await $`rm -Rf tsconfig.tsbuildinfo dist release`;
