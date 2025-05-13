@@ -60,6 +60,7 @@ const config = {
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
+      //'plugin:@typescript-eslint/recommended-requiring-type-checking',
       "plugin:import/errors",
       "plugin:import/typescript",
       "plugin:graphile-export/recommended",
@@ -83,9 +84,11 @@ const config = {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
+    // We need this for our `GraphileEngine` namespace
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-var-requires": "off",
+    // This needs full type-checking now (apparently?)
     "@typescript-eslint/consistent-type-imports": "off",
     "no-confusing-arrow": 0,
     "no-else-return": 0,
@@ -95,11 +98,14 @@ const config = {
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
     "tsdoc/syntax": 2,
+
+    // Rules that we should enable:
     "@typescript-eslint/no-inferrable-types": "warn",
     "no-inner-declarations": "warn",
+
+    // Rules we've disabled for now because they're so noisy (but we should really address)
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -110,24 +116,33 @@ const config = {
       },
     ],
 
+    /*
+     * simple-import-sort seems to be the most stable import sorting currently,
+     * disable others
+     */
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "sort-imports": "off",
     "import/order": "off",
+
     "import/extensions": ["error", "ignorePackages"],
     "import/no-deprecated": "warn",
+
+    // Apply has been more optimised than spread, use whatever feels right.
     "prefer-spread": "off",
+
+    // note you must disable the base rule as it can report incorrect errors
     "no-duplicate-imports": "off",
     "import/no-duplicates": "error",
   },
 };
 const overrides = [
+  // Rules for core plugins
   {
     files: [
       "graphile-build/graphile-build/src/plugins/**/*.ts",
       "graphile-build/graphile-build-pg/src/**/*.ts",
     ],
-
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -140,9 +155,10 @@ const overrides = [
       ],
     },
   },
+
+  // Rules for non-core plugins
   {
     files: ["graphile-build/graphile-utils/src/**/*.ts"],
-
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -161,9 +177,10 @@ const overrides = [
       ],
     },
   },
+
+  // Rules for interfaces.ts files
   {
     files: ["**/interfaces.ts"],
-
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -175,12 +192,13 @@ const overrides = [
       ],
     },
   },
+
+  // Rules for TypeScript only
   {
     files: ["**/*.ts", "**/*.tsx"],
 
     languageOptions: {
       parser: tsParser,
-
       parserOptions: {
         project: "./tsconfig.json",
       },
@@ -190,54 +208,58 @@ const overrides = [
       "@typescript-eslint/consistent-type-imports": "error",
       "no-dupe-class-members": "off",
       "no-undef": "off",
+      // This rule doesn't understand import of './js'
       "import/no-unresolved": "off",
     },
   },
+
+  // Rules for JavaScript only
   {
     files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
-
     rules: {
       "@typescript-eslint/consistent-type-imports": "off",
       "tsdoc/syntax": "off",
       "import/extensions": "off",
     },
   },
+
+  // Stricter rules for source code
   {
     files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
-
     languageOptions: {
       parser: tsParser,
-
       parserOptions: {
         project: true,
       },
     },
-
     rules: {},
   },
+
+  // Rules for tests only
   {
     files: ["**/__tests__/**/*.{ts,js}"],
-
     rules: {
+      // Disable these to enable faster test writing
       "prefer-const": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
+
+      // We don't normally care about race conditions in tests
       "require-atomic-updates": "off",
     },
   },
+
+  // React rules
   {
     files: [
       "grafast/ruru/src/**/*.ts",
       "grafast/ruru/src/**/*.tsx",
       "**/website/src/**",
     ],
-
     extends: compat.extends("plugin:react/recommended"),
-
     rules: {
       "react-hooks/rules-of-hooks": "error",
-
       "react-hooks/exhaustive-deps": [
         "warn",
         {
@@ -245,10 +267,12 @@ const overrides = [
         },
       ],
 
+      // Stuff I don't care about
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
     },
   },
+
   {
     files: [
       "**/vendor/**/__tests__/**/*.ts",
@@ -258,7 +282,6 @@ const overrides = [
       "**/website/examples/**",
       "graphile-build/graphile-utils/__tests__/*Plugin.ts",
     ],
-
     rules: {
       "graphile-export/exhaustive-deps": 0,
       "graphile-export/export-methods": 0,
@@ -267,17 +290,18 @@ const overrides = [
       "graphile-export/no-nested": 0,
     },
   },
+
   {
     files: ["**/website/**"],
-
     rules: {
       "import/no-unresolved": "off",
     },
   },
+
+  // Don't use Node.js builtins
   {
     files: ["grafast/grafast/src/**", "utils/graphile-config/src/**"],
     ignores: ["utils/graphile-config/src/loadConfig.ts"],
-
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
@@ -295,10 +319,7 @@ const overrides = [
             "freelist",
             "fs",
             "fs/promises",
-            {
-              name: "http",
-              allowTypeImports: true,
-            },
+            { name: "http", allowTypeImports: true },
             "https",
             "module",
             "net",
@@ -321,7 +342,6 @@ const overrides = [
             "vm",
             "zlib",
           ],
-
           patterns: ["node:*"],
         },
       ],
