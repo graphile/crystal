@@ -25,11 +25,19 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-const globalIgnoresFromFile = fs
-  .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
+const lintIgnore = fs.readFileSync(
+  path.resolve(__dirname, ".lintignore"),
+  "utf8",
+);
+const gitIgnore = fs.readFileSync(
+  path.resolve(__dirname, ".gitIgnore"),
+  "utf8",
+);
+const globalIgnoresFromFile = `${lintIgnore}\n${gitIgnore}`
   .split("\n")
   .map((line) => line.trim())
-  .filter((line) => line && !line.startsWith("#"))
+  // TODO: support `!` unfiltering. Currently ignored because we only use it in .yarn
+  .filter((line) => line && !line.startsWith("#") && !line.startsWith("!"))
   .map((line) => {
     let text = line;
     text = text.startsWith("/") ? text.substring(1) : `**/${text}`;
