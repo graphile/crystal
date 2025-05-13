@@ -3,9 +3,9 @@
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint:fix": "yarn run eslint --fix . && yarn prettier:fix",
-    "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological run pretest",
-    "test": "NODE_ENV=test yarn workspaces foreach --topological run test",
-    "posttest": "NODE_ENV=test yarn workspaces foreach --topological run posttest && node scripts/benjies-depcheck.mjs",
+    "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --all --topological run pretest",
+    "test": "NODE_ENV=test yarn workspaces foreach --all --topological run test",
+    "posttest": "NODE_ENV=test yarn workspaces foreach --all --topological run posttest && node scripts/benjies-depcheck.mjs",
     "prepack:all": "scripts/prepack-all",
     "build": "yarn && yarn workspace ruru-components prepack && yarn workspace ruru prepack && tsc -b",
     "watch": "yarn build && tsc -b --watch",
