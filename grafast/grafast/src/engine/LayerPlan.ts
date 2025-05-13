@@ -713,8 +713,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       case "polymorphic": {
         const parentStepId = this.reason.parentStep.id;
-        const parentStepStore = parentBucket.store.get(parentStepId);
-        if (!parentStepStore) {
+        const typenameEV = parentBucket.store.get(parentStepId);
+        if (!typenameEV) {
           throw new Error(
             `GrafastInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
               parentStepId,
@@ -747,7 +747,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex < parentBucket.size;
           originalIndex++
         ) {
-          const flags = parentStepStore._flagsAt(originalIndex);
+          const flags = typenameEV._flagsAt(originalIndex);
           if (
             flags &
             (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL | FLAG_POLY_SKIPPED)
@@ -762,13 +762,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
           const polymorphicPath =
             parentBucket.polymorphicPathList.at(originalIndex);
-          const typeName =
-            this.reason.type === "polymorphic"
-              ? parentStepStore.at(originalIndex)
-              : // TODO: make this more efficient!
-                parentBucket.polymorphicPathList
-                  .at(originalIndex)!
-                  .replace(/^.*>([^>]+)$/, "$1");
+          const typeName = typenameEV.at(originalIndex);
           if (!this.reason.typeNames.includes(typeName)) {
             // TODO: should we error?
             // Skip
@@ -777,9 +771,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           const newIndex = size++;
           map.set(originalIndex, newIndex);
           polymorphicPathList[newIndex] =
-            this.reason.type === "polymorphic"
-              ? (polymorphicPath ?? "") + ">" + typeName
-              : parentBucket.polymorphicPathList.at(originalIndex)!;
+            (polymorphicPath ?? "") + ">" + typeName;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
           for (const planId of batchCopyStepIds) {
             const ev = store.get(planId)!;
