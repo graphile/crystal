@@ -373,6 +373,9 @@ const oldConfig = {
         "postgraphile/postgraphile/src/index.ts",
         "utils/graphile-export/src/exportSchema.ts",
         "utils/graphile/src/commands/behavior/debug/main.ts",
+        "graphile-build/graphile-simplify-inflection/test.js",
+        "grafast/dataplan-pg/src/steps/pgStmt.ts",
+        "scripts/postversion.mjs",
       ],
       rules: {
         "import/no-unresolved": "off",
@@ -383,6 +386,7 @@ const oldConfig = {
       files: [
         "postgraphile/postgraphile/src/cli.ts",
         "utils/graphile-config/src/resolvePresets.ts",
+        "grafast/dataplan-pg/src/inspect.ts",
       ],
       rules: {
         "@typescript-eslint/no-require-imports": "off",
@@ -407,7 +411,10 @@ const oldConfig = {
       },
     },
     {
-      files: ["utils/graphile-export/src/optimize/index.ts"],
+      files: [
+        "utils/graphile-export/src/optimize/index.ts",
+        "grafast/dataplan-pg/src/executor.ts",
+      ],
       rules: {
         "@typescript-eslint/no-unused-expressions": "off",
       },
