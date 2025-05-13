@@ -3,12 +3,6 @@ name: Base Test Workflow
 on:
   workflow_call:
     inputs:
-      prepackPackages:
-        description:
-          List of packages to be prepacked given as {package-a,} the extra , is
-          important! or {package-A,package-B}
-        required: true
-        type: string
       package:
         description: Name of the package that should be tested
         type: string
@@ -44,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         postgres-version: [12, 17] #, 11, 13, 14, 15]
-        node-version: [20.x] #, 18.x]
+        node-version: [22.x]
 
     services:
       postgres:
@@ -62,9 +56,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
@@ -95,11 +89,7 @@ jobs:
         run: yarn build
 
       - name: "Prepack"
-        run:
-          yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}'
-          run prepack
+        run: yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.package }}' run prepack
 
       - name: "Test Project"
-        run:
-          yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
-          inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
+        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --worktree --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
