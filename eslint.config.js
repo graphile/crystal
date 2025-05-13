@@ -29,7 +29,13 @@ const globalIgnoresFromFile = fs
   .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
   .split("\n")
   .map((line) => line.trim())
-  .filter((line) => line && !line.startsWith("#"));
+  .filter((line) => line && !line.startsWith("#"))
+  .map((line) => {
+    let text = line;
+    text = text.startsWith("/") ? text.substring(1) : `**/${text}`;
+    text = text.endsWith("/") ? text + "**" : text;
+    return text;
+  });
 
 const fixupExtends = (...strings) =>
   fixupConfigRules(compat.extends(...strings));
