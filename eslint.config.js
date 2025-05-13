@@ -203,13 +203,9 @@ const oldConfig = {
 
       languageOptions: {
         parser: tsParser,
-        parserOptions: {
-          project: "./tsconfig.json",
-        },
       },
 
       rules: {
-        "@typescript-eslint/consistent-type-imports": "error",
         "no-dupe-class-members": "off",
         "no-undef": "off",
         // This rule doesn't understand import of './js'
@@ -221,7 +217,6 @@ const oldConfig = {
     {
       files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
       rules: {
-        "@typescript-eslint/consistent-type-imports": "off",
         "tsdoc/syntax": "off",
         "import/extensions": "off",
       },
@@ -236,7 +231,9 @@ const oldConfig = {
           project: true,
         },
       },
-      rules: {},
+      rules: {
+        "@typescript-eslint/consistent-type-imports": "error",
+      },
     },
 
     // Rules for tests only
