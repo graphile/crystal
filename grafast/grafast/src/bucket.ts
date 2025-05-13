@@ -97,6 +97,12 @@ export interface Bucket {
    */
   polymorphicPathList: readonly (string | null)[];
 
+  /**
+   * If the bucket represents a `polymorphic` layer plan then an array
+   * containing the matched typeName for each item, otherwise null.
+   */
+  polymorphicType: null | readonly string[];
+
   // PERF: this is only required when stream is enabled (and only for buckets
   // that may contain streamed things, directly or indirectly) - we should only
   // set it in those cases.

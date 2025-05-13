@@ -406,6 +406,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           parentLayerPlan.children.push(this);
         }
       } else {
+        if (reason.type === "polymorphicPartition") {
+          if (parentLayerPlan.reason.type !== "polymorphic") {
+            throw new Error(
+              `GrafastInternalError<ef8fcb9a-5252-4593-915c-b3ebe4aa8eff>: a polymorphicPartition may only be a child of a polymorphic layer plan, but ${this} was created under ${parentLayerPlan}`,
+            );
+          }
+        }
         parentLayerPlan.children.push(this);
       }
     }
@@ -483,6 +490,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "mutationField"
         ? (parentBucket.polymorphicPathList as string[])
         : [];
+    const polymorphicType =
+      this.reason.type === "polymorphic" ? ([] as string[]) : null;
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> =
       this.reason.type === "mutationField" ? parentBucket.iterators : [];
     const map: Map<number, number | number[]> = new Map();
@@ -772,6 +781,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           map.set(originalIndex, newIndex);
           polymorphicPathList[newIndex] =
             (polymorphicPath ?? "") + ">" + typeName;
+          polymorphicType![newIndex] = typeName;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
           for (const planId of batchCopyStepIds) {
             const ev = store.get(planId)!;
@@ -815,11 +825,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           ) {
             continue;
           }
-          const typeName =
-            // TODO: make this more efficient!
-            parentBucket.polymorphicPathList
-              .at(originalIndex)!
-              .replace(/^.*>([^>]+)$/, "$1");
+          const typeName = parentBucket.polymorphicType!.at(originalIndex)!;
           if (!this.reason.typeNames.includes(typeName)) {
             continue;
           }
@@ -873,6 +879,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
         flagUnion: parentBucket.flagUnion,
         polymorphicPathList,
+        polymorphicType,
         iterators,
       });
       parentBucket.children[this.id] = {
@@ -1041,6 +1048,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
           flagUnion,
           polymorphicPathList,
+          polymorphicType: null,
           iterators,
         },
       );

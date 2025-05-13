@@ -1303,6 +1303,7 @@ export function newBucket(
     | "size"
     | "flagUnion"
     | "polymorphicPathList"
+    | "polymorphicType"
     | "iterators"
   >,
 ): Bucket {
@@ -1361,8 +1362,15 @@ export function newBucket(
         spec.layerPlan.operationPlan.makeMetaByMetaKey()
       : parentMetaByMetaKey;
   // Copy from spec
-  const { layerPlan, store, size, flagUnion, polymorphicPathList, iterators } =
-    spec;
+  const {
+    layerPlan,
+    store,
+    size,
+    flagUnion,
+    polymorphicPathList,
+    polymorphicType,
+    iterators,
+  } = spec;
   const children = Object.create(null);
   const bucket: Bucket = {
     sharedState,
@@ -1373,6 +1381,7 @@ export function newBucket(
     size,
     flagUnion,
     polymorphicPathList,
+    polymorphicType,
     iterators,
     metaByMetaKey,
     isComplete: false,
