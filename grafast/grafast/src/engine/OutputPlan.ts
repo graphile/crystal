@@ -737,12 +737,6 @@ export function getChildBucketAndIndex(
       "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  /* Handled above?!
-  if (outputPlan != null && layerPlan === bucket.layerPlan) {
-    // Same layer; straightforward
-    return [bucket, bucketIndex];
-  }
-  */
 
   const paths = pathsFromAncestorToTargetLayerPlan(bucket.layerPlan, layerPlan);
   if (paths.length === 0) {
