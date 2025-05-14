@@ -137,7 +137,21 @@ const atpe =
   typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
 const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
-/* How many selection sets deep do we allow? Should be handled by validation. */
+
+/**
+ * How many planning layers deep do we allow? Should be handled by validation.
+ *
+ * A planning layer can happen due to:
+ *
+ * - A nested selection set
+ * - Planning a field return type
+ * - A list position
+ * - A polymorphic type
+ * - A deferred/streamed response
+ *
+ * These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+ * limit should be set quite high - e.g. 6x the selection set depth.
+ */
 const MAX_DEPTH = 1000;
 
 /**
@@ -1648,14 +1662,14 @@ export class OperationPlan {
   }
 
   private planPending() {
-    for (let depth = 0; depth < MAX_DEPTH; depth++) {
+    for (let depth = 0; depth <= MAX_DEPTH; depth++) {
       // Process the next batch
 
       const l = this.planningQueue.length;
       if (l === 0) break;
       if (depth === MAX_DEPTH) {
         throw new Error(
-          `Grafast refuses to traverse selection sets at depth ${MAX_DEPTH}`,
+          `Query is too complex, Grafast refuses to continue processing at planning depth ${MAX_DEPTH}`,
         );
       }
 
