@@ -40,11 +40,6 @@ export interface PlanIntoOutputPlanDetails
   extends CommonPlanningDetails<GraphQLOutputType> {
   outputPlan: OutputPlan;
   // This is the LAYER-RELATIVE path, not the absolute path! It resets!
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLOutputType;
   // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
   layerPlan: LayerPlan;
   selections: readonly SelectionNode[] | undefined;
@@ -63,12 +58,6 @@ export interface PlanFieldReturnTypeDetails
 
 export interface ProcessGroupedFieldSetDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLObjectType;
   layerPlan: LayerPlan;
   objectTypeFields: GraphQLFieldMap<any, any>;
   isMutation: boolean;
@@ -77,12 +66,6 @@ export interface ProcessGroupedFieldSetDetails
 
 export interface PlanSelectionSetDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLObjectType;
   layerPlan: LayerPlan;
   selections: readonly SelectionNode[];
   resolverEmulation: boolean;
@@ -91,12 +74,6 @@ export interface PlanSelectionSetDetails
 
 export interface PlanListItemDetails
   extends CommonPlanningDetails<GraphQLList<GraphQLOutputType>> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLList<GraphQLOutputType>;
   layerPlan: LayerPlan;
   selections: readonly SelectionNode[] | undefined;
   listDepth: number;
@@ -107,12 +84,6 @@ export interface PlanListItemDetails
 
 export interface PolymorphicResolveTypeDetails
   extends CommonPlanningDetails<GraphQLInterfaceType | GraphQLUnionType> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLInterfaceType | GraphQLUnionType;
   layerPlan: LayerPlan;
   selections: readonly SelectionNode[];
   allPossibleObjectTypes: readonly GraphQLObjectType<any, any>[];
@@ -128,12 +99,6 @@ export interface PolymorphicResolveTypeDetails
 
 export interface PolymorphicPlanObjectTypeDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: GraphQLObjectType;
   layerPlan: LayerPlan;
   fieldNodes: readonly FieldNode[];
   locationDetails: LocationDetails;
