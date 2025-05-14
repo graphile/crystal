@@ -38,15 +38,13 @@ export interface CommonPlanningDetails<
 
 export interface PlanIntoOutputPlanDetails
   extends CommonPlanningDetails<GraphQLOutputType> {
-  outputPlan: OutputPlan;
+  resolverEmulation: boolean;
   // This is the LAYER-RELATIVE path, not the absolute path! It resets!
   // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
-  layerPlan: LayerPlan;
   selections: readonly SelectionNode[] | undefined;
   parentObjectType: GraphQLObjectType | null;
   responseKey: string | null;
   locationDetails: LocationDetails;
-  resolverEmulation: boolean;
   listDepth: number;
   streamDetails: StreamDetails | null;
 }
@@ -58,7 +56,6 @@ export interface PlanFieldReturnTypeDetails
 
 export interface ProcessGroupedFieldSetDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  layerPlan: LayerPlan;
   objectTypeFields: GraphQLFieldMap<any, any>;
   isMutation: boolean;
   groupedFieldSet: SelectionSetDigest;
@@ -66,32 +63,29 @@ export interface ProcessGroupedFieldSetDetails
 
 export interface PlanSelectionSetDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  layerPlan: LayerPlan;
-  selections: readonly SelectionNode[];
   resolverEmulation: boolean;
+  selections: readonly SelectionNode[];
   isMutation?: boolean;
 }
 
 export interface PlanListItemDetails
   extends CommonPlanningDetails<GraphQLList<GraphQLOutputType>> {
-  layerPlan: LayerPlan;
+  resolverEmulation: boolean;
   selections: readonly SelectionNode[] | undefined;
   listDepth: number;
   stream: LayerPlanReasonListItemStream | undefined;
   locationDetails: LocationDetails;
-  resolverEmulation: boolean;
 }
 
 export interface PolymorphicResolveTypeDetails
   extends CommonPlanningDetails<GraphQLInterfaceType | GraphQLUnionType> {
-  layerPlan: LayerPlan;
+  resolverEmulation: boolean;
   selections: readonly SelectionNode[];
   allPossibleObjectTypes: readonly GraphQLObjectType<any, any>[];
   locationDetails: LocationDetails;
   parentObjectType: GraphQLObjectType | null; // Used by this.mutateTodos
   responseKey: string | null; // Used by this.mutateTodos
   isNonNull: boolean;
-  resolverEmulation: boolean;
 
   // Populated by mutateTodos
   stepForType?: ReadonlyMap<GraphQLObjectType, Step>;
@@ -99,9 +93,8 @@ export interface PolymorphicResolveTypeDetails
 
 export interface PolymorphicPlanObjectTypeDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
-  layerPlan: LayerPlan;
+  resolverEmulation: boolean;
   fieldNodes: readonly FieldNode[];
   locationDetails: LocationDetails;
   isNonNull: boolean;
-  resolverEmulation: boolean;
 }
