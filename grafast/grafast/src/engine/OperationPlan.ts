@@ -321,51 +321,7 @@ export class OperationPlan {
     AnyInputStep
   >();
 
-  /**
-   * TEMPORARY. Maybe.
-   *
-   * @internal
-   */
-  private stepsByPlanningPath = new Map<string, Step[]>();
   private frozenPlanningPaths = new Set<string>();
-
-  private addStepAtPlanningPath(planningPath: string, step: Step) {
-    if (this.frozenPlanningPaths.has(planningPath)) {
-      throw new Error(
-        `Attempted to add ${step} to ${planningPath} but that path is already frozen!`,
-      );
-    }
-    let list = this.stepsByPlanningPath.get(planningPath);
-    if (!list) {
-      list = [];
-      this.stepsByPlanningPath.set(planningPath, list);
-    }
-    list.push(step);
-  }
-
-  private analyzePlanningPath(planningPath: string) {
-    const PAD = 80;
-    console.log();
-    if (this.frozenPlanningPaths.has(planningPath)) {
-      console.warn(`${planningPath.padEnd(PAD, " ")} !! ALREADY FROZEN`);
-      return;
-    }
-    this.frozenPlanningPaths.add(planningPath);
-    const list = this.stepsByPlanningPath.get(planningPath);
-    if (!list) {
-      console.warn(`${planningPath.padEnd(PAD, " ")} !! NO STEPS FOUND`);
-      return;
-    }
-    if (isDev) {
-      // No more allowed!
-      Object.freeze(list);
-    }
-    console.log(
-      `${planningPath.padEnd(PAD, " ")} Found steps:\n- ${list.join("\n- ")}`,
-    );
-
-    // TODO: actually tidy this up
-  }
 
   /** @internal */
   public resolveInfoOperationBase: Pick<
