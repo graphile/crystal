@@ -2010,25 +2010,17 @@ export class OperationPlan {
     return $step;
   }
 
-  private planFieldReturnType(details: {
-    outputPlan: OutputPlan;
-    // This is the LAYER-RELATIVE path, not the absolute path! It resets!
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLOutputType;
-    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
-    layerPlan: LayerPlan;
-    selections: readonly SelectionNode[] | undefined;
-    parentObjectType: GraphQLObjectType;
-    responseKey: string | null;
-    locationDetails: LocationDetails;
-    resolverEmulation: boolean;
-    streamDetails: StreamDetails | null;
-  }): void {
+  private planFieldReturnType(
+    details: Omit<
+      Parameters<typeof this.planIntoOutputPlan>[0],
+      "listDepth" | "parentObjectType"
+    > & {
+      parentObjectType: GraphQLObjectType;
+    },
+  ): void {
     return this.planIntoOutputPlan({ ...details, listDepth: 0 });
   }
+
   private planIntoOutputPlan(details: {
     outputPlan: OutputPlan;
     // This is the LAYER-RELATIVE path, not the absolute path! It resets!
