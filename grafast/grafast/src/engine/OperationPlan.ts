@@ -1659,10 +1659,6 @@ export class OperationPlan {
         GraphQLUnionType | GraphQLInterfaceType,
         Array<Parameters<typeof this.polymorphicResolveType>[0]>
       >();
-      // const polymorphicPlanObjectTypeEntriesByRootStep = new Map<
-      //   Step,
-      //   CommonPlanningDetails[]
-      // >();
       const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
         LayerPlan,
         Map<Step, Array<Parameters<typeof this.planFieldReturnType>[0]>>
@@ -1685,14 +1681,6 @@ export class OperationPlan {
             polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
           }
           list.push(args);
-          //} else if (method == this.polymorphicPlanObjectType) {
-          //  const $root = args.parentStep;
-          //  let list = polymorphicPlanObjectTypeEntriesByRootStep.get($root);
-          //  if (!list) {
-          //    list = [];
-          //    polymorphicPlanObjectTypeEntriesByRootStep.set($root, list);
-          //  }
-          //  list.push(args);
         } else if (method == this.planFieldReturnType) {
           const args = rawArgs as Parameters<
             typeof this.planFieldReturnType
@@ -1809,15 +1797,6 @@ export class OperationPlan {
           // of all the values from toCombine.
           combinedLayerPlan.addCombo(toCombine, $combined);
 
-          // // Update the outputPlans to link to this new combined layer
-          // // plan, and use the new common step
-          // for (const argsTuple of argsTupleList) {
-          //   const outputPlan = argsTuple.outputPlan;
-          //   outputPlan.layerPlan = combinedLayerPlan;
-          //   argsTuple.polymorphicPaths = combinedPolymorphicPaths;
-          //   argsTuple.parentStep = $combined;
-          //   argsTuple.layerPlan = combinedLayerPlan;
-          // }
           commonLayerPlan = combinedLayerPlan;
           commonStep = $combined;
         } else {
