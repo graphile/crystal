@@ -1610,9 +1610,10 @@ export class OperationPlan {
       // made (critical for ensuring the OutputPlans output fields in the
       // correct order); whereas `todo` is the result of grouping `batch` into
       // groups where the planning paths match.
-      const batch = this.planningQueue.splice(0, l);
+      const batch = this.planningQueue.slice(0, l);
       const todo: Todo = [...this.planningQueueByPlanningPath.entries()];
-
+      // Now clear the stores ready to start collecting the next lot.
+      this.planningQueue.length = 0;
       this.planningQueueByPlanningPath.clear();
 
       // First, do a planning-path-aware deduplicate
