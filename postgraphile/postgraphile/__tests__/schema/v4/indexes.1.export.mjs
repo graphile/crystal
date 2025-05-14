@@ -10388,7 +10388,6 @@ function findTypeNameMatch(specifier) {
       return typeName;
     }
   }
-  console.error(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
   return null;
 }
 function hasRecord($row) {

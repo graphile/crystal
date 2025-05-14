@@ -2384,7 +2384,6 @@ function findTypeNameMatch(specifier) {
       return typeName;
     }
   }
-  console.error(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
   return null;
 }
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
