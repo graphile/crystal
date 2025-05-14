@@ -959,7 +959,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     const $parentSideEffect = this.parentSideEffectStep;
     if ($parentSideEffect) {
-      throw new Error(`Do not support side effects here`);
+      throw new Error(
+        `Side effects were not expected at this position; this is likely an issue with your plans, but if not then please file an issue containing a minimal reproduction`,
+      );
     }
 
     let size = 0;
