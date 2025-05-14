@@ -1984,48 +1984,6 @@ export class OperationPlan {
         }
       }
 
-      /*
-      // Handle calls to this.polymorphicPlanObjectType by creating a
-      // polymorphic layer plan for each unique $root
-      for (const [
-        parentStep,
-        argsTupleList,
-      ] of polymorphicPlanObjectTypeEntriesByRootStep) {
-        const typeNames = [
-          ...new Set(
-            argsTupleList.map(
-              (a) => (a.positionType as GraphQLObjectType).name,
-            ),
-          ),
-        ];
-        const firstArgs = argsTupleList[0];
-        const resolveTypeLayerPlan = firstArgs.layerPlan;
-        if (isDev) {
-          if (resolveTypeLayerPlan.reason.type !== "resolveType") {
-            throw new Error(
-              `GrafastInternalError<cf75a4c4-4bb3-47d0-a3c5-77fcd05a1187>: the parent of a polymorphic layer plan must always be a resolveType layer plan`,
-            );
-          }
-          for (const args of argsTupleList) {
-            assert.strictEqual(
-              args.layerPlan,
-              resolveTypeLayerPlan,
-              `GrafastInternalError<6552e87e-6b94-43e7-a50a-001da359032e>: all batched polymorphic steps must belong to the same layer plan`,
-            );
-          }
-        }
-        const polymorphicLayerPlan = new LayerPlan(this, resolveTypeLayerPlan, {
-          type: "polymorphic",
-          polymorphicPaths: new Set(parentStep.polymorphicPaths!),
-          typeNames,
-          parentStep,
-        });
-        for (const args of argsTupleList) {
-          args.layerPlan = polymorphicLayerPlan;
-        }
-      }
-      */
-
       for (const [
         parentLayerPlan,
         planFieldReturnTypeEntriesByStep,
