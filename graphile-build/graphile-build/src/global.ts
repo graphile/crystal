@@ -149,7 +149,15 @@ declare global {
     // Options in the config
 
     interface InflectionOptions {}
-    interface GatherOptions {}
+    interface GatherOptions {
+      /**
+       * Used in tests to mute expected warnings. Likely to be replaced when
+       * we add a diagnostics system.
+       *
+       * @experimental
+       */
+      muteWarnings?: boolean;
+    }
     interface SchemaOptions {
       /**
        * A behavior string to prepend to all behavior checks, can be overriden

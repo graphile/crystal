@@ -57,6 +57,18 @@ import { makeSchema } from "../src/index.js";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
 
+export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
+  name: "SwallowAllErrorsPlugin",
+  schema: {
+    hooks: {
+      build(build) {
+        build.handleRecoverableError = () => {};
+        return build;
+      },
+    },
+  },
+};
+
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
  * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
@@ -251,6 +263,7 @@ export async function runTestQuery(
     extends?: string | string[];
     pgIdentifiers?: "qualified" | "unqualified";
     search_path?: string;
+    muteWarnings?: boolean;
   },
   options: {
     callback?: (
@@ -278,6 +291,7 @@ export async function runTestQuery(
     cleanupSql,
     pgIdentifiers,
     search_path,
+    muteWarnings = true,
   } = config;
   const { path } = options;
 
@@ -307,9 +321,13 @@ export async function runTestQuery(
       return imported;
     }),
   );
+
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset, ...presets],
-    plugins: [StreamDeferPlugin],
+    plugins: [
+      StreamDeferPlugin,
+      ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
+    ],
     pgServices: [
       {
         adaptor,
@@ -347,6 +365,7 @@ export async function runTestQuery(
     },
     gather: {
       pgIdentifiers,
+      muteWarnings,
     },
     grafast: {
       explain: ["plan"],
