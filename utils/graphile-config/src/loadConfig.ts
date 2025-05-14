@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import "./interfaces.js";
 
 import { access } from "node:fs/promises";
