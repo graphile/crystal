@@ -1628,10 +1628,9 @@ export class OperationPlan {
         }
         this.frozenPlanningPaths?.add(planningPath);
         for (const entry of batch) {
-          let step = entry[1].parentStep;
+          const step = entry[1].parentStep;
           const actualStep = this.stepTracker.getStepById(step.id);
           if (actualStep !== step) {
-            step = actualStep;
             entry[1].parentStep = actualStep;
           }
         }
