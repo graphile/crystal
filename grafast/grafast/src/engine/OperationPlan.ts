@@ -4803,6 +4803,7 @@ export class OperationPlan {
         copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
+        // BUG: this is unsafe since combo layer plans will be included multiple times. We should reference by id, perhaps?
         children: lp.children.map(printBucket),
         rootStepId: lp.rootStep ? lp.rootStep.id : null,
       };
