@@ -1907,7 +1907,7 @@ export class OperationPlan {
                 (p) => !stepIsValidInPolyPath($stepForType, p),
               );
               if (missedPaths.length > 0) {
-                console.warn(
+                throw new Error(
                   `When planning ${graphqlType}'s planForType for ${
                     type.name
                   }, returned step ${
