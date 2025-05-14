@@ -322,7 +322,7 @@ export class OperationPlan {
     AnyInputStep
   >();
 
-  private frozenPlanningPaths = new Set<string>();
+  private frozenPlanningPaths = isDev ? null : new Set<string>();
 
   /** @internal */
   public resolveInfoOperationBase: Pick<
@@ -1574,7 +1574,7 @@ export class OperationPlan {
     details: TDetails,
   ): void {
     const { planningPath } = details;
-    if (this.frozenPlanningPaths.has(planningPath)) {
+    if (this.frozenPlanningPaths?.has(planningPath)) {
       throw new Error(
         `GrafastInternalError<93c64f55-4f3f-442f-a17b-391e28bd3629>: Already processed planning path ${planningPath}`,
       );
@@ -1620,12 +1620,12 @@ export class OperationPlan {
 
       // Update the step references (and freeze the paths)
       for (const [planningPath, batch] of todo) {
-        if (this.frozenPlanningPaths.has(planningPath)) {
+        if (this.frozenPlanningPaths?.has(planningPath)) {
           throw new Error(
             `GrafastInternalError<dd30288e-9375-4025-91a6-66b64e74cf74>: planning path already processed - ${planningPath}`,
           );
         }
-        this.frozenPlanningPaths.add(planningPath);
+        this.frozenPlanningPaths?.add(planningPath);
         for (const entry of batch) {
           let step = entry[1].parentStep;
           const actualStep = this.stepTracker.getStepById(step.id);
