@@ -1869,6 +1869,11 @@ export class OperationPlan {
           type: "polymorphic",
           parentLayerPlan: commonLayerPlan,
           polymorphicPaths: new Set(
+            // BUG: this isn't 100% correct, it's possible that this layer
+            // plan might not be used in some of these polymorphic paths (e.g.
+            // if fragment types caused certain fields to not be selected in
+            // certain scenarios). We should instead figure out the concrete
+            // list of polymorphic paths actually seen during planning.
             allTypeNames.flatMap((t) => basePaths.map((p) => `${p}>${t}`)),
           ),
           typeNames: allTypeNames,
@@ -1876,7 +1881,7 @@ export class OperationPlan {
         });
         for (const type of allPossibleObjectTypes) {
           const polymorphicPaths = new Set(
-            basePaths.map((p) => p + `>${type.name}`),
+            basePaths.map((p) => `${p}>${type.name}`),
           );
           const $stepForType = polymorphicTypePlanner.planForType
             ? withGlobalLayerPlan(
@@ -1965,10 +1970,17 @@ export class OperationPlan {
         for (const [_step, entries] of planFieldReturnTypeEntriesByStep) {
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
-          // I'm not sure if we care if the field result type is the same or not. I don't think so?
-          // We want to create a polymorphicPartition layer plan for these, if it makes sense.
-          // It makes sense if there are multiple different groups; which we checked in the `if` above. So, yes.
-          // Check assumption: the different groups should relate to different types.
+
+          // TODO: I'm not sure if we care if the field result type is the
+          // same or not. I don't think so?
+
+          // We want to create a polymorphicPartition layer plan for these, if
+          // it makes sense.
+          // It makes sense if there are multiple different groups; which we
+          // checked in the `if` above. So, yes.
+
+          // TODO: Check assumption: the different groups should relate to
+          // different types.
 
           const parentObjectTypes = new Set(
             entries.map((e) => e.parentObjectType),
