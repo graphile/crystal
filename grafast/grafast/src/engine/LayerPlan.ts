@@ -47,6 +47,7 @@ export interface LayerPlanReasonRoot {
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonNullableField {
   type: "nullableBoundary";
+  parentLayerPlan: LayerPlan;
   /**
    * Can be used such that the same LayerPlan can be used for two selection
    * sets for the same parent plan. In this case an additional output plan
@@ -66,6 +67,7 @@ export interface LayerPlanReasonListItemStream {
 /** Non-branching, non-deferred */
 export interface LayerPlanReasonListItem {
   type: "listItem";
+  parentLayerPlan: LayerPlan;
   /**
    * Can be used such that the same LayerPlan can be used for two lists for
    * the same parent plan. In this case an additional output plan would be
@@ -84,17 +86,20 @@ export interface LayerPlanReasonListItem {
 /** Non-branching, deferred */
 export interface LayerPlanReasonSubscription {
   type: "subscription";
+  parentLayerPlan: LayerPlan;
 }
 
 /** Non-branching, deferred */
 export interface LayerPlanReasonMutationField {
   type: "mutationField";
+  parentLayerPlan: LayerPlan;
   mutationIndex: number;
 }
 
 /** Non-branching, deferred */
 export interface LayerPlanReasonDefer {
   type: "defer";
+  parentLayerPlan: LayerPlan;
   // TODO: change to labelStepId, also add ifStepId. See listItem.stream for
   // examples.
   label?: string;
@@ -115,6 +120,7 @@ export interface LayerPlanReasonDefer {
  */
 export interface LayerPlanReasonPolymorphic {
   type: "polymorphic";
+  parentLayerPlan: LayerPlan;
   typeNames: string[];
   /**
    * Stores the __typename, needed for execution (see `executeBucket`).
@@ -133,6 +139,7 @@ export interface LayerPlanReasonPolymorphic {
  */
 export interface LayerPlanReasonPolymorphicPartition {
   type: "polymorphicPartition";
+  parentLayerPlan: LayerPlan<LayerPlanReasonPolymorphic>;
   typeNames: string[];
   polymorphicPaths: ReadonlySet<string>;
 }
@@ -142,6 +149,7 @@ export interface LayerPlanReasonSubroutine {
   // NOTE: the plan that has a subroutine should call executeBucket from within
   // `execute`.
   type: "subroutine";
+  parentLayerPlan: LayerPlan;
   parentStep: Step;
 }
 
@@ -160,6 +168,15 @@ export interface LayerPlanReasonSubroutine {
 export interface LayerPlanReasonCombined {
   type: "combined";
   parentLayerPlans: ReadonlyArray<LayerPlan>;
+}
+
+export function hasParentLayerPlan(
+  reason: LayerPlanReason,
+): reason is Exclude<
+  LayerPlanReason,
+  LayerPlanReasonRoot | LayerPlanReasonCombined
+> {
+  return reason.type !== "root" && reason.type !== "combined";
 }
 
 export function isDeferredLayerPlan(layerPlan: LayerPlan): boolean {
@@ -312,7 +329,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    *
    * @internal
    */
-  public parentSideEffectStep: Step | null = null;
+  public parentSideEffectStep: Step | null;
 
   /**
    * This tracks the latest seen side effect at the current point in planning
@@ -358,19 +375,61 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   constructor(
     public readonly operationPlan: OperationPlan,
-    public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
     // This layer plan is dependent on the latest side effect. Note that when
     // we set a `rootStep` later, if the root step is dependent on this step
     // (directly or indirectly) we will clear this property.
-    this.parentSideEffectStep = parentLayerPlan?.latestSideEffectStep ?? null;
 
     // There has yet to be any side effects created in this layer.
     this.latestSideEffectStep = null;
 
     this.stepsByConstructor = new Map();
-    if (parentLayerPlan !== null) {
+    if (reason.type === "root") {
+      this.parentSideEffectStep = null;
+      this.depth = 0;
+      this.ancestry = [this];
+      this.deferBoundaryDepth = 0;
+
+      this.id = operationPlan.addLayerPlan(this);
+
+      assert.strictEqual(
+        this.id,
+        0,
+        "Root layer plan must have id=0, there must be only one",
+      );
+    } else if (reason.type === "combined") {
+      this.parentSideEffectStep = null;
+      const firstParentLayerPlan = reason.parentLayerPlans[0];
+      const rootLp = firstParentLayerPlan.ancestry[0];
+      if (rootLp.reason.type !== "root") {
+        throw new Error(
+          "GrafastInternalError<e9290db3-9a1b-45af-a50e-baa9e161d7cc>: expected the 0'th entry in ancestry to be the root layer plan",
+        );
+      }
+      // We don't allow references beyond a combined layer plan (except to the root)
+      this.ancestry = [rootLp, this];
+      this.depth = 1;
+      this.deferBoundaryDepth = 1;
+
+      this.id = operationPlan.addLayerPlan(this);
+
+      // Deliberately shadow!
+      for (const parentLayerPlan of reason.parentLayerPlans) {
+        parentLayerPlan.children.push(this);
+      }
+    } else {
+      const parentLayerPlan = reason.parentLayerPlan;
+
+      if (reason.type === "polymorphicPartition") {
+        if (parentLayerPlan.reason.type !== "polymorphic") {
+          throw new Error(
+            `GrafastInternalError<ef8fcb9a-5252-4593-915c-b3ebe4aa8eff>: a polymorphicPartition may only be a child of a polymorphic layer plan, but ${this} was created under ${parentLayerPlan}`,
+          );
+        }
+      }
+
+      this.parentSideEffectStep = parentLayerPlan.latestSideEffectStep ?? null;
       this.depth = parentLayerPlan.depth + 1;
       this.ancestry = [...parentLayerPlan.ancestry, this];
       if (isDeferredLayerPlan(this)) {
@@ -378,52 +437,29 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       } else {
         this.deferBoundaryDepth = parentLayerPlan.deferBoundaryDepth;
       }
-    } else {
-      this.depth = 0;
-      this.ancestry = [this];
-      this.deferBoundaryDepth = 0;
-    }
-    this.id = operationPlan.addLayerPlan(this);
-    if (!parentLayerPlan) {
-      assert.strictEqual(
-        this.id,
-        0,
-        "All but the first LayerPlan must have a parent",
-      );
-    } else {
-      assert.ok(
-        reason.type != "root",
-        "Non-root LayerPlan must have a parentStep",
-      );
-      if (reason.type === "combined") {
-        assert.ok(
-          reason.parentLayerPlans.includes(parentLayerPlan),
-          "GrafastInternalError<f68525c6-d82d-41ff-9648-8227134690f3>: combined layer plan parent inconsistency",
-        );
 
-        // Deliberately shadow!
-        for (const parentLayerPlan of reason.parentLayerPlans) {
-          parentLayerPlan.children.push(this);
-        }
-      } else {
-        if (reason.type === "polymorphicPartition") {
-          if (parentLayerPlan.reason.type !== "polymorphic") {
-            throw new Error(
-              `GrafastInternalError<ef8fcb9a-5252-4593-915c-b3ebe4aa8eff>: a polymorphicPartition may only be a child of a polymorphic layer plan, but ${this} was created under ${parentLayerPlan}`,
-            );
-          }
-        }
-        parentLayerPlan.children.push(this);
-      }
+      this.id = operationPlan.addLayerPlan(this);
+
+      parentLayerPlan.children.push(this);
     }
   }
 
   toString() {
     let chain = "";
     // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let prev: LayerPlan = this;
     let current: LayerPlan | null = this;
-    while ((current = current.parentLayerPlan)) {
+    while (
+      (current = hasParentLayerPlan(current.reason)
+        ? current.reason.parentLayerPlan
+        : null)
+    ) {
       chain = chain + `∈${current.id}`;
+      prev = current;
+    }
+    if (prev.reason.type === "combined") {
+      chain =
+        chain + `Σ${prev.reason.parentLayerPlans.map((p) => p.id).join("|")}`;
     }
     const reasonExtra =
       this.reason.type === "polymorphicPartition"
@@ -1121,8 +1157,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     if (existing) {
       return existing;
     }
-    return new LayerPlan(this.operationPlan, this, {
+    return new LayerPlan(this.operationPlan, {
       type: "polymorphicPartition",
+      parentLayerPlan: this as LayerPlan<LayerPlanReasonPolymorphic>,
       typeNames,
       polymorphicPaths,
     });

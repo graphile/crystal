@@ -27,6 +27,7 @@ import { expressionSymbol } from "../steps/access.js";
 import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
+import { hasParentLayerPlan } from "./LayerPlan.js";
 
 const debug = debugFactory("grafast:OutputPlan");
 const debugVerbose = debug.extend("verbose");
@@ -573,25 +574,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         const childIsNonNull = this.childIsNonNull;
-        const getDirectLayerPlanChild = (lp: LayerPlan): LayerPlan | null => {
-          let directLayerPlanChild = lp;
-          while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
-            if (directLayerPlanChild.reason.type === "combined") {
-              for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
-                const dlpc = getDirectLayerPlanChild(plp);
-                if (dlpc) return dlpc;
-              }
-              return null;
-            }
-            const parent = directLayerPlanChild.parentLayerPlan;
-            if (!parent) {
-              return null;
-            }
-            directLayerPlanChild = parent;
-          }
-          return directLayerPlanChild;
-        };
         const directLayerPlanChild = getDirectLayerPlanChild(
+          this.layerPlan,
           this.child.layerPlan,
         );
         if (directLayerPlanChild == null) {
@@ -1797,4 +1781,33 @@ function withFastExpression(
       }
     },
   );
+}
+
+/**
+ * Finds the child of `targetParent` that has a path towards `descendent` (by
+ * walking backwards from descendent to targetParent).
+ */
+export function getDirectLayerPlanChild(
+  targetParent: LayerPlan,
+  descendent: LayerPlan,
+): LayerPlan | null {
+  let directLayerPlanChild = descendent;
+  let parent: LayerPlan;
+  while (
+    hasParentLayerPlan(directLayerPlanChild.reason) &&
+    (parent = directLayerPlanChild.reason.parentLayerPlan) !== targetParent
+  ) {
+    directLayerPlanChild = parent;
+  }
+  if (directLayerPlanChild.reason.type === "combined") {
+    for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
+      const dlpc = getDirectLayerPlanChild(targetParent, plp);
+      if (dlpc) return dlpc;
+    }
+    return null;
+  } else if (directLayerPlanChild.reason.type === "root") {
+    return null;
+  } else {
+    return directLayerPlanChild;
+  }
 }

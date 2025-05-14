@@ -238,13 +238,25 @@ export class StepTracker {
       });
     }
     this.layerPlans[layerPlan.id] = null;
+
     // Remove layerPlan from its parent
-    if (layerPlan.parentLayerPlan !== null) {
-      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
+    if (layerPlan.reason.type === "root") {
+      // no action
+    } else if (layerPlan.reason.type === "combined") {
+      for (const parentLayerPlan of layerPlan.reason.parentLayerPlans) {
+        const idx = parentLayerPlan.children.indexOf(layerPlan);
+        if (idx >= 0) {
+          parentLayerPlan.children.splice(idx, 1);
+        }
+      }
+    } else {
+      const parentLayerPlan = layerPlan.reason.parentLayerPlan;
+      const idx = parentLayerPlan.children.indexOf(layerPlan);
       if (idx >= 0) {
-        layerPlan.parentLayerPlan.children.splice(idx, 1);
+        parentLayerPlan.children.splice(idx, 1);
       }
     }
+
     // Remove references
     const $root = layerPlan.rootStep;
     if ($root) {

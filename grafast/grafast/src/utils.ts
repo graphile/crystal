@@ -1094,7 +1094,10 @@ export function pathsFromAncestorToTargetLayerPlan(
     return [[]];
   }
 
-  if (lp.reason.type === "combined") {
+  if (lp.reason.type === "root") {
+    // No paths found - lp doesn't inherit from ancestor.
+    return [];
+  } else if (lp.reason.type === "combined") {
     const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
       pathsFromAncestorToTargetLayerPlan(ancestor, plp),
     );
@@ -1102,18 +1105,15 @@ export function pathsFromAncestorToTargetLayerPlan(
       path.push(lp);
     }
     return childPaths;
-  } else if (lp.parentLayerPlan) {
+  } else {
     const childPaths = pathsFromAncestorToTargetLayerPlan(
       ancestor,
-      lp.parentLayerPlan,
+      lp.reason.parentLayerPlan,
     );
     for (const path of childPaths) {
       path.push(lp);
     }
     return childPaths;
-  } else {
-    // No paths found - lp doesn't inherit from ancestor.
-    return [];
   }
 }
 
@@ -1122,15 +1122,15 @@ export function layerPlanHeirarchyContains(
   targetLp: LayerPlan,
 ): boolean {
   if (lp === targetLp) return true;
-  if (lp.reason.type === "combined") {
+  if (lp.reason.type === "root") {
+    return false;
+  } else if (lp.reason.type === "combined") {
     return lp.reason.parentLayerPlans.some((plp) =>
       layerPlanHeirarchyContains(plp, targetLp),
     );
-  } else if (lp.parentLayerPlan) {
-    // PERF: loop would be faster than recursion
-    return layerPlanHeirarchyContains(lp.parentLayerPlan, targetLp);
   } else {
-    return false;
+    // PERF: loop would be faster than recursion
+    return layerPlanHeirarchyContains(lp.reason.parentLayerPlan, targetLp);
   }
 }
 
@@ -1162,8 +1162,8 @@ export function layerPlanHeirarchyContains(
  * need it.
  */
 export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
-  let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
-  do {
+  for (let i = descendent.layerPlan.depth; i >= 0; i--) {
+    const currentLayerPlan = descendent.layerPlan.ancestry[i];
     if (currentLayerPlan === ancestor.layerPlan) {
       return true;
     }
@@ -1204,7 +1204,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
         throw new Error(`Unhandled layer plan type '${never}'`);
       }
     }
-  } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
+  }
   throw new Error(
     `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
   );

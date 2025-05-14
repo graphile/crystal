@@ -180,6 +180,7 @@ const {
  */
 let planningTimeoutWarmupMultiplier = 5;
 const EMPTY_ARRAY = Object.freeze([]);
+const EMPTY_SET: ReadonlySet<never> = new Set();
 
 export const POLYMORPHIC_ROOT_PATH = null;
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> | null = null;
@@ -393,7 +394,7 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
-    this.rootLayerPlan = new LayerPlan(this, null, REASON_ROOT);
+    this.rootLayerPlan = new LayerPlan(this, REASON_ROOT);
 
     // Set up the shared steps for variables, context and rootValue
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
@@ -862,13 +863,10 @@ export class OperationPlan {
       }
       this.rootLayerPlan.setRootStep(subscribeStep);
 
-      const subscriptionEventLayerPlan = new LayerPlan(
-        this,
-        this.rootLayerPlan,
-        {
-          type: "subscription",
-        },
-      );
+      const subscriptionEventLayerPlan = new LayerPlan(this, {
+        type: "subscription",
+        parentLayerPlan: this.rootLayerPlan,
+      });
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
@@ -947,13 +945,10 @@ export class OperationPlan {
 
       this.rootLayerPlan.setRootStep(subscribeStep);
 
-      const subscriptionEventLayerPlan = new LayerPlan(
-        this,
-        this.rootLayerPlan,
-        {
-          type: "subscription",
-        },
-      );
+      const subscriptionEventLayerPlan = new LayerPlan(this, {
+        type: "subscription",
+        parentLayerPlan: this.rootLayerPlan,
+      });
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
@@ -1013,8 +1008,7 @@ export class OperationPlan {
       }
     }
 
-    const firstLayerPlan = parentLayerPlans[0];
-    return new LayerPlan(this, firstLayerPlan, {
+    return new LayerPlan(this, {
       type: "combined",
       parentLayerPlans,
     });
@@ -1047,8 +1041,9 @@ export class OperationPlan {
       return itemStep;
     }
     // Create a new LayerPlan for this list item
-    const layerPlan = new LayerPlan(this, parentLayerPlan, {
+    const layerPlan = new LayerPlan(this, {
       type: "listItem",
+      parentLayerPlan,
       parentStep: listStep,
       stream,
     });
@@ -1247,8 +1242,9 @@ export class OperationPlan {
         let step: Step;
         let haltTree = false;
         const fieldLayerPlan = isMutation
-          ? new LayerPlan(this, outputPlan.layerPlan, {
+          ? new LayerPlan(this, {
               type: "mutationField",
+              parentLayerPlan: outputPlan.layerPlan,
               mutationIndex: ++mutationIndex,
             })
           : outputPlan.layerPlan;
@@ -1438,8 +1434,9 @@ export class OperationPlan {
     }
     if (groupedFieldSet.deferred !== undefined) {
       for (const deferred of groupedFieldSet.deferred) {
-        const deferredLayerPlan = new LayerPlan(this, outputPlan.layerPlan, {
+        const deferredLayerPlan = new LayerPlan(this, {
           type: "defer",
+          parentLayerPlan: outputPlan.layerPlan,
           label: deferred.label,
         });
         const deferredOutputPlan = new OutputPlan(
@@ -1897,8 +1894,9 @@ export class OperationPlan {
         const stepForType = new Map<GraphQLObjectType, Step>();
         const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
         const basePaths = [...(combinedPolymorphicPaths ?? [""])];
-        const polymorphicLayerPlan = new LayerPlan(this, commonLayerPlan, {
+        const polymorphicLayerPlan = new LayerPlan(this, {
           type: "polymorphic",
+          parentLayerPlan: commonLayerPlan,
           polymorphicPaths: new Set(
             allTypeNames.flatMap((t) => basePaths.map((p) => `${p}>${t}`)),
           ),
@@ -2310,8 +2308,9 @@ export class OperationPlan {
         if (match !== undefined) {
           objectLayerPlan = match;
         } else {
-          objectLayerPlan = new LayerPlan(this, parentLayerPlan, {
+          objectLayerPlan = new LayerPlan(this, {
             type: "nullableBoundary",
+            parentLayerPlan,
             parentStep: $step,
           });
           objectLayerPlan.setRootStep($step);
@@ -3356,15 +3355,20 @@ export class OperationPlan {
     }
     */
 
-    if (step.layerPlan.parentLayerPlan?.reason.type === "mutationField") {
+    if (step.layerPlan.reason.type === "root") {
+      // There is no higher layerPlan
+      return;
+    } else if (step.layerPlan.reason.type === "combined") {
+      // Cannot hoist out of a combination
+      return;
+    } else if (
+      step.layerPlan.reason.parentLayerPlan.reason.type === "mutationField"
+    ) {
       // Never hoist into a mutation layer
       return;
     }
+
     switch (step.layerPlan.reason.type) {
-      case "root": {
-        // There is no higher layerPlan
-        return;
-      }
       case "subscription":
       case "defer": {
         // Should be deferred, don't evaluate early (unless it's cheap to do so)
@@ -3411,10 +3415,6 @@ export class OperationPlan {
           break;
         }
       }
-      case "combined": {
-        // Cannot hoist out of a combination
-        return;
-      }
       case "listItem": {
         // Should be safe to hoist so long as it doesn't depend on the
         // `__ItemStep` itself (which is just a regular dependency, so it'll be
@@ -3459,10 +3459,6 @@ export class OperationPlan {
     }
 
     // All our checks passed, hoist it.
-    assert.ok(
-      step.layerPlan.parentLayerPlan !== null,
-      "GrafastInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
-    );
 
     // 1: adjust polymorphicPaths to fit new layerPlan
     if (step.layerPlan.reason.type === "polymorphic") {
@@ -3491,7 +3487,10 @@ export class OperationPlan {
         : null;
 
     // 2: move it up a layer
-    this.stepTracker.moveStepToLayerPlan(step, step.layerPlan.parentLayerPlan);
+    this.stepTracker.moveStepToLayerPlan(
+      step,
+      step.layerPlan.reason.parentLayerPlan,
+    );
 
     // 3: if it's was in a subroutine, the subroutine parent plan needs to list it as a dependency
     if ($subroutine) {
@@ -3578,10 +3577,10 @@ export class OperationPlan {
       this.stepTracker.layerPlansByParentStep.get(step);
     if (layerPlansByParent !== undefined) {
       for (const layerPlan of layerPlansByParent) {
-        if (layerPlan.parentLayerPlan === step.layerPlan) {
+        if (layerPlan.reason.parentLayerPlan === step.layerPlan) {
           return step;
         } else {
-          dependentLayerPlans.add(layerPlan.parentLayerPlan!);
+          dependentLayerPlans.add(layerPlan.reason.parentLayerPlan);
         }
       }
     }
@@ -4348,6 +4347,11 @@ export class OperationPlan {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
+        if (currentLayerPlan.reason.type === "root") {
+          throw new Error(
+            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan}`,
+          );
+        }
         if (currentLayerPlan.copyStepIds.includes(dep.id)) {
           break;
         }
@@ -4381,7 +4385,7 @@ export class OperationPlan {
             return;
           }
         } else {
-          currentLayerPlan = currentLayerPlan.parentLayerPlan;
+          currentLayerPlan = currentLayerPlan.reason.parentLayerPlan;
         }
         if (!currentLayerPlan) {
           throw new Error(
@@ -4414,9 +4418,18 @@ export class OperationPlan {
         return existing;
       }
 
-      const parentPolyPaths = layerPlan.parentLayerPlan
-        ? processPolymorphicPathsInLayerPlan(layerPlan.parentLayerPlan)
-        : new Set<string>();
+      const parentPolyPaths: ReadonlySet<string> =
+        layerPlan.reason.type === "root"
+          ? EMPTY_SET
+          : layerPlan.reason.type === "combined"
+            ? new Set(
+                layerPlan.reason.parentLayerPlans.flatMap((p) => [
+                  ...processPolymorphicPathsInLayerPlan(p),
+                ]),
+              )
+            : processPolymorphicPathsInLayerPlan(
+                layerPlan.reason.parentLayerPlan,
+              );
       let polyPaths: ReadonlySet<string>;
       const reason = layerPlan.reason;
       switch (reason.type) {
@@ -4727,7 +4740,18 @@ export class OperationPlan {
         // don't need to actually scale it up/down.
         //
         // If parentSideEffectStep exists then parentLayerPlan must exist.
-        ensurePlanAvailableInLayer($sideEffect, layerPlan.parentLayerPlan!);
+        if (layerPlan.reason.type === "root") {
+          // No action
+        } else if (layerPlan.reason.type === "combined") {
+          throw new Error(
+            `GrafastInternalError<26f6b639-637b-4db5-980b-294697317e35>: combined layer plan ${layerPlan} is not permitted to reference side effects`,
+          );
+        } else {
+          ensurePlanAvailableInLayer(
+            $sideEffect,
+            layerPlan.reason.parentLayerPlan,
+          );
+        }
       }
 
       // Copy polymorphic parentStepId
@@ -4739,25 +4763,28 @@ export class OperationPlan {
       // Ensure list is accessible in parent layerPlan
       if (layerPlan.reason.type === "listItem") {
         const parentStep = layerPlan.reason.parentStep;
-        ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+        ensurePlanAvailableInLayer(
+          parentStep,
+          layerPlan.reason.parentLayerPlan,
+        );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
           if (stream.initialCountStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),
-              layerPlan.parentLayerPlan!,
+              layerPlan.reason.parentLayerPlan,
             );
           }
           if (stream.ifStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.ifStepId),
-              layerPlan.parentLayerPlan!,
+              layerPlan.reason.parentLayerPlan,
             );
           }
           if (stream.labelStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.labelStepId),
-              layerPlan.parentLayerPlan!,
+              layerPlan.reason.parentLayerPlan,
             );
           }
         }
@@ -5326,7 +5353,7 @@ function polymorphicPathsForLayer(
       return null;
     }
     default: {
-      return polymorphicPathsForLayer(layer.parentLayerPlan!);
+      return polymorphicPathsForLayer(layer.reason.parentLayerPlan);
     }
   }
 }

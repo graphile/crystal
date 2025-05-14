@@ -50,8 +50,9 @@ export class ApplyTransformsStep extends Step {
     this.addDataDependency(listPlan);
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+    this.subroutineLayer = new LayerPlan(this.operationPlan, {
       type: "subroutine",
+      parentLayerPlan: this.layerPlan,
       parentStep: this,
     });
     const itemPlan = withGlobalLayerPlan(

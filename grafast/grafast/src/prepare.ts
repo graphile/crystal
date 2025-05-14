@@ -26,7 +26,11 @@ import type {
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
-import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
+import {
+  coerceError,
+  getChildBucketAndIndex,
+  getDirectLayerPlanChild,
+} from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type {
   GrafastExecutionArgs,
@@ -794,15 +798,14 @@ async function processStream(
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
-    let directLayerPlanChild = spec.outputPlan.layerPlan;
-    while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
-      const parent = directLayerPlanChild.parentLayerPlan;
-      if (!parent) {
-        throw new Error(
-          `GrafastInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
-        );
-      }
-      directLayerPlanChild = parent;
+    const directLayerPlanChild = getDirectLayerPlanChild(
+      spec.bucket.layerPlan,
+      spec.outputPlan.layerPlan,
+    );
+    if (directLayerPlanChild === null) {
+      throw new Error(
+        `GrafastInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
+      );
     }
     const { id: listItemStepId, _isUnary: isUnary } =
       directLayerPlanChild.rootStep!;
