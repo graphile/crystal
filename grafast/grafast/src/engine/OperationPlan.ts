@@ -1970,6 +1970,7 @@ export class OperationPlan {
         for (const [_step, entries] of planFieldReturnTypeEntriesByStep) {
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
+          // We know all `entries` come from the same layer plan.
 
           // TODO: I'm not sure if we care if the field result type is the
           // same or not. I don't think so?
