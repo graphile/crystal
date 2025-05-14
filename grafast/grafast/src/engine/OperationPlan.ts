@@ -1982,7 +1982,9 @@ export class OperationPlan {
           // TODO: Check assumption: the different groups should relate to
           // different types.
 
-          const typeNames = entries.map((e) => e.parentObjectType.name);
+          const typeNameSet = new Set<string>();
+          entries.forEach((e) => void typeNameSet.add(e.parentObjectType.name));
+          const typeNames = [...typeNameSet];
 
           // TODO: eliminate this
           const polymorphicPaths = new Set(
