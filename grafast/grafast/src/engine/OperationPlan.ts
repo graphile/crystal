@@ -1584,7 +1584,11 @@ export class OperationPlan {
       list = [];
       this.planningQueueByPlanningPath.set(planningPath, list);
     }
-    const tuple: QueueTuple<TDetails> = [method, details];
+    const tuple: QueueTuple<TDetails> = [
+      method,
+      details,
+      this.loc ? [...this.loc] : null,
+    ];
     this.planningQueue.push(tuple);
     list.push(tuple);
   }
@@ -1637,8 +1641,11 @@ export class OperationPlan {
       this.mutateTodos(todo);
 
       // Finally plan this layer
-      for (const [fn, details] of batch) {
+      for (const [fn, details, loc] of batch) {
+        const prevLoc = this.loc;
+        this.loc = loc;
         fn.call(this, details);
+        this.loc = prevLoc;
       }
     }
 
@@ -5238,7 +5245,11 @@ interface CommonPlanningDetails<
   positionType: TType;
   layerPlan: LayerPlan;
 }
-type QueueTuple<T extends CommonPlanningDetails> = [(details: T) => void, T];
+type QueueTuple<T extends CommonPlanningDetails> = [
+  (details: T) => void,
+  T,
+  string[] | null,
+];
 
 /*
 function setsOverlap(s1: ReadonlySet<string>, s2: ReadonlySet<string>) {
