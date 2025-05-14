@@ -932,12 +932,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         } else if (ev.isBatch) {
           // Create a batch execution value if one doesn't already exist
           if (!newEv) {
-            const values = arrayOfLength(totalSize, null);
-            newEv = batchExecutionValue(values);
             // By default, these values aren't used
-            for (let i = 0; i < totalSize; i++) {
-              newEv._flags[i] = FLAG_NULL & FLAG_STOPPED;
-            }
+            newEv = batchExecutionValue(
+              arrayOfLength(totalSize, null),
+              arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
+            );
           }
           // Populate it with the values we care about
           for (let i = 0, l = parentBucket.size; i < l; i++) {
