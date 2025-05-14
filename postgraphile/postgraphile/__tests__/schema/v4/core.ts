@@ -79,6 +79,7 @@ export const test =
           } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
         schema: {
+          muteWarnings,
           ...graphileBuildOptions,
         },
       };

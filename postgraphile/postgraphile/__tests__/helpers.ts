@@ -363,6 +363,7 @@ export async function runTestQuery(
     schema: {
       pgForbidSetofFunctionsToReturnNull:
         config.setofFunctionsContainNulls === false,
+      muteWarnings,
       ...graphileBuildOptions,
     },
     gather: {

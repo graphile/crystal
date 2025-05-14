@@ -204,6 +204,14 @@ declare global {
       exportSchemaSDLPath?: string;
       exportSchemaIntrospectionResultPath?: string;
       sortExport?: boolean;
+
+      /**
+       * Used in tests to mute expected warnings. Likely to be replaced when
+       * we add a diagnostics system.
+       *
+       * @experimental
+       */
+      muteWarnings?: boolean;
     }
 
     /**

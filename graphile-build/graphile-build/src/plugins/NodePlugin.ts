@@ -156,8 +156,10 @@ export const NodePlugin: GraphileConfig.Plugin = {
                 makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName)),
               [makeDecodeNodeId, nodeIdHandlerByTypeName],
             );
+            const muteWarnings = build.options.muteWarnings ?? false;
+            const displayWarning = isDev && !muteWarnings;
             const findTypeNameMatch = EXPORTABLE(
-              (inspect, isDev, nodeIdHandlerByTypeName) =>
+              (displayWarning, inspect, nodeIdHandlerByTypeName) =>
                 function findTypeNameMatch(
                   specifier: Record<string, any> | null,
                 ) {
@@ -170,8 +172,8 @@ export const NodePlugin: GraphileConfig.Plugin = {
                       return typeName;
                     }
                   }
-                  if (isDev) {
-                    console.error(
+                  if (displayWarning) {
+                    console.warn(
                       `Could not find a type that matched the specifier '${inspect(
                         specifier,
                       )}'`,
@@ -179,7 +181,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   }
                   return null;
                 },
-              [inspect, isDev, nodeIdHandlerByTypeName],
+              [displayWarning, inspect, nodeIdHandlerByTypeName],
             );
             return {
               description: build.wrapDescription(

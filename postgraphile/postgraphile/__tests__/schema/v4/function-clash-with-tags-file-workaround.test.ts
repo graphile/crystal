@@ -41,6 +41,9 @@ test(
       gather: {
         muteWarnings: false,
       },
+      schema: {
+        muteWarnings: false,
+      },
       plugins: [
         makePgSmartTagsPlugin({
           kind: "class",

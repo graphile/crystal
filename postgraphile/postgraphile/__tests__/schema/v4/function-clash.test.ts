@@ -49,6 +49,9 @@ test(
       gather: {
         muteWarnings: false,
       },
+      schema: {
+        muteWarnings: false,
+      },
     },
   ),
 );
