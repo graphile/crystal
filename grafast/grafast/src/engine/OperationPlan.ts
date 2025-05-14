@@ -1721,7 +1721,8 @@ export class OperationPlan {
         const planningPath = firstArgsTuple.planningPath;
         const allPossibleObjectTypes = firstArgsTuple.allPossibleObjectTypes;
 
-        // The existence of this is common
+        // The existence of this is common (i.e. either all have it set, or all
+        // have it null, but the actual contents may differ)
         const polymorphicPaths = firstArgsTuple.polymorphicPaths;
 
         const combinedPolymorphicPaths = polymorphicPaths
