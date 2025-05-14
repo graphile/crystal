@@ -264,6 +264,7 @@ export async function runTestQuery(
     pgIdentifiers?: "qualified" | "unqualified";
     search_path?: string;
     muteWarnings?: boolean;
+    dontLogErrors?: boolean;
   },
   options: {
     callback?: (
@@ -292,6 +293,7 @@ export async function runTestQuery(
     pgIdentifiers,
     search_path,
     muteWarnings = true,
+    dontLogErrors = false,
   } = config;
   const { path } = options;
 
@@ -579,7 +581,7 @@ export async function runTestQuery(
             const { data, errors, extensions } = JSON.parse(
               JSON.stringify(result),
             );
-            if (errors) {
+            if (errors && !dontLogErrors) {
               console.error(result.errors?.[0].originalError || errors[0]);
             }
             if (options.callback) {

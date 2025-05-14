@@ -1,4 +1,5 @@
 ## expect(errors).toHaveLength(1);
+#> dontLogErrors: true
 #> schema: ["a", "b", "c"]
 mutation {
   jsonIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }

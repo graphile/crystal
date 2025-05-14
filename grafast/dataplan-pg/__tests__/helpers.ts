@@ -151,6 +151,7 @@ export async function runTestQuery(
      * to ensure the plan reuse doesn't break the query.
      */
     runTimes?: number;
+    dontLogErrors?: boolean;
   },
   options: {
     callback?: (
