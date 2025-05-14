@@ -33,6 +33,7 @@ import type { Constraint } from "./constraints.js";
 import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
+import type { GrafastOperationOptions } from "./prepare.js";
 import type { ListCapableStep, Step } from "./step.js";
 import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -904,8 +905,8 @@ export interface EstablishOperationPlanEvent {
   variableValues: Record<string, any>;
   context: any;
   rootValue: any;
-  planningTimeout: number | undefined;
   args: GrafastExecutionArgs;
+  options: GrafastOperationOptions;
 }
 export interface ExecuteStepEvent {
   args: GrafastExecutionArgs;

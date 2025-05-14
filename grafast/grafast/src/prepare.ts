@@ -56,7 +56,7 @@ const { GraphQLError } = graphql;
 const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 
-export interface GrafastPrepareOptions {
+export interface GrafastOperationOptions {
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
    *
@@ -75,6 +75,22 @@ export interface GrafastPrepareOptions {
   outputDataAsString?: boolean;
 
   timeouts?: GrafastTimeouts;
+
+  /**
+   * How many planning layers deep do we allow? Should be handled by validation.
+   *
+   * A planning layer can happen due to:
+   *
+   * - A nested selection set
+   * - Planning a field return type
+   * - A list position
+   * - A polymorphic type
+   * - A deferred/streamed response
+   *
+   * These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+   * limit should be set quite high - e.g. 6x the selection set depth.
+   */
+  maxPlanningDepth?: number;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -548,7 +564,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
     event.variableValues,
     event.context as any,
     event.rootValue,
-    event.planningTimeout,
+    event.options,
   );
 }
 
@@ -557,7 +573,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
  */
 export function grafastPrepare(
   args: GrafastExecutionArgs,
-  options: GrafastPrepareOptions = {},
+  options: GrafastOperationOptions,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -580,7 +596,6 @@ export function grafastPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
     if (middleware != null) {
@@ -593,8 +608,8 @@ export function grafastPrepare(
           variableValues,
           context: context as any,
           rootValue,
-          planningTimeout,
           args,
+          options,
         },
         establishOperationPlanFromEvent,
       );
@@ -606,7 +621,7 @@ export function grafastPrepare(
         variableValues,
         context as any,
         rootValue,
-        planningTimeout,
+        options,
       );
     }
   } catch (error) {

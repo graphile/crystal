@@ -855,6 +855,22 @@ declare global {
       explain?: boolean | string[];
 
       timeouts?: GrafastTimeouts;
+
+      /**
+       * How many planning layers deep do we allow? Should be handled by validation.
+       *
+       * A planning layer can happen due to:
+       *
+       * - A nested selection set
+       * - Planning a field return type
+       * - A list position
+       * - A polymorphic type
+       * - A deferred/streamed response
+       *
+       * These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+       * limit should be set quite high - e.g. 6x the selection set depth.
+       */
+      maxPlanningDepth?: number;
     }
     interface Preset {
       /**
