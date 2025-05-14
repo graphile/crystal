@@ -1843,6 +1843,7 @@ export class OperationPlan {
         // Call planTypes and plan each of the types?
         const planType =
           graphqlType.extensions?.grafast?.planType ?? defaultPlanType;
+        // TODO: revisit this. If planType exists then no need? If resolver emulation then always?
         const resolverEmulation =
           // argsTupleList.some((a) => a.resolverEmulation) && (
           graphqlType.resolveType != null ||
