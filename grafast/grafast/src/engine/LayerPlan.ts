@@ -410,7 +410,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       // We don't allow references beyond a combined layer plan (except to the root)
       this.ancestry = [rootLp, this];
       this.depth = 1;
-      this.deferBoundaryDepth = 1;
+      // TODO: is this correct?
+      this.deferBoundaryDepth = 0;
 
       this.id = operationPlan.addLayerPlan(this);
 
