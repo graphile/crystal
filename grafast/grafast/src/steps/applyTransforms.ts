@@ -175,6 +175,7 @@ export class ApplyTransformsStep extends Step {
         store,
         flagUnion: bucket.flagUnion,
         polymorphicPathList,
+        polymorphicType: null,
         iterators,
       });
       await executeBucket(childBucket, extra._requestContext);

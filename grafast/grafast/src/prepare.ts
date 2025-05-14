@@ -328,6 +328,7 @@ function executePreemptive(
     store,
     flagUnion: 0,
     polymorphicPathList,
+    polymorphicType: null,
     iterators,
   });
   const startTime = timeSource.now();
@@ -374,6 +375,7 @@ function executePreemptive(
       store,
       flagUnion: rootBucket.flagUnion,
       polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
+      polymorphicType: null,
       iterators: [new Set()],
       size: 1, //store.size
     });
@@ -830,6 +832,7 @@ async function processStream(
       store,
       flagUnion: 0,
       polymorphicPathList,
+      polymorphicType: null,
       iterators,
     });
 
@@ -997,6 +1000,7 @@ function processSingleDeferred(
     store,
     flagUnion: 0,
     polymorphicPathList,
+    polymorphicType: null,
     iterators,
   });
 

@@ -318,6 +318,7 @@ export class __ListTransformStep<
         store,
         flagUnion: bucket.flagUnion,
         polymorphicPathList,
+        polymorphicType: null,
         iterators,
       });
       await executeBucket(childBucket, extra._requestContext);
